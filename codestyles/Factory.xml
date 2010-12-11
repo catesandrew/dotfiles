@@ -13,8 +13,8 @@
       <option name="USE_RELATIVE_INDENTS" value="false" />
     </value>
   </option>
-  <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
   <option name="RIGHT_MARGIN" value="80" />
+  <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
   <JSCodeStyleSettings>
     <option name="INDENT_PACKAGE_CHILDREN" value="1" />
   </JSCodeStyleSettings>

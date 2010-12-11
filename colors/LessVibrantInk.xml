@@ -691,16 +691,6 @@
         <option name="ERROR_STRIPE_COLOR" />
       </value>
     </option>
-    <option name="JS.DOC_COMMENT">
-      <value>
-        <option name="FOREGROUND" value="808080" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="2" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
     <option name="JS.DOC_TAG">
       <value>
         <option name="FOREGROUND" />
@@ -1382,6 +1372,16 @@
       </value>
     </option>
     <option name="SCOPE_KEY_All">
+      <value>
+        <option name="FOREGROUND" />
+        <option name="BACKGROUND" />
+        <option name="FONT_TYPE" value="0" />
+        <option name="EFFECT_COLOR" />
+        <option name="EFFECT_TYPE" value="0" />
+        <option name="ERROR_STRIPE_COLOR" />
+      </value>
+    </option>
+    <option name="SCOPE_KEY_Non-Project Files">
       <value>
         <option name="FOREGROUND" />
         <option name="BACKGROUND" />
