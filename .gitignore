@@ -15,3 +15,4 @@ settings.jar
 templates/rails.xml
 templates/ruby rspec.xml
 templates/ruby.xml
+tasks/
