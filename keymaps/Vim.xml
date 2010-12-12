@@ -93,6 +93,9 @@
   <action id="Subversion.CommitProject" />
   <action id="ToggleBookmark2" />
   <action id="ToggleBookmark6" />
+  <action id="Tool_JSLint">
+    <keyboard-shortcut first-keystroke="shift meta J" />
+  </action>
   <action id="TypeHierarchy">
     <keyboard-shortcut first-keystroke="shift control alt H" />
   </action>

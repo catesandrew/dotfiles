@@ -31,5 +31,8 @@
   <action id="SwitchUp">
     <keyboard-shortcut first-keystroke="control alt UP" />
   </action>
+  <action id="Tool_JSLint">
+    <keyboard-shortcut first-keystroke="shift meta J" />
+  </action>
 </keymap>
 

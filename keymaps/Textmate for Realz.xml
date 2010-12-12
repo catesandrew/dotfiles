@@ -55,6 +55,9 @@
   <action id="SwitchUp">
     <keyboard-shortcut first-keystroke="control alt UP" />
   </action>
+  <action id="Tool_JSLint">
+    <keyboard-shortcut first-keystroke="shift meta J" />
+  </action>
   <action id="Unsplit">
     <keyboard-shortcut first-keystroke="control X" second-keystroke="0" />
   </action>

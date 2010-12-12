@@ -306,6 +306,9 @@
     <keyboard-shortcut first-keystroke="F8" />
   </action>
   <action id="ToggleBookmark" />
+  <action id="Tool_JSLint">
+    <keyboard-shortcut first-keystroke="shift meta J" />
+  </action>
   <action id="UsageView.ShowRecentFindUsages" />
   <action id="Vcs.QuickListPopupAction" />
   <action id="Vcs.ShowTabbedFileHistory">
