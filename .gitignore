@@ -10,7 +10,8 @@ disabled_plugins.txt
 disabled_update.txt
 inspection/
 options/
-rubymine10.key
+rubymine30.key
+*.key
 settings.jar
 templates/rails.xml
 templates/ruby rspec.xml
