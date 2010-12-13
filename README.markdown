@@ -31,6 +31,8 @@ Colors
   **snowblind** - think rainbows and unicorns with a warm fuzzy, only in white  
   **bloodshot** - muted version of colorblind  
   **cataracts** - pastel on grey
+
+**Most themes use the custom [MesloGM font](https://github.com/andreberg/Meslo-Font) which needs to be installed.**
   
 Keymaps
 -------
