@@ -20,10 +20,9 @@ Installation
 
 Then relaunch RubyMine. Open the `Preferences` panel and select `External Tools`. Click on `JSLint` and within the `Edit Tool` dialog box, switch the path on the `Working directory` input field to your `HOME` path for your machine.
 
-Every now and then it will be necessary to update some of the submodules. To do this, run the following:
+Every now and then it will be necessary to update some of the submodules. To do this, run the following from the command line:
 
-    git submodule foreach git checkout master
-    git submodule foreach git pull --rebase
+    bash update
 
 Colors
 ------
