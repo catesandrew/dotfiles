@@ -24,5 +24,17 @@
       <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
     </filter>
   </tool>
+  <tool name="JSHint Linter" description="Run JSHint on the current file" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="true" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="jshint" />
+      <option name="PARAMETERS" value="$FilePath$" />
+      <option name="WORKING_DIRECTORY" />
+    </exec>
+    <filter>
+      <option name="NAME" value="nodelint" />
+      <option name="DESCRIPTION" value="Parse the output from nodelint" />
+      <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
+    </filter>
+  </tool>
 </toolSet>
 
