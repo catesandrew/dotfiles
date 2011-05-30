@@ -4,7 +4,7 @@
     <exec>
       <option name="COMMAND" value="gjslint" />
       <option name="PARAMETERS" value="--unix_mode --strict --nojsdoc --nosummary $FilePath$" />
-      <option name="WORKING_DIRECTORY" value="/Users/catesandrew/Library/Preferences/IntelliJIdea10/tools/" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Library/Preferences/IntelliJIdea10/tools/" />
     </exec>
     <filter>
       <option name="NAME" value="nodelint" />
@@ -16,7 +16,7 @@
     <exec>
       <option name="COMMAND" value="fixjsstyle" />
       <option name="PARAMETERS" value="--strict --nojsdoc $FilePath$" />
-      <option name="WORKING_DIRECTORY" value="/Users/catesandrew/Library/Preferences/IntelliJIdea10/tools/" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Library/Preferences/IntelliJIdea10/tools/" />
     </exec>
     <filter>
       <option name="NAME" value="nodelint" />
@@ -37,3 +37,4 @@
     </filter>
   </tool>
 </toolSet>
+
