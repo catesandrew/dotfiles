@@ -4,7 +4,7 @@
     <exec>
       <option name="COMMAND" value="nodelint/nodelint" />
       <option name="PARAMETERS" value="$FilePath$ --config &quot;nodelint-config/config.js&quot; --reporter &quot;nodelint/examples/idea/reporter.js&quot;" />
-      <option name="WORKING_DIRECTORY" value="/Users/mkitt/Library/Preferences/RubyMine30/tools/" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$" />
     </exec>
     <filter>
       <option name="NAME" value="nodelint" />
