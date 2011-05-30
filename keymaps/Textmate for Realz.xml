@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="Textmate for Realz">
+<keymap version="1" name="Textmate for Realz" parent="TextMate">
   <action id="ChangeSplitOrientation">
     <keyboard-shortcut first-keystroke="shift control meta M" />
   </action>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="MK">
+<keymap version="1" name="MK" parent="Mac OS X 10.5+">
   <action id="CodeCompletion">
     <keyboard-shortcut first-keystroke="control SPACE" />
     <keyboard-shortcut first-keystroke="alt ESCAPE" />
