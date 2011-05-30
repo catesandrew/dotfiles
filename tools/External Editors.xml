@@ -2,7 +2,7 @@
 <toolSet name="External Editors">
   <tool name="Open in Textmate" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="false" synchronizeAfterRun="false">
     <exec>
-      <option name="COMMAND" value="/opt/local/bin/mate" />
+      <option name="COMMAND" value="/usr/local/bin/mate" />
       <option name="PARAMETERS" value="$FilePath$" />
       <option name="WORKING_DIRECTORY" />
     </exec>
