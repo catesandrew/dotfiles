@@ -882,36 +882,6 @@
         <option name="ERROR_STRIPE_COLOR" />
       </value>
     </option>
-    <option name="JS.BRACES">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.BRACKETS">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.COMMA">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
     <option name="JS.DOC_COMMENT">
       <value>
         <option name="FOREGROUND" value="5f5a60" />
@@ -937,26 +907,6 @@
         <option name="FOREGROUND" />
         <option name="BACKGROUND" />
         <option name="FONT_TYPE" value="1" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.DOT">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.GLOBAL_FUNCTION">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="2" />
         <option name="EFFECT_COLOR" />
         <option name="EFFECT_TYPE" value="0" />
         <option name="ERROR_STRIPE_COLOR" />
@@ -1062,41 +1012,11 @@
         <option name="ERROR_STRIPE_COLOR" />
       </value>
     </option>
-    <option name="JS.PARENTHS">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
     <option name="JS.REGEXP">
       <value>
         <option name="FOREGROUND" value="e9c062" />
         <option name="BACKGROUND" />
         <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.SEMICOLON">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="JS.STATIC_MEMBER_FUNCTION">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="2" />
         <option name="EFFECT_COLOR" />
         <option name="EFFECT_TYPE" value="0" />
         <option name="ERROR_STRIPE_COLOR" />
@@ -1352,39 +1272,9 @@
         <option name="ERROR_STRIPE_COLOR" />
       </value>
     </option>
-    <option name="REGEXP.BRACES">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="REGEXP.BRACKETS">
-      <value>
-        <option name="FOREGROUND" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
     <option name="REGEXP.CHAR_CLASS">
       <value>
         <option name="FOREGROUND" value="cf7d34" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="REGEXP.COMMA">
-      <value>
-        <option name="FOREGROUND" />
         <option name="BACKGROUND" />
         <option name="FONT_TYPE" value="0" />
         <option name="EFFECT_COLOR" />
@@ -1425,16 +1315,6 @@
     <option name="REGEXP.META">
       <value>
         <option name="FOREGROUND" value="cda869" />
-        <option name="BACKGROUND" />
-        <option name="FONT_TYPE" value="0" />
-        <option name="EFFECT_COLOR" />
-        <option name="EFFECT_TYPE" value="0" />
-        <option name="ERROR_STRIPE_COLOR" />
-      </value>
-    </option>
-    <option name="REGEXP.PARENTHS">
-      <value>
-        <option name="FOREGROUND" />
         <option name="BACKGROUND" />
         <option name="FONT_TYPE" value="0" />
         <option name="EFFECT_COLOR" />

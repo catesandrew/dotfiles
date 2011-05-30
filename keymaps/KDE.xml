@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="Default for KDE">
+<keymap version="1" name="KDE">
   <action id="ChangeSignature">
     <keyboard-shortcut first-keystroke="control 6" />
   </action>
