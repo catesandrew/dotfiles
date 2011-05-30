@@ -1,46 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap name="TextMate" version="1" disable-mnemonics="false" parent="Mac OS X 10.5+">
-  <action id="Git.Revert" />
-  <action id="tasks.activate" />
-
-  <action id="EditorToggleColumnMode">
-    <keyboard-shortcut first-keystroke="shift meta 8" />
-    <keyboard-shortcut first-keystroke="shift meta MULTIPLY" />
-  </action>
-
-  <action id="Rerun">
-    <keyboard-shortcut first-keystroke="control alt R"/>
-  </action>
-  <action id="Refresh">
-    <keyboard-shortcut first-keystroke="control alt R"/>
-  </action>
-
-  <action id="ChooseDebugConfiguration">
-    <keyboard-shortcut first-keystroke="meta D" />
-  </action>
-  <action id="DebugClass">
-    <keyboard-shortcut first-keystroke="shift meta D" />
-  </action>
-  <action id="Debug" />
-
-  <action id="ChooseRunConfiguration">
-    <keyboard-shortcut first-keystroke="meta R" />
-  </action>
-  <action id="RunClass">
-    <keyboard-shortcut first-keystroke="shift meta R" />
-  </action>
-  <action id="Run">
-    <keyboard-shortcut first-keystroke="control meta R" />
-  </action>
-
+<keymap version="1" name="TextMate" parent="Mac OS X 10.5+">
   <action id="$Delete">
     <keyboard-shortcut first-keystroke="DELETE" />
     <keyboard-shortcut first-keystroke="meta BACK_SPACE" />
   </action>
-
   <action id="AddToFavoritesPopup" />
   <action id="AutoIndentLines">
     <keyboard-shortcut first-keystroke="meta alt OPEN_BRACKET" />
+  </action>
+  <action id="ChooseDebugConfiguration">
+    <keyboard-shortcut first-keystroke="meta D" />
+  </action>
+  <action id="ChooseRunConfiguration">
+    <keyboard-shortcut first-keystroke="meta R" />
   </action>
   <action id="CloseActiveTab">
     <keyboard-shortcut first-keystroke="shift meta W" />
@@ -62,6 +34,10 @@
     <keyboard-shortcut first-keystroke="F1" />
   </action>
   <action id="ContextHelp" />
+  <action id="Debug" />
+  <action id="DebugClass">
+    <keyboard-shortcut first-keystroke="shift meta D" />
+  </action>
   <action id="EditorCodeBlockEnd">
     <keyboard-shortcut first-keystroke="control CLOSE_BRACKET" />
     <keyboard-shortcut first-keystroke="control E" />
@@ -91,10 +67,17 @@
     <keyboard-shortcut first-keystroke="control W" />
     <keyboard-shortcut first-keystroke="shift meta B" />
   </action>
+  <action id="EditorTab">
+    <keyboard-shortcut first-keystroke="TAB" />
+  </action>
   <action id="EditorToggleCase">
     <keyboard-shortcut first-keystroke="control G" />
     <keyboard-shortcut first-keystroke="control U" />
     <keyboard-shortcut first-keystroke="shift control U" />
+  </action>
+  <action id="EditorToggleColumnMode">
+    <keyboard-shortcut first-keystroke="shift meta 8" />
+    <keyboard-shortcut first-keystroke="shift meta MULTIPLY" />
   </action>
   <action id="EditorToggleShowLineNumbers">
     <keyboard-shortcut first-keystroke="meta alt L" />
@@ -116,6 +99,9 @@
   </action>
   <action id="ExportToTextFile" />
   <action id="ExternalJavaDoc" />
+  <action id="ExtractInclude">
+    <keyboard-shortcut first-keystroke="shift control H" />
+  </action>
   <action id="FindInPath">
     <keyboard-shortcut first-keystroke="shift meta F" />
   </action>
@@ -128,6 +114,7 @@
   <action id="FindWordAtCaret">
     <keyboard-shortcut first-keystroke="meta E" />
   </action>
+  <action id="Git.Revert" />
   <action id="GotoClass">
     <keyboard-shortcut first-keystroke="meta N" />
     <keyboard-shortcut first-keystroke="shift alt C" />
@@ -145,13 +132,11 @@
   <action id="GotoNextBookmark">
     <keyboard-shortcut first-keystroke="F2" />
   </action>
-  <action id="GotoNextError">
-  </action>
+  <action id="GotoNextError" />
   <action id="GotoPreviousBookmark">
     <keyboard-shortcut first-keystroke="shift F2" />
   </action>
-  <action id="GotoPreviousError">
-  </action>
+  <action id="GotoPreviousError" />
   <action id="GotoSymbol">
     <keyboard-shortcut first-keystroke="shift meta T" />
     <keyboard-shortcut first-keystroke="shift alt M" />
@@ -184,9 +169,16 @@
   <action id="PreviousOccurence">
     <keyboard-shortcut first-keystroke="shift control UP" />
   </action>
+  <action id="QuickChangeScheme" />
   <action id="QuickJavaDoc">
     <mouse-shortcut keystroke="control button2" />
     <keyboard-shortcut first-keystroke="control H" />
+  </action>
+  <action id="QuickList.Refactor this...">
+    <keyboard-shortcut first-keystroke="control F" />
+  </action>
+  <action id="QuickList.Ruby/Rails">
+    <keyboard-shortcut first-keystroke="control Y" />
   </action>
   <action id="RailsNavigatePopupAction">
     <keyboard-shortcut first-keystroke="meta alt DOWN" />
@@ -201,14 +193,26 @@
   <action id="ReformatCode">
     <keyboard-shortcut first-keystroke="control Q" />
   </action>
+  <action id="Refresh">
+    <keyboard-shortcut first-keystroke="control alt R" />
+  </action>
   <action id="Replace">
     <keyboard-shortcut first-keystroke="meta alt F" />
   </action>
   <action id="ReplaceInPath">
     <keyboard-shortcut first-keystroke="shift meta alt F" />
   </action>
+  <action id="Rerun">
+    <keyboard-shortcut first-keystroke="control alt R" />
+  </action>
   <action id="Resume">
     <keyboard-shortcut first-keystroke="meta F9" />
+  </action>
+  <action id="Run">
+    <keyboard-shortcut first-keystroke="control meta R" />
+  </action>
+  <action id="RunClass">
+    <keyboard-shortcut first-keystroke="shift meta R" />
   </action>
   <action id="SaveAll">
     <keyboard-shortcut first-keystroke="meta S" />
@@ -231,11 +235,11 @@
     <keyboard-shortcut first-keystroke="control B" />
   </action>
   <action id="TypeHierarchy" />
-  <action id="Vcs.UpdateProject">
-    <keyboard-shortcut first-keystroke="control V" />
-  </action>
   <action id="Vcs.QuickListPopupAction">
     <keyboard-shortcut first-keystroke="shift control V" />
+  </action>
+  <action id="Vcs.UpdateProject">
+    <keyboard-shortcut first-keystroke="control V" />
   </action>
   <action id="ViewBreakpoints">
     <keyboard-shortcut first-keystroke="control meta B" />
@@ -244,49 +248,70 @@
     <keyboard-shortcut first-keystroke="alt F2" />
     <keyboard-shortcut first-keystroke="control meta alt P" />
   </action>
-  <action id="org.jetbrains.plugins.ruby.rails.actions.execution.RunRailsScriptAction">
-    <keyboard-shortcut first-keystroke="control R" />
+  <action id="tasks.activate" />
+  <action id="ChangeSplitOrientation">
+    <keyboard-shortcut first-keystroke="shift control meta M" />
   </action>
-  <action id="org.jetbrains.plugins.ruby.rails.actions.generators.ReloadGeneratorsAction">
-    <keyboard-shortcut first-keystroke="shift control alt G" />
+  <action id="EditorDeleteLine">
+    <keyboard-shortcut first-keystroke="shift control K" />
   </action>
-  <action id="org.jetbrains.plugins.ruby.rails.actions.rake.ReloadRakeTasksAction">
-    <keyboard-shortcut first-keystroke="shift control alt R" />
+  <action id="EditorEscape" />
+  <action id="EditorToggleColumnMode">
+    <keyboard-shortcut first-keystroke="shift meta MULTIPLY" />
+    <keyboard-shortcut first-keystroke="control meta C" />
   </action>
-  <action id="rails:generator:controller">
-    <keyboard-shortcut first-keystroke="meta alt G" second-keystroke="C" />
-    <keyboard-shortcut first-keystroke="shift control G" second-keystroke="C" />
+  <action id="GotoFile">
+    <keyboard-shortcut first-keystroke="meta T" />
   </action>
-  <action id="rails:generator:migration">
-    <keyboard-shortcut first-keystroke="meta alt G" second-keystroke="I" />
-    <keyboard-shortcut first-keystroke="shift control M" />
-    <keyboard-shortcut first-keystroke="shift control G" second-keystroke="I" />
+  <action id="HippieCompletion">
+    <keyboard-shortcut first-keystroke="alt SLASH" />
+    <keyboard-shortcut first-keystroke="ESCAPE" />
   </action>
-  <action id="rails:generator:model">
-    <keyboard-shortcut first-keystroke="meta alt G" second-keystroke="M" />
-    <keyboard-shortcut first-keystroke="shift alt G" second-keystroke="M" />
+  <action id="Move" />
+  <action id="MoveEditorToOppositeTabGroup">
+    <keyboard-shortcut first-keystroke="control meta M" />
   </action>
-  <action id="rake:db:migrate">
-    <keyboard-shortcut first-keystroke="control I" />
+  <action id="NewElement">
+    <keyboard-shortcut first-keystroke="shift meta N" />
   </action>
-  <action id="rake:db:schema:dump">
-    <keyboard-shortcut first-keystroke="shift control R" second-keystroke="D" />
+  <action id="NextDiff" />
+  <action id="QuickChangeScheme">
+    <keyboard-shortcut first-keystroke="control BACK_QUOTE" />
   </action>
-  <action id="rake:test">
-    <keyboard-shortcut first-keystroke="shift control R" second-keystroke="T" />
+  <action id="RunClass">
+    <keyboard-shortcut first-keystroke="shift control F10" />
+    <keyboard-shortcut first-keystroke="shift meta R" />
   </action>
-  <action id="ExtractInclude">
-    <keyboard-shortcut first-keystroke="shift control H"/>
+  <action id="SplitHorizontally">
+    <keyboard-shortcut first-keystroke="F6" />
   </action>
-  <action id="QuickChangeScheme" />
-  <action id="EditorTab">
-    <keyboard-shortcut first-keystroke="TAB" />
+  <action id="SplitVertically">
+    <keyboard-shortcut first-keystroke="F7" />
   </action>
-
-  <action id="QuickList.Refactor this...">
-    <keyboard-shortcut first-keystroke="control F" />
+  <action id="StepInto" />
+  <action id="SwitchApply">
+    <keyboard-shortcut first-keystroke="control alt ENTER" />
   </action>
-  <action id="QuickList.Ruby/Rails">
-    <keyboard-shortcut first-keystroke="control Y" />
+  <action id="SwitchDown">
+    <keyboard-shortcut first-keystroke="control alt DOWN" />
   </action>
+  <action id="SwitchLeft">
+    <keyboard-shortcut first-keystroke="control alt LEFT" />
+  </action>
+  <action id="SwitchRight">
+    <keyboard-shortcut first-keystroke="control alt RIGHT" />
+  </action>
+  <action id="SwitchUp">
+    <keyboard-shortcut first-keystroke="control alt UP" />
+  </action>
+  <action id="Tool_JSLint">
+    <keyboard-shortcut first-keystroke="shift meta J" />
+  </action>
+  <action id="Unsplit">
+    <keyboard-shortcut first-keystroke="control X" second-keystroke="0" />
+  </action>
+  <action id="VimPluginToggle">
+    <keyboard-shortcut first-keystroke="control meta V" />
+  </action>  
 </keymap>
+

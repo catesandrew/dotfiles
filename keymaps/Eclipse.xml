@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="Eclipse" disable-mnemonics="false" parent="Mac OS X 10.5+">
-  <action id="FileChooser.TogglePathShowing">
-    <keyboard-shortcut first-keystroke="control P"/>
-  </action>
+<keymap version="1" name="Eclipse" parent="Mac OS X 10.5+">
   <action id="$Redo">
     <keyboard-shortcut first-keystroke="control Y" />
   </action>
@@ -59,13 +56,13 @@
     <keyboard-shortcut first-keystroke="control CLOSE_BRACKET" />
     <keyboard-shortcut first-keystroke="shift control P" />
   </action>
-  <action id="EditorDeleteToLineEnd">
-    <keyboard-shortcut first-keystroke="shift control DELETE" />
-  </action>
   <action id="EditorDeleteLine">
     <keyboard-shortcut first-keystroke="control D" />
   </action>
-  <action id="EditorDuplicate"/>
+  <action id="EditorDeleteToLineEnd">
+    <keyboard-shortcut first-keystroke="shift control DELETE" />
+  </action>
+  <action id="EditorDuplicate" />
   <action id="EditorDuplicateLines">
     <keyboard-shortcut first-keystroke="control alt DOWN" />
   </action>
@@ -107,12 +104,15 @@
   <action id="Faces.Create.Model.Element">
     <keyboard-shortcut first-keystroke="alt INSERT" />
   </action>
+  <action id="FileChooser.TogglePathShowing">
+    <keyboard-shortcut first-keystroke="control P" />
+  </action>
   <action id="FileStructurePopup">
     <keyboard-shortcut first-keystroke="control F3" />
   </action>
   <action id="Find">
     <keyboard-shortcut first-keystroke="control H" />
-    <keyboard-shortcut first-keystroke="control I"/>
+    <keyboard-shortcut first-keystroke="control I" />
   </action>
   <action id="FindInPath">
     <keyboard-shortcut first-keystroke="control alt G" />
@@ -155,7 +155,7 @@
   <action id="GotoPreviousError">
     <keyboard-shortcut first-keystroke="shift F1" />
   </action>
-  <action id="GotoTypeDeclaration"/>
+  <action id="GotoTypeDeclaration" />
   <action id="Graph.Faces.OpenSelectedPages">
     <keyboard-shortcut first-keystroke="F12" />
     <keyboard-shortcut first-keystroke="shift control E" />
@@ -219,13 +219,13 @@
   <action id="NextDiff">
     <keyboard-shortcut first-keystroke="control F7" />
   </action>
+  <action id="NextEditorTab">
+    <keyboard-shortcut first-keystroke="shift control alt LEFT" />
+  </action>
   <action id="NextOccurence" />
   <action id="NextTab">
     <keyboard-shortcut first-keystroke="control F6" />
     <keyboard-shortcut first-keystroke="control alt LEFT" />
-  </action>
-  <action id="NextEditorTab">
-    <keyboard-shortcut first-keystroke="control shift alt LEFT" />
   </action>
   <action id="OptimizeImports">
     <keyboard-shortcut first-keystroke="control alt O" />
@@ -233,13 +233,13 @@
   </action>
   <action id="OverrideMethods" />
   <action id="ParameterInfo" />
+  <action id="PreviousEditorTab">
+    <keyboard-shortcut first-keystroke="shift control alt RIGHT" />
+  </action>
   <action id="PreviousOccurence" />
   <action id="PreviousTab">
     <keyboard-shortcut first-keystroke="shift control F6" />
     <keyboard-shortcut first-keystroke="control alt RIGHT" />
-  </action>
-  <action id="PreviousEditorTab">
-    <keyboard-shortcut first-keystroke="control alt shift RIGHT" />
   </action>
   <action id="Print">
     <keyboard-shortcut first-keystroke="control P" />
@@ -255,9 +255,6 @@
     <keyboard-shortcut first-keystroke="shift control F" />
   </action>
   <action id="Refresh" />
-  <action id="Unwrap">
-    <keyboard-shortcut first-keystroke="alt R" />
-  </action>
   <action id="RenameElement">
     <keyboard-shortcut first-keystroke="shift alt R" />
   </action>
@@ -323,8 +320,12 @@
   <action id="TypeHierarchy">
     <keyboard-shortcut first-keystroke="F4" />
   </action>
+  <action id="Unwrap">
+    <keyboard-shortcut first-keystroke="alt R" />
+  </action>
   <action id="Vcs.UpdateProject" />
   <action id="ViewNavigationBar">
     <keyboard-shortcut first-keystroke="alt HOME" />
   </action>
 </keymap>
+

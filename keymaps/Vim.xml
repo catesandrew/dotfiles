@@ -74,8 +74,12 @@
     <keyboard-shortcut first-keystroke="shift control I" />
   </action>
   <action id="InsertLiveTemplate" />
-  <action id="MethodHierarchy.ImplementMethodAction" />
-  <action id="MethodHierarchy.OverrideMethodAction" />
+  <action id="MethodHierarchy.ImplementMethodAction">
+    <keyboard-shortcut first-keystroke="shift control I" />
+  </action>
+  <action id="MethodHierarchy.OverrideMethodAction">
+    <keyboard-shortcut first-keystroke="shift control O" />
+  </action>
   <action id="OverrideMethods">
     <keyboard-shortcut first-keystroke="shift control O" />
   </action>
@@ -91,6 +95,21 @@
   <action id="SaveAll" />
   <action id="Starteam.CheckinProject" />
   <action id="Subversion.CommitProject" />
+  <action id="SwitchApply">
+    <keyboard-shortcut first-keystroke="control alt ENTER" />
+  </action>
+  <action id="SwitchDown">
+    <keyboard-shortcut first-keystroke="control alt DOWN" />
+  </action>
+  <action id="SwitchLeft">
+    <keyboard-shortcut first-keystroke="control alt LEFT" />
+  </action>
+  <action id="SwitchRight">
+    <keyboard-shortcut first-keystroke="control alt RIGHT" />
+  </action>
+  <action id="SwitchUp">
+    <keyboard-shortcut first-keystroke="control alt UP" />
+  </action>
   <action id="ToggleBookmark2" />
   <action id="ToggleBookmark6" />
   <action id="Tool_JSLint">
