@@ -16,7 +16,7 @@ set nocompatible
 " Basic options --------------------------------------------------------------- {{{
 
 set encoding=utf-8
-set modelines=0
+" set modelines=0
 set scrolloff=3
 set autoindent
 set showmode
@@ -51,9 +51,9 @@ au FocusLost * :wa
 
 " Tabs, spaces, wrapping {{{
 
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 set wrap
 set textwidth=85
