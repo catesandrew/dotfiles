@@ -16,7 +16,7 @@ set nocompatible
 " Basic options --------------------------------------------------------------- {{{
 
 set encoding=utf-8
-" set modelines=0
+set modelines=0
 set scrolloff=3
 set autoindent
 set showmode
@@ -47,7 +47,7 @@ set splitbelow
 set splitright
 
 " Save when losing focus
-au FocusLost * :wa
+" au FocusLost * :wa
 
 " Tabs, spaces, wrapping {{{
 
@@ -76,7 +76,7 @@ set backup                        " enable backups
 " }}}
 " Leader {{{
 
-let mapleader = ","
+" let mapleader = ","
 let maplocalleader = "\\"
 
 " }}}
@@ -92,13 +92,21 @@ colorscheme molokai
 " Useful abbreviations -------------------------------------------------------- {{{
 
 iabbrev ldis ಠ_ಠ
-iabbrev sl/ http://stevelosh.com/
-iabbrev bb/ http://bitbucket.org/
-iabbrev bbs/ http://bitbucket.org/sjl/
-iabbrev sl@ steve@stevelosh.com
+
 
 " }}}
 " Searching and movement ------------------------------------------------------ {{{
+
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>
+nnoremap j gj
+nnoremap k gk
 
 " Use sane regexes.
 nnoremap / /\v
@@ -437,6 +445,9 @@ au Filetype rst nnoremap <buffer> <localleader>4 yypVr`
 
 " Clean whitespace
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+
+" sort css properties
+nnoremap <leader>S ?{<CR>jV/^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
 " Change case
 nnoremap <C-u> gUiw
@@ -825,7 +836,7 @@ endfunction " }}}
 " MacVim ---------------------------------------------------------------------- {{{
 
 if has('gui_running')
-    set guifont=Menlo:h12
+    set guifont=Anonymous\ Pro:h16
 
     " Remove all the UI cruft
     set go-=T
