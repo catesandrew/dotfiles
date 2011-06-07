@@ -1,9 +1,9 @@
-/*********************/
-/* buffer.h          */
-/* for Par 1.52      */
-/* Copyright 2001 by */
-/* Adam M. Costello  */
-/*********************/
+/***********************/
+/* buffer.h            */
+/* for Par 1.52-i18n.3 */
+/* Copyright 2001 by   */
+/* Adam M. Costello    */
+/***********************/
 
 /* This is ANSI C code (C89). */
 

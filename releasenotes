@@ -1,12 +1,23 @@
-  *********************
-  * releasenotes      *
-  * for Par 1.52      *
-  * Copyright 2001 by *
-  * Adam M. Costello  *
-  *********************
+  ***********************
+  * releasenotes        *
+  * for Par 1.52-i18n.3 *
+  * Copyright 2001 by   *
+  * Adam M. Costello    *
+  * Modified by         *
+  * Jérôme Pouiller     *
+  ***********************
 
 
 Each entry below describes changes since the previous version.
+Par 1.52-i18n.3 released 2006-Oct-03
+    Fix bug with option 'g'
+
+Par 1.52-i18n.2 released 2006-Aug-03
+    Fix bug debian #310495.
+
+Par 1.52-i18n.1 released 2006-Jun-22
+    Changed char in wchar_t. Allow support of multibytes characters.
+    Added support for double-width characters.
 
 Par 1.52 released 2001-Apr-29
     Fixed a portability problem regarding unsigned char versus char.

@@ -1,18 +1,20 @@
-/*********************/
-/* reformat.h        */
-/* for Par 1.52      */
-/* Copyright 2001 by */
-/* Adam M. Costello  */
-/*********************/
+/***********************/
+/* reformat.h          */
+/* for Par 1.52-i18n.3 */
+/* Copyright 2001 by   */
+/* Adam M. Costello    */
+/* Modified by         */
+/* Jérôme Pouiller     */
+/***********************/
 
 /* This is ANSI C code (C89). */
 
 
 #include "errmsg.h"
+#include <wchar.h>
 
-
-char **reformat(
-  const char * const *inlines, const char * const *endline, int afp, int fs,
+wchar_t **reformat(
+  const wchar_t * const *inlines, const wchar_t * const *endline, int afp, int fs,
   int hang, int prefix, int suffix, int width, int cap, int fit, int guess,
   int just, int last, int Report, int touch, errmsg_t errmsg
 );

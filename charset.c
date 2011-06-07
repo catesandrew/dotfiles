@@ -1,9 +1,11 @@
-/*********************/
-/* charset.c         */
-/* for Par 1.52      */
-/* Copyright 2001 by */
-/* Adam M. Costello  */
-/*********************/
+/***********************/
+/* charset.c           */
+/* for Par 1.52-i18n.3 */
+/* Copyright 2001 by   */
+/* Adam M. Costello    */
+/* Modified by         */
+/* Jérôme Pouiller     */
+/***********************/
 
 /* This is ANSI C code (C89). */
 
@@ -22,6 +24,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #undef NULL
 #define NULL ((void *) 0)
@@ -39,8 +43,8 @@
 typedef unsigned char csflag_t;
 
 struct charset {
-  char *inlist;    /* Characters in inlist are in the set.                */
-  char *outlist;   /* Characters in outlist are not in the set.           */
+  wchar_t *inlist;    /* Characters in inlist are in the set.                */
+  wchar_t *outlist;   /* Characters in outlist are not in the set.           */
                    /* inlist and outlist must have no common characters.  */
                    /* inlist and outlist may be NULL, which acts like "". */
   csflag_t flags;  /* Characters in neither list are in the set if they   */
@@ -56,25 +60,25 @@ static const csflag_t CS_UCASE = 1,  /* Includes all upper case letters. */
                       CS_NUL   = 8;  /* Includes the NUL character.      */
 
 
-static int appearsin(char c, const char *str)
+static int appearsin(wchar_t c, const wchar_t *str)
 
 /* Returns 0 if c is '\0' or str is NULL or c     */
 /* does not appear in *str.  Otherwise returns 1. */
 {
-  return c && str && strchr(str,c);
+  return c && str && wcschr(str,c);
 }
 
 
-static int hexdigtoint(char c)
+static int hexdigtoint(wchar_t c)
 
 /* Returns the value represented by the hexadecimal */
 /* digit c, or -1 if c is not a hexadecimal digit.  */
 {
-  const char *p, * const hexdigits = "0123456789ABCDEFabcdef";
+  const wchar_t *p, * const hexdigits = L"0123456789ABCDEFabcdef";
   int n;
 
   if (!c) return -1;
-  p = strchr(hexdigits, *(unsigned char *)&c);
+  p = wcschr(hexdigits, c);
   if (!p) return -1;
   n = p - hexdigits;
   if (n >= 16) n -= 6;
@@ -91,35 +95,46 @@ charset *parsecharset(const char *str, errmsg_t errmsg)
 {
   charset *cset = NULL;
   buffer *cbuf = NULL;
-  const char *p, * const singleescapes = "_sbqQx";
+  const wchar_t *p, * const singleescapes = L"_sbqQx";
   int hex1, hex2;
-  char ch;
-
+  wchar_t ch;
+  wchar_t *wstr;
+      
+  wstr = (wchar_t *) malloc((strlen(str) + 1) * sizeof(wchar_t));
+  if (!wstr) {
+    wcscpy(errmsg,outofmem);
+    goto pcserror;
+  }
+  if ((size_t)(-1) == mbstowcs(wstr, str, strlen(str) + 1)) {
+    wcscpy(errmsg,mbserror);
+    goto pcserror;
+  }
   cset = malloc(sizeof (charset));
   if (!cset) {
-    strcpy(errmsg,outofmem);
+    wcscpy(errmsg,outofmem);
     goto pcserror;
   }
   cset->inlist = cset->outlist = NULL;
   cset->flags = 0;
 
-  cbuf = newbuffer(sizeof (char), errmsg);
+  cbuf = newbuffer(sizeof (wchar_t), errmsg);
   if (*errmsg) goto pcserror;
 
-  for (p = str;  *p;  ++p)
-    if (*p == '_') {
+  for (p = wstr;  *p;  ++p)
+    if (*p == L'_') {
       ++p;
       if (appearsin(*p, singleescapes)) {
-        if      (*p == '_') ch = '_' ;
-        else if (*p == 's') ch = ' ' ;
-        else if (*p == 'b') ch = '\\';
-        else if (*p == 'q') ch = '\'';
-        else if (*p == 'Q') ch = '\"';
+        if      (*p == L'_') ch = L'_' ;
+        else if (*p == L's') ch = L' ' ;
+        else if (*p == L'b') ch = L'\\';
+        else if (*p == L'q') ch = L'\'';
+        else if (*p == L'Q') ch = L'\"';
         else /*  *p == 'x'  */ {
+          /* FIXME _x metacharacter should allow wide characters input.*/
           hex1 = hexdigtoint(p[1]);
           hex2 = hexdigtoint(p[2]);
           if (hex1 < 0  ||  hex2 < 0) goto pcsbadstr;
-          *(unsigned char *)&ch = 16 * hex1 + hex2;
+          ch = 16 * hex1 + hex2;
           p += 2;
         }
         if (!ch)
@@ -130,14 +145,14 @@ charset *parsecharset(const char *str, errmsg_t errmsg)
         }
       }
       else {
-        if      (*p == 'A') cset->flags |= CS_UCASE;
-        else if (*p == 'a') cset->flags |= CS_LCASE;
-        else if (*p == '0') cset->flags |= CS_DIGIT;
+        if      (*p == L'A') cset->flags |= CS_UCASE;
+        else if (*p == L'a') cset->flags |= CS_LCASE;
+        else if (*p == L'0') cset->flags |= CS_DIGIT;
         else goto pcsbadstr;
       }
     }
     else {
-      additem(cbuf,p,errmsg);
+      additem(cbuf, p,errmsg);
       if (*errmsg) goto pcserror;
     }
   ch = '\0';
@@ -149,11 +164,12 @@ charset *parsecharset(const char *str, errmsg_t errmsg)
 pcscleanup:
 
   if (cbuf) freebuffer(cbuf);
+  if (wstr) free(wstr);
   return cset;
 
 pcsbadstr:
 
-  sprintf(errmsg, "Bad charset syntax: %.*s\n", errmsg_size - 22, str);
+  swprintf(errmsg, errmsg_size, L"Bad charset syntax: %.*s\n", errmsg_size - 22, str);
 
 pcserror:
 
@@ -171,14 +187,14 @@ void freecharset(charset *cset)
 }
 
 
-int csmember(char c, const charset *cset)
+int csmember(wchar_t c, const charset *cset)
 {
   return
     appearsin(c, cset->inlist) ||
     ( !appearsin(c, cset->outlist) &&
-      ( (cset->flags & CS_LCASE && islower(*(unsigned char *)&c)) ||
-        (cset->flags & CS_UCASE && isupper(*(unsigned char *)&c)) ||
-        (cset->flags & CS_DIGIT && isdigit(*(unsigned char *)&c)) ||
+        ( (cset->flags & CS_LCASE && iswlower(*(wint_t *)&c)) ||
+          (cset->flags & CS_UCASE && iswupper(*(wint_t *)&c)) ||
+          (cset->flags & CS_DIGIT && iswdigit(*(wint_t *)&c)) ||
         (cset->flags & CS_NUL   && !c                           )   ) );
 }
 
@@ -191,16 +207,16 @@ static charset *csud(
 {
   charset *csu;
   buffer *inbuf = NULL, *outbuf = NULL;
-  char *lists[4], **list, *p, nullchar = '\0';
+  wchar_t *lists[4], **list, *p, nullchar = L'\0';
 
   csu = malloc(sizeof (charset));
   if (!csu) {
-    strcpy(errmsg,outofmem);
+    wcscpy(errmsg,outofmem);
     goto csuderror;
   }
-  inbuf = newbuffer(sizeof (char), errmsg);
+  inbuf = newbuffer(sizeof (wchar_t), errmsg);
   if (*errmsg) goto csuderror;
-  outbuf = newbuffer(sizeof (char), errmsg);
+  outbuf = newbuffer(sizeof (wchar_t), errmsg);
   if (*errmsg) goto csuderror;
   csu->inlist = csu->outlist = NULL;
   csu->flags =  u  ?  cset1->flags |  cset2->flags

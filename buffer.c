@@ -1,9 +1,9 @@
-/*********************/
-/* buffer.c          */
-/* for Par 1.52      */
-/* Copyright 2001 by */
-/* Adam M. Costello  */
-/*********************/
+/***********************/
+/* buffer.c            */
+/* for Par 1.52-i18n.3 */
+/* Copyright 2001 by   */
+/* Adam M. Costello    */
+/***********************/
 
 /* This is ANSI C code (C89). */
 
@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #undef NULL
 #define NULL ((void *) 0)
@@ -60,7 +61,7 @@ buffer *newbuffer(size_t itemsize, errmsg_t errmsg)
   blk = malloc(sizeof (block));
   items = malloc(maxhere * itemsize);
   if (!buf || !blk || !items) {
-    strcpy(errmsg,outofmem);
+    wcscpy(errmsg,outofmem);
     goto nberror;
   }
 
@@ -127,7 +128,7 @@ void additem(buffer *buf, const void *item, errmsg_t errmsg)
       new = malloc(sizeof (block));
       items = malloc(maxhere * itemsize);
       if (!new || !items) {
-        strcpy(errmsg,outofmem);
+        wcscpy(errmsg,outofmem);
         goto aierror;
       }
       blk->next = new;
@@ -174,7 +175,7 @@ void *copyitems(buffer *buf, errmsg_t errmsg)
 
   r = malloc(n * itemsize);
   if (!r) {
-    strcpy(errmsg,outofmem);
+    wcscpy(errmsg,outofmem);
     return NULL;
   }
 

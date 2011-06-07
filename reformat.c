@@ -1,9 +1,11 @@
-/*********************/
-/* reformat.c        */
-/* for Par 1.52      */
-/* Copyright 2001 by */
-/* Adam M. Costello  */
-/*********************/
+/***********************/
+/* reformat.c          */
+/* for Par 1.52-i18n.3 */
+/* Copyright 2001 by   */
+/* Adam M. Costello    */
+/* Modified by         */
+/* Jérôme Pouiller     */
+/***********************/
 
 /* This is ANSI C code (C89). */
 
@@ -16,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wctype.h>
 
 #undef NULL
 #define NULL ((void *) 0)
@@ -33,14 +36,15 @@
 typedef unsigned char wflag_t;
 
 typedef struct word {
-  const char *chrs;       /* Pointer to the characters in the word */
+  const wchar_t *chrs;    /* Pointer to the characters in the word */
                           /* (NOT terminated by '\0').             */
   struct word *prev,      /* Pointer to previous word.             */
               *next,      /* Pointer to next word.                 */
                           /* Supposing this word were the first... */
               *nextline;  /*   Pointer to first word in next line. */
   int score,              /*   Value of the objective function.    */
-      length;             /* Length of this word.                  */
+      length,             /* Length (in widechar) of this word.    */
+      width;              /* Visual width of this word.            */
   wflag_t flags;          /* Notable properties of this word.      */
 } word;
 
@@ -57,17 +61,36 @@ static const wflag_t
 #define iscurious(w) (((w)->flags & 2) != 0)
 #define iscapital(w) (((w)->flags & 4) != 0)
 
+static int getWidth(const wchar_t *beg, const wchar_t *end)
+/* Compute (visual) width of a  word. This function is aware */
+/* about double-width characters used in oriental langages.  */
+{
+  int ret, tmp;
+  
+  for (ret = 0; beg != end; beg++) {
+#ifdef NOWIDTH
+    tmp = 1;
+#else
+    tmp = wcwidth(*beg);
+#endif
+    if (tmp < 0)
+      tmp = 0;
+    ret += tmp;
+  }
+  
+  return ret;
+}
 
 static int checkcapital(word *w)
 /* Returns 1 if *w is capitalized according to the definition */
 /* in par.doc (assuming <cap> is 0), or 0 if not.             */
 {
-  const char *p, *end;
+  const wchar_t *p, *end;
 
   for (p = w->chrs, end = p + w->length;
-       p < end && !isalnum(*(unsigned char *)p);
+       p < end && !iswalnum(*p);
        ++p);
-  return p < end && !islower(*(unsigned char *)p);
+  return p < end && !iswlower(*p);
 }
 
 
@@ -75,19 +98,19 @@ static int checkcurious(word *w)
 /* Returns 1 if *w is curious according to */
 /* the definition in par.doc, or 0 if not. */
 {
-  const char *start, *p;
-  char ch;
+  const wchar_t *start, *p;
+  wchar_t ch;
 
   for (start = w->chrs, p = start + w->length;  p > start;  --p) {
     ch = p[-1];
-    if (isalnum(*(unsigned char *)&ch)) return 0;
-    if (ch == '.' || ch == '?' || ch == '!' || ch == ':') break;
+    if (iswalnum(*(wchar_t *)&ch)) return 0;
+    if (ch == L'.' || ch == L'?' || ch == L'!' || ch == L':') break;
   }
 
   if (p <= start + 1) return 0;
 
   --p;
-  do if (isalnum(*(unsigned char *)--p)) return 1;
+  do if (iswalnum(*(wchar_t *)--p)) return 1;
   while (p > start);
 
   return 0;
@@ -95,31 +118,32 @@ static int checkcurious(word *w)
 
 
 static int simplebreaks(word *head, word *tail, int L, int last)
-
-/* Chooses line breaks in a list of words which maximize the length of the   */
-/* shortest line.  L is the maximum line length.  The last line counts as a  */
-/* line only if last is non-zero. _head must point to a dummy word, and tail */
-/* must point to the last word, whose next field must be NULL.  Returns the  */
-/* length of the shortest line on success, -1 if there is a word of length   */
-/* greater than L, or L if there are no lines.                               */
+/* Chooses line  breaks in a  list of words  which maximize */
+/* the length of  the shortest line. L is  the maximum line */
+/* length. The last  line counts as a line only  if last is */
+/* non-zero. _head  must point  to a  dummy word,  and tail */
+/* must point  to the last  word, whose next field  must be */
+/* NULL.  Returns  the  length  of  the  shortest  line  on */
+/* success, -1 if there is a word of length greater than L, */
+/* or L if there are no lines.                              */
 {
   word *w1, *w2;
   int linelen, score;
 
   if (!head->next) return L;
 
-  for (w1 = tail, linelen = w1->length;
+  for (w1 = tail, linelen = w1->width;
        w1 != head && linelen <= L;
-       linelen += isshifted(w1), w1 = w1->prev, linelen += 1 + w1->length) {
+       linelen += isshifted(w1), w1 = w1->prev, linelen += 1 + w1->width) {
     w1->score = last ? linelen : L;
     w1->nextline = NULL;
   }
 
   for ( ;  w1 != head;  w1 = w1->prev) {
     w1->score = -1;
-    for (linelen = w1->length,  w2 = w1->next;
+    for (linelen = w1->width,  w2 = w1->next;
          linelen <= L;
-         linelen += 1 + isshifted(w2) + w2->length,  w2 = w2->next) {
+         linelen += 1 + isshifted(w2) + w2->width,  w2 = w2->next) {
       score = w2->score;
       if (linelen < score) score = linelen;
       if (score >= w1->score) {
@@ -168,7 +192,7 @@ static void normalbreaks(
 
   shortest = simplebreaks(head,tail,target,last);
   if (shortest < 0) {
-    sprintf(errmsg,impossibility,1);
+    swprintf(errmsg,errmsg_size,impossibility,1);
     return;
   }
 
@@ -178,9 +202,9 @@ static void normalbreaks(
   w1 = tail;
   do {
     w1->score = -1;
-    for (linelen = w1->length,  w2 = w1->next;
+    for (linelen = w1->width,  w2 = w1->next;
          linelen <= target;
-         linelen += 1 + isshifted(w2) + w2->length,  w2 = w2->next) {
+         linelen += 1 + isshifted(w2) + w2->width,  w2 = w2->next) {
       extra = target - linelen;
       minlen = shortest;
       if (w2)
@@ -202,7 +226,7 @@ static void normalbreaks(
   } while (w1 != head);
 
   if (head->next->score < 0)
-    sprintf(errmsg,impossibility,2);
+    swprintf(errmsg,errmsg_size,impossibility,2);
 }
 
 
@@ -225,9 +249,9 @@ static void justbreaks(
   w1 = tail;
   do {
     w1->score = L;
-    for (numgaps = 0, extra = L - w1->length, w2 = w1->next;
+    for (numgaps = 0, extra = L - w1->width, w2 = w1->next;
          extra >= 0;
-         ++numgaps, extra -= 1 + isshifted(w2) + w2->length, w2 = w2->next) {
+         ++numgaps, extra -= 1 + isshifted(w2) + w2->width, w2 = w2->next) {
       gap = numgaps ? (extra + numgaps - 1) / numgaps : L;
       if (w2)
         score = w2->score;
@@ -247,7 +271,7 @@ static void justbreaks(
 
   maxgap = head->next->score;
   if (maxgap >= L) {
-    strcpy(errmsg, "Cannot justify.\n");
+    wcscpy(errmsg, L"Cannot justify.\n");
     return;
   }
 
@@ -257,9 +281,9 @@ static void justbreaks(
   w1 = tail;
   do {
     w1->score = -1;
-    for (numgaps = 0, extra = L - w1->length, w2 = w1->next;
+    for (numgaps = 0, extra = L - w1->width, w2 = w1->next;
          extra >= 0;
-         ++numgaps, extra -= 1 + isshifted(w2) + w2->length, w2 = w2->next) {
+         ++numgaps, extra -= 1 + isshifted(w2) + w2->width, w2 = w2->next) {
       gap = numgaps ? (extra + numgaps - 1) / numgaps : L;
       if (w2)
         score = w2->score;
@@ -288,40 +312,39 @@ static void justbreaks(
   } while (w1 != head);
 
   if (head->next->score < 0)
-    sprintf(errmsg,impossibility,3);
+    swprintf(errmsg,errmsg_size,impossibility,3);
 }
 
 
-char **reformat(
-  const char * const *inlines, const char * const *endline, int afp, int fs,
+wchar_t **reformat(
+  const wchar_t * const *inlines, const wchar_t * const *endline, int afp, int fs,
   int hang, int prefix, int suffix, int width, int cap, int fit, int guess,
   int just, int last, int Report, int touch, errmsg_t errmsg
 )
 {
   int numin, affix, L, onfirstword = 1, linelen, numout, numgaps, extra, phase;
-  const char * const *line, **suffixes = NULL, **suf, *end, *p1, *p2;
-  char *q1, *q2, **outlines = NULL;
+  const wchar_t * const *line, **suffixes = NULL, **suf, *end, *p1, *p2;
+  wchar_t *q1, *q2, **outlines = NULL;
   word dummy, *head, *tail, *w1, *w2;
   buffer *pbuf = NULL;
 
 /* Initialization: */
-
   *errmsg = '\0';
   dummy.next = dummy.prev = NULL;
   dummy.flags = 0;
   head = tail = &dummy;
   numin = endline - inlines;
   if (numin <= 0) {
-    sprintf(errmsg,impossibility,4);
+    swprintf(errmsg,errmsg_size,impossibility,4);
     goto rfcleanup;
   }
   numgaps = extra = 0;  /* unnecessary, but quiets compiler warnings */
 
 /* Allocate space for pointers to the suffixes: */
 
-  suffixes = malloc(numin * sizeof (const char *));
+  suffixes = malloc(numin * sizeof (const wchar_t *));
   if (!suffixes) {
-    strcpy(errmsg,outofmem);
+    wcscpy(errmsg,outofmem);
     goto rfcleanup;
   }
 
@@ -334,8 +357,8 @@ char **reformat(
   do {
     for (end = *line;  *end;  ++end);
     if (end - *line < affix) {
-      sprintf(errmsg,
-              "Line %d shorter than <prefix> + <suffix> = %d + %d = %d\n",
+      swprintf(errmsg,errmsg_size,
+              L"Line %d shorter than <prefix> + <suffix> = %d + %d = %d\n",
               line - inlines + 1, prefix, suffix, affix);
       goto rfcleanup;
     }
@@ -343,17 +366,17 @@ char **reformat(
     *suf = end;
     p1 = *line + prefix;
     for (;;) {
-      while (p1 < end && *p1 == ' ') ++p1;
+      while (p1 < end && *p1 == L' ') ++p1;
       if (p1 == end) break;
       p2 = p1;
       if (onfirstword) {
         p1 = *line + prefix;
         onfirstword = 0;
       }
-      while (p2 < end && *p2 != ' ') ++p2;
+      while (p2 < end && *p2 != L' ') ++p2;
       w1 = malloc(sizeof (word));
       if (!w1) {
-        strcpy(errmsg,outofmem);
+        wcscpy(errmsg,outofmem);
         goto rfcleanup;
       }
       w1->next = NULL;
@@ -361,6 +384,7 @@ char **reformat(
       tail = tail->next = w1;
       w1->chrs = p1;
       w1->length = p2 - p1;
+      w1->width = getWidth(p1, p2);
       w1->flags = 0;
       p1 = p2;
     }
@@ -377,6 +401,7 @@ char **reformat(
         if (iscurious(w1)) {
           if (w1->chrs[w1->length] && w1->chrs + w1->length + 1 == w2->chrs) {
             w2->length += w1->length + 1;
+            w2->width += w1->width + 1;
             w2->chrs = w1->chrs;
             w2->prev = w1->prev;
             w2->prev->next = w2;
@@ -397,20 +422,20 @@ char **reformat(
 
   if (Report)
     for (w2 = head->next;  w2;  w2 = w2->next) {
-      if (w2->length > L) {
-        linelen = w2->length;
+      if (w2->width > L) {
+        linelen = w2->width;
         if (linelen > errmsg_size - 17)
           linelen = errmsg_size - 17;
-        sprintf(errmsg, "Word too long: %.*s\n", linelen, w2->chrs);
+        swprintf(errmsg,errmsg_size, L"Word too long: %.*ls\n", linelen, w2->chrs);
         goto rfcleanup;
       }
     }
   else
     for (w2 = head->next;  w2;  w2 = w2->next)
-      while (w2->length > L) {
+      while (w2->width > L) {
         w1 = malloc(sizeof (word));
         if (!w1) {
-          strcpy(errmsg,outofmem);
+          wcscpy(errmsg,outofmem);
           goto rfcleanup;
         }
         w1->next = w2;
@@ -420,7 +445,9 @@ char **reformat(
         w1->chrs = w2->chrs;
         w2->chrs += L;
         w1->length = L;
+        w1->width = getWidth(w1->chrs, w1->chrs + L);
         w2->length -= L;
+        w2->width -= w1->width;
         w1->flags = 0;
         if (iscapital(w2)) {
           w1->flags |= W_CAPITAL;
@@ -444,9 +471,9 @@ char **reformat(
     L = 0;
     w1 = head->next;
     while (w1) {
-      for (linelen = w1->length, w2 = w1->next;
+      for (linelen = w1->width, w2 = w1->next;
            w2 != w1->nextline;
-           linelen += 1 + isshifted(w2) + w2->length, w2 = w2->next);
+           linelen += 1 + isshifted(w2) + w2->width, w2 = w2->next);
       if (linelen > L) L = linelen;
       w1 = w2;
     }
@@ -454,67 +481,67 @@ char **reformat(
 
 /* Construct the lines: */
 
-  pbuf = newbuffer(sizeof (char *), errmsg);
+  pbuf = newbuffer(sizeof (wchar_t *), errmsg);
   if (*errmsg) goto rfcleanup;
 
   numout = 0;
   w1 = head->next;
   while (numout < hang || w1) {
     if (w1)
-      for (w2 = w1->next, numgaps = 0, extra = L - w1->length;
+      for (w2 = w1->next, numgaps = 0, extra = L - w1->width;
            w2 != w1->nextline;
-           ++numgaps, extra -= 1 + isshifted(w2) + w2->length, w2 = w2->next);
+           ++numgaps, extra -= 1 + isshifted(w2) + w2->width, w2 = w2->next);
     linelen = suffix || (just && (w2 || last)) ?
                 L + affix :
                 w1 ? prefix + L - extra : prefix;
-    q1 = malloc((linelen + 1) * sizeof (char));
+    q1 = malloc((linelen + 1) * sizeof (wchar_t));
     if (!q1) {
-      strcpy(errmsg,outofmem);
+      wcscpy(errmsg,outofmem);
       goto rfcleanup;
     }
     additem(pbuf, &q1, errmsg);
     if (*errmsg) goto rfcleanup;
     ++numout;
     q2 = q1 + prefix;
-    if      (numout <= numin) memcpy(q1, inlines[numout - 1], prefix);
-    else if (numin  >  hang ) memcpy(q1, endline[-1],         prefix);
+    if      (numout <= numin) memcpy(q1, inlines[numout - 1], prefix * sizeof(wchar_t));
+    else if (numin  >  hang ) memcpy(q1, endline[-1],         prefix * sizeof(wchar_t));
     else {
       if (afp > prefix) afp = prefix;
-      memcpy(q1, endline[-1], afp);
+      memcpy(q1, endline[-1], afp * sizeof(wchar_t));
       q1 += afp;
-      while (q1 < q2) *q1++ = ' ';
+      while (q1 < q2) *q1++ = L' ';
     }
     q1 = q2;
     if (w1) {
       phase = numgaps / 2;
       for (w2 = w1;  ;  ) {
-        memcpy(q1, w2->chrs, w2->length);
+        memcpy(q1, w2->chrs, w2->length * sizeof(wchar_t));
         q1 += w2->length;
         w2 = w2->next;
         if (w2 == w1->nextline) break;
-        *q1++ = ' ';
+        *q1++ = L' ';
         if (just && (w1->nextline || last)) {
           phase += extra;
           while (phase >= numgaps) {
-            *q1++ = ' ';
+            *q1++ = L' ';
             phase -= numgaps;
           }
         }
-        if (isshifted(w2)) *q1++ = ' ';
+        if (isshifted(w2)) *q1++ = L' ';
       }
     }
     q2 += linelen - affix;
-    while (q1 < q2) *q1++ = ' ';
+    while (q1 < q2) *q1++ = L' ';
     q2 = q1 + suffix;
-    if      (numout <= numin) memcpy(q1, suffixes[numout - 1], suffix);
-    else if (numin  >  hang ) memcpy(q1, suffixes[numin  - 1], suffix);
+    if      (numout <= numin) memcpy(q1, suffixes[numout - 1], suffix * sizeof(wchar_t));
+    else if (numin  >  hang ) memcpy(q1, suffixes[numin  - 1], suffix * sizeof(wchar_t));
     else {
       if (fs > suffix) fs = suffix;
-      memcpy(q1, suffixes[numin - 1], fs);
+      memcpy(q1, suffixes[numin - 1], fs * sizeof(wchar_t));
       q1 += fs;
-      while(q1 < q2) *q1++ = ' ';
+      while(q1 < q2) *q1++ = L' ';
     }
-    *q2 = '\0';
+    *q2 = L'\0';
     if (w1) w1 = w1->nextline;
   }
 
@@ -543,5 +570,6 @@ rfcleanup:
     freebuffer(pbuf);
   }
 
+  
   return outlines;
 }
