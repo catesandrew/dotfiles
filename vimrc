@@ -56,9 +56,9 @@ set shiftwidth=2
 set softtabstop=2
 set expandtab
 set wrap
-set textwidth=85
+set textwidth=120
 set formatoptions=qrn1
-set colorcolumn=+1
+" set colorcolumn=+1
 
 " }}}
 " Status line {{{
@@ -197,7 +197,7 @@ noremap <leader>g <C-w>v
 " }}}
 " Folding --------------------------------------------------------------------- {{{
 
-set foldlevelstart=0
+set foldlevelstart=99
 
 " Space to toggle folds.
 nnoremap <Space> za
