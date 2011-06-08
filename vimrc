@@ -55,7 +55,7 @@ set tabstop=2
 set shiftwidth=2
 set softtabstop=2
 set expandtab
-set wrap
+set nowrap
 set textwidth=120
 set formatoptions=qrn1
 " set colorcolumn=+1
@@ -63,7 +63,41 @@ set formatoptions=qrn1
 " }}}
 " Status line {{{
 
-set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)
+" set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)
+set laststatus=2                                          " statusline setup
+if has('statusline')
+  "set statusline=\ \ \ \ \ line:%l\ column:%c\ \ \ %M%Y%r%=%-14.(%t%)\ %p%%
+  set statusline=   " clear the statusline, allow for rearranging parts
+  set statusline+=%f\                "Path to the file, as typed or relative to current dir
+  set statusline+=%#errormsg#        "change color
+  set statusline+=%{&ff!='unix'?'['.&ff.']':''}   "display a warning if fileformat isnt unix
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=%#errormsg#       "change color
+  set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}   "display a warning if file encoding isnt utf-8
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=\ %y              "filetype
+  set statusline+=%([%R%M]%)        "read-only (RO), modified (+) and unmodifiable (-) flags between braces
+  set statusline+=%{'~'[&pm=='']}   "shows a '~' if in patchmode
+  set statusline+=\ %{fugitive#statusline()}  "show Git info, via fugitive.git
+  "set statusline+=\ (%{synIDattr(synID(line('.'),col('.'),0),'name')}) "DEBUG : display the current syntax item name
+  set statusline+=%#error#          "change color
+  set statusline+=%{&paste?'[paste]':''}    "display a warning if &paste is set
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=%=                "right-align following items
+  set statusline+=#%n               "buffer number
+  set statusline+=\ %l/%L,          "current line number/total number of lines,
+  set statusline+=%c                "Column number
+  set statusline+=%V                " -{Virtual column number} (Not displayed if equal to 'c')
+  set statusline+=\ %p%%            "percentage of lines through the file%
+  set statusline+=\                 "trailing space
+  if has('title')
+    set titlestring=%t%(\ [%R%M]%)
+  endif
+endif
+
+
+
+
 
 " }}}
 " Backups {{{
@@ -173,11 +207,11 @@ nnoremap <m-Up> :cprevious<cr>zvzz
 " Directional Keys {{{
 
 " Why stretch?
-noremap h ;
-noremap j h
-noremap k gj
-noremap l gk
-noremap ; l
+" noremap h ;
+" noremap j h
+" noremap k gj
+" noremap l gk
+" noremap ; l
 
 " Easy buffer navigation
 " Note: For this section to make any sense you need to remap Ctrl-; to Ctrl-g at
@@ -264,7 +298,7 @@ au FileType c setlocal foldmethod=syntax
 " }}}
 " HTML and HTMLDjango {{{
 
-au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+" au BufNewFile,BufRead *.html setlocal filetype=htmldjango
 au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
 " Use <localleader>f to fold the current tag.
@@ -528,6 +562,11 @@ let g:event_handler_attributes_complete = 0
 let g:rdfa_attributes_complete = 0
 let g:microdata_attributes_complete = 0
 let g:atia_attributes_complete = 0
+
+" }}}
+" Show syntax filetypes in menu {{{
+
+let do_syntax_sel_menu = 1|runtime! synmenu.vim|aunmenu &Syntax.&Show\ filetypes\ in\ menu
 
 " }}}
 " Rope {{{
@@ -836,7 +875,7 @@ endfunction " }}}
 " MacVim ---------------------------------------------------------------------- {{{
 
 if has('gui_running')
-    set guifont=Anonymous\ Pro:h16
+    set guifont=Anonymous\ Pro:h14
 
     " Remove all the UI cruft
     set go-=T
