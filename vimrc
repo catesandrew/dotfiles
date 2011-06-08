@@ -17,21 +17,34 @@ set nocompatible
 
 set encoding=utf-8
 set modelines=0
+set scrolljump=5
 set scrolloff=3
 set autoindent
 set showmode
+set foldenable
+
+
+
+if has('cmdline_info')
+		set ruler                  	" show the ruler
+		set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+		set showcmd                	" show partial commands in status line and
+									" selected characters/lines in visual mode
+endif
+
 set showcmd
 set hidden
 set wildmenu
-set wildmode=list:longest
+set wildmode=list:longest,full
+set whichwrap=b,s,h,l,<,>,[,]
 set visualbell
 set cursorline
 set ttyfast
 set ruler
-set backspace=indent,eol,start
+set backspace=indent,eol,start   
+set nu
 set nonumber
 set norelativenumber
-set laststatus=2
 set history=1000
 set undofile
 set undoreload=10000
@@ -63,9 +76,8 @@ set formatoptions=qrn1
 " }}}
 " Status line {{{
 
-" set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)
-set laststatus=2                                          " statusline setup
 if has('statusline')
+  set laststatus=2                                          " statusline setup  
   "set statusline=\ \ \ \ \ line:%l\ column:%c\ \ \ %M%Y%r%=%-14.(%t%)\ %p%%
   set statusline=   " clear the statusline, allow for rearranging parts
   set statusline+=%f\                "Path to the file, as typed or relative to current dir
@@ -110,7 +122,7 @@ set backup                        " enable backups
 " }}}
 " Leader {{{
 
-" let mapleader = ","
+let mapleader = ","
 let maplocalleader = "\\"
 
 " }}}
@@ -119,6 +131,7 @@ let maplocalleader = "\\"
 syntax on
 set background=dark
 colorscheme molokai
+set tabpagemax=15 "only show 15 tabs
 
 " }}}
 
@@ -130,6 +143,13 @@ iabbrev ldis ಠ_ಠ
 
 " }}}
 " Searching and movement ------------------------------------------------------ {{{
+                      
+" Fix home and end keybindings for screen, particularly on mac
+" - for some reason this fixes the arrow keys too. huh.
+" map [F $
+" imap [F $
+" map [H g0
+" imap [H g0
 
 nnoremap <up> <nop>
 nnoremap <down> <nop>
@@ -138,9 +158,48 @@ nnoremap <right> <nop>
 inoremap <up> <nop>
 inoremap <down> <nop>
 inoremap <left> <nop>
-inoremap <right> <nop>
-nnoremap j gj
-nnoremap k gk
+inoremap <right> <nop>                                                  
+
+" Wrapped lines goes down/up to next row, rather than next line in file.
+" nnoremap j gj
+" nnoremap k gk       
+
+" Stupid shift key fixes
+cmap W w 						
+cmap WQ wq
+cmap wQ wq
+cmap Q q
+cmap Tabe tabe
+
+""" Code folding options
+nmap <leader>f0 :set foldlevel=0<CR>
+nmap <leader>f1 :set foldlevel=1<CR>
+nmap <leader>f2 :set foldlevel=2<CR>
+nmap <leader>f3 :set foldlevel=3<CR>
+nmap <leader>f4 :set foldlevel=4<CR>
+nmap <leader>f5 :set foldlevel=5<CR>
+nmap <leader>f6 :set foldlevel=6<CR>
+nmap <leader>f7 :set foldlevel=7<CR>
+nmap <leader>f8 :set foldlevel=8<CR>
+nmap <leader>f9 :set foldlevel=9<CR>
+
+"clearing highlighted search
+nmap <silent> <leader>/ :nohlsearch<CR>     
+
+" Shortcuts
+
+" Change Working Directory to that of the current file
+cmap cwd lcd %:p:h
+cmap cd. lcd %:p:h
+
+" visual shifting (does not exit Visual mode)
+vnoremap < <gv
+vnoremap > >gv
+
+	
+" For when you forget to sudo.. Really Write the file.
+cmap w!! w !sudo tee % >/dev/null
+
 
 " Use sane regexes.
 nnoremap / /\v
@@ -157,35 +216,36 @@ set gdefault
 
 set virtualedit+=block
 
-map <leader><space> :noh<cr>
+" map <leader><space> :noh<cr>
 
 runtime macros/matchit.vim
 map <tab> %
 
+" Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
 nnoremap D d$
 
 " Keep search matches in the middle of the window.
-nnoremap * *zzzv
-nnoremap # #zzzv
-nnoremap n nzzzv
-nnoremap N Nzzzv
+" nnoremap * *zzzv
+" nnoremap # #zzzv
+" nnoremap n nzzzv
+" nnoremap N Nzzzv
 
 " L is easier to type, and I never use the default behavior.
-noremap L $
+" noremap L $
 
 " Heresy
-inoremap <c-a> <esc>I
-inoremap <c-e> <esc>A
+" inoremap <c-a> <esc>I
+" inoremap <c-e> <esc>A
 
 " Open a Quickfix window for the last search
-nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
+" nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Fix linewise visual selection of various text objects
-nnoremap Vit vitVkoj
-nnoremap Vat vatV
-nnoremap Vab vabV
-nnoremap VaB vaBV
+" nnoremap Vit vitVkoj
+" nnoremap Vat vatV
+" nnoremap Vab vabV
+" nnoremap VaB vaBV
 
 " Error navigation {{{
 "
@@ -196,35 +256,31 @@ nnoremap VaB vaBV
 " Previous  |     M-l                M-Up      |
 "            ----------------------------------
 "
-nnoremap ˚ :lnext<cr>zvzz
-nnoremap ¬ :lprevious<cr>zvzz
-inoremap ˚ <esc>:lnext<cr>zvzz
-inoremap ¬ <esc>:lprevious<cr>zvzz
-nnoremap <m-Down> :cnext<cr>zvzz
-nnoremap <m-Up> :cprevious<cr>zvzz
+" nnoremap ˚ :lnext<cr>zvzz
+" nnoremap ¬ :lprevious<cr>zvzz
+" inoremap ˚ <esc>:lnext<cr>zvzz
+" inoremap ¬ <esc>:lprevious<cr>zvzz
+" nnoremap <m-Down> :cnext<cr>zvzz
+" nnoremap <m-Up> :cprevious<cr>zvzz
 " }}}
 
 " Directional Keys {{{
 
-" Why stretch?
-" noremap h ;
-" noremap j h
-" noremap k gj
-" noremap l gk
-" noremap ; l
-
 " Easy buffer navigation
-" Note: For this section to make any sense you need to remap Ctrl-; to Ctrl-g at
-"       the KEYBOARD level.  The reason is that for some reason the OS X doesn't
-"       recognize the Ctrl+; combination as something special, so it just passes it
-"       to Vim as a semicolon.
-"
-"       Yeah, it's dumb.
-noremap <C-j>  <C-w>h
-noremap <C-k>  <C-w>j
-noremap <C-l>  <C-w>k
-noremap <C-g>  <C-w>l
+noremap <C-j>  <C-w>j
+noremap <C-k>  <C-w>k
+noremap <C-l>  <C-w>l
+noremap <C-h>  <C-w>h
 noremap <leader>g <C-w>v
+
+" Easier moving in tabs and windows
+map <C-J> <C-W>j<C-W>_
+map <C-K> <C-W>k<C-W>_
+map <C-L> <C-W>l<C-W>_
+map <C-H> <C-W>h<C-W>_
+map <C-K> <C-W>k<C-W>_
+
+
 
 " }}}
 
@@ -480,9 +536,6 @@ au Filetype rst nnoremap <buffer> <localleader>4 yypVr`
 " Clean whitespace
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 
-" sort css properties
-nnoremap <leader>S ?{<CR>jV/^\s*\}?$<CR>k:sort<CR>:noh<CR>
-
 " Change case
 nnoremap <C-u> gUiw
 inoremap <C-u> <esc>gUiwea
@@ -500,12 +553,12 @@ nnoremap <leader>v V`]
 inoremap <C-_> <Space><BS><Esc>:call InsertCloseTag()<cr>a
 
 " Faster Esc
-inoremap jk <ESC>
+" inoremap jk <ESC>
 
 " Marks and Quotes
-noremap ' `
-noremap æ '
-noremap ` <C-^>
+" noremap ' `
+" noremap æ '
+" noremap ` <C-^>
 
 " Calculator
 inoremap <C-B> <C-O>yiW<End>=<C-R>=<C-R>0<CR>
@@ -513,8 +566,8 @@ inoremap <C-B> <C-O>yiW<End>=<C-R>=<C-R>0<CR>
 " Better Completion
 set completeopt=longest,menuone,preview
 " inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-inoremap <expr> <C-p> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>up>" : ""<CR>'
-inoremap <expr> <C-n> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" inoremap <expr> <C-p> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>up>" : ""<CR>'
+" inoremap <expr> <C-n> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 
 " Rainbows!
 nmap <leader>R :RainbowParenthesesToggle<CR>
@@ -545,15 +598,20 @@ nnoremap <D-p> "_ddPV`]
 
 " Ack {{{
 
-map <leader>a :Ack! 
+" map <leader>a :Ack! 
 
 " }}}
 " NERD Tree {{{
 
-noremap <F2> :NERDTreeToggle<cr>
-inoremap <F2> <esc>:NERDTreeToggle<cr>
-let NERDTreeIgnore=['.vim$', '\~$', '.*\.pyc$', 'pip-log\.txt$', 'whoosh_index', 'xapian_index', '.*.pid', 'monitor.py', '.*-fixtures-.*.json', '.*\.o$']
-au Filetype nerdtree setlocal nolist
+map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+map <leader>e :NERDTreeFind<CR>
+nmap <leader>nt :NERDTreeFind<CR>
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeShowBookmarks=1
+let NERDTreeChDirMode=0
+" let NERDTreeQuitOnOpen=1
+" let NERDTreeShowHidden=1
+let NERDTreeKeepTreeInNewTab=1
 
 " }}}
 " HTML5 {{{
@@ -602,9 +660,97 @@ let g:syntastic_enable_signs=1
 let g:syntastic_disabled_filetypes = ['html', 'python']
 
 " }}}
-" Command-T {{{
+" Delimitmate {{{
 
-let g:CommandTMaxHeight = 20
+au FileType * let b:delimitMate_autoclose = 1
+  " If using html auto complete (complete closing tag)
+  au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
+
+" }}}
+" AutoCloseTag {{{
+  " Make it so AutoCloseTag works for xml and xhtml files as well
+"au FileType xhtml,xml ru ftplugin/html/autoclosetag.vim
+au FileType xhtml,xml ru ~/.vim/bundle/autoclosetag/ftplugin/html/autoclose.vim
+
+" }}}
+" SnipMate {{{
+
+" Setting the author var
+" If forking, please overwrite in your .vimrc.local file
+let g:snips_author = 'Andrew Cates <catesandrew@netflix.com>'
+" Shortcut for reloading snippets, useful when developing
+nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>    
+
+" }}}
+" ShowMarks {{{
+
+let showmarks_include = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+" Don't leave on by default, use :ShowMarksOn to enable
+let g:showmarks_enable = 0
+" For marks a-z
+highlight ShowMarksHLl gui=bold guibg=LightBlue guifg=Blue
+" For marks A-Z
+highlight ShowMarksHLu gui=bold guibg=LightRed guifg=DarkRed
+" For all other marks
+highlight ShowMarksHLo gui=bold guibg=LightYellow guifg=DarkYellow
+" For multiple marks on the same line.
+highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
+
+" }}}
+" Tabularize {{{
+
+if exists(":Tabularize")
+  nmap <Leader>a= :Tabularize /=<CR>
+  vmap <Leader>a= :Tabularize /=<CR>
+  nmap <Leader>a: :Tabularize /:<CR>
+  vmap <Leader>a: :Tabularize /:<CR>
+  nmap <Leader>a:: :Tabularize /:\zs<CR>
+  vmap <Leader>a:: :Tabularize /:\zs<CR>
+  nmap <Leader>a, :Tabularize /,<CR>
+  vmap <Leader>a, :Tabularize /,<CR>
+  nmap <Leader>a| :Tabularize /|<CR>
+  vmap <Leader>a| :Tabularize /|<CR>
+endif  
+
+" }}}
+" Ctags Variables {{{
+
+" This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
+set tags=./tags;/,$HOME/vimtags
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> " C-\ - Open the definition in a new tab
+map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>      " A-] - Open the definition in a vertical split
+
+" }}}
+" EasyTags {{{
+
+" Disabling for now. It doesn't work well on large tag files 
+let g:loaded_easytags = 1  " Disable until it's working better
+let g:easytags_cmd = 'ctags'
+let g:easytags_dynamic_files = 1
+if !has('win32') && !has('win64')
+  let g:easytags_resolve_links = 1
+endif
+
+
+" }}}
+" Taglist Variables {{{
+
+let Tlist_Auto_Highlight_Tag = 1
+let Tlist_Auto_Update = 1
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_File_Fold_Auto_Close = 1
+let Tlist_Highlight_Tag_On_BufEnter = 1
+let Tlist_Use_Right_Window = 1
+let Tlist_Use_SingleClick = 1
+
+let g:ctags_statusline=1
+" Override how taglist does javascript
+let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'  
+
+" }}}
+" JSON {{{
+
+nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>                       
 
 " }}}
 " LISP (built-in) {{{
@@ -632,6 +778,12 @@ let g:sparkupNextMapping = '<c-q>'
 " Autoclose {{{
 
 nmap <Leader>x <Plug>ToggleAutoCloseMappings
+
+" }}}
+" Tasklist {{{
+
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 
 " }}}
 " Tasklist {{{
@@ -875,7 +1027,10 @@ endfunction " }}}
 " MacVim ---------------------------------------------------------------------- {{{
 
 if has('gui_running')
-    set guifont=Anonymous\ Pro:h14
+    set guifont=Anonymous\ Pro:h14   
+    set guioptions-=T          	" remove the toolbar
+    set lines=96               	" 40 lines of text instead of 24,
+    set transparency=5          " Make the window slightly transparent
 
     " Remove all the UI cruft
     set go-=T
@@ -922,6 +1077,8 @@ if has('gui_running')
 
     imap <M-BS>         <C-w>
     inoremap <D-BS>     <esc>my0c`y
+else
+  set term=builtin_ansi       " Make arrow and other keys work
 endif
 
 " }}}
