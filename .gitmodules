@@ -93,4 +93,14 @@
 	url = git://github.com/bdd/vim-scala.git
 [submodule "bundle/gist-vim"]
 	path = bundle/gist-vim
-	url = git://github.com/mattn/gist-vim.git
+  url = git://github.com/mattn/gist-vim.git
+[submodule "bundle/vim-json"]
+	path = bundle/vim-json
+	url = git://github.com/leshill/vim-json.git
+[submodule "bundle/delimitMate"]
+	path = bundle/delimitMate
+	url = git://github.com/Raimondi/delimitMate.git
+
+[submodule "bundle/snipmate-snippets"]
+	path = bundle/snipmate-snippets
+	url = git://github.com/spf13/snipmate-snippets.git
