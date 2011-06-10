@@ -1,0 +1,5 @@
+# Example file
+# This file will only get executed on a Linux system with the hostname
+# joe.schmoe.net when you log in interactively.
+
+echo "Hi there..."

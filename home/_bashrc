@@ -1,0 +1,49 @@
+#######################################################################
+# .bashrc                                                             #
+# version 0.2.1                                                       #
+# by Paul Duncan <pabs@pablotron.org>                                 #
+#######################################################################
+
+###############################
+# Source Global Configuration #
+###############################
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+if [ "$PS1" ]; then
+#######################
+# Interactive Startup #
+#######################
+    . ~/.bash/aliases.sh
+    . ~/.bash/completions.sh
+    . ~/.bash/prompt.sh
+    . ~/.bash/functions.sh
+    
+    #fortune
+else
+###########################
+# Non-Interactive Startup #
+###########################
+   :
+fi
+
+###################
+# General Startup #
+###################
+umask 002
+mesg n
+
+PATH="$PATH:/usr/X11R6/bin"
+HISTIGNORE="$HISTIGNORE:ls:cd"
+
+export PATH HISTIGNORE
+
+#####################################
+# Custom (Machine-Specific) Startup #
+#####################################
+. ~/.bash/custom.sh
+
+
+
+
