@@ -14,8 +14,8 @@
     path = home/vim/bundle/ackvim
     url = git://github.com/mileszs/ack.vim.git
 [submodule "home/vim/bundle/snipmate"]
-    path = home/vim/bundle/snipmate
-    url = git://github.com/msanders/snipmate.vim.git
+	path = home/vim/bundle/snipmate
+	url = git://github.com/msanders/snipmate.vim.git
 [submodule "home/vim/bundle/vim-surround"]
     path = home/vim/bundle/vim-surround
     url = git://github.com/tpope/vim-surround.git
@@ -35,8 +35,8 @@
     path = home/vim/bundle/zencoding-vim
     url = git://github.com/mattn/zencoding-vim.git
 [submodule "home/vim/bundle/xml"]
-    path = home/vim/bundle/xml
-    url = git://github.com/othree/xml.vim.git
+	path = home/vim/bundle/xml
+	url = git://github.com/othree/xml.vim.git
 [submodule "home/vim/bundle/color-sampler-pack"]
     path = home/vim/bundle/color-sampler-pack
     url = git://github.com/vim-scripts/Color-Sampler-Pack.git
