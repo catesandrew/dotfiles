@@ -1,0 +1,54 @@
+[user]
+  name = Andrew Cates
+[core]
+  excludesfile = /Users/catesandrew/.gitignore
+  editor = mate -w
+  quotepath = false
+[git-p4]
+  user = catesandrew
+  useclientspec = true 
+[alias]
+  fp = format-patch --stdout -1
+  idiff = "!git diff | idiff"
+  vdiff = difftool
+  qlog = log --abbrev-commit --date=relative --pretty=format:'%C(bold yellow)%h%Creset %s %C(bold yellow)<%an>%Creset'
+  st = status
+  co = checkout
+  lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+  # Quickly Commit / Uncommit Work-In-Progress
+  # By David Gageot (http://gist.github.com/492227): 
+  wip = "git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m \"wip\""
+  unwip = "git log -n 1 | grep -q -c wip && git reset HEAD~1"
+  #hdiff = "git diff --color-words --no-index orig.txt edited.txt | /tmp/ansi2html.sh > 2beshared.html"
+[branch]
+	autosetupmerge = true  
+[difftool "Kaleidoscope"]
+  cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
+[difftool]
+  prompt = false
+[diff]
+  tool = Kaleidoscope  
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  sh = auto
+  #ui = true
+[color "branch"]
+  current = yellow reverse
+  local = yellow 
+  remote = green
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+[color "sh"]
+  branch = yellow reverse
+  workdir = blue bold
+  dirty = red  
+  

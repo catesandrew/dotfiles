@@ -1,0 +1,117 @@
+# https://github.com/github/gitignore
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.tar.gz
+*.zip
+*.bzip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OSX generated files #
+######################
+.DS_Store
+Icon?
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Textmate #
+######################
+*.tmproj
+*.tmproject
+tmtags
+
+# Java #
+######################
+*.class
+
+# Textmate #
+######################
+*.tmproj
+*.tmproject
+tmtags
+
+# CVS #
+######################
+/CVS/*
+*/CVS/*
+.cvsignore
+*/.cvsignore
+
+
+# Eclipse #
+######################
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# CDT-specific 
+.cproject
+
+# Emacs #
+######################
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+
+# IntelliJ #
+######################
+# *.iml
+# *.ipr
+# *.iws
+# .idea/
+
+# Etags #
+######################
+# Ignore tags created by etags and ctags
+TAGS
+tags
+
+# VI #
+######################
+*.swp
+*.swo
+
+.perforce
