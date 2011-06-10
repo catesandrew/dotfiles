@@ -1,0 +1,13 @@
+<jetbrains.communicator.jabber.impl.JabberSettings>
+  <myAccount>
+    <myUsername>catesandrew</myUsername>
+    <myPort>5222</myPort>
+    <myServer>intellijoin.org</myServer>
+    <myPassword></myPassword>
+    <myForceSSL>false</myForceSSL>
+    <myRememberPassword>false</myRememberPassword>
+    <myShouldLogin>true</myShouldLogin>
+  </myAccount>
+  <mySkipJabberConnection>false</mySkipJabberConnection>
+  <myWasOnceConnectedSuccessfully>false</myWasOnceConnectedSuccessfully>
+</jetbrains.communicator.jabber.impl.JabberSettings>

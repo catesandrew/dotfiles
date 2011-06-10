@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolSet>
+  <tool name="Closure Linter Summary" description="Run Closure Linter on the current file" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="true" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="gjslint" />
+      <option name="PARAMETERS" value="--unix_mode --strict --nojsdoc --nosummary $FilePath$" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Library/Preferences/IntelliJIdea10/tools/" />
+    </exec>
+    <filter>
+      <option name="NAME" value="nodelint" />
+      <option name="DESCRIPTION" value="Parse the output from nodelint" />
+      <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
+    </filter>
+  </tool>
+  <tool name="Closure Linter Fixer" description="Run Closure Linter on the current file" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="true" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="fixjsstyle" />
+      <option name="PARAMETERS" value="--strict --nojsdoc $FilePath$" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Library/Preferences/IntelliJIdea10/tools/" />
+    </exec>
+    <filter>
+      <option name="NAME" value="nodelint" />
+      <option name="DESCRIPTION" value="Parse the output from nodelint" />
+      <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
+    </filter>
+  </tool>
+  <tool name="JSHint Linter" description="Run JSHint on the current file" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="true" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="jshint" />
+      <option name="PARAMETERS" value="$FilePath$" />
+      <option name="WORKING_DIRECTORY" />
+    </exec>
+    <filter>
+      <option name="NAME" value="nodelint" />
+      <option name="DESCRIPTION" value="Parse the output from nodelint" />
+      <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
+    </filter>
+  </tool>
+  <tool name="Refresh Running Browser" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="false" synchronizeAfterRun="false">
+    <exec>
+      <option name="COMMAND" value="/usr/local/bin/nf" />
+      <option name="PARAMETERS" value="refresh" />
+      <option name="WORKING_DIRECTORY" value="/usr/local/bin" />
+    </exec>
+  </tool>
+</toolSet>
+

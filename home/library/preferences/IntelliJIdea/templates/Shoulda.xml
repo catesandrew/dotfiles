@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templateSet group="Shoulda">
+  <template name="cont" value="context &quot;$CONTEXT_NAME$&quot; do&#10;  setup { $SETUP_BLOCK$ }&#10;  &#10;  should &quot;$SHOULD_NAME$&quot; do&#10;    $SHOULD_BLOCK$&#10;  end&#10;end" description="" toReformat="false" toShortenFQNames="true">
+    <variable name="CONTEXT_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="SETUP_BLOCK" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="SHOULD_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="SHOULD_BLOCK" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="false" />
+      <option name="XML" value="false" />
+      <option name="RUBY" value="true" />
+      <option name="RHTML" value="false" />
+      <option name="CUCUMBER_FEATURE_FILE" value="false" />
+      <option name="CSS" value="false" />
+      <option name="JAVA_SCRIPT" value="false" />
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+  <template name="should" value="should &quot;$SHOULD_NAME$&quot; do&#10;  $SHOULD_BLOCK$&#10;end" description="" toReformat="false" toShortenFQNames="true">
+    <variable name="SHOULD_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="SHOULD_BLOCK" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="false" />
+      <option name="XML" value="false" />
+      <option name="RUBY" value="true" />
+      <option name="RHTML" value="false" />
+      <option name="CUCUMBER_FEATURE_FILE" value="false" />
+      <option name="CSS" value="false" />
+      <option name="JAVA_SCRIPT" value="false" />
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+</templateSet>
+
