@@ -1,6 +1,111 @@
 [submodule "home/library/preferences/IntelliJIdea/tools/nodelint"]
-	path = home/library/preferences/IntelliJIdea/tools/nodelint
-	url = https://github.com/tav/nodelint.git
+    path = home/library/preferences/IntelliJIdea/tools/nodelint
+    url = https://github.com/tav/nodelint.git
 [submodule "home/library/preferences/IntelliJIdea/tools/nodelint-config"]
-	path = home/library/preferences/IntelliJIdea/tools/nodelint-config
-	url = https://github.com/factorylabs/nodelint-config.git
+    path = home/library/preferences/IntelliJIdea/tools/nodelint-config
+    url = https://github.com/factorylabs/nodelint-config.git
+[submodule "home/vim/bundle/nerdcommenter"]
+    path = home/vim/bundle/nerdcommenter
+    url = git://github.com/scrooloose/nerdcommenter.git
+[submodule "home/vim/bundle/nerdtree"]
+    path = home/vim/bundle/nerdtree
+    url = git://github.com/scrooloose/nerdtree.git
+[submodule "home/vim/bundle/ackvim"]
+    path = home/vim/bundle/ackvim
+    url = git://github.com/mileszs/ack.vim.git
+[submodule "home/vim/bundle/snipmate"]
+    path = home/vim/bundle/snipmate
+    url = git://github.com/msanders/snipmate.vim.git
+[submodule "home/vim/bundle/vim-surround"]
+    path = home/vim/bundle/vim-surround
+    url = git://github.com/tpope/vim-surround.git
+[submodule "home/vim/bundle/vim-repeat"]
+    path = home/vim/bundle/vim-repeat
+    url = git://github.com/tpope/vim-repeat.git
+[submodule "home/vim/bundle/vim-fugitive"]
+    path = home/vim/bundle/vim-fugitive
+    url = git://github.com/tpope/vim-fugitive.git
+[submodule "home/vim/bundle/solarized"]
+    path = home/vim/bundle/solarized
+    url = git://github.com/altercation/vim-colors-solarized.git
+[submodule "home/vim/bundle/html5"]
+    path = home/vim/bundle/html5
+    url = git://github.com/othree/html5.vim.git
+[submodule "home/vim/bundle/zencoding-vim"]
+    path = home/vim/bundle/zencoding-vim
+    url = git://github.com/mattn/zencoding-vim.git
+[submodule "home/vim/bundle/xml"]
+    path = home/vim/bundle/xml
+    url = git://github.com/othree/xml.vim.git
+[submodule "home/vim/bundle/color-sampler-pack"]
+    path = home/vim/bundle/color-sampler-pack
+    url = git://github.com/vim-scripts/Color-Sampler-Pack.git
+[submodule "home/vim/bundle/vim-git"]
+    path = home/vim/bundle/vim-git
+    url = git://github.com/tpope/vim-git.git
+[submodule "home/vim/bundle/vim-haml"]
+    path = home/vim/bundle/vim-haml
+    url = git://github.com/tpope/vim-haml.git
+[submodule "home/vim/bundle/vim-indent-object"]
+    path = home/vim/bundle/vim-indent-object
+    url = git://github.com/michaeljsmith/vim-indent-object.git
+[submodule "home/vim/bundle/vim-javascript"]
+    path = home/vim/bundle/vim-javascript
+    url = git://github.com/pangloss/vim-javascript.git
+[submodule "home/vim/bundle/jslint"]
+    path = home/vim/bundle/jslint
+    url = git://github.com/hallettj/jslint.vim.git
+[submodule "home/vim/bundle/taglist"]
+    path = home/vim/bundle/taglist
+    url = git://github.com/vim-scripts/taglist.vim.git
+[submodule "home/vim/bundle/vim-vividchalk"]
+    path = home/vim/bundle/vim-vividchalk
+    url = git://github.com/tpope/vim-vividchalk.git
+[submodule "home/vim/bundle/supertab"]
+    path = home/vim/bundle/supertab
+    url = git://github.com/ervandew/supertab.git
+[submodule "home/vim/bundle/textile"]
+    path = home/vim/bundle/textile
+    url = git://github.com/timcharper/textile.vim.git
+[submodule "home/vim/bundle/zoom-win"]
+    path = home/vim/bundle/zoom-win
+    url = git://github.com/vim-scripts/ZoomWin.git
+[submodule "home/vim/bundle/vim-markdown"]
+    path = home/vim/bundle/vim-markdown
+    url = git://github.com/tpope/vim-markdown.git
+[submodule "home/vim/bundle/vim-align"]
+    path = home/vim/bundle/vim-align
+    url = git://github.com/tsaleh/vim-align.git
+[submodule "home/vim/bundle/vim-unimpaired"]
+    path = home/vim/bundle/vim-unimpaired
+    url = git://github.com/tpope/vim-unimpaired.git
+[submodule "home/vim/bundle/searchfold"]
+    path = home/vim/bundle/searchfold
+    url = git://github.com/vim-scripts/searchfold.vim.git
+[submodule "home/vim/bundle/vim-endwise"]
+    path = home/vim/bundle/vim-endwise
+    url = git://github.com/tpope/vim-endwise.git
+[submodule "home/vim/bundle/vim-irblack"]
+    path = home/vim/bundle/vim-irblack
+    url = git://github.com/wgibbs/vim-irblack.git
+[submodule "home/vim/bundle/syntastic"]
+    path = home/vim/bundle/syntastic
+    url = git://github.com/scrooloose/syntastic.git
+[submodule "home/vim/bundle/puppet-vim"]
+    path = home/vim/bundle/puppet-vim
+    url = git://github.com/ajf/puppet-vim.git
+[submodule "home/vim/bundle/vim-scala"]
+    path = home/vim/bundle/vim-scala
+    url = git://github.com/bdd/vim-scala.git
+[submodule "home/vim/bundle/gist-vim"]
+    path = home/vim/bundle/gist-vim
+  url = git://github.com/mattn/gist-vim.git
+[submodule "home/vim/bundle/vim-json"]
+    path = home/vim/bundle/vim-json
+    url = git://github.com/leshill/vim-json.git
+[submodule "home/vim/bundle/delimitMate"]
+    path = home/vim/bundle/delimitMate
+    url = git://github.com/Raimondi/delimitMate.git
+[submodule "home/vim/bundle/snipmate-snippets"]
+    path = home/vim/bundle/snipmate-snippets
+    url = git://github.com/spf13/snipmate-snippets.git
