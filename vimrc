@@ -371,18 +371,6 @@ au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
 au BufNewFile,BufRead *.html inoremap <buffer> <s-cr> <cr><esc>kA<cr>
 au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
 
-" Sparkup mappings:
-"
-" <c-e><space> to expand sparkup normally:
-"     <p>|</p>
-"
-" <c-e><return> to force an expanded sparkup.
-"     <p>
-"         |
-"     </p>
-au BufNewFile,BufRead *.html imap <buffer> <c-s><cr> <c-s><s-cr>
-au BufNewFile,BufRead *.html imap <buffer> <c-s><space> <c-s>.<bs>
-
 " Django tags
 au FileType jinja,htmldjango inoremap <buffer> <c-t> {%<space><space>%}<left><left><left>
 
@@ -603,7 +591,7 @@ nnoremap <D-p> "_ddPV`]
 " }}}
 " NERD Tree {{{
 
-map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 map <leader>e :NERDTreeFind<CR>
 nmap <leader>nt :NERDTreeFind<CR>
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
