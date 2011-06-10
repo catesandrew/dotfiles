@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="Vim" parent="TextMate">
+<keymap version="1" name="Vim" parent="Mac OS X 10.5+">
   <action id="$Copy">
     <keyboard-shortcut first-keystroke="control INSERT" />
   </action>
@@ -21,6 +21,7 @@
   <action id="ClearCase.CheckInProject" />
   <action id="CodeCompletion" />
   <action id="CommanderSwapPanels" />
+  <action id="Console.TableResult.Reload" />
   <action id="ContextHelp" />
   <action id="EditorBackSpace">
     <keyboard-shortcut first-keystroke="BACK_SPACE" />
@@ -118,7 +119,25 @@
   <action id="SmartTypeCompletion" />
   <action id="Starteam.CheckinProject" />
   <action id="Subversion.CommitProject" />
+  <action id="SwitchApply">
+    <keyboard-shortcut first-keystroke="control alt ENTER" />
+  </action>
+  <action id="SwitchDown">
+    <keyboard-shortcut first-keystroke="control alt DOWN" />
+  </action>
+  <action id="SwitchLeft">
+    <keyboard-shortcut first-keystroke="control alt LEFT" />
+  </action>
+  <action id="SwitchRight">
+    <keyboard-shortcut first-keystroke="control alt RIGHT" />
+  </action>
+  <action id="SwitchUp">
+    <keyboard-shortcut first-keystroke="control alt UP" />
+  </action>
   <action id="ToggleBookmark2" />
+  <action id="Tool_Refresh Running Browser">
+    <keyboard-shortcut first-keystroke="meta R" />
+  </action>
   <action id="TypeHierarchy">
     <keyboard-shortcut first-keystroke="shift control alt H" />
   </action>

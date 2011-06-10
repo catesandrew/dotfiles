@@ -36,5 +36,12 @@
       <option name="REGEXP" value="$FILE_PATH$ $LINE$:$COLUMN$" />
     </filter>
   </tool>
+  <tool name="Refresh Running Browser" showInMainMenu="true" showInEditor="true" showInProject="true" showInSearchPopup="true" disabled="false" useConsole="false" synchronizeAfterRun="false">
+    <exec>
+      <option name="COMMAND" value="/usr/local/bin/nf" />
+      <option name="PARAMETERS" value="refresh" />
+      <option name="WORKING_DIRECTORY" value="/usr/local/bin" />
+    </exec>
+  </tool>
 </toolSet>
 
