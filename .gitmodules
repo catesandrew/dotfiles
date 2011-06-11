@@ -115,3 +115,6 @@
 [submodule "home/vim/bundle/file-line"]
 	path = home/vim/bundle/file-line
 	url = git://github.com/vim-scripts/file-line.git
+[submodule "home/vim/bundle/IndexedSearch"]
+	path = home/vim/bundle/IndexedSearch
+	url = git://github.com/vim-scripts/IndexedSearch.git
