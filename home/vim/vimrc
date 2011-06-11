@@ -74,6 +74,13 @@ set formatoptions=qrn1
 " set colorcolumn=+1
 
 " }}}
+" Par {{{
+
+:set formatprg=par\ -w78
+":map <A-q> {v}!par -jw78<CR>
+":vmap <A-q> !par -jw78<CR>
+
+" }}}
 " Status line {{{
 
 if has('statusline')
