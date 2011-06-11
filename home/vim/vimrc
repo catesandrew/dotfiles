@@ -24,6 +24,18 @@ set autoindent
 set showmode
 set foldenable
 
+" search for exuberant ctags
+if executable('ctags-exuberant')
+    let g:ctagsbin = 'ctags-exuberant'
+elseif executable('exctags')
+    let g:ctagsbin = 'exctags'
+elseif executable('ctags')
+    let g:ctagsbin = 'ctags'
+elseif executable('ctags.exe')
+    let g:ctagsbin = 'ctags.exe'
+elseif executable('tags')
+    let g:ctagsbin = 'tags'
+endif
 
 
 if has('cmdline_info')
