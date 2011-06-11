@@ -620,14 +620,6 @@ let g:atia_attributes_complete = 0
 " }}}
 " Show syntax filetypes in menu {{{
 
-" }}}
-" Rope {{{
-
-let ropevim_enable_shortcuts = 0
-let ropevim_guess_project = 1
-let ropevim_global_prefix = '<C-c>p'
-
-source $HOME/.vim/sadness/sadness.vim
 
 " }}}
 " Gundo {{{
