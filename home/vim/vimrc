@@ -8,7 +8,8 @@
 " Preamble -------------------------------------------------------------------- {{{
 
 filetype off
-call pathogen#runtime_append_all_bundles()
+silent! call pathogen#runtime_append_all_bundles()
+" silent! call pathogen#runtime_prepend_subdirectories("~/.vim/bundle/")
 filetype plugin indent on
 set nocompatible
 
