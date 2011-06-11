@@ -2,7 +2,11 @@
   name = Andrew Cates
 [core]
   excludesfile = /Users/catesandrew/.gitignore
-  editor = mate -w
+  # The internal command will return focus directly to the terminal after 
+  # the commit message is saved and quit. It's a small optimization, 
+  # but a nice one, I find. (Tip originally found here: 
+  # http://b4winckler.wordpress.com/2009/09/02/macvim-on-snow-leopard/#comment-36
+  editor = 'mvim -f -c"au VimLeave * !open -a Terminal"'
   quotepath = false
 [git-p4]
   user = catesandrew
@@ -21,7 +25,7 @@
   unwip = "git log -n 1 | grep -q -c wip && git reset HEAD~1"
   #hdiff = "git diff --color-words --no-index orig.txt edited.txt | /tmp/ansi2html.sh > 2beshared.html"
 [branch]
-	autosetupmerge = true  
+  autosetupmerge = true  
 [difftool "Kaleidoscope"]
   cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
 [difftool]
