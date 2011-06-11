@@ -52,9 +52,6 @@
 [submodule "home/vim/bundle/jslint"]
     path = home/vim/bundle/jslint
     url = git://github.com/hallettj/jslint.vim.git
-[submodule "home/vim/bundle/taglist"]
-    path = home/vim/bundle/taglist
-    url = git://github.com/vim-scripts/taglist.vim.git
 [submodule "home/vim/bundle/vim-vividchalk"]
     path = home/vim/bundle/vim-vividchalk
     url = git://github.com/tpope/vim-vividchalk.git
