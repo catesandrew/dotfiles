@@ -1,0 +1,9 @@
+Document: par
+Title: Debian par Manual
+Author: Adam M. Costello
+Abstract: paragraph reformatter
+Section: text
+
+Format: text
+Files: /usr/share/doc/par/par.doc.gz
+
