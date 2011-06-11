@@ -4,6 +4,12 @@ export EDITOR='mate -w'
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export JAVA_HOME="`/usr/libexec/java_home`"
 
+# The internal command will return focus directly to the terminal after 
+# the commit message is saved and quit. It's a small optimization, 
+# but a nice one, I find. (Tip originally found here: 
+# http://b4winckler.wordpress.com/2009/09/02/macvim-on-snow-leopard/#comment-36
+export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
+
 # vim and gnome-terminal have support for 256 colours in fedora 8 at least
 # Note debian/ubuntu users need to install the ncurses-term package for this
 # Note this should be set in ~/.profile for Fedora startup scripts to

@@ -2,11 +2,6 @@
   name = Andrew Cates
 [core]
   excludesfile = /Users/catesandrew/.gitignore
-  # The internal command will return focus directly to the terminal after 
-  # the commit message is saved and quit. It's a small optimization, 
-  # but a nice one, I find. (Tip originally found here: 
-  # http://b4winckler.wordpress.com/2009/09/02/macvim-on-snow-leopard/#comment-36
-  editor = 'mvim -f -c"au VimLeave * !open -a Terminal"'
   quotepath = false
 [git-p4]
   user = catesandrew

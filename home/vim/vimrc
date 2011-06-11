@@ -612,8 +612,6 @@ let g:atia_attributes_complete = 0
 " }}}
 " Show syntax filetypes in menu {{{
 
-let do_syntax_sel_menu = 1|runtime! synmenu.vim|aunmenu &Syntax.&Show\ filetypes\ in\ menu
-
 " }}}
 " Rope {{{
 
@@ -808,10 +806,10 @@ let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
 let g:org_debug = 1
 " }}}
 " DirDiff {{{
-map <unique> <Leader>Dg <Plug>DirDiffGet
-map <unique> <Leader>Dp <Plug>DirDiffPut
-map <unique> <Leader>Dj <Plug>DirDiffNext
-map <unique> <Leader>Dk <Plug>DirDiffPrev
+"map <unique> <Leader>Dg <Plug>DirDiffGet
+"map <unique> <Leader>Dp <Plug>DirDiffPut
+"map <unique> <Leader>Dj <Plug>DirDiffNext
+"map <unique> <Leader>Dk <Plug>DirDiffPrev
 " }}}
 
 " }}}
