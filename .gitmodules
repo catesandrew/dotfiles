@@ -112,3 +112,6 @@
 [submodule "prefix/src/doctorjs"]
 	path = prefix/src/doctorjs
 	url = git://github.com/mozilla/doctorjs.git
+[submodule "home/vim/bundle/file-line"]
+	path = home/vim/bundle/file-line
+	url = git://github.com/vim-scripts/file-line.git
