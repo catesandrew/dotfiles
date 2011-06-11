@@ -136,3 +136,6 @@
 [submodule "home/vim/bundle/tagbar"]
 	path = home/vim/bundle/tagbar
 	url = git://github.com/majutsushi/tagbar.git
+[submodule "home/vim/bundle/vim-extradite"]
+	path = home/vim/bundle/vim-extradite
+	url = git://github.com/int3/vim-extradite.git
