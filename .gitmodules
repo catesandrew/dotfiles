@@ -118,3 +118,6 @@
 [submodule "home/vim/bundle/IndexedSearch"]
 	path = home/vim/bundle/IndexedSearch
 	url = git://github.com/vim-scripts/IndexedSearch.git
+[submodule "home/vim/bundle/jQuery"]
+	path = home/vim/bundle/jQuery
+	url = git://github.com/vim-scripts/jQuery.git
