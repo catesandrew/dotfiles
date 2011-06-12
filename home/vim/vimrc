@@ -1,17 +1,34 @@
-" .vimrc
-" Author: Steve Losh <steve@stevelosh.com>
-" Source: http://bitbucket.org/sjl/dotfiles/src/tip/vim/
 "
-" This file changes a lot.  I'll try to document pieces of it whenever I have
-" a few minutes to kill.
+" Personal preference .vimrc file
+"
+" My personally preferred version of vim is the one with the "HUGE" feature
+" set, in addition to the following configure options:
+"
+"     ./configure --with-features=huge
+"                 --enable-pythoninterp --enable-rubyinterp
+"                 --enable-perlinterp --with-macarchs=x86_64
+"                 --with-macsdk=10.6 --enable-enablemultibyte
+"                 --enable-cscope --prefix=/usr/local
+"
+" To start vim without using this .vimrc file, use:
+"     vim -u NORC
+"
+" To start vim without loading any .vimrc or plugins, use:
+"     vim -u NONE
+"
+
+" Use vim settings, rather then vi settings (much better!)
+" This must be first, because it changes other options as a side effect.
+set nocompatible
 
 " Preamble -------------------------------------------------------------------- {{{
 
-filetype off
+" Use pathogen to easily modify the runtime path to include all plugins under
+" the ~/.vim/bundle directory
+filetype off                    " force reloading *after* pathogen loaded
+silent! call pathogen#helptags()
 silent! call pathogen#runtime_append_all_bundles()
-" silent! call pathogen#runtime_prepend_subdirectories("~/.vim/bundle/")
-filetype plugin indent on
-set nocompatible
+filetype plugin indent on       " enable detection, plugins and indenting in one step
 
 " }}}
 " Basic options --------------------------------------------------------------- {{{
@@ -20,29 +37,30 @@ set encoding=utf-8
 set modelines=0
 set scrolljump=5
 set scrolloff=3
-set autoindent
+set autoindent " always set autoindenting on
+set copyindent    " copy the previous indentation on autoindenting
 set showmode
 set foldenable
 
 " search for exuberant ctags
 if executable('ctags-exuberant')
-    let g:ctagsbin = 'ctags-exuberant'
+  let g:ctagsbin = 'ctags-exuberant'
 elseif executable('exctags')
-    let g:ctagsbin = 'exctags'
+  let g:ctagsbin = 'exctags'
 elseif executable('ctags')
-    let g:ctagsbin = 'ctags'
+  let g:ctagsbin = 'ctags'
 elseif executable('ctags.exe')
-    let g:ctagsbin = 'ctags.exe'
+  let g:ctagsbin = 'ctags.exe'
 elseif executable('tags')
-    let g:ctagsbin = 'tags'
+  let g:ctagsbin = 'tags'
 endif
 
 
 if has('cmdline_info')
-		set ruler                  	" show the ruler
-		set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
-		set showcmd                	" show partial commands in status line and
-									" selected characters/lines in visual mode
+  set ruler                   " show the ruler
+  set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+  set showcmd                 " show partial commands in status line and
+                " selected characters/lines in visual mode
 endif
 
 set showcmd
@@ -54,11 +72,12 @@ set visualbell
 set cursorline
 set ttyfast
 set ruler
-set backspace=indent,eol,start   
+set backspace=indent,eol,start    " allow backspacing over everything in insert mode
 set nu
-set nonumber
-set norelativenumber
-set history=1000
+set number        " always show line numbers
+set relativenumber
+set history=1000         " remember more commands and search history
+set undolevels=1000      " use many muchos levels of undo
 set undofile
 set undoreload=10000
 set cpoptions+=J
@@ -71,6 +90,10 @@ set matchtime=3
 set showbreak=↪
 set splitbelow
 set splitright
+set title                " change the terminal's title
+set visualbell           " don't beep
+set noerrorbells         " don't beep
+
 
 " Save when losing focus
 " au FocusLost * :wa
@@ -78,7 +101,8 @@ set splitright
 " Tabs, spaces, wrapping {{{
 
 set tabstop=2
-set shiftwidth=2
+set shiftwidth=2 " number of spaces to use for autoindenting
+set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set softtabstop=2
 set expandtab
 set nowrap
@@ -142,15 +166,16 @@ set backup                        " enable backups
 " }}}
 " Leader {{{
 
-let mapleader = ","
-let maplocalleader = "\\"
+" Change the mapleader from \ to ,
+let mapleader=","
 
 " }}}
 " Color scheme {{{
 
 syntax on
 set background=dark
-colorscheme molokai
+"colorscheme molokai
+colorscheme mustang
 set tabpagemax=15 "only show 15 tabs
 
 " }}}
@@ -185,7 +210,7 @@ inoremap <right> <nop>
 " nnoremap k gk       
 
 " Stupid shift key fixes
-cmap W w 						
+cmap W w
 cmap WQ wq
 cmap wQ wq
 cmap Q q
@@ -225,13 +250,15 @@ cmap w!! w !sudo tee % >/dev/null
 "nnoremap / /\v
 "vnoremap / /\v
 
-set ignorecase
-set smartcase
+set ignorecase    " ignore case when searching
+set smartcase     " ignore case if search pattern is all lowercase,
+                  "    case-sensitive otherwise
 
-set incsearch
-set showmatch
-set hlsearch
-
+set smarttab      " insert tabs on the start of a line according to
+                  "    shiftwidth, not tabstop
+set incsearch     " show search matches as you type                 
+set showmatch     " set show matching parenthesis
+set hlsearch      " highlight search terms
 set gdefault
 
 set virtualedit+=block
@@ -580,23 +607,37 @@ set completeopt=longest,menuone,preview
 " Rainbows!
 nmap <leader>R :RainbowParenthesesToggle<CR>
 
-" Edit vim stuff
-nnoremap <leader>ev <C-w>s<C-w>j<C-w>L:e $MYVIMRC<cr>
-nnoremap <leader>es <C-w>s<C-w>j<C-w>L:e ~/.vim/snippets/<cr>
+" This is a little tweak that is a time-saver while you’re building
+" up your .vimrc. This effectively maps the ,ev and ,sv keys to
+" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
 " Sudo to write
 cmap w!! w !sudo tee % >/dev/null
 
-" Easy filetype switching
-nnoremap _hd :set ft=htmldjango<CR>
-nnoremap _jt :set ft=htmljinja<CR>
-nnoremap _cw :set ft=confluencewiki<CR>
-nnoremap _pd :set ft=python.django<CR>
-nnoremap _d  :set ft=diff<CR>
-nnoremap _a  :AnsiEsc<CR>
-
-" Toggle paste
+" Toggle paste: Every Vim user likes to enable auto-indenting of
+" source code, so Vim can intelligently position you cursor on the
+" next line as you type. This has one big ugly consequence however:
+" when you paste text into your terminal-based Vim with a right
+" mouse click, Vim cannot know it is coming from a paste. To Vim, it
+" looks like text entered by someone who can type incredibly fast
+" :) Since Vim thinks this is regular key strokes, it applies all
+" auto-indenting and auto-expansion of defined abbreviations to the
+" input, resulting in often cascading indents of paragraphs. There is
+" an easy option to prevent this, however. You can temporarily switch
+" to “paste mode”, simply by setting the following option:
 set pastetoggle=<F8>
+
+
+" Shortcut mappings {{{
+" Since I never use the ; key anyway, this is a real optimization for almost
+" all Vim commands, since we don't have to press that annoying Shift key that
+" slows the commands down
+nnoremap ; :
+"Map the colon to the semicolon so we don't prevent the default behavior
+"of the ; key, which is to repeat the previous f/F/t/T command. 
+nnoremap : ;
 
 " Replaste
 nnoremap <D-p> "_ddPV`]
