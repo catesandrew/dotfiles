@@ -71,11 +71,9 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 set termencoding=utf-8
 set encoding=utf-8
 set lazyredraw                  " don't update the display while executing macros
-set cmdheight=2                 " use a status bar that is 2 rows high
+set cmdheight=1                 " use a status bar that is 2 rows high
 
 " }}}
-
-
 " Tabs, spaces, wrapping {{{
 
 set tabstop=2
@@ -182,13 +180,15 @@ let mapleader=","
 " }}}
 " Color scheme {{{
 
-syntax on
-set background=dark
-"colorscheme molokai
-colorscheme mustang
-set tabpagemax=15 "only show 15 tabs
+if &t_Co >= 256 || has("gui_running")
+  set background=dark
+  "colorscheme molokai
+  colorscheme mustang
+endif
 
-" }}}
+if &t_Co > 2 || has("gui_running")
+  syntax on                    " switch syntax highlighting on, when the terminal has colors
+endif  
 
 " }}}
 " Useful abbreviations -------------------------------------------------------- {{{
@@ -216,20 +216,8 @@ inoremap <left> <nop>
 inoremap <right> <nop>                                                  
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
-" nnoremap j gj
-" nnoremap k gk       
-
-""" Code folding options
-nmap <leader>f0 :set foldlevel=0<CR>
-nmap <leader>f1 :set foldlevel=1<CR>
-nmap <leader>f2 :set foldlevel=2<CR>
-nmap <leader>f3 :set foldlevel=3<CR>
-nmap <leader>f4 :set foldlevel=4<CR>
-nmap <leader>f5 :set foldlevel=5<CR>
-nmap <leader>f6 :set foldlevel=6<CR>
-nmap <leader>f7 :set foldlevel=7<CR>
-nmap <leader>f8 :set foldlevel=8<CR>
-nmap <leader>f9 :set foldlevel=9<CR>
+"nnoremap j gj
+"nnoremap k gk       
 
 "clearing highlighted search
 nmap <silent> <leader>/ :nohlsearch<CR>     
@@ -240,15 +228,6 @@ nmap <silent> <leader>/ :nohlsearch<CR>
 cmap cwd lcd %:p:h
 cmap cd. lcd %:p:h
 
-" visual shifting (does not exit Visual mode)
-vnoremap < <gv
-vnoremap > >gv
-
-	
-" For when you forget to sudo.. Really Write the file.
-cmap w!! w !sudo tee % >/dev/null
-
-
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
 nnoremap / /\v
@@ -257,10 +236,6 @@ vnoremap / /\v
 " Speed up scrolling of the viewport slightly
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
-
-" Yank from the cursor to the end of the line, to be consistent with C and D.
-nnoremap Y y$
-nnoremap D d$
 
 " Keep search matches in the middle of the window.
 " nnoremap * *zzzv
@@ -316,9 +291,127 @@ map <C-K> <C-W>k<C-W>_
 map <C-L> <C-W>l<C-W>_
 map <C-H> <C-W>h<C-W>_
 
-
-
 " }}}
+" Convenience mappings -------------------------------------------------------- {{{
+
+" Clean whitespace
+map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+
+" Change case
+nnoremap <C-u> gUiw
+inoremap <C-u> <esc>gUiwea
+
+" Yankring
+nnoremap <silent> <F6> :YRShow<cr>
+let g:yankring_history_dir = '/tmp/vim'
+
+" Formatting, TextMate-style
+nnoremap <leader>q gqip
+
+" Easier linewise reselection
+nnoremap <leader>v V`]
+
+" HTML tag closing
+inoremap <C-_> <Space><BS><Esc>:call InsertCloseTag()<cr>a
+
+" Faster Esc
+" inoremap jk <ESC>
+
+" Marks and Quotes
+" noremap ' `
+" noremap æ '
+" noremap ` <C-^>
+
+" Calculator
+inoremap <C-B> <C-O>yiW<End>=<C-R>=<C-R>0<CR>
+
+" Better Completion
+set completeopt=longest,menuone,preview
+
+" This is a little tweak that is a time-saver while you’re building
+" up your .vimrc. This effectively maps the ,ev and ,sv keys to
+" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
+
+" Sudo to write
+cmap w!! w !sudo tee % >/dev/null
+
+" Quickly close the current window
+"nnoremap <leader>q :q<CR>
+
+" Use Q for formatting the current paragraph (or visual selection)
+"vmap Q gq
+"nmap Q gqap
+
+" make p in Visual mode replace the selected text with the yank register
+vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
+
+" Shortcut to make
+nmap mk :make<CR>  
+
+" Complete whole filenames/lines with a quicker shortcut key in insert mode
+imap <C-f> <C-x><C-f>
+imap <C-l> <C-x><C-l>
+
+" Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
+" yanked stack (also, in visual mode)
+nmap <silent> <leader>d "_d
+vmap <silent> <leader>d "_d  
+
+" Yank from the cursor to the end of the line, to be consistent with C and D.
+nnoremap Y y$
+nnoremap D d$
+
+" Yank/paste to the OS clipboard with ,y and ,p
+nmap <leader>y "+y
+nmap <leader>Y "+yy
+nmap <leader>p "+p
+nmap <leader>P "+P   
+
+" visual shifting (does not exit Visual mode)
+vnoremap < <gv
+vnoremap > >gv
+
+" Quickly get out of insert mode without your fingers having to leave the
+" home row (either use 'jj' or 'jk')
+"inoremap jj <Esc>
+"inoremap jk <Esc>
+
+" Quick alignment of text
+nmap <leader>al :left<CR>
+nmap <leader>ar :right<CR>
+nmap <leader>ac :center<CR>
+
+" Pull word under cursor into LHS of a substitute (for quick search and
+" replace)
+nmap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
+
+" Scratch
+nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>  
+
+
+
+" Toggle paste: Every Vim user likes to enable auto-indenting of
+" source code, so Vim can intelligently position you cursor on the
+" next line as you type. This has one big ugly consequence however:
+" when you paste text into your terminal-based Vim with a right
+" mouse click, Vim cannot know it is coming from a paste. To Vim, it
+" looks like text entered by someone who can type incredibly fast
+" :) Since Vim thinks this is regular key strokes, it applies all
+" auto-indenting and auto-expansion of defined abbreviations to the
+" input, resulting in often cascading indents of paragraphs. There is
+" an easy option to prevent this, however. You can temporarily switch
+" to “paste mode”, simply by setting the following option:
+set pastetoggle=<F8>
+
+" Reselect text that was just pasted with ,v
+nnoremap <leader>v V`]  
+
+" Shortcut mappings {{{
+
+" Replaste
+nnoremap <D-p> "_ddPV`]
 
 " }}}
 " Folding --------------------------------------------------------------------- {{{
@@ -355,6 +448,17 @@ function! MyFoldText()
 endfunction
 set foldtext=MyFoldText()
 
+""" Code folding options
+nmap <leader>f0 :set foldlevel=0<CR>
+nmap <leader>f1 :set foldlevel=1<CR>
+nmap <leader>f2 :set foldlevel=2<CR>
+nmap <leader>f3 :set foldlevel=3<CR>
+nmap <leader>f4 :set foldlevel=4<CR>
+nmap <leader>f5 :set foldlevel=5<CR>
+nmap <leader>f6 :set foldlevel=6<CR>
+nmap <leader>f7 :set foldlevel=7<CR>
+nmap <leader>f8 :set foldlevel=8<CR>
+nmap <leader>f9 :set foldlevel=9<CR>  
 
 " }}}
 " Destroy infuriating keys ---------------------------------------------------- {{{
@@ -376,7 +480,6 @@ inoremap # X<BS>#
 " Cram {{{
 
 au BufNewFile,BufRead *.t set filetype=cram
-
 let cram_fold=1
 autocmd Syntax cram setlocal foldlevel=1
 
@@ -559,78 +662,6 @@ au Filetype rst nnoremap <buffer> <localleader>3 yypVr~
 au Filetype rst nnoremap <buffer> <localleader>4 yypVr`
 
 " }}}
-
-" }}}
-" Convenience mappings -------------------------------------------------------- {{{
-
-" Clean whitespace
-map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
-
-" Change case
-nnoremap <C-u> gUiw
-inoremap <C-u> <esc>gUiwea
-
-" Yankring
-nnoremap <silent> <F6> :YRShow<cr>
-
-" Formatting, TextMate-style
-nnoremap <leader>q gqip
-
-" Easier linewise reselection
-nnoremap <leader>v V`]
-
-" HTML tag closing
-inoremap <C-_> <Space><BS><Esc>:call InsertCloseTag()<cr>a
-
-" Faster Esc
-" inoremap jk <ESC>
-
-" Marks and Quotes
-" noremap ' `
-" noremap æ '
-" noremap ` <C-^>
-
-" Calculator
-inoremap <C-B> <C-O>yiW<End>=<C-R>=<C-R>0<CR>
-
-" Better Completion
-set completeopt=longest,menuone,preview
-" inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" inoremap <expr> <C-p> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>up>" : ""<CR>'
-" inoremap <expr> <C-n> pumvisible() ? '<C-n>'  : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
-
-" Rainbows!
-nmap <leader>R :RainbowParenthesesToggle<CR>
-
-" This is a little tweak that is a time-saver while you’re building
-" up your .vimrc. This effectively maps the ,ev and ,sv keys to
-" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
-
-" Sudo to write
-cmap w!! w !sudo tee % >/dev/null
-
-" Toggle paste: Every Vim user likes to enable auto-indenting of
-" source code, so Vim can intelligently position you cursor on the
-" next line as you type. This has one big ugly consequence however:
-" when you paste text into your terminal-based Vim with a right
-" mouse click, Vim cannot know it is coming from a paste. To Vim, it
-" looks like text entered by someone who can type incredibly fast
-" :) Since Vim thinks this is regular key strokes, it applies all
-" auto-indenting and auto-expansion of defined abbreviations to the
-" input, resulting in often cascading indents of paragraphs. There is
-" an easy option to prevent this, however. You can temporarily switch
-" to “paste mode”, simply by setting the following option:
-set pastetoggle=<F8>
-
-
-" Shortcut mappings {{{
-
-" Replaste
-nnoremap <D-p> "_ddPV`]
-
-" }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
 " Ack {{{
@@ -640,16 +671,43 @@ nnoremap <D-p> "_ddPV`]
 " }}}
 " NERD Tree {{{
 
-map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
-map <leader>e :NERDTreeFind<CR>
-nmap <leader>nt :NERDTreeFind<CR>
-let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
-let NERDTreeShowBookmarks=1
+"map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 let NERDTreeChDirMode=0
-" let NERDTreeQuitOnOpen=1
-" let NERDTreeShowHidden=1
+
+
+ " NERDTree settings {{{
+" Put focus to the NERD Tree with F3 (tricked by quickly closing it and
+" immediately showing it again, since there is no :NERDTreeFocus command)
+nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
+nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
+nmap <leader>N :NERDTreeClose<CR>
+
+" Store the bookmarks file
+let NERDTreeBookmarksFile=expand("/tmp/vim/NERDTreeBookmarks")
+
+" Show the bookmarks table on startup
+let NERDTreeShowBookmarks=1
+
+" Show hidden files, too
+let NERDTreeShowFiles=1
+let NERDTreeShowHidden=1
+
+" Quit on opening files from the tree
+let NERDTreeQuitOnOpen=1
+
+" Highlight the selected entry in the tree
+let NERDTreeHighlightCursorline=1
+
+" Use a single click to fold/unfold directories and a double click to open
+" files
+let NERDTreeMouseMode=2
+
 let NERDTreeKeepTreeInNewTab=1
 
+" Don't display these kinds of files
+let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$',
+            \ '\.o$', '\.so$', '\.egg$', '^\.git$' ]
+ 
 " }}}
 " HTML5 {{{
 
@@ -742,19 +800,6 @@ endif
 " }}}
 " Ctags Variables {{{
 
-" search for exuberant ctags
-if executable('ctags-exuberant')
-  let g:ctagsbin = 'ctags-exuberant'
-elseif executable('exctags')
-  let g:ctagsbin = 'exctags'
-elseif executable('ctags')
-  let g:ctagsbin = 'ctags'
-elseif executable('ctags.exe')
-  let g:ctagsbin = 'ctags.exe'
-elseif executable('tags')
-  let g:ctagsbin = 'tags'
-endif
-
 " This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
 set tags=./tags;/,$HOME/vimtags
 map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> " C-\ - Open the definition in a new tab
@@ -775,12 +820,39 @@ endif
 " }}}
 " Taglist Variables {{{
 
+nmap <leader>l :TlistClose<CR>:TlistToggle<CR>
+nmap <leader>L :TlistClose<CR>
+
+" quit Vim when the TagList window is the last open window
+let Tlist_Exit_OnlyWindow=1         " quit when TagList is the last open window
+let Tlist_GainFocus_On_ToggleOpen=1 " put focus on the TagList window when it opens
+"let Tlist_Process_File_Always=1     " process files in the background, even when the TagList window isn't open
+"let Tlist_Show_One_File=1           " only show tags from the current buffer, not all open buffers
+let Tlist_WinWidth=40               " set the width
+let Tlist_Inc_Winwidth=1            " increase window by 1 when growing
+
+" shorten the time it takes to highlight the current tag (default is 4 secs)
+" note that this setting influences Vim's behaviour when saving swap files,
+" but we have already turned off swap files (earlier)
+"set updatetime=1000
+
+" the default ctags in /usr/bin on the Mac is GNU ctags, so change it to the
+" exuberant ctags version in /usr/local/bin
+let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
+
+" show function/method prototypes in the list
+let Tlist_Display_Prototype=1
+
+" don't show scope info
+let Tlist_Display_Tag_Scope=0
+
+" show TagList window on the right
+let Tlist_Use_Right_Window=1  
+
+
 let Tlist_Auto_Highlight_Tag = 1
 let Tlist_Auto_Update = 1
-let Tlist_Exit_OnlyWindow = 1
 let Tlist_File_Fold_Auto_Close = 1
-let Tlist_Highlight_Tag_On_BufEnter = 1
-let Tlist_Use_Right_Window = 1
 let Tlist_Use_SingleClick = 1
 
 let g:ctags_statusline=1
