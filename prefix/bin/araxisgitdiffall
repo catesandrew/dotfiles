@@ -1,0 +1,26 @@
+#!/usr/bin/osascript
+# cloned from araxisgitdiff, but instead using item 1 and 2 instead of 2 and 5.
+on run args
+  tell application "Araxis Merge"
+    set _folder1 to item 1 of args as text
+    set _folder2 to item 2 of args as text  
+
+    if not _folder1 starts with "/"
+      set _folder1 to (POSIX path of (POSIX file "." as alias)) & _folder1
+    end if
+
+    if not _folder2 starts with "/"
+      set _folder2 to (POSIX path of (POSIX file "." as alias)) & _folder2
+    end if
+
+    set _document to compare {_folder1, _folder2}
+
+    tell _document
+      activate
+    end tell
+    repeat while exists _document
+      delay 1
+    end repeat
+  end tell
+end run
+

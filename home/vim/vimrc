@@ -33,70 +33,48 @@ filetype plugin indent on       " enable detection, plugins and indenting in one
 " }}}
 " Basic options --------------------------------------------------------------- {{{
 
-set encoding=utf-8
 set modelines=0
 set scrolljump=5
-set scrolloff=3
+set scrolloff=4                 " keep 4 lines off the edges of the screen when scrolling
 set autoindent " always set autoindenting on
 set copyindent    " copy the previous indentation on autoindenting
-set showmode
-set foldenable
-
-" search for exuberant ctags
-if executable('ctags-exuberant')
-  let g:ctagsbin = 'ctags-exuberant'
-elseif executable('exctags')
-  let g:ctagsbin = 'exctags'
-elseif executable('ctags')
-  let g:ctagsbin = 'ctags'
-elseif executable('ctags.exe')
-  let g:ctagsbin = 'ctags.exe'
-elseif executable('tags')
-  let g:ctagsbin = 'tags'
-endif
-
-
-if has('cmdline_info')
-  set ruler                   " show the ruler
-  set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
-  set showcmd                 " show partial commands in status line and
-                " selected characters/lines in visual mode
-endif
-
-set showcmd
-set hidden
-set wildmenu
-set wildmode=list:longest,full
+set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
-set visualbell
-set cursorline
-set ttyfast
-set ruler
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
 set nu
 set number        " always show line numbers
 set relativenumber
-set history=1000         " remember more commands and search history
-set undolevels=1000      " use many muchos levels of undo
-set undofile
-set undoreload=10000
 set cpoptions+=J
-set list
 set listchars=tab:▸\ ,eol:¬
 set shell=/bin/bash
-set lazyredraw
-set wildignore+=*.pyc,.hg,.git
 set matchtime=3
 set showbreak=↪
 set splitbelow
 set splitright
-set title                " change the terminal's title
-set visualbell           " don't beep
-set noerrorbells         " don't beep
+set ignorecase    " ignore case when searching
+set smartcase     " ignore case if search pattern is all lowercase,
+                  "    case-sensitive otherwise
+
+set smarttab      " insert tabs on the start of a line according to
+                  "    shiftwidth, not tabstop
+set incsearch     " show search matches as you type                 
+set showmatch     " set show matching parenthesis
+set hlsearch      " highlight search terms
+set gdefault                    " search/replace "globally" (on a line) by default
+set nolist                      " don't show invisible characters by default,
+                                " but it is enabled for some file types (see later)
+set virtualedit=all             " allow the cursor to go in to "invalid" places
 
 
-" Save when losing focus
-" au FocusLost * :wa
+" Editor layout {{{
+
+set termencoding=utf-8
+set encoding=utf-8
+set lazyredraw                  " don't update the display while executing macros
+set cmdheight=2                 " use a status bar that is 2 rows high
+
+" }}}
+
 
 " Tabs, spaces, wrapping {{{
 
@@ -104,24 +82,68 @@ set tabstop=2
 set shiftwidth=2 " number of spaces to use for autoindenting
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set softtabstop=2
-set expandtab
-set nowrap
+set expandtab                   " expand tabs by default (overloadable per file type later)
+set nowrap                      " don't wrap lines
 set textwidth=120
-set formatoptions=qrn1
+set formatoptions+=1            " When wrapping paragraphs, don't end lines
+                                "    with 1-letter words (looks stupid)
 " set colorcolumn=+1
 
 " }}}
 " Par {{{
 
-:set formatprg=par\ -w78
+set formatprg=par\ -w78
 ":map <A-q> {v}!par -jw78<CR>
 ":vmap <A-q> !par -jw78<CR>
 
 " }}}
+" Vim behaviour {{{
+set hidden                      " hide buffers instead of closing them this
+                                "    means that the current buffer can be put
+                                "    to background without being written; and
+                                "    that marks and undo history are preserved
+set switchbuf=useopen           " reveal already opened files from the
+                                " quickfix window instead of opening new
+                                " buffers
+set history=1000                " remember more commands and search history
+set undolevels=1000             " use many muchos levels of undo
+set undoreload=10000
+if v:version >= 730
+    set undofile                " keep a persistent backup file
+    set undodir=/tmp/vim/undo//     " undo files
+endif
+set nobackup                    " do not keep backup files, it's 70's style cluttering
+set noswapfile                  " do not write annoying intermediate swap files,
+                                "    who did ever restore from swap files anyway?
+set backupdir=/tmp/vim/backup// " backups
+set directory=/tmp/vim/swap//   " swap files
+                                " store swap files in one of these directories
+                                "    (in case swapfile is ever turned on)
+set wildmenu                    " make tab completion for files/buffers act like bash
+set wildmode=list:longest,full  " show a list when pressing tab and complete
+                                "    first full match
+set wildignore=*.swp,*.bak,*.pyc,*.class
+set title                       " change the terminal's title
+set visualbell                  " don't beep
+set noerrorbells                " don't beep
+set nomodeline                  " disable mode lines (security measure)
+"set ttyfast                     " always use a fast terminal
+set cursorline                  " underline the current line, for quick orientation
+
+if has('cmdline_info')
+  set ruler                   " show the ruler
+  set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+  set showcmd                   " show (partial) command in the last line of the screen
+                                "    this also shows visual selection info
+endif
+
+
+" }}}    
 " Status line {{{
 
 if has('statusline')
-  set laststatus=2                                          " statusline setup  
+  set laststatus=2                " tell VIM to always put a status line in, even
+                                "    if there is only one window
   "set statusline=\ \ \ \ \ line:%l\ column:%c\ \ \ %M%Y%r%=%-14.(%t%)\ %p%%
   set statusline=   " clear the statusline, allow for rearranging parts
   set statusline+=%f\                "Path to the file, as typed or relative to current dir
@@ -150,19 +172,7 @@ if has('statusline')
     set titlestring=%t%(\ [%R%M]%)
   endif
 endif
-
-
-
-
-
-" }}}
-" Backups {{{
-
-set undodir=/tmp/vim/undo//     " undo files
-set backupdir=/tmp/vim/backup// " backups
-set directory=/tmp/vim/swap//   " swap files
-set backup                        " enable backups
-
+                                
 " }}}
 " Leader {{{
 
@@ -209,13 +219,6 @@ inoremap <right> <nop>
 " nnoremap j gj
 " nnoremap k gk       
 
-" Stupid shift key fixes
-cmap W w
-cmap WQ wq
-cmap wQ wq
-cmap Q q
-cmap Tabe tabe
-
 """ Code folding options
 nmap <leader>f0 :set foldlevel=0<CR>
 nmap <leader>f1 :set foldlevel=1<CR>
@@ -246,27 +249,14 @@ vnoremap > >gv
 cmap w!! w !sudo tee % >/dev/null
 
 
-" Use sane regexes.
-"nnoremap / /\v
-"vnoremap / /\v
+" Thanks to Steve Losh for this liberating tip
+" See http://stevelosh.com/blog/2010/09/coming-home-to-vim
+nnoremap / /\v
+vnoremap / /\v
 
-set ignorecase    " ignore case when searching
-set smartcase     " ignore case if search pattern is all lowercase,
-                  "    case-sensitive otherwise
-
-set smarttab      " insert tabs on the start of a line according to
-                  "    shiftwidth, not tabstop
-set incsearch     " show search matches as you type                 
-set showmatch     " set show matching parenthesis
-set hlsearch      " highlight search terms
-set gdefault
-
-set virtualedit+=block
-
-" map <leader><space> :noh<cr>
-
-"runtime macros/matchit.vim
-"map <tab> %
+" Speed up scrolling of the viewport slightly
+nnoremap <C-e> 2<C-e>
+nnoremap <C-y> 2<C-y>
 
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
@@ -325,7 +315,6 @@ map <C-J> <C-W>j<C-W>_
 map <C-K> <C-W>k<C-W>_
 map <C-L> <C-W>l<C-W>_
 map <C-H> <C-W>h<C-W>_
-map <C-K> <C-W>k<C-W>_
 
 
 
@@ -334,8 +323,13 @@ map <C-K> <C-W>k<C-W>_
 " }}}
 " Folding --------------------------------------------------------------------- {{{
 
-set foldlevelstart=99
-
+set foldenable                  " enable folding
+"set foldcolumn=2                " add a fold column
+set foldmethod=marker           " detect triple-{ style fold markers
+set foldlevelstart=99           " start out with nothing folded
+set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
+                                " which commands trigger auto-unfold
+                                
 " Space to toggle folds.
 nnoremap <Space> za
 vnoremap <Space> za
@@ -344,7 +338,7 @@ vnoremap <Space> za
 " cursor happens to be.
 nnoremap zO zCzO
 
-function! MyFoldText() " {{{
+function! MyFoldText()
     let line = getline(v:foldstart)
 
     let nucolwidth = &fdc + &number * &numberwidth
@@ -356,10 +350,11 @@ function! MyFoldText() " {{{
     let line = substitute(line, '\t', onetab, 'g')
 
     let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-    return line . '…' . repeat(" ",fillcharcount) . foldedlinecount . '…' . ' '
-endfunction " }}}
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+    return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+endfunction
 set foldtext=MyFoldText()
+
 
 " }}}
 " Destroy infuriating keys ---------------------------------------------------- {{{
@@ -631,13 +626,6 @@ set pastetoggle=<F8>
 
 
 " Shortcut mappings {{{
-" Since I never use the ; key anyway, this is a real optimization for almost
-" all Vim commands, since we don't have to press that annoying Shift key that
-" slows the commands down
-nnoremap ; :
-"Map the colon to the semicolon so we don't prevent the default behavior
-"of the ; key, which is to repeat the previous f/F/t/T command. 
-nnoremap : ;
 
 " Replaste
 nnoremap <D-p> "_ddPV`]
@@ -753,6 +741,19 @@ endif
 
 " }}}
 " Ctags Variables {{{
+
+" search for exuberant ctags
+if executable('ctags-exuberant')
+  let g:ctagsbin = 'ctags-exuberant'
+elseif executable('exctags')
+  let g:ctagsbin = 'exctags'
+elseif executable('ctags')
+  let g:ctagsbin = 'ctags'
+elseif executable('ctags.exe')
+  let g:ctagsbin = 'ctags.exe'
+elseif executable('tags')
+  let g:ctagsbin = 'tags'
+endif
 
 " This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
 set tags=./tags;/,$HOME/vimtags
@@ -991,6 +992,9 @@ inoremap <s-cr> <esc>A:<cr>
 " }}}
 " Error toggles --------------------------------------------------------------- {{{
 
+
+nmap <silent> <f3> :ErrorsToggle<cr>
+
 command! ErrorsToggle call ErrorsToggle()
 function! ErrorsToggle() " {{{
   if exists("w:is_error_window")
@@ -1003,8 +1007,12 @@ function! ErrorsToggle() " {{{
   endif
 endfunction " }}}
 
-command! -bang -nargs=? QFixToggle call QFixToggle(<bang>0)
-function! QFixToggle(forced) " {{{
+
+" Tame the quickfix window (open/close using f4)
+nmap <silent> <f4> :QFix<CR>
+
+command! -bang -nargs=? QFix call QFixToggle(<bang>0)
+function! QFixToggle(forced)
   if exists("g:qfix_win") && a:forced == 0
     cclose
     unlet g:qfix_win
@@ -1012,10 +1020,7 @@ function! QFixToggle(forced) " {{{
     copen 10
     let g:qfix_win = bufnr("$")
   endif
-endfunction " }}}
-
-nmap <silent> <f3> :ErrorsToggle<cr>
-nmap <silent> <f4> :QFixToggle<cr>
+endfunction
 
 " }}}
 " Persistent echo ------------------------------------------------------------- {{{

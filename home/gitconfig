@@ -26,7 +26,11 @@
 [difftool]
   prompt = false
 [diff]
-  tool = Kaleidoscope  
+  tool = araxis
+[merge]
+  tool = araxis
+[diffall]
+  external = araxisgitdiffall
 [color]
   diff = auto
   status = auto
