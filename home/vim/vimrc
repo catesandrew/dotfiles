@@ -182,8 +182,14 @@ let mapleader=","
 
 if &t_Co >= 256 || has("gui_running")
   set background=dark
-  "colorscheme molokai
+  "colorscheme baycomb
   colorscheme mustang
+  "colorscheme molokai
+  "let g:solarized_termcolors=256
+  "let g:solarized_bold = 1
+  "let g:solarized_underline = 1
+  "let g:solarized_italic = 1
+  "colorscheme solarized
 endif
 
 if &t_Co > 2 || has("gui_running")
@@ -477,11 +483,26 @@ inoremap # X<BS>#
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
 
+
+" Invisible Chars {{{  
+
+" Show invisible characters in all of these files
+au FileType vim setlocal list
+au FileType python,rst setlocal list
+au FileType ruby setlocal list
+au FileType javascript,css setlocal list
+
+" }}}
+" Ruby {{{
+
+au FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+
+" }}}
 " Cram {{{
 
 au BufNewFile,BufRead *.t set filetype=cram
 let cram_fold=1
-autocmd Syntax cram setlocal foldlevel=1
+au Syntax cram setlocal foldlevel=1
 
 " }}}
 " Clojure {{{
@@ -499,7 +520,32 @@ au FileType c setlocal foldmethod=syntax
 " }}}
 " HTML and HTMLDjango {{{
 
+ " This function detects, based on HTML content, whether this is a
+" Django template, or a plain HTML file, and sets filetype accordingly
+fun! s:DetectHTMLVariant()
+    let n = 1
+    while n < 50 && n < line("$")
+        " check for django
+        if getline(n) =~ '{%\s*\(extends\|load\|block\|if\|for\|include\|trans\)\>'
+            set ft=htmldjango.html
+            return
+        endif
+        let n = n + 1
+    endwhile
+    " go with html
+    set ft=html
+endfun
+
+au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
 " au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+
+" Auto-closing of HTML/XML tags
+let g:closetag_default_xml=1
+au FileType html,htmldjango let b:closetag_html_style=1
+au FileType html,xhtml,xml source ~/.vim/scripts/closetag.vim
+au FileType html,xml set listchars-=tab:>.          
+
+
 au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
 " Use <localleader>f to fold the current tag.
@@ -570,6 +616,9 @@ au BufNewFile,BufRead *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs
 
 au FileType javascript setlocal foldmethod=marker
 au FileType javascript setlocal foldmarker={,}
+"au FileType javascript setlocal expandtab
+"au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
+"au FileType javascript setlocal foldmethod=marker foldmarker={,}   
 
 " }}}
 " Confluence {{{
@@ -599,6 +648,10 @@ au Filetype markdown nnoremap <buffer> <localleader>3 I### <ESC>
 
 au FileType vim setlocal foldmethod=marker
 au FileType help setlocal textwidth=78
+ " Bind <F1> to show the keyword under cursor
+" general help can still be entered manually, with :h
+au FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
+au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>  
 
 " }}}
 " Python {{{
@@ -1054,6 +1107,38 @@ function! OpenQuoted() " {{{
 
     exe "silent !open ." . @r
 endfunction " }}}
+
+
+ " Restore cursor position upon reopening files {{{
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+" }}}
+
+" Common abbreviations / misspellings {{{
+source ~/.vim/autocorrect.vim
+" }}}
+
+" Extra vi-compatibility {{{
+" set extra vi-compatible options
+set cpoptions+=$     " when changing a line, don't redisplay, but put a '$' at
+                     " the end during the change
+set formatoptions-=o " don't start new lines w/ comment leader on pressing 'o'
+au filetype vim set formatoptions-=o
+                     " somehow, during vim filetype detection, this gets set
+                     " for vim files, so explicitly unset it again
+" }}}
+
+" Extra user or machine specific settings {{{
+source ~/.vim/user.vim
+" }}}
+
+" Creating underline/overline headings for markup languages
+" Inspired by http://sphinx.pocoo.org/rest.html#sections
+nnoremap <leader>1 yyPVr=jyypVr=
+nnoremap <leader>2 yyPVr*jyypVr*
+nnoremap <leader>3 yypVr=
+nnoremap <leader>4 yypVr-
+nnoremap <leader>5 yypVr^
+nnoremap <leader>6 yypVr"   
 
 " }}}
 " MacVim ---------------------------------------------------------------------- {{{

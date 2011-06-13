@@ -19,10 +19,6 @@ function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
 # posgrep: grep the directory frontmost in the Finder
 function posgrep { grep -iIrn "$1" "`/usr/local/bin/posd`"; }
 
-function ecweb {
-  nf status;nf kill;nf status;nf run ecweb;nf status;nf log ecweb
-}
-
 function tom {
 	if [ "`ps xwww | grep -v grep | grep -c catalina`" == "0" ];then
 		echo "Off";
@@ -53,6 +49,17 @@ function quoteoftheday {
   echo `curl --silent http://www.quotedb.com/quote/quote.php?action=quote_of_the_day_rss | awk 'NR==22' | sed -e 's/<[^>]*>//g'`
 }
 
+# Image width
+width () {
+  echo $(sips -g pixelWidth $1 | grep -oE "[[:digit:]]{1,}$")
+}
+
+# Image height
+height () {
+  echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")
+}
+
+
 
 ##################################################
 # Fancy PWD display function
@@ -66,7 +73,7 @@ function quoteoftheday {
 ##################################################
 bash_prompt_command() {
     # How many characters of the $PWD should be kept
-    local pwdmaxlen=25
+    local pwdmaxlen=32
     # Indicate that there has been dir truncation
     local trunc_symbol=".."
     local dir=${PWD##*/}
