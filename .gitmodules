@@ -148,3 +148,6 @@
 [submodule "home/vim/bundle/showmarks-politz"]
 	path = home/vim/bundle/showmarks-politz
 	url = git://github.com/vim-scripts/showmarks--Politz.git
+[submodule "home/vim/bundle/vim-easymotion"]
+	path = home/vim/bundle/vim-easymotion
+	url = git://github.com/Lokaltog/vim-easymotion.git
