@@ -671,16 +671,15 @@ au Filetype rst nnoremap <buffer> <localleader>4 yypVr`
 " }}}
 " NERD Tree {{{
 
-"map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
-let NERDTreeChDirMode=0
-
-
  " NERDTree settings {{{
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and
 " immediately showing it again, since there is no :NERDTreeFocus command)
 nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
 nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
 nmap <leader>N :NERDTreeClose<CR>
+"map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+
+let NERDTreeChDirMode=0
 
 " Store the bookmarks file
 let NERDTreeBookmarksFile=expand("/tmp/vim/NERDTreeBookmarks")
@@ -717,19 +716,6 @@ let g:microdata_attributes_complete = 0
 let g:atia_attributes_complete = 0
 
 " }}}
-" Show syntax filetypes in menu {{{
-
-
-" }}}
-" Gundo {{{
-
-nnoremap <F5> :GundoToggle<CR>
-let g:gundo_debug = 1
-let g:gundo_preview_bottom = 1
-let g:gundo_map_move_older = "k"
-let g:gundo_map_move_newer = "l"
-
-" }}}
 " VimClojure {{{
 
 let vimclojure#HighlightBuiltins = 1
@@ -748,8 +734,8 @@ let g:syntastic_disabled_filetypes = ['html', 'python']
 " Delimitmate {{{
 
 au FileType * let b:delimitMate_autoclose = 1
-  " If using html auto complete (complete closing tag)
-  au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
+" If using html auto complete (complete closing tag)
+au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
 
 " }}}
 " AutoCloseTag {{{
