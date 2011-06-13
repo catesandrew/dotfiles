@@ -1064,22 +1064,6 @@ inoremap <s-cr> <esc>A:<cr>
 " }}}
 " Error toggles --------------------------------------------------------------- {{{
 
-
-nmap <silent> <f3> :ErrorsToggle<cr>
-
-command! ErrorsToggle call ErrorsToggle()
-function! ErrorsToggle() " {{{
-  if exists("w:is_error_window")
-    unlet w:is_error_window
-    exec "q"
-  else
-    exec "Errors"
-    lopen
-    let w:is_error_window = 1
-  endif
-endfunction " }}}
-
-
 " Tame the quickfix window (open/close using f4)
 nmap <silent> <f4> :QFix<CR>
 
