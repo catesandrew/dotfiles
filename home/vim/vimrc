@@ -837,28 +837,10 @@ vnoremap <silent> <Leader>f :<C-U>call EasyMotionF(1, 0)<CR>
 nnoremap <silent> <Leader>F      :call EasyMotionF(0, 1)<CR>
 vnoremap <silent> <Leader>F :<C-U>call EasyMotionF(1, 1)<CR>
 
-" }}}
-" Sparkup {{{
-
-let g:sparkupExecuteMapping = '<c-s>'
-let g:sparkupNextMapping = '<c-q>'
-
 "}}}
 " Autoclose {{{
 
 nmap <Leader>x <Plug>ToggleAutoCloseMappings
-
-" }}}
-" Tasklist {{{
-
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
-
-" }}}
-" Tasklist {{{
-
-let g:tlRememberPosition = 1
-map <leader>td <Plug>TaskList
 
 " }}}
 " Pydoc {{{
@@ -887,13 +869,6 @@ let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo',
 
 let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
 let g:org_debug = 1
-" }}}
-" DirDiff {{{
-"map <unique> <Leader>Dg <Plug>DirDiffGet
-"map <unique> <Leader>Dp <Plug>DirDiffPut
-"map <unique> <Leader>Dj <Plug>DirDiffNext
-"map <unique> <Leader>Dk <Plug>DirDiffPrev
-" }}}
 
 " }}}
 " Synstack -------------------------------------------------------------------- {{{
