@@ -1073,8 +1073,7 @@ if has('gui_running')
 
     " PeepOpen
     if has("gui_macvim")
-        macmenu &File.New\ Tab key=<nop>
-        map <leader><leader> <Plug>PeepOpen
+      map <leader><leader> <Plug>PeepOpen
     end
 
     highlight SpellBad term=underline gui=undercurl guisp=Orange
