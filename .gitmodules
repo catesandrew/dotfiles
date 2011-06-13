@@ -145,3 +145,6 @@
 [submodule "home/vim/bundle/rainbow-parenthesis"]
 	path = home/vim/bundle/rainbow-parenthesis
 	url = git://github.com/vim-scripts/Rainbow-Parenthsis-Bundle.git
+[submodule "home/vim/bundle/showmarks-politz"]
+	path = home/vim/bundle/showmarks-politz
+	url = git://github.com/vim-scripts/showmarks--Politz.git
