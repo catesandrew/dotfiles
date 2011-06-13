@@ -304,8 +304,8 @@ map <C-H> <C-W>h<C-W>_
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 
 " Change case
-nnoremap <C-u> gUiw
-inoremap <C-u> <esc>gUiwea
+" nnoremap <C-u> gUiw
+" inoremap <C-u> <esc>gUiwea
 
 " Yankring
 nnoremap <silent> <F6> :YRShow<cr>
