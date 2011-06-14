@@ -82,7 +82,7 @@ set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set softtabstop=2
 set expandtab                   " expand tabs by default (overloadable per file type later)
 set nowrap                      " don't wrap lines
-set textwidth=120
+set textwidth=80
 set formatoptions+=1            " When wrapping paragraphs, don't end lines
                                 "    with 1-letter words (looks stupid)
 " set colorcolumn=+1
@@ -90,7 +90,7 @@ set formatoptions+=1            " When wrapping paragraphs, don't end lines
 " }}}
 " Par {{{
 
-set formatprg=par\ -w78
+"set formatprg=par\ -w78
 ":map <A-q> {v}!par -jw78<CR>
 ":vmap <A-q> !par -jw78<CR>
 
