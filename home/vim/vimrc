@@ -226,7 +226,7 @@ inoremap <right> <nop>
 "nnoremap k gk       
 
 "clearing highlighted search
-nmap <silent> <leader>/ :nohlsearch<CR>     
+noremap <silent> <leader>/ :nohlsearch<CR>
 
 " Shortcuts
 
