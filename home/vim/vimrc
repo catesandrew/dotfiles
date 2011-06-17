@@ -199,36 +199,11 @@ endif
 " }}}
 " Useful abbreviations -------------------------------------------------------- {{{
 
-iabbrev ldis ಠ_ಠ
-
-
 " }}}
 " Searching and movement ------------------------------------------------------ {{{
-                      
-" Fix home and end keybindings for screen, particularly on mac
-" - for some reason this fixes the arrow keys too. huh.
-" map [F $
-" imap [F $
-" map [H g0
-" imap [H g0
-
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
-nnoremap <right> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>                                                  
-
-" Wrapped lines goes down/up to next row, rather than next line in file.
-"nnoremap j gj
-"nnoremap k gk       
 
 "clearing highlighted search
 noremap <silent> <leader>/ :nohlsearch<CR>
-
-" Shortcuts
 
 " Change Working Directory to that of the current file
 cmap cwd lcd %:p:h
@@ -237,75 +212,41 @@ cmap cd. lcd %:p:h
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
 nnoremap / /\v
-vnoremap / /\v
 
 " Speed up scrolling of the viewport slightly
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 
-" Keep search matches in the middle of the window.
-" nnoremap * *zzzv
-" nnoremap # #zzzv
-" nnoremap n nzzzv
-" nnoremap N Nzzzv
-
-" L is easier to type, and I never use the default behavior.
-" noremap L $
-
-" Heresy
-" inoremap <c-a> <esc>I
-" inoremap <c-e> <esc>A
-
-" Open a Quickfix window for the last search
-" nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
-
-" Fix linewise visual selection of various text objects
-" nnoremap Vit vitVkoj
-" nnoremap Vat vatV
-" nnoremap Vab vabV
-" nnoremap VaB vaBV
-
-" Error navigation {{{
-"
-"             Location List     QuickFix Window
-"            (e.g. Syntastic)     (e.g. Ack)
-"            ----------------------------------
-" Next      |     M-k               M-Down     |
-" Previous  |     M-l                M-Up      |
-"            ----------------------------------
-"
-" nnoremap ˚ :lnext<cr>zvzz
-" nnoremap ¬ :lprevious<cr>zvzz
-" inoremap ˚ <esc>:lnext<cr>zvzz
-" inoremap ¬ <esc>:lprevious<cr>zvzz
-" nnoremap <m-Down> :cnext<cr>zvzz
-" nnoremap <m-Up> :cprevious<cr>zvzz
 " }}}
-
 " Directional Keys {{{
 
-" Easy buffer navigation
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>  
+
+" Easier moving in tabs and windows
 noremap <C-j>  <C-w>j
 noremap <C-k>  <C-w>k
 noremap <C-l>  <C-w>l
 noremap <C-h>  <C-w>h
-noremap <leader>g <C-w>v
 
-" Easier moving in tabs and windows
-map <C-J> <C-W>j<C-W>_
-map <C-K> <C-W>k<C-W>_
-map <C-L> <C-W>l<C-W>_
-map <C-H> <C-W>h<C-W>_
+" Fix home and end keybindings for screen, particularly on mac
+" - for some reason this fixes the arrow keys too. huh.
+" map [F $
+" imap [F $
+" map [H g0
+" imap [H g0
 
 " }}}
 " Convenience mappings -------------------------------------------------------- {{{
 
 " Clean whitespace
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
-
-" Change case
-" nnoremap <C-u> gUiw
-" inoremap <C-u> <esc>gUiwea
 
 " Yankring
 nnoremap <silent> <F6> :YRShow<cr>
@@ -316,20 +257,6 @@ nnoremap <leader>q gqip
 
 " Easier linewise reselection
 nnoremap <leader>v V`]
-
-" HTML tag closing
-inoremap <C-_> <Space><BS><Esc>:call InsertCloseTag()<cr>a
-
-" Faster Esc
-" inoremap jk <ESC>
-
-" Marks and Quotes
-" noremap ' `
-" noremap æ '
-" noremap ` <C-^>
-
-" Calculator
-inoremap <C-B> <C-O>yiW<End>=<C-R>=<C-R>0<CR>
 
 " Better Completion
 set completeopt=longest,menuone,preview
@@ -349,16 +276,6 @@ cmap w!! w !sudo tee % >/dev/null
 " Use Q for formatting the current paragraph (or visual selection)
 "vmap Q gq
 "nmap Q gqap
-
-" make p in Visual mode replace the selected text with the yank register
-vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
-
-" Shortcut to make
-nmap mk :make<CR>  
-
-" Complete whole filenames/lines with a quicker shortcut key in insert mode
-imap <C-f> <C-x><C-f>
-imap <C-l> <C-x><C-l>
 
 " Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
 " yanked stack (also, in visual mode)
@@ -395,8 +312,6 @@ nmap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
 
 " Scratch
 nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>  
-
-
 
 " Toggle paste: Every Vim user likes to enable auto-indenting of
 " source code, so Vim can intelligently position you cursor on the
@@ -943,101 +858,101 @@ nmap <M-S> :call SynStack()<CR>
 
 " Shortcut for [] {{{
 
-onoremap id i[
-onoremap ad a[
-vnoremap id i[
-vnoremap ad a[
+"onoremap id i[
+"onoremap ad a[
+"vnoremap id i[
+"vnoremap ad a[
 
 " }}}
 " Next/Last () {{{
-vnoremap <silent> inb :<C-U>normal! f(vib<cr>
-onoremap <silent> inb :<C-U>normal! f(vib<cr>
-vnoremap <silent> anb :<C-U>normal! f(vab<cr>
-onoremap <silent> anb :<C-U>normal! f(vab<cr>
-vnoremap <silent> in( :<C-U>normal! f(vi(<cr>
-onoremap <silent> in( :<C-U>normal! f(vi(<cr>
-vnoremap <silent> an( :<C-U>normal! f(va(<cr>
-onoremap <silent> an( :<C-U>normal! f(va(<cr>
+"vnoremap <silent> inb :<C-U>normal! f(vib<cr>
+"onoremap <silent> inb :<C-U>normal! f(vib<cr>
+"vnoremap <silent> anb :<C-U>normal! f(vab<cr>
+"onoremap <silent> anb :<C-U>normal! f(vab<cr>
+"vnoremap <silent> in( :<C-U>normal! f(vi(<cr>
+"onoremap <silent> in( :<C-U>normal! f(vi(<cr>
+"vnoremap <silent> an( :<C-U>normal! f(va(<cr>
+"onoremap <silent> an( :<C-U>normal! f(va(<cr>
 
-vnoremap <silent> ilb :<C-U>normal! F)vib<cr>
-onoremap <silent> ilb :<C-U>normal! F)vib<cr>
-vnoremap <silent> alb :<C-U>normal! F)vab<cr>
-onoremap <silent> alb :<C-U>normal! F)vab<cr>
-vnoremap <silent> il( :<C-U>normal! F)vi(<cr>
-onoremap <silent> il( :<C-U>normal! F)vi(<cr>
-vnoremap <silent> al( :<C-U>normal! F)va(<cr>
-onoremap <silent> al( :<C-U>normal! F)va(<cr>
+"vnoremap <silent> ilb :<C-U>normal! F)vib<cr>
+"onoremap <silent> ilb :<C-U>normal! F)vib<cr>
+"vnoremap <silent> alb :<C-U>normal! F)vab<cr>
+"onoremap <silent> alb :<C-U>normal! F)vab<cr>
+"vnoremap <silent> il( :<C-U>normal! F)vi(<cr>
+"onoremap <silent> il( :<C-U>normal! F)vi(<cr>
+"vnoremap <silent> al( :<C-U>normal! F)va(<cr>
+"onoremap <silent> al( :<C-U>normal! F)va(<cr>
 " }}}
 " Next/Last {} {{{
-vnoremap <silent> inB :<C-U>normal! f{viB<cr>
-onoremap <silent> inB :<C-U>normal! f{viB<cr>
-vnoremap <silent> anB :<C-U>normal! f{vaB<cr>
-onoremap <silent> anB :<C-U>normal! f{vaB<cr>
-vnoremap <silent> in{ :<C-U>normal! f{vi{<cr>
-onoremap <silent> in{ :<C-U>normal! f{vi{<cr>
-vnoremap <silent> an{ :<C-U>normal! f{va{<cr>
-onoremap <silent> an{ :<C-U>normal! f{va{<cr>
+"vnoremap <silent> inB :<C-U>normal! f{viB<cr>
+"onoremap <silent> inB :<C-U>normal! f{viB<cr>
+"vnoremap <silent> anB :<C-U>normal! f{vaB<cr>
+"onoremap <silent> anB :<C-U>normal! f{vaB<cr>
+"vnoremap <silent> in{ :<C-U>normal! f{vi{<cr>
+"onoremap <silent> in{ :<C-U>normal! f{vi{<cr>
+"vnoremap <silent> an{ :<C-U>normal! f{va{<cr>
+"onoremap <silent> an{ :<C-U>normal! f{va{<cr>
 
-vnoremap <silent> ilB :<C-U>normal! F}viB<cr>
-onoremap <silent> ilB :<C-U>normal! F}viB<cr>
-vnoremap <silent> alB :<C-U>normal! F}vaB<cr>
-onoremap <silent> alB :<C-U>normal! F}vaB<cr>
-vnoremap <silent> il{ :<C-U>normal! F}vi{<cr>
-onoremap <silent> il{ :<C-U>normal! F}vi{<cr>
-vnoremap <silent> al{ :<C-U>normal! F}va{<cr>
-onoremap <silent> al{ :<C-U>normal! F}va{<cr>
+"vnoremap <silent> ilB :<C-U>normal! F}viB<cr>
+"onoremap <silent> ilB :<C-U>normal! F}viB<cr>
+"vnoremap <silent> alB :<C-U>normal! F}vaB<cr>
+"onoremap <silent> alB :<C-U>normal! F}vaB<cr>
+"vnoremap <silent> il{ :<C-U>normal! F}vi{<cr>
+"onoremap <silent> il{ :<C-U>normal! F}vi{<cr>
+"vnoremap <silent> al{ :<C-U>normal! F}va{<cr>
+"onoremap <silent> al{ :<C-U>normal! F}va{<cr>
 " }}}
 " Next/Last [] {{{
-vnoremap <silent> ind :<C-U>normal! f[vi[<cr>
-onoremap <silent> ind :<C-U>normal! f[vi[<cr>
-vnoremap <silent> and :<C-U>normal! f[va[<cr>
-onoremap <silent> and :<C-U>normal! f[va[<cr>
-vnoremap <silent> in[ :<C-U>normal! f[vi[<cr>
-onoremap <silent> in[ :<C-U>normal! f[vi[<cr>
-vnoremap <silent> an[ :<C-U>normal! f[va[<cr>
-onoremap <silent> an[ :<C-U>normal! f[va[<cr>
+"vnoremap <silent> ind :<C-U>normal! f[vi[<cr>
+"onoremap <silent> ind :<C-U>normal! f[vi[<cr>
+"vnoremap <silent> and :<C-U>normal! f[va[<cr>
+"onoremap <silent> and :<C-U>normal! f[va[<cr>
+"vnoremap <silent> in[ :<C-U>normal! f[vi[<cr>
+"onoremap <silent> in[ :<C-U>normal! f[vi[<cr>
+"vnoremap <silent> an[ :<C-U>normal! f[va[<cr>
+"onoremap <silent> an[ :<C-U>normal! f[va[<cr>
 
-vnoremap <silent> ild :<C-U>normal! F]vi[<cr>
-onoremap <silent> ild :<C-U>normal! F]vi[<cr>
-vnoremap <silent> ald :<C-U>normal! F]va[<cr>
-onoremap <silent> ald :<C-U>normal! F]va[<cr>
-vnoremap <silent> il[ :<C-U>normal! F]vi[<cr>
-onoremap <silent> il[ :<C-U>normal! F]vi[<cr>
-vnoremap <silent> al[ :<C-U>normal! F]va[<cr>
-onoremap <silent> al[ :<C-U>normal! F]va[<cr>
-" }}}
+"vnoremap <silent> ild :<C-U>normal! F]vi[<cr>
+"onoremap <silent> ild :<C-U>normal! F]vi[<cr>
+"vnoremap <silent> ald :<C-U>normal! F]va[<cr>
+"onoremap <silent> ald :<C-U>normal! F]va[<cr>
+"vnoremap <silent> il[ :<C-U>normal! F]vi[<cr>
+"onoremap <silent> il[ :<C-U>normal! F]vi[<cr>
+"vnoremap <silent> al[ :<C-U>normal! F]va[<cr>
+"onoremap <silent> al[ :<C-U>normal! F]va[<cr>
+"" }}}
 " Next/Last <> {{{
-vnoremap <silent> in< :<C-U>normal! f<vi<<cr>
-onoremap <silent> in< :<C-U>normal! f<vi<<cr>
-vnoremap <silent> an< :<C-U>normal! f<va<<cr>
-onoremap <silent> an< :<C-U>normal! f<va<<cr>
+"vnoremap <silent> in< :<C-U>normal! f<vi<<cr>
+"onoremap <silent> in< :<C-U>normal! f<vi<<cr>
+"vnoremap <silent> an< :<C-U>normal! f<va<<cr>
+"onoremap <silent> an< :<C-U>normal! f<va<<cr>
 
-vnoremap <silent> il< :<C-U>normal! f>vi<<cr>
-onoremap <silent> il< :<C-U>normal! f>vi<<cr>
-vnoremap <silent> al< :<C-U>normal! f>va<<cr>
-onoremap <silent> al< :<C-U>normal! f>va<<cr>
+"vnoremap <silent> il< :<C-U>normal! f>vi<<cr>
+"onoremap <silent> il< :<C-U>normal! f>vi<<cr>
+"vnoremap <silent> al< :<C-U>normal! f>va<<cr>
+"onoremap <silent> al< :<C-U>normal! f>va<<cr>
 " }}}
 " Next '' {{{
-vnoremap <silent> in' :<C-U>normal! f'vi'<cr>
-onoremap <silent> in' :<C-U>normal! f'vi'<cr>
-vnoremap <silent> an' :<C-U>normal! f'va'<cr>
-onoremap <silent> an' :<C-U>normal! f'va'<cr>
+"vnoremap <silent> in' :<C-U>normal! f'vi'<cr>
+"onoremap <silent> in' :<C-U>normal! f'vi'<cr>
+"vnoremap <silent> an' :<C-U>normal! f'va'<cr>
+"onoremap <silent> an' :<C-U>normal! f'va'<cr>
 
-vnoremap <silent> il' :<C-U>normal! F'vi'<cr>
-onoremap <silent> il' :<C-U>normal! F'vi'<cr>
-vnoremap <silent> al' :<C-U>normal! F'va'<cr>
-onoremap <silent> al' :<C-U>normal! F'va'<cr>
+"vnoremap <silent> il' :<C-U>normal! F'vi'<cr>
+"onoremap <silent> il' :<C-U>normal! F'vi'<cr>
+"vnoremap <silent> al' :<C-U>normal! F'va'<cr>
+"onoremap <silent> al' :<C-U>normal! F'va'<cr>
 " }}}
 " Next "" {{{
-vnoremap <silent> in" :<C-U>normal! f"vi"<cr>
-onoremap <silent> in" :<C-U>normal! f"vi"<cr>
-vnoremap <silent> an" :<C-U>normal! f"va"<cr>
-onoremap <silent> an" :<C-U>normal! f"va"<cr>
+"vnoremap <silent> in" :<C-U>normal! f"vi"<cr>
+"onoremap <silent> in" :<C-U>normal! f"vi"<cr>
+"vnoremap <silent> an" :<C-U>normal! f"va"<cr>
+"onoremap <silent> an" :<C-U>normal! f"va"<cr>
 
-vnoremap <silent> il" :<C-U>normal! F"vi"<cr>
-onoremap <silent> il" :<C-U>normal! F"vi"<cr>
-vnoremap <silent> al" :<C-U>normal! F"va"<cr>
-onoremap <silent> al" :<C-U>normal! F"va"<cr>
+"vnoremap <silent> il" :<C-U>normal! F"vi"<cr>
+"onoremap <silent> il" :<C-U>normal! F"vi"<cr>
+"vnoremap <silent> al" :<C-U>normal! F"va"<cr>
+"onoremap <silent> al" :<C-U>normal! F"va"<cr>
 " }}}
 
 " }}}
@@ -1109,7 +1024,7 @@ function! OpenQuoted() " {{{
 endfunction " }}}
 
 
- " Restore cursor position upon reopening files {{{
+" Restore cursor position upon reopening files {{{
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 " }}}
 
