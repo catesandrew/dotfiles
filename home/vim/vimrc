@@ -41,7 +41,6 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
-set nu
 set number        " always show line numbers
 set relativenumber
 set cpoptions+=J
@@ -82,7 +81,7 @@ set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set softtabstop=2
 set expandtab                   " expand tabs by default (overloadable per file type later)
 set nowrap                      " don't wrap lines
-set textwidth=80
+set textwidth=120
 set formatoptions+=1            " When wrapping paragraphs, don't end lines
                                 "    with 1-letter words (looks stupid)
 " set colorcolumn=+1
@@ -402,30 +401,15 @@ inoremap # X<BS>#
 " Invisible Chars {{{  
 
 " Show invisible characters in all of these files
-au FileType vim setlocal list
-au FileType python,rst setlocal list
-au FileType ruby setlocal list
-au FileType javascript,css setlocal list
+"au FileType vim setlocal list
+"au FileType python,rst setlocal list
+"au FileType ruby setlocal list
+"au FileType javascript,css setlocal list
 
 " }}}
 " Ruby {{{
 
-au FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-
-" }}}
-" Cram {{{
-
-au BufNewFile,BufRead *.t set filetype=cram
-let cram_fold=1
-au Syntax cram setlocal foldlevel=1
-
-" }}}
-" Clojure {{{
-
-au FileType clojure call TurnOnClojureFolding()
-
-" Eval toplevel form, even when you're on the opening paren.
-au FileType clojure nmap <localleader>ee 0;\et
+"au FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
 " }}}
 " C {{{
@@ -451,21 +435,22 @@ fun! s:DetectHTMLVariant()
     set ft=html
 endfun
 
-au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
+"au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
 " au BufNewFile,BufRead *.html setlocal filetype=htmldjango
 
 " Auto-closing of HTML/XML tags
 let g:closetag_default_xml=1
-au FileType html,htmldjango let b:closetag_html_style=1
+au FileType html let b:closetag_html_style=1
 au FileType html,xhtml,xml source ~/.vim/scripts/closetag.vim
 au FileType html,xml set listchars-=tab:>.          
 
-
-au BufNewFile,BufRead *.html setlocal foldmethod=manual
+"au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
 " Use <localleader>f to fold the current tag.
 au BufNewFile,BufRead *.html nnoremap <buffer> <localleader>f Vatzf
 au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
+au BufNewFile,BufRead *.htm nnoremap <buffer> <localleader>f Vatzf
+au BufNewFile,BufRead *.htm nnoremap <buffer> VV vatV
 
 " Use Shift-Return to turn this:
 "     <tag>|</tag>
@@ -474,14 +459,8 @@ au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
 "     <tag>
 "         |
 "     </tag>
-au BufNewFile,BufRead *.html inoremap <buffer> <s-cr> <cr><esc>kA<cr>
-au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
-
-" Django tags
-au FileType jinja,htmldjango inoremap <buffer> <c-t> {%<space><space>%}<left><left><left>
-
-" Django variables
-au FileType jinja,htmldjango inoremap <buffer> <c-f> {{<space><space>}}<left><left><left>
+"au BufNewFile,BufRead *.html inoremap <buffer> <s-cr> <cr><esc>kA<cr>
+"au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
 
 " }}}
 " CSS and LessCSS {{{
@@ -518,13 +497,13 @@ au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 "         ...
 "     }
 "
-au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
-au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+"au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+"au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
 " Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
 " positioned inside of them AND the following code doesn't get unfolded.
-au BufNewFile,BufRead *.css  inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
-au BufNewFile,BufRead *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
+"au BufNewFile,BufRead *.css  inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
+"au BufNewFile,BufRead *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
 
 " }}}
 " Javascript {{{
@@ -534,19 +513,6 @@ au FileType javascript setlocal foldmarker={,}
 "au FileType javascript setlocal expandtab
 "au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
 "au FileType javascript setlocal foldmethod=marker foldmarker={,}   
-
-" }}}
-" Confluence {{{
-
-au BufRead,BufNewFile *.confluencewiki setlocal filetype=confluencewiki
-
-" Wiki pages should be soft-wrapped.
-au FileType confluencewiki setlocal wrap linebreak nolist
-
-" }}}
-" Fish {{{
-
-au BufNewFile,BufRead *.fish setlocal filetype=fish
 
 " }}}
 " Markdown {{{
@@ -569,67 +535,10 @@ au FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>  
 
 " }}}
-" Python {{{
-
-au Filetype python noremap  <localleader>rr :RopeRename<CR>
-au Filetype python vnoremap <localleader>rm :RopeExtractMethod<CR>
-au Filetype python noremap  <localleader>ri :RopeOrganizeImports<CR>
-au FileType python setlocal omnifunc=pythoncomplete#Complete
-
-" }}}
-" Django {{{
-
-au BufNewFile,BufRead urls.py      setlocal nowrap
-au BufNewFile,BufRead urls.py      normal! zR
-au BufNewFile,BufRead dashboard.py normal! zR
-
-au BufNewFile,BufRead admin.py     setlocal filetype=python.django
-au BufNewFile,BufRead urls.py      setlocal filetype=python.django
-au BufNewFile,BufRead models.py    setlocal filetype=python.django
-au BufNewFile,BufRead views.py     setlocal filetype=python.django
-au BufNewFile,BufRead settings.py  setlocal filetype=python.django
-au BufNewFile,BufRead settings.py  setlocal foldmethod=marker
-au BufNewFile,BufRead forms.py     setlocal filetype=python.django
-au BufNewFile,BufRead common_settings.py  setlocal filetype=python.django
-au BufNewFile,BufRead common_settings.py  setlocal foldmethod=marker
-
-" }}}
-" Nginx {{{
-
-au BufRead,BufNewFile /etc/nginx/conf/*                      set ft=nginx
-au BufRead,BufNewFile /etc/nginx/sites-available/*           set ft=nginx
-au BufRead,BufNewFile /usr/local/etc/nginx/sites-available/* set ft=nginx
-
-" }}}
-" Pentadactyl {{{
-
-au BufNewFile,BufRead .pentadactylrc set filetype=pentadactyl
-
-" }}}
-" Vagrant {{{
-
-au BufRead,BufNewFile Vagrantfile set ft=ruby
-
-" }}}
-" Puppet {{{
-
-au Filetype puppet setlocal foldmethod=marker
-au Filetype puppet setlocal foldmarker={,}
-
-" }}}
 " Firefox {{{
 
 au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 
-" }}}
-" ReStructuredText {{{
-
-au Filetype rst nnoremap <buffer> <localleader>1 yypVr=
-au Filetype rst nnoremap <buffer> <localleader>2 yypVr-
-au Filetype rst nnoremap <buffer> <localleader>3 yypVr~
-au Filetype rst nnoremap <buffer> <localleader>4 yypVr`
-
-" }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
 " Ack {{{
@@ -707,7 +616,7 @@ au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
 
 " }}}
 " AutoCloseTag {{{
-  " Make it so AutoCloseTag works for xml and xhtml files as well
+" Make it so AutoCloseTag works for xml and xhtml files as well
 "au FileType xhtml,xml ru ftplugin/html/autoclosetag.vim
 au FileType xhtml,xml ru ~/.vim/bundle/autoclosetag/ftplugin/html/autoclose.vim
 
@@ -790,11 +699,6 @@ let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:prop
 nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>                       
 
 " }}}
-" LISP (built-in) {{{
-
-let g:lisp_rainbow = 1
-
-" }}}
 " Easymotion {{{
 
 let g:EasyMotion_do_mapping = 0
@@ -809,12 +713,6 @@ vnoremap <silent> <Leader>F :<C-U>call EasyMotionF(1, 1)<CR>
 " Autoclose {{{
 
 nmap <Leader>x <Plug>ToggleAutoCloseMappings
-
-" }}}
-" Pydoc {{{
-
-au FileType python noremap <buffer> <localleader>lw :call ShowPyDoc('<C-R><C-W>', 1)<CR>
-au FileType python noremap <buffer> <localleader>lW :call ShowPyDoc('<C-R><C-A>', 1)<CR>
 
 " }}}
 " Scratch {{{
