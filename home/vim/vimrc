@@ -447,10 +447,10 @@ au FileType html,xml set listchars-=tab:>.
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
 " Use <localleader>f to fold the current tag.
-au BufNewFile,BufRead *.html nnoremap <buffer> <localleader>f Vatzf
-au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
-au BufNewFile,BufRead *.htm nnoremap <buffer> <localleader>f Vatzf
-au BufNewFile,BufRead *.htm nnoremap <buffer> VV vatV
+"au BufNewFile,BufRead *.html nnoremap <buffer> <localleader>f Vatzf
+"au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
+"au BufNewFile,BufRead *.htm nnoremap <buffer> <localleader>f Vatzf
+"au BufNewFile,BufRead *.htm nnoremap <buffer> VV vatV
 
 " Use Shift-Return to turn this:
 "     <tag>|</tag>
