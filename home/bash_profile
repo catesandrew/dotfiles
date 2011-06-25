@@ -4,6 +4,8 @@ export EDITOR='mate -w'
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export JAVA_HOME="`/usr/libexec/java_home`"
 
+export PYTHONPATH=/usr/local/lib/python2.6/site-packages     
+
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
 # few annoyances:
