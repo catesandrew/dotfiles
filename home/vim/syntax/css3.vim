@@ -10,16 +10,16 @@ if exists("b:current_syntax")
   finish
 endif
 
-"if !exists("main_syntax")
-  "let main_syntax = 'css'
-"endif
+if !exists("main_syntax")
+  let main_syntax = 'css'
+endif
 
-"if version < 600
-  "so <sfile>:p:h/css.vim
-"else
-  "runtime! syntax/css.vim
-  "unlet b:current_syntax
-"endif
+if version < 600
+  so <sfile>:p:h/css.vim
+else
+  runtime! syntax/css.vim
+  unlet b:current_syntax
+endif
 
 
 syn case ignore
@@ -250,5 +250,5 @@ HLink cssURL String
 
 delcommand HLink
 
-let b:current_syntax = "css"
+let b:current_syntax = "css3"
 syn sync minlines=10
