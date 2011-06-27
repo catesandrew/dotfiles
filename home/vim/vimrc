@@ -7,7 +7,7 @@
 "     ./configure --with-features=huge
 "                 --enable-pythoninterp --enable-rubyinterp
 "                 --enable-perlinterp --with-macarchs=x86_64
-"                 --with-macsdk=10.6 --enable-enablemultibyte
+"                 --with-macsdk=10.6 --enable-multibyte
 "                 --enable-cscope --prefix=/usr/local
 "
 " To start vim without using this .vimrc file, use:
@@ -34,6 +34,7 @@ filetype plugin indent on       " enable detection, plugins and indenting in one
 " Basic options --------------------------------------------------------------- {{{
 
 set modelines=0
+set updatecount=50 "write swap file to disk after 50 keystrokes
 set scrolljump=5
 set scrolloff=4                 " keep 4 lines off the edges of the screen when scrolling
 set autoindent " always set autoindenting on
@@ -57,7 +58,7 @@ set smartcase     " ignore case if search pattern is all lowercase,
 set smarttab      " insert tabs on the start of a line according to
                   "    shiftwidth, not tabstop
 set incsearch     " show search matches as you type                 
-set showmatch     " set show matching parenthesis
+set showmatch matchtime=3 " when bracket is inserted, briefly jump to the matching one
 set hlsearch      " highlight search terms
 set gdefault                    " search/replace "globally" (on a line) by default
 set nolist                      " don't show invisible characters by default,
@@ -107,13 +108,13 @@ set undolevels=1000             " use many muchos levels of undo
 set undoreload=10000
 if v:version >= 730
     set undofile                " keep a persistent backup file
-    set undodir=/tmp/vim/undo//     " undo files
+    set undodir=~/.vim/tmp/undo//     " undo files
 endif
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-set backupdir=/tmp/vim/backup// " backups
-set directory=/tmp/vim/swap//   " swap files
+set backupdir=~/.vim/tmp/backup// " backups
+set directory=~/vim/tmp/swap//   " swap files
                                 " store swap files in one of these directories
                                 "    (in case swapfile is ever turned on)
 set wildmenu                    " make tab completion for files/buffers act like bash
@@ -249,7 +250,7 @@ map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 
 " Yankring
 nnoremap <silent> <F6> :YRShow<cr>
-let g:yankring_history_dir = '/tmp/vim'
+let g:yankring_history_dir = '~/.vim/tmp'
 
 " Formatting, TextMate-style
 nnoremap <leader>q gqip
@@ -295,11 +296,6 @@ nmap <leader>P "+P
 vnoremap < <gv
 vnoremap > >gv
 
-" Quickly get out of insert mode without your fingers having to leave the
-" home row (either use 'jj' or 'jk')
-"inoremap jj <Esc>
-"inoremap jk <Esc>
-
 " Quick alignment of text
 nmap <leader>al :left<CR>
 nmap <leader>ar :right<CR>
@@ -325,10 +321,8 @@ nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 " to “paste mode”, simply by setting the following option:
 set pastetoggle=<F8>
 
-" Reselect text that was just pasted with ,v
+" Reselect text that was just pasted with <leader>v
 nnoremap <leader>v V`]  
-
-" Shortcut mappings {{{
 
 " Replaste
 nnoremap <D-p> "_ddPV`]
@@ -344,29 +338,29 @@ set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
                                 " which commands trigger auto-unfold
                                 
 " Space to toggle folds.
-nnoremap <Space> za
-vnoremap <Space> za
+"nnoremap <Space> za
+"vnoremap <Space> za
 
 " Make zO recursively open whatever top level fold we're in, no matter where the
 " cursor happens to be.
-nnoremap zO zCzO
+"nnoremap zO zCzO
 
-function! MyFoldText()
-    let line = getline(v:foldstart)
+"function! MyFoldText()
+    "let line = getline(v:foldstart)
 
-    let nucolwidth = &fdc + &number * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 3
-    let foldedlinecount = v:foldend - v:foldstart
+    "let nucolwidth = &fdc + &number * &numberwidth
+    "let windowwidth = winwidth(0) - nucolwidth - 3
+    "let foldedlinecount = v:foldend - v:foldstart
 
-    " expand tabs into spaces
-    let onetab = strpart('          ', 0, &tabstop)
-    let line = substitute(line, '\t', onetab, 'g')
+    "" expand tabs into spaces
+    "let onetab = strpart('          ', 0, &tabstop)
+    "let line = substitute(line, '\t', onetab, 'g')
 
-    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
-    return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-endfunction
-set foldtext=MyFoldText()
+    "let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    "let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+    "return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+"endfunction
+"set foldtext=MyFoldText()
 
 """ Code folding options
 nmap <leader>f0 :set foldlevel=0<CR>
@@ -441,7 +435,6 @@ endfun
 " Auto-closing of HTML/XML tags
 let g:closetag_default_xml=1
 au FileType html let b:closetag_html_style=1
-au FileType html,xhtml,xml source ~/.vim/scripts/closetag.vim
 au FileType html,xml set listchars-=tab:>.          
 
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
@@ -465,6 +458,7 @@ au FileType html,xml set listchars-=tab:>.
 " }}}
 " CSS and LessCSS {{{
 
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 au BufNewFile,BufRead *.less setlocal filetype=less
 
 au BufNewFile,BufRead *.css  setlocal foldmethod=marker
@@ -477,7 +471,6 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
 au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 " Use <leader>S to sort properties.  Turns this:
 "
 "     p {
@@ -560,7 +553,7 @@ nmap <leader>N :NERDTreeClose<CR>
 let NERDTreeChDirMode=0
 
 " Store the bookmarks file
-let NERDTreeBookmarksFile=expand("/tmp/vim/NERDTreeBookmarks")
+let NERDTreeBookmarksFile=expand("~/.vim/tmp/NERDTreeBookmarks")
 
 " Show the bookmarks table on startup
 let NERDTreeShowBookmarks=1
@@ -582,8 +575,7 @@ let NERDTreeMouseMode=2
 let NERDTreeKeepTreeInNewTab=1
 
 " Don't display these kinds of files
-let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$',
-            \ '\.o$', '\.so$', '\.egg$', '^\.git$' ]
+let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
  
 " }}}
 " HTML5 {{{
@@ -592,15 +584,6 @@ let g:event_handler_attributes_complete = 0
 let g:rdfa_attributes_complete = 0
 let g:microdata_attributes_complete = 0
 let g:atia_attributes_complete = 0
-
-" }}}
-" VimClojure {{{
-
-let vimclojure#HighlightBuiltins = 1
-let vimclojure#ParenRainbow = 1
-let vimclojure#WantNailgun = 1
-let vimclojure#NailgunClient = $HOME . "/.vim/bundle/vimclojure/bin/ng"
-let vimclojure#SplitPos = "right"
 
 " }}}
 " Syntastic {{{
@@ -616,17 +599,8 @@ au FileType * let b:delimitMate_autoclose = 1
 au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
 
 " }}}
-" AutoCloseTag {{{
-" Make it so AutoCloseTag works for xml and xhtml files as well
-"au FileType xhtml,xml ru ftplugin/html/autoclosetag.vim
-au FileType xhtml,xml ru ~/.vim/bundle/autoclosetag/ftplugin/html/autoclose.vim
-
-" }}}
 " SnipMate {{{
 
-" Setting the author var
-" If forking, please overwrite in your .vimrc.local file
-let g:snips_author = 'Andrew Cates <catesandrew@netflix.com>'
 " Shortcut for reloading snippets, useful when developing
 nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>    
 
@@ -650,8 +624,10 @@ highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
 
 " This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
 set tags=./tags;/,$HOME/vimtags
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> " C-\ - Open the definition in a new tab
-map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>      " A-] - Open the definition in a vertical split
+" C-\ - Open the definition in a new tab
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> 
+" A-] - Open the definition in a vertical split
+map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>      
 
 " }}}
 " Taglist Variables {{{
