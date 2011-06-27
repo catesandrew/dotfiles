@@ -148,9 +148,6 @@
 [submodule "home/vim/bundle/vim-easymotion"]
 	path = home/vim/bundle/vim-easymotion
 	url = git://github.com/Lokaltog/vim-easymotion.git
-[submodule "home/vim/bundle/vim-css-color"]
-	path = home/vim/bundle/vim-css-color
-	url = git://github.com/skammer/vim-css-color.git
 [submodule "home/vim/bundle/gitv"]
 	path = home/vim/bundle/gitv
 	url = git://github.com/gregsexton/gitv.git
