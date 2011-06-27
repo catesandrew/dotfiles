@@ -42,7 +42,6 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
-set number        " always show line numbers
 set relativenumber
 set cpoptions+=J
 set listchars=tab:▸\ ,eol:¬
@@ -365,29 +364,29 @@ set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
                                 " which commands trigger auto-unfold
                                 
 " Space to toggle folds.
-"nnoremap <Space> za
-"vnoremap <Space> za
+nnoremap <Space> za
+vnoremap <Space> za
 
 " Make zO recursively open whatever top level fold we're in, no matter where the
 " cursor happens to be.
-"nnoremap zO zCzO
+nnoremap zO zCzO
 
-"function! MyFoldText()
-    "let line = getline(v:foldstart)
+function! MyFoldText()
+    let line = getline(v:foldstart)
 
-    "let nucolwidth = &fdc + &number * &numberwidth
-    "let windowwidth = winwidth(0) - nucolwidth - 3
-    "let foldedlinecount = v:foldend - v:foldstart
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
 
-    "" expand tabs into spaces
-    "let onetab = strpart('          ', 0, &tabstop)
-    "let line = substitute(line, '\t', onetab, 'g')
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
 
-    "let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    "let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
-    "return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-"endfunction
-"set foldtext=MyFoldText()
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+    return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+endfunction
+set foldtext=MyFoldText()
 
 """ Code folding options
 nmap <leader>f0 :set foldlevel=0<CR>
