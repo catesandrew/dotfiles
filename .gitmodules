@@ -160,3 +160,6 @@
 [submodule "home/vim/bundle/vim-peepopen"]
 	path = home/vim/bundle/vim-peepopen
 	url = git://github.com/shemerey/vim-peepopen.git
+[submodule "home/vim/bundle/closetag"]
+	path = home/vim/bundle/closetag
+	url = git://github.com/docunext/closetag.vim.git
