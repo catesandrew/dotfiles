@@ -47,7 +47,6 @@ set relativenumber
 set cpoptions+=J
 set listchars=tab:▸\ ,eol:¬
 set shell=/bin/bash
-set matchtime=3
 set showbreak=↪
 set splitbelow
 set splitright
@@ -55,16 +54,26 @@ set ignorecase    " ignore case when searching
 set smartcase     " ignore case if search pattern is all lowercase,
                   "    case-sensitive otherwise
 
+set nrformats=octal,hex,alpha " Enable CTRL-A/CTRL-X to work on octal and hex numbers, as well as characters
 set smarttab      " insert tabs on the start of a line according to
                   "    shiftwidth, not tabstop
 set incsearch     " show search matches as you type                 
-set showmatch matchtime=3 " when bracket is inserted, briefly jump to the matching one
+set showmatch     " when a bracket is inserted, breifly jump to a matching one
+set matchtime=2   " jump to matching bracket for 2/10th of a second
 set hlsearch      " highlight search terms
 set gdefault                    " search/replace "globally" (on a line) by default
 set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
 set virtualedit=all             " allow the cursor to go in to "invalid" places
 
+" Remember things between sessions
+"
+" '20  - remember marks for 20 previous files
+" \"50 - save 50 lines for each register
+" :20  - remember 20 items in command-line history 
+" %    - remember the buffer list (if vim started without a file arg)
+" n    - set name of viminfo file
+set viminfo='20,\"50,:20,%,n~/.viminfo
 
 " Editor layout {{{
 
@@ -245,6 +254,24 @@ noremap <C-h>  <C-w>h
 " }}}
 " Convenience mappings -------------------------------------------------------- {{{
 
+" save changes
+map <leader>s :w<CR>
+" exit vim without saving any changes
+map <leader>q :q!<CR>
+" exit vim saving changes
+map <leader>w :x<CR>
+" use CTRL-F for omni completion
+imap <C-F> 
+" map CTRL-L to piece-wise copying of the line above the current one
+imap <C-L> @@@<ESC>hhkywjl?@@@<CR>P/@@@<CR>3s
+" map ,f to display all lines with keyword under cursor and ask which one to jump to
+nmap <leader>f [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
+" open filename under cursor in a new window (use current file's working directory) 
+nmap gf :new %:p:h/<cfile><CR>
+" map <Alt-p> and <Alt-P> to paste below/above and reformat
+nnoremap <M-P> P'[v']=
+nnoremap <M-p> p'[v']=
+
 " Clean whitespace
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 
@@ -255,80 +282,80 @@ let g:yankring_history_dir = '~/.vim/tmp'
 " Formatting, TextMate-style
 nnoremap <leader>q gqip
 
-" Easier linewise reselection
-nnoremap <leader>v V`]
+" easier linewise reselection
+nnoremap <leader>v v`]
 
-" Better Completion
+" better completion
 set completeopt=longest,menuone,preview
 
-" This is a little tweak that is a time-saver while you’re building
-" up your .vimrc. This effectively maps the ,ev and ,sv keys to
-" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
+" this is a little tweak that is a time-saver while you’re building
+" up your .vimrc. this effectively maps the ,ev and ,sv keys to
+" edit/reload .vimrc. (i got this from derek wyatt’s .vimrc file.)
+nmap <silent> <leader>ev :e $myvimrc<cr>
+nmap <silent> <leader>sv :so $myvimrc<cr>
 
-" Sudo to write
+" sudo to write
 cmap w!! w !sudo tee % >/dev/null
 
-" Quickly close the current window
-"nnoremap <leader>q :q<CR>
+" quickly close the current window
+"nnoremap <leader>q :q<cr>
 
-" Use Q for formatting the current paragraph (or visual selection)
-"vmap Q gq
-"nmap Q gqap
+" use q for formatting the current paragraph (or visual selection)
+"vmap q gq
+"nmap q gqap
 
-" Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
+" use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
 " yanked stack (also, in visual mode)
 nmap <silent> <leader>d "_d
 vmap <silent> <leader>d "_d  
 
-" Yank from the cursor to the end of the line, to be consistent with C and D.
-nnoremap Y y$
-nnoremap D d$
+" yank from the cursor to the end of the line, to be consistent with c and d.
+nnoremap y y$
+nnoremap d d$
 
-" Yank/paste to the OS clipboard with ,y and ,p
+" yank/paste to the os clipboard with ,y and ,p
 nmap <leader>y "+y
-nmap <leader>Y "+yy
+nmap <leader>y "+yy
 nmap <leader>p "+p
-nmap <leader>P "+P   
+nmap <leader>p "+p   
 
-" visual shifting (does not exit Visual mode)
+" visual shifting (does not exit visual mode)
 vnoremap < <gv
 vnoremap > >gv
 
-" Quick alignment of text
-nmap <leader>al :left<CR>
-nmap <leader>ar :right<CR>
-nmap <leader>ac :center<CR>
+" quick alignment of text
+nmap <leader>al :left<cr>
+nmap <leader>ar :right<cr>
+nmap <leader>ac :center<cr>
 
-" Pull word under cursor into LHS of a substitute (for quick search and
+" pull word under cursor into lhs of a substitute (for quick search and
 " replace)
-nmap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
+nmap <leader>z :%s#\<<c-r>=expand("<cword>")<cr>\>#
 
-" Scratch
-nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>  
+" scratch
+nmap <leader><tab> :sscratch<cr><c-w>x<c-j>  
 
-" Toggle paste: Every Vim user likes to enable auto-indenting of
-" source code, so Vim can intelligently position you cursor on the
-" next line as you type. This has one big ugly consequence however:
-" when you paste text into your terminal-based Vim with a right
-" mouse click, Vim cannot know it is coming from a paste. To Vim, it
+" toggle paste: every vim user likes to enable auto-indenting of
+" source code, so vim can intelligently position you cursor on the
+" next line as you type. this has one big ugly consequence however:
+" when you paste text into your terminal-based vim with a right
+" mouse click, vim cannot know it is coming from a paste. to vim, it
 " looks like text entered by someone who can type incredibly fast
-" :) Since Vim thinks this is regular key strokes, it applies all
+" :) since vim thinks this is regular key strokes, it applies all
 " auto-indenting and auto-expansion of defined abbreviations to the
-" input, resulting in often cascading indents of paragraphs. There is
-" an easy option to prevent this, however. You can temporarily switch
+" input, resulting in often cascading indents of paragraphs. there is
+" an easy option to prevent this, however. you can temporarily switch
 " to “paste mode”, simply by setting the following option:
-set pastetoggle=<F8>
+set pastetoggle=<f8>
 
-" Reselect text that was just pasted with <leader>v
-nnoremap <leader>v V`]  
+" reselect text that was just pasted with <leader>v
+nnoremap <leader>v v`]  
 
-" Replaste
-nnoremap <D-p> "_ddPV`]
+" replaste
+nnoremap <d-p> "_ddpv`]
 
 " }}}
-" Folding --------------------------------------------------------------------- {{{
+" folding --------------------------------------------------------------------- {{{
 
 set foldenable                  " enable folding
 set foldcolumn=0                " add a fold column
@@ -337,15 +364,15 @@ set foldlevelstart=99           " start out with nothing folded
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
                                 " which commands trigger auto-unfold
                                 
-" Space to toggle folds.
-"nnoremap <Space> za
-"vnoremap <Space> za
+" space to toggle folds.
+"nnoremap <space> za
+"vnoremap <space> za
 
-" Make zO recursively open whatever top level fold we're in, no matter where the
+" make zo recursively open whatever top level fold we're in, no matter where the
 " cursor happens to be.
-"nnoremap zO zCzO
+"nnoremap zo zczo
 
-"function! MyFoldText()
+"function! myfoldtext()
     "let line = getline(v:foldstart)
 
     "let nucolwidth = &fdc + &number * &numberwidth
@@ -360,62 +387,62 @@ set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
     "let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
     "return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
 "endfunction
-"set foldtext=MyFoldText()
+"set foldtext=myfoldtext()
 
-""" Code folding options
-nmap <leader>f0 :set foldlevel=0<CR>
-nmap <leader>f1 :set foldlevel=1<CR>
-nmap <leader>f2 :set foldlevel=2<CR>
-nmap <leader>f3 :set foldlevel=3<CR>
-nmap <leader>f4 :set foldlevel=4<CR>
-nmap <leader>f5 :set foldlevel=5<CR>
-nmap <leader>f6 :set foldlevel=6<CR>
-nmap <leader>f7 :set foldlevel=7<CR>
-nmap <leader>f8 :set foldlevel=8<CR>
-nmap <leader>f9 :set foldlevel=9<CR>  
+""" code folding options
+nmap <leader>f0 :set foldlevel=0<cr>
+nmap <leader>f1 :set foldlevel=1<cr>
+nmap <leader>f2 :set foldlevel=2<cr>
+nmap <leader>f3 :set foldlevel=3<cr>
+nmap <leader>f4 :set foldlevel=4<cr>
+nmap <leader>f5 :set foldlevel=5<cr>
+nmap <leader>f6 :set foldlevel=6<cr>
+nmap <leader>f7 :set foldlevel=7<cr>
+nmap <leader>f8 :set foldlevel=8<cr>
+nmap <leader>f9 :set foldlevel=9<cr>  
 
 " }}}
-" Destroy infuriating keys ---------------------------------------------------- {{{
+" destroy infuriating keys ---------------------------------------------------- {{{
 
-" Fuck you, help key.
+" fuck you, help key.
 set fuoptions=maxvert,maxhorz
-noremap <F1> :set invfullscreen<CR>
-inoremap <F1> <ESC>:set invfullscreen<CR>a
+noremap <f1> :set invfullscreen<cr>
+inoremap <f1> <esc>:set invfullscreen<cr>a
 
-" Fuck you too, manual key.
-nnoremap K <nop>
+" fuck you too, manual key.
+nnoremap k <nop>
 
-" Stop it, hash key.
-inoremap # X<BS>#
-
-" }}}
-" Various filetype-specific stuff --------------------------------------------- {{{
-
-
-" Invisible Chars {{{  
-
-" Show invisible characters in all of these files
-"au FileType vim setlocal list
-"au FileType python,rst setlocal list
-"au FileType ruby setlocal list
-"au FileType javascript,css setlocal list
+" stop it, hash key.
+inoremap # x<bs>#
 
 " }}}
-" Ruby {{{
+" various filetype-specific stuff --------------------------------------------- {{{
 
-"au FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+
+" invisible chars {{{  
+
+" show invisible characters in all of these files
+"au filetype vim setlocal list
+"au filetype python,rst setlocal list
+"au filetype ruby setlocal list
+"au filetype javascript,css setlocal list
 
 " }}}
-" C {{{
+" ruby {{{
 
-au FileType c setlocal foldmethod=syntax
+"au filetype ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
 " }}}
-" HTML and HTMLDjango {{{
+" c {{{
 
- " This function detects, based on HTML content, whether this is a
-" Django template, or a plain HTML file, and sets filetype accordingly
-fun! s:DetectHTMLVariant()
+au filetype c setlocal foldmethod=syntax
+
+" }}}
+" html and htmldjango {{{
+
+ " this function detects, based on html content, whether this is a
+" django template, or a plain html file, and sets filetype accordingly
+fun! s:detecthtmlvariant()
     let n = 1
     while n < 50 && n < line("$")
         " check for django
@@ -429,49 +456,49 @@ fun! s:DetectHTMLVariant()
     set ft=html
 endfun
 
-"au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
-" au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+"au bufnewfile,bufread *.html,*.htm call s:detecthtmlvariant()
+" au bufnewfile,bufread *.html setlocal filetype=htmldjango
 
-" Auto-closing of HTML/XML tags
+" auto-closing of html/xml tags
 let g:closetag_default_xml=1
-au FileType html let b:closetag_html_style=1
-au FileType html,xml set listchars-=tab:>.          
+au filetype html let b:closetag_html_style=1
+au filetype html,xml set listchars-=tab:>.          
 
-"au BufNewFile,BufRead *.html setlocal foldmethod=manual
+"au bufnewfile,bufread *.html setlocal foldmethod=manual
 
-" Use <localleader>f to fold the current tag.
-"au BufNewFile,BufRead *.html nnoremap <buffer> <localleader>f Vatzf
-"au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
-"au BufNewFile,BufRead *.htm nnoremap <buffer> <localleader>f Vatzf
-"au BufNewFile,BufRead *.htm nnoremap <buffer> VV vatV
+" use <localleader>f to fold the current tag.
+"au bufnewfile,bufread *.html nnoremap <buffer> <localleader>f vatzf
+"au bufnewfile,bufread *.html nnoremap <buffer> vv vatv
+"au bufnewfile,bufread *.htm nnoremap <buffer> <localleader>f vatzf
+"au bufnewfile,bufread *.htm nnoremap <buffer> vv vatv
 
-" Use Shift-Return to turn this:
+" use shift-return to turn this:
 "     <tag>|</tag>
 "
 " into this:
 "     <tag>
 "         |
 "     </tag>
-"au BufNewFile,BufRead *.html inoremap <buffer> <s-cr> <cr><esc>kA<cr>
-"au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
+"au bufnewfile,bufread *.html inoremap <buffer> <s-cr> <cr><esc>ka<cr>
+"au bufnewfile,bufread *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
 
 " }}}
-" CSS and LessCSS {{{
+" css and lesscss {{{
 
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-au BufNewFile,BufRead *.less setlocal filetype=less
+autocmd filetype css set omnifunc=csscomplete#completecss
+au bufnewfile,bufread *.less setlocal filetype=less
 
-au BufNewFile,BufRead *.css  setlocal foldmethod=marker
-au BufNewFile,BufRead *.less setlocal foldmethod=marker
+au bufnewfile,bufread *.css  setlocal foldmethod=marker
+au bufnewfile,bufread *.less setlocal foldmethod=marker
 
-au BufNewFile,BufRead *.css  setlocal foldmarker={,}
-au BufNewFile,BufRead *.less setlocal foldmarker={,}
+au bufnewfile,bufread *.css  setlocal foldmarker={,}
+au bufnewfile,bufread *.less setlocal foldmarker={,}
 
-" Use cc to change lines without borking the indentation.
-au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
-au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
+" use cc to change lines without borking the indentation.
+au bufnewfile,bufread *.css  nnoremap <buffer> cc ddko
+au bufnewfile,bufread *.less nnoremap <buffer> cc ddko
 
-" Use <leader>S to sort properties.  Turns this:
+" use <leader>s to sort properties.  turns this:
 "
 "     p {
 "         width: 200px;
@@ -491,94 +518,94 @@ au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 "         ...
 "     }
 "
-"au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
-"au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+"au bufnewfile,bufread *.css  nnoremap <buffer> <localleader>s ?{<cr>jv/\v^\s*\}?$<cr>k:sort<cr>:noh<cr>
+"au bufnewfile,bufread *.less nnoremap <buffer> <localleader>s ?{<cr>jv/\v^\s*\}?$<cr>k:sort<cr>:noh<cr>
 
-" Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
-" positioned inside of them AND the following code doesn't get unfolded.
-"au BufNewFile,BufRead *.css  inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
-"au BufNewFile,BufRead *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
-
-" }}}
-" Javascript {{{
-
-au FileType javascript setlocal foldmethod=marker
-au FileType javascript setlocal foldmarker={,}
-"au FileType javascript setlocal expandtab
-"au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
-"au FileType javascript setlocal foldmethod=marker foldmarker={,}   
+" make {<cr> insert a pair of brackets in such a way that the cursor is correctly
+" positioned inside of them and the following code doesn't get unfolded.
+"au bufnewfile,bufread *.css  inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>ka<bs><space><space>
+"au bufnewfile,bufread *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>ka<bs><space><space>
 
 " }}}
-" Markdown {{{
+" javascript {{{
 
-au BufNewFile,BufRead *.m*down setlocal filetype=markdown
-
-" Use <localleader>1/2/3 to add headings.
-au Filetype markdown nnoremap <buffer> <localleader>1 yypVr=
-au Filetype markdown nnoremap <buffer> <localleader>2 yypVr-
-au Filetype markdown nnoremap <buffer> <localleader>3 I### <ESC>
+au filetype javascript setlocal foldmethod=marker
+au filetype javascript setlocal foldmarker={,}
+"au filetype javascript setlocal expandtab
+"au filetype javascript setlocal listchars=trail:·,extends:#,nbsp:·
+"au filetype javascript setlocal foldmethod=marker foldmarker={,}   
 
 " }}}
-" Vim {{{
+" markdown {{{
 
-au FileType vim setlocal foldmethod=marker
-au FileType help setlocal textwidth=78
- " Bind <F1> to show the keyword under cursor
+au bufnewfile,bufread *.m*down setlocal filetype=markdown
+
+" use <localleader>1/2/3 to add headings.
+au filetype markdown nnoremap <buffer> <localleader>1 yypvr=
+au filetype markdown nnoremap <buffer> <localleader>2 yypvr-
+au filetype markdown nnoremap <buffer> <localleader>3 i### <esc>
+
+" }}}
+" vim {{{
+
+au filetype vim setlocal foldmethod=marker
+au filetype help setlocal textwidth=78
+ " bind <f1> to show the keyword under cursor
 " general help can still be entered manually, with :h
-au FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
-au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>  
+au filetype vim noremap <buffer> <f1> <esc>:help <c-r><c-w><cr>
+au filetype vim noremap! <buffer> <f1> <esc>:help <c-r><c-w><cr>  
 
 " }}}
-" Firefox {{{
+" firefox {{{
 
-au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
+au bufread,bufnewfile ~/library/caches/* setlocal buftype=nofile
 
-" Plugin settings ------------------------------------------------------------- {{{
+" plugin settings ------------------------------------------------------------- {{{
 
-" Ack {{{
+" ack {{{
 
-" map <leader>a :Ack! 
+" map <leader>a :ack! 
 
 " }}}
-" NERD Tree {{{
+" nerd tree {{{
 
- " NERDTree settings {{{
-" Put focus to the NERD Tree with F3 (tricked by quickly closing it and
-" immediately showing it again, since there is no :NERDTreeFocus command)
-nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
-nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
-nmap <leader>N :NERDTreeClose<CR>
-"map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+ " nerdtree settings {{{
+" put focus to the nerd tree with f3 (tricked by quickly closing it and
+" immediately showing it again, since there is no :nerdtreefocus command)
+nmap <leader>n :nerdtreeclose<cr>:nerdtreetoggle<cr>
+nmap <leader>m :nerdtreeclose<cr>:nerdtreefind<cr>
+nmap <leader>n :nerdtreeclose<cr>
+"map <f2> :nerdtreetoggle<cr>:nerdtreemirror<cr>
 
-let NERDTreeChDirMode=0
+let nerdtreechdirmode=0
 
-" Store the bookmarks file
-let NERDTreeBookmarksFile=expand("~/.vim/tmp/NERDTreeBookmarks")
+" store the bookmarks file
+let nerdtreebookmarksfile=expand("~/.vim/tmp/nerdtreebookmarks")
 
-" Show the bookmarks table on startup
-let NERDTreeShowBookmarks=1
+" show the bookmarks table on startup
+let nerdtreeshowbookmarks=1
 
-" Show hidden files, too
-let NERDTreeShowFiles=1
-let NERDTreeShowHidden=1
+" show hidden files, too
+let nerdtreeshowfiles=1
+let nerdtreeshowhidden=1
 
-" Quit on opening files from the tree
-let NERDTreeQuitOnOpen=1
+" quit on opening files from the tree
+let nerdtreequitonopen=1
 
-" Highlight the selected entry in the tree
-let NERDTreeHighlightCursorline=1
+" highlight the selected entry in the tree
+let nerdtreehighlightcursorline=1
 
-" Use a single click to fold/unfold directories and a double click to open
+" use a single click to fold/unfold directories and a double click to open
 " files
-let NERDTreeMouseMode=2
+let nerdtreemousemode=2
 
-let NERDTreeKeepTreeInNewTab=1
+let nerdtreekeeptreeinnewtab=1
 
-" Don't display these kinds of files
-let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
+" don't display these kinds of files
+let nerdtreeignore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
  
 " }}}
-" HTML5 {{{
+" html5 {{{
 
 let g:event_handler_attributes_complete = 0
 let g:rdfa_attributes_complete = 0
@@ -586,152 +613,152 @@ let g:microdata_attributes_complete = 0
 let g:atia_attributes_complete = 0
 
 " }}}
-" Syntastic {{{
+" syntastic {{{
 
 let g:syntastic_enable_signs=1
 let g:syntastic_disabled_filetypes = ['html', 'python']
 
 " }}}
-" Delimitmate {{{
+" delimitmate {{{
 
-au FileType * let b:delimitMate_autoclose = 1
-" If using html auto complete (complete closing tag)
-au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
-
-" }}}
-" SnipMate {{{
-
-" Shortcut for reloading snippets, useful when developing
-nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>    
+au filetype * let b:delimitmate_autoclose = 1
+" if using html auto complete (complete closing tag)
+au filetype xml,html,xhtml let b:delimitmate_matchpairs = "(:),[:],{:}"
 
 " }}}
-" ShowMarks {{{
+" snipmate {{{
 
-let showmarks_include = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-" Don't leave on by default, use :ShowMarksOn to enable
+" shortcut for reloading snippets, useful when developing
+nnoremap ,smr <esc>:exec reloadallsnippets()<cr>    
+
+" }}}
+" showmarks {{{
+
+let showmarks_include = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+" don't leave on by default, use :showmarkson to enable
 let g:showmarks_enable = 0
-" For marks a-z
-highlight ShowMarksHLl gui=bold guibg=LightBlue guifg=Blue
-" For marks A-Z
-highlight ShowMarksHLu gui=bold guibg=LightRed guifg=DarkRed
-" For all other marks
-highlight ShowMarksHLo gui=bold guibg=LightYellow guifg=DarkYellow
-" For multiple marks on the same line.
-highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
+" for marks a-z
+highlight showmarkshll gui=bold guibg=lightblue guifg=blue
+" for marks a-z
+highlight showmarkshlu gui=bold guibg=lightred guifg=darkred
+" for all other marks
+highlight showmarkshlo gui=bold guibg=lightyellow guifg=darkyellow
+" for multiple marks on the same line.
+highlight showmarkshlm gui=bold guibg=lightgreen guifg=darkgreen
 
 " }}}
-" Ctags Variables {{{
+" ctags variables {{{
 
-" This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
-set tags=./tags;/,$HOME/vimtags
-" C-\ - Open the definition in a new tab
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> 
-" A-] - Open the definition in a vertical split
-map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>      
+" this will look in the current directory for 'tags', and work up the tree towards root until one is found. 
+set tags=./tags;/,$home/vimtags
+" c-\ - open the definition in a new tab
+map <c-\> :tab split<cr>:exec("tag ".expand("<cword>"))<cr> 
+" a-] - open the definition in a vertical split
+map <a-]> :vsp <cr>:exec("tag ".expand("<cword>"))<cr>      
 
 " }}}
-" Taglist Variables {{{
+" taglist variables {{{
 
-nmap <leader>l :TlistClose<CR>:TlistToggle<CR>
-nmap <leader>L :TlistClose<CR>
+nmap <leader>l :tlistclose<cr>:tlisttoggle<cr>
+nmap <leader>l :tlistclose<cr>
 
-" quit Vim when the TagList window is the last open window
-let Tlist_Exit_OnlyWindow=1         " quit when TagList is the last open window
-let Tlist_GainFocus_On_ToggleOpen=1 " put focus on the TagList window when it opens
-"let Tlist_Process_File_Always=1     " process files in the background, even when the TagList window isn't open
-"let Tlist_Show_One_File=1           " only show tags from the current buffer, not all open buffers
-let Tlist_Inc_Winwidth=1            " increase window by 1 when growing
+" quit vim when the taglist window is the last open window
+let tlist_exit_onlywindow=1         " quit when taglist is the last open window
+let tlist_gainfocus_on_toggleopen=1 " put focus on the taglist window when it opens
+"let tlist_process_file_always=1     " process files in the background, even when the taglist window isn't open
+"let tlist_show_one_file=1           " only show tags from the current buffer, not all open buffers
+let tlist_inc_winwidth=1            " increase window by 1 when growing
 
 " shorten the time it takes to highlight the current tag (default is 4 secs)
-" note that this setting influences Vim's behaviour when saving swap files,
+" note that this setting influences vim's behaviour when saving swap files,
 " but we have already turned off swap files (earlier)
 "set updatetime=1000
 
-" the default ctags in /usr/bin on the Mac is GNU ctags, so change it to the
+" the default ctags in /usr/bin on the mac is gnu ctags, so change it to the
 " exuberant ctags version in /usr/local/bin
-let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
+let tlist_ctags_cmd = '/usr/local/bin/ctags'
 
-let Tlist_Enable_Fold_Column=0 
+let tlist_enable_fold_column=0 
 " show function/method prototypes in the list
-let Tlist_Display_Prototype=1
+let tlist_display_prototype=1
 
 " don't show scope info
-let Tlist_Display_Tag_Scope=0
+let tlist_display_tag_scope=0
 
-" show TagList window on the right
-let Tlist_Use_Right_Window=1  
+" show taglist window on the right
+let tlist_use_right_window=1  
 
-let Tlist_Auto_Highlight_Tag = 1
-let Tlist_Auto_Update = 1
-let Tlist_File_Fold_Auto_Close = 1
-let Tlist_Use_SingleClick = 1
+let tlist_auto_highlight_tag = 1
+let tlist_auto_update = 1
+let tlist_file_fold_auto_close = 1
+let tlist_use_singleclick = 1
 
 let g:ctags_statusline=1
-" Override how taglist does javascript
+" override how taglist does javascript
 let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'  
 
 " }}}
-" JSON {{{
+" json {{{
 
-nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>                       
+nmap <leader>jt <esc>:%!python -m json.tool<cr><esc>:set filetype=json<cr>                       
 
 " }}}
-" Easymotion {{{
+" easymotion {{{
 
-let g:EasyMotion_do_mapping = 0
+let g:easymotion_do_mapping = 0
 
-nnoremap <silent> <Leader>f      :call EasyMotionF(0, 0)<CR>
-vnoremap <silent> <Leader>f :<C-U>call EasyMotionF(1, 0)<CR>
+nnoremap <silent> <leader>f      :call easymotionf(0, 0)<cr>
+vnoremap <silent> <leader>f :<c-u>call easymotionf(1, 0)<cr>
 
-nnoremap <silent> <Leader>F      :call EasyMotionF(0, 1)<CR>
-vnoremap <silent> <Leader>F :<C-U>call EasyMotionF(1, 1)<CR>
+nnoremap <silent> <leader>f      :call easymotionf(0, 1)<cr>
+vnoremap <silent> <leader>f :<c-u>call easymotionf(1, 1)<cr>
 
 "}}}
-" Autoclose {{{
+" autoclose {{{
 
-nmap <Leader>x <Plug>ToggleAutoCloseMappings
+nmap <leader>x <plug>toggleautoclosemappings
 
 " }}}
-" Scratch {{{
+" scratch {{{
 
-command! ScratchToggle call ScratchToggle()
-function! ScratchToggle() " {{{
+command! scratchtoggle call scratchtoggle()
+function! scratchtoggle() " {{{
   if exists("w:is_scratch_window")
     unlet w:is_scratch_window
     exec "q"
   else
-    exec "normal! :Sscratch\<cr>\<C-W>J:resize 13\<cr>"
+    exec "normal! :sscratch\<cr>\<c-w>j:resize 13\<cr>"
     let w:is_scratch_window = 1
   endif
 endfunction " }}}
-nnoremap <silent> <leader><tab> :ScratchToggle<cr>
+nnoremap <silent> <leader><tab> :scratchtoggle<cr>
 
 " }}}
-" OrgMode {{{
-let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo', 'Misc']
+" orgmode {{{
+let g:org_plugins = ['showhide', '|', 'navigator', 'editstructure', '|', 'todo', 'misc']
 
-let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
+let g:org_todo_keywords = ['todo', 'hold', '|', 'done']
 let g:org_debug = 1
 
 " }}}
-" Synstack -------------------------------------------------------------------- {{{
+" synstack -------------------------------------------------------------------- {{{
 
-" Show the stack of syntax hilighting classes affecting whatever is under the
+" show the stack of syntax hilighting classes affecting whatever is under the
 " cursor.
-function! SynStack() " {{{
+function! synstack() " {{{
   if !exists("*synstack")
     return
   endif
 
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+  echo map(synstack(line('.'), col('.')), 'synidattr(v:val, "name")')
 endfunc " }}}
 
-nmap <M-S> :call SynStack()<CR>
+nmap <m-s> :call synstack()<cr>
 
 " }}}
-" Text objects ---------------------------------------------------------------- {{{
+" text objects ---------------------------------------------------------------- {{{
 
-" Shortcut for [] {{{
+" shortcut for [] {{{
 
 "onoremap id i[
 "onoremap ad a[
@@ -739,111 +766,111 @@ nmap <M-S> :call SynStack()<CR>
 "vnoremap ad a[
 
 " }}}
-" Next/Last () {{{
-"vnoremap <silent> inb :<C-U>normal! f(vib<cr>
-"onoremap <silent> inb :<C-U>normal! f(vib<cr>
-"vnoremap <silent> anb :<C-U>normal! f(vab<cr>
-"onoremap <silent> anb :<C-U>normal! f(vab<cr>
-"vnoremap <silent> in( :<C-U>normal! f(vi(<cr>
-"onoremap <silent> in( :<C-U>normal! f(vi(<cr>
-"vnoremap <silent> an( :<C-U>normal! f(va(<cr>
-"onoremap <silent> an( :<C-U>normal! f(va(<cr>
+" next/last () {{{
+"vnoremap <silent> inb :<c-u>normal! f(vib<cr>
+"onoremap <silent> inb :<c-u>normal! f(vib<cr>
+"vnoremap <silent> anb :<c-u>normal! f(vab<cr>
+"onoremap <silent> anb :<c-u>normal! f(vab<cr>
+"vnoremap <silent> in( :<c-u>normal! f(vi(<cr>
+"onoremap <silent> in( :<c-u>normal! f(vi(<cr>
+"vnoremap <silent> an( :<c-u>normal! f(va(<cr>
+"onoremap <silent> an( :<c-u>normal! f(va(<cr>
 
-"vnoremap <silent> ilb :<C-U>normal! F)vib<cr>
-"onoremap <silent> ilb :<C-U>normal! F)vib<cr>
-"vnoremap <silent> alb :<C-U>normal! F)vab<cr>
-"onoremap <silent> alb :<C-U>normal! F)vab<cr>
-"vnoremap <silent> il( :<C-U>normal! F)vi(<cr>
-"onoremap <silent> il( :<C-U>normal! F)vi(<cr>
-"vnoremap <silent> al( :<C-U>normal! F)va(<cr>
-"onoremap <silent> al( :<C-U>normal! F)va(<cr>
+"vnoremap <silent> ilb :<c-u>normal! f)vib<cr>
+"onoremap <silent> ilb :<c-u>normal! f)vib<cr>
+"vnoremap <silent> alb :<c-u>normal! f)vab<cr>
+"onoremap <silent> alb :<c-u>normal! f)vab<cr>
+"vnoremap <silent> il( :<c-u>normal! f)vi(<cr>
+"onoremap <silent> il( :<c-u>normal! f)vi(<cr>
+"vnoremap <silent> al( :<c-u>normal! f)va(<cr>
+"onoremap <silent> al( :<c-u>normal! f)va(<cr>
 " }}}
-" Next/Last {} {{{
-"vnoremap <silent> inB :<C-U>normal! f{viB<cr>
-"onoremap <silent> inB :<C-U>normal! f{viB<cr>
-"vnoremap <silent> anB :<C-U>normal! f{vaB<cr>
-"onoremap <silent> anB :<C-U>normal! f{vaB<cr>
-"vnoremap <silent> in{ :<C-U>normal! f{vi{<cr>
-"onoremap <silent> in{ :<C-U>normal! f{vi{<cr>
-"vnoremap <silent> an{ :<C-U>normal! f{va{<cr>
-"onoremap <silent> an{ :<C-U>normal! f{va{<cr>
+" next/last {} {{{
+"vnoremap <silent> inb :<c-u>normal! f{vib<cr>
+"onoremap <silent> inb :<c-u>normal! f{vib<cr>
+"vnoremap <silent> anb :<c-u>normal! f{vab<cr>
+"onoremap <silent> anb :<c-u>normal! f{vab<cr>
+"vnoremap <silent> in{ :<c-u>normal! f{vi{<cr>
+"onoremap <silent> in{ :<c-u>normal! f{vi{<cr>
+"vnoremap <silent> an{ :<c-u>normal! f{va{<cr>
+"onoremap <silent> an{ :<c-u>normal! f{va{<cr>
 
-"vnoremap <silent> ilB :<C-U>normal! F}viB<cr>
-"onoremap <silent> ilB :<C-U>normal! F}viB<cr>
-"vnoremap <silent> alB :<C-U>normal! F}vaB<cr>
-"onoremap <silent> alB :<C-U>normal! F}vaB<cr>
-"vnoremap <silent> il{ :<C-U>normal! F}vi{<cr>
-"onoremap <silent> il{ :<C-U>normal! F}vi{<cr>
-"vnoremap <silent> al{ :<C-U>normal! F}va{<cr>
-"onoremap <silent> al{ :<C-U>normal! F}va{<cr>
+"vnoremap <silent> ilb :<c-u>normal! f}vib<cr>
+"onoremap <silent> ilb :<c-u>normal! f}vib<cr>
+"vnoremap <silent> alb :<c-u>normal! f}vab<cr>
+"onoremap <silent> alb :<c-u>normal! f}vab<cr>
+"vnoremap <silent> il{ :<c-u>normal! f}vi{<cr>
+"onoremap <silent> il{ :<c-u>normal! f}vi{<cr>
+"vnoremap <silent> al{ :<c-u>normal! f}va{<cr>
+"onoremap <silent> al{ :<c-u>normal! f}va{<cr>
 " }}}
-" Next/Last [] {{{
-"vnoremap <silent> ind :<C-U>normal! f[vi[<cr>
-"onoremap <silent> ind :<C-U>normal! f[vi[<cr>
-"vnoremap <silent> and :<C-U>normal! f[va[<cr>
-"onoremap <silent> and :<C-U>normal! f[va[<cr>
-"vnoremap <silent> in[ :<C-U>normal! f[vi[<cr>
-"onoremap <silent> in[ :<C-U>normal! f[vi[<cr>
-"vnoremap <silent> an[ :<C-U>normal! f[va[<cr>
-"onoremap <silent> an[ :<C-U>normal! f[va[<cr>
+" next/last [] {{{
+"vnoremap <silent> ind :<c-u>normal! f[vi[<cr>
+"onoremap <silent> ind :<c-u>normal! f[vi[<cr>
+"vnoremap <silent> and :<c-u>normal! f[va[<cr>
+"onoremap <silent> and :<c-u>normal! f[va[<cr>
+"vnoremap <silent> in[ :<c-u>normal! f[vi[<cr>
+"onoremap <silent> in[ :<c-u>normal! f[vi[<cr>
+"vnoremap <silent> an[ :<c-u>normal! f[va[<cr>
+"onoremap <silent> an[ :<c-u>normal! f[va[<cr>
 
-"vnoremap <silent> ild :<C-U>normal! F]vi[<cr>
-"onoremap <silent> ild :<C-U>normal! F]vi[<cr>
-"vnoremap <silent> ald :<C-U>normal! F]va[<cr>
-"onoremap <silent> ald :<C-U>normal! F]va[<cr>
-"vnoremap <silent> il[ :<C-U>normal! F]vi[<cr>
-"onoremap <silent> il[ :<C-U>normal! F]vi[<cr>
-"vnoremap <silent> al[ :<C-U>normal! F]va[<cr>
-"onoremap <silent> al[ :<C-U>normal! F]va[<cr>
+"vnoremap <silent> ild :<c-u>normal! f]vi[<cr>
+"onoremap <silent> ild :<c-u>normal! f]vi[<cr>
+"vnoremap <silent> ald :<c-u>normal! f]va[<cr>
+"onoremap <silent> ald :<c-u>normal! f]va[<cr>
+"vnoremap <silent> il[ :<c-u>normal! f]vi[<cr>
+"onoremap <silent> il[ :<c-u>normal! f]vi[<cr>
+"vnoremap <silent> al[ :<c-u>normal! f]va[<cr>
+"onoremap <silent> al[ :<c-u>normal! f]va[<cr>
 "" }}}
-" Next/Last <> {{{
-"vnoremap <silent> in< :<C-U>normal! f<vi<<cr>
-"onoremap <silent> in< :<C-U>normal! f<vi<<cr>
-"vnoremap <silent> an< :<C-U>normal! f<va<<cr>
-"onoremap <silent> an< :<C-U>normal! f<va<<cr>
+" next/last <> {{{
+"vnoremap <silent> in< :<c-u>normal! f<vi<<cr>
+"onoremap <silent> in< :<c-u>normal! f<vi<<cr>
+"vnoremap <silent> an< :<c-u>normal! f<va<<cr>
+"onoremap <silent> an< :<c-u>normal! f<va<<cr>
 
-"vnoremap <silent> il< :<C-U>normal! f>vi<<cr>
-"onoremap <silent> il< :<C-U>normal! f>vi<<cr>
-"vnoremap <silent> al< :<C-U>normal! f>va<<cr>
-"onoremap <silent> al< :<C-U>normal! f>va<<cr>
+"vnoremap <silent> il< :<c-u>normal! f>vi<<cr>
+"onoremap <silent> il< :<c-u>normal! f>vi<<cr>
+"vnoremap <silent> al< :<c-u>normal! f>va<<cr>
+"onoremap <silent> al< :<c-u>normal! f>va<<cr>
 " }}}
-" Next '' {{{
-"vnoremap <silent> in' :<C-U>normal! f'vi'<cr>
-"onoremap <silent> in' :<C-U>normal! f'vi'<cr>
-"vnoremap <silent> an' :<C-U>normal! f'va'<cr>
-"onoremap <silent> an' :<C-U>normal! f'va'<cr>
+" next '' {{{
+"vnoremap <silent> in' :<c-u>normal! f'vi'<cr>
+"onoremap <silent> in' :<c-u>normal! f'vi'<cr>
+"vnoremap <silent> an' :<c-u>normal! f'va'<cr>
+"onoremap <silent> an' :<c-u>normal! f'va'<cr>
 
-"vnoremap <silent> il' :<C-U>normal! F'vi'<cr>
-"onoremap <silent> il' :<C-U>normal! F'vi'<cr>
-"vnoremap <silent> al' :<C-U>normal! F'va'<cr>
-"onoremap <silent> al' :<C-U>normal! F'va'<cr>
+"vnoremap <silent> il' :<c-u>normal! f'vi'<cr>
+"onoremap <silent> il' :<c-u>normal! f'vi'<cr>
+"vnoremap <silent> al' :<c-u>normal! f'va'<cr>
+"onoremap <silent> al' :<c-u>normal! f'va'<cr>
 " }}}
-" Next "" {{{
-"vnoremap <silent> in" :<C-U>normal! f"vi"<cr>
-"onoremap <silent> in" :<C-U>normal! f"vi"<cr>
-"vnoremap <silent> an" :<C-U>normal! f"va"<cr>
-"onoremap <silent> an" :<C-U>normal! f"va"<cr>
+" next "" {{{
+"vnoremap <silent> in" :<c-u>normal! f"vi"<cr>
+"onoremap <silent> in" :<c-u>normal! f"vi"<cr>
+"vnoremap <silent> an" :<c-u>normal! f"va"<cr>
+"onoremap <silent> an" :<c-u>normal! f"va"<cr>
 
-"vnoremap <silent> il" :<C-U>normal! F"vi"<cr>
-"onoremap <silent> il" :<C-U>normal! F"vi"<cr>
-"vnoremap <silent> al" :<C-U>normal! F"va"<cr>
-"onoremap <silent> al" :<C-U>normal! F"va"<cr>
+"vnoremap <silent> il" :<c-u>normal! f"vi"<cr>
+"onoremap <silent> il" :<c-u>normal! f"vi"<cr>
+"vnoremap <silent> al" :<c-u>normal! f"va"<cr>
+"onoremap <silent> al" :<c-u>normal! f"va"<cr>
 " }}}
-
-" }}}
-" Quickreturn ----------------------------------------------------------------- {{{
-
-inoremap <c-cr> <esc>A<cr>
-inoremap <s-cr> <esc>A:<cr>
 
 " }}}
-" Error toggles --------------------------------------------------------------- {{{
+" quickreturn ----------------------------------------------------------------- {{{
 
-" Tame the quickfix window (open/close using f4)
-nmap <silent> <f4> :QFix<CR>
+inoremap <c-cr> <esc>a<cr>
+inoremap <s-cr> <esc>a:<cr>
 
-command! -bang -nargs=? QFix call QFixToggle(<bang>0)
-function! QFixToggle(forced)
+" }}}
+" error toggles --------------------------------------------------------------- {{{
+
+" tame the quickfix window (open/close using f4)
+nmap <silent> <f4> :qfix<cr>
+
+command! -bang -nargs=? qfix call qfixtoggle(<bang>0)
+function! qfixtoggle(forced)
   if exists("g:qfix_win") && a:forced == 0
     cclose
     unlet g:qfix_win
@@ -854,34 +881,34 @@ function! QFixToggle(forced)
 endfunction
 
 " }}}
-" Persistent echo ------------------------------------------------------------- {{{
+" persistent echo ------------------------------------------------------------- {{{
 
-" http://vim.wikia.com/wiki/Make_echo_seen_when_it_would_otherwise_disappear_and_go_unseen
+" http://vim.wikia.com/wiki/make_echo_seen_when_it_would_otherwise_disappear_and_go_unseen
 "
-" further improvement in restoration of the &updatetime. To make this
+" further improvement in restoration of the &updatetime. to make this
 " usable in the plugins, we want it to be safe for the case when
-" two plugins use same this same technique. Two independent
-" restorations of &ut can run in unpredictable sequence. In order to
+" two plugins use same this same technique. two independent
+" restorations of &ut can run in unpredictable sequence. in order to
 " make it safe, we add additional check in &ut restoration.
-let s:Pecho=''
-fu! s:Pecho(msg)
+let s:pecho=''
+fu! s:pecho(msg)
   let s:hold_ut=&ut | if &ut>1|let &ut=1|en
-  let s:Pecho=a:msg
-  aug Pecho
-    au CursorHold * if s:Pecho!=''|echo s:Pecho
-          \|let s:Pecho=''|if s:hold_ut > &ut |let &ut=s:hold_ut|en|en
-          \|aug Pecho|exe 'au!'|aug END|aug! Pecho
-  aug END
+  let s:pecho=a:msg
+  aug pecho
+    au cursorhold * if s:pecho!=''|echo s:pecho
+          \|let s:pecho=''|if s:hold_ut > &ut |let &ut=s:hold_ut|en|en
+          \|aug pecho|exe 'au!'|aug end|aug! pecho
+  aug end
 endf
 
 " }}}
-" Open quoted ----------------------------------------------------------------- {{{
+" open quoted ----------------------------------------------------------------- {{{
 
-nnoremap <silent> ø :OpenQuoted<cr>
-command! OpenQuoted call OpenQuoted()
+nnoremap <silent> ø :openquoted<cr>
+command! openquoted call openquoted()
 
-" Open the file in the current (or next) set of quotes.
-function! OpenQuoted() " {{{
+" open the file in the current (or next) set of quotes.
+function! openquoted() " {{{
     let @r = ''
 
     exe 'normal! vi' . "'" . '"ry'
@@ -899,15 +926,15 @@ function! OpenQuoted() " {{{
 endfunction " }}}
 
 
-" Restore cursor position upon reopening files {{{
-autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+" restore cursor position upon reopening files {{{
+autocmd bufreadpost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 " }}}
 
-" Common abbreviations / misspellings {{{
+" common abbreviations / misspellings {{{
 source ~/.vim/autocorrect.vim
 " }}}
 
-" Extra vi-compatibility {{{
+" extra vi-compatibility {{{
 " set extra vi-compatible options
 set cpoptions+=$     " when changing a line, don't redisplay, but put a '$' at
                      " the end during the change
@@ -917,74 +944,74 @@ au filetype vim set formatoptions-=o
                      " for vim files, so explicitly unset it again
 " }}}
 
-" Extra user or machine specific settings {{{
+" extra user or machine specific settings {{{
 source ~/.user.vim
 " }}}
 
-" Creating underline/overline headings for markup languages
-" Inspired by http://sphinx.pocoo.org/rest.html#sections
-nnoremap <leader>1 yyPVr=jyypVr=
-nnoremap <leader>2 yyPVr*jyypVr*
-nnoremap <leader>3 yypVr=
-nnoremap <leader>4 yypVr-
-nnoremap <leader>5 yypVr^
-nnoremap <leader>6 yypVr"   
+" creating underline/overline headings for markup languages
+" inspired by http://sphinx.pocoo.org/rest.html#sections
+nnoremap <leader>1 yypvr=jyypvr=
+nnoremap <leader>2 yypvr*jyypvr*
+nnoremap <leader>3 yypvr=
+nnoremap <leader>4 yypvr-
+nnoremap <leader>5 yypvr^
+nnoremap <leader>6 yypvr"   
 
 " }}}
-" MacVim ---------------------------------------------------------------------- {{{
+" macvim ---------------------------------------------------------------------- {{{
 
 if has('gui_running')
-    set guifont=Anonymous\ Pro:h14   
-    set guioptions-=T          	" remove the toolbar
+    set guifont=anonymous\ pro:h14   
+    set guioptions-=t          	" remove the toolbar
     set lines=96               	" 40 lines of text instead of 24,
-    set transparency=5          " Make the window slightly transparent
+    set transparency=5          " make the window slightly transparent
 
-    " Remove all the UI cruft
-    set go-=T
+    " remove all the ui cruft
+    set go-=t
     set go-=l
-    set go-=L
+    set go-=l
     set go-=r
-    set go-=R
+    set go-=r
 
-    " PeepOpen
+    " peepopen
     if has("gui_macvim")
-      map <leader><leader> <Plug>PeepOpen
+      map <leader><leader> <plug>peepopen
     end
 
-    highlight SpellBad term=underline gui=undercurl guisp=Orange
+    highlight spellbad term=underline gui=undercurl guisp=orange
 
-    " Use a line-drawing char for pretty vertical splits.
+    " use a line-drawing char for pretty vertical splits.
     set fillchars=vert:│
 
-    " Different cursors for different modes.
-    set guicursor=n-c:block-Cursor-blinkon0
-    set guicursor+=v:block-vCursor-blinkon0
-    set guicursor+=i-ci:ver20-iCursor
+    " different cursors for different modes.
+    set guicursor=n-c:block-cursor-blinkon0
+    set guicursor+=v:block-vcursor-blinkon0
+    set guicursor+=i-ci:ver20-icursor
 
-    " Use the normal HIG movements, except for M-Up/Down
+    " use the normal hig movements, except for m-up/down
     let macvim_skip_cmd_opt_movement = 1
-    no   <D-Left>       <Home>
-    no!  <D-Left>       <Home>
-    no   <M-Left>       <C-Left>
-    no!  <M-Left>       <C-Left>
+    no   <d-left>       <home>
+    no!  <d-left>       <home>
+    no   <m-left>       <c-left>
+    no!  <m-left>       <c-left>
 
-    no   <D-Right>      <End>
-    no!  <D-Right>      <End>
-    no   <M-Right>      <C-Right>
-    no!  <M-Right>      <C-Right>
+    no   <d-right>      <end>
+    no!  <d-right>      <end>
+    no   <m-right>      <c-right>
+    no!  <m-right>      <c-right>
 
-    no   <D-Up>         <C-Home>
-    ino  <D-Up>         <C-Home>
-    imap <M-Up>         <C-o>{
+    no   <d-up>         <c-home>
+    ino  <d-up>         <c-home>
+    imap <m-up>         <c-o>{
 
-    no   <D-Down>       <C-End>
-    ino  <D-Down>       <C-End>
-    imap <M-Down>       <C-o>}
+    no   <d-down>       <c-end>
+    ino  <d-down>       <c-end>
+    imap <m-down>       <c-o>}
 
-    imap <M-BS>         <C-w>
-    inoremap <D-BS>     <esc>my0c`y
+    imap <m-bs>         <c-w>
+    inoremap <d-bs>     <esc>my0c`y
 else
-  set term=builtin_ansi       " Make arrow and other keys work
+  set term=builtin_ansi       " make arrow and other keys work
 endif
 
 " }}}
