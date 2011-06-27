@@ -166,3 +166,6 @@
 [submodule "home/vim/bundle/css-one-line"]
 	path = home/vim/bundle/css-one-line
 	url = git://github.com/vim-scripts/CSS-one-line--multi-line-folding.git
+[submodule "home/vim/bundle/vim-easytags"]
+	path = home/vim/bundle/vim-easytags
+	url = git://github.com/xolox/vim-easytags.git
