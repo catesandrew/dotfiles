@@ -477,6 +477,7 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
 au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 " Use <leader>S to sort properties.  Turns this:
 "
 "     p {
