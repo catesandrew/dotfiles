@@ -520,11 +520,30 @@ au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 " }}}
 " Javascript {{{
 
-au FileType javascript setlocal foldmethod=marker
-au FileType javascript setlocal foldmarker={,}
 "au FileType javascript setlocal expandtab
 "au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
 "au FileType javascript setlocal foldmethod=marker foldmarker={,}   
+
+au FileType javascript call JavaScriptFold()
+au FileType javascript setl fen
+au FileType javascript setl nocindent
+
+au FileType javascript imap <C-t> console.log();<esc>hi
+au FileType javascript imap <C-a> alert();<esc>hi
+
+au FileType javascript inoremap <buffer> $r return
+au FileType javascript inoremap <buffer> $f //--- PH ----------------------------------------------<esc>FP2xi
+
+function! JavaScriptFold()
+    setl foldmethod=syntax
+    setl foldlevelstart=1
+    syn region foldBraces start=/{/ end=/}/ transparent fold keepend extend
+
+    function! FoldText()
+    return substitute(getline(v:foldstart), '{.*', '{...}', '')
+    endfunction
+    setl foldtext=FoldText()
+endfunction
 
 " }}}
 " Markdown {{{
