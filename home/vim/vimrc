@@ -257,16 +257,8 @@ noremap <C-h>  <C-w>h
 map <leader>s :w<CR>
 " exit vim without saving any changes
 map <leader>q :q!<CR>
-" exit vim saving changes
-map <leader>w :x<CR>
 " use CTRL-F for omni completion
 imap <C-F> 
-" map CTRL-L to piece-wise copying of the line above the current one
-imap <C-L> @@@<ESC>hhkywjl?@@@<CR>P/@@@<CR>3s
-" map ,f to display all lines with keyword under cursor and ask which one to jump to
-nmap <leader>f [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
-" open filename under cursor in a new window (use current file's working directory) 
-nmap gf :new %:p:h/<cfile><CR>
 " map <Alt-p> and <Alt-P> to paste below/above and reformat
 nnoremap <M-P> P'[v']=
 nnoremap <M-p> p'[v']=
