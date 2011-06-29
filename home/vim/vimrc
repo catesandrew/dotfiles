@@ -84,13 +84,13 @@ set cmdheight=1                 " use a status bar that is 2 rows high
 " }}}
 " Tabs, spaces, wrapping {{{
 
-set tabstop=2
-set shiftwidth=2 " number of spaces to use for autoindenting
+set tabstop=4
+set shiftwidth=4 " number of spaces to use for autoindenting
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
-set softtabstop=2
+set softtabstop=4
 set expandtab                   " expand tabs by default (overloadable per file type later)
 set nowrap                      " don't wrap lines
-set textwidth=120
+set textwidth=79
 set formatoptions+=1            " When wrapping paragraphs, don't end lines
                                 "    with 1-letter words (looks stupid)
 " set colorcolumn=+1
@@ -364,19 +364,19 @@ vnoremap <Space> za
 nnoremap zO zCzO
 
 function! MyFoldText()
-    let line = getline(v:foldstart)
+  let line = getline(v:foldstart)
 
-    let nucolwidth = &fdc + &number * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 3
-    let foldedlinecount = v:foldend - v:foldstart
+  let nucolwidth = &fdc + &number * &numberwidth
+  let windowwidth = winwidth(0) - nucolwidth - 3
+  let foldedlinecount = v:foldend - v:foldstart
 
-    " expand tabs into spaces
-    let onetab = strpart('          ', 0, &tabstop)
-    let line = substitute(line, '\t', onetab, 'g')
+  " expand tabs into spaces
+  let onetab = strpart('          ', 0, &tabstop)
+  let line = substitute(line, '\t', onetab, 'g')
 
-    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
-    return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+  let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+  let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+  return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
 endfunction
 set foldtext=MyFoldText()
 
@@ -409,14 +409,14 @@ inoremap # X<BS>#
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
 
+" Python {{{
 
-" Invisible Chars {{{  
-
-" Show invisible characters in all of these files
-"au FileType vim setlocal list
-"au FileType python,rst setlocal list
-"au FileType ruby setlocal list
-"au FileType javascript,css setlocal list
+" (tab width 4 chr, wrap at 79th char)
+autocmd FileType python setlocal sw=4
+autocmd FileType python setlocal ts=4
+autocmd FileType python setlocal sts=4
+autocmd FileType python setlocal textwidth=79
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
 " }}}
 " Ruby {{{
@@ -430,21 +430,34 @@ au FileType c setlocal foldmethod=syntax
 
 " }}}
 " HTML and HTMLDjango {{{
+  
+" HTML (tab width 2 chr, no wrapping)
+autocmd FileType html setlocal sw=2
+autocmd FileType html setlocal ts=2
+autocmd FileType html setlocal sts=2
+autocmd FileType html setlocal textwidth=0
+autocmd FileType html setlocal omnifunc=htmlcomplete#CompleteTags
+
+" XHTML (tab width 2 chr, no wrapping)
+autocmd FileType xhtml setlocal sw=2
+autocmd FileType xhtml setlocal ts=2
+autocmd FileType xhtml setlocal sts=2
+autocmd FileType xhtml setlocal textwidth=0
 
  " This function detects, based on HTML content, whether this is a
 " Django template, or a plain HTML file, and sets filetype accordingly
 fun! s:DetectHTMLVariant()
-    let n = 1
-    while n < 50 && n < line("$")
-        " check for django
-        if getline(n) =~ '{%\s*\(extends\|load\|block\|if\|for\|include\|trans\)\>'
-            set ft=htmldjango.html
-            return
-        endif
-        let n = n + 1
-    endwhile
-    " go with html
-    set ft=html
+  let n = 1
+  while n < 50 && n < line("$")
+    " check for django
+    if getline(n) =~ '{%\s*\(extends\|load\|block\|if\|for\|include\|trans\)\>'
+      set ft=htmldjango.html
+      return
+    endif
+    let n = n + 1
+  endwhile
+  " go with html
+  set ft=html
 endfun
 
 "au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
@@ -476,7 +489,13 @@ au FileType html,xml set listchars-=tab:>.
 " }}}
 " CSS and LessCSS {{{
 
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
+" (tab width 2 chr, wrap at 79th char)
+autocmd FileType css setlocal sw=2
+autocmd FileType css setlocal ts=2
+autocmd FileType css setlocal sts=2
+autocmd FileType css setlocal textwidth=0
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+
 au BufNewFile,BufRead *.less setlocal filetype=less
 
 au BufNewFile,BufRead *.css  setlocal foldmethod=marker
@@ -486,8 +505,8 @@ au BufNewFile,BufRead *.css  setlocal foldmarker={,}
 au BufNewFile,BufRead *.less setlocal foldmarker={,}
 
 " Use cc to change lines without borking the indentation.
-au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
-au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
+"au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
+"au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 
 " Use <leader>S to sort properties.  Turns this:
 "
@@ -520,7 +539,13 @@ au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 " }}}
 " Javascript {{{
 
-"au FileType javascript setlocal expandtab
+" (tab width 2 chr, no-wrapping)
+autocmd FileType javascript setlocal sw=2
+autocmd FileType javascript setlocal ts=2
+autocmd FileType javascript setlocal sts=2
+autocmd FileType javascript setlocal textwidth=0
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+
 "au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
 "au FileType javascript setlocal foldmethod=marker foldmarker={,}   
 
@@ -540,7 +565,7 @@ function! JavaScriptFold()
     syn region foldBraces start=/{/ end=/}/ transparent fold keepend extend
 
     function! FoldText()
-    return substitute(getline(v:foldstart), '{.*', '{...}', '')
+        return substitute(getline(v:foldstart), '{.*', '{...}', '')
     endfunction
     setl foldtext=FoldText()
 endfunction
