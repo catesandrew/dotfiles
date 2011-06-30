@@ -205,6 +205,8 @@ if &t_Co > 2 || has("gui_running")
 endif  
 
 " }}}
+
+" }}}
 " Useful abbreviations -------------------------------------------------------- {{{
 
 " }}}
@@ -354,7 +356,6 @@ set foldmethod=marker           " detect triple-{ style fold markers
 set foldlevelstart=99           " start out with nothing folded
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
                                 " which commands trigger auto-unfold
-                                
 " Space to toggle folds.
 nnoremap <Space> za
 vnoremap <Space> za
@@ -363,22 +364,22 @@ vnoremap <Space> za
 " cursor happens to be.
 nnoremap zO zCzO
 
-function! MyFoldText()
-  let line = getline(v:foldstart)
+"function! MyFoldText()
+  "let line = getline(v:foldstart)
 
-  let nucolwidth = &fdc + &number * &numberwidth
-  let windowwidth = winwidth(0) - nucolwidth - 3
-  let foldedlinecount = v:foldend - v:foldstart
+  "let nucolwidth = &fdc + &number * &numberwidth
+  "let windowwidth = winwidth(0) - nucolwidth - 3
+  "let foldedlinecount = v:foldend - v:foldstart
 
-  " expand tabs into spaces
-  let onetab = strpart('          ', 0, &tabstop)
-  let line = substitute(line, '\t', onetab, 'g')
+  "" expand tabs into spaces
+  "let onetab = strpart('          ', 0, &tabstop)
+  "let line = substitute(line, '\t', onetab, 'g')
 
-  let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-  let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
-  return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-endfunction
-set foldtext=MyFoldText()
+  "let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+  "let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+  "return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+"endfunction
+"set foldtext=MyFoldText()
 
 """ Code folding options
 nmap <leader>f0 :set foldlevel=0<CR>
@@ -546,7 +547,7 @@ autocmd FileType javascript setlocal sts=2
 autocmd FileType javascript setlocal textwidth=0
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 
-"au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
+au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
 "au FileType javascript setlocal foldmethod=marker foldmarker={,}   
 
 au FileType javascript call JavaScriptFold()
@@ -555,9 +556,6 @@ au FileType javascript setl nocindent
 
 au FileType javascript imap <C-t> console.log();<esc>hi
 au FileType javascript imap <C-a> alert();<esc>hi
-
-au FileType javascript inoremap <buffer> $r return
-au FileType javascript inoremap <buffer> $f //--- PH ----------------------------------------------<esc>FP2xi
 
 function! JavaScriptFold()
     setl foldmethod=syntax
@@ -595,6 +593,9 @@ au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 
 au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 
+" }}}
+
+" }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
 " Ack {{{
@@ -604,7 +605,6 @@ au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 " }}}
 " NERD Tree {{{
 
- " NERDTree settings {{{
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and
 " immediately showing it again, since there is no :NERDTreeFocus command)
 nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
@@ -774,6 +774,8 @@ let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo',
 
 let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
 let g:org_debug = 1
+
+" }}}
 
 " }}}
 " Synstack -------------------------------------------------------------------- {{{
