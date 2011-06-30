@@ -42,7 +42,7 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
-set relativenumber
+"set relativenumber
 set cpoptions+=J
 set listchars=tab:▸\ ,eol:¬
 set shell=/bin/bash
@@ -64,6 +64,19 @@ set gdefault                    " search/replace "globally" (on a line) by defau
 set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
 set virtualedit=all             " allow the cursor to go in to "invalid" places
+
+augroup TrackActiveWindow
+    autocmd!
+    autocmd WinEnter,BufRead * setl cursorline
+    autocmd WinEnter * set relativenumber
+    autocmd WinEnter * set nonumber
+
+    autocmd WinLeave * setl nocursorline
+    autocmd WinLeave * set norelativenumber
+    autocmd WinLeave * set number
+augroup END
+doautocmd TrackActiveWindow WinEnter
+
 
 " Remember things between sessions
 "
