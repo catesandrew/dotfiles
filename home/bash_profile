@@ -3,7 +3,10 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 export EDITOR='mate -w'
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export JAVA_HOME="`/usr/libexec/java_home`"
-
+alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
+alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
+alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
 export PYTHONPATH=/usr/local/lib/python2.6/site-packages     
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
