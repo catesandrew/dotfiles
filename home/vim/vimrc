@@ -42,7 +42,6 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
-"set relativenumber
 set cpoptions+=J
 set listchars=tab:▸\ ,eol:¬
 set shell=/bin/bash
@@ -67,13 +66,11 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 
 augroup TrackActiveWindow
     autocmd!
-    autocmd WinEnter,BufRead * setl cursorline
-    autocmd WinEnter * set relativenumber
-    autocmd WinEnter * set nonumber
+    autocmd WinEnter,BufEnter * setl cursorline
+    autocmd WinEnter,BufEnter * set relativenumber
 
-    autocmd WinLeave * setl nocursorline
-    autocmd WinLeave * set norelativenumber
-    autocmd WinLeave * set number
+    autocmd WinLeave,BufLeave * setl nocursorline
+    autocmd WinLeave,BufLeave * set norelativenumber
 augroup END
 doautocmd TrackActiveWindow WinEnter
 
@@ -1014,7 +1011,8 @@ nnoremap <leader>6 yypVr"
 if has('gui_running')
     set guifont=Anonymous\ Pro:h14   
     set guioptions-=T          	" remove the toolbar
-    set lines=96               	" 40 lines of text instead of 24,
+    set lines=40               	" 40 lines of text instead of 24,
+    set columns=80 
     set transparency=5          " Make the window slightly transparent
 
     " Remove all the UI cruft
