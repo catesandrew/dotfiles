@@ -756,9 +756,9 @@ au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
-" Ack {{{
+" Google Code Wiki {{{
 
-" map <leader>a :Ack! 
+autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki 
 
 " }}}
 " NERD Tree {{{
