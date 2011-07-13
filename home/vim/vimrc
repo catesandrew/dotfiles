@@ -1171,14 +1171,11 @@ if has('gui_running')
     set columns=80 
     set transparency=5          " Make the window slightly transparent
 
-    if !exists("g:vimrcloaded")
-        "winpos 0 0
-        if ! &diff
-            winsize 130 90
-        else
-            winsize 227 90
-        endif
-        let g:vimrcloaded = 1
+    "winpos 0 0
+    if ! &diff
+        winsize 130 90
+    else
+        winsize 227 90
     endif
 
     " Remove all the UI cruft
