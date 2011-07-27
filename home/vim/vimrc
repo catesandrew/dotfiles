@@ -567,6 +567,14 @@ inoremap # X<BS>#
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
 
+" Ant {{{
+
+autocmd FileType ant setlocal sw=2
+autocmd FileType ant setlocal ts=2
+autocmd FileType ant setlocal sts=2
+autocmd FileType ant setlocal textwidth=0
+
+" }}}
 " Python {{{
 
 " (tab width 4 chr, wrap at 79th char)

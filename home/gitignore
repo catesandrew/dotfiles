@@ -1,5 +1,5 @@
 # https://github.com/github/gitignore
-
+.dropbox
 # Compiled source #
 ###################
 *.com
