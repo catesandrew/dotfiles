@@ -37,7 +37,7 @@ filetype plugin indent on       " enable detection, plugins and indenting in one
 
 " }}}
 " Basic options --------------------------------------------------------------- {{{
-
+let $JS_CMD='node'
 set modelines=0
 set updatecount=50 "write swap file to disk after 50 keystrokes
 set scrolljump=5
