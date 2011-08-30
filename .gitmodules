@@ -175,3 +175,6 @@
 [submodule "prefix/src/pyflakes"]
 	path = prefix/src/pyflakes
 	url = git://github.com/kevinw/pyflakes.git
+[submodule "prefix/src/jsdoc-toolkit"]
+	path = prefix/src/jsdoc-toolkit
+	url = git://github.com/paperjs/jsdoc-toolkit.git
