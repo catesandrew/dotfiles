@@ -59,7 +59,13 @@ height () {
   echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")
 }
 
+# Image width
+wh () {
+  width=`identify -format "%[fx:w]" "$1"`;
+  height=`identify -format "%[fx:h]" "$1"`;
+  echo "width x height = $width x $height"
 
+}
 
 ##################################################
 # Fancy PWD display function

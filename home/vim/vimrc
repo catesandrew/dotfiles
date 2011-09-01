@@ -598,7 +598,8 @@ au FileType c setlocal foldmethod=syntax
 " HTML and HTMLDjango {{{
   
 " HTML (tab width 2 chr, no wrapping)
-autocmd FileType html setlocal sw=2
+au BufRead,BufNewFile *_html.template set filetype=html
+autocmd FileType html setlocal sw=2     
 autocmd FileType html setlocal ts=2
 autocmd FileType html setlocal sts=2
 autocmd FileType html setlocal textwidth=0
@@ -656,6 +657,7 @@ au FileType html,xml set listchars-=tab:>.
 " CSS and LessCSS {{{
 
 " (tab width 2 chr, wrap at 79th char)
+au BufRead,BufNewFile *_css.template set filetype=css
 autocmd FileType css setlocal sw=2
 autocmd FileType css setlocal ts=2
 autocmd FileType css setlocal sts=2
@@ -706,6 +708,7 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 " Javascript {{{
 
 " (tab width 2 chr, no-wrapping)
+au BufRead,BufNewFile *_js.template set filetype=javascript
 autocmd FileType javascript setlocal sw=2
 autocmd FileType javascript setlocal ts=2
 autocmd FileType javascript setlocal sts=2
