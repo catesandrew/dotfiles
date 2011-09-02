@@ -1,0 +1,908 @@
+#!/bin/bash
+     
+# +-nf/
+#   |
+#   +-build <branch>
+#   |
+#   +-deploy <branch>
+#   |
+#   +-nbpd
+#   | |
+#   | +-config (launches nbp)
+#   | |
+#   | +-log
+#   | |
+#   | +-start
+#   | |
+#   | +-status
+#   | |
+#   | +-stop
+#   |
+#   +-redir
+#   | |
+#   | +-start <branch>
+#   | |
+#   | +-stop <branch>
+#   |
+#   +-tomcat
+#   | |
+#   | +-bounch <branch> (nf tomcat status;nf tomcat kill;nf tomcat status;nf tomcat run <branch>;nf tomcat status;nf tomcat log <ecweb>)
+#   | |
+#   | +-kill
+#   | |
+#   | +-log <branch>
+#   | |
+#   | +-run <branch>
+#   | |
+#   | +-status 
+#   | |
+#   | +-stop <branch>
+#   |
+#   +-track
+#   | |
+#   | +-discard <branch>
+#   | |
+#   | +-dux
+#   | |
+#   | +-patch
+#   | | |
+#   | | +-apply <branch>
+#   | | |
+#   | | +-format <branch>
+#   | |
+#   | +-rebase <branch>
+#   | |
+#   | +-start <branch>
+#   | |
+#   | +-stop <branch>
+#   |
+#   +-wii
+#     |
+#     +-log
+#     |
+#     +-start
+#     |
+#     +-status
+#     |
+#     +-stop
+#
+# 
+USAGE='[help|tomcat|redir|wii|nbpd|track|patch|discard|dux|rebase]'
+
+USAGE='[help|run|stop|kill|status|start-track|stop-track|format-patch|apply-patch|discard|dux|rebase|log] [<branch>]'
+LONG_USAGE='nf help
+        print this long help message.
+nf run [<branch>]
+        Start Catalina in the current window.
+nf stop [<branch>]
+        Stop Catalina.
+nf kill [<branch>]
+        Kill Catalina.
+nf status 
+        Catalina status.
+nf start-track [<branch>]
+        Start tracking.
+nf stop-track [<branch>]
+        Stop tracking.
+nf format-patch [<branch>]
+        Create the configs patch.
+nf apply-patch [<branch>]
+        Apply the configs patch.
+nf discard [<branch>]
+        Discard the changes.
+nf dux [<branch>]
+        Update the dux templates.
+nf rebase [<branch>]
+        Run p4 rebase.
+
+Branches: [ecweb|ecadmin|account-web|common|root|baseline|monthly|release|all]
+
+Please use "man nf" to get the full man page.'
+
+die() {
+	echo >&2 "$@"
+	exit 1
+}
+
+function require_clean_work_tree () {
+    local branch_name="$1"
+    git rev-parse --verify HEAD >/dev/null || exit 1
+    git update-index -q --ignore-submodules --refresh
+    local err=0
+
+    if ! git diff-files --quiet --ignore-submodules
+    then     
+        growlnotify -sticky -t "[$branch_name] clean work tree" -m "Cannot $1: You have unstaged changes. Think of stashing your changes and then stash apply'ing them after."
+        echo >&2 "Cannot [$branch_name]: You have unstaged changes."
+        err=1
+    fi
+
+    if ! git diff-index --cached --quiet --ignore-submodules HEAD --
+    then
+        if [ $err = 0 ]
+        then
+            #growlnotify -sticky -t "clean work tree" -m "Cannot $1: Your index contains uncommitted changes."
+            echo >&2 "Cannot [$branch_name]: Your index contains uncommitted changes."
+        else
+            #growlnotify -sticky -t "clean work tree" -m "Additionally, your index contains uncommitted changes."
+            echo >&2 "Additionally, your index contains uncommitted changes."
+        fi
+        err=1
+    fi
+
+    if [ $err = 1 ]
+    then
+        test -n "$2" && echo >&2 "$2"
+        exit 1
+    fi
+}
+
+function require_master_branch() {
+  local branch_name="$1"
+  local branch_ref=`git symbolic-ref HEAD`
+  branch_ref=`printf "%s" "${branch_ref##refs/heads/}"`
+  if [ ! $branch_ref == "master" ]; then
+    growlnotify -sticky -t "[$branch_name] require master branch" -m "You're not on the master branch. You're on branch $branch_ref. Checkout master branch before continuing."
+    echo "You're not on the master branch. You're on branch '$branch_ref'. This operation is aborting."
+    exit 1
+  fi 
+}
+
+
+
+function refresh_running_browsers() {
+  ###	Refresh All Active Browsers - OmniWeb, Safari, Firefox & IE
+  ### v1.0. 2005-03-29
+  ###
+
+  # Check if Internet Explorer is running, if so refresh
+  ps -xc|grep -sq "Internet Explorer" && osascript -e 'tell app "Internet Explorer"' -e 'activate' -e 'OpenURL "JavaScript:window.location.reload();" toWindow -1' -e 'end tell'
+
+  # Check if OmniWeb is running, if so refresh
+  ps -xc|grep -sq OmniWeb && osascript -e 'tell app "OmniWeb"' -e 'activate' -e 'reload first browser' -e 'end tell'
+
+  # Check if Firefox is running, if so refresh
+  ps -xc|grep -sqi firefox && osascript -e 'tell app "firefox"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+
+  # Check if Safari is running, if so refresh
+  ps -xc|grep -sq Safari && osascript -e 'tell app "Safari"' -e 'activate' -e 'do JavaScript "window.location.reload();" in first document' -e 'end tell'
+
+  # Check if Camino is running, if so refresh 
+  ps -xc|grep -sq Camino && osascript -e 'tell app "Camino"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+
+  # Check if Chrome is running, if so refresh 
+  ps -xc|grep -sq "Google Chrome" && osascript -e 'tell app "Google Chrome"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+  
+}
+
+function wii_logger() {
+  #Usage: TcpLoggerClient IP_ADDR LOG_LEVEL TRACE_AREA
+  #Log Levels: trace, debug, info, error, fatal
+  # http://wiki.netflix.com/docs/DOC-20055
+  # TRACE AREAS
+  # 10: (NCCP) NCCP transactions
+  # 28: JS_BRIDGE: nrdp bridge methods
+  # 50-55: HTTP activity (primarily related to streaming and NCCP)
+  # 81: (ERROR_HANDLING) Error handling
+  # 85: (JAVASCRIPT) Javascript console output (also output from _cout)
+  # 86: (NFOBJECT) Low level bridge activity
+
+  local IP=$1
+  local LEVEL=$2
+
+  if [ $# != 2 ] ; then
+    echo "Usage: netflix-wii-log [IP_ADDRESS] [LOG_LEVEL]"
+    echo "LOG_LEVEL:"
+    echo "  trace, debug, info, error, fatal"
+    exit 1
+  fi
+
+  #java -cp /Users/catesandrew/Library/Java/Extensions TcpLoggerClient $1 $2 10,28,81,85,86
+  java -cp $HOME/Library/Java/Extensions TcpLoggerClient $1 $2 10,81,85   
+}
+
+function start_redir_ports() {
+  local branch_name="$1"
+  local matches=`sudo ipfw list | grep '00100 fwd 127.0.0.1,8080'`
+
+  if [ -z "$matches" ]; then    
+    echo "$branch_name: Applying port forwarding rules:"
+
+    echo "\t80  > 8080"
+    sudo ipfw add 100 fwd 127.0.0.1,8080 tcp from any to any 80 in > /dev/null
+
+    echo "\t443 > 8443"
+    sudo ipfw add 100 fwd 127.0.0.1,8443 tcp from any to any 443 in > /dev/null 
+  else
+    echo "$branch_name: Port forwarding rules already applied. No action taken."
+  fi
+
+}
+
+function kill_redir_ports() {
+  local branch_name="$1"
+  local matches=`sudo ipfw list | grep '00100 fwd 127.0.0.1,8080'`
+
+  if [ -z "$matches" ]; then
+    echo "$branch: No rules to delete."
+  else
+    echo "$branch_name: Port forwarding rules deleted."
+    sudo ipfw delete 100	
+  fi
+}
+
+
+function require_branch() {
+  local branch_name="$1"
+  case "$branch_name" in
+  	ecweb|ecadmin|account-web|common|root|baseline|monthly|release|all)
+      ;;
+  	*)
+  	  echo "Error: Unknown Branch [$branch_name]."
+  	  echo "$LONG_USAGE"
+  	  exit
+  esac
+}
+
+function run_catalina() {
+  local branch="$1"
+  
+  local www="$HOME/dev/$branch/javaweb/netflixServer"          
+  local cloud="$HOME/dev/certs"  
+  case "$branch" in
+  	ecweb|ecadmin|account-web|common)
+  	  export DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+      export JAVA_OPTS="-Xrs -Xms1024m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=256m $DEBUG_OPTS"
+      export JAVA_OPTS="-noverify -javaagent:/Applications/ZeroTurnaround/JRebel/jrebel.jar $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl $JAVA_OPTS"
+      #export JAVA_OPTS="-Djavax.net.ssl.keyStore=$www/qa_backend_services.keystore $JAVA_OPTS"
+      #export JAVA_OPTS="-Djavax.net.ssl.keyStorePassword=changeit $JAVA_OPTS"
+      #export JAVA_OPTS="-Djavax.net.ssl.trustStore=$www/qa_backend_services.keystore $JAVA_OPTS"
+      #export JAVA_OPTS="-Djavax.net.ssl.trustStorePassword=changeit $JAVA_OPTS"  
+      export JAVA_OPTS="-Djavax.net.ssl.keyStore=$cloud/cacerts_nflx $JAVA_OPTS"           
+      export JAVA_OPTS="-Djavax.net.ssl.keyStorePassword=changeit $JAVA_OPTS"   
+      export JAVA_OPTS="-Djavax.net.ssl.trustStore=$cloud/cacerts_nflx $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.net.ssl.trustStorePassword=changeit $JAVA_OPTS"
+      export JAVA_OPTS="-Dcom.netflix.videometadata.dobulkfill=false $JAVA_OPTS"
+      export JAVA_OPTS="-Dnetflix.environment=test $JAVA_OPTS"
+      ;;
+  	baseline|monthly|release)
+  	  export DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+      export JAVA_OPTS="-Xrs -Xms512M -Xmx1400m -XX:PermSize=64m -XX:MaxPermSize=256m -Doracle.jdbc.V8Compatible=true -Dnetflix.home=$www/ -Duser.name=${USER} $DEBUG_OPTS"
+      export JAVA_OPTS="-noverify -javaagent:/Applications/ZeroTurnaround/JRebel/jrebel.jar $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.net.ssl.keyStore=$www/qa_backend_services.keystore $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.net.ssl.keyStorePassword=changeit $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.net.ssl.trustStore=$www/qa_backend_services.keystore $JAVA_OPTS"
+      export JAVA_OPTS="-Djavax.net.ssl.trustStorePassword=changeit $JAVA_OPTS"
+      ;;  
+  	*)
+  	  echo "Error: Unsupported branch [$branch]."
+  	  exit
+  esac
+  
+  export CATALINA_BASE=${HOME}/dev/$branch
+  export CATALINA_TMPDIR=${CATALINA_BASE}/temp             
+  pushd "$HOME/dev/$branch" > /dev/null
+  $CATALINA_HOME/bin/catalina.sh run > $HOME/Library/Logs/dev/catalina-$branch.log 2>&1 &   
+  growlnotify -t "[$branch] started" -m "The $branch web application has started."    
+  popd > /dev/null
+}
+
+
+function stop_catalina() {
+  local branch="$1"
+    
+  export CATALINA_BASE=${HOME}/dev/$branch
+  export CATALINA_TMPDIR=${CATALINA_BASE}/temp
+  $CATALINA_HOME/bin/catalina.sh stop
+}
+
+function kill_catalina() {
+  if [ "`ps xwww | grep -v grep | grep -c catalina`" == "1" ]; then
+		local CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+	  kill -9 $CATALINA_PID
+		echo "Catalina is dead. Killed process $CATALINA_PID"
+	else
+		echo "Catalina is not running."
+	fi
+}
+
+function status_catalina() {  
+	if [ "`ps xwww | grep -v grep | grep -c catalina`" == "0" ];then
+		echo "Catalina is not running.";
+	else
+		local CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+		echo "Catalina is running. PID: [$CATALINA_PID]";
+	fi
+}
+
+
+function rebase() {
+  local branch_name="$1"
+  # 1. require master branch	
+  require_master_branch $branch_name
+  # 2. require clean tree
+  require_clean_work_tree $branch_name
+	# 3. start tracking configs
+	start_tracking $branch_name
+	# 4. checkthem out to remove local changes
+	discard_changes	$branch_name
+  # 5. get changes from p4
+	git p4 rebase
+	# 6. Rebase our configs branch
+	git checkout configs
+	git rebase p4/master
+	# 7. Create a new configs patch
+	git checkout master
+	format_patch $branch_name
+	# 8. apply-patch
+	apply_patch $branch_name
+	# 9. stop tracking the files
+	stop_tracking $branch_name
+	
+	growlnotify -t "[$branch_name] p4 rebase" -m "The git-p4 rebase process has completed, including patching the local config files."
+  
+}
+
+function rebase_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local branch_name
+  local location
+  local config
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+    config=${configs[$i]} 
+    branch_name=${branch_names[$i]} 
+    
+    pushd $location > /dev/null
+    if [ "$config" == "" ]; then
+      files=()
+    else
+      files=$(ls $config | tr '\n' ' ')
+    fi
+    
+    rebase $branch_name
+
+    popd > /dev/null
+    let i+=1
+  done  
+}   
+
+
+function sync() {
+  local branch_name="$1"
+	p4 sync	
+	growlnotify -t "[$branch_name] p4 sync" -m "The p4 sync process has completed."  
+}
+
+function sync_helper() {
+  local i=0
+  local l=${#p4_locations[@]}
+  local branch_name
+  local p4_location   
+             
+  while [ "$i" -lt "$l" ]
+  do
+    p4_location=${p4_locations[$i]} 
+    branch_name=${branch_names[$i]} 
+    pushd $p4_location > /dev/null                                       
+    sync $branch_name                                    
+    popd > /dev/null
+    let i+=1
+  done  
+}
+
+
+function start_tracking() {
+  local branch_name="$1" 
+  local count=${#files[@]}
+  if [ ! $count == 0 ]; then
+    for file in $files
+  	  do
+  	    git update-index --no-assume-unchanged $file > /dev/null
+  	  done  
+  fi
+}
+
+function start_tracking_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local location
+  local config
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+    config=${configs[$i]} 
+
+    pushd $location > /dev/null
+    if [ "$config" == "" ]; then
+      files=()
+    else
+      files=$(ls $config | tr '\n' ' ')
+    fi
+    
+    start_tracking
+    
+    popd > /dev/null
+    let i+=1
+  done
+}
+
+function stop_tracking() {
+  local branch_name="$1"               
+  local count=${#files[@]}
+  if [ ! $count == 0 ]; then
+    for file in $files
+  	  do
+  	    git update-index --assume-unchanged $file > /dev/null
+  	  done
+  fi
+}
+
+function stop_tracking_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+    config=${configs[$i]}
+     
+    pushd $location > /dev/null
+    if [ "$config" == "" ]; then
+      files=()
+    else
+      files=$(ls $config | tr '\n' ' ')
+    fi
+
+    stop_tracking
+    
+    popd > /dev/null
+    let i+=1
+  done 
+}
+
+function discard_changes() {
+  local branch_name="$1"               
+  local count=${#files[@]}
+  if [ ! $count == 0 ]; then
+    for file in $files
+  	  do
+  	    git checkout $file > /dev/null
+  	  done
+  fi
+}
+
+function discard_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+    config=${configs[$i]} 
+
+    pushd $location > /dev/null
+    if [ "$config" == "" ]; then
+      files=()
+    else
+      files=$(ls $config | tr '\n' ' ')
+    fi
+    
+    require_master_branch
+    discard_changes
+    
+    popd > /dev/null
+    let i+=1
+  done
+}
+
+function ant_build() {
+  local ant_build_location="$1"
+  #local p4_client=`p4 client -o | grep ^Client: | sed -E 's/Client:(.*)/\1/' | sed -E "s/${USER}_lgmd_(.*)/\1/"`
+  #echo "p4 client [${p4_client}]"
+  ant -Dcompile.deprecation=false clean debug copy-uncompressed-js deploydebug
+}
+
+function ant_build_helper() {
+  local i=0
+  local l=${#ant_build_locations[@]}
+  local ant_build_location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    ant_build_location=${ant_build_locations[$i]} 
+
+    pushd $ant_build_location > /dev/null
+    
+    require_master_branch
+    ant_build $ant_build_location
+    
+    popd > /dev/null
+    let i+=1
+  done 
+}
+
+function deploy_build() {
+  local tomcat_deploy_location="$1"
+  local ant_build_location="$2"
+  #local p4_client=`p4 client -o | grep ^Client: | sed -E 's/Client:(.*)/\1/' | sed -E "s/${USER}_lgmd_(.*)/\1/"`
+  #echo "p4 client [${p4_client}]"
+
+	echo "Removing prior $LOCATION deployment...\n"
+	rm -Rf $tomcat_deploy_location/webapps/*
+	rm -Rf $tomcat_deploy_location/javaweb/*
+	
+	
+	# steps from the wiki
+	if [ ! -f $tomcat_deploy_location/conf/server.xml ] 
+	then
+	  echo "Copying server.xml over to dev/$LOCATION/conf/"
+	  cp $P4_HOME/Tomcat6.0.10/conf/server.xml $tomcat_deploy_location/conf/
+	fi
+
+	if [ -f $P4_HOME/Tomcat6.0.10/conf/server.xml ] 
+	then
+	  echo "Updating server.xml to point to $LOCATION"
+	  sed -E "s/dev\/[a-zA-Z]+/dev\/$LOCATION/g" $P4_HOME/Tomcat6.0.10/conf/server.xml > $tomcat_deploy_location/conf/server.xml
+	fi
+
+	if [ ! -f $tomcat_deploy_location/conf/web.xml ] 
+	then
+	  echo "Copying web.xml over to dev/$LOCATION/conf/"
+	  cp $P4_HOME/Tomcat6.0.10/conf/web.xml $tomcat_deploy_location/conf/
+	fi
+
+	# if [ ! -f $HOME/dev/$1/conf/server.properties ] 
+	# then
+	#   echo "Copying server.properties over to dev/$1/conf/"
+	#   cp $P4_HOME/WebEng/$1/javaweb/netflixServer/server.properties $HOME/dev/$1/conf/
+	# fi
+
+	#cp -a $BRANCH/public_html/ $HOME/dev/$LOCATION/webapps/ROOT
+	#ditto $BRANCH/STAGING/WEB-INF $HOME/dev/$LOCATION/webapps/ROOT/WEB-INF
+	
+	#cp -a $P4_HOME/WebEng/$1/javaweb/netflixServer $HOME/dev/$1/javaweb/
+	
+	#cp -a $TOMCAT_HOME/webapps/netflixServer $HOME/dev/$LOCATION/javaweb/
+	cp -a $ant_build_location/netflixServer $tomcat_deploy_location/javaweb/
+	cp -r $TOMCAT_HOME/webapps/ROOT $tomcat_deploy_location/webapps/
+	mv $tomcat_deploy_location/webapps/ROOT/netflix.jre.jar $tomcat_deploy_location/webapps/ROOT/WEB-INF/lib/  
+  
+}
+
+function deploy_build_helper() {
+  local i=0
+  local l=${#tomcat_deploy_locations[@]}
+  local tomcat_deploy_location
+  local ant_build_location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    tomcat_deploy_location=${tomcat_deploy_locations[$i]} 
+    ant_build_location=${ant_build_locations[$i]} 
+
+    pushd $ant_build_location > /dev/null
+    
+    require_master_branch
+    deploy_build $tomcat_deploy_location $ant_build_location
+    
+    popd > /dev/null
+    let i+=1
+  done 
+}
+
+function format_patch() {
+  git checkout configs 2> /dev/null
+	git format-patch master --stdout > configs.patch
+	git checkout master 2> /dev/null
+}
+
+function format_patch_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+
+    pushd $location > /dev/null
+    
+    require_master_branch
+  	require_clean_work_tree
+    format_patch
+    
+    popd > /dev/null
+    let i+=1
+  done  
+}
+
+function apply_patch() {
+  # First, take a look at what changes are in the patch. 
+	# You can do this easily with git apply
+	git apply --stat configs.patch
+	if $(git apply --check configs.patch 2>/dev/null); then :; else
+		echo "Could not apply patch cleanly."
+		exit 1
+	fi
+	git apply configs.patch
+}
+
+function apply_patch_helper() {
+  local i=0
+  local l=${#locations[@]}
+  local location
+  
+  while [ "$i" -lt "$l" ]
+  do
+    location=${locations[$i]} 
+
+    pushd $location > /dev/null
+    
+    require_master_branch
+  	require_clean_work_tree
+    apply_patch
+    
+    popd > /dev/null
+    let i+=1
+  done
+}
+
+function update_dux() { 
+  pushd $WORKSPACE/.dux > /dev/null  
+  growlnotify -t "Dux Templates" -m "Removing prior dux jars."       
+  rm *.jar
+  popd > /dev/null
+     
+  pushd $WORKSPACE/cloud/git_ecweb/duxtemplates > /dev/null       
+  growlnotify -t "Dux Templates" -m "Regenerating dux jars."       
+  ant -f templates.xml compile-all          
+  growlnotify -t "Dux Templates" -m "Deploying new dux jars."       
+  cp build/stage/*.jar $WORKSPACE/.dux
+  popd > /dev/null  
+}
+
+
+
+counter=0;
+declare -a configs
+declare -a locations 
+declare -a branch_names
+declare -a ant_build_locations
+declare -a tomcat_deploy_locations
+declare -a files  
+declare -a p4_locations
+
+function build_location_and_config() {
+  local branch="$1"
+  case "$branch" in
+  ecweb)
+  	locations[$counter]=/Users/catesandrew/workspace/cloud/git_ecweb   
+  	p4_locations[$counter]=/Users/catesandrew/workspace/cloud/p4_ecweb   
+  	configs[$counter]="build.xml duxtemplates/build.properties duxtemplates/build.xml duxtemplates/ivy.xml duxtemplates/templates.xml family.properties webapp/build.xml webapp/ivy.xml webapp/conf/struts.xml ecweb-abtests/ivy.xml ecweb-abtests/build.xml"
+  	branch_names[$counter]="ecweb"
+  	let counter+=1
+    ;;
+  ecadmin)
+  	locations[$counter]=/Users/catesandrew/workspace/cloud/git_ecadmin   
+  	p4_locations[$counter]=/Users/catesandrew/workspace/cloud/p4_ecadmin   
+  	configs[$counter]="build.xml"  
+  	branch_names[$counter]="ecadmin" 
+  	let counter+=1
+    ;;
+  account-web)
+  	locations[$counter]=/Users/catesandrew/workspace/cloud/git_account-web        
+  	p4_locations[$counter]=/Users/catesandrew/workspace/cloud/p4_account-web        
+  	configs[$counter]="build.xml"  
+  	branch_names[$counter]="account-web" 
+  	let counter+=1
+      ;;
+  common)
+  	locations[$counter]=/Users/catesandrew/workspace/cloud/git_common
+  	p4_locations[$counter]=/Users/catesandrew/workspace/cloud/p4_common
+  	configs[$counter]="abtest/build.xml abtest/ivy.xml build.xml dux/build.xml dux/ivy.xml duxcopy/build.xml duxcopy/ivy.xml duxsnapshot/build.xml duxsnapshot/ivy.xml facade/build.xml facade/ivy.xml family.properties mustache/build.xml mustache/ivy.xml mustache2java/build.xml mustache2java/ivy.xml restclient/build.xml restclient/ivy.xml tools/build.xml tools/ivy.xml tracking/common/build.xml tracking/common/ivy.xml tracking/sal/build.xml tracking/sal/ivy.xml uicommon/build.xml uicommon/ivy.xml util/build.xml util/ivy.xml rules/build.xml rules/ivy.xml visitor/build.xml visitor/ivy.xml"
+    branch_names[$counter]="common" 
+  	let counter+=1
+    ;;
+  root)
+  	locations[$counter]=/Users/catesandrew/workspace/cloud/git_root 
+  	p4_locations[$counter]=/Users/catesandrew/workspace/cloud/p4_root 
+  	configs[$counter]=""  
+  	branch_names[$counter]="root" 
+  	let counter+=1
+    ;;
+  baseline)
+    locations[$counter]=/Users/catesandrew/workspace/webeng/git_baseline     
+    p4_locations[$counter]=/Users/catesandrew/workspace/webeng/p4_baseline     
+    ant_build_locations[$counter]=${locations[$counter]}/javaweb
+    tomcat_deploy_locations[$counter]=$HOME/dev/baseline
+		configs[$counter]="javaweb/netflixServer/dev.properties javaweb/netflixServer/server.properties javaweb/ivy.xml"
+		branch_names[$counter]="baseline" 
+		let counter+=1
+		;;
+  release)
+    locations[$counter]=/Users/catesandrew/workspace/webeng/git_release
+    p4_locations[$counter]=/Users/catesandrew/workspace/webeng/p4_release
+    ant_build_locations[$counter]=${locations[$counter]}/javaweb
+    tomcat_deploy_locations[$counter]=$HOME/dev/release
+		configs[$counter]="javaweb/netflixServer/dev.properties javaweb/netflixServer/server.properties javaweb/ivy.xml"
+		branch_names[$counter]="release" 
+		let counter+=1
+		;;
+  monthly)
+    locations[$counter]=/Users/catesandrew/workspace/webeng/git_monthly       
+    p4_locations[$counter]=/Users/catesandrew/workspace/webeng/p4_monthly       
+    ant_build_locations[$counter]=${locations[$counter]}/javaweb
+    tomcat_deploy_locations[$counter]=$HOME/dev/monthly
+		configs[$counter]="javaweb/netflixServer/dev.properties javaweb/netflixServer/server.properties javaweb/ivy.xml"
+		branch_names[$counter]="monthly" 
+		let counter+=1
+		;;   
+  *)
+    echo "Non supported branch selected"
+		exit 1
+    usage ;;
+  esac
+}
+
+function build_location_and_config_helper() {
+  local branch="$1"
+  if [ $branch == "all" ]; then
+    build_location_and_config "ecweb"
+    build_location_and_config "ecadmin"
+    build_location_and_config "account-web"
+    build_location_and_config "common"
+    build_location_and_config "root"
+    build_location_and_config "baseline"
+    build_location_and_config "release"
+    build_location_and_config "monthly" 
+  else
+    build_location_and_config "$branch"
+  fi
+}
+
+dashless=$(basename "$0" | sed -e 's/-/ /')
+usage() {
+  die "Usage: $dashless $USAGE"
+}
+
+if [ -z "$LONG_USAGE" ]
+then
+  LONG_USAGE="Usage: $dashless $USAGE"
+else
+  LONG_USAGE="Usage: $dashless $USAGE
+
+$LONG_USAGE"
+fi
+
+case "$1" in
+  -h|--h|--he|--hel|--help)
+  echo "$LONG_USAGE"
+  exit
+esac
+
+
+case "$#" in
+0)
+    usage ;;
+*)
+    cmd="$1"
+    shift
+    
+    case "$cmd" in
+    help)
+      nf -h ;;
+    run)
+      require_branch "$@"
+      run_catalina "$@" 
+      ;;
+    stop)
+      require_branch "$@"
+      stop_catalina "$@"
+      ;;
+    kill)
+      kill_catalina "$@" 
+      ;;
+    status)
+      status_catalina "$@"
+      ;;
+    start-track)
+      echo "start tracking..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      start_tracking_helper "$@"
+      ;;
+    stop-track)
+      echo "stop tracking..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      stop_tracking_helper "$@"
+      ;;
+    format-patch)
+      echo "formating configs.patch..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      format_patch_helper "$@"
+      ;;
+    apply-patch)
+      echo "applying configs.patch..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      apply_patch_helper "$@"
+      ;;
+    discard)
+      echo "discarding..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      discard_helper "$@"
+      ;;  
+    dux)
+      echo "updating dux..."
+      update_dux "$@"
+      ;;
+    rebase)
+      require_branch "$@"
+      build_location_and_config_helper "$@"     
+      echo "p4 syncing..."   
+      sync_helper
+      echo "p4 rebasing..."  
+      rebase_helper
+      ;;  
+    sync)
+      echo "p4 syncing..."
+      build_location_and_config_helper "$@"
+      sync_helper
+      ;;      
+    build)
+      echo "ant building..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      ant_build_helper "$@"
+      ;;
+    deploy)
+      echo "deploying..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      deploy_build_helper "$@"
+      ;;      
+    log)
+      require_branch "$@"
+      #tail -f "$HOME/Library/Logs/dev/catalina-$1.log"
+      # http://code.google.com/p/log4tailer/
+      log4tail --throttle 0.1 $HOME/Library/Logs/dev/catalina-$1.log
+      ;; 
+    redir-stop)
+      echo "stopping redirection of ip ports..."
+      require_branch "$@"
+      kill_redir_ports "$@"
+      ;;
+    redir-start)
+      echo "starting to redirect ip ports..."
+      require_branch wii_logger
+      start_redir_ports "$@"
+      ;;
+    nbpd)
+      echo "starting nbpd..."
+      $WORKSPACE/ppd/nrdp/nrd/release/3.1/app/nbp/nbpd -T 8 -L ~/Library/Logs/dev/nbpd.log &
+      ;;
+    wii-log)
+      echo "wii logging..."
+      wii_logger wii_logger "$@"
+      log4tail --throttle 0.1 $HOME/Library/Logs/dev/catalina-$1.log
+      ;; 
+    refresh)
+      echo "refreshing running browsers..."
+      refresh_running_browsers "$@"
+      ;;
+    *)
+      usage 
+      ;;
+    esac
+esac
