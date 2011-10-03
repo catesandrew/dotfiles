@@ -76,7 +76,7 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 augroup vimrc
     autocmd WinEnter,BufEnter,BufRead * setl cursorline
     autocmd WinEnter,BufEnter,BufRead * setl relativenumber
-
+   
     autocmd WinLeave,BufLeave * setl nocursorline
     autocmd WinLeave,BufLeave * setl norelativenumber
 augroup END
@@ -597,8 +597,22 @@ au FileType c setlocal foldmethod=syntax
 " }}}
 " HTML and HTMLDjango {{{
   
+function! DoDux()
+    if &filetype == 'html'
+        exec "!nf dux-html& > /dev/null"
+    elseif &filetype == 'javascript'
+        exec "!nf dux-js& > /dev/null"
+    elseif &filetype == 'css'
+        exec "!nf dux-css& > /dev/null"
+    endif
+endfunction
+
 " HTML (tab width 2 chr, no wrapping)
 au BufRead,BufNewFile *_html.template set filetype=html
+"autocmd FileType html cnoreabbrev w w<bar>silent !nf dux-html& > /dev/null
+autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
+autocmd FileType html nnoremap <silent> <leader>r :silent !nf refresh&<CR>
+
 autocmd FileType html setlocal sw=2     
 autocmd FileType html setlocal ts=2
 autocmd FileType html setlocal sts=2
@@ -664,6 +678,10 @@ autocmd FileType css setlocal sts=2
 autocmd FileType css setlocal textwidth=0
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 
+"autocmd FileType css cnoreabbrev w w<bar>silent !nf dux-css& > /dev/null
+autocmd FileType css cnoreabbrev w w<bar>silent call DoDux()
+autocmd FileType css nnoremap <silent> <leader>r :silent !nf refresh&<CR>
+
 au BufNewFile,BufRead *.less setlocal filetype=less
 
 au BufNewFile,BufRead *.css  setlocal foldmethod=marker
@@ -720,6 +738,10 @@ au FileType javascript nnoremap <buffer> <C-c>  :<C-u>call WriteJSDocComment()<C
 au FileType javascript call JavaScriptFold()
 au FileType javascript setl fen
 au FileType javascript setl nocindent
+
+"autocmd FileType javascript cnoreabbrev w w<bar>silent !nf dux-js& > /dev/null
+autocmd FileType javascript cnoreabbrev w w<bar>silent call DoDux()
+autocmd FileType javascript nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au FileType javascript imap <C-t> console.log();<esc>hi
 au FileType javascript imap <C-a> alert();<esc>hi
