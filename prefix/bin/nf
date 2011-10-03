@@ -670,6 +670,50 @@ function update_dux() {
 }
 
 
+function update_dux_device_js() { 
+  pushd $WORKSPACE/.dux > /dev/null  
+  growlnotify -t "Dux Templates" -m "Removing prior device dux JS jars."       
+  rm DEVICE_JS*.jar
+  popd > /dev/null
+     
+  pushd $WORKSPACE/cloud/git_ecweb/duxtemplates > /dev/null       
+  growlnotify -t "Device Dux JS Templates" -m "Regenerating dux jars."       
+  #ant -f templates.xml compile-all          
+  ant -f templates.xml compile-js-device
+  growlnotify -t "Device Dux JS Templates" -m "Deploying new dux jars."       
+  cp build/stage/DEVICE_JS*.jar $WORKSPACE/.dux
+  popd > /dev/null  
+}
+
+function update_dux_device_css() { 
+  pushd $WORKSPACE/.dux > /dev/null  
+  growlnotify -t "Dux Templates" -m "Removing prior device dux CSS jars."       
+  rm DEVICE_CSS*.jar
+  popd > /dev/null
+     
+  pushd $WORKSPACE/cloud/git_ecweb/duxtemplates > /dev/null       
+  growlnotify -t "Device Dux CSS Templates" -m "Regenerating dux jars."       
+  #ant -f templates.xml compile-all          
+  ant -f templates.xml compile-css-device
+  growlnotify -t "Device Dux CSS Templates" -m "Deploying new dux jars."       
+  cp build/stage/DEVICE_CSS*.jar $WORKSPACE/.dux
+  popd > /dev/null  
+}
+
+function update_dux_device_html() { 
+  pushd $WORKSPACE/.dux > /dev/null  
+  growlnotify -t "Dux Templates" -m "Removing prior device dux HTML jars."       
+  rm DEVICE_HTML*.jar
+  popd > /dev/null
+     
+  pushd $WORKSPACE/cloud/git_ecweb/duxtemplates > /dev/null       
+  growlnotify -t "Device Dux HTML Templates" -m "Regenerating dux jars."       
+  #ant -f templates.xml compile-all          
+  ant -f templates.xml compile-html-device
+  growlnotify -t "Device Dux HTML Templates" -m "Deploying new dux jars."       
+  cp build/stage/DEVICE_HTML*.jar $WORKSPACE/.dux
+  popd > /dev/null  
+}
 
 counter=0;
 declare -a configs
@@ -846,6 +890,18 @@ case "$#" in
     dux)
       echo "updating dux..."
       update_dux "$@"
+      ;;
+    dux-js)
+      echo "updating device js dux..."
+      update_dux_device_js "$@"
+      ;;
+    dux-css)
+      echo "updating device css dux..."
+      update_dux_device_css "$@"
+      ;;
+    dux-html)
+      echo "updating device html dux..."
+      update_dux_device_html "$@"
       ;;
     rebase)
       require_branch "$@"
