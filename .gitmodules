@@ -181,3 +181,6 @@
 [submodule "home/vim/bundle/vim-handlebars"]
 	path = home/vim/bundle/vim-handlebars
 	url = git://github.com/nono/vim-handlebars.git
+[submodule "home/vim/bundle/vim-stylus"]
+	path = home/vim/bundle/vim-stylus
+	url = git://github.com/wavded/vim-stylus.git
