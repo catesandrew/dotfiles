@@ -946,7 +946,7 @@ case "$#" in
       ;;
     nbpd)
       echo "starting nbpd..."
-      $WORKSPACE/ppd/nrdp/nrd/release/3.1/app/nbp/nbpd -T 8 -L ~/Library/Logs/dev/nbpd.log &
+      $WORKSPACE/device/builds/3.1_kp/dev/app/nbp/nbpd -T 8 -L ~/Library/Logs/dev/nbpd.log &
       ;;
     wii-log)
       echo "wii logging..."
