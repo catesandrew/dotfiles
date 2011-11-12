@@ -184,3 +184,6 @@
 [submodule "home/vim/bundle/vim-stylus"]
 	path = home/vim/bundle/vim-stylus
 	url = git://github.com/wavded/vim-stylus.git
+[submodule "home/vim/bundle/vim-mustache"]
+	path = home/vim/bundle/vim-mustache
+	url = git://github.com/juvenn/mustache.vim.git
