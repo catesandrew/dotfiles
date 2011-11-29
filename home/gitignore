@@ -115,3 +115,5 @@ tags
 *.swo
 
 .perforce
+
+node_modules/**

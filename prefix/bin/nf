@@ -244,6 +244,86 @@ function require_branch() {
   esac
 }
 
+function run_phoenix() {
+  pushd "/usr/local/src/walmart/phoenix" > /dev/null
+
+  #jake startproduction 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+  local branch_name="$1"
+  case "$branch_name" in
+  	1)
+      jake start[1] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake e1 started" -m "Phoenix has started."    
+      echo "Jake e1 started"
+      ;;
+  	2)
+      jake start[2] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake e2 started" -m "Phoenix has started."    
+      echo "Jake e2 started"
+      ;;
+  	3)
+      jake start[3] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake e3 started" -m "Phoenix has started."    
+      echo "Jake e3 started"
+      ;;
+  	4)
+      jake start[4] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake e4 started" -m "Phoenix has started."    
+      echo "Jake e4 started"
+      ;;
+  	prod)
+      jake startproduction 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake prod started" -m "Phoenix has started."    
+      echo "Jake prod started"
+      ;;
+  	*)
+      jake start 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake dev started" -m "Phoenix has started."    
+      echo "Jake dev started"
+      ;;
+  esac
+  #jake start[4] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+  #growlnotify -t "Jake started" -m "Phoenix has started."    
+  jake watch 1>$HOME/Library/Logs/dev/jake.log 2>&1 &
+  growlnotify -t "Jake watched" -m "Jake is being watched."    
+  echo "Jake is being watched"
+
+  popd > /dev/null
+}
+
+function stop_phoenix() {
+    local ORIGIFS=$IFS
+    # set $IFS to end-of-line
+    IFS=`echo -en "\n\b"`
+
+    if [ "`ps xwww | grep -v grep | grep -c jake`" > "0" ]; then
+        local PIDS=`ps A | grep -v grep | grep jake | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+
+        for PID in $PIDS; do
+            kill -9 $PID
+            echo "Jake is dead. Killed process $PID"
+        done
+
+    else
+        echo "Jake is not running."
+    fi
+
+    if [ "`ps xwww | grep -v grep | grep -c node`" > "0" ]; then
+        local PIDS=`ps A | grep -v grep | grep node | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+
+        for PID in $PIDS; do
+            kill -9 $PID
+            echo "NodeJS is dead. Killed process $PID"
+        done
+
+    else
+        echo "NodeJS is not running."
+    fi
+
+    # set $IFS back
+    IFS=$ORIGIFS
+}
+
+
 function run_catalina() {
   local branch="$1"
   
@@ -844,12 +924,14 @@ case "$#" in
     help)
       nf -h ;;
     run)
-      require_branch "$@"
-      run_catalina "$@" 
+      #require_branch "$@"
+      #run_catalina "$@" 
+      run_phoenix "$@"
       ;;
     stop)
-      require_branch "$@"
-      stop_catalina "$@"
+      #require_branch "$@"
+      #stop_catalina "$@"
+      stop_phoenix
       ;;
     kill)
       kill_catalina "$@" 
