@@ -270,6 +270,11 @@ function run_phoenix() {
       growlnotify -t "Jake e4 started" -m "Phoenix has started."    
       echo "Jake e4 started"
       ;;
+  	mock)
+      jake startmocks 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      growlnotify -t "Jake mocks started" -m "Phoenix has started."    
+      echo "Jake mocks started"
+      ;;
   	prod)
       jake startproduction 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
       growlnotify -t "Jake prod started" -m "Phoenix has started."    

@@ -9,6 +9,8 @@ alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
 alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
 export PYTHONPATH=/usr/local/lib/python2.6/site-packages     
+export LC_CTYPE="utf-8"
+#export CC=/usr/bin/gcc-4.2
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
