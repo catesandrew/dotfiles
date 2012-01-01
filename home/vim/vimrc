@@ -567,6 +567,22 @@ inoremap # X<BS>#
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
 
+" Markdown {{{
+
+autocmd FileType markdown setlocal wrap
+autocmd FileType markdown setlocal linebreak
+autocmd FileType markdown setlocal nolist
+autocmd FileType markdown setlocal textwidth=0
+autocmd FileType markdown setlocal virtualedit=
+autocmd FileType markdown setlocal display+=lastline
+autocmd FileType markdown setlocal wrapmargin=10
+autocmd FileType markdown noremap  <buffer> <silent> k gk
+autocmd FileType markdown noremap  <buffer> <silent> j gj
+autocmd FileType markdown noremap  <buffer> <silent> 0 g0
+autocmd FileType markdown noremap  <buffer> <silent> $ g$
+
+" }}}
+
 " Ant {{{
 
 autocmd FileType ant setlocal sw=2
