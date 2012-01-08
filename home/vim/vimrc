@@ -805,6 +805,10 @@ au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
+" Marked Support {{{
+nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
+
+" }}}
 " Google Code Wiki {{{
 
 autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki 

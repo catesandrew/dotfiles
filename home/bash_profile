@@ -1,13 +1,13 @@
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
-export EDITOR='mate -w'
+#export EDITOR='mate -w'
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH:~/.dotfiles/prefix/src/doctorjs/bin"
 export JAVA_HOME="`/usr/libexec/java_home`"
 export NODE_PATH=/usr/local/lib/jsctags/:$NODE_PATH
 alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
-alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
-alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
+#alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+#alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
+#alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
 export PYTHONPATH=/Library/Python/2.7/site-packages     
 export LC_CTYPE="utf-8"
 export CC=/usr/bin/gcc-4.2
