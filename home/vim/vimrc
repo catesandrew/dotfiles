@@ -582,7 +582,12 @@ autocmd FileType markdown noremap  <buffer> <silent> 0 g0
 autocmd FileType markdown noremap  <buffer> <silent> $ g$
 
 " }}}
+" SRT {{{
 
+" Syntax highlighting for subtitle files in Subrip (srt) format
+autocmd BufNewFile,BufRead *.srt setf srt     
+
+" }}}
 " Ant {{{
 
 autocmd FileType ant setlocal sw=2
