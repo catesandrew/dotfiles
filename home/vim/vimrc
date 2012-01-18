@@ -616,7 +616,7 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 au FileType c setlocal foldmethod=syntax
 
 " }}}
-" HTML and HTMLDjango {{{
+" HTML, Mustache, and HTMLDjango {{{
   
 function! DoDux()
     if &filetype == 'html'
@@ -629,16 +629,16 @@ function! DoDux()
 endfunction
 
 " HTML (tab width 2 chr, no wrapping)
-au BufRead,BufNewFile *_html.template set filetype=html
+"au BufRead,BufNewFile *_html.template set filetype=html
 "autocmd FileType html cnoreabbrev w w<bar>silent !nf dux-html& > /dev/null
 "autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType html nnoremap <silent> <leader>r :silent !nf refresh&<CR>
+autocmd FileType html,mustache nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
-autocmd FileType html setlocal sw=2     
-autocmd FileType html setlocal ts=2
-autocmd FileType html setlocal sts=2
-autocmd FileType html setlocal textwidth=0
-autocmd FileType html setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType html,mustache setlocal sw=2     
+autocmd FileType html,mustache setlocal ts=2
+autocmd FileType html,mustache setlocal sts=2
+autocmd FileType html,mustache setlocal textwidth=0
+autocmd FileType html,mustache setlocal omnifunc=htmlcomplete#CompleteTags
 
 " XHTML (tab width 2 chr, no wrapping)
 autocmd FileType xhtml setlocal sw=2
@@ -667,8 +667,8 @@ endfun
 
 " Auto-closing of HTML/XML tags
 let g:closetag_default_xml=1
-au FileType html let b:closetag_html_style=1
-au FileType html,xml set listchars-=tab:>.          
+au FileType html,mustache let b:closetag_html_style=1
+au FileType html,xml,mustache set listchars-=tab:>.          
 
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
@@ -689,19 +689,19 @@ au FileType html,xml set listchars-=tab:>.
 "au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
 
 " }}}
-" CSS and LessCSS {{{
+" CSS, Stylus, and LessCSS {{{
 
 " (tab width 2 chr, wrap at 79th char)
-au BufRead,BufNewFile *_css.template set filetype=css
-autocmd FileType css setlocal sw=2
-autocmd FileType css setlocal ts=2
-autocmd FileType css setlocal sts=2
-autocmd FileType css setlocal textwidth=0
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+"au BufRead,BufNewFile *_css.template set filetype=css
+autocmd FileType css,stylus setlocal sw=2
+autocmd FileType css,stylus setlocal ts=2
+autocmd FileType css,stylus setlocal sts=2
+autocmd FileType css,stylus setlocal textwidth=0
+autocmd FileType css,stylus setlocal omnifunc=csscomplete#CompleteCSS
 
 "autocmd FileType css cnoreabbrev w w<bar>silent !nf dux-css& > /dev/null
 "autocmd FileType css cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType css nnoremap <silent> <leader>r :silent !nf refresh&<CR>
+autocmd FileType css,stylus nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au BufNewFile,BufRead *.less setlocal filetype=less
 
