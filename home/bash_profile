@@ -11,6 +11,7 @@ alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 export PYTHONPATH=/Library/Python/2.7/site-packages     
 export LC_CTYPE="utf-8"
 export CC=/usr/bin/gcc-4.2
+ulimit -n 6553
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
