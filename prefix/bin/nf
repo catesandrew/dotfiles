@@ -286,11 +286,9 @@ function run_phoenix() {
       echo "Jake dev started"
       ;;
   esac
-  #jake start[4] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
-  #growlnotify -t "Jake started" -m "Phoenix has started."    
   jake watch 1>$HOME/Library/Logs/dev/jake.log 2>&1 &
   growlnotify -t "Jake watched" -m "Jake is being watched."    
-  echo "Jake is being watched"
+  #echo "Jake is being watched"
 
   popd > /dev/null
 }
@@ -740,6 +738,14 @@ function apply_patch_helper() {
   done
 }
 
+function lumbar_phoenix() {
+  local moduleName="$1"
+  pushd /usr/local/src/walmart/phoenix > /dev/null  
+  growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for module $moduleName"       
+  lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module $1 ./lumbar.json build/dev
+  popd > /dev/null  
+}
+
 function update_dux() { 
   pushd $WORKSPACE/.dux > /dev/null  
   growlnotify -t "Dux Templates" -m "Removing prior dux jars."       
@@ -937,6 +943,9 @@ case "$#" in
       #require_branch "$@"
       #stop_catalina "$@"
       stop_phoenix
+      ;;
+    lumbar)
+      lumbar_phoenix "$@"
       ;;
     kill)
       kill_catalina "$@" 

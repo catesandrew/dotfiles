@@ -1,0 +1,78 @@
+*TypeRedeemer*      Font-size & Line-height Unit Converter
+
+==============================================================================
+1.Contents                              *TypeRedeemer* *TypeRedeemer-contents*
+
+    1.Contents..........................|TypeRedeemer-contents|
+    2.Overview..........................|TypeRedeemer-overview|
+    3.Mappings..........................|TypeRedeemer-mappings|
+        3.1 To px ......................|TypeRedeemer-ToPx|
+        3.2 To em ......................|TypeRedeemer-ToEm|
+        3.3 To percent .................|TypeRedeemer-ToPercent|
+        3.4 All to px ..................|TypeRedeemer-AllToPx|
+        3.5 All to em ..................|TypeRedeemer-AllToEm|
+        3.6 All to percent .............|TypeRedeemer-AllToPercent|
+        3.7 Set default font size ......|TypeRedeemer-SetDefaultFontSize|
+        3.8 Show default font size .....|TypeRedeemer-ShowDefaultFontSize|
+    4.Contact...........................|TypeRedeemer-contact|
+
+==============================================================================
+2.Overview                                             *TypeRedeemer-overview*
+
+There exist numerous online tools for converting CSS body font size from one 
+format to another, but going back and forth between them and vim can be 
+tedious at best. This script aims to convert these CSS values to the format 
+of your choice quickly and seamlessly.
+
+==============================================================================
+3.Mappings                                             *TypeRedeemer-mappings*
+
+If you only want to modify one declaration at a time, place the cursor on the
+line containing the line-height/font-size value and execute the mapping. 
+Otherwise, you can place the cursor anywhere and execute the appropriate 
+mapping to change all declarations at once.
+
+
+[count]<leader>px                                          *TypeRedeemer-ToPx* 
+Convert font-size/line-height value on the current line to px
+
+
+[count]<leader>em                                          *TypeRedeemer-ToEm* 
+Convert font-size/line-height value on the current line to em
+
+
+[count]<leader>p%                                     *TypeRedeemer-ToPercent*
+Convert font-size/line-height value on the current line to a percentage
+
+
+<leader>apx                                             *TypeRedeemer-AllToPx*
+Convert all font-size/line-height values to px
+
+
+<leader>aem                                             *TypeRedeemer-AllToEm*
+Convert all font-size/line-height values to em
+
+
+<leader>ap%                                        *TypeRedeemer-AllToPercent* 
+Convert all font-size/line-height values to percentages
+
+
+<leader>sd                                   *TypeRedeemer-SetDefaultFontSize*
+This mapping lets you change the default font size, which is used for
+converting values from format to another. By default, the font size is set 
+to the browser standard of 16 pixels.
+
+
+<leader>gd                                  *TypeRedeemer-ShowDefaultFontSize*
+Displays the current value that the default font size is set to.
+
+
+==============================================================================
+4.Contact                                               *TypeRedeemer-contact*
+
+Patches and improvements are welcomed. Feel free to fork the repo at 
+http://github.com/hostsamurai/typeredeemer.git
+
+==============================================================================
+
+vim:tw=78:ts=8:ft=help:norl:
