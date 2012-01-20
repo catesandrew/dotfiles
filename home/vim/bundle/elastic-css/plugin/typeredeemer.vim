@@ -163,7 +163,7 @@ endfunction
 "    {all}: specify 'all' to convert all font-size/line-height declarations is
 "           a stylesheet to the given unit
 function! s:SelectRegex(unit, ...)
-    let rx = 's/\v((font-size|line-height): )(\d+(\.\d{1,6})?(px|em|\%));/\=submatch(1).string('
+    let rx = 's/\v((font-size|line-height):[ ]*)(\d+(\.\d{1,6})?(px|em|\%));/\=submatch(1).string('
     if a:unit == 'percent'
         let rx = rx . 's:PercentEquivalent(submatch(3)))."%;"/'
     elseif a:unit == 'px'
