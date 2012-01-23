@@ -647,6 +647,12 @@ endfunction
 "autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
 autocmd FileType mustache cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType html,mustache nnoremap <silent> <leader>r :silent !nf refresh&<CR>
+                                                               
+autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |
+    \ let b:match_words = '<:>,' .
+    \ '<\@<=[ou]l\>[^>]*\%(>\|$\):<\@<=li\>:<\@<=/[ou]l>,' .
+    \ '<\@<=dl\>[^>]*\%(>\|$\):<\@<=d[td]\>:<\@<=/dl>,' .
+    \ '<\@<=\([^/][^ \t>]*\)[^>]*\%(>\|$\):<\@<=/\1>'
 
 autocmd FileType html,mustache setlocal sw=2     
 autocmd FileType html,mustache setlocal ts=2
