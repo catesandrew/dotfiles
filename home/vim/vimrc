@@ -632,11 +632,11 @@ function! DoLumbar()
     let l:file_dir=expand('<sfile>:p:h') 
     if l:file_dir == '/usr/local/src/walmart/phoenix'
         if &filetype == 'mustache'
-            exec "!nf lumbar home > /dev/null"
+            exec "!nf lumbar base > /dev/null"
         elseif &filetype == 'javascript'
-            exec "!nf lumbar home > /dev/null"
+            exec "!nf lumbar base > /dev/null"
         elseif &filetype == 'stylus'
-            exec "!nf lumbar home > /dev/null"
+            exec "!nf lumbar base > /dev/null"
         endif
     endif
 endfunction

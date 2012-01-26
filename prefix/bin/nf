@@ -739,11 +739,23 @@ function apply_patch_helper() {
 }
 
 function lumbar_phoenix() {
-  local moduleName="$1"
-  pushd /usr/local/src/walmart/phoenix > /dev/null  
-  growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for module $moduleName"       
-  lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module $1 ./lumbar.json build/dev
-  popd > /dev/null  
+  pushd "/usr/local/src/walmart/phoenix"> /dev/null  
+
+  local module_name="$1"
+  case "$module_name" in
+  	all)
+      echo "Regenerating lumbar for all modules."       
+      growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
+      lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ;;
+  	*)
+      echo "Regenerating lumbar for $module_name."       
+      growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."       
+      lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
+      ;;
+  esac
+
+  popd > /dev/null
 }
 
 function update_dux() { 
