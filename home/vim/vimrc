@@ -628,18 +628,39 @@ function! DoDux()
     endif
 endfunction
 
+autocmd FileType stylus,javascript,mustache nnoremap <silent> <leader>sl :call SetParentLumbarBundleName()<CR>  
+autocmd FileType stylus,javascript,mustache nnoremap <silent> <leader>gl :call GetParentLumbarBundleName()<CR>  
+
+let g:parentLumbarBundleName = "base"
 function! DoLumbar()          	
     let l:file_dir=expand('<sfile>:p:h') 
     if l:file_dir == '/usr/local/src/walmart/phoenix'
         if &filetype == 'mustache'
-            exec "!nf lumbar base > /dev/null"
+            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         elseif &filetype == 'javascript'
-            exec "!nf lumbar base > /dev/null"
+            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         elseif &filetype == 'stylus'
-            exec "!nf lumbar base > /dev/null"
+            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         endif
     endif
+endfunction    
+
+" -----------------------------------------------------------------------------
+"  SetParentLumbarBundleName: Prompt the user to enter a module name {{{2
+function! SetParentLumbarBundleName()
+    call inputsave()
+    let input = input('New default lumbar bundle name: ') 
+    call inputrestore()
+
+    let g:parentLumbarBundleName = input
 endfunction
+
+
+" -----------------------------------------------------------------------------
+"  GetParentLumbarBundleName: Retrieve the current value {{{2
+function! GetParentLumbarBundleName()
+    echo 'Current default bundle name: ' . string(g:parentLumbarBundleName)
+endfunction 
 
 " HTML (tab width 2 chr, no wrapping)
 "au BufRead,BufNewFile *_html.template set filetype=html

@@ -190,3 +190,6 @@
 [submodule "home/vim/bundle/vim-matchit"]
 	path = home/vim/bundle/vim-matchit
 	url = git://github.com/mirell/vim-matchit.git
+[submodule "home/vim/bundle/vim-rooter"]
+	path = home/vim/bundle/vim-rooter
+	url = git://github.com/airblade/vim-rooter.git
