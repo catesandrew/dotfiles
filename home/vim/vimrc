@@ -643,6 +643,17 @@ function! DoLumbar()
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         endif
     endif
+    if l:file_dir == '/usr/local/src/walmart/walmart-ipad-homepageserver'
+        if &filetype == 'mustache'
+            exec "!nf lumbar ipad-homepage > /dev/null"
+        elseif &filetype == 'html'
+            exec "!nf lumbar ipad-homepage > /dev/null"
+        elseif &filetype == 'javascript'
+            exec "!nf lumbar ipad-homepage > /dev/null"
+        elseif &filetype == 'stylus'
+            exec "!nf lumbar ipad-homepage > /dev/null"
+        endif
+    endif
 endfunction    
 
 " -----------------------------------------------------------------------------
@@ -666,7 +677,7 @@ endfunction
 "au BufRead,BufNewFile *_html.template set filetype=html
 "autocmd FileType html cnoreabbrev w w<bar>silent !nf dux-html& > /dev/null
 "autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType mustache cnoreabbrev w w<bar>silent call DoLumbar()
+autocmd FileType html,mustache cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType html,mustache nnoremap <silent> <leader>r :silent !nf refresh&<CR>
                                                                
 autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |

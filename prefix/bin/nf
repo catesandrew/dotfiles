@@ -286,8 +286,8 @@ function run_phoenix() {
       echo "Jake dev started"
       ;;
   esac
-  jake watch 1>$HOME/Library/Logs/dev/jake.log 2>&1 &
-  growlnotify -t "Jake watched" -m "Jake is being watched."    
+  #jake watch 1>$HOME/Library/Logs/dev/jake.log 2>&1 &
+  #growlnotify -t "Jake watched" -m "Jake is being watched."    
   #echo "Jake is being watched"
 
   popd > /dev/null
@@ -747,6 +747,25 @@ function lumbar_phoenix() {
       echo "Regenerating lumbar for all modules."       
       growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
       lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ;;
+  	ipad-homepage)
+      echo "Regenerating lumbar for ipad homepage."       
+
+      pushd "/usr/local/src/walmart/walmart-ipad-homepageserver"> /dev/null  
+      if [ ! -d "./output" ]; then
+        mkdir output
+      fi
+    
+      # generate the prod system
+      #node generatehomescreen.js -v -o ./output/main.html
+      #node generatehomescreen.js -v -q -t ./templates/home.handlebars -o ./output/index.html
+      #node generatehomescreen.js -v -q -t ./templates/home_v2.handlebars -o ./output/index.html
+      lumbar ./lumbar.json ./output
+      
+      echo "Copying output/ipad/ to ~/Sites/ipad/"
+      cp -R ./output/ipad/* ~/Sites/ipad/
+      popd > /dev/null
+
       ;;
   	*)
       echo "Regenerating lumbar for $module_name."       
