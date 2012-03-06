@@ -923,6 +923,8 @@ let g:atia_attributes_complete = 0
 
 let g:syntastic_enable_signs=0
 let g:syntastic_disabled_filetypes = ['html', 'python', "javascript"]
+let g:syntastic_javascript_checker = ["jslint", "jsl", "jshint"]
+
 
 " }}}
 " Delimitmate {{{
