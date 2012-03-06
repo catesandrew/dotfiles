@@ -643,7 +643,7 @@ function! DoLumbar()
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         endif
     endif
-    if l:file_dir == '/usr/local/src/walmart/walmart-ipad-homepageserver'
+    if l:file_dir == '/usr/local/src/walmart/ipad-homepageserver'
         if &filetype == 'mustache'
             exec "!nf lumbar ipad-homepage > /dev/null"
         elseif &filetype == 'html'

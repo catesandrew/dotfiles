@@ -751,7 +751,7 @@ function lumbar_phoenix() {
   	ipad-homepage)
       echo "Regenerating lumbar for ipad homepage."       
 
-      pushd "/usr/local/src/walmart/walmart-ipad-homepageserver"> /dev/null  
+      pushd "/usr/local/src/walmart/ipad-homepageserver"> /dev/null  
       if [ ! -d "./output" ]; then
         mkdir output
       fi
