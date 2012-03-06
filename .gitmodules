@@ -169,12 +169,6 @@
 [submodule "home/vim/bundle/vim-easytags"]
 	path = home/vim/bundle/vim-easytags
 	url = git://github.com/xolox/vim-easytags.git
-[submodule "home/vim/bundle/pyflakes-vim"]
-	path = home/vim/bundle/pyflakes-vim
-	url = git://github.com/kevinw/pyflakes-vim.git
-[submodule "prefix/src/pyflakes"]
-	path = prefix/src/pyflakes
-	url = git://github.com/kevinw/pyflakes.git
 [submodule "prefix/src/jsdoc-toolkit"]
 	path = prefix/src/jsdoc-toolkit
 	url = git://github.com/paperjs/jsdoc-toolkit.git
