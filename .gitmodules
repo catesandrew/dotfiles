@@ -46,9 +46,6 @@
 [submodule "home/vim/bundle/vim-javascript"]
     path = home/vim/bundle/vim-javascript
     url = git://github.com/pangloss/vim-javascript.git
-[submodule "home/vim/bundle/jslint"]
-    path = home/vim/bundle/jslint
-    url = git://github.com/hallettj/jslint.vim.git
 [submodule "home/vim/bundle/vim-vividchalk"]
     path = home/vim/bundle/vim-vividchalk
     url = git://github.com/tpope/vim-vividchalk.git
