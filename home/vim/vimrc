@@ -189,6 +189,10 @@ if has('statusline')
   "set statusline+=\ (%{synIDattr(synID(line('.'),col('.'),0),'name')}) "DEBUG : display the current syntax item name
   set statusline+=%#error#          "change color
   set statusline+=%{&paste?'[paste]':''}    "display a warning if &paste is set
+
+  set statusline+=%#warningmsg#
+  set statusline+=%{SyntasticStatuslineFlag()}
+
   set statusline+=%*                "reset color to normal statusline color
   set statusline+=%=                "right-align following items
   set statusline+=#%n               "buffer number
@@ -926,6 +930,9 @@ let g:atia_attributes_complete = 0
 let g:syntastic_enable_signs=0
 "let g:syntastic_disabled_filetypes = ['html', 'python', 'javascript']
 let g:syntastic_javascript_checker = 'jslint'
+let g:syntastic_mode_map = { 'mode': 'active',
+                            \ 'active_filetypes': ['ruby', 'php', 'javascript', 'html', 'handlebars', 'stylus', 'css'],
+                            \ 'passive_filetypes': ['puppet'] }
 
 
 " }}}
