@@ -187,3 +187,6 @@
 [submodule "prefix/src/jsonval"]
 	path = prefix/src/jsonval
 	url = git://github.com/dangerousben/jsonval.git
+[submodule "home/vim/bundle/tabular"]
+	path = home/vim/bundle/tabular
+	url = git://github.com/godlygeek/tabular.git
