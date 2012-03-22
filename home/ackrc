@@ -1,0 +1,11 @@
+--ignore-dir=build
+--ignore-dir=\.git
+--ignore-dir=node_modules
+--type-add
+js=.coffee
+--type-add
+html=.handlebars,.mustache
+--type-add
+css=.stylus,.styl,.less
+--type-add
+ruby=.haml,.rake
