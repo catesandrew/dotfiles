@@ -10,7 +10,6 @@ alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 #alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
 export PYTHONPATH=/Library/Python/2.7/site-packages     
 export LC_CTYPE="utf-8"
-export CC=/usr/bin/gcc-4.2
 ulimit -n 1024
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
