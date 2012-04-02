@@ -187,3 +187,6 @@
 [submodule "home/vim/bundle/tabular"]
 	path = home/vim/bundle/tabular
 	url = git://github.com/godlygeek/tabular.git
+[submodule "home/vim/bundle/vim-jade"]
+	path = home/vim/bundle/vim-jade
+	url = git://github.com/digitaltoad/vim-jade.git
