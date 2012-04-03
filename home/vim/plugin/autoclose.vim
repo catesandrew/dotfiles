@@ -63,6 +63,11 @@ nmap <Plug>ToggleAutoCloseMappings :call <SID>ToggleAutoCloseMappings()<CR>
 if (!hasmapto( '<Plug>ToggleAutoCloseMappings', 'n' ))
     nmap <unique> <Leader>a <Plug>ToggleAutoCloseMappings
 endif
+
+if !exists(":ToggleAutoCloseMappings")
+    command ToggleAutoCloseMappings :call <SID>ToggleAutoCloseMappings()
+endif
+
 fun <SID>ToggleAutoCloseMappings() " --- {{{2
     if g:autoclose_on
         iunmap "
@@ -71,8 +76,8 @@ fun <SID>ToggleAutoCloseMappings() " --- {{{2
         iunmap )
         iunmap [
         iunmap ]
-        iunmap {
-        iunmap }
+        "iunmap {
+        "iunmap }
         iunmap <BS>
         iunmap <C-h>
         iunmap <Esc>
@@ -85,9 +90,8 @@ fun <SID>ToggleAutoCloseMappings() " --- {{{2
         inoremap ) <C-R>=<SID>CloseStackPop(')')<CR>
         inoremap <silent> [ [<C-R>=<SID>CloseStackPush(']')<CR>
         inoremap <silent> ] <C-R>=<SID>CloseStackPop(']')<CR>
-        "inoremap <silent> { {<C-R>=<SID>CloseStackPush('}')<CR>
-        inoremap <silent> { <C-R>=<SID>OpenSpecial('{','}')<CR>
-        inoremap <silent> } <C-R>=<SID>CloseStackPop('}')<CR>
+        "inoremap <silent> { <C-R>=<SID>OpenSpecial('{','}')<CR>
+        "inoremap <silent> } <C-R>=<SID>CloseStackPop('}')<CR>
         inoremap <silent> <BS> <C-R>=<SID>OpenCloseBackspace()<CR>
         inoremap <silent> <C-h> <C-R>=<SID>OpenCloseBackspace()<CR>
         inoremap <silent> <Esc> <C-R>=<SID>CloseStackPop('')<CR><Esc>
