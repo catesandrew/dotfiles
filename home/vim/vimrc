@@ -634,18 +634,23 @@ endfunction
 
 autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>sl :call SetParentLumbarBundleName()<CR>  
 autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>gl :call GetParentLumbarBundleName()<CR>  
+autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>dl :call DoLumbar()<CR>  
 
 let g:parentLumbarBundleName = "base"
 function! DoLumbar()          	
     let l:file_dir=expand('<sfile>:p:h') 
     if l:file_dir == '/usr/local/src/walmart/phoenix'
         if &filetype == 'mustache'
+            exec "!nf lumbar base > /dev/null"
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         elseif &filetype == 'handlebars'
+            exec "!nf lumbar base > /dev/null"
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         elseif &filetype == 'javascript'
+            exec "!nf lumbar base > /dev/null"
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         elseif &filetype == 'stylus'
+            exec "!nf lumbar base > /dev/null"
             exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
         endif
     endif
@@ -683,7 +688,7 @@ endfunction
 au BufRead,BufNewFile *.handlebars set filetype=handlebars
 "autocmd FileType html cnoreabbrev w w<bar>silent !nf dux-html& > /dev/null
 "autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType html,mustache,handlebars cnoreabbrev w w<bar>silent call DoLumbar()
+"autocmd FileType html,mustache,handlebars cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType html,mustache,handlebars nnoremap <silent> <leader>r :silent !nf refresh&<CR>
                                                                
 autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |
@@ -759,7 +764,7 @@ autocmd FileType css,stylus setlocal omnifunc=csscomplete#CompleteCSS
 
 "autocmd FileType css cnoreabbrev w w<bar>silent !nf dux-css& > /dev/null
 "autocmd FileType css cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType stylus cnoreabbrev w w<bar>silent call DoLumbar()
+"autocmd FileType stylus cnoreabbrev w w<bar>silent call DoLumbar()
  
 autocmd FileType css,stylus nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
@@ -822,7 +827,7 @@ au FileType javascript setl nocindent
 
 "autocmd FileType javascript cnoreabbrev w w<bar>silent !nf dux-js& > /dev/null
 "autocmd FileType javascript cnoreabbrev w w<bar>silent call DoDux()
-autocmd FileType javascript cnoreabbrev w w<bar>silent call DoLumbar()
+"autocmd FileType javascript cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType javascript nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au FileType javascript imap <C-t> console.log();<esc>hi
