@@ -758,6 +758,11 @@ function lumbar_phoenix() {
       growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
       lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
       ;;
+  	test)
+      echo "Regenerating lumbar tests for all modules."       
+      growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar tests for all modules."       
+      lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ;;
   	ipad-homepage)
       echo "Regenerating lumbar for ipad homepage."       
 
