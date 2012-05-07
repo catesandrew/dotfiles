@@ -251,42 +251,42 @@ function run_phoenix() {
   local branch_name="$1"
   case "$branch_name" in
   	1)
-      jake start[1] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[1] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e1 started" -m "Phoenix has started."    
       echo "Jake e1 started"
       ;;
   	2)
-      jake start[2] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[2] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e2 started" -m "Phoenix has started."    
       echo "Jake e2 started"
       ;;
   	3)
-      jake start[3] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[3] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e3 started" -m "Phoenix has started."    
       echo "Jake e3 started"
       ;;
   	4)
-      jake start[4] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[4] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e4 started" -m "Phoenix has started."    
       echo "Jake e4 started"
       ;;
   	5)
-      jake start[5] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[5] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e5 started" -m "Phoenix has started."    
       echo "Jake e5 started"
       ;;
   	6)
-      jake start[6] 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 start[6] 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake e6 started" -m "Phoenix has started."    
       echo "Jake e6 started"
       ;;
   	mock)
-      jake startmocks 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 startmocks 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake mocks started" -m "Phoenix has started."    
       echo "Jake mocks started"
       ;;
   	prod)
-      jake startproduction 1>$HOME/Library/Logs/dev/phoenix.log 2>&1 &
+      jake 2>&1 startproduction 1>$HOME/Library/Logs/dev/phoenix.log &
       growlnotify -t "Jake prod started" -m "Phoenix has started."    
       echo "Jake prod started"
       ;;
