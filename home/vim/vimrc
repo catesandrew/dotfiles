@@ -435,6 +435,8 @@ let g:yankring_history_dir = '~/.vim/tmp'
 
 " Formatting, TextMate-style
 nnoremap <leader>q gqip
+" good when you want to delete a paragraph?
+"nnoremap <leader>q gqap
 
 " Easier linewise reselection
 nnoremap <leader>v V`]
@@ -1032,6 +1034,16 @@ nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 autocmd FileType gitcommit DiffGitCached | wincmd L | wincmd p
 autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
+
+" Also, you should hook other event, because FileType is too early, and cursor
+" position will be overwritten using info from .viminfo:
+function MyBufEnter()
+  " don't (re)store filepos for git commit message files
+  if &filetype == "gitcommit"
+    call setpos('.', [0, 1, 1, 0])
+  endif
+endfunction
+au BufEnter * call MyBufEnter()
 
 " }}}
 " Easymotion {{{
