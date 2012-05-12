@@ -1028,6 +1028,11 @@ au BufRead,BufNewFile *.json set filetype=json
 nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>                       
 
 " }}}
+" Git Commit {{{
+
+autocmd FileType gitcommit DiffGitCached | wincmd p
+
+" }}}
 " Easymotion {{{
 
 let g:EasyMotion_do_mapping = 0
