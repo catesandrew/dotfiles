@@ -1031,6 +1031,7 @@ nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 " Git Commit {{{
 
 autocmd FileType gitcommit DiffGitCached | wincmd L | wincmd p
+autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
 
 " }}}
 " Easymotion {{{
