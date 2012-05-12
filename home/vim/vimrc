@@ -1030,7 +1030,7 @@ nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 " }}}
 " Git Commit {{{
 
-autocmd FileType gitcommit DiffGitCached | wincmd p
+autocmd FileType gitcommit DiffGitCached | wincmd L | wincmd p
 
 " }}}
 " Easymotion {{{
