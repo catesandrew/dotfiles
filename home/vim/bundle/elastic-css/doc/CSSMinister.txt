@@ -1,95 +1,139 @@
 *CSSMinister.txt*           CSS Color Converter 
 
 ==============================================================================
-1.Contents                                *CSSMinister* *CSSMinister-contents*
+CONTENTS                                                *CSSMinister-contents*
 
-    1.Contents     |CSSMinister-contents|
-    2.Overview     |CSSMinister-overview|
-    3.Mappings     |CSSMinister-mappings|
-    4.Changelog    |CSSMinister-changelog| 
-    5.Contact      |CSSMinister-contact| 
-
-==============================================================================
-2.Overview                                              *CSSMinister-overview*
-
-CSSMinister lets you convert colors in your CSS, Less, or Sass stylesheets. 
-You can switch to and fro hex, RGB, and HSL formats through the mappings 
-defined in this plugin.
+    1. Overview .................. |CSSMinisterOverview|
+    2. Usage ..................... |CSSMinisterUsage|
+        2.1 Color Functions ...... |CSSMinisterFunctions| 
+        2.2 Mappings ............. |CSSMinisterMappings|
+        2.3 Configuration ........ |CSSMinisterConfig|
+    3. License ................... |CSSMinisterLicense|
+    4. Contributing .............. |CSSMinisterContributing|
+    5. Changelog ................. |CSSMinisterChangelog|
+    6. Contact ................... |CSSMinisterContact|
 
 ==============================================================================
-3.Mappings                                              *CSSMinister-mappings*
+1. Overview                                              *CSSMinisterOverview*
 
-CSSMinister defines the following mappings:
-
-[count],xr |CSSMinisterHexToRGB|
-Hex to RGB conversion for the next matching color on the current line.
-
-[count],xh |CSSMinisterHexToHSL|
-Hex to HSL conversion for the next matching color on the current line.
-
-[count],rx |CSSMinisterRGBToHex|
-RGB to hex conversion for the next matching color on the current line.
-
-[count],rh |CSSMinisterRGBToHSL|
-RGB to HSL conversion for the next matching color on the current line.
-
-[count],hx |CSSMinisterHSLToHex|
-HSL to hex conversion for the next matching color on the current line.
-
-[count],hr |CSSMinisterHSLToRGB|
-HSL to RGB conversion for the next matching color on the current line.
-
-[count],kx |CSSMinisterKeywordToHex|
-HTML4 color keyword to hex conversion for the next matching color on 
-the current line.
-
-[count],kr |CSSMinisterKeywordToRGB|
-HTML4 color keyword to RGB conversion for the next matching color on 
-the current line.
-
-[count],kh |CSSMinisterKeywordToHSL|
-HTML4 color keyword to HSL conversion for the next matching color on 
-the current line.
-
-The following mappings operate on all colors in the current buffer:
-
-,axr |CSSMinisterHexToRGBAll|
-Converts all hex color values to their RGB counterparts.
-
-,axh |CSSMinisterHexToHSLAll|
-Converts all hex color values to their HSL counterparts.
-
-,arx |CSSMinisterRGBToHexAll|
-Converts all RGB color values to their hex counterparts.
-
-,arh |CSSMinisterRGBToHSLAll|
-Converts all RGB color values to their HSL counterparts.
-
-,ahx |CSSMinisterHSLToHexAll|
-Converts all HSL color values to their hex counterparts.
-
-,ahr |CSSMinisterHSLToRGBAll|
-Converts all HSL color values to their RGB counterparts.
-
-,akx |CSSMinisterKeywordToHexAll|
-Converts all HTML4 color keyword values to their hex counterparts.
-
-,akr |CSSMinisterKeywordToRGBAll|
-Converts all HTML4 color keyword values to their RGB counterparts.
-
-,akh |CSSMinisterKeywordToHSLAll|
-Converts all HTML4 color keyword values to their HSL counterparts.
+CSSMinister is a CSS color converter that lets you switch to and fro hex,
+keyword, HSL(A) and RGB(A) color formats. It lets you convert between these
+color formats either one CSS property at a time, over a range, or throughout
+the entire file.
 
 ==============================================================================
-4.Changelog                                            *CSSMinister-changelog*
+2. Usage                                                    *CSSMinisterUsage*
 
+To change the color format of a CSS property at a time, simply place the
+cursor on the line whose color you wish to convert, go into command line mode
+and type the name of the function that corresponds with the color format you
+wish to convert to. For instance, if there's a line in your stylesheet that
+reads:
+
+    .awesomeness { background-color: #CC0066; }
+
+And you wish to convert from hex to HSLA, you would place your cursor anywhere
+on that line and type :ToHSLA.
+
+Converting all colors over a range works in a similar way. After highlighting
+any number of lines in visual mode, go into command line mode and type the
+name of the function that corresponds to the color format you wish to switch
+to. If you only wish to convert only from one color format to another, you can
+use the appropriate function followed by the color format you want to switch
+from. So, to only convert all hex color values to HSLA in a range or in the
+entire file, type:
+
+    :ToHSLAAll hex
+
+The functions that end in 'All' are meant to be used only in the case where
+you want to convert from only one color format to another, either in a range
+or in the entire stylesheet.
+
+==============================================================================
+2.1 Color Functions                                     *CSSMinisterFunctions*
+
+                                        *:ToHex* *:ToRGB* *:ToRGBA* *:ToHSL* *:ToHSLA*
+To convert one color at a time, or all colors in a range, use the following in
+command line mode:
+
+    :ToHex
+    :ToRGB
+    :ToRGBA
+    :ToHSL
+    :ToHSLA
+
+                          *:ToHexAll* *:ToRGBAll* *:ToRGBAAll* *:ToHSLAll* *:ToHSLAAll*
+To convert from only one color format to another, in a range or in the entire 
+stylesheet, use the following in command line mode:
+
+    :ToHexAll format
+    :ToRGBAll format
+    :ToRGBAAll format
+    :ToHSLAll format
+    :ToHSLAAll format
+ 
+Where format is the color format you want to switch from.
+
+==============================================================================
+2.2 Mappings                                              *CSSMinisterMappings*
+
+The following mappings are available, if enabled, and only work either one
+line at a time or in a range:
+
+[count]<g:CSSMinisterMapPrefix>x
+Convert colors to hex format.
+
+[count]<g:CSSMinisterMapPrefix>r
+Convert colors to RGB format.
+
+[count]<g:CSSMinisterMapPrefix>h
+Convert colors to HSL format.
+
+[count]<g:CSSMinisterMapPrefix>ra
+Convert colors to RGBA format.
+
+[count]<g:CSSMinisterMapPrefix>ha
+Convert colors to HSLA format.
+
+==============================================================================
+2.3 Configuration                                          *CSSMinisterConfig*
+
+Put these in your .vimrc file somewhere.
+
+|g:CSSMinisterCreateMappings| Enables keyboard mappings; default is 1.
+|g:CSSMinisterMapPrefix|      If mappings are enabled, it lets you specify a
+                            substitute key for <Leader>.
+
+==============================================================================
+3. License                                                *CSSMinisterLicense*
+
+Released under the MIT license http://www.opensource.org/licenses/MIT.
+
+==============================================================================
+4. Contributing                                      *CSSMinisterContributing*
+
+Patches, bug fixes, and features are welcome. Simply fork the project on
+github (https://github.com/hostsamurai/CSSMinister.vim) and send me a pull
+request.
+
+==============================================================================
+5. Changelog                                            *CSSMinisterChangelog*
+
+1.0.0
+    * Added extended color keywords
+    * Conversions between HSLA and RGBA formats
+    * Visual mode conversions
+    * Prompt before converting all colors in a buffer
+    * Handle zero-padded values in RGB(A) and HSL(A) colors
+    * Replaced old mappings with commands as a less obstructive solution
+    * Added configuration options
 0.2.1
-    - Fixed broken color keyword regex
+    * Fixed broken color keyword regex
 0.2.0
-    - convert any HTML4 color keyword to its hexadecimal/RGB/HSL equivalent
+    * Convert any HTML4 color keyword to its hexadecimal/RGB/HSL equivalent
 
 ==============================================================================
-5.Contact                                                *CSSMinister-contact*
+6. Contact                                                *CSSMinisterContact*
 
 Suggestions, improvements, and criticism are all welcome. Feel free to 
 contact me at kuroi_kenshi96 at yahoo dot com.
