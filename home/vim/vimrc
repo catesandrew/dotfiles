@@ -81,7 +81,6 @@ augroup vimrc
     autocmd WinLeave,BufLeave * setl norelativenumber
 augroup END
 
-
 " Remember things between sessions
 "
 " '20  - remember marks for 20 previous files
@@ -670,7 +669,7 @@ function! DoLumbar()
 endfunction    
 
 " -----------------------------------------------------------------------------
-"  SetParentLumbarBundleName: Prompt the user to enter a module name {{{2
+"  SetParentLumbarBundleName: Prompt the user to enter a module name 
 function! SetParentLumbarBundleName()
     call inputsave()
     let input = input('New default lumbar bundle name: ') 
@@ -681,7 +680,7 @@ endfunction
 
 
 " -----------------------------------------------------------------------------
-"  GetParentLumbarBundleName: Retrieve the current value {{{2
+"  GetParentLumbarBundleName: Retrieve the current value 
 function! GetParentLumbarBundleName()
     echo 'Current default bundle name: ' . string(g:parentLumbarBundleName)
 endfunction 
@@ -874,10 +873,58 @@ au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 
 " }}}
+" XML {{{
+
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" }}}
 
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
+" Improve completion popup menu {{{
+
+inoremap <expr> <Esc>      pumvisible() ? "\<C-e>" : "\<Esc>"
+inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <Down>     pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <Up>       pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-Tab>  pumvisible() ? "\<C-P>" : "\<S-Tab>"
+
+" }}}
+" Neocomplcache Support {{{
+
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+" Use neocomplcache.
+let g:neocomplcache_enable_at_startup = 1
+" Use smartcase.
+let g:neocomplcache_enable_smart_case = 1
+" Use camel case completion.
+let g:neocomplcache_enable_camel_case_completion = 1
+" Use underbar completion.
+let g:neocomplcache_enable_underbar_completion = 1
+" Set minimum syntax keyword length.
+let g:neocomplcache_min_syntax_length = 3
+let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+" <C-h>, <BS>: close popup and delete backword char.
+"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+"inoremap <expr><C-y>  neocomplcache#close_popup()
+"inoremap <expr><C-e>  neocomplcache#cancel_popup()
+
+" AutoComplPop like behavior.
+"let g:neocomplcache_enable_auto_select = 1
+
+" }}}
 " Marked Support {{{
 nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
 

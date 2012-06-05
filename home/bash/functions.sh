@@ -4,6 +4,13 @@
 # by Paul Duncan <pabs@pablotron.org>                                 #
 #######################################################################
 
+# Start an HTTP server from a directory, optionally specifying the port
+function server() {
+    local port="${1:-8000}"
+    open "http://localhost:${port}/"
+    python -m SimpleHTTPServer "$port"
+}
+
 # moved this to a shell script
 # you can get it from http://www.pablotron.org/downloads/google
 #function google() { TF=/tmp/wget-"$USER"-"$RANDOM".html; wget -O $TF -q http://www.google.com/search?q=`echo $1|sed 's/ /+/g'`; perl -nle 'if (/href=/i) { $t=""; $u=""; /<A HREF=(.*?)>(.*?)<\/A>/; $t=$2; $u=$1; if ($t && $u && $t !~ /^(<IMG|Cached)/ && $u !~ /^\//) { $c++; $t =~ s/<\/?b>//gi; print "$c. \"$t\":\n    $u"; } }' < $TF; rm $TF; }
