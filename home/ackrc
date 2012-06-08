@@ -1,4 +1,5 @@
 --ignore-dir=build
+--ignore-dir=test
 --ignore-dir=\.git
 --ignore-dir=node_modules
 --type-add
