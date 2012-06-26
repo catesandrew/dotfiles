@@ -1,0 +1,665 @@
+#!/bin/bash
+     
+USAGE='[help|tomcat|redir|wii|nbpd|track|patch|discard|dux|rebase]'
+
+USAGE='[help|run|stop|kill|status|start-track|stop-track|format-patch|apply-patch|discard|lumbar|log] [<branch>]'
+LONG_USAGE='wm help
+        print this long help message
+wm run 
+        Start Express JS Phoenix
+wm stop 
+        Stop ExpressJS Phoenix
+wm kill 
+        Kill ExpressJS Phoenix
+wm status 
+        ExpressJS Phoenix status
+wm start-track [<project>] [<branch=master>]
+        Start tracking
+wm stop-track [<project>] [<branch=master>]
+        Stop tracking
+wm format-patch [<project>] [<branch=master>]
+        Create the configs patch
+wm apply-patch [<project>] [<branch=master>]
+        Apply the configs patch
+wm discard [<project>] [<branch=master>]
+        Discard the changes
+wm lumbar [<module=all>]
+        Update the js packages templates
+
+Branches: [phoenix|thorax|all]
+
+Please use "man wm" to get the full man page.'
+
+die() {
+	echo >&2 "$@"
+	exit 1
+}
+
+function require_clean_work_tree () {
+    local branch_name="$1"
+    git rev-parse --verify HEAD >/dev/null || exit 1
+    git update-index -q --ignore-submodules --refresh
+    local err=0
+
+    if ! git diff-files --quiet --ignore-submodules
+    then     
+        growlnotify -sticky -t "[$branch_name] clean work tree" -m "Cannot $1: You have unstaged changes. Think of stashing your changes and then stash apply'ing them after."
+        echo >&2 "Cannot [$branch_name]: You have unstaged changes."
+        err=1
+    fi
+
+    if ! git diff-index --cached --quiet --ignore-submodules HEAD --
+    then
+        if [ $err = 0 ]
+        then
+            #growlnotify -sticky -t "clean work tree" -m "Cannot $1: Your index contains uncommitted changes."
+            echo >&2 "Cannot [$branch_name]: Your index contains uncommitted changes."
+        else
+            #growlnotify -sticky -t "clean work tree" -m "Additionally, your index contains uncommitted changes."
+            echo >&2 "Additionally, your index contains uncommitted changes."
+        fi
+        err=1
+    fi
+
+    if [ $err = 1 ]
+    then
+        test -n "$2" && echo >&2 "$2"
+        exit 1
+    fi
+}
+
+function require_master_branch() {
+    local branch_name="$1"
+    local remote_name="${2:-master}"
+    local branch_ref=`git symbolic-ref HEAD`
+    branch_ref=`printf "%s" "${branch_ref##refs/heads/}"`
+    if [ ! ${branch_ref} == ${remote_name} ]; then
+        growlnotify -sticky -t "[${branch_name}] require ${remote_name} branch" -m "You're not on the ${remote_name} branch. You're on branch $branch_ref. Checkout ${remote_name} branch before continuing."
+        echo "You're not on the ${remote_name} branch. You're on branch '$branch_ref'. This operation is aborting."
+        exit 1
+    fi 
+}
+
+
+
+function refresh_running_browsers() {
+    ###	Refresh All Active Browsers - OmniWeb, Safari, Firefox & IE
+    ### v1.0. 2005-03-29
+    ###
+
+    # Check if Chrome is running, if so refresh 
+    ps -xc|grep -sq "Google Chrome" && osascript -e 'tell app "Google Chrome"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+
+    # Check if Internet Explorer is running, if so refresh
+    #ps -xc|grep -sq "Internet Explorer" && osascript -e 'tell app "Internet Explorer"' -e 'activate' -e 'OpenURL "JavaScript:window.location.reload();" toWindow -1' -e 'end tell'
+
+    # Check if OmniWeb is running, if so refresh
+    #ps -xc|grep -sq OmniWeb && osascript -e 'tell app "OmniWeb"' -e 'activate' -e 'reload first browser' -e 'end tell'
+
+    # Check if Firefox is running, if so refresh
+    #ps -xc|grep -sqi firefox && osascript -e 'tell app "firefox"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+
+    # Check if Safari is running, if so refresh
+    #ps -xc|grep -sq Safari && osascript -e 'tell app "Safari"' -e 'activate' -e 'do JavaScript "window.location.reload();" in first document' -e 'end tell'
+
+    # Check if Camino is running, if so refresh 
+    #ps -xc|grep -sq Camino && osascript -e 'tell app "Camino"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
+}
+
+function require_branch() {
+  local branch_name="$1"
+  case "$branch_name" in
+  	phoenix|thorax|all)
+      ;;
+  	*)
+  	  echo "Error: Unknown Branch [$branch_name]."
+  	  echo "$LONG_USAGE"
+  	  exit
+  esac
+}
+
+function run_phoenix() {
+  pushd "/usr/local/src/walmart/phoenix" > /dev/null
+  basename=phoenix
+
+  local branch_name="$1"
+  case "$branch_name" in
+  	1)
+      exec 2>&1 jake start[1] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e1 started" -m "Phoenix has started."    
+      echo "Jake e1 started"
+      ;;
+  	2)
+      exec 2>&1 jake start[2] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e2 started" -m "Phoenix has started."    
+      echo "Jake e2 started"
+      ;;
+  	3)
+      exec 2>&1 jake start[3] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e3 started" -m "Phoenix has started."    
+      echo "Jake e3 started"
+      ;;
+  	4)
+      exec 2>&1 jake start[4] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e4 started" -m "Phoenix has started."    
+      echo "Jake e4 started"
+      ;;
+  	5)
+      exec 2>&1 jake start[5] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e5 started" -m "Phoenix has started."    
+      echo "Jake e5 started"
+      ;;
+  	6)
+      exec 2>&1 jake start[6] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e6 started" -m "Phoenix has started."    
+      echo "Jake e6 started"
+      ;;
+  	mock)
+      exec 2>&1 jake startmocks 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake mocks started" -m "Phoenix has started."    
+      echo "Jake mocks started"
+      ;;
+  	prod)
+      exec 2>&1 jake startproduction 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake prod started" -m "Phoenix has started."    
+      echo "Jake prod started"
+      ;;
+  	*)
+      exec 2>&1 jake start 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake dev started" -m "Phoenix has started."    
+      echo "Jake dev started"
+      ;;
+  esac
+  #jake watch 1>$HOME/Library/Logs/dev/jake.log 2>&1 &
+
+  popd > /dev/null
+}
+
+function stop_phoenix() {
+    local basename=phoenix
+
+    if [ -f $HOME/.pids/$basename.pid ]; then
+        kill 2>&1 `cat $HOME/.pids/$basename.pid` 1>/tmp/${basename}_kill.log
+        rm $HOME/.pids/$basename.pid
+    else
+        echo "Phoenix is not running, if it is, try killing it instead."
+    fi
+}
+
+function kill_phoenix() {
+    local ORIGIFS=$IFS
+
+    # set $IFS to end-of-line
+    IFS=`echo -en "\n\b"`
+
+    if [ "`ps xwww | grep -v grep | grep -c node`" > "0" ]; then
+        local PIDS=`ps A | grep -v grep | grep node | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+
+        for PID in $PIDS; do
+            kill -9 $PID
+            echo "NodeJS is dead. Killed process $PID"
+        done
+    else
+        echo "NodeJS is not running."
+    fi
+
+    # set $IFS back
+    IFS=$ORIGIFS
+}
+
+function status_phoenix() {  
+    local basename=phoenix
+
+    if [ -f $HOME/.pids/$basename.pid ]; then
+		local PID=`cat $HOME/.pids/$basename.pid`;
+		echo "Phoenix is running. PID: [${PID}]";
+    else
+        echo "Phoenix is not running."
+    fi
+}
+
+function phoenix_pid_helper() {
+  mkdir -p $HOME/.pids
+  basename=phoenix
+  if [ -f $HOME/.pids/$basename.pid ]; then
+    echo "Existing phoenix instance already exists, trying to kill it."
+    kill 2>&1 `cat $HOME/.pids/$basename.pid` 1>/tmp/${basename}_kill.log
+    rm $HOME/.pids/$basename.pid
+  fi
+  echo $1 > $HOME/.pids/$basename.pid
+}
+
+function lumbar_phoenix() {
+  pushd "/usr/local/src/walmart/phoenix"> /dev/null  
+
+  mkdir -p $HOME/.pids
+  basename=lumbar
+  local module_name="${1:-all}"
+  case "$module_name" in
+    kill)
+      if [ -f $HOME/.pids/$basename.pid ]; then
+        kill 2>&1 `cat $HOME/.pids/$basename.pid` 1>/tmp/${basename}_kill.log
+        rm $HOME/.pids/$basename.pid
+      fi
+      ;;
+  	all)
+      echo "Regenerating lumbar for all modules."       
+      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
+      echo $$ > $HOME/.pids/$basename.pid
+      #exec 2>&1 lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev 1>/tmp/$basename.log
+      exec 2>&1 lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ;;
+  	test)
+      echo "Regenerating lumbar tests for all modules."       
+      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar tests for all modules."       
+      #echo $$ > $HOME/.pids/$basename.pid
+      lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ;;
+  	*)
+      echo "Regenerating lumbar for ${module_name}."       
+      #growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."       
+      #echo $$ > $HOME/.pids/$basename.pid
+      lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
+      ;;
+  	ipad-homepage)
+      echo "Regenerating lumbar for ipad homepage."       
+
+      pushd "/usr/local/src/walmart/ipad-homepageserver"> /dev/null  
+      if [ ! -d "./output" ]; then
+        mkdir output
+      fi
+    
+      # generate the prod system
+      #node generatehomescreen.js -v -o ./output/main.html
+      #node generatehomescreen.js -v -q -t ./templates/home.handlebars -o ./output/index.html
+      #node generatehomescreen.js -v -q -t ./templates/home_v2.handlebars -o ./output/index.html
+      lumbar ./lumbar.json ./output
+      
+      echo "Copying output/ipad/ to ~/Sites/ipad/"
+      cp -R ./output/ipad/* ~/Sites/ipad/
+      popd > /dev/null
+
+      ;;
+  esac
+
+  popd > /dev/null
+}
+
+function rebase() {
+    local branch_name="$1"
+    local remote_name="${2:-master}"
+    echo "wm rebase ${branch_name} on branch ${remote_name}"
+    # 1. require master branch	
+    require_master_branch ${branch_name} ${remote_name}
+    # 2. require clean tree
+    require_clean_work_tree ${branch_name}
+    # 3. start tracking configs
+    start_tracking 
+    # 4. checkthem out to remove local changes
+    discard_changes	${branch_name} ${remote_name}
+
+    if [ ${remote_name} == "master" ]; then
+        # 5. get changes from upstream
+        git pull origin master
+        # 6. Rebase our configs branch
+        git checkout configs
+        git rebase master
+    fi 
+
+    # 7. Create a new configs patch
+    git checkout ${remote_name}
+    format_patch ${branch_name} ${remote_name}
+    # 8. apply-patch
+    apply_patch ${branch_name} ${remote_name}
+    # 9. stop tracking the files
+    stop_tracking 
+
+    growlnotify -t "[${branch_name}] git pull and rebase" -m "The git pull and rebase process has completed, including patching the local config files."
+}
+
+function rebase_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local branch_name
+    local location
+    local config
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        config=${configs[$i]} 
+        branch_name=${branch_names[$i]} 
+
+        pushd $location > /dev/null
+        if [ "$config" == "" ]; then
+            files=()
+        else
+            files=$(ls $config | tr '\n' ' ')
+        fi
+
+        rebase ${branch_name} $2
+
+        popd > /dev/null
+        let i+=1
+    done  
+}   
+
+function start_tracking() {
+    local branch_name="$1"               
+    local remote_name="${2:-master}"
+
+    local count=${#files[@]}
+    if [ ! $count == 0 ]; then
+        for file in $files
+        do
+            git update-index --no-assume-unchanged $file > /dev/null
+        done  
+    fi
+}
+
+function start_tracking_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local location
+    local config
+    local branch_name
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        config=${configs[$i]} 
+        branch_name=${branch_names[$i]}
+
+        pushd $location > /dev/null
+        if [ "$config" == "" ]; then
+            files=()
+        else
+            files=$(ls $config | tr '\n' ' ')
+        fi
+
+        start_tracking ${branch_name} $2
+
+        popd > /dev/null
+        let i+=1
+    done
+}
+
+function stop_tracking() {
+    local branch_name="$1"               
+    local remote_name="${2:-master}"
+
+    local count=${#files[@]}
+    if [ ! $count == 0 ]; then
+        for file in $files
+        do
+            git update-index --assume-unchanged $file > /dev/null
+        done
+    fi
+}
+
+function stop_tracking_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local location
+    local branch_name
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        config=${configs[$i]}
+        branch_name=${branch_names[$i]}
+
+        pushd $location > /dev/null
+        if [ "$config" == "" ]; then
+            files=()
+        else
+            files=$(ls $config | tr '\n' ' ')
+        fi
+
+        stop_tracking ${branch_name} $2
+
+        popd > /dev/null
+        let i+=1
+    done 
+}
+
+function discard_changes() {
+    local branch_name="$1"               
+    local remote_name="${2:-master}"
+
+    require_master_branch ${branch_name} ${remote_name}
+
+    local count=${#files[@]}
+    if [ ! $count == 0 ]; then
+        for file in $files
+        do
+            git checkout $file > /dev/null
+        done
+    fi
+}
+
+function discard_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local location
+    local branch_name
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        config=${configs[$i]} 
+        branch_name=${branch_names[$i]}
+
+        pushd $location > /dev/null
+        if [ "$config" == "" ]; then
+            files=()
+        else
+            files=$(ls $config | tr '\n' ' ')
+        fi
+
+        discard_changes ${branch_name} $2
+
+        popd > /dev/null
+        let i+=1
+    done
+}
+
+function format_patch() {
+    local branch_name="$1"               
+    local remote_name="${2:-master}"
+    require_master_branch ${branch_name} ${remote_name}
+    require_clean_work_tree ${branch_name}
+
+    git checkout configs 2> /dev/null
+    git format-patch ${remote_name} --stdout > configs.patch
+    git checkout ${remote_name} 2> /dev/null
+}
+
+function format_patch_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local location
+    local branch_name
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        branch_name=${branch_names[$i]}
+        pushd $location > /dev/null
+        format_patch ${branch_name} $2
+        popd > /dev/null
+        let i+=1
+    done  
+}
+
+function apply_patch() {
+    local branch_name="$1"               
+    local remote_name="${2:-master}"
+    require_master_branch ${branch_name} ${remote_name}
+    require_clean_work_tree ${branch_name}
+
+    # First, take a look at what changes are in the patch. 
+    # You can do this easily with git apply
+    git apply --stat configs.patch
+    if $(git apply --check configs.patch 2>/dev/null); then :; else
+        echo "Could not apply patch cleanly."
+        exit 1
+    fi
+    git apply configs.patch
+}
+
+function apply_patch_helper() {
+    local i=0
+    local l=${#locations[@]}
+    local location
+    local branch_name
+
+    while [ "$i" -lt "$l" ]
+    do
+        location=${locations[$i]} 
+        branch_name=${branch_names[$i]}
+        pushd $location > /dev/null
+        apply_patch ${branch_name} $2
+        popd > /dev/null
+        let i+=1
+    done
+}
+
+counter=0;
+declare -a configs
+declare -a locations 
+declare -a branch_names
+declare -a files  
+
+function build_location_and_config() {
+    local branch="$1"
+    case "$branch" in
+        thorax)
+            locations[$counter]="/usr/local/src/walmart/thorax"
+            configs[$counter]=".gitignore"
+            branch_names[$counter]="thorax"
+            let counter+=1
+            ;;
+        phoenix)
+            locations[$counter]="/usr/local/src/walmart/phoenix"
+            configs[$counter]=".gitignore Jakefile public/web/index.html js/init.js"  
+            branch_names[$counter]="phoenix" 
+            let counter+=1
+            ;;
+        *)
+            echo "Non supported branch selected"
+            exit 1
+            usage ;;
+    esac
+}
+
+function build_location_and_config_helper() {
+    local branch="$1"
+    if [ $branch == "all" ]; then
+        build_location_and_config "thorax"
+        build_location_and_config "phoenix"
+    else
+        build_location_and_config "$branch"
+    fi
+}
+
+dashless=$(basename "$0" | sed -e 's/-/ /')
+usage() {
+    die "Usage: $dashless $USAGE"
+}
+
+if [ -z "$LONG_USAGE" ]
+then
+    LONG_USAGE="Usage: $dashless $USAGE"
+else
+    LONG_USAGE="Usage: $dashless $USAGE
+
+$LONG_USAGE"
+fi
+
+case "$1" in
+    -h|--h|--he|--hel|--help)
+    echo "$LONG_USAGE"
+    exit
+esac
+
+case "$#" in
+0)
+    usage ;;
+*)
+    cmd="$1"
+    shift
+    
+    case "$cmd" in
+    help)
+      nf -h ;;
+    run)
+      #require_branch "$@"
+      run_phoenix "$@"
+      ;;
+    stop)
+      #require_branch "$@"
+      stop_phoenix "$@"
+      ;;
+    lumbar)
+      lumbar_phoenix "$@"
+      ;;
+    kill)
+      kill_phoenix "$@" 
+      ;;
+    status)
+      status_phoenix "$@"
+      ;;
+    start-track)
+      echo "start tracking..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      start_tracking_helper "$@"
+      ;;
+    stop-track)
+      echo "stop tracking..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      stop_tracking_helper "$@"
+      ;;
+    format-patch)
+      echo "formating configs.patch..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      format_patch_helper "$@"
+      ;;
+    apply-patch)
+      echo "applying configs.patch..."
+      build_location_and_config_helper "$@"
+      apply_patch_helper "$@"
+      ;;
+    discard)
+      echo "discarding..."
+      require_branch "$@"
+      build_location_and_config_helper "$@"
+      discard_helper "$@"
+      ;;  
+    rebase)
+      require_branch "$@"
+      build_location_and_config_helper "$@"     
+      #echo "git rebasing..."  
+      rebase_helper "$@"
+      ;;  
+    log)
+      require_branch "$@"
+      #tail -f "$HOME/Library/Logs/dev/catalina-$1.log"
+      # http://code.google.com/p/log4tailer/
+      log4tail --throttle 0.1 $HOME/Library/Logs/dev/catalina-$1.log
+      ;; 
+    phoenix_pid)
+      phoenix_pid_helper "$@"
+      ;; 
+    refresh)
+      echo "refreshing running browsers..."
+      refresh_running_browsers "$@"
+      ;;
+    *)
+      usage 
+      ;;
+    esac
+esac
