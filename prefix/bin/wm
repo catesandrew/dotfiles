@@ -2,7 +2,7 @@
      
 USAGE='[help|tomcat|redir|wii|nbpd|track|patch|discard|dux|rebase]'
 
-USAGE='[help|run|stop|kill|status|start-track|stop-track|format-patch|apply-patch|discard|lumbar|log] [<branch>]'
+USAGE='[help|run|stop|kill|status|start-track|stop-track|format-patch|apply-patch|discard|lumbar|log] [<phoenix>]'
 LONG_USAGE='wm help
         print this long help message
 wm run 
@@ -247,19 +247,19 @@ function lumbar_phoenix() {
       #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
       echo $$ > $HOME/.pids/$basename.pid
       #exec 2>&1 lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev 1>/tmp/$basename.log
-      exec 2>&1 lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      exec 2>&1 ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
       ;;
   	test)
       echo "Regenerating lumbar tests for all modules."       
       #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar tests for all modules."       
       #echo $$ > $HOME/.pids/$basename.pid
-      lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
       ;;
   	*)
       echo "Regenerating lumbar for ${module_name}."       
       #growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."       
       #echo $$ > $HOME/.pids/$basename.pid
-      lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
+      ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
       ;;
   	ipad-homepage)
       echo "Regenerating lumbar for ipad homepage."       
@@ -298,13 +298,11 @@ function rebase() {
     # 4. checkthem out to remove local changes
     discard_changes	${branch_name} ${remote_name}
 
-    if [ ${remote_name} == "master" ]; then
-        # 5. get changes from upstream
-        git pull origin master
-        # 6. Rebase our configs branch
-        git checkout configs
-        git rebase master
-    fi 
+    # 5. get changes from upstream
+    git pull origin ${remote_name}
+    # 6. Rebase our configs branch
+    git checkout configs
+    git rebase ${remote_name}
 
     # 7. Create a new configs patch
     git checkout ${remote_name}
