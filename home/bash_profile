@@ -4,6 +4,7 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH:~/.dotfiles/prefix/src/doctorjs/bin"
 export JAVA_HOME="`/usr/libexec/java_home`"
 export NODE_PATH=/usr/local/lib/jsctags/:$NODE_PATH
+export HTML_TIDY=$HOME/.tidyrc
 alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 #alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 #alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"

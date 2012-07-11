@@ -390,14 +390,14 @@ nnoremap <C-y> 2<C-y>
 
 " }}}
 " Directional Keys ---------------------------------------------------------- {{{
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
-nnoremap <right> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>  
+"nnoremap <up> <nop>
+"nnoremap <down> <nop>
+"nnoremap <left> <nop>
+"nnoremap <right> <nop>
+"inoremap <up> <nop>
+"inoremap <down> <nop>
+"inoremap <left> <nop>
+"inoremap <right> <nop>  
 
 " Easier moving in tabs and windows
 noremap <C-j>  <C-w>j
@@ -623,16 +623,6 @@ au FileType c setlocal foldmethod=syntax
 " }}}
 " HTML, Mustache, and HTMLDjango {{{
   
-function! DoDux()
-    if &filetype == 'html'
-        exec "!nf dux-html& > /dev/null"
-    elseif &filetype == 'javascript'
-        exec "!nf dux-js& > /dev/null"
-    elseif &filetype == 'css'
-        exec "!nf dux-css& > /dev/null"
-    endif
-endfunction
-
 autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>sl :call SetParentLumbarBundleName()<CR>  
 autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>gl :call GetParentLumbarBundleName()<CR>  
 autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>dl :call DoLumbar()<CR>  
@@ -687,9 +677,6 @@ endfunction
 
 " HTML (tab width 2 chr, no wrapping)
 au BufRead,BufNewFile *.handlebars set filetype=handlebars
-"autocmd FileType html cnoreabbrev w w<bar>silent !nf dux-html& > /dev/null
-"autocmd FileType html cnoreabbrev w w<bar>silent call DoDux()
-"autocmd FileType html,mustache,handlebars cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType html,mustache,handlebars nnoremap <silent> <leader>r :silent !nf refresh&<CR>
                                                                
 autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |
@@ -767,9 +754,6 @@ autocmd FileType css,stylus setlocal sts=2
 autocmd FileType css,stylus setlocal textwidth=0
 autocmd FileType css,stylus setlocal omnifunc=csscomplete#CompleteCSS
 
-"autocmd FileType css cnoreabbrev w w<bar>silent !nf dux-css& > /dev/null
-"autocmd FileType css cnoreabbrev w w<bar>silent call DoDux()
-"autocmd FileType stylus cnoreabbrev w w<bar>silent call DoLumbar()
  
 autocmd FileType css,stylus nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
@@ -1056,9 +1040,6 @@ au FileType javascript call JavaScriptFold()
 au FileType javascript setl fen
 au FileType javascript setl nocindent
 
-"autocmd FileType javascript cnoreabbrev w w<bar>silent !nf dux-js& > /dev/null
-"autocmd FileType javascript cnoreabbrev w w<bar>silent call DoDux()
-"autocmd FileType javascript cnoreabbrev w w<bar>silent call DoLumbar()
 autocmd FileType javascript nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au FileType javascript imap <C-t> console.log();<esc>hi
@@ -1136,7 +1117,7 @@ map <leader>a :Ack!
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
 " Use neocomplcache.
-let g:neocomplcache_enable_at_startup = 1
+let g:neocomplcache_enable_at_startup = 0
 " Use smartcase.
 let g:neocomplcache_enable_smart_case = 1
 " Use camel case completion.

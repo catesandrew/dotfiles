@@ -312,6 +312,7 @@ function rebase() {
     # 9. stop tracking the files
     stop_tracking 
 
+
     growlnotify -t "[${branch_name}] git pull and rebase" -m "The git pull and rebase process has completed, including patching the local config files."
 }
 
@@ -504,6 +505,7 @@ function apply_patch() {
         exit 1
     fi
     git apply configs.patch
+    rm configs.patch
 }
 
 function apply_patch_helper() {
@@ -540,7 +542,7 @@ function build_location_and_config() {
             ;;
         phoenix)
             locations[$counter]="/usr/local/src/walmart/phoenix"
-            configs[$counter]=".gitignore Jakefile public/web/index.html js/init.js"  
+            configs[$counter]="Jakefile public/web/index.html js/init.js"  
             branch_names[$counter]="phoenix" 
             let counter+=1
             ;;
