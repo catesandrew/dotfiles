@@ -190,9 +190,6 @@
 [submodule "home/vim/bundle/vim-jade"]
 	path = home/vim/bundle/vim-jade
 	url = git://github.com/digitaltoad/vim-jade.git
-[submodule "home/vim/bundle/neocomplcache"]
-	path = home/vim/bundle/neocomplcache
-	url = https://github.com/Shougo/neocomplcache.git
 [submodule "home/vim/bundle/vim-orgmode"]
 	path = home/vim/bundle/vim-orgmode
 	url = https://github.com/jceb/vim-orgmode.git
