@@ -1,7 +1,7 @@
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 #export EDITOR='mate -w'
-export PATH="/usr/local/bin:/usr/local/sbin:$PATH:~/.dotfiles/prefix/src/doctorjs/bin"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/android/tools:/usr/local/android/platform-tools:$PATH:~/.dotfiles/prefix/src/doctorjs/bin"
 export JAVA_HOME="`/usr/libexec/java_home`"
 export NODE_PATH=/usr/local/lib/jsctags/:$NODE_PATH
 export HTML_TIDY=$HOME/.tidyrc
