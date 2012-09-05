@@ -186,6 +186,27 @@ function stop_phoenix() {
     fi
 }
 
+function kill_livereload() {
+    local ORIGIFS=$IFS
+
+    # set $IFS to end-of-line
+    IFS=`echo -en "\n\b"`
+
+    if [ "`ps xwww | grep -v grep | grep -c LiveReload`" > "0" ]; then
+        local PIDS=`ps A | grep -v grep | grep LiveReload | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+
+        for PID in $PIDS; do
+            kill -9 $PID
+            echo "LiveReload is dead. Killed process $PID"
+        done
+    else
+        echo "LiveReload is not running."
+    fi
+
+    # set $IFS back
+    IFS=$ORIGIFS
+}
+
 function kill_phoenix() {
     local ORIGIFS=$IFS
 
@@ -606,6 +627,9 @@ case "$#" in
       ;;
     kill)
       kill_phoenix "$@" 
+      ;;
+    stomp)
+      kill_livereload "$@" 
       ;;
     status)
       status_phoenix "$@"
