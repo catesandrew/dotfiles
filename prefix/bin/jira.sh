@@ -3,11 +3,13 @@ USAGE='[help|title|html2md]'
 
 USAGE='[help|title|html2md] [<moweb-id>]'
 LONG_USAGE='jira help
-        print this long help message
+        Print this long help message
 jira title 
         Copy jira ticket title to clipboard
 jira html2md 
         Export jira ticket into markdown format
+jira cli-help
+        Print the long jira cli official help message
 '
 
 die() {
@@ -84,24 +86,31 @@ case "$1" in
 esac
 
 case "$#" in
-0)
-    usage ;;
-*)
-    cmd="$1"
-    shift
-    
-    case "$cmd" in
-    help)
-      jira -h ;;
-    title)
-      title_helper "$@"
-      ;;
-    html2md)
-      html2md_helper "$@"
-      ;;
+    0)
+        usage ;;
     *)
-      usage 
-      ;;
-    esac
+        CMD="$1"
+
+        case "$CMD" in
+            help)
+                jira -h ;;
+            title)
+                shift
+                title_helper "$@"
+                ;;
+            html2md)
+                shift
+                html2md_helper "$@"
+                ;;
+            cli-help)
+                java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --help
+                ;;
+            create-bug)
+                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Desebrada" --affectsVersions "Desebrada" --environment "E3-->www_E4" --components "Checkout" --summary "Trying from command line"
+                ;;
+            *)
+                java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS} "${@}" 
+                ;;
+        esac
 esac
 
