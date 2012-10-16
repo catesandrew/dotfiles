@@ -154,6 +154,11 @@ function run_phoenix() {
       #growlnotify -t "Jake e6 started" -m "Phoenix has started."    
       echo "Jake e6 started"
       ;;
+  	11)
+      exec 2>&1 jake start[11] 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake e11 started" -m "Phoenix has started."    
+      echo "Jake e11 started"
+      ;;
   	mock)
       exec 2>&1 jake startmocks 1>$HOME/Library/Logs/dev/$basename.log &
       #growlnotify -t "Jake mocks started" -m "Phoenix has started."    
@@ -192,16 +197,16 @@ function kill_livereload() {
     # set $IFS to end-of-line
     IFS=`echo -en "\n\b"`
 
-    if [ "`ps xwww | grep -v grep | grep -c LiveReload`" > "0" ]; then
+    #if [ "`ps xwww | grep -v grep | grep -c LiveReload`" > 0 ]; then
         local PIDS=`ps A | grep -v grep | grep LiveReload | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
 
         for PID in $PIDS; do
             kill -9 $PID
             echo "LiveReload is dead. Killed process $PID"
         done
-    else
-        echo "LiveReload is not running."
-    fi
+    #else
+        #echo "LiveReload is not running."
+    #fi
 
     # set $IFS back
     IFS=$ORIGIFS
@@ -213,16 +218,16 @@ function kill_phoenix() {
     # set $IFS to end-of-line
     IFS=`echo -en "\n\b"`
 
-    if [ "`ps xwww | grep -v grep | grep -c node`" > "0" ]; then
+    #if [ "`ps xwww | grep -v grep | grep -c node`" > "0" ]; then
         local PIDS=`ps A | grep -v grep | grep node | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
 
         for PID in $PIDS; do
             kill -9 $PID
             echo "NodeJS is dead. Killed process $PID"
         done
-    else
-        echo "NodeJS is not running."
-    fi
+    #else
+        #echo "NodeJS is not running."
+    #fi
 
     # set $IFS back
     IFS=$ORIGIFS
@@ -319,11 +324,13 @@ function rebase() {
     # 4. checkthem out to remove local changes
     discard_changes	${branch_name} ${remote_name}
 
-    # 5. get changes from upstream
-    git pull origin ${remote_name}
-    # 6. Rebase our configs branch
-    git checkout configs
-    git rebase ${remote_name}
+    if [ ${remote_name} == 'master' ]; then
+        # 5. get changes from upstream
+        git pull origin ${remote_name}
+        # 6. Rebase our configs branch
+        git checkout configs
+        git rebase ${remote_name}
+    fi 
 
     # 7. Create a new configs patch
     git checkout ${remote_name}
@@ -563,7 +570,7 @@ function build_location_and_config() {
             ;;
         phoenix)
             locations[$counter]="/usr/local/src/walmart/phoenix"
-            configs[$counter]="Jakefile public/web/index.html js/init.js"  
+            configs[$counter]="Jakefile public/web/index.html js/init.js js/views/footer.js templates/footer.handlebars js/anivia-events.js config/dev.json"  
             branch_names[$counter]="phoenix" 
             let counter+=1
             ;;
@@ -629,7 +636,7 @@ case "$#" in
       kill_phoenix "$@" 
       ;;
     stomp)
-      kill_livereload "$@" 
+      kill_livereload
       ;;
     status)
       status_phoenix "$@"

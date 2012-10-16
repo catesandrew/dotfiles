@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #  Github-flavored markdown to HTML, in a command-line util.
 #
 #  $ cat README.md | ./ghmarkdown.rb
