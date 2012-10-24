@@ -286,6 +286,7 @@ function lumbar_phoenix() {
       #growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."       
       #echo $$ > $HOME/.pids/$basename.pid
       ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
+      #./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
       ;;
   	ipad-homepage)
       echo "Regenerating lumbar for ipad homepage."       

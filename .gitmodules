@@ -187,3 +187,6 @@
 [submodule "home/vim/bundle/vim-orgmode"]
 	path = home/vim/bundle/vim-orgmode
 	url = https://github.com/jceb/vim-orgmode.git
+[submodule "home/vim/bundle/vim-csharp"]
+	path = home/vim/bundle/vim-csharp
+	url = git://github.com/xandox/vim-csharp.git
