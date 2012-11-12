@@ -28,8 +28,9 @@ function title_helper() {
     #node.io file_query "${OUT_HTML}" h1#summary-val | pbcopy
     local TITLE=`node.io file_query "${OUT_HTML}" h1#summary-val`
     TITLE=`echo ${TITLE} | sed s/\"/\'/g`
-    echo "\"${TITLE} - ${1}\"" | pbcopy
-    
+    #echo "\"${TITLE} - ${1}\"" | pbcopy
+    echo "[MOWEB-${1}](https://wmobile.atlassian.net/browse/MOWEB-${1} \"${TITLE}\")" | pbcopy
+
     rm .login.html; rm .cookies.txt; rm "${OUT_HTML}"
 }
 
@@ -105,8 +106,11 @@ case "$#" in
             cli-help)
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --help
                 ;;
-            create-bug)
+            create-moweb)
                 jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Desebrada" --affectsVersions "Desebrada" --environment "E3-->www_E4" --components "Checkout" --summary "Trying from command line"
+                ;;
+            create-serv)
+                jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "SERV_12.10 (Sapphire)" --affectsVersions "SERV_12.10 (Sapphire)" --labels "Desebrada" --components "" --summary "Trying from command line"
                 ;;
             *)
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS} "${@}" 

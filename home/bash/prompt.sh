@@ -8,9 +8,9 @@
 # Eterm Title #
 ###############
 if [ $TERM = "xterm-256color" ]; then
-  XTITLE="\[\e]0;\u@\h (\w) - Bash \v\a\]"
+    XTITLE="\[\e]0;\u@\h (\w) - Bash \v\a\]"
 else
-  XTITLE=""
+    XTITLE=""
 fi
 
 #################
@@ -55,9 +55,9 @@ C_GT="$NOTHING"
 # Custom Root Prompt Colors #
 #############################
 if [ $EUID = "0" ]; then
-  C_OP_PAREN="$YELLOW"
-  C_USER="$LIGHT_RED"
-  C_CL_PAREN="$YELLOW"
+    C_OP_PAREN="$YELLOW"
+    C_USER="$LIGHT_RED"
+    C_CL_PAREN="$YELLOW"
 fi
 
 #################
@@ -82,8 +82,8 @@ $C_PWD""\W""$C_GT"">""$NOTHING "
 #PS1=$'\[\e]2;\h::\]$PWD\[\a\]\[\e]1;\]$(basename "$(dirname "$PWD")")/\W\[\a\]'$PS1
 
 bash_prompt_old() {
-#  PS1="$XTITLE""$C_USER""\u""$C_AMP""@""$C_HOST""\h""$C_COLON"":""$C_PWD""\$NEW_PWD""$C_GT"">""$NOTHING " 
-  #PS1=$'\[\e]2;\h::\]$PWD\[\a\]\[\e]1;\]$(basename "$(dirname "$PWD")")/\W\[\a\]'$PS1   
+#  PS1="$XTITLE""$C_USER""\u""$C_AMP""@""$C_HOST""\h""$C_COLON"":""$C_PWD""\$NEW_PWD""$C_GT"">""$NOTHING "
+  #PS1=$'\[\e]2;\h::\]$PWD\[\a\]\[\e]1;\]$(basename "$(dirname "$PWD")")/\W\[\a\]'$PS1
     PS1="$XTITLE""$C_USER""\u""$C_COLON"":""\$(__git_ps1 '(%s)')""$C_AMP""@""$C_HOST""\h""$C_COLON"":""$C_PWD""\$NEW_PWD""$C_GT"">""$NOTHING " 
 }
 
@@ -98,17 +98,17 @@ fi
 if tput setaf 1 &> /dev/null; then
     tput sgr0
     if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
-      MAGENTA=$(tput setaf 9)
-      ORANGE=$(tput setaf 172)
-      GREEN=$(tput setaf 190)
-      PURPLE=$(tput setaf 141)
-      WHITE=$(tput setaf 256)
+        MAGENTA=$(tput setaf 9)
+        ORANGE=$(tput setaf 172)
+        GREEN=$(tput setaf 190)
+        PURPLE=$(tput setaf 141)
+        WHITE=$(tput setaf 256)
     else
-      MAGENTA=$(tput setaf 5)
-      ORANGE=$(tput setaf 4)
-      GREEN=$(tput setaf 2)
-      PURPLE=$(tput setaf 1)
-      WHITE=$(tput setaf 7)
+        MAGENTA=$(tput setaf 5)
+        ORANGE=$(tput setaf 4)
+        GREEN=$(tput setaf 2)
+        PURPLE=$(tput setaf 1)
+        WHITE=$(tput setaf 7)
     fi
     BOLD=$(tput bold)
     RESET=$(tput sgr0)
@@ -123,16 +123,18 @@ else
 fi
 
 parse_git_dirty () {
-  [[ $(git status 2> /dev/null | tail -n1) != "nothing to commit (working directory clean)" ]] && echo "*"
+    [[ $(git status 2> /dev/null | tail -n1) != "nothing to commit, working directory clean" ]] && echo "*"
 }
+
 parse_git_branch () {
-  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(parse_git_dirty)/"
+    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(parse_git_dirty)/"
 }
 
 bash_prompt() {
-  PS1="\[${BOLD}${MAGENTA}\]$XTITLE\u \[$WHITE\]at \[$ORANGE\]\h \[$WHITE\]in \[$GREEN\]\$NEW_PWD\[$WHITE\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$PURPLE\]\$(parse_git_branch)\[$WHITE\]\n\$ \[$RESET\]"
+    PS1="\[${BOLD}${MAGENTA}\]$XTITLE\u \[$WHITE\]at \[$ORANGE\]\h \[$WHITE\]in \[$GREEN\]\$NEW_PWD\[$WHITE\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$PURPLE\]\$(parse_git_branch)\[$WHITE\]\n\$ \[$RESET\]"
 }
 
 PROMPT_COMMAND=bash_prompt_command
-bash_prompt  
+bash_prompt
 unset bash_prompt
+

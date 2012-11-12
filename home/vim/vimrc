@@ -73,12 +73,36 @@ set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
 set virtualedit=all             " allow the cursor to go in to "invalid" places
 
+" Show trailing whitespace:
+":match ExtraWhitespace /\s\+$/
+" Show trailing whitespace and spaces before a tab:
+":match ExtraWhitespace /\s\+$\| \+\ze\t/
+" Show tabs that are not at the start of a line:
+":match ExtraWhitespace /[^\t]\zs\t\+/
+" Show spaces used for indenting (so you use only tabs for indenting).
+":match ExtraWhitespace /^\t*\zs \+/
+" Switch off :match highlighting.
+":match
+
 augroup vimrc
     autocmd WinEnter,BufEnter,BufRead * setl cursorline
     autocmd WinEnter,BufEnter,BufRead * setl relativenumber
    
     autocmd WinLeave,BufLeave * setl nocursorline
     autocmd WinLeave,BufLeave * setl norelativenumber
+
+    "With the following in your vimrc, the command will be applied to the first
+    "window, and to any subsequent windows. The pattern * applies the highlight
+    "to all files
+    " Show leading whitespace that includes spaces, and trailing whitespace.
+    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+
+    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
 augroup END
 
 " Remember things between sessions
@@ -223,6 +247,9 @@ endif
 
 if &t_Co > 2 || has("gui_running")
   syntax on                    " switch syntax highlighting on, when the terminal has colors
+  " http://superuser.com/questions/430344/macvim-lags-while-vim-on-terminal-is-buttery-smooth
+  " http://stackoverflow.com/questions/4775605/vim-syntax-highlight-improve-performance
+  syntax sync minlines=256
 endif  
 
 " }}}
