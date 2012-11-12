@@ -82,9 +82,6 @@
 [submodule "home/vim/bundle/puppet-vim"]
     path = home/vim/bundle/puppet-vim
     url = git://github.com/ajf/puppet-vim.git
-[submodule "home/vim/bundle/vim-scala"]
-    path = home/vim/bundle/vim-scala
-    url = git://github.com/bdd/vim-scala.git
 [submodule "home/vim/bundle/gist-vim"]
     path = home/vim/bundle/gist-vim
   url = git://github.com/mattn/gist-vim.git
