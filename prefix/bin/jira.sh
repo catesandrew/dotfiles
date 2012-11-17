@@ -110,7 +110,7 @@ case "$#" in
                 jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Desebrada" --affectsVersions "Desebrada" --environment "E3-->www_E4" --components "Checkout" --summary "Trying from command line"
                 ;;
             create-serv)
-                jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "SERV_12.10 (Sapphire)" --affectsVersions "SERV_12.10 (Sapphire)" --labels "Desebrada" --components "" --summary "Trying from command line"
+                jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "SERV_12.12 (Cranberry)" --affectsVersions "SERV_12.12 (Cranberry)" --labels "enchido" --components "" --summary "Trying from command line"
                 ;;
             *)
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS} "${@}" 

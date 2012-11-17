@@ -187,3 +187,6 @@
 [submodule "home/vim/bundle/vim-csharp"]
 	path = home/vim/bundle/vim-csharp
 	url = git://github.com/xandox/vim-csharp.git
+[submodule "home/vim/bundle/vim-figlet"]
+	path = home/vim/bundle/vim-figlet
+	url = https://github.com/vim-scripts/Figlet.vim
