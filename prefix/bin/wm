@@ -269,39 +269,39 @@ function lumbar_phoenix() {
       fi
       ;;
   	all)
-      echo "Regenerating lumbar for all modules."       
-      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."       
+      echo "Regenerating lumbar for all modules."
+      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar for all modules."
       echo $$ > $HOME/.pids/$basename.pid
       #exec 2>&1 lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev 1>/tmp/$basename.log
-      exec 2>&1 ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ./node_modules/phoenix-build/node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
       ;;
   	test)
-      echo "Regenerating lumbar tests for all modules."       
-      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar tests for all modules."       
+      echo "Regenerating lumbar tests for all modules."
+      #growlnotify -t "$moduleName - Lumbaring" -m "Regenerating lumbar tests for all modules."
       #echo $$ > $HOME/.pids/$basename.pid
-      ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
+      ./node_modules/phoenix-build/node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use lumbar-tester --with {\"includeTests\":true} --use conditional --with {\"env\":\"dev\"} ./lumbar.json build/dev
       ;;
   	*)
-      echo "Regenerating lumbar for ${module_name}."       
-      #growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."       
+      echo "Regenerating lumbar for ${module_name}."
+      #growlnotify -t "$module_name - Lumbaring" -m "Regenerating lumbar for $module_name."
       #echo $$ > $HOME/.pids/$basename.pid
-      ./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
+      ./node_modules/phoenix-build/node_modules/lumbar/bin/lumbar --config ./config/dev.json --use lumbar-long-expires --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
       #./node_modules/lumbar/bin/lumbar --config ./config/dev.json --use conditional --with {\"env\":\"dev\"} --module "$module_name" ./lumbar.json build/dev
       ;;
   	ipad-homepage)
-      echo "Regenerating lumbar for ipad homepage."       
+      echo "Regenerating lumbar for ipad homepage."
 
-      pushd "/usr/local/src/walmart/ipad-homepageserver"> /dev/null  
+      pushd "/usr/local/src/walmart/ipad-homepageserver"> /dev/null
       if [ ! -d "./output" ]; then
         mkdir output
       fi
-    
+
       # generate the prod system
       #node generatehomescreen.js -v -o ./output/main.html
       #node generatehomescreen.js -v -q -t ./templates/home.handlebars -o ./output/index.html
       #node generatehomescreen.js -v -q -t ./templates/home_v2.handlebars -o ./output/index.html
       lumbar ./lumbar.json ./output
-      
+
       echo "Copying output/ipad/ to ~/Sites/ipad/"
       cp -R ./output/ipad/* ~/Sites/ipad/
       popd > /dev/null

@@ -190,3 +190,6 @@
 [submodule "home/vim/bundle/vim-figlet"]
 	path = home/vim/bundle/vim-figlet
 	url = https://github.com/vim-scripts/Figlet.vim
+[submodule "home/vim/bundle/webapi-vim"]
+	path = home/vim/bundle/webapi-vim
+	url = https://github.com/mattn/webapi-vim.git
