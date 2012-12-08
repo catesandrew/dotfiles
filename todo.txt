@@ -1,0 +1,12 @@
+ Ctrl+Command+Enter for toggling task status
+Andrew Cates:
+✓ task 2
+- task 3
+  New Project:
+  - task 4
+
+Project 1:
+- task 1
+- task 2 @done
+Project 2:
+- task 3

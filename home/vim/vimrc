@@ -90,6 +90,7 @@ set gdefault                    " search/replace "globally" (on a line) by defau
 set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
 set virtualedit=all             " allow the cursor to go in to "invalid" places
+set synmaxcol=512               " long lines slow down vim
 
 " Show trailing whitespace:
 ":match ExtraWhitespace /\s\+$/
@@ -208,7 +209,7 @@ if has('cmdline_info')
 endif
 
 
-" }}}    
+" }}}
 " Status line {{{
 
 if has('statusline')
@@ -268,119 +269,12 @@ if &t_Co > 2 || has("gui_running")
   " http://superuser.com/questions/430344/macvim-lags-while-vim-on-terminal-is-buttery-smooth
   " http://stackoverflow.com/questions/4775605/vim-syntax-highlight-improve-performance
   syntax sync minlines=256
-endif  
+endif
 
 " }}}
 
 " }}}
 " Useful functions -------------------------------------------------------- {{{
-
-"recalculate the trailing whitespace warning when idle, and after saving
-autocmd cursorhold,bufwritepost * unlet! b:statusline_trailing_space_warning
-
-"return '[\s]' if trailing white space is detected
-"return '' otherwise
-function! StatuslineTrailingSpaceWarning()
-    if !exists("b:statusline_trailing_space_warning")
-        if search('\s\+$', 'nw') != 0
-            let b:statusline_trailing_space_warning = '[\s]'
-        else
-            let b:statusline_trailing_space_warning = ''
-        endif
-    endif
-    return b:statusline_trailing_space_warning
-endfunction
-
-
-"return the syntax highlight group under the cursor ''
-function! StatuslineCurrentHighlight()
-    let name = synIDattr(synID(line('.'),col('.'),1),'name')
-    if name == ''
-        return ''
-    else
-        return '[' . name . ']'
-    endif
-endfunction
-
-"recalculate the tab warning flag when idle and after writing
-autocmd cursorhold,bufwritepost * unlet! b:statusline_tab_warning
-
-"return '[&et]' if &et is set wrong
-"return '[mixed-indenting]' if spaces and tabs are used to indent
-"return an empty string if everything is fine
-function! StatuslineTabWarning()
-    if !exists("b:statusline_tab_warning")
-        let tabs = search('^\t', 'nw') != 0
-        let spaces = search('^ ', 'nw') != 0
-
-        if tabs && spaces
-            let b:statusline_tab_warning =  '[mixed-indenting]'
-        elseif (spaces && !&et) || (tabs && &et)
-            let b:statusline_tab_warning = '[&et]'
-        else
-            let b:statusline_tab_warning = ''
-        endif
-    endif
-    return b:statusline_tab_warning
-endfunction
-
-"recalculate the long line warning when idle and after saving
-autocmd cursorhold,bufwritepost * unlet! b:statusline_long_line_warning
-
-"return a warning for "long lines" where "long" is either &textwidth or 80 (if
-"no &textwidth is set)
-"
-"return '' if no long lines
-"return '[#x,my,$z] if long lines are found, were x is the number of long
-"lines, y is the median length of the long lines and z is the length of the
-"longest line
-function! StatuslineLongLineWarning()
-    if !exists("b:statusline_long_line_warning")
-        let long_line_lens = s:LongLines()
-
-        if len(long_line_lens) > 0
-            let b:statusline_long_line_warning = "[" .
-                        \ '#' . len(long_line_lens) . "," .
-                        \ 'm' . s:Median(long_line_lens) . "," .
-                        \ '$' . max(long_line_lens) . "]"
-        else
-            let b:statusline_long_line_warning = ""
-        endif
-    endif
-    return b:statusline_long_line_warning
-endfunction
-
-"return a list containing the lengths of the long lines in this buffer
-function! s:LongLines()
-    let threshold = (&tw ? &tw : 80)
-    let spaces = repeat(" ", &ts)
-
-    let long_line_lens = []
-
-    let i = 1
-    while i <= line("$")
-        let len = strlen(substitute(getline(i), '\t', spaces, 'g'))
-        if len > threshold
-            call add(long_line_lens, len)
-        endif
-        let i += 1
-    endwhile
-
-    return long_line_lens
-endfunction
-
-"find the median of the given array of numbers
-function! s:Median(nums)
-    let nums = sort(a:nums)
-    let l = len(nums)
-
-    if l % 2 == 1
-        let i = (l-1) / 2
-        return nums[i]
-    else
-        return (nums[l/2] + nums[(l/2)-1]) / 2
-    endif
-endfunction
 
 " The following beast is something i didn't write... it will return the
 " syntax highlighting group that the current "thing" under the cursor
@@ -443,7 +337,7 @@ nnoremap <C-y> 2<C-y>
 "inoremap <up> <nop>
 "inoremap <down> <nop>
 "inoremap <left> <nop>
-"inoremap <right> <nop>  
+"inoremap <right> <nop>
 
 " Easier moving in tabs and windows
 noremap <C-j>  <C-w>j
@@ -614,6 +508,9 @@ nnoremap K <nop>
 
 " Stop it, hash key.
 inoremap # X<BS>#
+
+" Dreadful 'Ex' Mode
+nnoremap <silent> Q ZZ
 
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
@@ -1087,6 +984,11 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
+" ZenCoding {{{
+
+let g:user_zen_leader_key = '<leader>z'
+
+" }}}
 " AlignMaps {{{
 
 "AlignCtrl lW =
@@ -1094,7 +996,7 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " }}}
 " Ack {{{
 
-map <leader>a :Ack!
+map <leader>a :Ack! 
 
 " }}}
 " Improve completion popup menu {{{
@@ -1217,7 +1119,7 @@ au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
 " SnipMate {{{
 
 " Shortcut for reloading snippets, useful when developing
-nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>    
+nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>
 
 " }}}
 " ShowMarks {{{
@@ -1239,12 +1141,12 @@ highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
 
 command! CtagsR !ctags -R
 
-" This will look in the current directory for 'tags', and work up the tree towards root until one is found. 
+" This will look in the current directory for 'tags', and work up the tree towards root until one is found.
 set tags=./tags,tags " search tag file recursively (see :h file-searching)
 " C-\ - Open the definition in a new tab
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR> 
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 " A-] - Open the definition in a vertical split
-map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>      
+map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
 " Taglist Variables {{{
@@ -1268,7 +1170,7 @@ let Tlist_Inc_Winwidth=1            " increase window by 1 when growing
 " exuberant ctags version in /usr/local/bin
 let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
 
-let Tlist_Enable_Fold_Column=0 
+let Tlist_Enable_Fold_Column=0
 " show function/method prototypes in the list
 let Tlist_Display_Prototype=1
 
@@ -1276,7 +1178,7 @@ let Tlist_Display_Prototype=1
 let Tlist_Display_Tag_Scope=0
 
 " show TagList window on the right
-let Tlist_Use_Right_Window=1  
+let Tlist_Use_Right_Window=1
 
 let Tlist_Auto_Highlight_Tag = 1
 let Tlist_Auto_Update = 1
@@ -1285,13 +1187,13 @@ let Tlist_Use_SingleClick = 1
 
 let g:ctags_statusline=1
 " Override how taglist does javascript
-let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'  
+let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'
 
 " }}}
 " JSON {{{
 
 au BufRead,BufNewFile *.json set filetype=json
-nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>                       
+nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " }}}
 " Git Commit {{{
@@ -1373,7 +1275,7 @@ endfunction
 " Scratch {{{
 
 command! ScratchToggle call ScratchToggle()
-function! ScratchToggle() 
+function! ScratchToggle()
   if exists("w:is_scratch_window")
     unlet w:is_scratch_window
     exec "q"
@@ -1381,8 +1283,15 @@ function! ScratchToggle()
     exec "normal! :Sscratch\<cr>\<C-W>J:resize 13\<cr>"
     let w:is_scratch_window = 1
   endif
-endfunction 
+endfunction
 nnoremap <silent> <leader><tab> :ScratchToggle<cr>
+
+" }}}
+" HTML Indent {{{
+
+let g:html_indent_inctags = "html,body,head,tbody"
+let g:html_indent_script1 = "inc"
+let g:html_indent_style1 = "inc"
 
 " }}}
 
