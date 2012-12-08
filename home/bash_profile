@@ -9,7 +9,7 @@ alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 #alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 #alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
 #alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
-export PYTHONPATH=/Library/Python/2.7/site-packages     
+export PYTHONPATH=/Library/Python/2.7/site-packages
 export LC_CTYPE="utf-8"
 ulimit -n 1024
 # How to use elinks to display html parts of emails
@@ -46,7 +46,7 @@ bind -m vi-insert '"\M-[B": ""'
 bind -m vi-insert '"\M-[6~": ""'
 # bind -m vi-insert '\C-n: next-history'
 # ^n cycle through the list of partial matches
-bind -m vi-insert "\C-n":menu-complete     
+bind -m vi-insert "\C-n":menu-complete
 # Ctrl-A: insert at line start like in emacs mode
 bind -m vi-insert '\C-a: beginning-of-line'
 # Ctrl-E: append at line end like in emacs mode
@@ -62,12 +62,10 @@ bind -m emacs '"\ev": vi-editing-mode'
 
 ## Specify vi editing mode
 set -o vi
-   
 
-        
-# The internal command will return focus directly to the terminal after 
-# the commit message is saved and quit. It's a small optimization, 
-# but a nice one, I find. (Tip originally found here: 
+# The internal command will return focus directly to the terminal after
+# the commit message is saved and quit. It's a small optimization,
+# but a nice one, I find. (Tip originally found here:
 # http://b4winckler.wordpress.com/2009/09/02/macvim-on-snow-leopard/#comment-36
 export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
 
@@ -89,3 +87,6 @@ if [ -f ~/.bashrc ]; then
 fi
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+export NVM_TARGET="$HOME/.dotfiles/prefix/src/nvm"
+export NVM_DIR="/usr/local/nvm"
+[[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*

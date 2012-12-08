@@ -193,3 +193,6 @@
 [submodule "home/vim/bundle/webapi-vim"]
 	path = home/vim/bundle/webapi-vim
 	url = https://github.com/mattn/webapi-vim.git
+[submodule "prefix/src/nvm"]
+	path = prefix/src/nvm
+	url = git://github.com/creationix/nvm.git

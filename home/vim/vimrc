@@ -42,7 +42,7 @@ set nocompatible
 " Define and reset augroup used in vimrc
 augroup vimrc
     autocmd!
-augroup END  
+augroup END
 
 " Preamble -------------------------------------------------------------------- {{{
 
@@ -79,7 +79,7 @@ set smartcase     " ignore case if search pattern is all lowercase,
 set nrformats=octal,hex,alpha " Enable CTRL-A/CTRL-X to work on octal and hex numbers, as well as characters
 set smarttab      " insert tabs on the start of a line according to
                   "    shiftwidth, not tabstop
-set incsearch     " show search matches as you type                 
+set incsearch     " show search matches as you type
 set notitle       " don't rewrite title string
 set showmatch     " when a bracket is inserted, breifly jump to a matching one
 set matchtime=2   " jump to matching bracket for 2/10th of a second
@@ -359,9 +359,9 @@ function! s:LongLines()
 
     let i = 1
     while i <= line("$")
-        let len = strlen(substitute(getline(i), '\t', spaces, 'g'))           
+        let len = strlen(substitute(getline(i), '\t', spaces, 'g'))
         if len > threshold
-            call add(long_line_lens, len)                                        
+            call add(long_line_lens, len)
         endif
         let i += 1
     endwhile
@@ -380,7 +380,8 @@ function! s:Median(nums)
     else
         return (nums[l/2] + nums[(l/2)-1]) / 2
     endif
-endfunction                 
+endfunction
+
 " The following beast is something i didn't write... it will return the
 " syntax highlighting group that the current "thing" under the cursor
 " belongs to -- very useful for figuring out what to change as far as
@@ -507,7 +508,7 @@ cmap w!! w !sudo tee % >/dev/null
 " Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
 " yanked stack (also, in visual mode)
 nmap <silent> <leader>d "_d
-vmap <silent> <leader>d "_d  
+vmap <silent> <leader>d "_d
 
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
@@ -516,8 +517,8 @@ nnoremap D d$
 " Yank/paste to the OS clipboard with ,y and ,p
 nmap <leader>y "+y
 nmap <leader>Y "+yy
-nmap <leader>p "+p   
-nmap <leader>P "+P   
+nmap <leader>p "+p
+nmap <leader>P "+P
 
 " visual shifting (does not exit Visual mode)
 vnoremap < <gv
@@ -533,7 +534,7 @@ nmap <leader>ac :center<CR>
 nmap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
 
 " Scratch
-nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>  
+nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 
 " Toggle paste: Every Vim user likes to enable auto-indenting of
 " source code, so Vim can intelligently position you cursor on the
@@ -549,7 +550,7 @@ nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 set pastetoggle=<F8>
 
 " Reselect text that was just pasted with <leader>v
-nnoremap <leader>v V`]  
+nnoremap <leader>v V`]
 
 " Replaste
 nnoremap <D-p> "_ddPV`]
@@ -598,7 +599,7 @@ nmap <leader>f5 :set foldlevel=5<CR>
 nmap <leader>f6 :set foldlevel=6<CR>
 nmap <leader>f7 :set foldlevel=7<CR>
 nmap <leader>f8 :set foldlevel=8<CR>
-nmap <leader>f9 :set foldlevel=9<CR>  
+nmap <leader>f9 :set foldlevel=9<CR>
 
 " }}}
 " Destroy infuriating keys ---------------------------------------------------- {{{
@@ -635,7 +636,7 @@ autocmd FileType markdown noremap  <buffer> <silent> $ g$
 " SRT {{{
 
 " Syntax highlighting for subtitle files in Subrip (srt) format
-autocmd BufNewFile,BufRead *.srt setf srt     
+autocmd BufNewFile,BufRead *.srt setf srt
 
 " }}}
 " Ant {{{
@@ -667,70 +668,19 @@ au FileType c setlocal foldmethod=syntax
 
 " }}}
 " HTML, Mustache, and HTMLDjango {{{
-  
-autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>sl :call SetParentLumbarBundleName()<CR>  
-autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>gl :call GetParentLumbarBundleName()<CR>  
-autocmd FileType stylus,javascript,mustache,handlebars nnoremap <silent> <leader>dl :call DoLumbar()<CR>  
 
-let g:parentLumbarBundleName = "base"
-function! DoLumbar()          	
-    let l:file_dir=expand('<sfile>:p:h') 
-    if l:file_dir == '/usr/local/src/walmart/phoenix'
-        if &filetype == 'mustache'
-            exec "!nf lumbar base > /dev/null"
-            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
-        elseif &filetype == 'handlebars'
-            exec "!nf lumbar base > /dev/null"
-            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
-        elseif &filetype == 'javascript'
-            exec "!nf lumbar base > /dev/null"
-            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
-        elseif &filetype == 'stylus'
-            exec "!nf lumbar base > /dev/null"
-            exec "!nf lumbar " . g:parentLumbarBundleName . " > /dev/null"
-        endif
-    endif
-    if l:file_dir == '/usr/local/src/walmart/ipad-homepageserver'
-        if &filetype == 'mustache'
-            exec "!nf lumbar ipad-homepage > /dev/null"
-        elseif &filetype == 'html'
-            exec "!nf lumbar ipad-homepage > /dev/null"
-        elseif &filetype == 'javascript'
-            exec "!nf lumbar ipad-homepage > /dev/null"
-        elseif &filetype == 'stylus'
-            exec "!nf lumbar ipad-homepage > /dev/null"
-        endif
-    endif
-endfunction    
-
-" -----------------------------------------------------------------------------
-"  SetParentLumbarBundleName: Prompt the user to enter a module name 
-function! SetParentLumbarBundleName()
-    call inputsave()
-    let input = input('New default lumbar bundle name: ') 
-    call inputrestore()
-
-    let g:parentLumbarBundleName = input
-endfunction
-
-
-" -----------------------------------------------------------------------------
-"  GetParentLumbarBundleName: Retrieve the current value 
-function! GetParentLumbarBundleName()
-    echo 'Current default bundle name: ' . string(g:parentLumbarBundleName)
-endfunction 
 
 " HTML (tab width 2 chr, no wrapping)
 au BufRead,BufNewFile *.handlebars set filetype=handlebars
 autocmd FileType html,mustache,handlebars nnoremap <silent> <leader>r :silent !nf refresh&<CR>
-                                                               
+
 autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |
     \ let b:match_words = '<:>,' .
     \ '<\@<=[ou]l\>[^>]*\%(>\|$\):<\@<=li\>:<\@<=/[ou]l>,' .
     \ '<\@<=dl\>[^>]*\%(>\|$\):<\@<=d[td]\>:<\@<=/dl>,' .
     \ '<\@<=\([^/][^ \t>]*\)[^>]*\%(>\|$\):<\@<=/\1>'
 
-autocmd FileType html,mustache,handlebars setlocal sw=2     
+autocmd FileType html,mustache,handlebars setlocal sw=2
 autocmd FileType html,mustache,handlebars setlocal ts=2
 autocmd FileType html,mustache,handlebars setlocal sts=2
 autocmd FileType html,mustache,handlebars setlocal textwidth=0
@@ -768,7 +718,7 @@ endfun
 " Auto-closing of HTML/XML tags
 let g:closetag_default_xml=1
 au FileType html,mustache,handlebars let b:closetag_html_style=1
-au FileType html,xml,mustache,handlebars set listchars-=tab:>.          
+au FileType html,xml,mustache,handlebars set listchars-=tab:>.
 
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
@@ -799,7 +749,6 @@ autocmd FileType css,stylus setlocal sts=2
 autocmd FileType css,stylus setlocal textwidth=0
 autocmd FileType css,stylus setlocal omnifunc=csscomplete#CompleteCSS
 
- 
 autocmd FileType css,stylus nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au BufNewFile,BufRead *.less setlocal filetype=less
@@ -847,7 +796,7 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 
 au FileType stylus setlocal foldmethod=expr
 au FileType stylus setlocal foldexpr=GetStylusFold(v:lnum)
-au FileType stylus setlocal foldtext=StylusFoldText()  
+au FileType stylus setlocal foldtext=StylusFoldText()
 
 " Principles:
 " - a def/class starts a fold
@@ -1094,8 +1043,8 @@ function! JavaScriptFold()
     "setl foldmethod=syntax
     "setl foldlevelstart=1
     "syn region foldBraces start="{" end="}" transparent fold keepend extend
-    setl foldmethod=marker 
-    setl foldmarker={,}   
+    setl foldmethod=marker
+    setl foldmarker={,}
 
     function! FoldText()
         return substitute(getline(v:foldstart), '{.*', '{...}', '')
@@ -1121,7 +1070,7 @@ au FileType help setlocal textwidth=78
  " Bind <F1> to show the keyword under cursor
 " general help can still be entered manually, with :h
 au FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
-au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>  
+au FileType vim noremap! <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 
 " }}}
 " Firefox {{{
@@ -1138,9 +1087,14 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
+" AlignMaps {{{
+
+"AlignCtrl lW =
+
+" }}}
 " Ack {{{
 
-map <leader>a :Ack! 
+map <leader>a :Ack!
 
 " }}}
 " Improve completion popup menu {{{
@@ -1192,7 +1146,7 @@ nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
 " }}}
 " Google Code Wiki {{{
 
-autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki 
+autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki
 
 " }}}
 " NERD Tree {{{
@@ -1232,7 +1186,7 @@ let NERDTreeKeepTreeInNewTab=1
 let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
 
 au Filetype nerdtree setlocal nolist
- 
+
 " }}}
 " HTML5 {{{
 
@@ -1673,10 +1627,10 @@ if has('gui_running')
         set ttymouse=xterm2
     endif
 
-    set guifont=Anonymous\ Pro:h14   
+    set guifont=Anonymous\ Pro:h14
     set guioptions-=T          	" remove the toolbar
     set lines=40               	" 40 lines of text instead of 24,
-    set columns=80 
+    set columns=80
     set transparency=5          " Make the window slightly transparent
 
     "winpos 0 0
@@ -1696,7 +1650,7 @@ if has('gui_running')
     " PeepOpen
     if has("gui_macvim")
       map <leader><leader><leader> <Plug>PeepOpen
-    end        
+    end
 
     highlight SpellBad term=underline gui=undercurl guisp=Orange
 
