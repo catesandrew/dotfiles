@@ -441,7 +441,9 @@ nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 " input, resulting in often cascading indents of paragraphs. There is
 " an easy option to prevent this, however. You can temporarily switch
 " to “paste mode”, simply by setting the following option:
-set pastetoggle=<F8>
+set pastetoggle=<F7>
+
+nmap <F8> :TagbarToggle<CR>
 
 " Reselect text that was just pasted with <leader>v
 nnoremap <leader>v V`]

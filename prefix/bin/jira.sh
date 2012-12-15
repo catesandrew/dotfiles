@@ -109,6 +109,9 @@ case "$#" in
             create-moweb)
                 jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Desebrada" --affectsVersions "Desebrada" --environment "E3-->www_E4" --components "Checkout" --summary "Trying from command line"
                 ;;
+            create-sub-story)
+                jira --action createIssue --parent "MOWEB-1020" --project "Mobile Web" --type "Story Task" --components "Search" --summary "Faceted Search: Trying from command line" --description "This functionality enables the user to select values for brand, price range, customer rating, color, etc. (facets) to narrow search results."
+                ;;
             create-serv)
                 jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "SERV_12.12 (Cranberry)" --affectsVersions "SERV_12.12 (Cranberry)" --labels "enchido" --components "" --summary "Trying from command line"
                 ;;
