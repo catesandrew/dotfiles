@@ -74,13 +74,6 @@ wh () {
 
 }
 
-function translate() {
-  curl -s "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=`perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$1"`&langpair=`if [ "$3" != "" ]; then echo $2; fi;`%7C`if [ "$3" == "" ]; then echo $2; else echo $3; fi;`" | sed 's/{"responseData": {"translatedText":"\([^"]*\)".*}, .*}/\1\n/'; 
-}
-function translate2() {
-    wget -qO- "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=$1&langpair=$2|${3:-en}" | sed 's/.*"translatedText":"\([^"]*\)".*}/\1\n/';
-}
-
 function diffall() {
     for name in $(git diff --name-only $1); do git difftool $1 $name & done
 }

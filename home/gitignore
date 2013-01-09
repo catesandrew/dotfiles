@@ -137,3 +137,6 @@ build/*
 *.pbxuser
 *.xcworkspace
 xcuserdata
+
+# WebStorm
+.idea

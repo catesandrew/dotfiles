@@ -202,3 +202,6 @@
 [submodule "home/vim/vim-visualstar"]
 	path = home/vim/vim-visualstar
 	url = git://github.com/thinca/vim-visualstar.git
+[submodule "home/vim/bundle/vis"]
+	path = home/vim/bundle/vis
+	url = https://github.com/vim-scripts/vis.git

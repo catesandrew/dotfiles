@@ -162,7 +162,7 @@ set imsearch=0                 " disable input method control in search mode
 " }}}
 " Par {{{
 
-set formatprg=par\ -w72
+" set formatprg=par\ -w72
 :map <A-q> {v}!par -jw72<CR>
 :vmap <A-q> !par -jw72<CR>
 
