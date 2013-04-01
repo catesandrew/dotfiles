@@ -1,7 +1,10 @@
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 #export EDITOR='mate -w'
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/android/tools:/usr/local/android/platform-tools:$PATH"
+export M2_HOME=/usr/local/apache-maven/apache-maven-3.0.5
+export M2=$M2_HOME/bin
+export MAVEN_OPTS="-Xms256m -Xmx512m"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/src/android-sdk/tools:/usr/local/src/android-sdk/platform-tools:$M2:$PATH"
 export JAVA_HOME="`/usr/libexec/java_home`"
 #export NODE_PATH="/usr/local/lib/jsctags:$NODE_PATH"
 export NODE_PATH="/usr/local/lib/jsctags"
@@ -14,8 +17,6 @@ alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
 export PYTHONPATH=/Library/Python/2.7/site-packages
 export LC_CTYPE="utf-8"
 ulimit -n 1024
-# How to use elinks to display html parts of emails
-export VMAIL_HTML_PART_READER='elinks -dump'
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a

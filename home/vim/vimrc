@@ -1146,14 +1146,29 @@ highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
 command! CtagsR !ctags -R
 
 " This will look in the current directory for 'tags', and work up the tree towards root until one is found.
-set tags=./tags,tags " search tag file recursively (see :h file-searching)
+set tags=./tags;,tags " search tag file recursively (see :h file-searching)
 " C-\ - Open the definition in a new tab
 map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 " A-] - Open the definition in a vertical split
 map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
-" Taglist Variables {{{
+" Easytags Variables {{{
+
+let g:easytags_cmd = '/usr/local/bin/ctags'
+let g:easytags_dynamic_files = 1
+let g:easytags_auto_highlight = 0
+let g:easytags_always_enabled = 0
+let g:easytags_on_cursorhold = 0
+let g:easytags_updatetime_autodisable = 1
+
+" }}}
+" Tagbar Variables {{{
+
+let g:tagbar_type_javascript = {'ctagsbin': '/usr/local/bin/jsctags'}
+
+" }}}
+" Taglist Plus Variables {{{
 
 nmap <leader>l :TlistClose<CR>:TlistToggle<CR>
 nmap <leader>L :TlistClose<CR>
@@ -1164,11 +1179,6 @@ let Tlist_GainFocus_On_ToggleOpen=1 " put focus on the TagList window when it op
 "let Tlist_Process_File_Always=1     " process files in the background, even when the TagList window isn't open
 "let Tlist_Show_One_File=1           " only show tags from the current buffer, not all open buffers
 let Tlist_Inc_Winwidth=1            " increase window by 1 when growing
-
-" shorten the time it takes to highlight the current tag (default is 4 secs)
-" note that this setting influences Vim's behaviour when saving swap files,
-" but we have already turned off swap files (earlier)
-"set updatetime=1000
 
 " the default ctags in /usr/bin on the Mac is GNU ctags, so change it to the
 " exuberant ctags version in /usr/local/bin
