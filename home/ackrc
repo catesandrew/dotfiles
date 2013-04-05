@@ -1,11 +1,10 @@
 --ignore-dir=build
---ignore-dir=test
 --ignore-dir=\.git
 --ignore-dir=node_modules
 --type-add
 js=.coffee
 --type-add
-html=.handlebars,.mustache
+html=.handlebars,.mustache,.hbs
 --type-add
 css=.stylus,.styl,.less
 --type-add

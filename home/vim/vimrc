@@ -991,6 +991,14 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 let g:user_zen_leader_key = '<leader>z'
 
 " }}}
+" Color Highlight {{{
+
+"let g:colorizer_auto_color = 1
+let g:colorizer_auto_filetype='css,html,handlebars,stylus'
+let g:colorizer_skip_comments = 1
+"au BufNewFile,BufRead *.css,*.html,*.htm,*.hbs,*.handlebars,*.styl :ColorHighlight!
+
+" }}}
 " AlignMaps {{{
 
 "AlignCtrl lW =
