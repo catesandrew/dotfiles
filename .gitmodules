@@ -205,3 +205,9 @@
 [submodule "home/vim/bundle/color_highlight"]
 	path = home/vim/bundle/color_highlight
 	url = https://github.com/chrisbra/color_highlight
+[submodule "home/vim/bundle/emmet-vim"]
+	path = home/vim/bundle/emmet-vim
+	url = https://github.com/mattn/emmet-vim.git
+[submodule "home/vim/bundle/vim-misc"]
+	path = home/vim/bundle/vim-misc
+	url = https://github.com/xolox/vim-misc.git
