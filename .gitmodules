@@ -58,9 +58,6 @@
 [submodule "home/vim/bundle/vim-markdown"]
     path = home/vim/bundle/vim-markdown
     url = git://github.com/tpope/vim-markdown.git
-[submodule "home/vim/bundle/vim-align"]
-    path = home/vim/bundle/vim-align
-    url = git://github.com/tsaleh/vim-align.git
 [submodule "home/vim/bundle/vim-unimpaired"]
     path = home/vim/bundle/vim-unimpaired
     url = git://github.com/tpope/vim-unimpaired.git
