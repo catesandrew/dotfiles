@@ -4,9 +4,9 @@ USAGE='[help|title|html2md]'
 USAGE='[help|title|html2md] [<moweb-id>]'
 LONG_USAGE='jira help
         Print this long help message
-jira title 
+jira title
         Copy jira ticket title to clipboard
-jira html2md 
+jira html2md
         Export jira ticket into markdown format
 jira cli-help
         Print the long jira cli official help message
@@ -48,7 +48,7 @@ function html2md_helper() {
     #echo $TEXT
 
     #for EACH in `echo $TEXT | tr "," "\n" | tr ")" "\n" | tr "#" "\n"| tr "'" "\n"| tr "." "\n"| tr "&" "\n"| tr "(" "\n"| tr "!" "\n"| tr "%" "\n"| tr "$" "\n"| tr "+" "\n"| tr "-" "\n"| tr "/" "\n"| tr "*" "\n"| tr "@" "\n"| tr "^" "\n"| tr "\"" "\n"`
-    #do 
+    #do
     #let EACH=$EACH-$SHIFT
     #STRING="$STRING$(printf "\\$(printf "%03o" $EACH)")"
     #done
@@ -107,16 +107,19 @@ case "$#" in
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --help
                 ;;
             create-moweb-bug)
-                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Jerky" --affectsVersions "Jerky" --environment "" --components "" --summary "Trying from command line"
+                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Lobster" --affectsVersions "Lobster" --environment "" --components "" --summary "Trying from command line"
                 ;;
             create-moweb-task)
                 jira --action createIssue --project "Mobile Web" --type "Task" --summary "Trying from command line"
                 ;;
             create-sub-story)
-                jira --action createIssue --parent "MOWEB-2214" --project "Mobile Web" --type "Story Task" --fixVersions "Jerky" --affectsVersions "Jerky" --components "Search" --summary "Trying from command line" --description "This functionality ..."
+                jira --action createIssue --parent "MOWEB-2417" --project "Mobile Web" --type "Story Task" --fixVersions "Lobster" --affectsVersions "Lobster" --components "" --labels "" --summary "Summary: " --description "Description: "
                 ;;
             create-serv-bug)
                 jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "" --affectsVersions "Backlog" --labels "MOWEB" --components "" --summary "Trying from command line"
+                ;;
+            create-serv-task)
+                jira --action createIssue --project "Services & Infrastructure" --type "Task" --summary "Trying from command line"
                 ;;
             *)
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS} "${@}" 

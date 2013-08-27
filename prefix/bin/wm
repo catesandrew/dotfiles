@@ -1,17 +1,17 @@
 #!/bin/bash
-     
+
 USAGE='[help|tomcat|redir|wii|nbpd|track|patch|discard|dux|rebase]'
 
 USAGE='[help|run|stop|kill|status|start-track|stop-track|format-patch|apply-patch|discard|lumbar|log] [<phoenix>]'
 LONG_USAGE='wm help
         print this long help message
-wm run 
+wm run
         Start Express JS Phoenix
-wm stop 
+wm stop
         Stop ExpressJS Phoenix
-wm kill 
+wm kill
         Kill ExpressJS Phoenix
-wm status 
+wm status
         ExpressJS Phoenix status
 wm start-track [<project>] [<branch=master>]
         Start tracking
@@ -42,7 +42,7 @@ function require_clean_work_tree () {
     local err=0
 
     if ! git diff-files --quiet --ignore-submodules
-    then     
+    then
         growlnotify -sticky -t "[$branch_name] clean work tree" -m "Cannot $1: You have unstaged changes. Think of stashing your changes and then stash apply'ing them after."
         echo >&2 "Cannot [$branch_name]: You have unstaged changes."
         err=1
@@ -87,7 +87,7 @@ function refresh_running_browsers() {
     ### v1.0. 2005-03-29
     ###
 
-    # Check if Chrome is running, if so refresh 
+    # Check if Chrome is running, if so refresh
     ps -xc|grep -sq "Google Chrome" && osascript -e 'tell app "Google Chrome"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
 
     # Check if Internet Explorer is running, if so refresh
@@ -102,7 +102,7 @@ function refresh_running_browsers() {
     # Check if Safari is running, if so refresh
     #ps -xc|grep -sq Safari && osascript -e 'tell app "Safari"' -e 'activate' -e 'do JavaScript "window.location.reload();" in first document' -e 'end tell'
 
-    # Check if Camino is running, if so refresh 
+    # Check if Camino is running, if so refresh
     #ps -xc|grep -sq Camino && osascript -e 'tell app "Camino"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
 }
 
@@ -119,7 +119,7 @@ function require_branch() {
 }
 
 function run_phoenix() {
-  pushd "/usr/local/src/walmart/phoenix" > /dev/null
+  pushd "/usr/local/src/walmart/us-mweb" > /dev/null
   basename=phoenix
 
   local branch_name="$1"
@@ -256,7 +256,7 @@ function phoenix_pid_helper() {
 }
 
 function lumbar_phoenix() {
-  pushd "/usr/local/src/walmart/phoenix"> /dev/null  
+  pushd "/usr/local/src/walmart/us-mweb"> /dev/null  
 
   mkdir -p $HOME/.pids
   basename=lumbar
@@ -554,6 +554,120 @@ function apply_patch_helper() {
     done
 }
 
+function css_test() {
+    US_MWEB_CSS_TEST="/usr/local/src/walmart/us-mweb-css-test"
+    US_MWEB="/usr/local/src/walmart/us-mweb"
+    HTML_FILE="${US_MWEB}/build/dev/web/css-test.html"
+
+    pushd "${US_MWEB_CSS_TEST}" > /dev/null
+
+    SCREENSHOT_DIR="./screenshots/web_ios"
+    FAIL_DIR="./failure/web_ios"
+
+    find "${FAIL_DIR}" -name "*.fail.png" -exec rm {} \;
+    find "${FAIL_DIR}" -name "*.diff.png" -exec rm {} \;
+    if [ -f ${HTML_FILE} ]; then
+        rm $HTML_FILE
+    fi
+    touch $HTML_FILE
+
+    # Run CSS Tests
+    env PLATFORM=web ./run.sh
+
+    echo "Generating HTML file...";
+    echo -e "<!DOCTYPE html>\n<html>\n<head>\n" >> $HTML_FILE
+    echo -e "<style type="text/css">\n" >> $HTML_FILE
+    echo -e ".header {vertical-align: middle; text-align: center;}\n" >> $HTML_FILE
+    echo -e ".cell {vertical-align: top; border: 2px solid black;}\n" >> $HTML_FILE
+    echo -e ".row > .cell > img {border: 1px solid gray;}\n" >> $HTML_FILE
+    echo -e "\n" >> $HTML_FILE
+    echo -e "</style>\n" >> $HTML_FILE
+    echo -e "</head>\n<body>\n<h1>CSS-Test Page</h1>\n" >> $HTML_FILE
+    echo -e "<table style=\"border: 2px solid black;\"><tbody>\n" >> $HTML_FILE
+
+    echo -e "<tr>" >> $HTML_FILE
+    echo -e "<td><p>Baseline</p></td>" >> $HTML_FILE
+    echo -e "<td><p>Fail</p></td>" >> $HTML_FILE
+    echo -e "<td><p>Diff</p></td>" >> $HTML_FILE
+    echo -e "</tr>" >> $HTML_FILE
+
+    LIST_OF_DIRS=`find ${SCREENSHOT_DIR} -type d -maxdepth 1 ! -name 'web_ios'`
+    for DIR in $LIST_OF_DIRS
+    do
+        DIR_BASENAME=`basename ${DIR}`
+        DIR_NAME="${SCREENSHOT_DIR}/${DIR_BASENAME}"
+
+        LIST_OF_FILES=`find ${DIR_NAME} -name "*.png" -not \( -name "*diff.png" -o -name "*.fail.png" \)`
+        DIR_LEN=${#DIR_NAME}
+
+        for FILE in $LIST_OF_FILES
+        do
+            WIDTH=`identify -format "%[fx:w]" "$FILE"`;
+            HEIGHT=`identify -format "%[fx:h]" "$FILE"`;
+            IDNAME=`basename "$FILE" .png`;
+            CLEAN=${IDNAME// /-}
+
+            DIFF_FILE="${FAIL_DIR}/${DIR_BASENAME}`echo ${FILE:$DIR_LEN} | sed -e 's/\.[a-z]*$//'`.diff.png"
+            FAIL_FILE="${FAIL_DIR}/${DIR_BASENAME}`echo ${FILE:$DIR_LEN} | sed -e 's/\.[a-z]*$//'`.fail.png"
+
+            echo -e "<tr class=\"row\">" >> $HTML_FILE
+            echo -e "<td class=\"header\" colspan=\"3\"><h2>${IDNAME}</h2></td>" >> $HTML_FILE
+            echo -e "</tr>" >> $HTML_FILE
+
+            echo -e "<tr class=\"row\">" >> $HTML_FILE
+
+            echo -e "<td class=\"cell baseline\">" >> $HTML_FILE
+            echo -e "<img width=\"${WIDTH}\" height=\"${HEIGHT}\" src=\"data:image/png;base64,`base64 "${FILE}"`\" />" >> $HTML_FILE;
+            echo -e "<p>Width: ${WIDTH}px</p>" >> $HTML_FILE;
+            echo -e "<p>Height: ${HEIGHT}px</p>" >> $HTML_FILE;
+            echo -e "</td>" >> $HTML_FILE
+
+            # ----
+
+            if [ -f ${FAIL_FILE} ]; then
+                FAIL_WIDTH=`identify -format "%[fx:w]" "${FAIL_FILE}"`;
+                FAIL_HEIGHT=`identify -format "%[fx:h]" "${FAIL_FILE}"`;
+                FAIL_IDNAME=`basename "${FAIL_FILE}" .png`;
+
+                echo -e "<td class=\"cell fail\">" >> $HTML_FILE
+                echo -e "<img width=\"${FAIL_WIDTH}\" height=\"${FAIL_HEIGHT}\" src=\"data:image/png;base64,`base64 "${FAIL_FILE}"`\" />" >> $HTML_FILE;
+                echo -e "<p>Width: ${FAIL_WIDTH}px</p>" >> $HTML_FILE;
+                echo -e "<p>Height: ${FAIL_HEIGHT}px</p>" >> $HTML_FILE;
+                echo -e "</td>" >> $HTML_FILE
+            else
+                echo -e "<td class=\"cell fail empty\">" >> $HTML_FILE
+                echo -e "</td>" >> $HTML_FILE
+            fi
+
+            if [ -f ${DIFF_FILE} ]; then
+                DIFF_WIDTH=`identify -format "%[fx:w]" "${DIFF_FILE}"`;
+                DIFF_HEIGHT=`identify -format "%[fx:h]" "${DIFF_FILE}"`;
+                DIFF_IDNAME=`basename "$DIFF_FILE" .png`;
+                DIFF_CLEAN=${DIFF_IDNAME// /-}
+
+                echo -e "<td class=\"cell diff\">" >> $HTML_FILE
+                echo -e "<img width=\"${DIFF_WIDTH}\" height=\"${DIFF_HEIGHT}\" src=\"data:image/png;base64,`base64 "${DIFF_FILE}"`\" />" >> $HTML_FILE;
+                echo -e "<p>Width: ${DIFF_WIDTH}px</p>" >> $HTML_FILE;
+                echo -e "<p>Height: ${DIFF_HEIGHT}px</p>" >> $HTML_FILE;
+                echo -e "</td>" >> $HTML_FILE
+            else
+                echo -e "<td class=\"cell diff empty\">" >> $HTML_FILE
+                echo -e "</td>" >> $HTML_FILE
+            fi
+
+            # ----
+
+            echo -e "</tr>" >> $HTML_FILE
+        done
+    done
+
+    echo -e "</tbody></table>" >> $HTML_FILE;
+    echo -e "</body>\n</html>" >> $HTML_FILE;
+    echo -e "\nComplete!";
+
+    popd > /dev/null
+}
+
 counter=0;
 declare -a configs
 declare -a locations 
@@ -570,9 +684,9 @@ function build_location_and_config() {
             let counter+=1
             ;;
         phoenix)
-            locations[$counter]="/usr/local/src/walmart/phoenix"
+            locations[$counter]="/usr/local/src/walmart/us-mweb"
             configs[$counter]="Jakefile public/web/index.html js/init.js js/views/footer.js templates/footer.handlebars js/anivia-events.js config/dev.json"  
-            branch_names[$counter]="phoenix" 
+            branch_names[$counter]="phoenix"
             let counter+=1
             ;;
         *)
@@ -677,6 +791,9 @@ case "$#" in
       #echo "git rebasing..."  
       rebase_helper "$@"
       ;;  
+    css-test)
+      css_test "$@"
+      ;;
     log)
       require_branch "$@"
       #tail -f "$HOME/Library/Logs/dev/catalina-$1.log"
