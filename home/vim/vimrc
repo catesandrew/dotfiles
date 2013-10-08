@@ -991,6 +991,11 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 let g:user_zen_leader_key = '<leader>z'
 
 " }}}
+" Tern {{{
+
+let g:tern_map_keys = 1
+
+" }}}
 " Color Highlight {{{
 
 "let g:colorizer_auto_color = 1
