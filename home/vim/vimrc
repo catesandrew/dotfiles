@@ -993,7 +993,20 @@ let g:user_zen_leader_key = '<leader>z'
 " }}}
 " Tern {{{
 
-let g:tern_map_keys = 1
+let g:tern_map_keys = 0
+let g:tern_show_argument_hints = 'on_hold'
+
+nnoremap <buffer> <Leader><Leader>td  :TernDoc<CR>
+nnoremap <buffer> <Leader><Leader>tb  :TernDocBrowse<CR>
+nnoremap <buffer> <Leader><Leader>tt  :TernType<CR>
+nnoremap <buffer> <Leader><Leader>td  :TernDef<CR>
+nnoremap <buffer> <Leader><Leader>tpd :TernDefPreview<CR>
+nnoremap <buffer> <Leader><Leader>tsd :TernDefSplit<CR>
+nnoremap <buffer> <Leader><Leader>ttd :TernDefTab<CR>
+nnoremap <buffer> <Leader><Leader>tr  :TernRefs<CR>
+nnoremap <buffer> <Leader><Leader>tR  :TernRename<CR>
+
+
 
 " }}}
 " Color Highlight {{{
@@ -1258,6 +1271,7 @@ au BufEnter * call MyBufEnter()
 
 "onoremap <silent> <Leader>t      :call EasyMotion#T(0, 0)<CR>
 "onoremap <silent> <Leader>T      :call EasyMotion#T(0, 1)<CR>
+
 
 "}}}
 " Autoclose {{{
