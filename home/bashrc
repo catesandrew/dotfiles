@@ -19,7 +19,7 @@ if [ "$PS1" ]; then
     . ~/.bash/completions.sh
     . ~/.bash/prompt.sh
     . ~/.bash/functions.sh
-    
+
     #fortune
 else
 ###########################

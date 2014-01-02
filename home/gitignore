@@ -140,3 +140,7 @@ xcuserdata
 
 # WebStorm
 .idea
+
+.tern-project
+.tern-port
+configs.patch

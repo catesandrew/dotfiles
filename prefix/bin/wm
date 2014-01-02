@@ -35,16 +35,45 @@ die() {
 	exit 1
 }
 
+function start_redir_ports() {
+  local repo_name="$1"
+  local matches=`sudo ipfw list | grep '00100 fwd 127.0.0.1,8080'`
+
+  if [ -z "$matches" ]; then
+    echo "[${repo_name}]  INFO: Ports- Applying port forwarding rules."
+
+    echo "80  > 8080"
+    sudo ipfw add 100 fwd 127.0.0.1,8080 tcp from any to any 80 in > /dev/null
+
+    echo "443 > 8081"
+    sudo ipfw add 100 fwd 127.0.0.1,8081 tcp from any to any 443 in > /dev/null
+  else
+    echo "[${repo_name}]  INFO: Ports- Port forwarding rules already applied. No action taken."
+  fi
+
+}
+
+function kill_redir_ports() {
+  local repo_name="$1"
+  local matches=`sudo ipfw list | grep '00100 fwd 127.0.0.1,8080'`
+
+  if [ -z "$matches" ]; then
+    echo "[${repo_name}]  INFO: Ports- No rules to delete."
+  else
+    echo "[${repo_name}]  INFO: Ports- Port forwarding rules deleted."
+    sudo ipfw delete 100
+  fi
+}
+
 function require_clean_work_tree () {
-    local branch_name="$1"
+    local repo_name="$1"
     git rev-parse --verify HEAD >/dev/null || exit 1
     git update-index -q --ignore-submodules --refresh
     local err=0
 
     if ! git diff-files --quiet --ignore-submodules
     then
-        growlnotify -sticky -t "[$branch_name] clean work tree" -m "Cannot $1: You have unstaged changes. Think of stashing your changes and then stash apply'ing them after."
-        echo >&2 "Cannot [$branch_name]: You have unstaged changes."
+        echo >&2 "[${repo_name}] ERROR: Clean- You have unstaged changes."
         err=1
     fi
 
@@ -52,32 +81,32 @@ function require_clean_work_tree () {
     then
         if [ $err = 0 ]
         then
-            #growlnotify -sticky -t "clean work tree" -m "Cannot $1: Your index contains uncommitted changes."
-            echo >&2 "Cannot [$branch_name]: Your index contains uncommitted changes."
+            echo >&2 "[${repo_name}] ERROR: Clean- Your index contains uncommitted changes."
         else
-            #growlnotify -sticky -t "clean work tree" -m "Additionally, your index contains uncommitted changes."
-            echo >&2 "Additionally, your index contains uncommitted changes."
+            echo >&2 "[${repo_name}] ERROR: Clean- Additionally, your index contains uncommitted changes."
         fi
         err=1
     fi
 
-    if [ $err = 1 ]
-    then
+    if [ $err = 1 ]; then
         test -n "$2" && echo >&2 "$2"
         exit 1
+    #else
+        #echo "[${repo_name}]  INFO: Clean- Your index has no uncommitted changes."
     fi
 }
 
-function require_master_branch() {
-    local branch_name="$1"
+function require_branch() {
+    local repo_name="$1"
     local remote_name="${2:-master}"
     local branch_ref=`git symbolic-ref HEAD`
     branch_ref=`printf "%s" "${branch_ref##refs/heads/}"`
     if [ ! ${branch_ref} == ${remote_name} ]; then
-        growlnotify -sticky -t "[${branch_name}] require ${remote_name} branch" -m "You're not on the ${remote_name} branch. You're on branch $branch_ref. Checkout ${remote_name} branch before continuing."
-        echo "You're not on the ${remote_name} branch. You're on branch '$branch_ref'. This operation is aborting."
+        echo "[${repo_name}] ERROR: Require- You're not on the '${remote_name}' branch. You're on branch '${branch_ref}'."
         exit 1
-    fi 
+    #else
+        #echo "[${repo_name}]  INFO: Require- You're on the '${remote_name}' branch."
+    fi
 }
 
 
@@ -106,14 +135,14 @@ function refresh_running_browsers() {
     #ps -xc|grep -sq Camino && osascript -e 'tell app "Camino"' -e 'activate' -e 'tell app "System Events" to keystroke "r" using {command down}' -e 'end tell'
 }
 
-function require_branch() {
-  local branch_name="$1"
-  case "$branch_name" in
-  	phoenix|thorax|all)
+function require_repo() {
+  local repo_name="$1"
+  case "$repo_name" in
+  	mweb|core|shared|connection|carousel|mobile-hacks|history-tracker|lumbar-loader|css-test|thorax|all)
       ;;
   	*)
-  	  echo "Error: Unknown Branch [$branch_name]."
-  	  echo "$LONG_USAGE"
+  	  echo "Error: Unknown repository [$repo_name]."
+        #echo "$LONG_USAGE"
   	  exit
   esac
 }
@@ -122,56 +151,57 @@ function run_phoenix() {
   pushd "/usr/local/src/walmart/us-mweb" > /dev/null
   basename=phoenix
 
-  local branch_name="$1"
-  case "$branch_name" in
+  local repo_name="$1"
+  case "$repo_name" in
   	1)
       exec 2>&1 jake start[1] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e1 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e1 started" -m "Phoenix has started."
       echo "Jake e1 started"
       ;;
   	2)
       exec 2>&1 jake start[2] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e2 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e2 started" -m "Phoenix has started."
       echo "Jake e2 started"
       ;;
   	3)
       exec 2>&1 jake start[3] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e3 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e3 started" -m "Phoenix has started."
       echo "Jake e3 started"
       ;;
   	4)
       exec 2>&1 jake start[4] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e4 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e4 started" -m "Phoenix has started."
       echo "Jake e4 started"
       ;;
   	5)
       exec 2>&1 jake start[5] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e5 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e5 started" -m "Phoenix has started."
       echo "Jake e5 started"
       ;;
   	6)
       exec 2>&1 jake start[6] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e6 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e6 started" -m "Phoenix has started."
       echo "Jake e6 started"
       ;;
   	11)
       exec 2>&1 jake start[11] 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake e11 started" -m "Phoenix has started."    
+      #growlnotify -t "Jake e11 started" -m "Phoenix has started."
       echo "Jake e11 started"
       ;;
   	mock)
       exec 2>&1 jake startmocks 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake mocks started" -m "Phoenix has started."    
+      #growlnotify -t "Jake mocks started" -m "Phoenix has started."
       echo "Jake mocks started"
       ;;
   	prod)
-      exec 2>&1 jake startproduction 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake prod started" -m "Phoenix has started."    
+      #exec 2>&1 jake startproduction 1>$HOME/Library/Logs/dev/$basename.log &
+      exec 2>&1 jake watch 1>$HOME/Library/Logs/dev/$basename.log &
+      #growlnotify -t "Jake prod started" -m "Phoenix has started."
       echo "Jake prod started"
       ;;
   	*)
       exec 2>&1 jake start 1>$HOME/Library/Logs/dev/$basename.log &
-      #growlnotify -t "Jake dev started" -m "Phoenix has started."    
+      #growlnotify -t "Jake dev started" -m "Phoenix has started."
       echo "Jake dev started"
       ;;
   esac
@@ -233,7 +263,7 @@ function kill_phoenix() {
     IFS=$ORIGIFS
 }
 
-function status_phoenix() {  
+function status_phoenix() {
     local basename=phoenix
 
     if [ -f $HOME/.pids/$basename.pid ]; then
@@ -256,7 +286,7 @@ function phoenix_pid_helper() {
 }
 
 function lumbar_phoenix() {
-  pushd "/usr/local/src/walmart/us-mweb"> /dev/null  
+  pushd "/usr/local/src/walmart/us-mweb"> /dev/null
 
   mkdir -p $HOME/.pids
   basename=lumbar
@@ -313,50 +343,54 @@ function lumbar_phoenix() {
 }
 
 function rebase() {
-    local branch_name="$1"
+    local repo_name="$1"
     local remote_name="${2:-master}"
-    echo "wm rebase ${branch_name} on branch ${remote_name}"
-    # 1. require master branch	
-    require_master_branch ${branch_name} ${remote_name}
+    echo >&2 "[${repo_name}]  INFO: Rebase- with branch '${remote_name}'."
+    # 1. require master branch
+    require_branch ${repo_name} ${remote_name}
     # 2. require clean tree
-    require_clean_work_tree ${branch_name}
+    require_clean_work_tree ${repo_name}
     # 3. start tracking configs
-    start_tracking 
+    start_tracking
     # 4. checkthem out to remove local changes
-    discard_changes	${branch_name} ${remote_name}
+    discard_changes	${repo_name} ${remote_name}
 
     if [ ${remote_name} == 'master' ]; then
         # 5. get changes from upstream
         git pull origin ${remote_name}
         # 6. Rebase our configs branch
-        git checkout configs
+        git checkout configs 2>/dev/null
         git rebase ${remote_name}
-    fi 
+    fi
 
     # 7. Create a new configs patch
-    git checkout ${remote_name}
-    format_patch ${branch_name} ${remote_name}
+    git checkout ${remote_name} 2>/dev/null
+    format_patch ${repo_name} ${remote_name}
     # 8. apply-patch
-    apply_patch ${branch_name} ${remote_name}
+    apply_patch ${repo_name} ${remote_name}
     # 9. stop tracking the files
-    stop_tracking 
+    stop_tracking
 
+    #10. bower update
+    if [ -f bower.json ]; then
+        bower --quiet update
+    fi
 
-    growlnotify -t "[${branch_name}] git pull and rebase" -m "The git pull and rebase process has completed, including patching the local config files."
+    echo >&2 "[${repo_name}]  INFO: Rebase- The git pull and rebase has completed succesfully."
 }
 
 function rebase_helper() {
     local i=0
     local l=${#locations[@]}
-    local branch_name
+    local repo_name
     local location
     local config
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
-        config=${configs[$i]} 
-        branch_name=${branch_names[$i]} 
+        location=${locations[$i]}
+        config=${configs[$i]}
+        repo_name=${repo_names[$i]}
 
         pushd $location > /dev/null
         if [ "$config" == "" ]; then
@@ -365,15 +399,15 @@ function rebase_helper() {
             files=$(ls $config | tr '\n' ' ')
         fi
 
-        rebase ${branch_name} $2
+        rebase ${repo_name} $2
 
         popd > /dev/null
         let i+=1
-    done  
-}   
+    done
+}
 
 function start_tracking() {
-    local branch_name="$1"               
+    local repo_name="$1"
     local remote_name="${2:-master}"
 
     local count=${#files[@]}
@@ -381,7 +415,7 @@ function start_tracking() {
         for file in $files
         do
             git update-index --no-assume-unchanged $file > /dev/null
-        done  
+        done
     fi
 }
 
@@ -390,13 +424,13 @@ function start_tracking_helper() {
     local l=${#locations[@]}
     local location
     local config
-    local branch_name
+    local repo_name
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
-        config=${configs[$i]} 
-        branch_name=${branch_names[$i]}
+        location=${locations[$i]}
+        config=${configs[$i]}
+        repo_name=${repo_names[$i]}
 
         pushd $location > /dev/null
         if [ "$config" == "" ]; then
@@ -405,7 +439,7 @@ function start_tracking_helper() {
             files=$(ls $config | tr '\n' ' ')
         fi
 
-        start_tracking ${branch_name} $2
+        start_tracking ${repo_name} $2
 
         popd > /dev/null
         let i+=1
@@ -413,7 +447,7 @@ function start_tracking_helper() {
 }
 
 function stop_tracking() {
-    local branch_name="$1"               
+    local repo_name="$1"
     local remote_name="${2:-master}"
 
     local count=${#files[@]}
@@ -429,13 +463,13 @@ function stop_tracking_helper() {
     local i=0
     local l=${#locations[@]}
     local location
-    local branch_name
+    local repo_name
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
+        location=${locations[$i]}
         config=${configs[$i]}
-        branch_name=${branch_names[$i]}
+        repo_name=${repo_names[$i]}
 
         pushd $location > /dev/null
         if [ "$config" == "" ]; then
@@ -444,18 +478,18 @@ function stop_tracking_helper() {
             files=$(ls $config | tr '\n' ' ')
         fi
 
-        stop_tracking ${branch_name} $2
+        stop_tracking ${repo_name} $2
 
         popd > /dev/null
         let i+=1
-    done 
+    done
 }
 
 function discard_changes() {
-    local branch_name="$1"               
+    local repo_name="$1"
     local remote_name="${2:-master}"
 
-    require_master_branch ${branch_name} ${remote_name}
+    require_branch ${repo_name} ${remote_name}
 
     local count=${#files[@]}
     if [ ! $count == 0 ]; then
@@ -470,13 +504,13 @@ function discard_helper() {
     local i=0
     local l=${#locations[@]}
     local location
-    local branch_name
+    local repo_name
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
-        config=${configs[$i]} 
-        branch_name=${branch_names[$i]}
+        location=${locations[$i]}
+        config=${configs[$i]}
+        repo_name=${repo_names[$i]}
 
         pushd $location > /dev/null
         if [ "$config" == "" ]; then
@@ -485,7 +519,7 @@ function discard_helper() {
             files=$(ls $config | tr '\n' ' ')
         fi
 
-        discard_changes ${branch_name} $2
+        discard_changes ${repo_name} $2
 
         popd > /dev/null
         let i+=1
@@ -493,10 +527,10 @@ function discard_helper() {
 }
 
 function format_patch() {
-    local branch_name="$1"               
+    local repo_name="$1"
     local remote_name="${2:-master}"
-    require_master_branch ${branch_name} ${remote_name}
-    require_clean_work_tree ${branch_name}
+    require_branch ${repo_name} ${remote_name}
+    require_clean_work_tree ${repo_name}
 
     git checkout configs 2> /dev/null
     git format-patch ${remote_name} --stdout > configs.patch
@@ -507,48 +541,55 @@ function format_patch_helper() {
     local i=0
     local l=${#locations[@]}
     local location
-    local branch_name
+    local repo_name
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
-        branch_name=${branch_names[$i]}
+        location=${locations[$i]}
+        repo_name=${repo_names[$i]}
         pushd $location > /dev/null
-        format_patch ${branch_name} $2
+        format_patch ${repo_name} $2
         popd > /dev/null
         let i+=1
-    done  
+    done
 }
 
 function apply_patch() {
-    local branch_name="$1"               
+    local repo_name="$1"
     local remote_name="${2:-master}"
-    require_master_branch ${branch_name} ${remote_name}
-    require_clean_work_tree ${branch_name}
+    require_branch ${repo_name} ${remote_name}
+    require_clean_work_tree ${repo_name}
 
-    # First, take a look at what changes are in the patch. 
-    # You can do this easily with git apply
-    git apply --stat configs.patch
-    if $(git apply --check configs.patch 2>/dev/null); then :; else
-        echo "Could not apply patch cleanly."
-        exit 1
+    local actual_size=$(du configs.patch | cut -f 1)
+    if [ $actual_size -gt 0 ]; then
+        # First, take a look at what changes are in the patch.
+        # You can do this easily with git apply
+        echo "[${repo_name}]  INFO: Apply- `git apply --stat configs.patch 2>/dev/null`"
+        if $(git apply --check configs.patch 2>/dev/null); then :; else
+            echo "[${repo_name}] ERROR: Apply- Could not apply patch cleanly."
+            exit 1
+        fi
+        git apply configs.patch
+        rm configs.patch
+    else
+        echo "[${repo_name}]  INFO: Apply- configs.patch file size is zero."
+        rm configs.patch
     fi
-    git apply configs.patch
-    rm configs.patch
+
 }
 
 function apply_patch_helper() {
     local i=0
     local l=${#locations[@]}
     local location
-    local branch_name
+    local repo_name
 
     while [ "$i" -lt "$l" ]
     do
-        location=${locations[$i]} 
-        branch_name=${branch_names[$i]}
+        location=${locations[$i]}
+        repo_name=${repo_names[$i]}
         pushd $location > /dev/null
-        apply_patch ${branch_name} $2
+        apply_patch ${repo_name} $2
         popd > /dev/null
         let i+=1
     done
@@ -670,39 +711,95 @@ function css_test() {
 
 counter=0;
 declare -a configs
-declare -a locations 
-declare -a branch_names
-declare -a files  
+declare -a locations
+declare -a repo_names
+declare -a files
 
 function build_location_and_config() {
-    local branch="$1"
-    case "$branch" in
-        thorax)
-            locations[$counter]="/usr/local/src/walmart/thorax"
+    local repo="$1"
+    case "$repo" in
+        mweb)
+            locations[$counter]="/usr/local/src/walmart/us-mweb"
             configs[$counter]=".gitignore"
-            branch_names[$counter]="thorax"
+            repo_names[$counter]="mweb"
             let counter+=1
             ;;
-        phoenix)
-            locations[$counter]="/usr/local/src/walmart/us-mweb"
-            configs[$counter]="Jakefile public/web/index.html js/init.js js/views/footer.js templates/footer.handlebars js/anivia-events.js config/dev.json"  
-            branch_names[$counter]="phoenix"
+        core)
+            locations[$counter]="/usr/local/src/walmart/us-mweb-core"
+            configs[$counter]=""
+            repo_names[$counter]="core"
+            let counter+=1
+            ;;
+        shared)
+            locations[$counter]="/usr/local/src/walmart/phoenix-shared"
+            configs[$counter]=""
+            repo_names[$counter]="shared"
+            let counter+=1
+            ;;
+        connection)
+            locations[$counter]="/usr/local/src/walmart/phoenix-connection"
+            configs[$counter]=""
+            repo_names[$counter]="connection"
+            let counter+=1
+            ;;
+        carousel)
+            locations[$counter]="/usr/local/src/walmart/phoenix-carousel"
+            configs[$counter]=""
+            repo_names[$counter]="carousel"
+            let counter+=1
+            ;;
+        mobile-hacks)
+            locations[$counter]="/usr/local/src/walmart/phoenix-mobile-hacks"
+            configs[$counter]=""
+            repo_names[$counter]="mobile-hacks"
+            let counter+=1
+            ;;
+        history-tracker)
+            locations[$counter]="/usr/local/src/walmart/backbone-historytracker"
+            configs[$counter]=""
+            repo_names[$counter]="history-tracker"
+            let counter+=1
+            ;;
+        lumbar-loader)
+            locations[$counter]="/usr/local/src/walmart/lumbar-loader"
+            configs[$counter]=""
+            repo_names[$counter]="lumbar-loader"
+            let counter+=1
+            ;;
+        css-test)
+            locations[$counter]="/usr/local/src/walmart/us-mweb-css-test"
+            configs[$counter]=""
+            repo_names[$counter]="css-test"
+            let counter+=1
+            ;;
+        thorax)
+            locations[$counter]="/usr/local/src/walmart/thorax"
+            configs[$counter]=""
+            repo_names[$counter]="thorax"
             let counter+=1
             ;;
         *)
-            echo "Non supported branch selected"
+            echo "Non supported repo selected"
             exit 1
             usage ;;
     esac
 }
 
 function build_location_and_config_helper() {
-    local branch="$1"
-    if [ $branch == "all" ]; then
+    local repo="$1"
+    if [ $repo == "all" ]; then
+        build_location_and_config "mweb"
+        build_location_and_config "core"
+        build_location_and_config "shared"
+        build_location_and_config "connection"
+        build_location_and_config "carousel"
+        build_location_and_config "mobile-hacks"
+        build_location_and_config "history-tracker"
+        build_location_and_config "lumbar-loader"
+        build_location_and_config "css-test"
         build_location_and_config "thorax"
-        build_location_and_config "phoenix"
     else
-        build_location_and_config "$branch"
+        build_location_and_config "$repo"
     fi
 }
 
@@ -732,23 +829,24 @@ case "$#" in
 *)
     cmd="$1"
     shift
-    
+
     case "$cmd" in
     help)
       nf -h ;;
     run)
-      #require_branch "$@"
+      #require_repo "$@"
       run_phoenix "$@"
       ;;
     stop)
-      #require_branch "$@"
+      #require_repo "$@"
       stop_phoenix "$@"
       ;;
     lumbar)
+      #build_location_and_config_helper "mweb"
       lumbar_phoenix "$@"
       ;;
     kill)
-      kill_phoenix "$@" 
+      kill_phoenix "$@"
       ;;
     stomp)
       kill_livereload
@@ -757,58 +855,60 @@ case "$#" in
       status_phoenix "$@"
       ;;
     start-track)
-      echo "start tracking..."
-      require_branch "$@"
+      require_repo "$@"
       build_location_and_config_helper "$@"
       start_tracking_helper "$@"
       ;;
     stop-track)
-      echo "stop tracking..."
-      require_branch "$@"
+      require_repo "$@"
       build_location_and_config_helper "$@"
       stop_tracking_helper "$@"
       ;;
     format-patch)
-      echo "formating configs.patch..."
-      require_branch "$@"
+      require_repo "$@"
       build_location_and_config_helper "$@"
       format_patch_helper "$@"
       ;;
     apply-patch)
-      echo "applying configs.patch..."
       build_location_and_config_helper "$@"
       apply_patch_helper "$@"
       ;;
     discard)
-      echo "discarding..."
-      require_branch "$@"
+      require_repo "$@"
       build_location_and_config_helper "$@"
       discard_helper "$@"
-      ;;  
+      ;;
     rebase)
-      require_branch "$@"
-      build_location_and_config_helper "$@"     
-      #echo "git rebasing..."  
+      require_repo "$@"
+      build_location_and_config_helper "$@"
       rebase_helper "$@"
-      ;;  
+      ;;
     css-test)
       css_test "$@"
       ;;
+    redir-stop)
+      #require_repo "$@"
+      kill_redir_ports "$@"
+      ;;
+    redir-start)
+      #require_branch "$@"
+      start_redir_ports "$@"
+      ;;
     log)
-      require_branch "$@"
+      require_repo "$@"
       #tail -f "$HOME/Library/Logs/dev/catalina-$1.log"
       # http://code.google.com/p/log4tailer/
       log4tail --throttle 0.1 $HOME/Library/Logs/dev/catalina-$1.log
-      ;; 
+      ;;
     phoenix_pid)
       phoenix_pid_helper "$@"
-      ;; 
+      ;;
     refresh)
       echo "refreshing running browsers..."
       refresh_running_browsers "$@"
       ;;
     *)
-      usage 
+      usage
       ;;
     esac
 esac

@@ -52,3 +52,11 @@ set bell-style visible
 
 # Let me have core dumps
 #ulimit -c unlimited
+ulimit -n 2048
+
+export PERL_LOCAL_LIB_ROOT="/Users/andrew/perl5:$PERL_LOCAL_LIB_ROOT";
+export PERL_MB_OPT="--install_base "/Users/andrew/perl5"";
+export PERL_MM_OPT="INSTALL_BASE=/Users/andrew/perl5";
+export PERL5LIB="/Users/andrew/perl5/lib/perl5:$PERL5LIB";
+export PATH="/Users/andrew/perl5/bin:$PATH";
+

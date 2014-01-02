@@ -107,7 +107,7 @@ case "$#" in
                 java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --help
                 ;;
             create-moweb-bug)
-                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "Lobster" --affectsVersions "Lobster" --environment "" --components "" --summary "Trying from command line"
+                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "New York Strip" --affectsVersions "New York Strip" --environment "" --components "" --summary "Trying from command line"
                 ;;
             create-moweb-task)
                 jira --action createIssue --project "Mobile Web" --type "Task" --summary "Trying from command line"

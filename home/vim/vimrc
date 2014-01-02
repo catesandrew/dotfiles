@@ -276,6 +276,14 @@ endif
 " }}}
 " Useful functions -------------------------------------------------------- {{{
 
+command! CleanEmptyBuffers call CleanEmptyBuffers()
+function! CleanEmptyBuffers()
+  let buffers = filter(range(0, bufnr('$')), 'buflisted(v:val) && empty(bufname(v:val)) && bufwinnr(v:val)<0')
+  if !empty(buffers)
+    exe 'bw '.join(buffers, ' ')
+  endif
+endfunction
+
 " The following beast is something i didn't write... it will return the
 " syntax highlighting group that the current "thing" under the cursor
 " belongs to -- very useful for figuring out what to change as far as
@@ -989,6 +997,12 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " ZenCoding {{{
 
 let g:user_zen_leader_key = '<leader>z'
+
+" }}}
+" Session {{{
+
+let g:session_autosave = 'yes'
+let g:session_autoload = 'no'
 
 " }}}
 " Tern {{{

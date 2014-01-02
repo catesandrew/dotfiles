@@ -1,22 +1,23 @@
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 #export EDITOR='mate -w'
-export M2_HOME=/usr/local/apache-maven/apache-maven-3.0.5
-export M2=$M2_HOME/bin
-export MAVEN_OPTS="-Xms256m -Xmx512m"
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/src/android-sdk/tools:/usr/local/src/android-sdk/platform-tools:$M2:$PATH"
+#export M2_HOME=/usr/local/apache-maven/apache-maven-3.0.5
+#export M2=$M2_HOME/bin
+#export MAVEN_OPTS="-Xms256m -Xmx512m"
 export JAVA_HOME="`/usr/libexec/java_home`"
-#export NODE_PATH="/usr/local/lib/jsctags:$NODE_PATH"
-export NODE_PATH="/usr/local/lib/jsctags"
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 export HTML_TIDY=$HOME/.tidyrc
 export TLSOURCE=en TLTARGET=es
-alias vim='/Applications/MacVim.app/Contents/MacOS/Vim'
-#alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-#alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
-#alias rcanary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --remote-debugging-port=9222"
 export PYTHONPATH=/Library/Python/2.7/site-packages
 export LC_CTYPE="utf-8"
-ulimit -n 1024
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+export PERL_LOCAL_LIB_ROOT="$HOME/perl5:$PERL_LOCAL_LIB_ROOT";
+export PERL_MB_OPT="--install_base "/Users/andrew/perl5"";
+export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
+export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB";
+export PATH="$HOME/perl5/bin:/usr/local/bin:/usr/local/sbin:/usr/local/rvm/bin:$PATH"
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a

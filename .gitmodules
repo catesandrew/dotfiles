@@ -208,3 +208,6 @@
 [submodule "home/vim/bundle/tern_for_vim"]
 	path = home/vim/bundle/tern_for_vim
 	url = https://github.com/marijnh/tern_for_vim.git
+[submodule "home/vim/bundle/vim-session"]
+	path = home/vim/bundle/vim-session
+	url = git@github.com:xolox/vim-session.git
