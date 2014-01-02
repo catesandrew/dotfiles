@@ -1299,6 +1299,11 @@ let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo',
 
 let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
 let g:org_debug = 1
+" }}}
+" Rooter{{{
+
+let g:rooter_patterns = ['Jakefile.js', 'Rakefile', 'Gruntfile.js', 'bower.json', 'package.json', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
+let g:rooter_use_lcd = 1
 
 " }}}
 " Fugitive {{{
