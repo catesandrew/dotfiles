@@ -2,6 +2,7 @@
 --ignore-dir=\.git
 --ignore-dir=node_modules
 --ignore-dir=test_components
+--ignore-dir=components/
 --type-add
 js=.coffee
 --type-add
