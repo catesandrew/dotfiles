@@ -1,15 +1,66 @@
 #!/bin/bash
+
+PROJECT=SWEP
+JIRA_CLI="java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.7.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS}"
 USAGE='[help|title|html2md]'
 
 USAGE='[help|title|html2md] [<moweb-id>]'
 LONG_USAGE='jira help
         Print this long help message
-jira title
+
+title
         Copy jira ticket title to clipboard
-jira html2md
+
+html2md
         Export jira ticket into markdown format
-jira cli-help
+
+cli-help
         Print the long jira cli official help message
+
+add-bug
+        Create a bug.
+
+add-task
+        Creaet a task.
+
+            Task is the designation for changes required to support an
+            Enhancement. Task requires a value for Original Estimate and Time
+            Spent before it can be resolved. Information documented in a Task
+            usually does not contribute directly to product documentation.
+
+add-enhancement
+        Create an enhancement.
+
+            Enhancement is the designation for an issue which describes an
+            improvement in product functionality or appearance.
+
+            An Enhancement contains the information used for product
+            documentation such as Release Bulletin, User Manuals and
+            Configuration Manuals.
+
+            Enhancements which involve multiple sub tasks/enhancements should
+            be identified as an Enhancement Collector or Master Task. (Note
+            - This may be a way to discern the effort which goes into
+            analysis/design from that which goes into development.)
+
+add-master-enhancement
+        Create a master enhancement
+
+list-components
+        List available components
+
+list-versions
+        List available versions
+
+Notes
+        All documents which are related to the enhancement/task must be
+        referenced or linked to the Jira task. More comprehensive
+        enhancements may require documentation in the iBASEt wiki.
+
+        Reported issue has been Fixed/Delivered
+            If this is an Enhancement, resolve it as Delivered.
+            If this is a bug, resolve it as Fixed.
+
 '
 
 die() {
@@ -21,25 +72,25 @@ function title_helper() {
     local OUT_HTML="jira-${1}.html"
 
     if [ -z "${JIRA_PASS}" ]; then echo "You need to set your username and password in the script."; exit 1; fi
-    wget -q -O .login.html https://wmobile.atlassian.net/rest/gadget/1.0/login --post-data="os_username=${JIRA_USER}&os_password=${JIRA_PASS}" --no-check-certificate --save-cookies=.cookies.txt --keep-session-cookies --referer https://wmobile.atlassian.net/
+    wget -q -O .login.html ${JIRA_SERVER}/rest/gadget/1.0/login --post-data="os_username=${JIRA_USER}&os_password=${JIRA_PASS}" --no-check-certificate --save-cookies=.cookies.txt --keep-session-cookies --referer ${JIRA_SERVER}
 
-    wget -q -O - "https://wmobile.atlassian.net/browse/MOWEB-$1" --no-check-certificate --load-cookies=.cookies.txt --keep-session-cookies --referer https://wmobile.atlassian.net/ > "${OUT_HTML}"
+    wget -q -O - "${JIRA_SERVER}/browse/SWEP-$1" --no-check-certificate --load-cookies=.cookies.txt --keep-session-cookies --referer ${JIRA_SERVER} > "${OUT_HTML}"
 
     #node.io file_query "${OUT_HTML}" h1#summary-val | pbcopy
-    local TITLE=`node.io file_query "${OUT_HTML}" h1#summary-val`
+    local TITLE=`node.io -s file_query "${OUT_HTML}" h1#summary-val`
     TITLE=`echo ${TITLE} | sed s/\"/\'/g`
-    #echo "\"${TITLE} - ${1}\"" | pbcopy
-    echo "[MOWEB-${1}](https://wmobile.atlassian.net/browse/MOWEB-${1} \"${TITLE}\")" | pbcopy
+    echo "Found: ${1} - \"${TITLE}\""
+    echo "[SWEP-${1}](${JIRA_SERVER}/browse/SWEP-${1} \"${TITLE}\")" | pbcopy
 
     rm .login.html; rm .cookies.txt; rm "${OUT_HTML}"
 }
 
 function html2md_helper() {
     if [ -z "${JIRA_PASS}" ]; then echo "You need to set your username and password in the script."; exit 1; fi
-    wget -q -O .login.html https://wmobile.atlassian.net/rest/gadget/1.0/login --post-data="os_username=${JIRA_USER}&os_password=${JIRA_PASS}" --no-check-certificate --save-cookies=.cookies.txt --keep-session-cookies --referer https://wmobile.atlassian.net/
+    wget -q -O .login.html ${JIRA_SERVER}/rest/gadget/1.0/login --post-data="os_username=${JIRA_USER}&os_password=${JIRA_PASS}" --no-check-certificate --save-cookies=.cookies.txt --keep-session-cookies --referer ${JIRA_SERVER}
 
     #grep "Image Validation" .login.html >/dev/null && echo "Error: You need to log out/in in a web browser" && exit 1
-    wget -q -O - "https://wmobile.atlassian.net/browse/MOWEB-$1" --no-check-certificate --load-cookies=.cookies.txt --keep-session-cookies --referer https://wmobile.atlassian.net/ > out.txt
+    wget -q -O - "${JIRA_SERVER}/browse/SWEP-$1" --no-check-certificate --load-cookies=.cookies.txt --keep-session-cookies --referer ${JIRA_SERVER} > out.txt
 
     #TEXT=`cat out.txt | grep "Generated String:" | cut -f 2 -d : | cut -f 1 -d "<" | tr -d [:blank:]`
     #SHIFT=`cat out.txt | grep "Generated String:" | cut -f 3 -d : | cut -f 1 -d "<" | tr -d [:blank:]`
@@ -104,26 +155,44 @@ case "$#" in
                 html2md_helper "$@"
                 ;;
             cli-help)
-                java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --help
+                echo `${JIRA_CLI} --help`
                 ;;
-            create-moweb-bug)
-                jira --action createIssue --project "Mobile Web" --type "Bug" --fixVersions "New York Strip" --affectsVersions "New York Strip" --environment "" --components "" --summary "Trying from command line"
+            add-bug)
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Bug" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --priority "Medium" --environment "" --components "" --summary "Bug Uncaught TypeError: ..."`
+                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                echo "Bug created: ${RESULT}"
+                python -mwebbrowser ${RESULT}
                 ;;
-            create-moweb-task)
-                jira --action createIssue --project "Mobile Web" --type "Task" --summary "Trying from command line"
+            add-task)
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Task ..."`
+                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                echo "Task created: ${RESULT}"
+                python -mwebbrowser ${RESULT}
                 ;;
-            create-sub-story)
-                jira --action createIssue --parent "MOWEB-2417" --project "Mobile Web" --type "Story Task" --fixVersions "Lobster" --affectsVersions "Lobster" --components "" --labels "" --summary "Summary: " --description "Description: "
+            add-enhancement)
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
+                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                echo "Enhancement created: ${RESULT}"
+                python -mwebbrowser ${RESULT}
                 ;;
-            create-serv-bug)
-                jira --action createIssue --project "Services & Infrastructure" --type "Bug" --fixVersions "" --affectsVersions "Backlog" --labels "MOWEB" --components "" --summary "Trying from command line"
+            add-master-enhancement)
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --parent "${PROJECT}-" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                echo "Master Enhancement created: ${RESULT}"
+                python -mwebbrowser ${RESULT}
                 ;;
-            create-serv-task)
-                jira --action createIssue --project "Services & Infrastructure" --type "Task" --summary "Trying from command line"
+            delete-issue)
+                echo `${JIRA_CLI} --action deleteIssue --issue "${PROJECT}-"`
                 ;;
+            list-components)
+                echo `${JIRA_CLI} --action getComponentList --project "${PROJECT}"`
+                ;;
+            list-versions)
+                echo `${JIRA_CLI} --action getVersionList --project "${PROJECT}"`
+                ;;
+
             *)
-                java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.0.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS} "${@}" 
+                `${JIRA_CLI} "${@}"`
                 ;;
         esac
 esac
-
