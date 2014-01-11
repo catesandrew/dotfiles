@@ -18,31 +18,61 @@
 #alias head='head -n $((${LINES:-12}-2))' #as many as possible without scrolling
 #alias tail='tail -n $((${LINES:-12}-2)) -s.1' #Likewise, also more responsive -f
 
-alias ll='ls -l'
-alias la='ls -A'
+# cdf: cd to the directory in the Finder's front window
+alias cdf='cd "$(/usr/local/bin/posd)"'
+
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
 
-# enable directory colors
-#eval `dircolors`
-#alias ls='ls --color=auto '
+# Allow aliases to be with sudo
+alias sudo="sudo "
 
 # misc
 alias ..="cd .."        #go to parent dir
 alias ...="cd ../.."    #go to grandparent dir
+alias ~="cd ~"
 alias -- -="cd -"       #go to previous dir
+
+# List dir contents aliases
+# ref: http://ss64.com/osx/ls.html
+# Long form no user group, color
+alias l="ls -oG"
+# Order by last modified, long form no user group, color
+alias lt="ls -toG"
+# List all except . and ..., color, mark file types, long form no user group, file size
+alias la="ls -AGFoh"
+# List all except . and ..., color, mark file types, long form no use group, order by last modified, file size
+alias lat="ls -AGFoth"
+
 alias l.='ls -d .*'     #list hidden files
 alias ll='ls -lhrt'     #extra info compared to "l"
 alias lld='ls -lUd */'  #list directories
 alias cls="clear"
 
-# GREP_COLOR=bright yellow on black bg.
-# use GREP_COLOR=7 to highlight whitespace on black terminals
-# LANG=C for speed. See also: http://www.pixelbeat.org/scripts/findrepo
-#alias grep='GREP_COLOR="1;33;40" LANG=C grep --color=auto'
+# Concatenate and print content of files (add line numbers)
+alias catn="cat -n"
 
-# I hate noise
-set bell-style visible
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en1"
+
+# Copy my public key to the pasteboard
+alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | printf '=> Public key copied to pasteboard.\n'"
+
+# Flush DNS cache
+alias flushdns="dscacheutil -flushcache"
+
+# Empty the Trash on all mounted volumes and the main HDD
+# Also, clear Apple’s System Logs to improve shell startup speed
+alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
+
+# Show/hide hidden files in Finder
+alias showdotfiles="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hidedotfiles="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+# Hide/show all desktop icons (useful when presenting)
+alias showdeskicons="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+alias hidedeskicons="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
 
 # Tell less not to beep and also display colours
 #export LESS="-QR"
@@ -53,10 +83,4 @@ set bell-style visible
 # Let me have core dumps
 #ulimit -c unlimited
 ulimit -n 2048
-
-export PERL_LOCAL_LIB_ROOT="/Users/andrew/perl5:$PERL_LOCAL_LIB_ROOT";
-export PERL_MB_OPT="--install_base "/Users/andrew/perl5"";
-export PERL_MM_OPT="INSTALL_BASE=/Users/andrew/perl5";
-export PERL5LIB="/Users/andrew/perl5/lib/perl5:$PERL5LIB";
-export PATH="/Users/andrew/perl5/bin:$PATH";
 

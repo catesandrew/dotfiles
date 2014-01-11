@@ -67,6 +67,9 @@ bind -m emacs '"\ev": vi-editing-mode'
 ## Specify vi editing mode
 set -o vi
 
+# I hate noise
+set bell-style visible
+
 # The internal command will return focus directly to the terminal after
 # the commit message is saved and quit. It's a small optimization,
 # but a nice one, I find. (Tip originally found here:
@@ -77,14 +80,48 @@ export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
 # Note debian/ubuntu users need to install the ncurses-term package for this
 # Note this should be set in ~/.profile for Fedora startup scripts to
 # setup LS_COLORS correctly.
-export TERM=xterm-256color
+if [[ $COLORTERM = gnome-* && $TERM = xterm ]]  && infocmp gnome-256color >/dev/null 2>&1; then
+    export TERM=gnome-256color
+elif infocmp xterm-256color >/dev/null 2>&1; then
+    export TERM=xterm-256color
+fi
+
+# Autocorrect typos in path names when using `cd`
+shopt -s cdspell
+
+# Check the window size after each command and, if necessary, update the values
+# of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Append to the Bash history file, rather than overwriting it
+shopt -s histappend
+
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
 
 # Don't store duplicate adjacent items in the history
 # HISTCONTROL=ignoreboth
 
-# Larger bash history (default is 500)
+# Ignore duplicate commands in the history
+export HISTCONTROL=ignoredups
+
+# Increase the maximum number of lines contained in the history file
+# (default is 500)
 export HISTFILESIZE=10000
+
+# Increase the maximum number of commands to remember
+# (default is 500)
 export HISTSIZE=10000
+
+# Make some commands not show up in history
+export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
+
+# Don't clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Export PhantomJS bin location (be explicit in case Homebrew is not installed
+# in the default location)
+#export PHANTOMJS_BIN="/usr/local/bin/phantomjs"
 
 if [ -f ~/.bashrc ]; then
   source ~/.bashrc

@@ -6,19 +6,24 @@
 
 # Start an HTTP server from a directory, optionally specifying the port
 function server() {
+    # Get port (if specified)
     local port="${1:-8000}"
+
+    # Open in the browser
     open "http://localhost:${port}/"
-    python -m SimpleHTTPServer "$port"
+    #python -m SimpleHTTPServer "$port"
+
+    # Redefining the default content-type to text/plain instead of the default
+    # application/octet-stream allows "unknown" files to be viewable in-browser
+    # as text instead of being downloaded.
+    #
+    # Unfortunately, "python -m SimpleHTTPServer" doesn't allow you to redefine
+    # the default content-type, but the SimpleHTTPServer module can be executed
+    # manually with just a few lines of code.
+    python -c $'import SimpleHTTPServer;\nSimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map[""] = "text/plain";\nSimpleHTTPServer.test();' "$port"
 }
 
-# moved this to a shell script
-# you can get it from http://www.pablotron.org/downloads/google
-#function google() { TF=/tmp/wget-"$USER"-"$RANDOM".html; wget -O $TF -q http://www.google.com/search?q=`echo $1|sed 's/ /+/g'`; perl -nle 'if (/href=/i) { $t=""; $u=""; /<A HREF=(.*?)>(.*?)<\/A>/; $t=$2; $u=$1; if ($t && $u && $t !~ /^(<IMG|Cached)/ && $u !~ /^\//) { $c++; $t =~ s/<\/?b>//gi; print "$c. \"$t\":\n    $u"; } }' < $TF; rm $TF; }
-
 function growl() { echo -e $'\e]9;'${1}'\007' ; return  ; }
-
-# cdf: cd to the directory in the Finder's front window
-alias cdf='cd "$(/usr/local/bin/posd)"'
 
 # posfind: search the directory frontmost in the Finder
 function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
@@ -42,10 +47,8 @@ function killtom {
 		echo "Tom is dead. Killed process $CATALINA_PID"
 	else
 		echo "Tom is not on."
-	fi	
+	fi
 }
-
-export LG_BROWSER LG_PREFIX
 
 function brainyquote {
   curl --silent http://www.brainyquote.com | egrep '(span class="body")|(span class="bodybold")' | sed -n '6p; 7p; ' | sed ' s/<[a-z0-9=."/ ]*>//g'
@@ -53,21 +56,20 @@ function brainyquote {
 
 function quoteoftheday {
   echo `curl --silent http://www.quotedb.com/quote/quote.php?action=quote_of_the_day_rss | awk 'NR==23' | sed -e 's/<[^>]*>//g'`
-  echo `curl --silent http://www.quotedb.com/quote/quote.php?action=quote_of_the_day_rss | awk 'NR==22' | sed -e 's/<[^>]*>//g'`
 }
 
 # Image width
-width () {
+function width () {
   echo $(sips -g pixelWidth $1 | grep -oE "[[:digit:]]{1,}$")
 }
 
 # Image height
-height () {
+function height () {
   echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")
 }
 
 # Image width
-wh () {
+function wh () {
   width=`identify -format "%[fx:w]" "$1"`;
   height=`identify -format "%[fx:h]" "$1"`;
   echo "width x height = $width x $height"
@@ -77,6 +79,34 @@ wh () {
 function diffall() {
     for name in $(git diff --name-only $1); do git difftool $1 $name & done
 }
+
+# Recursively delete files that match a certain pattern
+# (by default delete all `.DS_Store` files)
+function cleanup() {
+    local q="${1:-*.DS_Store}"
+    find . -type f -name "$q" -ls -delete
+}
+
+# Create a data URI from a file and copy it to the pasteboard
+function datauri() {
+    local mimeType=$(file -b --mime-type "$1")
+    if [[ $mimeType == text/* ]]; then
+        mimeType="${mimeType};charset=utf-8"
+    fi
+    printf "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')" | pbcopy | printf "=> data URI copied to pasteboard.\n"
+}
+
+# Compare original and gzipped file size
+function gz() {
+    local origsize=$(wc -c < "$1")
+    local gzipsize=$(gzip -c "$1" | wc -c)
+    local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l)
+
+    printf "orig: %d bytes\n" "$origsize"
+    printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
+}
+
+
 
 ##################################################
 # Fancy PWD display function

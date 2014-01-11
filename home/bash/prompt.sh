@@ -67,33 +67,9 @@ PS1="$XTITLE""$C_USER""\u""$C_AMP""@""\
 $C_HOST""\h""$C_COLON"":\
 $C_PWD""\W""$C_GT"">""$NOTHING "
 
-# iTerm Tab and Title Customization and prompt customization
-
-# Put the string " [bash]   hostname::/full/directory/path"
-# in the title bar using the command sequence
-# \[\e]2;[bash]   \h::\]$PWD\[\a\]
-
-# Put the penultimate and current directory 
-# in the iterm tab
-# \[\e]1;\]$(basename $(dirname $PWD))/\W\[\a\]
-
-# Make a simple command-line prompt:  bash-$
-
-#PS1=$'\[\e]2;\h::\]$PWD\[\a\]\[\e]1;\]$(basename "$(dirname "$PWD")")/\W\[\a\]'$PS1
-
-bash_prompt_old() {
-#  PS1="$XTITLE""$C_USER""\u""$C_AMP""@""$C_HOST""\h""$C_COLON"":""$C_PWD""\$NEW_PWD""$C_GT"">""$NOTHING "
-  #PS1=$'\[\e]2;\h::\]$PWD\[\a\]\[\e]1;\]$(basename "$(dirname "$PWD")")/\W\[\a\]'$PS1
-    PS1="$XTITLE""$C_USER""\u""$C_COLON"":""\$(__git_ps1 '(%s)')""$C_AMP""@""$C_HOST""\h""$C_COLON"":""$C_PWD""\$NEW_PWD""$C_GT"">""$NOTHING " 
-}
-
 # Sexy Bash Prompt, inspired by "Extravagant Zsh Prompt"
 # Screenshot: http://img.gf3.ca/d54942f474256ec26a49893681c49b5a.png
 # A big thanks to \amethyst on Freenode
-
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]]  && infocmp gnome-256color >/dev/null 2>&1; then export TERM=gnome-256color
-elif infocmp xterm-256color >/dev/null 2>&1; then export TERM=xterm-256color
-fi
 
 if tput setaf 1 &> /dev/null; then
     tput sgr0
@@ -135,6 +111,11 @@ bash_prompt() {
 }
 
 PROMPT_COMMAND=bash_prompt_command
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
 bash_prompt
 unset bash_prompt
 
