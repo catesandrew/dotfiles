@@ -17,16 +17,12 @@
     "mootools"      : false,
     "dojo"          : false,
 
-    "predef"        : [  // Extra globals.
-        "google",   // Google API variable.
-        "Android",  // PhoneGap variable.
-        "Phoenix",
-        "exports",
-        "Thorax",
-        "Handlebars",
-        "Backbone",
-        "_"
-    ],
+    "globals"        : [  // Extra globals.
+        "exports": true,
+        "Handlebars": true,
+        "Backbone": true,
+        "_": true
+    },
 
 
     // Development.
