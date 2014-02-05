@@ -17,7 +17,7 @@
     "mootools"      : false,
     "dojo"          : false,
 
-    "globals"        : [  // Extra globals.
+    "globals"        : {  // Extra globals.
         "exports": true,
         "Handlebars": true,
         "Backbone": true,

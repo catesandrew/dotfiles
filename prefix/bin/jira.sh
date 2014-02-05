@@ -169,6 +169,12 @@ case "$#" in
                 echo "Task created: ${RESULT}"
                 python -mwebbrowser ${RESULT}
                 ;;
+            add-master-task)
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                echo "Master Task created: ${RESULT}"
+                python -mwebbrowser ${RESULT}
+                ;;
             add-enhancement)
                 RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
                 RESULT=`echo ${RESULT} | sed s/.*https/https/g`
@@ -176,11 +182,17 @@ case "$#" in
                 python -mwebbrowser ${RESULT}
                 ;;
             add-master-enhancement)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --parent "${PROJECT}-" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
                 RESULT=`echo ${RESULT} | sed s/.*https/https/g`
                 echo "Master Enhancement created: ${RESULT}"
                 python -mwebbrowser ${RESULT}
                 ;;
+            #add-sub-)
+                #RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --parent "${PROJECT}-" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+                #RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+                #echo "Master Enhancement created: ${RESULT}"
+                #python -mwebbrowser ${RESULT}
+                #;;
             delete-issue)
                 echo `${JIRA_CLI} --action deleteIssue --issue "${PROJECT}-"`
                 ;;
