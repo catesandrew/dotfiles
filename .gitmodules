@@ -211,3 +211,6 @@
 [submodule "home/vim/bundle/vim-session"]
 	path = home/vim/bundle/vim-session
 	url = git@github.com:xolox/vim-session.git
+[submodule "home/vim/bundle/vim-jsbeautify"]
+	path = home/vim/bundle/vim-jsbeautify
+	url = git://github.com/maksimr/vim-jsbeautify.git
