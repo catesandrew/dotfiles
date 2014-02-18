@@ -1312,6 +1312,11 @@ au BufEnter * call MyBufEnter()
 
 
 "}}}
+" Sessions {{{
+
+let g:session_directory = '~/.vim/tmp/sessions'
+
+" }}}
 " Autoclose {{{
 
 nmap <Leader>x <Plug>ToggleAutoCloseMappings
