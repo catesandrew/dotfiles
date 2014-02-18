@@ -1088,6 +1088,10 @@ let g:neocomplcache_min_syntax_length = 3
 nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
 
 " }}}
+" MultiMarkdown Support {{{
+nnoremap <leader>MM :silent !open -a MultiMarkdown\ Composer.app '%:p'<cr>
+
+" }}}
 " Google Code Wiki {{{
 
 autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki
