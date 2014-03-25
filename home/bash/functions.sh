@@ -106,6 +106,9 @@ function gz() {
     printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
 }
 
+decode64 () {
+    echo $1 | base64 --decode ; echo
+}
 
 
 ##################################################

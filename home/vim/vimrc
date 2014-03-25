@@ -999,6 +999,15 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 let g:user_zen_leader_key = '<leader>z'
 
 " }}}
+" Vim-Airline {{{
+
+" Finally, you can add the convenience variable to your vimrc which will
+" automatically populate the g:airline_symbols dictionary with the powerline
+" symbols.
+
+let g:airline_powerline_fonts = 1
+
+" }}}
 " Session {{{
 
 let g:session_autosave = 'yes'
