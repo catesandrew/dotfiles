@@ -1348,6 +1348,58 @@ let g:rooter_patterns = ['Jakefile.js', 'Rakefile', 'Gruntfile.js', 'bower.json'
 let g:rooter_use_lcd = 1
 
 " }}}
+" Startify {{{
+
+let g:startify_files_number        = 8
+let g:startify_session_persistence = 1
+let g:startify_session_autoload    = 1
+let g:startify_enable_special      = 0
+
+let g:startify_list_order = [
+        \ ['   LRU:'],
+        \ 'files',
+        \ ['   Sessions:'],
+        \ 'sessions',
+        \ ['   Bookmarks:'],
+        \ 'bookmarks',
+        \ ]
+
+let g:startify_bookmarks = [
+            \ '~/.vim/vimrc',
+            \ '/data/vim/golfing',
+            \ ]
+
+let g:startify_custom_footer =
+        \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
+
+hi StartifyBracket ctermfg=240
+hi StartifyNumber  ctermfg=215
+hi StartifyPath    ctermfg=245
+hi StartifySlash   ctermfg=240
+hi StartifySpecial ctermfg=240
+hi StartifyHeader  ctermfg=114
+hi StartifyFooter  ctermfg=240
+
+
+let g:startify_skiplist = [
+           \ 'COMMIT_EDITMSG',
+           \ $VIMRUNTIME .'/doc',
+           \ 'bundle/.*/doc',
+           \ '\.DS_Store'
+           \ ]
+
+" How do I get both NERDTree and Startify working at startup?~
+autocmd VimEnter *
+                \ if !argc() |
+                \   Startify |
+                \   NERDTree |
+                \   execute "normal \<c-w>w" |
+                \ endif
+
+let g:startify_custom_header =
+      \ map(split(system('fortune | cowsay'), '\n'), '"   ". v:val') + ['','']
+
+" }}}
 " Fugitive {{{
 
 nnoremap <leader>gd :Gdiff<cr>
@@ -1362,6 +1414,9 @@ nnoremap <leader>gco :Gcheckout<cr>
 nnoremap <leader>gci :Gcommit<cr>
 nnoremap <leader>gm :Gmove<cr>
 nnoremap <leader>gr :Gremove<cr>
+
+"To use with GitHub FI, point g:fugitive_github_domains at a list of domains:
+let g:fugitive_github_domains = ['http://git.ibaset.com']
 
 augroup ft_fugitive
     au!

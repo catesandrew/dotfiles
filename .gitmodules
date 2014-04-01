@@ -220,3 +220,6 @@
 [submodule "home/vim/bundle/vim-airline"]
 	path = home/vim/bundle/vim-airline
 	url = https://github.com/bling/vim-airline
+[submodule "home/vim/bundle/vim-startify"]
+	path = home/vim/bundle/vim-startify
+	url = https://github.com/mhinz/vim-startify
