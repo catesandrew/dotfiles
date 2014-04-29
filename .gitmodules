@@ -217,3 +217,6 @@
 [submodule "home/vim/bundle/vim-startify"]
 	path = home/vim/bundle/vim-startify
 	url = https://github.com/mhinz/vim-startify
+[submodule "home/vim/bundle/vim-large-file"]
+	path = home/vim/bundle/vim-large-file
+	url = https://github.com/vim-scripts/LargeFile.git
