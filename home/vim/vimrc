@@ -1345,7 +1345,7 @@ let g:org_debug = 1
 " }}}
 " Rooter{{{
 
-let g:rooter_patterns = ['Jakefile.js', 'Rakefile', 'Gruntfile.js', 'bower.json', 'package.json', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
+let g:rooter_patterns = ['package.json', 'bower.json', 'Jakefile.js', 'Rakefile', 'Gruntfile.js', '.git', '.git/', '.svn/']
 let g:rooter_use_lcd = 1
 
 " }}}
