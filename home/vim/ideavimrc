@@ -1,0 +1,515 @@
+"
+"  ____                                 _
+" |  _ \ ___ _ __ ___  ___  _ __   __ _| |
+" | |_) / _ \ '__/ __|/ _ \| '_ \ / _` | |
+" |  __/  __/ |  \__ \ (_) | | | | (_| | |
+" |_|   \___|_|  |___/\___/|_| |_|\__,_|_|
+"
+"                  __
+"  _ __  _ __ ___ / _| ___ _ __ ___ _ __   ___ ___
+" | '_ \| '__/ _ \ |_ / _ \ '__/ _ \ '_ \ / __/ _ \
+" | |_) | | |  __/  _|  __/ | |  __/ | | | (_|  __/
+" | .__/|_|  \___|_|  \___|_|  \___|_| |_|\___\___|
+" |_|
+"        _                       __ _ _
+" __   _(_)_ __ ___  _ __ ___   / _(_) | ___
+" \ \ / / | '_ ` _ \| '__/ __| | |_| | |/ _ \
+"  \ V /| | | | | | | | | (__  |  _| | |  __/
+" (_)_/ |_|_| |_| |_|_|  \___| |_| |_|_|\___|
+"
+"
+" Use vim settings, rather then vi settings (much better!)
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" Define and reset augroup used in vimrc
+augroup vimrc
+    autocmd!
+augroup END
+
+" Basic options --------------------------------------------------------------- {{{
+set modelines=0
+set updatecount=50 "write swap file to disk after 50 keystrokes
+set scrolljump=5
+set scrolloff=5                 " keep 5 lines off the edges of the screen when scrolling
+set autoindent " always set autoindenting on
+set copyindent    " copy the previous indentation on autoindenting
+set showmode                    " always show what mode we're currently editing in
+set whichwrap=b,s,h,l,<,>,[,]
+set backspace=indent,eol,start    " allow backspacing over everything in insert mode
+set cpoptions+=J
+set listchars=tab:▸\ ,eol:¬
+set shell=/bin/bash
+set showbreak=↪
+set splitbelow
+set splitright
+set wrapscan      " search wrap around the end of the file
+set ignorecase    " ignore case when searching
+set smartcase     " ignore case if search pattern is all lowercase,
+                  "    case-sensitive otherwise
+
+set nrformats=octal,hex,alpha " Enable CTRL-A/CTRL-X to work on octal and hex numbers, as well as characters
+set smarttab      " insert tabs on the start of a line according to
+                  "    shiftwidth, not tabstop
+set incsearch     " show search matches as you type
+set notitle       " don't rewrite title string
+set showmatch     " when a bracket is inserted, breifly jump to a matching one
+set matchtime=2   " jump to matching bracket for 2/10th of a second
+set hlsearch      " highlight search terms
+nohlsearch        " avoid highlighting when reloading vimrc
+
+set gdefault                    " search/replace "globally" (on a line) by default
+set nolist                      " don't show invisible characters by default,
+                                " but it is enabled for some file types (see later)
+set virtualedit=all             " allow the cursor to go in to "invalid" places
+set synmaxcol=512               " long lines slow down vim
+
+" Show trailing whitespace:
+":match ExtraWhitespace /\s\+$/
+" Show trailing whitespace and spaces before a tab:
+":match ExtraWhitespace /\s\+$\| \+\ze\t/
+" Show tabs that are not at the start of a line:
+":match ExtraWhitespace /[^\t]\zs\t\+/
+" Show spaces used for indenting (so you use only tabs for indenting).
+":match ExtraWhitespace /^\t*\zs \+/
+" Switch off :match highlighting.
+":match
+
+augroup vimrc
+    autocmd WinEnter,BufEnter,BufRead * setl cursorline
+    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
+
+    autocmd WinLeave,BufLeave * setl nocursorline
+    autocmd WinLeave,BufLeave * setl norelativenumber
+
+    "With the following in your vimrc, the command will be applied to the first
+    "window, and to any subsequent windows. The pattern * applies the highlight
+    "to all files
+    " Show leading whitespace that includes spaces, and trailing whitespace.
+    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+
+    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
+augroup END
+
+" Remember things between sessions
+"
+" '20  - remember marks for 20 previous files
+" \"50 - save 50 lines for each register
+" :20  - remember 20 items in command-line history
+" %    - remember the buffer list (if vim started without a file arg)
+" n    - set name of viminfo file
+set viminfo='20,\"50,:20,%,n~/.viminfo
+
+" Editor layout {{{
+
+set termencoding=utf-8
+set encoding=utf-8
+set lazyredraw                  " don't update the display while executing macros
+set cmdheight=1                 " use a status bar that is 2 rows high
+
+" }}}
+" Tabs, spaces, wrapping {{{
+
+set tabstop=4
+set shiftwidth=4 " number of spaces to use for autoindenting
+set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
+set softtabstop=4
+set expandtab                   " expand tabs by default (overloadable per file type later)
+set smartindent                 " use smart indent
+set nowrap                      " don't wrap lines
+set textwidth=0                 " don't break line automatically
+set formatoptions+=1            " When wrapping paragraphs, don't end lines
+                                "    with 1-letter words (looks stupid)
+set formatoptions+=m           " add multibyte support
+" set colorcolumn=+1
+set nolinebreak                " don't break line automatically
+set iminsert=0                 " disable input method control in insert mode
+set imsearch=0                 " disable input method control in search mode
+
+" }}}
+" Par {{{
+
+" set formatprg=par\ -w72
+:map <A-q> {v}!par -jw72<CR>
+:vmap <A-q> !par -jw72<CR>
+
+" }}}
+" Vim behaviour {{{
+set hidden                      " hide buffers instead of closing them this
+                                "    means that the current buffer can be put
+                                "    to background without being written; and
+                                "    that marks and undo history are preserved
+set switchbuf=useopen           " reveal already opened files from the
+                                " quickfix window instead of opening new
+                                " buffers
+set history=1000                " remember more commands and search history
+set undolevels=1000             " use many muchos levels of undo
+set undoreload=10000
+if v:version >= 730
+    set undofile                " keep a persistent backup file
+    set undodir=~/.vim/tmp/undo//     " undo files
+endif
+set nobackup                    " do not keep backup files, it's 70's style cluttering
+set noswapfile                  " do not write annoying intermediate swap files,
+                                "    who did ever restore from swap files anyway?
+set backupdir=~/.vim/tmp/backup// " backups
+set directory=~/vim/tmp/swap//   " swap files
+                                " store swap files in one of these directories
+                                "    (in case swapfile is ever turned on)
+set autoread                    " auto re-read when the file is written by other applications
+set wildmenu                    " make tab completion for files/buffers act like bash
+set wildmode=list:longest,full  " show a list when pressing tab and complete
+                                "    first full match
+set wildignore=*.swp,*.bak,*.pyc,*.class
+set title                       " change the terminal's title
+set visualbell                  " don't beep
+set noerrorbells                " don't beep
+set nomodeline                  " disable mode lines (security measure)
+"set ttyfast                     " always use a fast terminal
+set cursorline                  " underline the current line, for quick orientation
+
+if has('cmdline_info')
+  set ruler                   " show the ruler
+  set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+  set showcmd                   " show (partial) command in the last line of the screen
+                                "    this also shows visual selection info
+endif
+
+
+" }}}
+" Status line {{{
+
+if has('statusline')
+  set laststatus=2                " tell VIM to always put a status line in, even
+                                "    if there is only one window
+  "set statusline=\ \ \ \ \ line:%l\ column:%c\ \ \ %M%Y%r%=%-14.(%t%)\ %p%%
+  set statusline=   " clear the statusline, allow for rearranging parts
+  set statusline+=%f\                "Path to the file, as typed or relative to current dir
+  set statusline+=%#errormsg#        "change color
+  set statusline+=%{&ff!='unix'?'['.&ff.']':''}   "display a warning if fileformat isnt unix
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=%#errormsg#       "change color
+  set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}   "display a warning if file encoding isnt utf-8
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=\ %y              "filetype
+  set statusline+=%([%R%M]%)        "read-only (RO), modified (+) and unmodifiable (-) flags between braces
+  set statusline+=%{'~'[&pm=='']}   "shows a '~' if in patchmode
+  set statusline+=\ %{fugitive#statusline()}  "show Git info, via fugitive.git
+  "set statusline+=\ (%{synIDattr(synID(line('.'),col('.'),0),'name')}) "DEBUG : display the current syntax item name
+  set statusline+=%#error#          "change color
+  set statusline+=%{&paste?'[paste]':''}    "display a warning if &paste is set
+
+  set statusline+=%#warningmsg#
+  set statusline+=%{SyntasticStatuslineFlag()}
+
+  set statusline+=%*                "reset color to normal statusline color
+  set statusline+=%=                "right-align following items
+  set statusline+=#%n               "buffer number
+  set statusline+=\ %l/%L,          "current line number/total number of lines,
+  set statusline+=%c                "Column number
+  set statusline+=%V                " -{Virtual column number} (Not displayed if equal to 'c')
+  set statusline+=\ %p%%            "percentage of lines through the file%
+  set statusline+=\                 "trailing space
+  if has('title')
+    set titlestring=%t%(\ [%R%M]%)
+  endif
+endif
+
+" }}}
+" Leader {{{
+
+" Change the mapleader from \ to ,
+let mapleader=","
+
+" }}}
+
+" }}}
+" Searching and movement ------------------------------------------------------ {{{
+
+"clearing highlighted search as well as redraw
+nnoremap <silent> <leader>/ :nohlsearch<CR><C-L>
+inoremap <silent> <leader>/ <C-O>:nohlsearch<CR>
+
+" Change Working Directory to that of the current file
+cmap cwd lcd %:p:h
+cmap cd. lcd %:p:h
+
+" Thanks to Steve Losh for this liberating tip
+" See http://stevelosh.com/blog/2010/09/coming-home-to-vim
+nnoremap / /\v
+
+" Speed up scrolling of the viewport slightly
+nnoremap <C-e> 2<C-e>
+nnoremap <C-y> 2<C-y>
+
+" }}}
+" Directional Keys ---------------------------------------------------------- {{{
+"nnoremap <up> <nop>
+"nnoremap <down> <nop>
+"nnoremap <left> <nop>
+"nnoremap <right> <nop>
+"inoremap <up> <nop>
+"inoremap <down> <nop>
+"inoremap <left> <nop>
+"inoremap <right> <nop>
+
+" Easier moving in tabs and windows
+noremap <C-j>  <C-w>j
+noremap <C-k>  <C-w>k
+noremap <C-l>  <C-w>l
+noremap <C-h>  <C-w>h
+
+" Fix home and end keybindings for screen, particularly on mac
+" - for some reason this fixes the arrow keys too. huh.
+" map [F $
+" imap [F $
+" map [H g0
+" imap [H g0
+
+" }}}
+" Convenience mappings -------------------------------------------------------- {{{
+
+" save changes
+map <leader>s :w<CR>
+" exit vim without saving any changes
+map <leader>q :q!<CR>
+" use CTRL-F for omni completion
+imap <C-F> 
+" map <Alt-p> and <Alt-P> to paste below/above and reformat
+nnoremap <M-P> P'[v']=
+nnoremap <M-p> p'[v']=
+
+" Clean whitespace
+map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+
+" Formatting, TextMate-style
+nnoremap <leader>q gqip
+" good when you want to delete a paragraph?
+"nnoremap <leader>q gqap
+
+" Easier linewise reselection
+nnoremap <leader>v V`]
+
+" Better Completion
+set completeopt=longest,menuone,preview
+
+" Use Q for formatting the current paragraph (or visual selection)
+"vmap Q gq
+"nmap Q gqap
+
+" Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
+" yanked stack (also, in visual mode)
+nmap <silent> <leader>d "_d
+vmap <silent> <leader>d "_d
+
+" Yank from the cursor to the end of the line, to be consistent with C and D.
+nnoremap Y y$
+nnoremap D d$
+
+" Yank/paste to the OS clipboard with ,y and ,p
+nmap <leader>y "+y
+nmap <leader>Y "+yy
+nmap <leader>p "+p
+nmap <leader>P "+P
+
+" visual shifting (does not exit Visual mode)
+vnoremap < <gv
+vnoremap > >gv
+
+" Quick alignment of text
+nmap <leader>al :left<CR>
+nmap <leader>ar :right<CR>
+nmap <leader>ac :center<CR>
+
+" Pull word under cursor into LHS of a substitute (for quick search and
+" replace)
+nmap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
+
+" Scratch
+nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
+
+" Toggle paste: Every Vim user likes to enable auto-indenting of
+" source code, so Vim can intelligently position you cursor on the
+" next line as you type. This has one big ugly consequence however:
+" when you paste text into your terminal-based Vim with a right
+" mouse click, Vim cannot know it is coming from a paste. To Vim, it
+" looks like text entered by someone who can type incredibly fast
+" :) Since Vim thinks this is regular key strokes, it applies all
+" auto-indenting and auto-expansion of defined abbreviations to the
+" input, resulting in often cascading indents of paragraphs. There is
+" an easy option to prevent this, however. You can temporarily switch
+" to “paste mode”, simply by setting the following option:
+set pastetoggle=<F7>
+
+nmap <F8> :TagbarToggle<CR>
+
+" Reselect text that was just pasted with <leader>v
+nnoremap <leader>v V`]
+
+" Replaste
+nnoremap <D-p> "_ddPV`]
+
+" }}}
+" Folding --------------------------------------------------------------------- {{{
+
+set foldenable                  " enable folding
+set foldcolumn=0                " add a fold column
+set foldmethod=marker           " detect triple-{ style fold markers
+set foldlevelstart=99           " start out with nothing folded
+set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
+                                " which commands trigger auto-unfold
+" Space to toggle folds.
+nnoremap <Space> za
+vnoremap <Space> za
+
+" Make zO recursively open whatever top level fold we're in, no matter where the
+" cursor happens to be.
+nnoremap zO zCzO
+
+""" Code folding options
+nmap <leader>f0 :set foldlevel=0<CR>
+nmap <leader>f1 :set foldlevel=1<CR>
+nmap <leader>f2 :set foldlevel=2<CR>
+nmap <leader>f3 :set foldlevel=3<CR>
+nmap <leader>f4 :set foldlevel=4<CR>
+nmap <leader>f5 :set foldlevel=5<CR>
+nmap <leader>f6 :set foldlevel=6<CR>
+nmap <leader>f7 :set foldlevel=7<CR>
+nmap <leader>f8 :set foldlevel=8<CR>
+nmap <leader>f9 :set foldlevel=9<CR>
+
+" }}}
+" Destroy infuriating keys ---------------------------------------------------- {{{
+
+" Fuck you, help key.
+set fuoptions=maxvert,maxhorz
+noremap <F1> :set invfullscreen<CR>
+inoremap <F1> <ESC>:set invfullscreen<CR>a
+
+" Fuck you too, manual key.
+nnoremap K <nop>
+
+" Stop it, hash key.
+inoremap # X<BS>#
+
+" Dreadful 'Ex' Mode
+nnoremap <silent> Q ZZ
+
+" }}}
+
+" Restore cursor position upon reopening files {{{
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+" }}}
+
+" Common abbreviations / misspellings {{{
+source ~/.vim/autocorrect.vim
+" }}}
+
+" Extra vi-compatibility {{{
+" set extra vi-compatible options
+set cpoptions+=$     " when changing a line, don't redisplay, but put a '$' at
+                     " the end during the change
+set formatoptions-=o " don't start new lines w/ comment leader on pressing 'o'
+au filetype vim set formatoptions-=o
+                     " somehow, during vim filetype detection, this gets set
+                     " for vim files, so explicitly unset it again
+" }}}
+
+" Extra user or machine specific settings {{{
+source ~/.user.vim
+" }}}
+
+" Creating underline/overline headings for markup languages
+" Inspired by http://sphinx.pocoo.org/rest.html#sections
+nnoremap <leader>1 yyPVr=jyypVr=
+nnoremap <leader>2 yyPVr*jyypVr*
+nnoremap <leader>3 yypVr=
+nnoremap <leader>4 yypVr-
+nnoremap <leader>5 yypVr^
+nnoremap <leader>6 yypVr"   
+
+" }}}
+" MacVim ---------------------------------------------------------------------- {{{
+
+if has('gui_running')
+    " Enable mouse wheel
+    " In Mac, Only on iTerm.app, disable on Terminal.app
+    if has('mac')
+        set mouse=a
+        set ttymouse=xterm2
+    endif
+
+    set guifont=Anonymous\ Pro\ for\ Powerline:h14
+    set guioptions-=T          	" remove the toolbar
+    set lines=40               	" 40 lines of text instead of 24,
+    set columns=80
+    set transparency=5          " Make the window slightly transparent
+
+    "winpos 0 0
+    if ! &diff
+        winsize 130 90
+    else
+        winsize 227 90
+    endif
+
+    " Remove all the UI cruft
+    set go-=T
+    set go-=l
+    set go-=L
+    set go-=r
+    set go-=R
+
+    " PeepOpen
+    if has("gui_macvim")
+      map <leader><leader><leader> <Plug>PeepOpen
+    end
+
+    highlight SpellBad term=underline gui=undercurl guisp=Orange
+
+    " Use a line-drawing char for pretty vertical splits.
+    set fillchars=vert:│
+
+    " Hide the mouse pointer while typing
+    set mousehide
+
+    " Set up the gui cursor to look nice
+    set guicursor=n-c:block-Cursor-blinkon0
+    set guicursor+=v:block-vCursor-blinkon0
+    set guicursor+=ve:ver35-Cursor
+    set guicursor+=o:hor50-Cursor
+    set guicursor+=i-ci:ver25-Cursor
+    set guicursor+=r-cr:hor20-Cursor
+    set guicursor+=sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+
+    " Use the normal HIG movements, except for M-Up/Down
+    let macvim_skip_cmd_opt_movement = 1
+    no   <D-Left>       <Home>
+    no!  <D-Left>       <Home>
+    no   <M-Left>       <C-Left>
+    no!  <M-Left>       <C-Left>
+
+    no   <D-Right>      <End>
+    no!  <D-Right>      <End>
+    no   <M-Right>      <C-Right>
+    no!  <M-Right>      <C-Right>
+
+    no   <D-Up>         <C-Home>
+    ino  <D-Up>         <C-Home>
+    imap <M-Up>         <C-o>{
+
+    no   <D-Down>       <C-End>
+    ino  <D-Down>       <C-End>
+    imap <M-Down>       <C-o>}
+
+    imap <M-BS>         <C-w>
+    inoremap <D-BS>     <esc>my0c`y
+else
+  set term=builtin_ansi       " Make arrow and other keys work
+endif
+
+" }}}

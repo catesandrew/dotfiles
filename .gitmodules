@@ -220,3 +220,6 @@
 [submodule "home/vim/bundle/vim-large-file"]
 	path = home/vim/bundle/vim-large-file
 	url = https://github.com/vim-scripts/LargeFile.git
+[submodule "home/vim/bundle/apiblueprint"]
+	path = home/vim/bundle/apiblueprint
+	url = https://github.com/kylef/apiblueprint.vim.git
