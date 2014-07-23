@@ -223,3 +223,6 @@
 [submodule "home/vim/bundle/apiblueprint"]
 	path = home/vim/bundle/apiblueprint
 	url = https://github.com/kylef/apiblueprint.vim.git
+[submodule "home/vim/bundle/vim-better-js-completion"]
+	path = home/vim/bundle/vim-better-js-completion
+	url = https://github.com/1995eaton/vim-better-javascript-completion.git

@@ -55,7 +55,8 @@ filetype plugin indent on       " enable detection, plugins and indenting in one
 
 " }}}
 " Basic options --------------------------------------------------------------- {{{
-let $JS_CMD='node'
+set breakindent
+"set showbreak=…
 set modelines=0
 set updatecount=50 "write swap file to disk after 50 keystrokes
 set scrolljump=5
@@ -1049,6 +1050,8 @@ let g:colorizer_skip_comments = 1
 " Ack {{{
 
 map <leader>a :Ack! 
+" You can use Ag with ack.vim by adding the following line to your .vimrc:
+let g:ackprg = 'ag --nogroup --nocolor --column'
 
 " }}}
 " Improve completion popup menu {{{
