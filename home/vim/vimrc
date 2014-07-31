@@ -92,6 +92,8 @@ set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
 set virtualedit=all             " allow the cursor to go in to "invalid" places
 set synmaxcol=512               " long lines slow down vim
+"https://coderwall.com/p/j9wnfw
+set clipboard=unnamed
 
 " Show trailing whitespace:
 ":match ExtraWhitespace /\s\+$/
@@ -178,16 +180,14 @@ set switchbuf=useopen           " reveal already opened files from the
                                 " buffers
 set history=1000                " remember more commands and search history
 set undolevels=1000             " use many muchos levels of undo
-set undoreload=10000
-if v:version >= 730
-    set undofile                " keep a persistent backup file
-    set undodir=~/.vim/tmp/undo//     " undo files
-endif
+set undoreload=10000            " max number lines to save for undo on a buffer reload
+set undofile                " keep a persistent backup file
+set undodir=~/.vim/tmp/undo     " undo files
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-set backupdir=~/.vim/tmp/backup// " backups
-set directory=~/vim/tmp/swap//   " swap files
+set backupdir=~/.vim/tmp/backup " backups
+set directory=~/vim/tmp/swap   " swap files
                                 " store swap files in one of these directories
                                 "    (in case swapfile is ever turned on)
 set autoread                    " auto re-read when the file is written by other applications
