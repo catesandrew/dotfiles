@@ -1009,12 +1009,6 @@ let g:user_zen_leader_key = '<leader>z'
 let g:airline_powerline_fonts = 1
 
 " }}}
-" Session {{{
-
-let g:session_autosave = 'yes'
-let g:session_autoload = 'no'
-
-" }}}
 " Tern {{{
 
 let g:tern_map_keys = 0
@@ -1353,7 +1347,11 @@ au BufEnter * call MyBufEnter()
 "}}}
 " Sessions {{{
 
+let g:session_autosave = 'yes'
+"let g:session_autoload = 'no'
 let g:session_directory = '~/.vim/tmp/sessions'
+let g:session_persist_colors = 0
+let g:session_menu = 0
 
 " }}}
 " Autoclose {{{
