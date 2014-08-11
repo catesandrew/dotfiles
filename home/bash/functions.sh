@@ -23,6 +23,10 @@ function server() {
     python -c $'import SimpleHTTPServer;\nSimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map[""] = "text/plain";\nSimpleHTTPServer.test();' "$port"
 }
 
+function mvim2() {
+    mvim --servername `git rev-parse --show-toplevel` .
+}
+
 function growl() { echo -e $'\e]9;'${1}'\007' ; return  ; }
 
 # posfind: search the directory frontmost in the Finder

@@ -38,7 +38,7 @@ alias -- -="cd -"       #go to previous dir
 # Long form no user group, color
 alias l="ls -oG"
 # Order by last modified, long form no user group, color
-alias lt="ls -toG"
+#alias lt="ls -toG"
 # List all except . and ..., color, mark file types, long form no user group, file size
 alias la="ls -AGFoh"
 # List all except . and ..., color, mark file types, long form no use group, order by last modified, file size

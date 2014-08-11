@@ -223,3 +223,15 @@
 [submodule "home/vim/bundle/vim-better-js-completion"]
 	path = home/vim/bundle/vim-better-js-completion
 	url = https://github.com/1995eaton/vim-better-javascript-completion.git
+[submodule "home/vim/bundle/vim-windowswap"]
+	path = home/vim/bundle/vim-windowswap
+	url = https://github.com/wesQ3/vim-windowswap
+[submodule "home/vim/bundle/vim-hdevtools"]
+	path = home/vim/bundle/vim-hdevtools
+	url = https://github.com/bitc/vim-hdevtools.git
+[submodule "home/vim/bundle/haskellmode-vim"]
+	path = home/vim/bundle/haskellmode-vim
+	url = https://github.com/lukerandall/haskellmode-vim.git
+[submodule "home/vim/bundle/ghcmod-vim"]
+	path = home/vim/bundle/ghcmod-vim
+	url = https://github.com/eagletmt/ghcmod-vim.git
