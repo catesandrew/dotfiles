@@ -18,9 +18,6 @@
 #alias head='head -n $((${LINES:-12}-2))' #as many as possible without scrolling
 #alias tail='tail -n $((${LINES:-12}-2)) -s.1' #Likewise, also more responsive -f
 
-# cdf: cd to the directory in the Finder's front window
-alias cdf='cd "$(/usr/local/bin/posd)"'
-
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
 
