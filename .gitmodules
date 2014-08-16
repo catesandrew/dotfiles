@@ -46,9 +46,6 @@
 [submodule "home/vim/bundle/supertab"]
     path = home/vim/bundle/supertab
     url = git://github.com/ervandew/supertab.git
-[submodule "home/vim/bundle/zoom-win"]
-    path = home/vim/bundle/zoom-win
-    url = git://github.com/vim-scripts/ZoomWin.git
 [submodule "home/vim/bundle/vim-markdown"]
     path = home/vim/bundle/vim-markdown
     url = git://github.com/tpope/vim-markdown.git
