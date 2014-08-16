@@ -58,9 +58,6 @@
 [submodule "home/vim/bundle/vim-unimpaired"]
     path = home/vim/bundle/vim-unimpaired
     url = git://github.com/tpope/vim-unimpaired.git
-[submodule "home/vim/bundle/vim-endwise"]
-    path = home/vim/bundle/vim-endwise
-    url = git://github.com/tpope/vim-endwise.git
 [submodule "home/vim/bundle/vim-irblack"]
     path = home/vim/bundle/vim-irblack
     url = git://github.com/wgibbs/vim-irblack.git
@@ -217,3 +214,6 @@
 [submodule "home/vim/bundle/vim-snipmate"]
 	path = home/vim/bundle/vim-snipmate
 	url = https://github.com/garbas/vim-snipmate.git
+[submodule "home/vim/bundle/vim-addon-mw-utils"]
+	path = home/vim/bundle/vim-addon-mw-utils
+	url = https://github.com/MarcWeber/vim-addon-mw-utils.git
