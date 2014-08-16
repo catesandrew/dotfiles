@@ -118,9 +118,6 @@
 [submodule "home/vim/bundle/vim-easymotion"]
 	path = home/vim/bundle/vim-easymotion
 	url = git://github.com/Lokaltog/vim-easymotion.git
-[submodule "home/vim/bundle/gitv"]
-	path = home/vim/bundle/gitv
-	url = git://github.com/gregsexton/gitv.git
 [submodule "home/vim/bundle/YankRing"]
 	path = home/vim/bundle/YankRing
 	url = git://github.com/vim-scripts/YankRing.vim.git
