@@ -49,9 +49,6 @@
 [submodule "home/vim/bundle/supertab"]
     path = home/vim/bundle/supertab
     url = git://github.com/ervandew/supertab.git
-[submodule "home/vim/bundle/textile"]
-    path = home/vim/bundle/textile
-    url = git://github.com/timcharper/textile.vim.git
 [submodule "home/vim/bundle/zoom-win"]
     path = home/vim/bundle/zoom-win
     url = git://github.com/vim-scripts/ZoomWin.git
