@@ -76,9 +76,6 @@
 [submodule "home/vim/bundle/file-line"]
 	path = home/vim/bundle/file-line
 	url = git://github.com/vim-scripts/file-line.git
-[submodule "home/vim/bundle/vim-addon-mw-utils"]
-	path = home/vim/bundle/vim-addon-mw-utils
-	url = git://github.com/MarcWeber/vim-addon-mw-utils.git
 [submodule "home/vim/bundle/tlib_vim"]
 	path = home/vim/bundle/tlib_vim
 	url = git://github.com/tomtom/tlib_vim.git
