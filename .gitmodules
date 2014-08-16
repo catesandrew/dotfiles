@@ -61,9 +61,6 @@
 [submodule "home/vim/bundle/vim-unimpaired"]
     path = home/vim/bundle/vim-unimpaired
     url = git://github.com/tpope/vim-unimpaired.git
-[submodule "home/vim/bundle/searchfold"]
-    path = home/vim/bundle/searchfold
-    url = git://github.com/vim-scripts/searchfold.vim.git
 [submodule "home/vim/bundle/vim-endwise"]
     path = home/vim/bundle/vim-endwise
     url = git://github.com/tpope/vim-endwise.git
