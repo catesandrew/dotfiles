@@ -76,9 +76,6 @@
 [submodule "home/vim/bundle/puppet-vim"]
     path = home/vim/bundle/puppet-vim
     url = git://github.com/ajf/puppet-vim.git
-[submodule "home/vim/bundle/gist-vim"]
-    path = home/vim/bundle/gist-vim
-  url = git://github.com/mattn/gist-vim.git
 [submodule "home/vim/bundle/vim-json"]
     path = home/vim/bundle/vim-json
     url = git://github.com/leshill/vim-json.git
