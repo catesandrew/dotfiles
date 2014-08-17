@@ -14,6 +14,7 @@ export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
 export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB";
 export PATH="$HOME/perl5/bin:/usr/local/bin:/usr/local/ssl/bin:/usr/local/sbin:/usr/local/rvm/bin:$PATH"
 export PATH="$HOME/.cabal/bin:$PATH"
+export GOPATH=/usr/local/go
 
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a

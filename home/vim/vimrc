@@ -38,13 +38,82 @@
 " Use vim settings, rather then vi settings (much better!)
 " This must be first, because it changes other options as a side effect.
 set nocompatible
+filetype on
+filetype off
 
 " Define and reset augroup used in vimrc
 augroup vimrc
     autocmd!
+    autocmd WinEnter,BufEnter,BufRead * setl cursorline
+    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
+
+    autocmd WinLeave,BufLeave * setl nocursorline
+    autocmd WinLeave,BufLeave * setl norelativenumber
+
+    "With the following in your vimrc, the command will be applied to the first
+    "window, and to any subsequent windows. The pattern * applies the highlight
+    "to all files
+    " Show leading whitespace that includes spaces, and trailing whitespace.
+    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+
+    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
 augroup END
 
+" Cursorline {{{
+" Only show cursorline in the current window and in normal mode.
+augroup cline
+    au!
+    au WinLeave * set nocursorline
+    au WinLeave * set norelativenumber
+    au WinEnter * set cursorline
+    au WinEnter * set relativenumber
+    au InsertEnter * set nocursorline
+    au InsertEnter * set norelativenumber
+    au InsertLeave * set cursorline
+    au InsertLeave * set relativenumber
+augroup END
+" }}}
+
+" Trailing whitespace {{{
+" Only shown when not in insert mode so I don't go insane.
+augroup trailing
+    au!
+    au InsertEnter * :set listchars-=trail:␣
+    au InsertLeave * :set listchars+=trail:␣
+augroup END
+
+" Remove trailing whitespaces when saving
+" Wanna know more? http://vim.wikia.com/wiki/Remove_unwanted_spaces
+" If you want to remove trailing spaces when you want, so not automatically,
+" see
+" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
+autocmd BufWritePre * :%s/\s\+$//e
+
+" }}}
+
 " Preamble -------------------------------------------------------------------- {{{
+
+" Utils {{{
+source ~/.vim/functions/util.vim
+" }}}
+
+" Load external configuration before anything else {{{
+if filereadable(expand("~/.vim/before.vimrc"))
+  source ~/.vim/before.vimrc
+endif
+" }}}
+
+" Local vimrc configuration {{{
+let s:localrc = expand($HOME . '/.vim/local.vimrc')
+if filereadable(s:localrc)
+    exec ':so ' . s:localrc
+endif
+" }}}
 
 " Use pathogen to easily modify the runtime path to include all plugins under
 " the ~/.vim/bundle directory
@@ -66,8 +135,9 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
+set binary
 set cpoptions+=J
-set listchars=tab:▸\ ,eol:¬
+set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
 set shell=/bin/bash
 set showbreak=↪
 set splitbelow
@@ -94,38 +164,6 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 set synmaxcol=512               " long lines slow down vim
 "https://coderwall.com/p/j9wnfw
 set clipboard=unnamed
-
-" Show trailing whitespace:
-":match ExtraWhitespace /\s\+$/
-" Show trailing whitespace and spaces before a tab:
-":match ExtraWhitespace /\s\+$\| \+\ze\t/
-" Show tabs that are not at the start of a line:
-":match ExtraWhitespace /[^\t]\zs\t\+/
-" Show spaces used for indenting (so you use only tabs for indenting).
-":match ExtraWhitespace /^\t*\zs \+/
-" Switch off :match highlighting.
-":match
-
-augroup vimrc
-    autocmd WinEnter,BufEnter,BufRead * setl cursorline
-    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
-
-    autocmd WinLeave,BufLeave * setl nocursorline
-    autocmd WinLeave,BufLeave * setl norelativenumber
-
-    "With the following in your vimrc, the command will be applied to the first
-    "window, and to any subsequent windows. The pattern * applies the highlight
-    "to all files
-    " Show leading whitespace that includes spaces, and trailing whitespace.
-    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-
-    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-    autocmd BufWinLeave * call clearmatches()
-augroup END
 
 " Remember things between sessions
 "
@@ -163,13 +201,6 @@ set iminsert=0                 " disable input method control in insert mode
 set imsearch=0                 " disable input method control in search mode
 
 " }}}
-" Par {{{
-
-" set formatprg=par\ -w72
-:map <A-q> {v}!par -jw72<CR>
-:vmap <A-q> !par -jw72<CR>
-
-" }}}
 " Vim behaviour {{{
 set hidden                      " hide buffers instead of closing them this
                                 "    means that the current buffer can be put
@@ -179,28 +210,40 @@ set switchbuf=useopen           " reveal already opened files from the
                                 " quickfix window instead of opening new
                                 " buffers
 set history=1000                " remember more commands and search history
-set undolevels=1000             " use many muchos levels of undo
+set undolevels=3000             " use many muchos levels of undo
 set undoreload=10000            " max number lines to save for undo on a buffer reload
-set undofile                " keep a persistent backup file
-set undodir=~/.vim/tmp/undo     " undo files
+set undofile                    " keep a persistent backup file
+set undodir=~/.vim/tmp/undo//     " undo files
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-set backupdir=~/.vim/tmp/backup " backups
-set directory=~/vim/tmp/swap   " swap files
+set backupdir=~/.vim/tmp/backup// " backups
+set directory=~/vim/tmp/swap//  " swap files
                                 " store swap files in one of these directories
                                 "    (in case swapfile is ever turned on)
 set autoread                    " auto re-read when the file is written by other applications
 set wildmenu                    " make tab completion for files/buffers act like bash
 set wildmode=list:longest,full  " show a list when pressing tab and complete
                                 "    first full match
-set wildignore=*.swp,*.bak,*.pyc,*.class
+set wildignore=.svn,CVS,.git,.hg,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,.DS_Store,*.aux,*.out,*.toc,tmp,*.scssc
 set title                       " change the terminal's title
 set visualbell                  " don't beep
 set noerrorbells                " don't beep
 set nomodeline                  " disable mode lines (security measure)
 "set ttyfast                     " always use a fast terminal
 set cursorline                  " underline the current line, for quick orientation
+
+set dictionary=/usr/share/dict/words
+
+" Don't redraw while executing macros
+set nolazyredraw
+
+set notimeout
+set ttimeout
+set ttimeoutlen=10
+
+" Highlight VCS conflict markers
+match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
 if has('cmdline_info')
   set ruler                   " show the ruler
@@ -254,6 +297,7 @@ endif
 
 " Change the mapleader from \ to ,
 let mapleader=","
+let maplocalleader = "\\"
 
 " }}}
 " Color scheme {{{
@@ -325,6 +369,12 @@ endfunction
 nnoremap <silent> <leader>/ :nohlsearch<CR><C-L>
 inoremap <silent> <leader>/ <C-O>:nohlsearch<CR>
 
+nmap <silent> <leader>hh :set invhlsearch<CR>
+nmap <silent> <leader>ll :set invlist<CR>
+nmap <silent> <leader>nn :set invnumber<CR>
+nmap <silent> <leader>pp :set invpaste<CR>
+nmap <silent> <leader>ii :set invrelativenumber<CR>
+
 " Change Working Directory to that of the current file
 cmap cwd lcd %:p:h
 cmap cd. lcd %:p:h
@@ -332,21 +382,48 @@ cmap cd. lcd %:p:h
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
 nnoremap / /\v
+vnoremap / /\v
 
 " Speed up scrolling of the viewport slightly
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 
+" clear search matching
+noremap <leader><space> :noh<cr>:call clearmatches()<cr>
+
+" Don't jump when using * for search
+nnoremap * *<c-o>
+
+" Keep search matches in the middle of the window.
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Same when jumping around
+nnoremap g; g;zz
+nnoremap g, g,zz
+
+" Open a Quickfix window for the last search.
+nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
+
+" Highlight word {{{
+
+nnoremap <silent> <leader>hh :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
+nnoremap <silent> <leader>h1 :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
+nnoremap <silent> <leader>h2 :execute '2match InterestingWord2 /\<<c-r><c-w>\>/'<cr>
+nnoremap <silent> <leader>h3 :execute '3match InterestingWord3 /\<<c-r><c-w>\>/'<cr>
+
+" }}}
+
 " }}}
 " Directional Keys ---------------------------------------------------------- {{{
-"nnoremap <up> <nop>
-"nnoremap <down> <nop>
-"nnoremap <left> <nop>
-"nnoremap <right> <nop>
-"inoremap <up> <nop>
-"inoremap <down> <nop>
-"inoremap <left> <nop>
-"inoremap <right> <nop>
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>
 
 " Easier moving in tabs and windows
 noremap <C-j>  <C-w>j
@@ -354,32 +431,49 @@ noremap <C-k>  <C-w>k
 noremap <C-l>  <C-w>l
 noremap <C-h>  <C-w>h
 
-" Fix home and end keybindings for screen, particularly on mac
-" - for some reason this fixes the arrow keys too. huh.
-" map [F $
-" imap [F $
-" map [H g0
-" imap [H g0
+" Easy buffer navigation
+noremap <leader>bp :bprevious<cr>
+noremap <leader>bn :bnext<cr>
+
+" Splits ,v and ,h to open new splits (vertical and horizontal)
+nnoremap <leader>v <C-w>v<C-w>l
+nnoremap <leader>h <C-w>s<C-w>j
+
+" Reselect visual block after indent/outdent
+vnoremap < <gv
+vnoremap > >gv
+
+" Bubbling lines
+nmap <C-Up> [e
+nmap <C-Down> ]e
+vmap <C-Up> [egv
+vmap <C-Down> ]egv
+
+" }}}
+" Triggers {{{
+
+" Save when losing focus
+au FocusLost    * :silent! wall
+"
+" When vimrc is edited, reload it
+autocmd! BufWritePost vimrc source ~/.vimrc
 
 " }}}
 " Convenience mappings -------------------------------------------------------- {{{
 
-" save changes
-map <leader>s :w<CR>
-" exit vim without saving any changes
-map <leader>q :q!<CR>
-" use CTRL-F for omni completion
-imap <C-F> 
+" Fast saving and closing current buffer without closing windows displaying the
+" buffer
+nmap <leader>wq :w!<cr>:Bclose<cr>
+
+" Seriously, guys. It's not like :W is bound to anything anyway.
+command! W :w
+
 " map <Alt-p> and <Alt-P> to paste below/above and reformat
 nnoremap <M-P> P'[v']=
 nnoremap <M-p> p'[v']=
 
 " Clean whitespace
 map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
-
-" Yankring
-nnoremap <silent> <F6> :YRShow<cr>
-let g:yankring_history_dir = '~/.vim/tmp'
 
 " Formatting, TextMate-style
 nnoremap <leader>q gqip
@@ -392,11 +486,11 @@ nnoremap <leader>v V`]
 " Better Completion
 set completeopt=longest,menuone,preview
 
-" This is a little tweak that is a time-saver while you’re building
-" up your .vimrc. This effectively maps the ,ev and ,sv keys to
-" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
+nnoremap <leader>ev <C-w>s<C-w>j:e $MYVIMRC<cr>
+nnoremap <leader>es <C-w>s<C-w>j:e ~/.vim/snippets/<cr>
+nnoremap <leader>eg <C-w>s<C-w>j:e ~/.gitconfig<cr>
+nnoremap <leader>ez <C-w>s<C-w>j:e ~/.zshrc<cr>
+nnoremap <leader>et <C-w>s<C-w>j:e ~/.tmux.conf<cr>
 
 " Sudo to write
 cmap w!! w !sudo tee % >/dev/null
@@ -418,14 +512,17 @@ nnoremap Y y$
 nnoremap D d$
 
 " Yank/paste to the OS clipboard with ,y and ,p
-nmap <leader>y "+y
-nmap <leader>Y "+yy
-nmap <leader>p "+p
-nmap <leader>P "+P
+nmap <leader>yo "+y
+nmap <leader>Yo "+yy
+nmap <leader>po "+p
+nmap <leader>Po "+P
 
 " visual shifting (does not exit Visual mode)
 vnoremap < <gv
 vnoremap > >gv
+
+" better ESC
+inoremap <C-k> <Esc>
 
 " Quick alignment of text
 nmap <leader>al :left<CR>
@@ -452,8 +549,6 @@ nmap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 " to “paste mode”, simply by setting the following option:
 set pastetoggle=<F7>
 
-nmap <F8> :TagbarToggle<CR>
-
 " Reselect text that was just pasted with <leader>v
 nnoremap <leader>v V`]
 
@@ -477,34 +572,8 @@ vnoremap <Space> za
 " cursor happens to be.
 nnoremap zO zCzO
 
-"function! MyFoldText()
-  "let line = getline(v:foldstart)
-
-  "let nucolwidth = &fdc + &number * &numberwidth
-  "let windowwidth = winwidth(0) - nucolwidth - 3
-  "let foldedlinecount = v:foldend - v:foldstart
-
-  "" expand tabs into spaces
-  "let onetab = strpart('          ', 0, &tabstop)
-  "let line = substitute(line, '\t', onetab, 'g')
-
-  "let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-  "let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
-  "return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-"endfunction
-"set foldtext=MyFoldText()
-
-""" Code folding options
-nmap <leader>f0 :set foldlevel=0<CR>
-nmap <leader>f1 :set foldlevel=1<CR>
-nmap <leader>f2 :set foldlevel=2<CR>
-nmap <leader>f3 :set foldlevel=3<CR>
-nmap <leader>f4 :set foldlevel=4<CR>
-nmap <leader>f5 :set foldlevel=5<CR>
-nmap <leader>f6 :set foldlevel=6<CR>
-nmap <leader>f7 :set foldlevel=7<CR>
-nmap <leader>f8 :set foldlevel=8<CR>
-nmap <leader>f9 :set foldlevel=9<CR>
+" Use ,z to "focus" the current fold.
+nnoremap <leader>z zMzvzz
 
 " }}}
 " Destroy infuriating keys ---------------------------------------------------- {{{
@@ -702,228 +771,25 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 " }}}
 " Stylus {{{
 
-au FileType stylus setlocal foldmethod=expr
-au FileType stylus setlocal foldexpr=GetStylusFold(v:lnum)
-au FileType stylus setlocal foldtext=StylusFoldText()
+" }}}
+" Par {{{
 
-" Principles:
-" - a def/class starts a fold
-" a line with indent less than the previous def/class ends a fold
-" empty lines and comment lines are linked to the previous fold
-" comment lines outside a def/class are never folded
-" other lines outside a def/class are folded together as a group
-" for algorithm, see bottom of script
+" set formatprg=par\ -w72
+:map <A-q> {v}!par -jw72<CR>
+:vmap <A-q> !par -jw72<CR>
 
-" - optionally, you can get empty lines between folds, see (***)
-" - another option is to ignore non-python files see (**)
-" - you can also modify the def/class check,
-"    allowing for multiline def and class definitions see (*)
+" }}}
+" haskell {{{
 
-" Note for vim 7 users:
-" Vim 6 line numbers always take 8 columns, while vim 7 has a numberwidth variable
-" you can change the 8 below to &numberwidth if you have vim 7,
-" this is only really useful when you plan to use more than 8 columns (i.e. never)
+au BufEnter *.hs compiler ghc
 
-" Note for masochists trying to read this:
-" I wanted to keep the functions short, so I replaced occurences of
-" if condition
-"     statement
-" by
-" if condition | statement
-" wherever I found that useful
+let g:ghc = "/usr/local/bin/ghc"
+let g:haddock_browser = "open"
 
-" (*)
-" class definitions are supposed to ontain a colon on the same line.
-" function definitions are *not* required to have a colon, to allow for multiline defs.
-" I you disagree, use instead of the pattern '^\s*\(class\s.*:\|def\s\)'
-" to enforce : for defs:                     '^\s*\(class\|def\)\s.*:'
-" you'll have to do this in two places.
-let s:defpat = '^\s*\([a-zA-Z]\.\[ ,)\s.*'
+" }}}
+" coffee script {{{
 
-function! StylusFoldText()
-  let fs = v:foldstart
-  while getline(fs) =~ '^\s*@' | let fs = nextnonblank(fs + 1)
-  endwhile
-  let line = getline(fs)
-  let nnum = nextnonblank(fs + 1)
-  let nextline = getline(nnum)
-  "get the document string: next line is ''' or """
-  if nextline =~ "^\\s\\+[\"']\\{3}\\s*$"
-      let line = line . " " . matchstr(getline(nextnonblank(nnum + 1)), '^\s*\zs.*\ze$')
-  "next line starts with qoutes, and has text
-  elseif nextline =~ "^\\s\\+[\"']\\{1,3}"
-      let line = line." ".matchstr(nextline, "^\\s\\+[\"']\\{1,3}\\zs.\\{-}\\ze['\"]\\{0,3}$")
-  elseif nextline =~ '^\s\+pass\s*$'
-    let line = line . ' pass'
-  endif
-  "compute the width of the visible part of the window (see Note above)
-  let w = winwidth(0) - &foldcolumn - (&number ? 8 : 0)
-  let size = 1 + v:foldend - v:foldstart
-  "compute expansion string
-  let spcs = '................'
-  while strlen(spcs) < w | let spcs = spcs . spcs
-  endwhile
-  "expand tabs (mail me if you have tabstop>10)
-  let onetab = strpart('          ', 0, &tabstop)
-  let line = substitute(line, '\t', onetab, 'g')
-  return strpart(line.spcs, 0, w-strlen(size)-7).'.'.size.' lines'
-endfunction
-
-function! GetBlockIndent(lnum)
-    " Auxiliary function; determines the indent level of the surrounding def/class
-    " "global" lines are level 0, first def &shiftwidth, and so on
-    " scan backwards for class/def that is shallower or equal
-    let ind = 100
-    let p = a:lnum+1
-    while indent(p) >= 0
-        let p = p - 1
-        " skip empty and comment lines
-        if getline(p) =~ '^$\|^\s*#' | continue
-        " zero-level regular line
-        elseif indent(p) == 0 | return 0
-        " skip deeper or equal lines
-        elseif indent(p) >= ind || getline(p) =~ '^$\|^\s*#' | continue
-        " indent is strictly less at this point: check for def/class
-        elseif getline(p) =~ s:defpat && getline(p) !~ '^\s*@'
-            " level is one more than this def/class
-            return indent(p) + &shiftwidth
-        endif
-        " shallower line that is neither class nor def: continue search at new level
-        let ind = indent(p)
-    endwhile
-    "beginning of file
-    return 0
-endfunction
-
-" Clever debug code, use to display text for a given moment the statement is executed:
-" call PrintIfCount(6, "Line: ".a:lnum.", indent: ".ind.", previous indent: ".pind)
-let s:counter=0
-function! PrintIfCount(n,t)
-    "Print text the nth time this function is called
-    let s:counter = s:counter+1
-    if s:counter==a:n | echo a:t
-    endif
-endfunction
-
-function! GetStylusFold(lnum)
-    " Determine folding level in Stylus source (see "higher foldlevel theory" below)
-    let line = getline(a:lnum)
-    let ind = indent(a:lnum)
-    " Case D***: class and def start a fold
-    " If previous line is @, it is not the first
-    if line =~ s:defpat && getline(prevnonblank(a:lnum-1)) !~ '^\s*@'
-        " let's see if this range of 0 or more @'s end in a class/def
-        let n = a:lnum
-        while getline(n) =~ '^\s*@' | let n = nextnonblank(n + 1)
-        endwhile
-        " yes, we have a match: this is the first of a real def/class with decorators
-        if getline(n) =~ s:defpat
-            return ">".(ind/&shiftwidth+1)
-        endif
-    " Case E***: empty lines fold with previous
-    " (***) change '=' to -1 if you want empty lines/comment out of a fold
-    elseif line == '' | return '='
-    endif
-    " now we need the indent from previous
-    let p = prevnonblank(a:lnum-1)
-    while p>0 && getline(p) =~ '^\s*#' | let p = prevnonblank(p-1)
-    endwhile
-    let pind = indent(p)
-    " If previous was definition: count as one level deeper
-    if getline(p) =~ s:defpat && getline(prevnonblank(a:lnum - 1)) !~ '^\s*@'
-        let pind = pind + &shiftwidth
-    " if begin of file: take zero
-    elseif p==0 | let pind = 0
-    endif
-    " Case S*=* and C*=*: indent equal
-    if ind>0 && ind==pind | return '='
-    " Case S*>* and C*>*: indent increase
-    elseif ind>pind | return '='
-    " All cases with 0 indent
-    elseif ind==0
-        " Case C*=0*: separate global code blocks
-        if pind==0 && line =~ '^#' | return 0
-        " Case S*<0* and S*=0*: global code
-        elseif line !~'^#'
-            " TODO: here we need to check GetBlockIndent(a:lnum) for version 3.3
-            " Case S*<0*: new global statement if/while/for/try/with
-            if 0<pind && line!~'^else\s*:\|^except.*:\|^elif.*:\|^finally\s*:' | return '>1'
-            " Case S*=0*, after level 0 comment
-            elseif 0==pind && getline(prevnonblank(a:lnum-1)) =~ '^\s*#' | return '>1'
-            " Case S*=0*, other, stay 1
-            else | return '='
-            endif
-        endif
-        " Case C*<0= and C*<0<: compute next indent
-        let n = nextnonblank(a:lnum+1)
-        while n>0 && getline(n) =~'^\s*#' | let n = nextnonblank(n+1)
-        endwhile
-        " Case C*<0=: split definitions
-        if indent(n)==0 | return 0
-        " Case C*<0<: shallow comment
-        else | return -1
-        end
-    endif
-    " now we really need to compute the actual fold indent
-    " do the hard computation
-    let blockindent = GetBlockIndent(a:lnum)
-    " Case SG<* and CG<*: global code, level 1
-    if blockindent==0 | return 1
-    endif
-    " now we need the indent from next
-    let n = nextnonblank(a:lnum+1)
-    while n>0 && getline(n) =~'^\s*#' | let n = nextnonblank(n+1)
-    endwhile
-    let nind = indent(n)
-    " Case CR<= and CR<>
-    endif
-    if line =~ '^\s*#' && ind>=nind | return -1
-    " Case CR<<: return next indent
-    elseif line =~ '^\s*#' | return nind / &shiftwidth
-    " Case SR<*: return actual indent
-    else | return blockindent / &shiftwidth
-    endif
-endfunction
-
-" higher foldlevel theory
-" There are five kinds of statements: S (code), D (def/class), E (empty), C (comment)
-
-" Note that a decorator statement (beginning with @) counts as definition,
-" but that of a sequence of @,@,@,def only the first one counts
-" This means that a definiion only counts if not preceded by a decorator
-
-" There are two kinds of folds: R (regular), G (global statements)
-
-" There are five indent situations with respect to the previous non-emtpy non-comment line:
-" > (indent), < (dedent), = (same); < and = combine with 0 (indent is zero)
-" Note: if the previous line is class/def, its indent is interpreted as one higher
-
-" There are three indent situations with respect to the next (non-E non-C) line:
-" > (dedent), < (indent), = (same)
-
-" Situations (in order of the script):
-" stat  fold prev   next
-" SDEC  RG   ><=00  ><=
-" D     *    *      *     begin fold level if previous is not @: '>'.ind/&sw+1
-" E     *    *      *     keep with previous: '='
-" S     *    =      *     stays the same: '='
-" C     *    =      *     combine with previous: '='
-" S     *    >      *     stays the same: '='
-" C     *    >      *     combine with previous: '='
-" C     *    =0     *     separate blocks: 0
-" S     *    <0     *     becomes new level 1: >1 (except except/else: 1)
-" S     *    =0     *     stays 1: '=' (after level 0 comment: '>1')
-" C     *    <0     =     split definitions: 0
-" C     *    <0     <     shallow comment: -1
-" C     *    <0     >     [never occurs]
-" S     G    <      *     global, not the first: 1
-" C     G    <      *     indent isn't 0: 1
-" C     R    <      =     foldlevel as computed for next line: -1
-" C     R    <      >     foldlevel as computed for next line: -1
-" S     R    <      *     compute foldlevel the hard way: use function
-" C     R    <      <     foldlevel as computed for this line: use function
-
-
+au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " }}}
 " Javascript {{{
@@ -1025,8 +891,6 @@ nnoremap <buffer> <Leader><Leader>ttd :TernDefTab<CR>
 nnoremap <buffer> <Leader><Leader>tr  :TernRefs<CR>
 nnoremap <buffer> <Leader><Leader>tR  :TernRename<CR>
 
-
-
 " }}}
 " Color Highlight {{{
 
@@ -1048,49 +912,6 @@ map <leader>a :Ack!
 let g:ackprg = 'ag --nogroup --nocolor --column'
 
 " }}}
-" Improve completion popup menu {{{
-
-"inoremap <expr> <Esc>      pumvisible() ? "\<C-e>" : "\<Esc>"
-"inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"
-"inoremap <expr> <Down>     pumvisible() ? "\<C-n>" : "\<Down>"
-"inoremap <expr> <Up>       pumvisible() ? "\<C-p>" : "\<Up>"
-"inoremap <expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-"inoremap <expr> <PageUp>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
-
-" <TAB>: completion.
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-"inoremap <expr><S-Tab>  pumvisible() ? "\<C-P>" : "\<S-Tab>"
-
-" }}}
-" Neocomplcache Support {{{
-
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplcache.
-let g:neocomplcache_enable_at_startup = 0
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-" Use camel case completion.
-let g:neocomplcache_enable_camel_case_completion = 1
-" Use underbar completion.
-let g:neocomplcache_enable_underbar_completion = 1
-" Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
-"let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-" <C-h>, <BS>: close popup and delete backword char.
-"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-"inoremap <expr><C-y>  neocomplcache#close_popup()
-"inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
-" AutoComplPop like behavior.
-"let g:neocomplcache_enable_auto_select = 1
-
-" }}}
 " Marked Support {{{
 nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
 
@@ -1104,6 +925,12 @@ nnoremap <leader>MM :silent !open -a MultiMarkdown\ Composer.app '%:p'<cr>
 autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki
 
 " }}}
+" NERD Commenter {{{
+
+nmap <leader># :call NERDComment(0, "invert")<cr>
+vmap <leader># :call NERDComment(0, "invert")<cr>
+
+" }}}
 " NERD Tree {{{
 
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and
@@ -1112,6 +939,12 @@ nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
 nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
 nmap <leader>N :NERDTreeClose<CR>
 "map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+
+" Disable the scrollbars (NERDTree)
+set guioptions-=r
+set guioptions-=L
+" Keep NERDTree window fixed between multiple toggles
+set winfixwidth
 
 let NERDTreeChDirMode=0
 
@@ -1210,7 +1043,7 @@ let g:syntastic_javascript_checkers = ['jshint', 'jscs']
 let g:syntastic_javascript_closurecompiler_path = '/usr/local/lib/closurecompiler/compiler.jar'
 let g:syntastic_mode_map = { 'mode': 'active',
                             \ 'active_filetypes': ['ruby', 'php', 'javascript', 'html', 'handlebars', 'stylus', 'css'],
-                            \ 'passive_filetypes': ['puppet'] }
+                            \ 'passive_filetypes': ['puppet', 'slim'] }
 
 
 " }}}
@@ -1362,9 +1195,14 @@ nmap <Leader>x <Plug>ToggleAutoCloseMappings
 " OrgMode {{{
 
 let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo', 'Misc']
-
 let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
 let g:org_debug = 1
+
+" }}}
+" vim-go {{{
+
+let g:go_disable_autoinstall = 1
+
 " }}}
 " Rooter{{{
 
@@ -1439,6 +1277,11 @@ nnoremap <leader>gci :Gcommit<cr>
 nnoremap <leader>gm :Gmove<cr>
 nnoremap <leader>gr :Gremove<cr>
 
+" ,f for global git serach for word under the cursor (with highlight)
+nmap <leader>gf :let @/="\\<<C-R><C-W>\\>"<CR>:set hls<CR>:silent Ggrep -w "<C-R><C-W>"<CR>:ccl<CR>:cw<CR><CR>
+" same in visual mode
+:vmap <leader>gf y:let @/=escape(@", '\\[]$^*.')<CR>:set hls<CR>:silent Ggrep -F "<C-R>=escape(@", '\\"#')<CR>"<CR>:ccl<CR>:cw<CR><CR>
+
 "To use with GitHub FI, point g:fugitive_github_domains at a list of domains:
 let g:fugitive_github_domains = ['http://git.ibaset.com']
 
@@ -1451,11 +1294,41 @@ augroup END
 " }}}
 " YankRing {{{
 
+let g:yankring_replace_n_pkey = '<leader>['
+let g:yankring_replace_n_nkey = '<leader>]'
+let g:yankring_history_dir = '~/.vim/tmp/'
+nmap <leader>y :YRShow<cr>
+
 function! YRRunAfterMaps()
     nnoremap Y :<C-U>YRYankCount 'y$'<CR>
     omap <expr> L YRMapsExpression("", "$")
     omap <expr> H YRMapsExpression("", "^")
 endfunction
+
+" }}}
+" indentline {{{
+
+set list lcs=tab:\|\
+let g:indentLine_color_term = 111
+let g:indentLine_color_gui = '#DADADA'
+let g:indentLine_char = 'c'
+"let g:indentLine_char = '∙▹¦'
+let g:indentLine_char = '∙'
+
+" }}}
+" vim-indent-object {{{
+
+let g:indentobject_meaningful_indentation = ["haml", "sass", "python", "yaml", "markdown"]
+
+" }}}
+" easybuffer {{{
+
+nmap <leader>be :EasyBufferToggle<enter>
+
+" }}}
+" ctrlp {{{
+
+let g:ctrlp_working_path_mode = ''
 
 " }}}
 " Scratch {{{
@@ -1790,4 +1663,55 @@ else
   set term=builtin_ansi       " Make arrow and other keys work
 endif
 
+" }}}
+
+" _ Vim {{{
+augroup ft_vim
+    au!
+
+    au FileType vim setlocal foldmethod=marker
+    au FileType help setlocal textwidth=78
+    au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
+augroup END
+" }}}
+
+" EXTENSIONS {{{
+
+" _. Scratch {{{
+source ~/.vim/functions/scratch_toggle.vim
+" }}}
+
+" _. Buffer Handling {{{
+source ~/.vim/functions/buffer_handling.vim
+" }}}
+
+" _. Tab {{{
+source ~/.vim/functions/insert_tab_wrapper.vim
+" }}}
+
+" _. Text Folding {{{
+source ~/.vim/functions/my_fold_text.vim
+" }}}
+
+" _. Gist {{{
+" Send visual selection to gist.github.com as a private, filetyped Gist
+" Requires the gist command line too (brew install gist)
+vnoremap <leader>G :w !gist -p -t %:e \| pbcopy<cr>
+" }}}
+
+" }}}
+" TEXT OBJECTS {{{
+
+" Shortcut for [] motion
+onoremap ir i[
+onoremap ar a[
+vnoremap ir i[
+vnoremap ar a[
+
+" }}}
+
+" Load addidional configuration (ie to overwrite shorcuts) {{{
+if filereadable(expand("~/.vim/after.vimrc"))
+  source ~/.vim/after.vimrc
+endif
 " }}}
