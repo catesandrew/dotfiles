@@ -232,9 +232,6 @@
 [submodule "home/vim/bundle/ctrlp"]
 	path = home/vim/bundle/ctrlp
 	url = https://github.com/kien/ctrlp.vim.git
-[submodule "home/vim/bundle/vim-yankstack"]
-	path = home/vim/bundle/vim-yankstack
-	url = https://github.com/maxbrunsfeld/vim-yankstack.git
 [submodule "home/vim/bundle/vim-eunuch"]
 	path = home/vim/bundle/vim-eunuch
 	url = https://github.com/tpope/vim-eunuch.git
