@@ -43,56 +43,21 @@ filetype off
 
 " Define and reset augroup used in vimrc
 augroup vimrc
-    autocmd!
-    autocmd WinEnter,BufEnter,BufRead * setl cursorline
-    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
-
-    autocmd WinLeave,BufLeave * setl nocursorline
-    autocmd WinLeave,BufLeave * setl norelativenumber
-
-    "With the following in your vimrc, the command will be applied to the first
-    "window, and to any subsequent windows. The pattern * applies the highlight
-    "to all files
-    " Show leading whitespace that includes spaces, and trailing whitespace.
-    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-
-    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-    autocmd BufWinLeave * call clearmatches()
+    au!
 augroup END
 
 " Cursorline {{{
 " Only show cursorline in the current window and in normal mode.
-augroup cline
-    au!
-    au WinLeave * set nocursorline
-    au WinLeave * set norelativenumber
-    au WinEnter * set cursorline
-    au WinEnter * set relativenumber
-    au InsertEnter * set nocursorline
-    au InsertEnter * set norelativenumber
-    au InsertLeave * set cursorline
-    au InsertLeave * set relativenumber
-augroup END
+"augroup cline
+    "au!
+"augroup END
 " }}}
 
 " Trailing whitespace {{{
 " Only shown when not in insert mode so I don't go insane.
-augroup trailing
-    au!
-    au InsertEnter * :set listchars-=trail:␣
-    au InsertLeave * :set listchars+=trail:␣
-augroup END
-
-" Remove trailing whitespaces when saving
-" Wanna know more? http://vim.wikia.com/wiki/Remove_unwanted_spaces
-" If you want to remove trailing spaces when you want, so not automatically,
-" see
-" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
-autocmd BufWritePre * :%s/\s\+$//e
+"augroup trailing
+    "au!
+"augroup END
 
 " }}}
 
@@ -164,6 +129,62 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 set synmaxcol=512               " long lines slow down vim
 "https://coderwall.com/p/j9wnfw
 set clipboard=unnamed
+
+" Show trailing whitespace:
+":match ExtraWhitespace /\s\+$/
+" Show trailing whitespace and spaces before a tab:
+":match ExtraWhitespace /\s\+$\| \+\ze\t/
+" Show tabs that are not at the start of a line:
+":match ExtraWhitespace /[^\t]\zs\t\+/
+" Show spaces used for indenting (so you use only tabs for indenting).
+":match ExtraWhitespace /^\t*\zs \+/
+" Switch off :match highlighting.
+":match
+
+augroup vimrc
+    autocmd WinEnter,BufEnter,BufRead * setl cursorline
+    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
+
+    autocmd WinLeave,BufLeave * setl nocursorline
+    autocmd WinLeave,BufLeave * setl norelativenumber
+
+    "With the following in your vimrc, the command will be applied to the first
+    "window, and to any subsequent windows. The pattern * applies the highlight
+    "to all files
+    " Show leading whitespace that includes spaces, and trailing whitespace.
+    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+
+    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
+augroup END
+
+" Cursorline {{{
+" Only show cursorline in the current window and in normal mode.
+"augroup cline
+    "au WinLeave * set nocursorline
+    "au WinEnter * set cursorline
+    "au InsertEnter * set nocursorline
+    "au InsertLeave * set cursorline
+"augroup END
+" }}}
+
+" Trailing whitespace {{{
+" Only shown when not in insert mode so I don't go insane.
+"augroup trailing
+    "au InsertEnter * :set listchars-=trail:␣
+    "au InsertLeave * :set listchars+=trail:␣
+"augroup END
+
+" Remove trailing whitespaces when saving
+" Wanna know more? http://vim.wikia.com/wiki/Remove_unwanted_spaces
+" If you want to remove trailing spaces when you want, so not automatically,
+" see
+" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
+autocmd BufWritePre * :%s/\s\+$//e
 
 " Remember things between sessions
 "
@@ -907,7 +928,7 @@ let g:colorizer_skip_comments = 1
 " }}}
 " Ack {{{
 
-map <leader>a :Ack! 
+map <leader>a :Ack!
 " You can use Ag with ack.vim by adding the following line to your .vimrc:
 let g:ackprg = 'ag --nogroup --nocolor --column'
 
@@ -987,7 +1008,7 @@ let g:atia_attributes_complete = 0
 " Syntastic {{{
 
 " Custom syntastic settings:
-function s:find_jshintrc(dir)
+function! s:find_jshintrc(dir)
     let l:found = globpath(a:dir, '.jshintrc')
     if filereadable(l:found)
         return l:found
@@ -1001,7 +1022,7 @@ function s:find_jshintrc(dir)
     return "~/.jshintrc"
 endfunction
 
-function UpdateJsHintConf()
+function! UpdateJsHintConf()
     let l:dir = expand('%:p:h')
     let l:jshintrc = s:find_jshintrc(l:dir)
     let g:syntastic_javascript_jshint_args = '-c ' . l:jshintrc
@@ -1009,7 +1030,7 @@ endfunction
 
 au BufEnter * call UpdateJsHintConf()
 
-function s:find_jscsrc(dir)
+function! s:find_jscsrc(dir)
     let l:jscsfound = globpath(a:dir, '.jscsrc')
     if filereadable(l:jscsfound)
         return l:jscsfound
@@ -1023,7 +1044,7 @@ function s:find_jscsrc(dir)
     return "~/.jscsrc"
 endfunction
 
-function UpdateJscsConf()
+function! UpdateJscsConf()
     let l:dir = expand('%:p:h')
     let l:jscsrc = s:find_jscsrc(l:dir)
     let g:syntastic_javascript_jscs_args = '-c ' . l:jscsrc
@@ -1152,7 +1173,7 @@ nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " Also, you should hook other event, because FileType is too early, and cursor
 " position will be overwritten using info from .viminfo:
-function MyBufEnter()
+function! MyBufEnter()
   " don't (re)store filepos for git commit message files
   if &filetype == "gitcommit"
     call setpos('.', [0, 1, 1, 0])
@@ -1582,7 +1603,7 @@ nnoremap <leader>2 yyPVr*jyypVr*
 nnoremap <leader>3 yypVr=
 nnoremap <leader>4 yypVr-
 nnoremap <leader>5 yypVr^
-nnoremap <leader>6 yypVr"   
+nnoremap <leader>6 yypVr"
 
 " }}}
 " MacVim ---------------------------------------------------------------------- {{{
