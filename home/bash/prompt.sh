@@ -1,21 +1,11 @@
-#######################################################################
-# ~/.bash/prompt.sh                                                   #
-# version 0.2.1                                                       #
-# by Paul Duncan <pabs@pablotron.org>                                 #
-#######################################################################
-
-###############
 # Eterm Title #
-###############
 if [ $TERM = "xterm-256color" ]; then
     XTITLE="\[\e]0;\u@\h (\w) - Bash \v\a\]"
 else
     XTITLE=""
 fi
 
-#################
 # Prompt Colors #
-#################
 BLACK="\[\033[0;30m\]"
 BLUE="\[\033[0;34m\]"
 GREEN="\[\033[0;32m\]"
@@ -34,9 +24,7 @@ YELLOW="\[\033[1;33m\]"
 WHITE="\[\033[1;37m\]"
 NOTHING="\[\033[0m\]"
 
-##################
 # Default Colors #
-##################
 C_USER="$WHITE"
 C_OP_PAREN="$DARK_GRAY"
 C_AMP="$NOTHING"
@@ -46,23 +34,17 @@ C_COLON="$NOTHING"
 C_PWD="$WHITE"
 C_GT="$NOTHING"
 
-##########################
 # Custom Hostname Colors #
-##########################
 . ~/.bash/host_colors.sh
 
-#############################
 # Custom Root Prompt Colors #
-#############################
 if [ $EUID = "0" ]; then
     C_OP_PAREN="$YELLOW"
     C_USER="$LIGHT_RED"
     C_CL_PAREN="$YELLOW"
 fi
 
-#################
 # Assign to PS1 #
-#################
 PS1="$XTITLE""$C_USER""\u""$C_AMP""@""\
 $C_HOST""\h""$C_COLON"":\
 $C_PWD""\W""$C_GT"">""$NOTHING "
@@ -118,4 +100,3 @@ PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
 bash_prompt
 unset bash_prompt
-

@@ -1,0 +1,81 @@
+# http://www.railsonmaui.com/blog/2014/03/11/rocking-with-tmux-tmuxinator-and-iterm2-for-rails-development/
+# Copy this file here: ~/.tmuxinator/brazen.yml
+# Invoke with
+#   mux brazen
+# Then hit 'Ctrl-a d' to detach
+# Then run 'tmux -CC attach'
+# Make sure that option for iterm2 is General --> tmux --> When attaching, open unrecognized windows in Tabs
+# Also, check option "Automatically hide the tmux client session after connecting"
+# tmux kill-session -t brazen
+
+name: brazen
+root: /usr/local/src/ibaset/brazen
+
+# Optional. tmux socket
+# socket_name: foo
+
+# Runs before everything. Use it to start daemons etc.
+# pre: sudo /etc/rc.d/mysqld start
+
+# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
+# pre_window: rbenv shell 2.0.0-p247
+pre_window: cd /usr/local/src/ibaset/brazen
+
+# Pass command line options to tmux. Useful for specifying a different tmux.conf.
+# tmux_options: -f ~/.tmux.mac.conf
+
+# Change the command to call tmux.  This can be used by derivatives/wrappers like byobu.
+# tmux_command: byobu
+
+#The following layouts are supported:
+
+    #even-horizontal
+            #Panes are spread out evenly from left to right across the window.
+
+    #even-vertical
+            #Panes are spread evenly from top to bottom.
+
+    #main-horizontal
+            #A large (main) pane is shown at the top of the window and the
+            #remaining panes are spread from left to right in the leftover
+            #space at the bottom.  Use the main-pane-height window option to
+            #specify the height of the top pane.
+
+    #main-vertical
+            #Similar to main-horizontal but the large pane is placed on the
+            #left and the others spread from top to bottom along the right.
+            #See the main-pane-width window option.
+
+    #tiled   Panes are spread out as evenly as possible over the window in
+            #both rows and columns.
+
+#windows:
+  #- editor:
+      #layout: main-vertical
+      #panes:
+        #- vim
+        #- guard
+  #- server: bundle exec rails s
+  #- logs: tail -f log/development.log
+
+
+#windows:
+  #- zeus: zeus start
+  #- spec: beg -g spec
+  #- server: beg -g server
+  #- worker:
+      #layout: main-horizontal
+      #panes:
+        #- beg -g worker
+        #- scheduler
+
+windows:
+  - server:
+        layout: main-horizontal
+        panes:
+            - grunt dev-start-watch
+            - mvim --servername brazen .
+  - editor:
+        layout: main-horizontal
+        panes:
+            - mvim --servername brazen .

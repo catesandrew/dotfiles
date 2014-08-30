@@ -1,33 +1,18 @@
-#######################################################################
-# ~/.bash/functions.sh                                                #
-# version 0.2.1                                                       #
-# by Paul Duncan <pabs@pablotron.org>                                 #
-#######################################################################
-
-# Start an HTTP server from a directory, optionally specifying the port
-function server() {
-    # Get port (if specified)
-    local port="${1:-8000}"
-
-    # Open in the browser
-    open "http://localhost:${port}/"
-    #python -m SimpleHTTPServer "$port"
-
-    # Redefining the default content-type to text/plain instead of the default
-    # application/octet-stream allows "unknown" files to be viewable in-browser
-    # as text instead of being downloaded.
-    #
-    # Unfortunately, "python -m SimpleHTTPServer" doesn't allow you to redefine
-    # the default content-type, but the SimpleHTTPServer module can be executed
-    # manually with just a few lines of code.
-    python -c $'import SimpleHTTPServer;\nSimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map[""] = "text/plain";\nSimpleHTTPServer.test();' "$port"
+# Helper function loading various enable-able files
+function _load_bash_it_files() {
+  subdirectory="$1"
+  if [ ! -d "${BASH_IT}/${subdirectory}" ]
+  then
+    continue
+  fi
+  FILES="${BASH_IT}/${subdirectory}/*.bash"
+  for bash_config_file in $FILES
+  do
+    if [ -e "${bash_config_file}" ]; then
+      source $bash_config_file
+    fi
+  done
 }
-
-function mvim2() {
-    mvim --servername `git rev-parse --show-toplevel` .
-}
-
-function growl() { echo -e $'\e]9;'${1}'\007' ; return  ; }
 
 # posfind: search the directory frontmost in the Finder
 function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
@@ -36,44 +21,26 @@ function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
 function posgrep { grep -iIrn "$1" "`/usr/local/bin/posd`"; }
 
 function tom {
-	if [ "`ps xwww | grep -v grep | grep -c catalina`" == "0" ];then
-		echo "Off";
-	else
-		CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
-		echo "On - $CATALINA_PID";
-	fi
+    if [ "`ps xwww | grep -v grep | grep -c catalina`" == "0" ];then
+        echo "Off";
+    else
+        CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+        echo "On - $CATALINA_PID";
+    fi
 }
 
 function killtom {
-	if [ "`ps xwww | grep -v grep | grep -c catalina`" == "1" ]; then
-		CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
-	  kill -9 $CATALINA_PID
-		echo "Tom is dead. Killed process $CATALINA_PID"
-	else
-		echo "Tom is not on."
-	fi
-}
-
-function brainyquote {
-  curl --silent http://www.brainyquote.com | egrep '(span class="body")|(span class="bodybold")' | sed -n '6p; 7p; ' | sed ' s/<[a-z0-9=."/ ]*>//g'
-}
-
-function quoteoftheday {
-  echo `curl --silent http://www.quotedb.com/quote/quote.php?action=quote_of_the_day_rss | awk 'NR==23' | sed -e 's/<[^>]*>//g'`
+    if [ "`ps xwww | grep -v grep | grep -c catalina`" == "1" ]; then
+        CATALINA_PID=`ps A | grep -v grep | grep catalina | awk '{ print $1 }' | sed 's/[ \t]*$//'`;
+      kill -9 $CATALINA_PID
+        echo "Tom is dead. Killed process $CATALINA_PID"
+    else
+        echo "Tom is not on."
+    fi
 }
 
 # Image width
-function width () {
-  echo $(sips -g pixelWidth $1 | grep -oE "[[:digit:]]{1,}$")
-}
-
-# Image height
-function height () {
-  echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")
-}
-
-# Image width
-function wh () {
+function wh() {
   width=`identify -format "%[fx:w]" "$1"`;
   height=`identify -format "%[fx:h]" "$1"`;
   echo "width x height = $width x $height"
@@ -138,6 +105,30 @@ cdf() {
     fi
 }
 
+function preexec_invoke_cmd () {
+    precmd
+    preexec_interactive_mode="yes"
+}
+
+# Notes:
+#  - tsort requires as input a stream of pairs (a, b) where package a depends
+#    on package b. If package a has k > 1 dependencies, we should have k lines
+#    associated to it; if package a has no dependencies, then we should have a
+#    single line (a, a). The pairs are just space delimited, no parentheses.
+#    the little awk program below formats the data that way for tsort.
+#  - tsort outputs the order from bottom to top; that's why we need to reverse
+#    it with tail -r.
+#
+# try So I'll try "uninstall... install" instead of "reinstal".
+function brew_reinstall () {
+    brew list \
+        | while read l; do echo -n "$l "; echo $(brew deps $l); done \
+        | awk 'NF == 1 {print $1, $1} NF > 1 {for (i=1;i<=NF;i++) print $1, $i}' \
+        | tsort \
+        | tail -r \
+        | while read l; do echo -n "$l "; brew reinstall $l; done
+}
+
 ##################################################
 # Fancy PWD display function
 ##################################################
@@ -161,5 +152,26 @@ bash_prompt_command() {
     then
         NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
         NEW_PWD=${trunc_symbol}/${NEW_PWD#*/}
+    fi
+}
+
+# Max length of PWD to display
+MAX_PWD_LENGTH=32
+
+# Displays last X characters of pwd
+function limited_pwd() {
+
+    # Replace $HOME with ~ if possible
+    RELATIVE_PWD=${PWD/#$HOME/\~}
+
+    local offset=$((${#RELATIVE_PWD}-$MAX_PWD_LENGTH))
+
+    if [ $offset -gt "0" ]
+    then
+        local truncated_symbol="..."
+        TRUNCATED_PWD=${RELATIVE_PWD:$offset:$MAX_PWD_LENGTH}
+        echo -e "${truncated_symbol}/${TRUNCATED_PWD#*/}"
+    else
+        echo -e "${RELATIVE_PWD}"
     fi
 }

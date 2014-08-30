@@ -1,21 +1,3 @@
-export CLICOLOR=1
-export LSCOLORS=ExFxCxDxBxegedabagacad
-export JAVA_HOME="`/usr/libexec/java_home`"
-export HTML_TIDY=$HOME/.tidyrc
-export TLSOURCE=en TLTARGET=es
-#export PYTHONPATH=/Library/Python/2.7/site-packages
-export LC_CTYPE="utf-8"
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-export PERL_LOCAL_LIB_ROOT="$HOME/perl5:$PERL_LOCAL_LIB_ROOT";
-export PERL_MB_OPT="--install_base "/Users/andrew/perl5"";
-export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
-export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB";
-export PATH="$HOME/perl5/bin:/usr/local/bin:/usr/local/ssl/bin:/usr/local/sbin:/usr/local/rvm/bin:$PATH"
-export PATH="$HOME/.cabal/bin:$PATH"
-export GOPATH=/usr/local/go
-
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
 # few annoyances:
@@ -67,64 +49,28 @@ set -o vi
 # I hate noise
 set bell-style visible
 
-# The internal command will return focus directly to the terminal after
-# the commit message is saved and quit. It's a small optimization,
-# but a nice one, I find. (Tip originally found here:
-# http://b4winckler.wordpress.com/2009/09/02/macvim-on-snow-leopard/#comment-36
-export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
+# Path to the bash it configuration
+export BASH_IT=$HOME/.bash
 
-# vim and gnome-terminal have support for 256 colours in fedora 8 at least
-# Note debian/ubuntu users need to install the ncurses-term package for this
-# Note this should be set in ~/.profile for Fedora startup scripts to
-# setup LS_COLORS correctly.
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]]  && infocmp gnome-256color >/dev/null 2>&1; then
-    export TERM=gnome-256color
-elif infocmp xterm-256color >/dev/null 2>&1; then
-    export TERM=xterm-256color
+# Lock and Load a custom theme file
+# location /.bash_it/themes/
+export BASH_IT_THEME='powerline'
+#export BASH_IT_THEME='sexy'
+
+#export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
+# Set mveditor/MacVim as EDITOR.
+if [ -f "${BASH_IT}/mveditor.sh" ]; then
+    export EDITOR="${BASH_IT}/mveditor.sh"
+    export GIT_EDITOR="${BASH_IT}/mveditor.sh"
+else
+    echo "WARNING: Can't find mac vim editor. Using vim instead."
+    export EDITOR="vim"
+    export GIT_EDITOR="vim"
 fi
 
-# Autocorrect typos in path names when using `cd`
-shopt -s cdspell
+# Don't check mail when opening terminal.
+unset MAILCHECK
 
-# Check the window size after each command and, if necessary, update the values
-# of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# Append to the Bash history file, rather than overwriting it
-shopt -s histappend
-
-# Case-insensitive globbing (used in pathname expansion)
-shopt -s nocaseglob
-
-# Don't store duplicate adjacent items in the history
-# HISTCONTROL=ignoreboth
-
-# Ignore duplicate commands in the history
-export HISTCONTROL=ignoredups
-
-# Increase the maximum number of lines contained in the history file
-# (default is 500)
-export HISTFILESIZE=10000
-
-# Increase the maximum number of commands to remember
-# (default is 500)
-export HISTSIZE=10000
-
-# Make some commands not show up in history
-export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
-
-# Don't clear the screen after quitting a manual page
-export MANPAGER="less -X"
-
-# Export PhantomJS bin location (be explicit in case Homebrew is not installed
-# in the default location)
-#export PHANTOMJS_BIN="/usr/local/bin/phantomjs"
-
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
+if [ -f "${HOME}/.bashrc" ]; then
+  source "${HOME}/.bashrc"
 fi
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-export NVM_TARGET="$HOME/.dotfiles/prefix/src/nvm"
-export NVM_DIR="/usr/local/nvm"
-[[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*

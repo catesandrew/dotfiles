@@ -100,9 +100,10 @@ set copyindent    " copy the previous indentation on autoindenting
 set showmode                    " always show what mode we're currently editing in
 set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
-set binary
+"set binary
 set cpoptions+=J
-set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
+set listchars=tab:▸\ ,eol:¬
+"set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
 set shell=/bin/bash
 set showbreak=↪
 set splitbelow
@@ -184,7 +185,7 @@ augroup END
 " If you want to remove trailing spaces when you want, so not automatically,
 " see
 " http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
-autocmd BufWritePre * :%s/\s\+$//e
+"autocmd BufWritePre * :%s/\s\+$//e
 
 " Remember things between sessions
 "
@@ -234,12 +235,12 @@ set history=1000                " remember more commands and search history
 set undolevels=3000             " use many muchos levels of undo
 set undoreload=10000            " max number lines to save for undo on a buffer reload
 set undofile                    " keep a persistent backup file
-set undodir=~/.vim/tmp/undo//     " undo files
+set undodir=~/.vim/tmp/undo     " undo files
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-set backupdir=~/.vim/tmp/backup// " backups
-set directory=~/vim/tmp/swap//  " swap files
+set backupdir=~/.vim/tmp/backup " backups
+set directory=~/vim/tmp/swap  " swap files
                                 " store swap files in one of these directories
                                 "    (in case swapfile is ever turned on)
 set autoread                    " auto re-read when the file is written by other applications
@@ -257,14 +258,14 @@ set cursorline                  " underline the current line, for quick orientat
 set dictionary=/usr/share/dict/words
 
 " Don't redraw while executing macros
-set nolazyredraw
+"set nolazyredraw
 
-set notimeout
-set ttimeout
-set ttimeoutlen=10
+"set notimeout
+"set ttimeout
+"set ttimeoutlen=10
 
 " Highlight VCS conflict markers
-match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
+"match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
 if has('cmdline_info')
   set ruler                   " show the ruler
@@ -318,7 +319,7 @@ endif
 
 " Change the mapleader from \ to ,
 let mapleader=","
-let maplocalleader = "\\"
+"let maplocalleader = "\\"
 
 " }}}
 " Color scheme {{{
@@ -390,11 +391,11 @@ endfunction
 nnoremap <silent> <leader>/ :nohlsearch<CR><C-L>
 inoremap <silent> <leader>/ <C-O>:nohlsearch<CR>
 
-nmap <silent> <leader>hh :set invhlsearch<CR>
-nmap <silent> <leader>ll :set invlist<CR>
-nmap <silent> <leader>nn :set invnumber<CR>
-nmap <silent> <leader>pp :set invpaste<CR>
-nmap <silent> <leader>ii :set invrelativenumber<CR>
+"nmap <silent> <leader>hh :set invhlsearch<CR>
+"nmap <silent> <leader>ll :set invlist<CR>
+"nmap <silent> <leader>nn :set invnumber<CR>
+"nmap <silent> <leader>pp :set invpaste<CR>
+"nmap <silent> <leader>ii :set invrelativenumber<CR>
 
 " Change Working Directory to that of the current file
 cmap cwd lcd %:p:h
@@ -403,7 +404,7 @@ cmap cd. lcd %:p:h
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
 nnoremap / /\v
-vnoremap / /\v
+"vnoremap / /\v
 
 " Speed up scrolling of the viewport slightly
 nnoremap <C-e> 2<C-e>
@@ -437,14 +438,14 @@ nnoremap <silent> <leader>h3 :execute '3match InterestingWord3 /\<<c-r><c-w>\>/'
 
 " }}}
 " Directional Keys ---------------------------------------------------------- {{{
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
-nnoremap <right> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>
+"nnoremap <up> <nop>
+"nnoremap <down> <nop>
+"nnoremap <left> <nop>
+"nnoremap <right> <nop>
+"inoremap <up> <nop>
+"inoremap <down> <nop>
+"inoremap <left> <nop>
+"inoremap <right> <nop>
 
 " Easier moving in tabs and windows
 noremap <C-j>  <C-w>j
@@ -457,12 +458,12 @@ noremap <leader>bp :bprevious<cr>
 noremap <leader>bn :bnext<cr>
 
 " Splits ,v and ,h to open new splits (vertical and horizontal)
-nnoremap <leader>v <C-w>v<C-w>l
-nnoremap <leader>h <C-w>s<C-w>j
+"nnoremap <leader>v <C-w>v<C-w>l
+"nnoremap <leader>h <C-w>s<C-w>j
 
 " Reselect visual block after indent/outdent
-vnoremap < <gv
-vnoremap > >gv
+"vnoremap < <gv
+"vnoremap > >gv
 
 " Bubbling lines
 nmap <C-Up> [e
@@ -474,7 +475,7 @@ vmap <C-Down> ]egv
 " Triggers {{{
 
 " Save when losing focus
-au FocusLost    * :silent! wall
+"au FocusLost    * :silent! wall
 "
 " When vimrc is edited, reload it
 autocmd! BufWritePost vimrc source ~/.vimrc
@@ -507,7 +508,11 @@ nnoremap <leader>v V`]
 " Better Completion
 set completeopt=longest,menuone,preview
 
+" This is a little tweak that is a time-saver while you’re building
+" up your .vimrc. This effectively maps the ,ev and ,sv keys to
+" edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
 nnoremap <leader>ev <C-w>s<C-w>j:e $MYVIMRC<cr>
+nnoremap <leader>sv <C-w>s<C-w>j:so $MYVIMRC<cr>
 nnoremap <leader>es <C-w>s<C-w>j:e ~/.vim/snippets/<cr>
 nnoremap <leader>eg <C-w>s<C-w>j:e ~/.gitconfig<cr>
 nnoremap <leader>ez <C-w>s<C-w>j:e ~/.zshrc<cr>
@@ -543,7 +548,7 @@ vnoremap < <gv
 vnoremap > >gv
 
 " better ESC
-inoremap <C-k> <Esc>
+"inoremap <C-k> <Esc>
 
 " Quick alignment of text
 nmap <leader>al :left<CR>
@@ -928,7 +933,7 @@ let g:colorizer_skip_comments = 1
 " }}}
 " Ack {{{
 
-map <leader>a :Ack!
+map <leader>a :Ack! 
 " You can use Ag with ack.vim by adding the following line to your .vimrc:
 let g:ackprg = 'ag --nogroup --nocolor --column'
 
@@ -962,10 +967,10 @@ nmap <leader>N :NERDTreeClose<CR>
 "map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 
 " Disable the scrollbars (NERDTree)
-set guioptions-=r
-set guioptions-=L
+"set guioptions-=r
+"set guioptions-=L
 " Keep NERDTree window fixed between multiple toggles
-set winfixwidth
+"set winfixwidth
 
 let NERDTreeChDirMode=0
 
@@ -1201,8 +1206,8 @@ au BufEnter * call MyBufEnter()
 "}}}
 " Sessions {{{
 
-let g:session_autosave = 'yes'
-"let g:session_autoload = 'no'
+let g:session_autosave = 'no'
+let g:session_autoload = 'yes'
 let g:session_directory = '~/.vim/tmp/sessions'
 let g:session_persist_colors = 0
 let g:session_menu = 0
@@ -1229,58 +1234,6 @@ let g:go_disable_autoinstall = 1
 
 let g:rooter_patterns = ['package.json', 'bower.json', 'Jakefile.js', 'Rakefile', 'Gruntfile.js', '.git', '.git/', '.svn/']
 let g:rooter_use_lcd = 1
-
-" }}}
-" Startify {{{
-
-let g:startify_files_number        = 8
-let g:startify_session_persistence = 1
-let g:startify_session_autoload    = 1
-let g:startify_enable_special      = 0
-
-let g:startify_list_order = [
-        \ ['   LRU:'],
-        \ 'files',
-        \ ['   Sessions:'],
-        \ 'sessions',
-        \ ['   Bookmarks:'],
-        \ 'bookmarks',
-        \ ]
-
-let g:startify_bookmarks = [
-            \ '~/.vim/vimrc',
-            \ '/data/vim/golfing',
-            \ ]
-
-let g:startify_custom_footer =
-        \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
-
-hi StartifyBracket ctermfg=240
-hi StartifyNumber  ctermfg=215
-hi StartifyPath    ctermfg=245
-hi StartifySlash   ctermfg=240
-hi StartifySpecial ctermfg=240
-hi StartifyHeader  ctermfg=114
-hi StartifyFooter  ctermfg=240
-
-
-let g:startify_skiplist = [
-           \ 'COMMIT_EDITMSG',
-           \ $VIMRUNTIME .'/doc',
-           \ 'bundle/.*/doc',
-           \ '\.DS_Store'
-           \ ]
-
-" How do I get both NERDTree and Startify working at startup?~
-autocmd VimEnter *
-                \ if !argc() |
-                \   Startify |
-                \   NERDTree |
-                \   execute "normal \<c-w>w" |
-                \ endif
-
-let g:startify_custom_header =
-      \ map(split(system('fortune | cowsay'), '\n'), '"   ". v:val') + ['','']
 
 " }}}
 " Fugitive {{{
@@ -1603,7 +1556,7 @@ nnoremap <leader>2 yyPVr*jyypVr*
 nnoremap <leader>3 yypVr=
 nnoremap <leader>4 yypVr-
 nnoremap <leader>5 yypVr^
-nnoremap <leader>6 yypVr"
+nnoremap <leader>6 yypVr"   
 
 " }}}
 " MacVim ---------------------------------------------------------------------- {{{
@@ -1711,7 +1664,7 @@ source ~/.vim/functions/insert_tab_wrapper.vim
 " }}}
 
 " _. Text Folding {{{
-source ~/.vim/functions/my_fold_text.vim
+"source ~/.vim/functions/my_fold_text.vim
 " }}}
 
 " _. Gist {{{

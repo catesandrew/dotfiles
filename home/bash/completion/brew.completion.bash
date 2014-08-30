@@ -1,3 +1,16 @@
+# TODO: Update to brew bash completion...
+if which brew >/dev/null 2>&1; then
+  if [ -f ${BREW_HOME}/etc/bash_completion ]; then
+    . ${BREW_HOME}/etc/bash_completion
+  fi
+
+  if [ -f ${BREW_HOME}/Library/Contributions/brew_bash_completion.sh ]; then
+    . ${BREW_HOME}/Library/Contributions/brew_bash_completion.sh
+  fi
+fi
+
+# TODO: Till then use previous bash completion
+
 # $Id: bash_completion.sh,v 1.2 2006/02/25 01:21:33 ianmacd Exp $
 
 # Check for bash (and that we haven't already been sourced).
