@@ -130,9 +130,6 @@
 [submodule "prefix/src/nvm"]
 	path = prefix/src/nvm
 	url = git://github.com/creationix/nvm.git
-[submodule "home/vim/vim-visualstar"]
-	path = home/vim/vim-visualstar
-	url = git://github.com/thinca/vim-visualstar.git
 [submodule "home/vim/bundle/vis"]
 	path = home/vim/bundle/vis
 	url = https://github.com/vim-scripts/vis.git
@@ -238,3 +235,6 @@
 [submodule "home/vim/bundle/vim-fireplace"]
 	path = home/vim/bundle/vim-fireplace
 	url = https://github.com/tpope/vim-fireplace.git
+[submodule "home/vim/bundle/vim-visualstar"]
+	path = home/vim/bundle/vim-visualstar
+	url = https://github.com/thinca/vim-visualstar.git
