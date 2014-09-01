@@ -217,9 +217,6 @@
 [submodule "home/vim/bundle/vim-go"]
 	path = home/vim/bundle/vim-go
 	url = https://github.com/fatih/vim-go.git
-[submodule "home/vim/bundle/badwolf"]
-	path = home/vim/bundle/badwolf
-	url = https://github.com/sjl/badwolf.git
 [submodule "home/vim/bundle/ctrlp"]
 	path = home/vim/bundle/ctrlp
 	url = https://github.com/kien/ctrlp.vim.git
