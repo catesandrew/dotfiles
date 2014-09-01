@@ -326,9 +326,8 @@ let mapleader=","
 
 if &t_Co >= 256 || has("gui_running")
   set background=dark
-  "colorscheme baycomb
-  colorscheme mustang
-  "colorscheme molokai
+  "colorscheme mustang
+  colorscheme jellybeans
 endif
 
 if &t_Co > 2 || has("gui_running")
