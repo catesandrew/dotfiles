@@ -817,6 +817,16 @@ let g:haddock_browser = "open"
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " }}}
+" Rainbow Parentheses {{{
+
+let g:rbpt_max = 16
+let g:rbpt_loadcmd_toggle = 0
+autocmd VimEnter * RainbowParenthesesToggle
+autocmd Syntax * RainbowParenthesesLoadRound
+autocmd Syntax * RainbowParenthesesLoadSquare
+autocmd Syntax * RainbowParenthesesLoadBraces
+
+" }}}
 " Javascript {{{
 
 " (tab width 2 chr, no-wrapping)
