@@ -319,6 +319,7 @@ endif
 
 " Change the mapleader from \ to ,
 let mapleader=","
+let g:BASH_MapLeader=','
 "let maplocalleader = "\\"
 
 " }}}

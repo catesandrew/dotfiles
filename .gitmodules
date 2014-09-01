@@ -244,3 +244,6 @@
 [submodule "home/vim/bundle/vim-css3-syntax"]
 	path = home/vim/bundle/vim-css3-syntax
 	url = https://github.com/hail2u/vim-css3-syntax.git
+[submodule "home/vim/bundle/bash-support"]
+	path = home/vim/bundle/bash-support
+	url = https://github.com/vim-scripts/bash-support.vim.git
