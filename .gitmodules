@@ -82,9 +82,6 @@
 [submodule "home/vim/bundle/vim-css-colors"]
 	path = home/vim/bundle/vim-css-colors
 	url = git://github.com/ap/vim-css-color.git
-[submodule "home/vim/bundle/css-one-line"]
-	path = home/vim/bundle/css-one-line
-	url = git://github.com/vim-scripts/CSS-one-line--multi-line-folding.git
 [submodule "prefix/src/jsdoc-toolkit"]
 	path = prefix/src/jsdoc-toolkit
 	url = git://github.com/paperjs/jsdoc-toolkit.git
