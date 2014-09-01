@@ -1213,11 +1213,6 @@ let g:session_persist_colors = 0
 let g:session_menu = 0
 
 " }}}
-" Autoclose {{{
-
-nmap <Leader>x <Plug>ToggleAutoCloseMappings
-
-" }}}
 " OrgMode {{{
 
 let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo', 'Misc']
