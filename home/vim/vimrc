@@ -719,8 +719,6 @@ endfun
 " au BufNewFile,BufRead *.html setlocal filetype=htmldjango
 
 " Auto-closing of HTML/XML tags
-let g:closetag_default_xml=1
-au FileType html,mustache,handlebars let b:closetag_html_style=1
 au FileType html,xml,mustache,handlebars set listchars-=tab:>.
 
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
