@@ -7,7 +7,6 @@ alias ga='git add'
 alias gall='git add .'
 alias gus='git reset HEAD'
 alias gm="git merge"
-alias g='git'
 alias get='git'
 alias gst='git status'
 alias gs='git status'
