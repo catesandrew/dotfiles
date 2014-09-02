@@ -1138,6 +1138,14 @@ let g:undotree_SetFocusWhenToggle=1
 nnoremap <silent> <F5> :UndotreeToggle<CR>
 
 " }}}
+" EasyGrep {{{
+
+let g:EasyGrepRecursive=1
+let g:EasyGrepAllOptionsInExplorer=1
+let g:EasyGrepCommand=1
+nnoremap <leader>vo :GrepOptions<cr>
+
+" }}}
 
 " }}}
 " Text objects ---------------------------------------------------------------- {{{

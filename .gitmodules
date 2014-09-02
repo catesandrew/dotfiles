@@ -247,3 +247,6 @@
 [submodule "home/vim/bundle/undotree"]
 	path = home/vim/bundle/undotree
 	url = https://github.com/mbbill/undotree.git
+[submodule "home/vim/bundle/vim-easygrep"]
+	path = home/vim/bundle/vim-easygrep
+	url = https://github.com/dkprice/vim-easygrep.git
