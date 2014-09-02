@@ -103,9 +103,6 @@
 [submodule "prefix/src/nvm"]
 	path = prefix/src/nvm
 	url = git://github.com/creationix/nvm.git
-[submodule "home/vim/bundle/vis"]
-	path = home/vim/bundle/vis
-	url = https://github.com/vim-scripts/vis.git
 [submodule "home/vim/bundle/color_highlight"]
 	path = home/vim/bundle/color_highlight
 	url = https://github.com/chrisbra/color_highlight
