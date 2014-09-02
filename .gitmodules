@@ -250,3 +250,6 @@
 [submodule "home/vim/bundle/vim-easygrep"]
 	path = home/vim/bundle/vim-easygrep
 	url = https://github.com/dkprice/vim-easygrep.git
+[submodule "home/vim/bundle/ctrlp-funky"]
+	path = home/vim/bundle/ctrlp-funky
+	url = https://github.com/tacahiroy/ctrlp-funky.git
