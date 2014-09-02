@@ -214,3 +214,6 @@
 [submodule "home/vim/bundle/neosnippet"]
 	path = home/vim/bundle/neosnippet
 	url = https://github.com/Shougo/neosnippet.vim.git
+[submodule "home/vim/bundle/neosnippet-snippets"]
+	path = home/vim/bundle/neosnippet-snippets
+	url = https://github.com/Shougo/neosnippet-snippets.git
