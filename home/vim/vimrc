@@ -22,11 +22,10 @@
 " My personally preferred version of vim is the one with the "HUGE" feature
 " set, in addition to the following configure options:
 "
-"     ./configure --with-features=huge
-"                 --enable-pythoninterp --enable-rubyinterp
-"                 --enable-perlinterp --with-macarchs=x86_64
-"                 --with-macsdk=10.6 --enable-multibyte
-"                 --enable-cscope --prefix=/usr/local
+" ./configure --with-features=huge --enable-gui=macvim --enable-perlinterp
+" --enable-pythoninterp --enable-rubyinterp --enable-cscope --enable-multibyte
+"  --enable-luainterp --enable-cscope --with-lua-prefix=/usr/local
+"  --with-luajit --with-tlib=ncurses --with-compiledby=Andrew
 "
 " To start vim without using this .vimrc file, use:
 "     vim -u NORC
@@ -34,30 +33,11 @@
 " To start vim without loading any .vimrc or plugins, use:
 "     vim -u NONE
 "
-
 " Use vim settings, rather then vi settings (much better!)
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 filetype on
 filetype off
-
-" Define and reset augroup used in vimrc
-augroup vimrc
-    au!
-augroup END
-
-" Cursorline {{{
-" Only show cursorline in the current window and in normal mode.
-"augroup cline
-    "au!
-"augroup END
-" }}}
-
-" Trailing whitespace {{{
-" Only shown when not in insert mode so I don't go insane.
-"augroup trailing
-    "au!
-"augroup END
 
 " }}}
 
@@ -102,8 +82,7 @@ set whichwrap=b,s,h,l,<,>,[,]
 set backspace=indent,eol,start    " allow backspacing over everything in insert mode
 "set binary
 set cpoptions+=J
-set listchars=tab:▸\ ,eol:¬
-"set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
+set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
 set shell=/bin/bash
 set showbreak=↪
 set splitbelow
@@ -130,62 +109,6 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 set synmaxcol=512               " long lines slow down vim
 "https://coderwall.com/p/j9wnfw
 set clipboard=unnamed
-
-" Show trailing whitespace:
-":match ExtraWhitespace /\s\+$/
-" Show trailing whitespace and spaces before a tab:
-":match ExtraWhitespace /\s\+$\| \+\ze\t/
-" Show tabs that are not at the start of a line:
-":match ExtraWhitespace /[^\t]\zs\t\+/
-" Show spaces used for indenting (so you use only tabs for indenting).
-":match ExtraWhitespace /^\t*\zs \+/
-" Switch off :match highlighting.
-":match
-
-augroup vimrc
-    autocmd WinEnter,BufEnter,BufRead * setl cursorline
-    autocmd WinEnter,BufEnter,BufRead * setl relativenumber
-
-    autocmd WinLeave,BufLeave * setl nocursorline
-    autocmd WinLeave,BufLeave * setl norelativenumber
-
-    "With the following in your vimrc, the command will be applied to the first
-    "window, and to any subsequent windows. The pattern * applies the highlight
-    "to all files
-    " Show leading whitespace that includes spaces, and trailing whitespace.
-    "autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-
-    "highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-    autocmd BufWinLeave * call clearmatches()
-augroup END
-
-" Cursorline {{{
-" Only show cursorline in the current window and in normal mode.
-"augroup cline
-    "au WinLeave * set nocursorline
-    "au WinEnter * set cursorline
-    "au InsertEnter * set nocursorline
-    "au InsertLeave * set cursorline
-"augroup END
-" }}}
-
-" Trailing whitespace {{{
-" Only shown when not in insert mode so I don't go insane.
-"augroup trailing
-    "au InsertEnter * :set listchars-=trail:␣
-    "au InsertLeave * :set listchars+=trail:␣
-"augroup END
-
-" Remove trailing whitespaces when saving
-" Wanna know more? http://vim.wikia.com/wiki/Remove_unwanted_spaces
-" If you want to remove trailing spaces when you want, so not automatically,
-" see
-" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
-"autocmd BufWritePre * :%s/\s\+$//e
 
 " Remember things between sessions
 "
@@ -253,7 +176,50 @@ set visualbell                  " don't beep
 set noerrorbells                " don't beep
 set nomodeline                  " disable mode lines (security measure)
 "set ttyfast                     " always use a fast terminal
+
+" Cursorline {{{
 set cursorline                  " underline the current line, for quick orientation
+" Only show cursorline in the current window and in normal mode.
+augroup cline
+    au!
+    au WinLeave,InsertEnter,BufEnter,BufRead * setlocal nocursorline
+    au WinEnter,InsertLeave,BufLeave * setlocal cursorline
+augroup END
+" }}}
+
+" Trailing whitespace {{{
+" Only shown when not in insert mode so I don't go insane.
+augroup trailing
+    au!
+    au InsertEnter * :set listchars-=trail:␣
+    au InsertLeave * :set listchars+=trail:␣
+
+    " With the following, the command will be applied to the first window, and
+    " to any subsequent windows. The pattern * applies the highlight to all
+    " files. Show leading whitespace that includes spaces, and trailing whitespace.
+    au ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+    au BufWinEnter,InsertLeave * match ExtraWhitespace /\s\+$/
+    au BufWinLeave,InsertEnter * call clearmatches()
+augroup END
+
+" Remove trailing whitespaces when saving
+" Wanna know more? http://vim.wikia.com/wiki/Remove_unwanted_spaces
+" If you want to remove trailing spaces when you want, so not automatically,
+" see
+" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script.
+"autocmd BufWritePre * :%s/\s\+$//e
+
+" }}}
+
+" Relative Number {{{
+" Only show relative number in the current window
+augroup rnumber
+    au!
+    au WinEnter,BufEnter,BufRead * setlocal relativenumber
+    au WinLeave,BufLeave * setlocal norelativenumber
+augroup END
+" }}}
+
 
 set dictionary=/usr/share/dict/words
 
@@ -344,45 +310,7 @@ endif
 " Useful functions -------------------------------------------------------- {{{
 
 command! CleanEmptyBuffers call CleanEmptyBuffers()
-function! CleanEmptyBuffers()
-  let buffers = filter(range(0, bufnr('$')), 'buflisted(v:val) && empty(bufname(v:val)) && bufwinnr(v:val)<0')
-  if !empty(buffers)
-    exe 'bw '.join(buffers, ' ')
-  endif
-endfunction
-
-" The following beast is something i didn't write... it will return the
-" syntax highlighting group that the current "thing" under the cursor
-" belongs to -- very useful for figuring out what to change as far as
-" syntax highlighting goes.
-nmap <silent> <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name")
-     \ . '> trans<' . synIDattr(synID(line("."),col("."),0),"name")
-     \ . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name")
-     \ . ">"<CR>
-
-"jump to last cursor position when opening a file
-"dont do it when writing a commit log entry
 autocmd BufReadPost * call SetCursorPosition()
-function! SetCursorPosition()
-    if &filetype !~ 'commit\c'
-        if line("'\"") > 0 && line("'\"") <= line("$")
-            exe "normal! g`\""
-            normal! zz
-        endif
-    end
-endfunction
-
-"define :HighlightLongLines command to highlight the offending parts of
-"lines that are longer than the specified length (defaulting to 80)
-command! -nargs=? HighlightLongLines call s:HighlightLongLines('<args>')
-function! s:HighlightLongLines(width)
-    let targetWidth = a:width != '' ? a:width : 79
-    if targetWidth > 0
-        exec 'match Todo /\%>' . (targetWidth) . 'v/'
-    else
-        echomsg "Usage: HighlightLongLines [natural number]"
-    endif
-endfunction
 
 " }}}
 " Searching and movement ------------------------------------------------------ {{{
@@ -478,7 +406,7 @@ vmap <C-Down> ]egv
 "au FocusLost    * :silent! wall
 "
 " When vimrc is edited, reload it
-autocmd! BufWritePost vimrc source ~/.vimrc
+"autocmd! BufWritePost vimrc source ~/.vimrc
 
 " }}}
 " Convenience mappings -------------------------------------------------------- {{{
@@ -719,8 +647,6 @@ endfun
 " au BufNewFile,BufRead *.html setlocal filetype=htmldjango
 
 " Auto-closing of HTML/XML tags
-au FileType html,xml,mustache,handlebars set listchars-=tab:>.
-
 "au BufNewFile,BufRead *.html setlocal foldmethod=manual
 
 " Use <localleader>f to fold the current tag.
@@ -829,14 +755,12 @@ autocmd Syntax * RainbowParenthesesLoadBraces
 " Javascript {{{
 
 " (tab width 2 chr, no-wrapping)
-au BufRead,BufNewFile *_js.template set filetype=javascript
 autocmd FileType javascript setlocal sw=2
 autocmd FileType javascript setlocal ts=2
 autocmd FileType javascript setlocal sts=2
 autocmd FileType javascript setlocal textwidth=0
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 
-au FileType javascript setlocal listchars=trail:·,extends:#,nbsp:·
 au FileType javascript nnoremap <buffer> <C-c>  :<C-u>call WriteJSDocComment()<CR>
 au FileType javascript call JavaScriptFold()
 au FileType javascript setl fen
@@ -1281,16 +1205,6 @@ function! YRRunAfterMaps()
     omap <expr> L YRMapsExpression("", "$")
     omap <expr> H YRMapsExpression("", "^")
 endfunction
-
-" }}}
-" indentline {{{
-
-set list lcs=tab:\|\
-let g:indentLine_color_term = 111
-let g:indentLine_color_gui = '#DADADA'
-let g:indentLine_char = 'c'
-"let g:indentLine_char = '∙▹¦'
-let g:indentLine_char = '∙'
 
 " }}}
 " vim-indent-object {{{
