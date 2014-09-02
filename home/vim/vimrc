@@ -912,7 +912,8 @@ nmap <leader>N :NERDTreeClose<CR>
 let NERDTreeChDirMode=0
 
 " Store the bookmarks file
-let NERDTreeBookmarksFile=expand("~/.vim/tmp/NERDTreeBookmarks")
+call EnsureExists(s:get_cache_dir('NERDTreeBookmarks'))
+let NERDTreeBookmarksFile=s:get_cache_dir('NERDTreeBookmarks')
 
 " Show the bookmarks table on startup
 let NERDTreeShowBookmarks=1
@@ -921,8 +922,8 @@ let NERDTreeShowBookmarks=1
 let NERDTreeShowFiles=1
 let NERDTreeShowHidden=1
 
-" Quit on opening files from the tree
-let NERDTreeQuitOnOpen=1
+" Do not quit on opening files from the tree
+let NERDTreeQuitOnOpen=0
 
 " Highlight the selected entry in the tree
 let NERDTreeHighlightCursorline=1
@@ -1058,7 +1059,7 @@ let g:ctrlp_follow_symlinks=1
 let g:ctrlp_max_files=20000
 call EnsureExists(s:get_cache_dir('ctrlp'))
 let g:ctrlp_cache_dir=s:get_cache_dir('ctrlp')
-let g:ctrlp_reuse_window='startify'
+" let g:ctrlp_reuse_window='startify'
 let g:ctrlp_extensions=['funky']
 let g:ctrlp_custom_ignore = {
     \ 'dir': '\v[\/]\.(git|hg|svn|idea)$',
