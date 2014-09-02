@@ -456,12 +456,6 @@ noremap <leader>bn :bnext<cr>
 "vnoremap < <gv
 "vnoremap > >gv
 
-" Bubbling lines
-nmap <C-Up> [e
-nmap <C-Down> ]e
-vmap <C-Up> [egv
-vmap <C-Down> ]egv
-
 " }}}
 " Triggers {{{
 
@@ -1071,6 +1065,15 @@ imap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expan
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 imap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
 smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
+
+" }}}
+" unimpaired {{{
+
+" Bubbling lines
+nmap <C-Up> [e
+nmap <C-Down> ]e
+vmap <C-Up> [egv
+vmap <C-Down> ]egv
 
 " }}}
 
