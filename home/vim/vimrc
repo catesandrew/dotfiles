@@ -879,12 +879,27 @@ nnoremap <leader>MM :silent !open -a MultiMarkdown\ Composer.app '%:p'<cr>
 autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki
 
 " }}}
-" NERD Commenter {{{
 
-nmap <leader># :call NERDComment(0, "invert")<cr>
-vmap <leader># :call NERDComment(0, "invert")<cr>
+" tcomment_vim {{{
+
+" yank visual before toggle comment
+vmap gy ygvgc
+" yank and paste visual before toggle comment
+vmap gyy ygvgc'>gp'.
+" yank line before toggle comment
+nmap gy yygcc
+" yank and paste line before toggle comment and remember position
+" it works both in normal and insert mode
+" Use :t-1 instead of yyP to preserve registers
+nmap gyy mz:t-1<cr>gCc`zmz
+imap gyy <esc>:t-1<cr>gCcgi
+
+" And one more mapping for consistency: gcc toggle comment line but gc toggle
+" comment visual, so let's make it more consistent:
+vmap gcc gc
 
 " }}}
+
 " NERD Tree {{{
 
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and

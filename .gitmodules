@@ -235,3 +235,6 @@
 [submodule "home/vim/bundle/vim-speeddating"]
 	path = home/vim/bundle/vim-speeddating
 	url = https://github.com/tpope/vim-speeddating.git
+[submodule "home/vim/bundle/tcomment_vim"]
+	path = home/vim/bundle/tcomment_vim
+	url = https://github.com/tomtom/tcomment_vim.git
