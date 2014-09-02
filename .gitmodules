@@ -43,9 +43,6 @@
 [submodule "home/vim/bundle/vim-unimpaired"]
     path = home/vim/bundle/vim-unimpaired
     url = git://github.com/tpope/vim-unimpaired.git
-[submodule "home/vim/bundle/vim-irblack"]
-    path = home/vim/bundle/vim-irblack
-    url = git://github.com/wgibbs/vim-irblack.git
 [submodule "home/vim/bundle/syntastic"]
     path = home/vim/bundle/syntastic
     url = git://github.com/scrooloose/syntastic.git
