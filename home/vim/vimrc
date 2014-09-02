@@ -1076,6 +1076,24 @@ vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
 " }}}
+" emmet-vim {{{
+
+function! s:zen_html_tab()
+    let line = getline('.')
+    if match(line, '<.*>') < 0
+        return "\<c-y>,"
+    endif
+    return "\<c-y>n"
+endfunction
+autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
+autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
+
+" }}}
+" JsBeautify {{{
+
+nnoremap <leader>fjs :call JsBeautify()<cr>
+
+" }}}
 
 " }}}
 " Text objects ---------------------------------------------------------------- {{{
