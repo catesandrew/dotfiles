@@ -986,18 +986,20 @@ let g:rooter_use_lcd = 1
 " }}}
 " Fugitive {{{
 
-nnoremap <leader>gd :Gdiff<cr>
-nnoremap <leader>gl :Glog<cr>
-nnoremap <leader>gs :Gstatus<cr>
-nnoremap <leader>gw :Gwrite<cr>
-nnoremap <leader>gg :Ggrep<cr>
-nnoremap <leader>gh :Gbrowse<cr>
-nnoremap <leader>ga :Gadd<cr>
-nnoremap <leader>gb :Gblame<cr>
-nnoremap <leader>gco :Gcheckout<cr>
-nnoremap <leader>gci :Gcommit<cr>
-nnoremap <leader>gm :Gmove<cr>
-nnoremap <leader>gr :Gremove<cr>
+nnoremap <silent> <leader>gd :Gdiff<cr>
+nnoremap <silent> <leader>gl :Glog<cr>
+nnoremap <silent> <leader>gs :Gstatus<cr>
+nnoremap <silent> <leader>gw :Gwrite<cr>
+nnoremap <silent> <leader>gg :Ggrep<cr>
+nnoremap <silent> <leader>gh :Gbrowse<cr>
+nnoremap <silent> <leader>ga :Gadd<cr>
+nnoremap <silent> <leader>gb :Gblame<cr>
+nnoremap <silent> <leader>gp :Git push<CR>
+nnoremap <silent> <leader>gc :Gcommit<cr>
+nnoremap <silent> <leader>gm :Gmove<cr>
+nnoremap <silent> <leader>gr :Gremove<cr>
+
+autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " ,f for global git serach for word under the cursor (with highlight)
 nmap <leader>gf :let @/="\\<<C-R><C-W>\\>"<CR>:set hls<CR>:silent Ggrep -w "<C-R><C-W>"<CR>:ccl<CR>:cw<CR><CR>
