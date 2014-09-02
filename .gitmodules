@@ -229,3 +229,6 @@
 [submodule "home/vim/bundle/MatchTag"]
 	path = home/vim/bundle/MatchTag
 	url = https://github.com/gregsexton/MatchTag.git
+[submodule "home/vim/bundle/vim-node"]
+	path = home/vim/bundle/vim-node
+	url = https://github.com/mmalecki/vim-node.js.git
