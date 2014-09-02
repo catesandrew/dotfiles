@@ -55,9 +55,6 @@
 [submodule "home/vim/bundle/YankRing"]
 	path = home/vim/bundle/YankRing
 	url = git://github.com/vim-scripts/YankRing.vim.git
-[submodule "home/vim/bundle/vim-peepopen"]
-	path = home/vim/bundle/vim-peepopen
-	url = git://github.com/shemerey/vim-peepopen.git
 [submodule "home/vim/bundle/vim-css-colors"]
 	path = home/vim/bundle/vim-css-colors
 	url = git://github.com/ap/vim-css-color.git
