@@ -1060,6 +1060,13 @@ let g:html_indent_script1 = "inc"
 let g:html_indent_style1 = "inc"
 
 " }}}
+" neocomplete {{{
+
+call EnsureExists(s:get_cache_dir('neocomplete'))
+let g:neocomplete#enable_at_startup=1
+let g:neocomplete#data_directory=s:get_cache_dir('neocomplete')
+
+" }}}
 
 " }}}
 " Text objects ---------------------------------------------------------------- {{{
