@@ -223,3 +223,6 @@
 [submodule "home/vim/bundle/vim-less"]
 	path = home/vim/bundle/vim-less
 	url = https://github.com/groenewege/vim-less.git
+[submodule "home/vim/bundle/scss-syntax"]
+	path = home/vim/bundle/scss-syntax
+	url = https://github.com/cakebaker/scss-syntax.vim.git
