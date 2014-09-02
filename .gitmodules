@@ -235,3 +235,6 @@
 [submodule "home/vim/bundle/vim-endwise"]
 	path = home/vim/bundle/vim-endwise
 	url = https://github.com/tpope/vim-endwise.git
+[submodule "home/vim/bundle/vim-speeddating"]
+	path = home/vim/bundle/vim-speeddating
+	url = https://github.com/tpope/vim-speeddating.git
