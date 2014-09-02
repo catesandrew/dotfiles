@@ -1125,6 +1125,11 @@ nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 
 " }}}
+" vim-sneak {{{
+
+let g:sneak#streak = 1
+
+" }}}
 
 " }}}
 " Text objects ---------------------------------------------------------------- {{{

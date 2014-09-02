@@ -241,3 +241,6 @@
 [submodule "home/vim/bundle/vim-expand-region"]
 	path = home/vim/bundle/vim-expand-region
 	url = https://github.com/terryma/vim-expand-region.git
+[submodule "home/vim/bundle/vim-sneak"]
+	path = home/vim/bundle/vim-sneak
+	url = https://github.com/justinmk/vim-sneak.git
