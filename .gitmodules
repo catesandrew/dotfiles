@@ -220,3 +220,6 @@
 [submodule "home/vim/bundle/vim-dispatch"]
 	path = home/vim/bundle/vim-dispatch
 	url = https://github.com/tpope/vim-dispatch.git
+[submodule "home/vim/bundle/vim-less"]
+	path = home/vim/bundle/vim-less
+	url = https://github.com/groenewege/vim-less.git
