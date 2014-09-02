@@ -615,6 +615,7 @@ nnoremap <silent> Q ZZ
 " Markdown {{{
 
 au BufNewFile,BufRead *.m*down setlocal filetype=markdown
+au FileType markdown setlocal omnifunc=htmlcomplete#CompleteTags
 
 " Use <localleader>1/2/3 to add headings.
 au Filetype markdown nnoremap <buffer> <localleader>1 yypVr=
