@@ -36,7 +36,67 @@
 " Use vim settings, rather then vi settings (much better!)
 " This must be first, because it changes other options as a side effect.
 
+" Detect OS -------------------------------------------------------- {{{
+let s:is_windows = has('win32') || has('win64')
+let s:is_cygwin = has('win32unix')
+let s:is_macvim = has('gui_macvim')
+" }}}
+
+" Useful Functions -------------------------------------------------------- {{{
+
+function! s:get_cache_dir(suffix) "{{{
+    return resolve(expand(s:cache_dir . '/' . a:suffix))
+endfunction "}}}
+
+function! Source(begin, end) "{{{
+    let lines = getline(a:begin, a:end)
+    for line in lines
+        execute line
+    endfor
+endfunction "}}}
+
+function! Preserve(command) "{{{
+    " preparation: save last search, and cursor position.
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    " do the business:
+    execute a:command
+    " clean up: restore previous search history, and cursor position
+    let @/=_s
+    call cursor(l, c)
+endfunction "}}}
+
+function! StripTrailingWhitespace() "{{{
+    call Preserve("%s/\\s\\+$//e")
+endfunction "}}}
+
+function! EnsureExists(path) "{{{
+    if !isdirectory(expand(a:path))
+        call mkdir(expand(a:path))
+    endif
+endfunction "}}}
+
+function! CloseWindowOrKillBuffer() "{{{
+    let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+
+    " never bdelete a nerd tree
+    if matchstr(expand("%"), 'NERD') == 'NERD'
+        wincmd c
+        return
+    endif
+
+    if number_of_windows_to_this_buffer > 1
+        wincmd c
+    else
+        bdelete
+    endif
+endfunction "}}}
+
+" }}}
+
 " Preamble -------------------------------------------------------------------- {{{
+let s:cache_dir='~/.vim/tmp'
 
 set nocompatible
 filetype on
@@ -157,12 +217,12 @@ set history=1000                " remember more commands and search history
 set undolevels=3000             " use many muchos levels of undo
 set undoreload=10000            " max number lines to save for undo on a buffer reload
 set undofile                    " keep a persistent backup file
-set undodir=~/.vim/tmp/undo     " undo files
+let &undodir = s:get_cache_dir('undo')
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-set backupdir=~/.vim/tmp/backup " backups
-set directory=~/vim/tmp/swap  " swap files
+let &backupdir = s:get_cache_dir('backup')
+let &directory = s:get_cache_dir('swap')
                                 " store swap files in one of these directories
                                 "    (in case swapfile is ever turned on)
 set autoread                    " auto re-read when the file is written by other applications
@@ -175,6 +235,11 @@ set visualbell                  " don't beep
 set noerrorbells                " don't beep
 set nomodeline                  " disable mode lines (security measure)
 "set ttyfast                     " always use a fast terminal
+
+call EnsureExists(s:cache_dir)
+call EnsureExists(&undodir)
+call EnsureExists(&backupdir)
+call EnsureExists(&directory)
 
 " Cursorline {{{
 set cursorline                  " underline the current line, for quick orientation
