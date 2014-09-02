@@ -211,3 +211,6 @@
 [submodule "home/vim/bundle/neocomplete"]
 	path = home/vim/bundle/neocomplete
 	url = https://github.com/Shougo/neocomplete.vim.git
+[submodule "home/vim/bundle/neosnippet"]
+	path = home/vim/bundle/neosnippet
+	url = https://github.com/Shougo/neosnippet.vim.git
