@@ -879,7 +879,6 @@ nnoremap <leader>MM :silent !open -a MultiMarkdown\ Composer.app '%:p'<cr>
 autocmd BufNewFile,BufRead *.wiki set ft=googlecodewiki
 
 " }}}
-
 " tcomment_vim {{{
 
 " yank visual before toggle comment
@@ -899,7 +898,6 @@ imap gyy <esc>:t-1<cr>gCcgi
 vmap gcc gc
 
 " }}}
-
 " NERD Tree {{{
 
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and
@@ -1109,6 +1107,22 @@ autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
 " JsBeautify {{{
 
 nnoremap <leader>fjs :call JsBeautify()<cr>
+
+" }}}
+" tabular {{{
+
+nmap <Leader>a& :Tabularize /&<CR>
+vmap <Leader>a& :Tabularize /&<CR>
+nmap <Leader>a= :Tabularize /=<CR>
+vmap <Leader>a= :Tabularize /=<CR>
+nmap <Leader>a: :Tabularize /:<CR>
+vmap <Leader>a: :Tabularize /:<CR>
+nmap <Leader>a:: :Tabularize /:\zs<CR>
+vmap <Leader>a:: :Tabularize /:\zs<CR>
+nmap <Leader>a, :Tabularize /,<CR>
+vmap <Leader>a, :Tabularize /,<CR>
+nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 
 " }}}
 
