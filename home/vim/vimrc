@@ -225,7 +225,6 @@ endif
 
 set showmatch          " when a bracket is inserted, breifly jump to a matching one
 set matchtime=2        " jump to matching bracket for 2/10th of a second
-set number
 set lazyredraw         " don't update the display while executing macros
 set noshowmode
 set termencoding=utf-8
