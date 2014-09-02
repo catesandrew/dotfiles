@@ -31,9 +31,6 @@
 [submodule "home/vim/bundle/xml"]
 	path = home/vim/bundle/xml
 	url = git://github.com/othree/xml.vim.git
-[submodule "home/vim/bundle/vim-git"]
-    path = home/vim/bundle/vim-git
-    url = git://github.com/tpope/vim-git.git
 [submodule "home/vim/bundle/vim-javascript"]
     path = home/vim/bundle/vim-javascript
     url = git://github.com/pangloss/vim-javascript.git
