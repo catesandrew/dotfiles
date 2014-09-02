@@ -854,11 +854,6 @@ let g:colorizer_auto_filetype='css,html,handlebars,stylus,javascript'
 let g:colorizer_skip_comments = 1
 
 " }}}
-" AlignMaps {{{
-
-"AlignCtrl lW =
-
-" }}}
 " Ack {{{
 
 map <leader>a :Ack! 
