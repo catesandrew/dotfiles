@@ -472,8 +472,8 @@ noremap <leader><space> :noh<cr>:call clearmatches()<cr>
 nnoremap * *<c-o>
 
 " Keep search matches in the middle of the window.
-nnoremap <silent> n nzz
-nnoremap <silent> N Nzz
+nnoremap <silent> n nzzzv
+nnoremap <silent> N Nzzzv
 nnoremap <silent> * *zz
 nnoremap <silent> # #zz
 nnoremap <silent> g* g*zz
