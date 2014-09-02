@@ -19,7 +19,7 @@
 "
 "
 "
-" My personally preferred version of vim is the one with the "HUGE" feature
+" My personally preferred version of vim is the one with the 'HUGE' feature
 " set, in addition to the following configure options:
 "
 " ./configure --with-features=huge --enable-gui=macvim --enable-perlinterp
@@ -36,12 +36,13 @@
 " Use vim settings, rather then vi settings (much better!)
 " This must be first, because it changes other options as a side effect.
 
-" Detect OS -------------------------------------------------------- {{{
+" Detect OS --------------------------------------------------------------- {{{
+
 let s:is_windows = has('win32') || has('win64')
 let s:is_cygwin = has('win32unix')
 let s:is_macvim = has('gui_macvim')
-" }}}
 
+" }}}
 " Useful Functions -------------------------------------------------------- {{{
 
 function! s:get_cache_dir(suffix) "{{{
@@ -296,28 +297,26 @@ set t_vb=
 " Vim behaviour {{{
 
 set switchbuf=useopen           " reveal already opened files from the
-                                " quickfix window instead of opening new
-                                " buffers
+                                " quickfix window instead of opening new buffers
 set history=1000                " remember more commands and search history
-set undolevels=3000             " use many muchos levels of undo
-set undoreload=10000            " max number lines to save for undo on a buffer reload
 
 " persistent undo
-if exists('+undofile')
+if has('persistent_undo')
   set undofile                    " keep a persistent backup file
+  set undolevels=3000             " use many muchos levels of undo
+  set undoreload=10000            " max number lines to save for undo on a buffer reload
   let &undodir = s:get_cache_dir('undo')
 endif
 
 " backups
-set backup
 let &backupdir = s:get_cache_dir('backup')
+set backup
 set nobackup                    " do not keep backup files, it's 70's style cluttering
 
 " swap files
 let &directory = s:get_cache_dir('swap')
 set noswapfile                  " do not write annoying intermediate swap files,
                                 "    who did ever restore from swap files anyway?
-
 call EnsureExists(s:cache_dir)
 call EnsureExists(&undodir)
 call EnsureExists(&backupdir)
