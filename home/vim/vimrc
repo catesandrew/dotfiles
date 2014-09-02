@@ -285,8 +285,7 @@ endif
 
 " Change the mapleader from \ to ,
 let mapleader=","
-let g:BASH_MapLeader=','
-"let maplocalleader = "\\"
+let maplocalleader = "\\"
 
 " }}}
 " Color scheme {{{
@@ -598,12 +597,11 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 au FileType c setlocal foldmethod=syntax
 
 " }}}
-" HTML, Mustache, and HTMLDjango {{{
+" HTML, Mustache, Handlebars, html template(s) {{{
 
 
 " HTML (tab width 2 chr, no wrapping)
 au BufRead,BufNewFile *.handlebars set filetype=handlebars
-autocmd FileType html,mustache,handlebars nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 autocmd FileType mustache,handlebars let b:match_ignorecase = 1 |
     \ let b:match_words = '<:>,' .
@@ -627,56 +625,15 @@ autocmd FileType xhtml setlocal ts=2
 autocmd FileType xhtml setlocal sts=2
 autocmd FileType xhtml setlocal textwidth=0
 
- " This function detects, based on HTML content, whether this is a
-" Django template, or a plain HTML file, and sets filetype accordingly
-fun! s:DetectHTMLVariant()
-  let n = 1
-  while n < 50 && n < line("$")
-    " check for django
-    if getline(n) =~ '{%\s*\(extends\|load\|block\|if\|for\|include\|trans\)\>'
-      set ft=htmldjango.html
-      return
-    endif
-    let n = n + 1
-  endwhile
-  " go with html
-  set ft=html
-endfun
-
-"au BufNewFile,BufRead *.html,*.htm call s:DetectHTMLVariant()
-" au BufNewFile,BufRead *.html setlocal filetype=htmldjango
-
-" Auto-closing of HTML/XML tags
-"au BufNewFile,BufRead *.html setlocal foldmethod=manual
-
-" Use <localleader>f to fold the current tag.
-"au BufNewFile,BufRead *.html nnoremap <buffer> <localleader>f Vatzf
-"au BufNewFile,BufRead *.html nnoremap <buffer> VV vatV
-"au BufNewFile,BufRead *.htm nnoremap <buffer> <localleader>f Vatzf
-"au BufNewFile,BufRead *.htm nnoremap <buffer> VV vatV
-
-" Use Shift-Return to turn this:
-"     <tag>|</tag>
-"
-" into this:
-"     <tag>
-"         |
-"     </tag>
-"au BufNewFile,BufRead *.html inoremap <buffer> <s-cr> <cr><esc>kA<cr>
-"au BufNewFile,BufRead *.html nnoremap <buffer> <s-cr> vit<esc>a<cr><esc>vito<esc>i<cr><esc>
-
 " }}}
 " CSS, Stylus, and LessCSS {{{
 
 " (tab width 2 chr, wrap at 79th char)
-"au BufRead,BufNewFile *_css.template set filetype=css
 autocmd FileType css,stylus setlocal sw=2
 autocmd FileType css,stylus setlocal ts=2
 autocmd FileType css,stylus setlocal sts=2
 autocmd FileType css,stylus setlocal textwidth=0
 autocmd FileType css,stylus setlocal omnifunc=csscomplete#CompleteCSS
-
-autocmd FileType css,stylus nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au BufNewFile,BufRead *.less setlocal filetype=less
 
@@ -687,8 +644,8 @@ au BufNewFile,BufRead *.css  setlocal foldmarker={,}
 au BufNewFile,BufRead *.less setlocal foldmarker={,}
 
 " Use cc to change lines without borking the indentation.
-"au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
-"au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
+au BufNewFile,BufRead *.css  nnoremap <buffer> cc ddko
+au BufNewFile,BufRead *.less nnoremap <buffer> cc ddko
 
 " Use <leader>S to sort properties.  Turns this:
 "
@@ -710,13 +667,9 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 "         ...
 "     }
 "
-"au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
-"au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
-" Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
-" positioned inside of them AND the following code doesn't get unfolded.
-"au BufNewFile,BufRead *.css  inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
-"au BufNewFile,BufRead *.less inoremap <buffer> {<cr> {}<left><cr>.<cr><esc>kA<bs><space><space>
+au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
 " }}}
 " Stylus {{{
@@ -732,7 +685,6 @@ au BufNewFile,BufRead *.less setlocal foldmarker={,}
 " haskell {{{
 
 au BufEnter *.hs compiler ghc
-
 let g:ghc = "/usr/local/bin/ghc"
 let g:haddock_browser = "open"
 
@@ -765,8 +717,6 @@ au FileType javascript nnoremap <buffer> <C-c>  :<C-u>call WriteJSDocComment()<C
 au FileType javascript call JavaScriptFold()
 au FileType javascript setl fen
 au FileType javascript setl nocindent
-
-autocmd FileType javascript nnoremap <silent> <leader>r :silent !nf refresh&<CR>
 
 au FileType javascript imap <C-t> console.log();<esc>hi
 au FileType javascript imap <C-a> alert();<esc>hi
@@ -819,11 +769,6 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
-" ZenCoding {{{
-
-let g:user_zen_leader_key = '<leader>z'
-
-" }}}
 " Vim-Airline {{{
 
 " Finally, you can add the convenience variable to your vimrc which will
@@ -853,9 +798,8 @@ nnoremap <buffer> <Leader><Leader>tR  :TernRename<CR>
 " Color Highlight {{{
 
 "let g:colorizer_auto_color = 1
-let g:colorizer_auto_filetype='css,html,handlebars,stylus'
+let g:colorizer_auto_filetype='css,html,handlebars,stylus,javascript'
 let g:colorizer_skip_comments = 1
-"au BufNewFile,BufRead *.css,*.html,*.htm,*.hbs,*.handlebars,*.styl :ColorHighlight!
 
 " }}}
 " AlignMaps {{{
@@ -929,9 +873,10 @@ let NERDTreeMouseMode=2
 let NERDTreeKeepTreeInNewTab=1
 
 " Don't display these kinds of files
-let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
+let NERDTreeIgnore=[ '\.DS_Store', '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$' ]
 
 au Filetype nerdtree setlocal nolist
+au Filetype nerdtree setlocal relativenumber
 
 " }}}
 " HTML5 {{{
@@ -944,52 +889,8 @@ let g:atia_attributes_complete = 0
 " }}}
 " Syntastic {{{
 
-" Custom syntastic settings:
-function! s:find_jshintrc(dir)
-    let l:found = globpath(a:dir, '.jshintrc')
-    if filereadable(l:found)
-        return l:found
-    endif
-
-    let l:parent = fnamemodify(a:dir, ':h')
-    if l:parent != a:dir
-        return s:find_jshintrc(l:parent)
-    endif
-
-    return "~/.jshintrc"
-endfunction
-
-function! UpdateJsHintConf()
-    let l:dir = expand('%:p:h')
-    let l:jshintrc = s:find_jshintrc(l:dir)
-    let g:syntastic_javascript_jshint_args = '-c ' . l:jshintrc
-endfunction
-
 au BufEnter * call UpdateJsHintConf()
-
-function! s:find_jscsrc(dir)
-    let l:jscsfound = globpath(a:dir, '.jscsrc')
-    if filereadable(l:jscsfound)
-        return l:jscsfound
-    endif
-
-    let l:jscsparent = fnamemodify(a:dir, ':h')
-    if l:jscsparent != a:dir
-        return s:find_jscsrc(l:jscsparent)
-    endif
-
-    return "~/.jscsrc"
-endfunction
-
-function! UpdateJscsConf()
-    let l:dir = expand('%:p:h')
-    let l:jscsrc = s:find_jscsrc(l:dir)
-    let g:syntastic_javascript_jscs_args = '-c ' . l:jscsrc
-endfunction
-
 au BufEnter * call UpdateJscsConf()
-
-
 let g:syntastic_enable_signs=0
 let g:syntastic_error_symbol='✗'
 let g:syntastic_always_populate_loc_list=1
@@ -1005,96 +906,10 @@ let g:syntastic_mode_map = { 'mode': 'active',
 
 
 " }}}
-" Delimitmate {{{
-
-au FileType * let b:delimitMate_autoclose = 1
-" If using html auto complete (complete closing tag)
-au FileType xml,html,xhtml let b:delimitMate_matchpairs = "(:),[:],{:}"
-
-" }}}
 " SnipMate {{{
 
 " Shortcut for reloading snippets, useful when developing
 nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>
-
-" }}}
-" ShowMarks {{{
-
-let showmarks_include = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-" Don't leave on by default, use :ShowMarksOn to enable
-let g:showmarks_enable = 0
-" For marks a-z
-highlight ShowMarksHLl gui=bold guibg=LightBlue guifg=Blue
-" For marks A-Z
-highlight ShowMarksHLu gui=bold guibg=LightRed guifg=DarkRed
-" For all other marks
-highlight ShowMarksHLo gui=bold guibg=LightYellow guifg=DarkYellow
-" For multiple marks on the same line.
-highlight ShowMarksHLm gui=bold guibg=LightGreen guifg=DarkGreen
-
-" }}}
-" Ctags Variables {{{
-
-command! CtagsR !ctags -R
-
-" This will look in the current directory for 'tags', and work up the tree towards root until one is found.
-set tags=./tags;,tags " search tag file recursively (see :h file-searching)
-" C-\ - Open the definition in a new tab
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
-" A-] - Open the definition in a vertical split
-map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-
-" }}}
-" Easytags Variables {{{
-
-let g:easytags_cmd = '/usr/local/bin/ctags'
-let g:easytags_dynamic_files = 1
-let g:easytags_auto_highlight = 0
-let g:easytags_auto_update = 0
-let g:easytags_always_enabled = 0
-let g:easytags_on_cursorhold = 0
-let g:easytags_updatetime_autodisable = 1
-
-" }}}
-" Tagbar Variables {{{
-
-"let g:tagbar_type_javascript = {'ctagsbin': '/usr/local/bin/jsctags'}
-
-" }}}
-" Taglist Plus Variables {{{
-
-nmap <leader>l :TlistClose<CR>:TlistToggle<CR>
-nmap <leader>L :TlistClose<CR>
-
-" quit Vim when the TagList window is the last open window
-let Tlist_Exit_OnlyWindow=1         " quit when TagList is the last open window
-let Tlist_GainFocus_On_ToggleOpen=1 " put focus on the TagList window when it opens
-"let Tlist_Process_File_Always=1     " process files in the background, even when the TagList window isn't open
-"let Tlist_Show_One_File=1           " only show tags from the current buffer, not all open buffers
-let Tlist_Inc_Winwidth=1            " increase window by 1 when growing
-
-" the default ctags in /usr/bin on the Mac is GNU ctags, so change it to the
-" exuberant ctags version in /usr/local/bin
-let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
-
-let Tlist_Enable_Fold_Column=0
-" show function/method prototypes in the list
-let Tlist_Display_Prototype=1
-
-" don't show scope info
-let Tlist_Display_Tag_Scope=0
-
-" show TagList window on the right
-let Tlist_Use_Right_Window=1
-
-let Tlist_Auto_Highlight_Tag = 1
-let Tlist_Auto_Update = 1
-let Tlist_File_Fold_Auto_Close = 1
-let Tlist_Use_SingleClick = 1
-
-let g:ctags_statusline=1
-" Override how taglist does javascript
-let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'
 
 " }}}
 " JSON {{{
@@ -1103,39 +918,6 @@ au BufRead,BufNewFile *.json set filetype=json
 nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " }}}
-" Git Commit {{{
-
-"autocmd FileType gitcommit DiffGitCached | wincmd L | wincmd p
-"autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
-
-" Also, you should hook other event, because FileType is too early, and cursor
-" position will be overwritten using info from .viminfo:
-function! MyBufEnter()
-  " don't (re)store filepos for git commit message files
-  if &filetype == "gitcommit"
-    call setpos('.', [0, 1, 1, 0])
-  endif
-endfunction
-au BufEnter * call MyBufEnter()
-
-" }}}
-" Easymotion {{{
-
-"let g:EasyMotion_do_mapping = 0
-
-"nnoremap <silent> <Leader>f      :call EasyMotion#F(0, 0)<CR>
-"onoremap <silent> <Leader>f      :call EasyMotion#F(0, 0)<CR>
-"vnoremap <silent> <Leader>f :<C-U>call EasyMotion#F(1, 0)<CR>
-
-"nnoremap <silent> <Leader>F      :call EasyMotion#F(0, 1)<CR>
-"onoremap <silent> <Leader>F      :call EasyMotion#F(0, 1)<CR>
-"vnoremap <silent> <Leader>F :<C-U>call EasyMotion#F(1, 1)<CR>
-
-"onoremap <silent> <Leader>t      :call EasyMotion#T(0, 0)<CR>
-"onoremap <silent> <Leader>T      :call EasyMotion#T(0, 1)<CR>
-
-
-"}}}
 " Sessions {{{
 
 let g:session_autosave = 'no'
@@ -1143,13 +925,6 @@ let g:session_autoload = 'yes'
 let g:session_directory = '~/.vim/tmp/sessions'
 let g:session_persist_colors = 0
 let g:session_menu = 0
-
-" }}}
-" OrgMode {{{
-
-let g:org_plugins = ['ShowHide', '|', 'Navigator', 'EditStructure', '|', 'Todo', 'Misc']
-let g:org_todo_keywords = ['TODO', 'HOLD', '|', 'DONE']
-let g:org_debug = 1
 
 " }}}
 " vim-go {{{
@@ -1188,7 +963,6 @@ let g:fugitive_github_domains = ['http://git.ibaset.com']
 
 augroup ft_fugitive
     au!
-
     au BufNewFile,BufRead .git/index setlocal nolist
 augroup END
 
@@ -1222,21 +996,6 @@ nmap <leader>be :EasyBufferToggle<enter>
 let g:ctrlp_working_path_mode = ''
 
 " }}}
-" Scratch {{{
-
-command! ScratchToggle call ScratchToggle()
-function! ScratchToggle()
-  if exists("w:is_scratch_window")
-    unlet w:is_scratch_window
-    exec "q"
-  else
-    exec "normal! :Sscratch\<cr>\<C-W>J:resize 13\<cr>"
-    let w:is_scratch_window = 1
-  endif
-endfunction
-nnoremap <silent> <leader><tab> :ScratchToggle<cr>
-
-" }}}
 " HTML Indent {{{
 
 let g:html_indent_inctags = "html,body,head,tbody"
@@ -1244,21 +1003,6 @@ let g:html_indent_script1 = "inc"
 let g:html_indent_style1 = "inc"
 
 " }}}
-
-" }}}
-" Synstack -------------------------------------------------------------------- {{{
-
-" Show the stack of syntax hilighting classes affecting whatever is under the
-" cursor.
-function! SynStack() " {{{
-  if !exists("*synstack")
-    return
-  endif
-
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-endfunc " }}}
-
-nmap <M-S> :call SynStack()<CR>
 
 " }}}
 " Text objects ---------------------------------------------------------------- {{{
@@ -1370,29 +1114,6 @@ inoremap <s-cr> <esc>A:<cr>
 
 " }}}
 " Error toggles --------------------------------------------------------------- {{{
-
-command! ErrorsToggle call ErrorsToggle()
-function! ErrorsToggle() " {{{
-  if exists("w:is_error_window")
-    unlet w:is_error_window
-    exec "q"
-  else
-    exec "Errors"
-    lopen
-    let w:is_error_window = 1
-  endif
-endfunction " }}}
-
-command! -bang -nargs=? QFixToggle call QFixToggle(<bang>0)
-function! QFixToggle(forced) " {{{
-  if exists("g:qfix_win") && a:forced == 0
-    cclose
-    unlet g:qfix_win
-  else
-    copen 10
-    let g:qfix_win = bufnr("$")
-  endif
-endfunction " }}}
 
 " Tame the quickfix window (open/close using f4)
 nmap <silent> <f4> :QFixToggle<cr>

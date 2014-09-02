@@ -43,3 +43,93 @@ function! s:HighlightLongLines(width)
     endif
 endfunction
 
+function! s:find_jshintrc(dir)
+    let l:found = globpath(a:dir, '.jshintrc')
+    if filereadable(l:found)
+        return l:found
+    endif
+
+    let l:parent = fnamemodify(a:dir, ':h')
+    if l:parent != a:dir
+        return s:find_jshintrc(l:parent)
+    endif
+
+    return "~/.jshintrc"
+endfunction
+
+function! UpdateJsHintConf()
+    let l:dir = expand('%:p:h')
+    let l:jshintrc = s:find_jshintrc(l:dir)
+    let g:syntastic_javascript_jshint_args = '-c ' . l:jshintrc
+endfunction
+
+function! s:find_jscsrc(dir)
+    let l:jscsfound = globpath(a:dir, '.jscsrc')
+    if filereadable(l:jscsfound)
+        return l:jscsfound
+    endif
+
+    let l:jscsparent = fnamemodify(a:dir, ':h')
+    if l:jscsparent != a:dir
+        return s:find_jscsrc(l:jscsparent)
+    endif
+
+    return "~/.jscsrc"
+endfunction
+
+function! UpdateJscsConf()
+    let l:dir = expand('%:p:h')
+    let l:jscsrc = s:find_jscsrc(l:dir)
+    let g:syntastic_javascript_jscs_args = '-c ' . l:jscsrc
+endfunction
+
+" Also, you should hook other event, because FileType is too early, and cursor
+" position will be overwritten using info from .viminfo:
+function! MyBufEnter()
+  " don't (re)store filepos for git commit message files
+  if &filetype == "gitcommit"
+    call setpos('.', [0, 1, 1, 0])
+  endif
+endfunction
+au BufEnter * call MyBufEnter()
+
+" Synstack -------------------------------------------------------------------- {{{
+
+" Show the stack of syntax hilighting classes affecting whatever is under the
+" cursor.
+function! SynStack() " {{{
+  if !exists("*synstack")
+    return
+  endif
+
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc " }}}
+
+nmap <M-S> :call SynStack()<CR>
+" }}}
+
+" Error toggles --------------------------------------------------------------- {{{
+
+command! ErrorsToggle call ErrorsToggle()
+function! ErrorsToggle() " {{{
+  if exists("w:is_error_window")
+    unlet w:is_error_window
+    exec "q"
+  else
+    exec "Errors"
+    lopen
+    let w:is_error_window = 1
+  endif
+endfunction " }}}
+
+command! -bang -nargs=? QFixToggle call QFixToggle(<bang>0)
+function! QFixToggle(forced) " {{{
+  if exists("g:qfix_win") && a:forced == 0
+    cclose
+    unlet g:qfix_win
+  else
+    copen 10
+    let g:qfix_win = bufnr("$")
+  endif
+endfunction " }}}
+" }}}
