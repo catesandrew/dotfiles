@@ -964,12 +964,6 @@ let g:syntastic_mode_map = { 'mode': 'active',
 
 
 " }}}
-" SnipMate {{{
-
-" Shortcut for reloading snippets, useful when developing
-nnoremap ,smr <esc>:exec ReloadAllSnippets()<cr>
-
-" }}}
 " JSON {{{
 
 au BufRead,BufNewFile *.json set filetype=json
