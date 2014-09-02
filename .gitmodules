@@ -232,3 +232,6 @@
 [submodule "home/vim/bundle/vim-node"]
 	path = home/vim/bundle/vim-node
 	url = https://github.com/mmalecki/vim-node.js.git
+[submodule "home/vim/bundle/vim-endwise"]
+	path = home/vim/bundle/vim-endwise
+	url = https://github.com/tpope/vim-endwise.git
