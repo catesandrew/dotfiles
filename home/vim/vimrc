@@ -1154,7 +1154,7 @@ let g:sneak#streak = 1
 " }}}
 " undotree {{{
 
-let g:undotree_SplitLocation='botright'
+let g:undotree_WindowLayout='botright'
 let g:undotree_SetFocusWhenToggle=1
 nnoremap <silent> <F5> :UndotreeToggle<CR>
 
