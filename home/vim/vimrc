@@ -35,13 +35,12 @@
 "
 " Use vim settings, rather then vi settings (much better!)
 " This must be first, because it changes other options as a side effect.
+
+" Preamble -------------------------------------------------------------------- {{{
+
 set nocompatible
 filetype on
 filetype off
-
-" }}}
-
-" Preamble -------------------------------------------------------------------- {{{
 
 " Utils {{{
 source ~/.vim/functions/util.vim
@@ -356,10 +355,10 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Highlight word {{{
 
-nnoremap <silent> <leader>hh :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
-nnoremap <silent> <leader>h1 :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
-nnoremap <silent> <leader>h2 :execute '2match InterestingWord2 /\<<c-r><c-w>\>/'<cr>
-nnoremap <silent> <leader>h3 :execute '3match InterestingWord3 /\<<c-r><c-w>\>/'<cr>
+"nnoremap <silent> <leader>hh :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
+"nnoremap <silent> <leader>h1 :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
+"nnoremap <silent> <leader>h2 :execute '2match InterestingWord2 /\<<c-r><c-w>\>/'<cr>
+"nnoremap <silent> <leader>h3 :execute '3match InterestingWord3 /\<<c-r><c-w>\>/'<cr>
 
 " }}}
 
@@ -550,6 +549,13 @@ nnoremap <silent> Q ZZ
 
 " Markdown {{{
 
+au BufNewFile,BufRead *.m*down setlocal filetype=markdown
+
+" Use <localleader>1/2/3 to add headings.
+au Filetype markdown nnoremap <buffer> <localleader>1 yypVr=
+au Filetype markdown nnoremap <buffer> <localleader>2 yypVr-
+au Filetype markdown nnoremap <buffer> <localleader>3 I### <ESC>
+
 autocmd FileType markdown setlocal wrap
 autocmd FileType markdown setlocal linebreak
 autocmd FileType markdown setlocal nolist
@@ -598,7 +604,6 @@ au FileType c setlocal foldmethod=syntax
 
 " }}}
 " HTML, Mustache, Handlebars, html template(s) {{{
-
 
 " HTML (tab width 2 chr, no wrapping)
 au BufRead,BufNewFile *.handlebars set filetype=handlebars
@@ -672,36 +677,16 @@ au BufNewFile,BufRead *.css  nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?
 au BufNewFile,BufRead *.less nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
 " }}}
-" Stylus {{{
-
-" }}}
-" Par {{{
-
-" set formatprg=par\ -w72
-:map <A-q> {v}!par -jw72<CR>
-:vmap <A-q> !par -jw72<CR>
-
-" }}}
-" haskell {{{
+" Haskell {{{
 
 au BufEnter *.hs compiler ghc
 let g:ghc = "/usr/local/bin/ghc"
 let g:haddock_browser = "open"
 
 " }}}
-" coffee script {{{
+" Coffee Script {{{
 
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-
-" }}}
-" Rainbow Parentheses {{{
-
-let g:rbpt_max = 16
-let g:rbpt_loadcmd_toggle = 0
-autocmd VimEnter * RainbowParenthesesToggle
-autocmd Syntax * RainbowParenthesesLoadRound
-autocmd Syntax * RainbowParenthesesLoadSquare
-autocmd Syntax * RainbowParenthesesLoadBraces
 
 " }}}
 " Javascript {{{
@@ -735,16 +720,6 @@ function! JavaScriptFold()
 endfunction
 
 " }}}
-" Markdown {{{
-
-au BufNewFile,BufRead *.m*down setlocal filetype=markdown
-
-" Use <localleader>1/2/3 to add headings.
-au Filetype markdown nnoremap <buffer> <localleader>1 yypVr=
-au Filetype markdown nnoremap <buffer> <localleader>2 yypVr-
-au Filetype markdown nnoremap <buffer> <localleader>3 I### <ESC>
-
-" }}}
 " Vim {{{
 
 au FileType vim setlocal foldmethod=marker
@@ -769,6 +744,16 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
 
+" Rainbow Parentheses {{{
+
+let g:rbpt_max = 16
+let g:rbpt_loadcmd_toggle = 0
+autocmd VimEnter * RainbowParenthesesToggle
+autocmd Syntax * RainbowParenthesesLoadRound
+autocmd Syntax * RainbowParenthesesLoadSquare
+autocmd Syntax * RainbowParenthesesLoadBraces
+
+" }}}
 " Vim-Airline {{{
 
 " Finally, you can add the convenience variable to your vimrc which will
@@ -776,6 +761,13 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " symbols.
 
 let g:airline_powerline_fonts = 1
+
+" }}}
+" Par {{{
+
+" set formatprg=par\ -w72
+:map <A-q> {v}!par -jw72<CR>
+:vmap <A-q> !par -jw72<CR>
 
 " }}}
 " Tern {{{
