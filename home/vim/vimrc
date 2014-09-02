@@ -862,8 +862,9 @@ let g:colorizer_skip_comments = 1
 " Ack {{{
 
 map <leader>a :Ack! 
-" You can use Ag with ack.vim by adding the following line to your .vimrc:
-let g:ackprg = 'ag --nogroup --nocolor --column'
+if executable('ag')
+    let g:ackprg = "ag --nogroup --column --smart-case --follow"
+endif
 
 " }}}
 " Marked Support {{{
