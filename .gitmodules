@@ -226,3 +226,6 @@
 [submodule "home/vim/bundle/scss-syntax"]
 	path = home/vim/bundle/scss-syntax
 	url = https://github.com/cakebaker/scss-syntax.vim.git
+[submodule "home/vim/bundle/MatchTag"]
+	path = home/vim/bundle/MatchTag
+	url = https://github.com/gregsexton/MatchTag.git
