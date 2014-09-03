@@ -130,27 +130,24 @@ filetype plugin indent on                          " enable detection, plugins a
 " Basic options --------------------------------------------------------------- {{{
 
 " Base configuration {{{
-set timeoutlen=300                              " mapping timeout
-set ttimeoutlen=50                              " keycode timeout
-set mouse=a                                     " enable mouse
-set mousehide                                   " hide when characters are typed
-set ttyfast                                     " assume fast terminal connection
+set timeoutlen=300      " mapping timeout
+set ttimeoutlen=50      " keycode timeout
+set mouse=a             " enable mouse
+set mousehide           " hide when characters are typed
+set ttyfast             " assume fast terminal connection
 set viewoptions=folds,options,cursor,unix,slash " unix/windows compatibility
 set encoding=utf-8
+set macmeta             " Use option (alt) as meta key.  When on, option-key presses are not interpreted,
 if exists('$TMUX')
   set clipboard=
 else
-  set clipboard=unnamed                         " sync with OS clipboard
+  set clipboard=unnamed " sync with OS clipboard
 endif
-set hidden                                      " hide buffers instead of closing them this
-                                                " means that the current buffer can be put
-                                                " to background without being written; and
-                                                " that marks and undo history are preserved
-set autoread                                    " auto re-read when the file is written by other applications
-set fileformats+=mac                            " add mac to auto-detection of file format line endings
-set nrformats-=octal                            " always assume decimal numbers
-set showcmd                                     " show (partial) command in the last line of the screen
-                                                " this also shows visual selection info
+set hidden              " hide buffers instead of closing them this means that the current buffer can be put to background without being written; and that marks and undo history are preserved
+set autoread            " auto re-read when the file is written by other applications
+set fileformats+=mac    " add mac to auto-detection of file format line endings
+set nrformats-=octal    " always assume decimal numbers
+set showcmd             " show (partial) command in the last line of the screen this also shows visual selection info
 set tags=tags;/
 set showfulltag
 set modeline
@@ -237,8 +234,7 @@ set foldenable             " enable folding
 set foldcolumn=0           " add a fold column
 set foldmethod=marker      " detect triple-{ style fold markers
 set foldlevelstart=99      " start out with nothing folded
-set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-                                " which commands trigger auto-unfold
+set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo " which commands trigger auto-unfold
 let g:xml_syntax_folding=1 " enable xml folding
 
 " }}}
@@ -361,40 +357,9 @@ augroup END
 
 " }}}
 " Status line {{{
+
 if has('statusline')
-  set laststatus=2                                                " tell VIM to always put a status line in, even
-                                                                  " if there is only one window
-                                                                  " set statusline=\ \ \ \ \ line:%l\ column:%c\ \ \ %M%Y%r%=%-14.(%t%)\ %p%%
-  set statusline=                                                 " clear the statusline, allow for rearranging parts
-  set statusline+=%f\                                             " Path to the file, as typed or relative to current dir
-  set statusline+=%#errormsg#                                     " change color
-  set statusline+=%{&ff!='unix'?'['.&ff.']':''}                   " display a warning if fileformat isnt unix
-  set statusline+=%*                                              " reset color to normal statusline color
-  set statusline+=%#errormsg#                                     " change color
-  set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''} " display a warning if file encoding isnt utf-8
-  set statusline+=%*                                              " reset color to normal statusline color
-  set statusline+=\ %y                                            " filetype
-  set statusline+=%([%R%M]%)                                      " read-only (RO), modified (+) and unmodifiable (-) flags between braces
-  set statusline+=%{'~'[&pm=='']}                                 " shows a '~' if in patchmode
-  set statusline+=\ %{fugitive#statusline()}                      " show Git info, via fugitive.git
-                                                                  " set statusline+=\ (%{synIDattr(synID(line('.'),col('.'),0),'name')})      " DEBUG : display the current syntax item name
-  set statusline+=%#error#                                        " change color
-  set statusline+=%{&paste?'[paste]':''}                          " display a warning if &paste is set
-
-  set statusline+=%#warningmsg#
-  set statusline+=%{SyntasticStatuslineFlag()}
-
-  set statusline+=%*                                              " reset color to normal statusline color
-  set statusline+=%=                                              " right-align following items
-  set statusline+=#%n                                             " buffer number
-  set statusline+=\ %l/%L,                                        " current line number/total number of lines,
-  set statusline+=%c                                              " Column number
-  set statusline+=%V                                              " -{Virtual column number} (Not displayed if equal to 'c')
-  set statusline+=\ %p%%                                          " percentage of lines through the file%
-  set statusline+=\                                               " trailing space
-  if has('title')
-    set titlestring=%t%(\ [%R%M]%)
-  endif
+  set laststatus=2  " tell VIM to always put a status line in, even if there is only one window
 endif
 
 " }}}
@@ -414,7 +379,7 @@ if &t_Co >= 256 || has("gui_running")
 endif
 
 if &t_Co > 2 || has("gui_running")
-  syntax on                    " switch syntax highlighting on, when the terminal has colors
+  syntax on " switch syntax highlighting on, when the terminal has colors
   " http://superuser.com/questions/430344/macvim-lags-while-vim-on-terminal-is-buttery-smooth
   " http://stackoverflow.com/questions/4775605/vim-syntax-highlight-improve-performance
   syntax sync minlines=256
@@ -423,7 +388,7 @@ endif
 " }}}
 
 " }}}
-" Useful functions -------------------------------------------------------- {{{
+" Useful functions ----------------------------------------------------------- {{{
 
 command! CleanEmptyBuffers call CleanEmptyBuffers()
 autocmd BufReadPost * call SetCursorPosition()
@@ -507,9 +472,12 @@ nnoremap <up> :tabnext<CR>
 nnoremap <down> :tabprev<CR>
 
 " smash escape
-" inoremap jk <esc>
-" inoremap kj <esc>
-"
+inoremap jk <esc>
+inoremap kj <esc>
+
+" better ESC
+"inoremap <C-k> <Esc>
+
 " " change cursor position in insert mode
 " inoremap <C-h> <left>
 " inoremap <C-l> <right>
@@ -629,9 +597,6 @@ nmap <leader>Po "+P
 " Reselect visual block after indent/outdent
 vnoremap < <gv
 vnoremap > >gv
-
-" better ESC
-"inoremap <C-k> <Esc>
 
 " Quick alignment of text
 nmap <leader>al :left<CR>
@@ -911,23 +876,6 @@ let g:airline#extensions#tabline#left_alt_sep='¦'
 :vmap <A-q> !par -jw72<CR>
 
 " }}}
-" Tern {{{
-
-let g:tern_map_keys = 0
-let g:tern_show_argument_hints = 'no'
-let g:tern_show_signature_in_pum = 0
-
-nnoremap <buffer> <Leader><Leader>td  :TernDoc<CR>
-nnoremap <buffer> <Leader><Leader>tb  :TernDocBrowse<CR>
-nnoremap <buffer> <Leader><Leader>tt  :TernType<CR>
-nnoremap <buffer> <Leader><Leader>td  :TernDef<CR>
-nnoremap <buffer> <Leader><Leader>tpd :TernDefPreview<CR>
-nnoremap <buffer> <Leader><Leader>tsd :TernDefSplit<CR>
-nnoremap <buffer> <Leader><Leader>ttd :TernDefTab<CR>
-nnoremap <buffer> <Leader><Leader>tr  :TernRefs<CR>
-nnoremap <buffer> <Leader><Leader>tR  :TernRename<CR>
-
-" }}}
 " Color Highlight {{{
 
 "let g:colorizer_auto_color = 1
@@ -1131,6 +1079,11 @@ nmap <leader>be :EasyBufferToggle<enter>
 " }}}
 " ctrlp {{{
 
+" peepopen
+" dirs to ignore:  (^(\.git|\.hg|\.svn|\.sass-cache|assets|node_modules|build|tmp|log|dev\/mocks|vendor\/(rails|gems|plugins))\/)|(components|node_modules)\/
+" files to ignore: (\.#.+|\.DS_Store|\.svn|\.png|\.jpe?g|\.gif|\.elc|\.rbc|\.pyc|\.swp|\.psd|\.ai|\.pdf|\.mov|\.aep|\.dmg|\.zip|\.gz|~)$
+" project root pattern: ^([RM]akefile|Jakefile\.js|bower\.json|package\.json|build\.xml|.*\.xcodeproj|.*\.bbprojectd|\.git|\.git/|\.hg|)$
+
 " let g:ctrlp_working_path_mode = ''
 let g:ctrlp_clear_cache_on_exit=1
 let g:ctrlp_max_height=40
@@ -1139,11 +1092,16 @@ let g:ctrlp_follow_symlinks=1
 let g:ctrlp_max_files=20000
 call EnsureExists(s:get_cache_dir('ctrlp'))
 let g:ctrlp_cache_dir=s:get_cache_dir('ctrlp')
-" let g:ctrlp_reuse_window='startify'
+let g:ctrlp_reuse_window='startify'
 let g:ctrlp_extensions=['funky']
+" let g:ctrlp_custom_ignore = {
+"     \ 'dir': '\v[\/]\.(git|hg|svn|idea)$',
+"     \ 'file': '\v\.DS_Store$'
+"     \ }
+let g:ctrlp_root_markers = ['Rakefile', 'Makefile', 'Jakefile.js', 'bower.json', 'package.json', 'build.xml']
 let g:ctrlp_custom_ignore = {
-    \ 'dir': '\v[\/]\.(git|hg|svn|idea)$',
-    \ 'file': '\v\.DS_Store$'
+    \ 'dir': '(^(\.git|\.hg|\.svn|\.sass-cache|assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins))\/)|(components|node_modules)\/',
+    \ 'file': '(\.#.+|\.DS_Store|\.svn|\.png|\.jpe?g|\.gif|\.elc|\.rbc|\.pyc|\.swp|\.psd|\.ai|\.pdf|\.mov|\.aep|\.dmg|\.zip|\.gz|~)$'
     \ }
 
 if executable('ag')
@@ -1451,6 +1409,10 @@ if has('gui_running')
 
     set guioptions-=T          	" remove the toolbar
     set guioptions+=t           " tear off menu items
+    set guioptions-=l           " Remove all the UI cruft
+    set guioptions-=L
+    set guioptions-=r
+    set guioptions-=R
     set lines=40               	" 40 lines of text instead of 24,
     set columns=80
 
@@ -1478,48 +1440,20 @@ if has('gui_running')
         winsize 227 90
     endif
 
-    " Remove all the UI cruft
-    " set guioptions-=l
-    " set guioptions-=L
-    " set guioptions-=r
-    " set guioptions-=R
-
     highlight SpellBad term=underline gui=undercurl guisp=Orange
 
     " Use a line-drawing char for pretty vertical splits.
-    " set fillchars=vert:│
-    "
-    " " Set up the gui cursor to look nice
-    " set guicursor=n-c:block-Cursor-blinkon0
-    " set guicursor+=v:block-vCursor-blinkon0
-    " set guicursor+=ve:ver35-Cursor
-    " set guicursor+=o:hor50-Cursor
-    " set guicursor+=i-ci:ver25-Cursor
-    " set guicursor+=r-cr:hor20-Cursor
-    " set guicursor+=sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-    "
-    " " Use the normal HIG movements, except for M-Up/Down
-    " let macvim_skip_cmd_opt_movement = 1
-    " no   <D-Left>       <Home>
-    " no!  <D-Left>       <Home>
-    " no   <M-Left>       <C-Left>
-    " no!  <M-Left>       <C-Left>
-    "
-    " no   <D-Right>      <End>
-    " no!  <D-Right>      <End>
-    " no   <M-Right>      <C-Right>
-    " no!  <M-Right>      <C-Right>
-    "
-    " no   <D-Up>         <C-Home>
-    " ino  <D-Up>         <C-Home>
-    " imap <M-Up>         <C-o>{
-    "
-    " no   <D-Down>       <C-End>
-    " ino  <D-Down>       <C-End>
-    " imap <M-Down>       <C-o>}
-    "
-    " imap <M-BS>         <C-w>
-    " inoremap <D-BS>     <esc>my0c`y
+    set fillchars=vert:│
+
+    " Set up the gui cursor to look nice
+    set guicursor=n-c:block-Cursor-blinkon0
+    set guicursor+=v:block-vCursor-blinkon0
+    set guicursor+=ve:ver35-Cursor
+    set guicursor+=o:hor50-Cursor
+    set guicursor+=i-ci:ver25-Cursor
+    set guicursor+=r-cr:hor20-Cursor
+    set guicursor+=sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+
 else
   if $COLORTERM == 'gnome-terminal'
     set t_Co=256 "why you no tell me correct colors?!?!
@@ -1541,7 +1475,6 @@ endif
 " _ Vim {{{
 augroup ft_vim
     au!
-
     au FileType vim setlocal foldmethod=marker
     au FileType help setlocal textwidth=78
     au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
@@ -1563,13 +1496,7 @@ source ~/.vim/functions/insert_tab_wrapper.vim
 " }}}
 
 " _. Text Folding {{{
-"source ~/.vim/functions/my_fold_text.vim
-" }}}
-
-" _. Gist {{{
-" Send visual selection to gist.github.com as a private, filetyped Gist
-" Requires the gist command line too (brew install gist)
-vnoremap <leader>G :w !gist -p -t %:e \| pbcopy<cr>
+source ~/.vim/functions/my_fold_text.vim
 " }}}
 
 " }}}
