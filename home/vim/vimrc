@@ -184,6 +184,10 @@ set title                     " change the terminal's title
 set nomodeline                " disable mode lines (security measure)
 set dictionary=/usr/share/dict/words
 
+" Insert only one space when joining lines that contain sentence-terminating
+" punctuation like `.`.
+set nojoinspaces
+
 if has('cmdline_info')
   set ruler                   " show the ruler
   set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
