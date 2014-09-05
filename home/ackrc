@@ -1,14 +1,25 @@
+# lexically sort filenames
+--sort-files
+
 --ignore-dir=build
 --ignore-dir=dist
 --ignore-dir=\.git
 --ignore-dir=node_modules
---ignore-dir=test_components
 --ignore-dir=components/
+--ignore-dir=bower_components/
 --type-add
-js=.coffee
+js=.coffee,.json
 --type-add
 html=.handlebars,.mustache,.hbs
 --type-add
-css=.stylus,.styl,.less
+css=.stylus,.styl,.less,.sass
 --type-add
 ruby=.haml,.rake
+--type-add
+vim=.vimrc
+
+# add types ack doesn't know about
+--type-set=MARKDOWN=md,mkd,markdown
+--type-set=RDOC=rdoc
+--type-set=slim=slim
+
