@@ -58,9 +58,6 @@
 [submodule "home/vim/bundle/vim-css-colors"]
 	path = home/vim/bundle/vim-css-colors
 	url = git://github.com/ap/vim-css-color.git
-[submodule "prefix/src/jsdoc-toolkit"]
-	path = prefix/src/jsdoc-toolkit
-	url = git://github.com/paperjs/jsdoc-toolkit.git
 [submodule "home/vim/bundle/vim-handlebars"]
 	path = home/vim/bundle/vim-handlebars
 	url = git://github.com/nono/vim-handlebars.git
