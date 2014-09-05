@@ -1,4 +1,0 @@
-AC_INIT(Par,1.52)
-dnl Checks for compiler
-AC_PROG_CC
-AC_OUTPUT(Makefile)
