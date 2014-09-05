@@ -3,7 +3,8 @@ about-alias 'vim abbreviations'
 
 alias v='mvim --remote-tab'
 
-function mvim2() {
+function vsn() {
     DIR_NAME=`git rev-parse --show-toplevel`
-    mvim --servername `basename ${DIR_NAME}` .
+    echo "Running mvim --servername `basename ${DIR_NAME}`"
+    mvim --servername `basename ${DIR_NAME}`
 }
