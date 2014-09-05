@@ -71,11 +71,7 @@ pre_window: cd /usr/local/src/ibaset/brazen
 
 windows:
   - server:
-        layout: main-horizontal
+        layout: even-vertical
         panes:
             - grunt dev-start-watch
-            - mvim --servername brazen .
-  - editor:
-        layout: main-horizontal
-        panes:
-            - mvim --servername brazen .
+            - mvim --servername brazen
