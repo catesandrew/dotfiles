@@ -864,9 +864,9 @@ autocmd Syntax * RainbowParenthesesLoadBraces
 " symbols.
 
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep=' '
-let g:airline#extensions#tabline#left_alt_sep='¦'
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#left_sep=' '
+" let g:airline#extensions#tabline#left_alt_sep='¦'
 
 " }}}
 " Par {{{
@@ -932,12 +932,6 @@ nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
 nmap <leader>N :NERDTreeClose<CR>
 "map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 
-" Disable the scrollbars (NERDTree)
-"set guioptions-=r
-"set guioptions-=L
-" Keep NERDTree window fixed between multiple toggles
-"set winfixwidth
-
 let NERDTreeChDirMode=0
 
 " Store the bookmarks file
@@ -957,8 +951,7 @@ let NERDTreeQuitOnOpen=0
 " Highlight the selected entry in the tree
 let NERDTreeHighlightCursorline=1
 
-" Use a single click to fold/unfold directories and a double click to open
-" files
+" Use a single click to fold/unfold directories and a double click to open files
 let NERDTreeMouseMode=2
 
 let NERDTreeKeepTreeInNewTab=1
@@ -1079,34 +1072,20 @@ nmap <leader>be :EasyBufferToggle<enter>
 " }}}
 " ctrlp {{{
 
-" peepopen
-" dirs to ignore:  (^(\.git|\.hg|\.svn|\.sass-cache|assets|node_modules|build|tmp|log|dev\/mocks|vendor\/(rails|gems|plugins))\/)|(components|node_modules)\/
-" files to ignore: (\.#.+|\.DS_Store|\.svn|\.png|\.jpe?g|\.gif|\.elc|\.rbc|\.pyc|\.swp|\.psd|\.ai|\.pdf|\.mov|\.aep|\.dmg|\.zip|\.gz|~)$
-" project root pattern: ^([RM]akefile|Jakefile\.js|bower\.json|package\.json|build\.xml|.*\.xcodeproj|.*\.bbprojectd|\.git|\.git/|\.hg|)$
-
-" let g:ctrlp_working_path_mode = ''
 let g:ctrlp_clear_cache_on_exit=1
 let g:ctrlp_max_height=40
-let g:ctrlp_show_hidden=0
+let g:ctrlp_show_hidden=1
 let g:ctrlp_follow_symlinks=1
 let g:ctrlp_max_files=20000
 call EnsureExists(s:get_cache_dir('ctrlp'))
 let g:ctrlp_cache_dir=s:get_cache_dir('ctrlp')
 let g:ctrlp_reuse_window='startify'
 let g:ctrlp_extensions=['funky']
-" let g:ctrlp_custom_ignore = {
-"     \ 'dir': '\v[\/]\.(git|hg|svn|idea)$',
-"     \ 'file': '\v\.DS_Store$'
-"     \ }
 let g:ctrlp_root_markers = ['Rakefile', 'Makefile', 'Jakefile.js', 'bower.json', 'package.json', 'build.xml']
 let g:ctrlp_custom_ignore = {
-    \ 'dir': '(^(\.git|\.hg|\.svn|\.sass-cache|assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins))\/)|(components|node_modules)\/',
-    \ 'file': '(\.#.+|\.DS_Store|\.svn|\.png|\.jpe?g|\.gif|\.elc|\.rbc|\.pyc|\.swp|\.psd|\.ai|\.pdf|\.mov|\.aep|\.dmg|\.zip|\.gz|~)$'
+    \ 'dir': '\v[\/]((assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins)|bower_components|components)|(\.(git|hg|svn|idea|sass-cache)))$',
+    \ 'file': '\v(\.(#.+|DS_Store|svn|png|jpe?g|gif|elc|rbc|pyc|swp|psd|ai|pdf|mov|aep|dmg|zip|gz|bmp)|(Thumbs\.db))$'
     \ }
-
-if executable('ag')
-    let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
-endif
 
 nmap \ [ctrlp]
 nnoremap [ctrlp] <nop>
