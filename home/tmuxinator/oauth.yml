@@ -1,0 +1,34 @@
+# Copy this file here: ~/.tmuxinator/oauth.yml
+# Invoke with
+#   mux oauth
+# Then hit 'Ctrl-a d' to detach
+# Then run 'tmux -CC attach'
+# Make sure that option for iterm2 is General --> tmux --> When attaching, open unrecognized windows in Tabs
+# Also, check option "Automatically hide the tmux client session after connecting"
+# tmux kill-session -t oauth
+
+name: oauth
+root: /usr/local/src/oauth-openid
+
+# Runs before everything. Use it to start daemons etc.
+# pre: sudo /etc/rc.d/mysqld start
+
+# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
+# pre_window: rbenv shell 2.0.0-p247
+# pre_window: cd /usr/local/src/oauth
+
+# Pass command line options to tmux. Useful for specifying a different tmux.conf.
+# tmux_options: -f ~/.tmux.mac.conf
+
+# Change the command to call tmux.  This can be used by derivatives/wrappers like byobu.
+# tmux_command: byobu
+
+windows:
+  - projects:
+        layout: even-vertical
+        panes:
+            - cd OpenIDConnect
+            - cd node-oauth2-provider
+            - cd node-openid-provider
+            - cd oauth2orize
+  - editor: mvim --servername 'oauth'
