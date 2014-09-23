@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# This came from:
+#     http://emacsformacosx.com/tips
+#
+
+set -e
+${BREW_HOME}/homebrew/Cellar/emacs/24.3/Emacs.app/Contents/MacOS/Emacs "$@"
+
+# if [[ $1 == -v ]]; then
+#     verbose=1
+#     shift
+# fi
+#
+# commands=$1
+#
+# main() {
+#     # enforce_usage
+#     run_emacs
+# }
+#
+#
+# # enforce_usage() {
+# #     if [ -z "$commands" ]; then
+# #         usage
+# #         exit $E_BADARGS
+# #     fi
+# # }
+# #
+# # usage() {
+# #     echo "usage: `emacs $0` commands"
+# # }
+#
+# run_emacs() {
+#     ${BREW_HOME}/homebrew/Cellar/emacs/24.3/Emacs.app/Contents/MacOS/Emacs "$@"
+#     # /Applications/Emacs.app/Contents/MacOS/Emacs "$@"
+# }
+#
+# log_command() {
+#     debug "=> $*"
+#     eval "$@"
+# }
+#
+# debug() {
+#     if [ $verbose ]; then
+#         echo $* >&2
+#     fi
+# }
+#
+# main

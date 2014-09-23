@@ -156,7 +156,7 @@ bash_prompt_command() {
 }
 
 # Max length of PWD to display
-MAX_PWD_LENGTH=32
+MAX_PWD_LENGTH=24
 
 # Displays last X characters of pwd
 function limited_pwd() {
@@ -168,7 +168,7 @@ function limited_pwd() {
 
     if [ $offset -gt "0" ]
     then
-        local truncated_symbol="..."
+        local truncated_symbol="…"
         TRUNCATED_PWD=${RELATIVE_PWD:$offset:$MAX_PWD_LENGTH}
         echo -e "${truncated_symbol}/${TRUNCATED_PWD#*/}"
     else

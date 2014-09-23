@@ -8,7 +8,7 @@
 # tmux kill-session -t oauth
 
 name: oauth
-root: /usr/local/src/oauth-openid
+root: /usr/local/src/sso/oauth
 
 # Runs before everything. Use it to start daemons etc.
 # pre: sudo /etc/rc.d/mysqld start

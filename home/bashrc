@@ -5,6 +5,7 @@ export TLSOURCE=en TLTARGET=es
 export LC_CTYPE="utf-8"
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
+export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
 
 export PERL_LOCAL_LIB_ROOT="${HOME}/perl5:$PERL_LOCAL_LIB_ROOT";
 export PERL_MB_OPT="--install_base "${HOME}/perl5"";
