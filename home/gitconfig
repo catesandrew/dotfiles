@@ -1,25 +1,37 @@
 [user]
   name = Andrew Cates
+  email = catesandrew@gmail.com
 [core]
-  excludesfile = /Users/catesandrew/.gitignore
+  excludesfile = ~/.gitignore
   quotepath = false
+  trustctime = false
+  autocrlf = input
 [git-p4]
-  user = catesandrew
+  user = andrew
   useclientspec = true
 [alias]
-  # https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
+  pu = !"git fetch origin -v; git fetch upstream -v; git merge upstream/develop"
   fp = format-patch --stdout -1
   idiff = "!git diff | idiff"
-  vdiff = difftool
   qlog = log --abbrev-commit --date=relative --pretty=format:'%C(bold yellow)%h%Creset %s %C(bold yellow)<%an>%Creset'
-  st = status
+  # Short status output
+  st = "!git status -sb"
   co = checkout
   lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
   # Quickly Commit / Uncommit Work-In-Progress
-  # By David Gageot (http://gist.github.com/492227): 
+  # By David Gageot (http://gist.github.com/492227):
   wip = "git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m \"wip\""
   unwip = "git log -n 1 | grep -q -c wip && git reset HEAD~1"
-  #hdiff = "git diff --color-words --no-index orig.txt edited.txt | /tmp/ansi2html.sh > 2beshared.html"
+  nr = "!git ls-files -o --exclude-standard | xargs rm"
+  # number of commits on branch.
+  # 1 rev-list lists revisions, and
+  # 2 master.. refers to "commits since current HEAD diverged from master"
+  count = "!git rev-list develop.. | wc -l"
+  #
+  # Show branches, tags in git log
+  dlog = "!git log --oneline --decorate"
+  # Diff by highlighting inline word changes instead of whole lines
+  wdiff = "!git diff --word-diff"
 
   # `git remote prune origin`: remove remote-tracking branches that were deleted from the remote repo
   # `git gc`: cleanup unnecessary files and optimize the local repository
@@ -60,27 +72,46 @@
   # Find out who is currently active on the repository
   # Displays committers in descending order of number of commits
   who = shortlog --numbered --summary --email --no-merges --since="3 months"
+
+  # Divergence (commits we added and commits remote added)
+  div = divergence
+
+  # Goodness (summary of diff lines added/removed/total)
+  gn = goodness
+  gnc = goodness --cached
+
+  # Fancy logging.
+  #   h = head
+  #   hp = head with patch
+  #   r = recent commits, only current branch
+  #   ra = recent commits, all reachable refs
+  #   l = all commits, only current branch
+  #   la = all commits, all reachable refs
+  head = !git r -1
+  h = !git head
+  hp = "!. ~/.githelpers && show_git_head"
+  r = !GIT_NO_PAGER=1 git l -30
+  ra = !git r --all
+  l = "!. ~/.githelpers && pretty_git_log"
+  la = !git l --all
 [branch]
-  autosetupmerge = true  
-[difftool "Kaleidoscope"]
-  cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
+  autosetupmerge = true
+  autosetuprebase = always
 [difftool]
   prompt = false
 [diff]
   tool = araxis
-[merge]
-  tool = araxis
-[diffall]
-  external = araxisgitdiffall
+  renamelimit = 3000
+[mergetool "araxis"]
+  path = /Applications/Araxis Merge.app/Contents/Utilities/compare
 [color]
   diff = auto
   status = auto
   branch = auto
   sh = auto
-  #ui = true
 [color "branch"]
   current = yellow reverse
-  local = yellow 
+  local = yellow
   remote = green
 [color "diff"]
   meta = yellow bold
@@ -95,8 +126,11 @@
   branch = yellow reverse
   workdir = blue bold
   dirty = red
-[pretty]
-  # tut: http://gitimmersion.com/lab_10.html
-  # ref: http://linux.die.net/man/1/git-log
-  # Result: <short-sha> <commit-message> (<pointer-names>) -- <commit-author-name>; <relative-time>
-  nice = "%C(yellow)%h%C(reset) %C(white)%s%C(cyan)%d%C(reset) -- %an; %ar"
+[web]
+  browser = open
+[push]
+  default = tracking
+[branch "master"]
+  rebase = true
+[mergetool]
+  keepBackup = true
