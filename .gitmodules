@@ -96,13 +96,13 @@
 	url = https://github.com/xolox/vim-misc.git
 [submodule "home/vim/bundle/vim-session"]
 	path = home/vim/bundle/vim-session
-	url = git@github.com:xolox/vim-session.git
+	url = https://github.com/xolox/vim-session.git
 [submodule "home/vim/bundle/vim-jsbeautify"]
 	path = home/vim/bundle/vim-jsbeautify
 	url = git://github.com/maksimr/vim-jsbeautify.git
 [submodule "home/vim/bundle/vim-multimarkdown"]
 	path = home/vim/bundle/vim-multimarkdown
-	url = git@github.com:jngeist/vim-multimarkdown.git
+	url = https://github.com/jngeist/vim-multimarkdown.git
 [submodule "home/vim/bundle/vim-airline"]
 	path = home/vim/bundle/vim-airline
 	url = https://github.com/bling/vim-airline
