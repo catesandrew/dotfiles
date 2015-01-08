@@ -896,7 +896,7 @@ endif
 
 " }}}
 " Marked Support {{{
-nnoremap <leader>M :silent !open -a Marked.app '%:p'<cr>
+nnoremap <leader>M :silent !open -a Marked\ 2.app '%:p'<cr>
 
 " }}}
 " MultiMarkdown Support {{{
@@ -991,6 +991,12 @@ let g:syntastic_mode_map = { 'mode': 'active',
                             \ 'active_filetypes': ['ruby', 'php', 'javascript', 'html', 'handlebars', 'stylus', 'css'],
                             \ 'passive_filetypes': ['puppet', 'slim'] }
 
+
+" }}}
+" Har {{{
+
+au BufRead,BufNewFile *.har set filetype=json
+nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " }}}
 " JSON {{{
