@@ -50,6 +50,15 @@ dbu() { docker build -t=$1 .; }
 # Show all alias related docker
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
+# http://viget.com/extend/how-to-use-docker-on-os-x-the-missing-guide
+docker-ip() {
+    boot2docker ip 2> /dev/null
+}
+
+docker2hostfile() {
+    echo $(docker-ip) dockerhost | tee -a "${HOME}/Library/Gas Mask/Local/Docker.hst"
+}
+
 # enter into a running container
 
 function dent {
