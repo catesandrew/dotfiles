@@ -1,5 +1,6 @@
 if [ $(uname) = "Darwin" ]; then
 
+    export CHEATCOLORS=true
     export JAVA_HOME="`/usr/libexec/java_home`"
     export HTML_TIDY=$HOME/.tidyrc
     export TLSOURCE=en TLTARGET=es
