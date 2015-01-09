@@ -1,0 +1,23 @@
+---
+curl: ! "curl - transfer a URL\r\n\r\nSynopsis:\r\n\r\n  curl [options] [URL...]\r\n\r\n\r\nCommand
+  line internet/network loader tool and ajax test tool. Read the contents of a URL,
+  dump the results to the stdout.\r\n\r\n\r\nTo return the entire page to stdout:\r\n\r\n
+  \ curl www.google.com\r\n\r\n\r\nTo simulate wget by downloading a file at a specific
+  web address, use the -O flag:\r\n\r\n  curl -O www.example.com/img.gif\r\n\r\n\r\nTo
+  see if a site is alive, just get the headers (--head or -I):\r\n\r\n  curl --head
+  www.yahoo.com\r\n\r\nA live response returns status, cookies, content length, etc.\r\n\r\n\r\nTo
+  send custom headers (anything you want!) use (--header or -H):\r\n\r\n  curl --header
+  \"User-Agent: something-special\" example.com\r\n  curl -H \"Accept-Encoding: gzip,
+  deflate\" example.com\r\n\r\n\r\nTo retrieve data with POST:\r\n\r\n  curl -d \"name1=a;name\"
+  www.google.com\r\n\r\n\r\nTo simulate a form post:\r\n\r\n  curl -F \"variable=value;variable2=value2\"
+  http://localhost:3000/your/url\r\n\r\n\r\nThis is helpful to get specific javascript
+  back:\r\n\r\n  curl -H \"Accept: application/json\" -i -X GET  http://localhost:3000/projects/3\r\n\r\n\r\nDelete
+  via rest (or set other http methods with the -X flag):\r\n\r\n  curl -X DELETE http://localhost:3000/projects/1\r\n\r\n\r\nAuthenticate
+  with username and password (http-basic if not specified otherwise):\r\n\r\n  curl
+  -u user:password http://example.com/whatever\r\n\r\n\r\nSave cookies to a file:\r\n\r\n
+  \ curl -c cookies.txt \\\r\n       -F \"username=meepo\" -F \"password=curiass\"
+  \\\r\n       http://example.com/login\r\n\r\n... and pass the saved cookies back
+  to the server:\r\n\r\n  curl -b cookies.txt http://example.com/action\r\n\r\nAlternatively
+  you can pass in cookies as key value pairs:\r\n\r\n  curl -b key=value http://example.com/action\r\n\r\nOr
+  using the custom header option:\r\n\r\n  curl -H 'Cookie: key=value' http://example.com/action\r\n\r\n\r\nThe
+  view the man page:  curl --manual | less\r\n\r\n\r\nRelated programs: wget"
