@@ -116,7 +116,6 @@ PREVIEW="less"
 
 # Start Up Scripts #
 
-#. ${BASH_IT}/prompt.sh
 . ${BREW_HOME}/etc/profile.d/z.sh
 
 # Custom (Machine-Specific) Startup #
