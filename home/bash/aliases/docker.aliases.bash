@@ -1,11 +1,23 @@
 cite 'about-alias'
 about-alias 'docker'
 
-# Docker Commands
+__docker_func_wrap ()
+{
+    local cur words cword prev
+    _get_comp_words_by_ref -n =: cur words cword prev
+    $1
+}
 
-# One liner to stop / remove all of Docker containers:
-# alias dsa='docker stop $(docker ps -a -q)'
-# alias dra='docker rm $(docker ps -a -q)'
+# __git_complete gco _git_checkout
+__docker_complete ()
+{
+    local wrapper="__docker_wrap${2}"
+    eval "$wrapper () { __docker_func_wrap $2 ; }"
+    complete -o bashdefault -o default -o nospace -F $wrapper $1 2>/dev/null \
+        || complete -o default -o nospace -F $wrapper $1
+}
+
+# Docker Commands
 
 # ------------------------------------
 # Docker alias and function
@@ -36,7 +48,15 @@ alias dki="docker run -i -t -P"
 dstop() { docker stop $(docker ps -a -q); }
 
 # Remove all containers
-drm() { docker rm $(docker ps -a -q); }
+drm() {
+    if [ $# -eq 0 ] ; then
+        # docker rm $(docker ps -a -q);
+        echo 'remove all'
+    else
+        docker rm $1;
+    fi
+}
+__docker_complete drm _docker_rm
 
 # Stop and Remove all containers
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
@@ -60,17 +80,16 @@ docker2hostfile() {
 }
 
 # enter into a running container
-
-function dent {
-docker exec -i -t $1 /bin/bash
+dent() {
+    docker exec -i -t $1 /bin/bash
 }
-complete -F _docker_exec dent
+__docker_complete dent _docker_exec
 
 # run bash for any image
-function dbash {
-docker run --rm -i -t -e TERM=xterm --entrypoint /bin/bash $1 
-}
-complete -F _docker_images dbash
-
 # dbash is particularly useful when diagnosing a failed `docker build`. Just
 # dbash the last generated image and re-run the failed command
+dbash() {
+    docker run --rm -i -t -e TERM=xterm --entrypoint /bin/bash $1 
+}
+__docker_complete dbash __docker_image_repos
+
