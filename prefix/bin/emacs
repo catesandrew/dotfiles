@@ -5,7 +5,7 @@
 #
 
 set -e
-${BREW_HOME}/homebrew/Cellar/emacs/24.3/Emacs.app/Contents/MacOS/Emacs "$@"
+${BREW_HOME}/homebrew/Cellar/emacs/24.4/Emacs.app/Contents/MacOS/Emacs "$@"
 
 # if [[ $1 == -v ]]; then
 #     verbose=1
@@ -32,7 +32,7 @@ ${BREW_HOME}/homebrew/Cellar/emacs/24.3/Emacs.app/Contents/MacOS/Emacs "$@"
 # # }
 #
 # run_emacs() {
-#     ${BREW_HOME}/homebrew/Cellar/emacs/24.3/Emacs.app/Contents/MacOS/Emacs "$@"
+#     ${BREW_HOME}/homebrew/Cellar/emacs/24.4/Emacs.app/Contents/MacOS/Emacs "$@"
 #     # /Applications/Emacs.app/Contents/MacOS/Emacs "$@"
 # }
 #
