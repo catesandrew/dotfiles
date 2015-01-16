@@ -137,7 +137,9 @@ set mousehide           " hide when characters are typed
 set ttyfast             " assume fast terminal connection
 set viewoptions=folds,options,cursor,unix,slash " unix/windows compatibility
 set encoding=utf-8
-set macmeta             " Use option (alt) as meta key.  When on, option-key presses are not interpreted,
+if s:is_macvim
+    set macmeta             " Use option (alt) as meta key.  When on, option-key presses are not interpreted,
+endif
 if exists('$TMUX')
   set clipboard=
 else
@@ -637,9 +639,11 @@ nnoremap <leader>z zMzvzz
 " Destroy infuriating keys ---------------------------------------------------- {{{
 
 " Fuck you, help key.
-set fuoptions=maxvert,maxhorz
-noremap <F1> :set invfullscreen<CR>
-inoremap <F1> <ESC>:set invfullscreen<CR>a
+if s:is_macvim
+    set fuoptions=maxvert,maxhorz
+    noremap <F1> :set invfullscreen<CR>
+    inoremap <F1> <ESC>:set invfullscreen<CR>a
+endif
 
 " Fuck you too, manual key.
 nnoremap K <nop>
