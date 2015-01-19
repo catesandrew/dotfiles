@@ -253,3 +253,6 @@
 [submodule "home/vim/bundle/vim-textobj-underscore"]
 	path = home/vim/bundle/vim-textobj-underscore
 	url = https://github.com/lucapette/vim-textobj-underscore.git
+[submodule "home/vim/bundle/vim-vagrant"]
+	path = home/vim/bundle/vim-vagrant
+	url = https://github.com/markcornick/vim-vagrant.git
