@@ -851,6 +851,11 @@ au BufRead,BufNewFile ~/Library/Caches/* setlocal buftype=nofile
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 " }}}
+" haproxy {{{
+
+au BufRead,BufNewFile haproxy* set ft=haproxy
+
+" }}}
 
 " }}}
 " Plugin settings ------------------------------------------------------------- {{{
