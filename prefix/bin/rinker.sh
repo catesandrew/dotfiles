@@ -33,9 +33,9 @@
 #################################################################
 
 ################ Script Variables ###############################
-IPPATH=/var/log/IP                    # IP address storage file
+IPPATH=${HOME}/Library/Logs/IP                    # IP address storage file
 TMPIP=/tmp/tmpIP                      # Temp IP storage file
-LOGPATH=/var/log/changeip.log         # Log file
+LOGPATH=${HOME}/Library/Logs/changeip.log         # Log file
 TEMP=/tmp/temp                        # Temp storage file
 CIPUSER=                              # ChangeIP.com Username
 CIPPASS=                              # ChangeIP.com Password
