@@ -67,15 +67,27 @@ __docker_complete drm _docker_rm
 # Stop and Remove all containers
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
 
-# Remove all images
+# Remove image specified by $1 or remove all untagged images
 dri() {
     if [ $# -eq 0 ] ; then
-        docker rmi $(docker images -q);
+        # This works by using rmi with a list of image ids. To get the image
+        # ids we call docker images then pipe it to grep "^<none>". The grep
+        # will filter it down to only lines with the value "<none>" in the
+        # repository column. Then to extract the id out of the third column we
+        # pipe it to awk "{print $3}" which will print the third column of each
+        # line passed to it.
+        docker rmi $(docker images | grep "^<none>" | awk '{print $3}')
     else
         docker rmi $1;
     fi
 }
 __docker_complete dri _docker_rmi
+
+# Remove all images
+drif() {
+    docker rmi $(docker images -q);
+}
+
 
 # Dockerfile build, e.g., $dbu tcnksm/test
 dbu() { docker build -t=$1 .; }
