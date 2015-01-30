@@ -256,3 +256,6 @@
 [submodule "home/vim/bundle/vim-vagrant"]
 	path = home/vim/bundle/vim-vagrant
 	url = https://github.com/markcornick/vim-vagrant.git
+[submodule "home/vim/bundle/vim-supervisor"]
+	path = home/vim/bundle/vim-supervisor
+	url = https://github.com/thiderman/vim-supervisor.git
