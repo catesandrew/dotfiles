@@ -37,18 +37,20 @@ IPPATH=${HOME}/Library/Logs/IP                    # IP address storage file
 TMPIP=/tmp/tmpIP                      # Temp IP storage file
 LOGPATH=${HOME}/Library/Logs/changeip.log         # Log file
 TEMP=/tmp/temp                        # Temp storage file
-CIPUSER=                              # ChangeIP.com Username
-CIPPASS=                              # ChangeIP.com Password
-CIPSET=1                              # ChangeIP.com recordset
+USER=${CIPUSER:-"no-user"}
+PASS=${CIPPASS:-"no-pass"}
+SET=${CIPSET:-"1"}
 LOGLEVEL=2                            # 0=off,1=normal,2=verbose
 LOGMAX=500                            # Max log lines, 0=unlimited
 #################################################################
 
+AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2'
 # get current IP from ip.changeip.com, and store in $TEMP
-wget -q -U "rinker.sh wget 1.0" -O $TEMP ip.changeip.com
+wget -q -U "$AGENT" -O $TEMP ip.changeip.com
 
 # parse $TEMP for the ip, and store in $TMPIP
 grep IPADDR < $TEMP | cut -d= -s -f2 | cut -d- -s -f1 > $TMPIP
+IP=`cat $TMPIP`
 
 # compare $IPPATH with $TMPIP, and if different, execute update
 if diff $IPPATH $TMPIP > /dev/null
@@ -62,7 +64,7 @@ if diff $IPPATH $TMPIP > /dev/null
           cat $IPPATH >> $LOGPATH
       fi
   else                                # different IP, execute update
-      wget -q -U "rinker.sh wget 1.0" -O $TEMP --http-user=$CIPUSER --http-password=$CIPPASS "https://nic.changeip.com/nic/update?cmd=update&set=$CIPSET"
+      wget -q -U "$AGENT" -O /dev/null --http-user=$USER --http-password=$PASS "https://nic.changeip.com/nic/update?cmd=update&set=$SET&ip=$IP"
       if [ $LOGLEVEL -ne 0 ]
         then                          # if logging, log update
           echo "--------------------------------" >> $LOGPATH
