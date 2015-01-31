@@ -259,3 +259,6 @@
 [submodule "home/vim/bundle/vim-supervisor"]
 	path = home/vim/bundle/vim-supervisor
 	url = https://github.com/thiderman/vim-supervisor.git
+[submodule "home/vim/bundle/plist.vim"]
+	path = home/vim/bundle/plist.vim
+	url = https://github.com/vim-scripts/plist.vim.git
