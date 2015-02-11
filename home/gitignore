@@ -138,6 +138,16 @@ build/*
 *.xcworkspace
 xcuserdata
 
+# Chef Cookbook
+.vagrant/
+/cookbooks
+
+# Bundler
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
+
 # WebStorm
 .idea
 
