@@ -39,6 +39,7 @@ fi
 
 export PATH="${HOME}/.cabal/bin:$PATH"
 export PATH="${HOME}/.bin:$PATH"
+export PACKER_CACHE_DIR="${HOME}/.packer_cache"
 
 # vim and gnome-terminal have support for 256 colours in fedora 8 at least
 # Note debian/ubuntu users need to install the ncurses-term package for this
