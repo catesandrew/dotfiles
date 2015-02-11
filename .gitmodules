@@ -82,9 +82,6 @@
 [submodule "home/vim/bundle/vim-figlet"]
 	path = home/vim/bundle/vim-figlet
 	url = https://github.com/vim-scripts/Figlet.vim
-[submodule "prefix/src/nvm"]
-	path = prefix/src/nvm
-	url = git://github.com/creationix/nvm.git
 [submodule "home/vim/bundle/color_highlight"]
 	path = home/vim/bundle/color_highlight
 	url = https://github.com/chrisbra/color_highlight

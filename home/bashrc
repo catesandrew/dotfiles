@@ -79,7 +79,7 @@ export MANPAGER="less -X"
 export IRC_CLIENT='irssi'
 
 # Node Version Manager
-export NVM_TARGET="$HOME/.dotfiles/prefix/src/nvm"
+export NVM_TARGET="$(brew --prefix nvm)"
 export NVM_DIR="/usr/local/nvm"
 [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
 
