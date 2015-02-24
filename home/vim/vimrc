@@ -657,6 +657,31 @@ nnoremap <silent> Q ZZ
 " }}}
 " Various filetype-specific stuff --------------------------------------------- {{{
 
+" api blueprint {{{
+
+autocmd FileType apiblueprint setlocal tabstop=4
+autocmd FileType apiblueprint setlocal softtabstop=4
+autocmd FileType apiblueprint setlocal shiftwidth=4
+
+" Use <localleader>1/2/3 to add headings.
+au Filetype apiblueprint nnoremap <buffer> <localleader>1 yypVr=
+au Filetype apiblueprint nnoremap <buffer> <localleader>2 yypVr-
+au Filetype apiblueprint nnoremap <buffer> <localleader>3 I### <ESC>
+
+autocmd FileType apiblueprint setlocal wrap
+autocmd FileType apiblueprint setlocal linebreak
+autocmd FileType apiblueprint setlocal nolist  " list disables linebreak
+autocmd FileType apiblueprint setlocal breakindentopt=shift:10
+autocmd FileType apiblueprint setlocal textwidth=0
+autocmd FileType apiblueprint setlocal virtualedit=
+autocmd FileType apiblueprint setlocal display+=lastline
+autocmd FileType apiblueprint setlocal wrapmargin=10
+autocmd FileType apiblueprint noremap  <buffer> <silent> k gk
+autocmd FileType apiblueprint noremap  <buffer> <silent> j gj
+autocmd FileType apiblueprint noremap  <buffer> <silent> 0 g0
+autocmd FileType apiblueprint noremap  <buffer> <silent> $ g$
+
+" }}}
 " Markdown {{{
 
 au BufNewFile,BufRead *.m*down setlocal filetype=markdown
@@ -669,7 +694,8 @@ au Filetype markdown nnoremap <buffer> <localleader>3 I### <ESC>
 
 autocmd FileType markdown setlocal wrap
 autocmd FileType markdown setlocal linebreak
-autocmd FileType markdown setlocal nolist
+autocmd FileType markdown setlocal nolist    " list disables linebreak
+autocmd FileType markdown setlocal breakindentopt=shift:10
 autocmd FileType markdown setlocal textwidth=0
 autocmd FileType markdown setlocal virtualedit=
 autocmd FileType markdown setlocal display+=lastline
