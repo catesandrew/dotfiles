@@ -259,3 +259,6 @@
 [submodule "home/vim/bundle/plist.vim"]
 	path = home/vim/bundle/plist.vim
 	url = https://github.com/vim-scripts/plist.vim.git
+[submodule "home/vim/bundle/vim-jsx"]
+	path = home/vim/bundle/vim-jsx
+	url = https://github.com/mxw/vim-jsx.git
