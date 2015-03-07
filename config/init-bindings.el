@@ -80,8 +80,8 @@
       (define-key evil-normal-state-map (kbd "SPC l") 'helm-swoop)
       (define-key evil-normal-state-map (kbd "SPC L") 'helm-multi-swoop)))
 
-  (define-key evil-normal-state-map (kbd "C-b") 'evil-scroll-up)
-  (define-key evil-normal-state-map (kbd "C-f") 'evil-scroll-down)
+  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-normal-state-map (kbd "C-d") 'evil-scroll-down)
 
   (define-key evil-normal-state-map (kbd "[ SPC") (bind (evil-insert-newline-above) (forward-line)))
   (define-key evil-normal-state-map (kbd "] SPC") (bind (evil-insert-newline-below) (forward-line -1)))
