@@ -1,3 +1,9 @@
+; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
+
+; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
+; can also enable Helm to manage the command buffer, which is pretty awesome
+; with: (helm-mode 1)
+
 (setq helm-command-prefix-key "C-c h")
 (setq helm-quick-update t)
 (setq helm-bookmark-show-location t)
