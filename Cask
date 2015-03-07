@@ -105,7 +105,6 @@
 (depends-on "parent-mode")
 (depends-on "pkg-info")
 (depends-on "popup")
-(depends-on "powerline")
 (depends-on "pretty-symbols") ;;
 (depends-on "projectile") ;;
 (depends-on "project-explorer") ;;
