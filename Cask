@@ -44,6 +44,7 @@
 (depends-on "evil-indent-textobject") ;;
 (depends-on "evil-visualstar") ;;
 (depends-on "evil-numbers") ;;
+(depends-on "evil-tabs") ;;
 (depends-on "f")
 (depends-on "fancy-narrow")
 (depends-on "fill-column-indicator")
