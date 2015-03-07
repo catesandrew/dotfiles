@@ -3,6 +3,16 @@
   (server-start))
 
 
+; Smooth scrolling
+
+; One annoying thing that most Vim users will find in Emacs is the jumpy
+; scrolling. To have Emacs scroll like Vim (that is, line by line and leaving
+; some lines before starting to scroll) the solution is to install smooth-scrolling
+(require 'smooth-scrolling)
+(setq scroll-margin 5
+scroll-conservatively 9999
+scroll-step 1)
+
 ;; move cursor to the last position upon open
 (require 'saveplace)
 (setq save-place-file (concat dotemacs-cache-directory "places"))
