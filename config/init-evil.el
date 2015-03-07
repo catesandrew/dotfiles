@@ -46,7 +46,15 @@
   (evil-esc-mode))
 
 
+
+; Leader key
+
 (require 'evil-leader)
+
+; Later, I found that the evil-leader key didn't work on some modes (like when
+; editing the .emacs file in emacs-lisp-mode), but the package FAQ solved the
+; problem, you have to add this before the `global-evil-leader-mode` setting:
+(setq evil-leader/in-all-states 1)
 (global-evil-leader-mode t)
 
 
