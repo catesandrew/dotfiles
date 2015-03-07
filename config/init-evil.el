@@ -78,6 +78,26 @@
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode t)
 
+; Easymotion => Evil Ace Jump
+
+; The functionality provided by the awesome Easymotion plugin on Vim is
+; actually integrated by default on Evil since it incorporates a package called
+; Ace Jump that does mostly the same. It's less powerful than Easymotion (some
+; jumps like backwards-only / forward-only / end-of-word and others are
+; missing) and I prefer how Easymotion shows directly two chars when a jump is
+; going to require them (instead of showing one and after pressing it, the
+; other which is what Ace-Jump does) but the important modes (bidirectional
+; jump to word and to char) that were the ones I was mostly using are provided.
+
+; Unlike Easymotion, jump to word asks for a letter, but that can be easily
+; disabled with: (setq ace-jump-word-mode-use-query-char nil). The author makes
+; the case that without asking for a char you're probably entering more key
+; presses most of the time. This is probably true, but when I want to jump to
+; a random word inside the buffer my brain-eye connection has already
+; identified the word but I've to stop and look/think for the first char, so in
+; the end for me is actually faster to get jump shortcuts to all the words
+; without having to provide the leading character.
+
 
 (setq evilnc-hotkey-comment-operator "gc")
 (require 'evil-nerd-commenter)
