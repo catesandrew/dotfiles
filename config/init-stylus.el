@@ -1,6 +1,6 @@
 (add-to-list 'auto-mode-alist
              '("\\.styl$" . (lambda ()
-                              (require-package 'stylus-mode)
+                              (require 'stylus-mode)
                               (stylus-mode))))
 
 (after 'stylus-mode

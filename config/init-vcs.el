@@ -1,7 +1,7 @@
 (setq vc-make-backup-files t)
 
 (after 'vc-git
-  (require-package 'magit)
+  (require 'magit)
 
   (after 'magit
     (setq magit-diff-options '("--histogram"))
@@ -19,13 +19,12 @@
 
   (if (display-graphic-p)
       (progn
-        (require-package 'git-gutter-fringe+)
         (require 'git-gutter-fringe+))
-    (require-package 'git-gutter+))
+    (require 'git-gutter+))
 
   (global-git-gutter+-mode))
 
-(require-package 'diff-hl)
+(require 'diff-hl)
 (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
 (unless (display-graphic-p)
   (diff-hl-margin-mode))

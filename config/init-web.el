@@ -3,11 +3,11 @@
 
 
 (after "js2-mode-autoloads"
-  (require-package 'skewer-mode)
+  (require 'skewer-mode)
   (skewer-setup))
 
 
-(require-package 'rainbow-mode)
+(require 'rainbow-mode)
 (add-hook 'html-mode-hook 'rainbow-mode)
 (add-hook 'web-mode-hook 'rainbow-mode)
 (add-hook 'css-mode-hook 'rainbow-mode)
@@ -15,7 +15,7 @@
 
 
 (defun my-emmet-mode ()
-  (require-package 'emmet-mode)
+  (require 'emmet-mode)
   (emmet-mode))
 
 (add-hook 'css-mode-hook 'my-emmet-mode)
@@ -28,7 +28,6 @@
 
 (after 'web-mode
   (after 'yasnippet
-    (require-package 'angular-snippets)
     (require 'angular-snippets)
     (angular-snippets-initialize)))
 

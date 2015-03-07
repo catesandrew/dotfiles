@@ -9,7 +9,6 @@
     "The path to the ycmd package."
     :group 'dotemacs-company)
 
-  (require-package 'company)
   (require 'company)
 
   (setq company-idle-delay 0.2)
@@ -52,16 +51,16 @@
 
   (when dotemacs-company/ycmd-server-command
     (setq ycmd-server-command `("python" ,dotemacs-company/ycmd-server-command))
-    (require-package 'ycmd)
+    (require 'ycmd)
     (ycmd-setup)
 
-    (require-package 'company-ycmd)
+    (require 'company-ycmd)
     (company-ycmd-setup))
 
   (global-company-mode)
 
   (when (display-graphic-p)
-    (require-package 'company-quickhelp)
+    (require 'company-quickhelp)
     (setq company-quickhelp-delay 0.2)
     (company-quickhelp-mode t))
 

@@ -1,4 +1,4 @@
-(require-package 'flycheck)
+(require 'flycheck)
 
 (after 'flycheck
   (setq flycheck-check-syntax-automatically '(save mode-enabled))

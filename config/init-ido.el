@@ -9,13 +9,13 @@
 (ido-mode t)
 (ido-everywhere t)
 
-(require-package 'ido-ubiquitous)
+(require 'ido-ubiquitous)
 (ido-ubiquitous-mode t)
 
-(require-package 'flx-ido)
+(require 'flx-ido)
 (flx-ido-mode t)
 
-(require-package 'ido-vertical-mode)
+(require 'ido-vertical-mode)
 (ido-vertical-mode)
 
 (provide 'init-ido)

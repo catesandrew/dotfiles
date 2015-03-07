@@ -40,53 +40,50 @@
 (setq evil-replace-state-cursor '("red" bar))
 (setq evil-operator-state-cursor '("red" hollow))
 
-(require-package 'evil)
 (require 'evil)
 
 (unless (display-graphic-p)
   (evil-esc-mode))
 
 
-(require-package 'evil-leader)
+(require 'evil-leader)
 (global-evil-leader-mode t)
 
 
 (setq evilnc-hotkey-comment-operator "gc")
-(require-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
 
 
-(require-package 'evil-surround)
+(require 'evil-surround)
 (global-evil-surround-mode t)
 
 
-(require-package 'evil-exchange)
+(require 'evil-exchange)
 (evil-exchange-install)
 
 
 (setq evil-jumper-auto-center t)
 (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps"))
 (setq evil-jumper-auto-save-interval 3600)
-(require-package 'evil-jumper)
+(require 'evil-jumper)
 (global-evil-jumper-mode t)
 
 
-(require-package 'evil-matchit)
+(require 'evil-matchit)
 (defun evilmi-customize-keybinding ()
   (evil-define-key 'normal evil-matchit-mode-map
     "%" 'evilmi-jump-items))
 (global-evil-matchit-mode t)
 
 
-(require-package 'evil-indent-textobject)
 (require 'evil-indent-textobject)
 
 
-(require-package 'evil-visualstar)
+(require 'evil-visualstar)
 (global-evil-visualstar-mode t)
 
 
-(require-package 'evil-numbers)
+(require 'evil-numbers)
 
 
 (defun my-major-mode-evil-state-adjust ()

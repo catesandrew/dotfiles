@@ -20,7 +20,7 @@
                            count)))))
 (setq hs-set-up-overlay 'my-fold-overlay)
 
-(require-package 'diminish)
+(require 'diminish)
 (diminish 'visual-line-mode)
 (after 'undo-tree (diminish 'undo-tree-mode))
 (after 'auto-complete (diminish 'auto-complete-mode))
@@ -37,7 +37,7 @@
 (after 'indent-guide (diminish 'indent-guide-mode))
 
 
-(require-package 'smart-mode-line)
+(require 'smart-mode-line)
 (setq sml/show-client t)
 (setq sml/show-eol t)
 (setq sml/show-frame-identification t)
@@ -52,7 +52,7 @@
                   (push '("function" . 955) prettify-symbols-alist)
                   (push '("return" . 8592) prettify-symbols-alist))))
   (progn
-    (require-package 'pretty-symbols)
+    (require 'pretty-symbols)
     (require 'pretty-symbols)
     (diminish 'pretty-symbols-mode)
     (add-to-list 'pretty-symbol-categories 'js)
@@ -61,7 +61,7 @@
     (add-hook 'find-file-hook 'pretty-symbols-mode)))
 
 
-(require-package 'color-identifiers-mode)
+(require 'color-identifiers-mode)
 (global-color-identifiers-mode)
 (diminish 'color-identifiers-mode)
 
@@ -70,14 +70,14 @@
 ;; (fancy-narrow-mode)
 
 
-(require-package 'highlight-symbol)
+(require 'highlight-symbol)
 (setq highlight-symbol-idle-delay 0.3)
 (add-hook 'prog-mode-hook 'highlight-symbol-mode)
 
-(require-package 'highlight-numbers)
+(require 'highlight-numbers)
 (add-hook 'prog-mode-hook 'highlight-numbers-mode)
 
-(require-package 'highlight-quoted)
+(require 'highlight-quoted)
 (add-hook 'prog-mode-hook 'highlight-quoted-mode)
 
 

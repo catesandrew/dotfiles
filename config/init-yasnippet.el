@@ -1,5 +1,3 @@
-(require-package 'yasnippet)
-
 (let* ((yas-install-dir (car (file-expand-wildcards (concat package-user-dir "/yasnippet-*"))))
        (dir (concat yas-install-dir "/snippets/js-mode")))
   (if (file-exists-p dir)

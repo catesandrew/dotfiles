@@ -11,7 +11,7 @@
   "When non-nil, turn on smartparens paren matching instead of the default Emacs show-paren-mode."
   :group 'dotemacs-smartparens)
 
-(require-package 'smartparens)
+(require 'smartparens)
 (require 'smartparens-config)
 
 (setq sp-autoescape-string-quote nil)

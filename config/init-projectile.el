@@ -1,6 +1,7 @@
-(require-package 'projectile)
+(require 'projectile)
 
-
+(setq projectile-mode-line
+      '(:eval (format " [%s]" (projectile-project-name))))
 (setq projectile-cache-file (concat dotemacs-cache-directory "projectile.cache"))
 (setq projectile-known-projects-file (concat dotemacs-cache-directory "projectile-bookmarks.eld"))
 (setq projectile-indexing-method 'alien)
@@ -31,7 +32,7 @@
 
 
 (when (executable-find "ack")
-  (require-package 's)
+  (require 's)
   (let ((val (concat "ack -f --print0" (s-join " --ignore-dir=" (cons "" projectile-globally-ignored-directories)))))
     (setq projectile-generic-command val)
     (setq projectile-svn-command val)))

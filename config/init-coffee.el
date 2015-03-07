@@ -1,3 +1,3 @@
-(require-package 'coffee-mode)
+(require 'coffee-mode)
 
 (provide 'init-coffee)

@@ -11,15 +11,15 @@
 (setq helm-imenu-fuzzy-match t)
 (setq helm-lisp-fuzzy-completion t)
 
-(require-package 'helm)
-(require-package 'helm-swoop)
-(require-package 'helm-descbinds)
+(require 'helm)
+(require 'helm-swoop)
+(require 'helm-descbinds)
 
 (after "projectile-autoloads"
-  (require-package 'helm-projectile))
+  (require 'helm-projectile))
 
 (after "company-autoloads"
-  (require-package 'helm-company))
+  (require 'helm-company))
 
 (require 'helm-config)
 (after 'helm

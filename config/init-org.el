@@ -63,7 +63,7 @@
      (toggle-truncate-lines t))
    (add-hook 'org-mode-hook #'my-org-mode-hook)
 
-   (require-package 'org-bullets)
+   (require 'org-bullets)
    (setq org-bullets-bullet-list '("✿" "❀" "☢" "☯" "✸" ))
    (add-hook 'org-mode-hook #'org-bullets-mode)))
 

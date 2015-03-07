@@ -5,7 +5,7 @@
      ,@commands))
 
 
-(require-package 'guide-key)
+(require 'guide-key)
 (require 'guide-key)
 (setq guide-key/guide-key-sequence '("C-x" "C-c" ","))
 (setq guide-key/recursive-key-sequence-flag t)
@@ -15,7 +15,7 @@
 
 
 (after 'evil
-  (require-package 'key-chord)
+  (require 'key-chord)
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
