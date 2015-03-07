@@ -8,4 +8,10 @@
 
 (global-flycheck-mode t)
 
+;; flycheck errors on a tooltip (doesnt work on console)
+(when (display-graphic-p (selected-frame))
+  (eval-after-load 'flycheck
+    '(custom-set-variables
+      '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))))
+
 (provide 'init-flycheck)

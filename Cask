@@ -54,6 +54,7 @@
 (depends-on "flycheck") ;;
 (depends-on "flycheck-cask")
 (depends-on "flycheck-package")
+(depends-on "flycheck-pos-tip")
 (depends-on "form-feed")
 (depends-on "framemove") ;;
 (depends-on "fullscreen-mode")
