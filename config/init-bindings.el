@@ -20,6 +20,7 @@
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
 
+  ; In order to define an use a <leader> prefix for your personal shortcuts
   (after 'evil-leader
     (evil-leader/set-leader ",")
     (evil-leader/set-key
