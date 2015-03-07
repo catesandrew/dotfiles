@@ -44,6 +44,17 @@
 (sml/setup)
 
 
+; (require 'powerline)
+; (powerline-default-theme)
+; (powerline-center-evil-theme)
+; (powerline-vim-theme)
+
+
+; (require 'powerline-evil)
+; (powerline-evil-vim-theme)
+
+
+
 (if (fboundp 'global-prettify-symbols-mode)
     (progn
       (global-prettify-symbols-mode)

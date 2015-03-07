@@ -12,6 +12,7 @@
 (depends-on "browse-kill-ring")
 (depends-on "buffer-move")
 (depends-on "cask")
+(depends-on "clojure-mode")
 (depends-on "cmake-mode")
 (depends-on "coffee-mode") ;;
 (depends-on "color-identifiers-mode") ;;
@@ -107,9 +108,12 @@
 (depends-on "parent-mode")
 (depends-on "pkg-info")
 (depends-on "popup")
+(depends-on "powerline")
+(depends-on "powerline-evil")
 (depends-on "pretty-symbols") ;;
 (depends-on "projectile") ;;
 (depends-on "project-explorer") ;;
+(depends-on "puppet-mode") ;;
 (depends-on "pt") ;;
 (depends-on "rainbow-delimiters") ;;
 (depends-on "rainbow-mode") ;;
