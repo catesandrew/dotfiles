@@ -25,6 +25,7 @@
 (depends-on "diff-hl") ;;
 (depends-on "diminish") ;;
 (depends-on "discover-my-major") ;;
+(depends-on "dtrt-indent") ;;
 (depends-on "dummy-h-mode")
 (depends-on "editorconfig") ;;
 (depends-on "elisp-slime-nav") ;;

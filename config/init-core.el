@@ -17,6 +17,17 @@
 scroll-conservatively 9999
 scroll-step 1)
 
+
+; dtrt-indent
+
+; Automatically determine the indentation settings used on the file that you're
+; currently editting and adapt Emacs's settings to them. It's great when you're
+; editing external files not created by you or that for some reason follow
+; different indentation rules that the ones you've in your config file.
+
+(require 'dtrt-indent)
+(dtrt-indent-mode 1)
+
 ;; move cursor to the last position upon open
 (require 'saveplace)
 (setq save-place-file (concat dotemacs-cache-directory "places"))
