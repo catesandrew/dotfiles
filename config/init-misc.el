@@ -29,7 +29,6 @@
 
 
 (when (executable-find "ack")
-  (require-package 'ack-and-a-half)
   (require-package 'wgrep-ack))
 
 
