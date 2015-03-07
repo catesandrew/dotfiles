@@ -76,4 +76,5 @@
 (depends-on "vala-mode")
 (depends-on "visual-regexp-steroids")
 (depends-on "yasnippet")
+(depends-on "zenburn-theme")
 (depends-on "zygospore")
