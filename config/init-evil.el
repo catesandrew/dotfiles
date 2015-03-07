@@ -58,6 +58,15 @@
 (global-evil-surround-mode t)
 
 
+; Tabs
+
+; If you install the evil-tabs package and enable it with you'll have :tabnew,
+; gt and friends with numbered tabs by default. Showing the tab number is
+; a very useful feature when you can change to a tab with #gt like in Vim
+; (with # being a number from 0 to 9), but unfortunately this package doesn't
+; support #gt but I worked it around with my awesome Elisp skills (close to
+; zero):
+
 (require 'evil-tabs)
 (global-evil-tabs-mode t)
 (define-key evil-normal-state-map (kbd "C-0") (lambda() (interactive) (elscreen-goto 0)))
