@@ -9,6 +9,19 @@
 (setq-default save-place t)
 
 
+;; disable line wrap
+(setq-default truncate-lines t)
+
+;; make side by side buffers function the same as the main window
+(setq truncate-partial-width-windows nil)
+
+(load-theme 'zenburn t)
+
+;; disable backup files
+(setq make-backup-files nil) ; stop creating backup~ files
+(setq auto-save-default nil) ; stop creating #autosave# files
+
+
 ;; minibuffer history
 (require 'savehist)
 (setq savehist-file (concat dotemacs-cache-directory "savehist")
