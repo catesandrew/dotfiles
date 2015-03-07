@@ -117,6 +117,7 @@
 (depends-on "pt") ;;
 (depends-on "rainbow-delimiters") ;;
 (depends-on "rainbow-mode") ;;
+(depends-on "relative-line-numbers")
 (depends-on "restclient")
 (depends-on "rtags")
 (depends-on "s") ;;
