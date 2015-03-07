@@ -77,6 +77,17 @@
               (let ((inhibit-read-only t))
                 (ansi-color-apply-on-region (point-min) (point-max))))))
 
+; Vim's Marks => Evil's Marks + Emacs' Bookmarks
+
+; Evil has marks just like Vim: m to jump to a mark, m-letter to set a mark,
+; m-uppercase_letter to set a mark that works between buffers. But while marks
+; are pretty useful for example to quickly jump between two or three positions
+; inside some files when you're coding, Emacs also has the concept of
+; "bookmarks" that are like inter-file marks that you can set with a name
+; (instead of a letter) and that with the elisp bit below in your config file
+; can be saved between sessions. I'm using helm-bookmarks to see and set them.
+; To delete bookmarks, press TAB inside the helm sub-window to see the list of
+; actions and choose "Delete Bookmark(s)".
 
 ;; bookmarks
 (setq bookmark-default-file (concat dotemacs-cache-directory "bookmarks"))
