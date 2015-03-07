@@ -66,7 +66,7 @@
 (depends-on "gitconfig-mode")
 (depends-on "gitignore-mode")
 (depends-on "go-eldoc") ;;
-(depends-on "go-mode")
+(depends-on "go-mode") ;;
 (depends-on "guide-key") ;;
 (depends-on "helm") ;;
 (depends-on "helm-swoop") ;;
@@ -81,7 +81,8 @@
 (depends-on "ibuffer-projectile")
 (depends-on "ido-ubiquitous") ;;
 (depends-on "ido-vertical-mode") ;;
-(depends-on "js2-mode")
+(depends-on "jade-mode") ;;
+(depends-on "js2-mode") ;;
 (depends-on "js2-refactor") ;;
 (depends-on "json-mode")
 (depends-on "json-reformat")
@@ -91,7 +92,7 @@
 (depends-on "lua-mode")
 (depends-on "magit") ;;
 (depends-on "magit-gitflow")
-(depends-on "markdown-mode")
+(depends-on "markdown-mode") ;;
 (depends-on "move-text")
 (depends-on "multiple-cursors") ;;
 (depends-on "mwim")
@@ -102,6 +103,7 @@
 (depends-on "paradox") ;;
 (depends-on "pallet")
 (depends-on "parent-mode")
+(depends-on "pattern-mode") ;;
 (depends-on "pkg-info")
 (depends-on "popup")
 (depends-on "powerline")
@@ -123,16 +125,20 @@
 (depends-on "stylus-mode") ;;
 (depends-on "tern") ;;
 (depends-on "tern-auto-complete") ;;
+(depends-on "toml-mode") ;;
 (depends-on "undo-tree") ;;
 (depends-on "vala-mode")
+(depends-on "vimrc-mode") ;;
 (depends-on "vkill") ;;
 (depends-on "visual-regexp-steroids")
 (depends-on "windsize") ;;
+(depends-on "web-mode") ;;
 (depends-on "wgrep") ;;
 (depends-on "wgrep-ack") ;;
 (depends-on "wgrep-ag") ;;
 (depends-on "wgrep-pt") ;;
 (depends-on "yasnippet") ;;
+(depends-on "yaml-mode") ;;
 (depends-on "ycmd") ;;
 (depends-on "zenburn-theme")
 (depends-on "zygospore")
