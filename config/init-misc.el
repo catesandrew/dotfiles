@@ -95,6 +95,15 @@
      )))
 
 
+; Sessions (:mksession in Vim)
+
+; Emacs have the commands M-x desktop-save and desktop-read. To have it
+; automatically saved/restored put into the .emacs: (desktop-save-mode 1). If
+; you want to start emacs without auto loading the session (if you configured
+; it), the command is emacs --no-desktop. But Emacs sessions doesn't know about
+; elscreens (which evil-tabs use for creating Vim-like tabs) so if you want to
+; save and restore full sessions use these functions:
+
 ;; Save session including tabs
 ;; http://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames
 (defun session-save ()
