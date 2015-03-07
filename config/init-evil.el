@@ -40,6 +40,9 @@
 (setq evil-replace-state-cursor '("red" bar))
 (setq evil-operator-state-cursor '("red" hollow))
 
+; Don't move back the cursor one position when exiting insert mode
+(setq evil-move-cursor-back nil)
+
 (require 'evil)
 
 (unless (display-graphic-p)
