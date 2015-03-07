@@ -1,3 +1,10 @@
+(setq user-full-name "Andrew Cates")
+(setq user-mail-address "catesandrew@gmail.com")
+
+;; $brew --prefix cask --> /usr/local/opt/cask
+(require 'cask "/usr/local/opt/cask/cask.el")
+(cask-initialize)
+
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
   :group 'local)
