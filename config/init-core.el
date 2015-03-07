@@ -28,6 +28,13 @@ scroll-step 1)
 (require 'dtrt-indent)
 (dtrt-indent-mode 1)
 
+; Coding Style and spaces instead of tabs
+
+; Emacs by default do the really evil thing of using tab characters for
+; indentation. To do the right thing and use spaces with 2 spaces per tab
+
+; (setq-default tab-width 2 indent-tabs-mode nil)
+
 ;; move cursor to the last position upon open
 (require 'saveplace)
 (setq save-place-file (concat dotemacs-cache-directory "places"))
