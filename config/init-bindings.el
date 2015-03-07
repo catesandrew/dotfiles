@@ -150,7 +150,7 @@
             (t
              (define-key evil-normal-state-map binding 'projectile-grep))))
     (after "helm-projectile-autoloads"
-      (require 'helm-projectile)
+      (helm-projectile-on)
       (define-key evil-normal-state-map (kbd "SPC e") 'helm-projectile-recentf)
       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)))
 
