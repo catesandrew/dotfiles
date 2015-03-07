@@ -1,3 +1,9 @@
+; "After" macro definition
+
+; I have an "after" macro defined that I copied from someone config file (can't
+; remember who - sorry). This is useful to specifiy code to be executed after
+; some plugin has loaded.
+
 (if (fboundp 'with-eval-after-load)
     (defmacro after (feature &rest body)
       "After FEATURE is loaded, evaluate BODY."
