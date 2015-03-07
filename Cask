@@ -3,8 +3,6 @@
 
 (depends-on "ace-jump-mode")
 (depends-on "aggressive-indent")
-(depends-on "align-by-current-symbol" :git "https://github.com/moonlite/.emacs.d.git" :files ("align-by-current-symbol" "packages/align-by-current-symbol/align-by-current-symbol.el"))
-(depends-on "align-string" :git "https://github.com/moonlite/.emacs.d.git" :files ("align-string" "packages/align-string/align-string.el"))
 (depends-on "auto-compile")
 (depends-on "bash-completion")
 (depends-on "browse-kill-ring")
@@ -29,9 +27,7 @@
 (depends-on "flx-ido")
 (depends-on "flycheck")
 (depends-on "flycheck-cask")
-(depends-on "flycheck-jscs" :git "https://github.com/moonlite/.emacs.d.git" :files ("flycheck-jscs" "packages/flycheck-jscs/flycheck-jscs.el"))
 (depends-on "flycheck-package")
-(depends-on "flycheck-vala" :git "https://github.com/moonlite/.emacs.d.git" :files ("flycheck-vala" "packages/flycheck-vala/flycheck-vala.el"))
 (depends-on "form-feed")
 (depends-on "fullscreen-mode")
 (depends-on "git-commit-mode")
