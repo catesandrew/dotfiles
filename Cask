@@ -103,7 +103,6 @@
 (depends-on "paradox") ;;
 (depends-on "pallet")
 (depends-on "parent-mode")
-(depends-on "pattern-mode") ;;
 (depends-on "pkg-info")
 (depends-on "popup")
 (depends-on "powerline")
