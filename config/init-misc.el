@@ -64,6 +64,35 @@
     (exec-path-from-shell-initialize)))
 
 
+;; http://emacs.stackexchange.com/questions/7308/define-key-to-toggle-between-javascript-implementation-and-test-file
+(defun js-jump-to (current from to format-name)
+  (find-file
+   (cl-loop with parts = (reverse current)
+            with fname = (file-name-sans-extension (cl-first parts))
+            for (name . rest) on (cl-rest parts)
+            until (string-equal name from)
+            collect name into names
+            finally (cl-return
+                     (mapconcat 'identity
+                                (nconc (reverse rest)
+                                       (list to)
+                                       (reverse names)
+                                       (list (funcall format-name fname) )) "/" )))))
+
+(defun js-format-impl-name (fname)
+  (format "%s.js" (replace-regexp-in-string "Spec" "" fname)))
+
+(defun js-format-test-name (fname)
+  (format "%sSpec.js" fname))
+
+(defun js-jump-to-implementation-or-test ()
+  (interactive)
+  (let ((current (split-string (buffer-file-name) "/")))
+    (cond
+     ((member "test" current) (js-jump-to current "test" "lib" 'js-format-impl-name))
+     ((member "lib" current)  (js-jump-to current "lib" "test" 'js-format-test-name))
+     (t (error "not within a test or lib directory"))
+     )))
 
 
 ;; Save session including tabs
