@@ -25,6 +25,10 @@
 (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (unless (display-graphic-p) (menu-bar-mode -1))
 
+(when (eq system-type 'darwin)
+  (require 'ls-lisp)
+  (setq ls-lisp-use-insert-directory-program nil))
+
 (add-to-list 'load-path (concat user-emacs-directory "/config"))
 (let ((base (concat user-emacs-directory "/elisp")))
   (add-to-list 'load-path base)
