@@ -46,6 +46,27 @@
   (evil-esc-mode))
 
 
+; Vim-like search highlighting
+
+; I prefer how Vim's highlight search and left the highlighted terms until you
+; make another search or clean the highlighted terms. I tough this would be
+; easy to get but it turned it wasn't so easy (for me). At the end I made my
+; first Emacs extension (and the first time I've programmed in Lisp since the
+; university a long time ago...) so all turned well. The extension is already
+; on Melpa has the very brief name of evil-search-highlight-persist. You can
+; enable it with:
+
+(require 'evil-search-highlight-persist)
+(global-evil-search-highlight-persist t)
+
+; To map a shortcut (leader-space) to clear the highlights I have:
+;
+; (evil-leader/set-key "SPC" 'evil-search-highlight-persist-remove-all)
+;
+; I must note that another good way to search in Emacs is to use occur or
+; helm-occur. This will show the search results on a list (on a split window
+; with occur) and you'll be able to jump easily to any match.
+
 
 ; Leader key
 

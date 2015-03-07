@@ -40,6 +40,7 @@
 (depends-on "evil-surround") ;;
 (depends-on "evil-exchange") ;;
 (depends-on "evil-jumper") ;;
+(depends-on "evil-search-highlight-persist") ;;
 (depends-on "evil-matchit") ;;
 (depends-on "evil-indent-textobject") ;;
 (depends-on "evil-visualstar") ;;
