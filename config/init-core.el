@@ -28,12 +28,6 @@ scroll-step 1)
 (require 'dtrt-indent)
 (dtrt-indent-mode 1)
 
-; Coding Style and spaces instead of tabs
-
-; Emacs by default do the really evil thing of using tab characters for
-; indentation. To do the right thing and use spaces with 2 spaces per tab
-
-; (setq-default tab-width 2 indent-tabs-mode nil)
 
 ;; move cursor to the last position upon open
 (require 'saveplace)
@@ -187,8 +181,10 @@ scroll-step 1)
 
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 
 
 (setq sentence-end-double-space nil)
@@ -204,11 +200,21 @@ scroll-step 1)
 ; a modern machine, I encourage you to add the following:
 (setq gc-cons-threshold 20000000)
 (setq initial-major-mode 'emacs-lisp-mode)
-(setq-default indent-tabs-mode nil)
 
+
+; spaces instead of tabs
+(setq-default c-basic-offset 2 c-default-style "bsd")
+(setq-default tab-width 2)
+(setq-default indent-tabs-mode nil)
+(setq-default highlight-tabs t)
+
+;; some more interface-related settings
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
+(setq read-file-name-completion-ignore-case t)
+(setq frame-title-format '("Emacs @ : %b %+%+ %f"))
+(setq mouse-yank-at-point t)
 
 
 (xterm-mouse-mode t)

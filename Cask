@@ -37,6 +37,7 @@
 (depends-on "exec-path-from-shell") ;;
 (depends-on "expand-region") ;;
 (depends-on "evil") ;;
+(depends-on "evil-args") ;;
 (depends-on "evil-leader") ;;
 (depends-on "evil-nerd-commenter") ;;
 (depends-on "evil-surround") ;;
@@ -51,6 +52,7 @@
 (depends-on "f")
 (depends-on "fancy-narrow")
 (depends-on "fill-column-indicator")
+(depends-on "fiplr") ;;
 (depends-on "flx")
 (depends-on "flx-ido") ;;
 (depends-on "flycheck") ;;

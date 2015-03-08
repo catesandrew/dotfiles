@@ -27,19 +27,60 @@
       "e" 'eval-last-sexp
       ", e" 'eval-defun
       "E" 'eval-defun
-      "f" 'ctl-x-5-prefix
       "c" 'my-new-eshell-split
       "C" 'customize-group
       "b d" 'kill-this-buffer
-      "v" (kbd "C-w v C-w l")
-      "s" (kbd "C-w s C-w j")
-      "P" 'package-list-packages
       "V" (bind (term "vim"))
       "h" help-map
-      "h h" 'help-for-help-internal)
+      "h h" 'help-for-help-internal
+      "SPC" 'lazy-highlight-cleanup
+      "SPC" 'evil-search-highlight-persist-remove-all
+      "f" 'end-of-defun            ; <leader>f/F end/start of function
+      "F" 'beginning-of-defun
+      "gof" 'open-explorer-path    ; open explorer window of buffer path
+      "," 'evil-ace-jump-word-mode ; <leader>, for Ace Jump (word)
+      "l" 'evil-ace-jump-line-mode ; <leader>l for Ace Jump (line)
+      "x" 'evil-ace-jump-char-mode ; <leader>x for Ace Jump (char)
+      "tn" 'elscreen-create        ; <leader>tn create new tab
+      "tc" 'elscreen-kill          ; <leader>tc close tab
+      ; "cv" 'delete-other-windows   ; <leader>cv to close other splits
+      ; "im" 'helm-imenu             ; shows functions
+      ; "co" 'evilnc-comment-or-uncomment-lines ; nerd commenter
+      ; "m" 'emmet-expand-line ; emmet
+      ; "ct" 'delete-trailing-whitespace
+      "=" (lambda(begin end)        ; <leader>= align selection lines by "="
+                              (interactive "r")
+                              (align-regexp begin end "\\(\\s-*\\)=" 1 1 ))
+      "v" (lambda () (interactive)
+                              (split-window-horizontally)
+                              (evil-window-right 1))
+      "p" (lambda()                 ; paste on a new line below current
+                              (interactive)
+                              (evil-open-below 1)
+                              (evil-paste-after 1)
+                              (evil-normal-state))
+      "P" (lambda()                 ; paste on a new line below current
+                              (interactive)
+                              (evil-open-above 1)
+                              (evil-previous-visual-line 1)
+                              (evil-paste-after 1)
+                              (evil-normal-state))
+      "o" (lambda () ; <leader>o open line below
+                              (interactive)
+                              (evil-open-below 1)
+                              (evil-normal-state))
+      "O" (lambda () ; <leader>o open line below
+                              (interactive)
+                              (evil-open-above 1)
+                              (evil-normal-state)))
+
 
     (after "paradox-autoloads"
       (evil-leader/set-key "P" 'paradox-list-packages))
+
+    ; (after "flycheck-autoloads"
+    ;   (evil-leader/set-key "ea" 'flycheck-list-errors)
+    ;   (evil-leader/set-key "en" 'flycheck-next-error))
 
     (after "magit-autoloads"
       (evil-leader/set-key
@@ -111,6 +152,8 @@
   (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
   (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
+  (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
+
 
   (define-key evil-motion-state-map "j" 'evil-next-visual-line)
   (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
@@ -171,6 +214,7 @@
   (evil-ex-define-cmd "Q" 'evil-quit)
   (evil-ex-define-cmd "Qa" 'evil-quit-all)
   (evil-ex-define-cmd "QA" 'evil-quit-all))
+
 
 ;; escape minibuffer
 (define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)

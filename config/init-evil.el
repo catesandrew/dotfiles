@@ -33,7 +33,7 @@
 (setq evil-search-module 'evil-search)
 (setq evil-magic 'very-magic)
 
-(setq evil-emacs-state-cursor `(,dotemacs-evil/emacs-cursor box))
+(setq evil-emacs-state-cursor '("red" box))
 (setq evil-normal-state-cursor '("green" box))
 (setq evil-visual-state-cursor '("orange" box))
 (setq evil-insert-state-cursor '("red" bar))
@@ -72,14 +72,20 @@
 
 
 ; Leader key
-
 (require 'evil-leader)
+
+
+; Tabs
+(require 'evil-tabs)
+(global-evil-tabs-mode t)
+
 
 ; Later, I found that the evil-leader key didn't work on some modes (like when
 ; editing the .emacs file in emacs-lisp-mode), but the package FAQ solved the
 ; problem, you have to add this before the `global-evil-leader-mode` setting:
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode t)
+
 
 ; Easymotion => Evil Ace Jump
 
@@ -108,39 +114,6 @@
 
 (require 'evil-surround)
 (global-evil-surround-mode t)
-
-
-; Tabs
-
-; If you install the evil-tabs package and enable it with you'll have :tabnew,
-; gt and friends with numbered tabs by default. Showing the tab number is
-; a very useful feature when you can change to a tab with #gt like in Vim
-; (with # being a number from 0 to 9), but unfortunately this package doesn't
-; support #gt but I worked it around with my awesome Elisp skills (close to
-; zero):
-
-(require 'evil-tabs)
-(global-evil-tabs-mode t)
-(define-key evil-normal-state-map (kbd "C-0") (lambda() (interactive) (elscreen-goto 0)))
-(define-key evil-normal-state-map (kbd "C-1") (lambda() (interactive) (elscreen-goto 1)))
-(define-key evil-normal-state-map (kbd "C-2") (lambda() (interactive) (elscreen-goto 2)))
-(define-key evil-normal-state-map (kbd "C-3") (lambda() (interactive) (elscreen-goto 3)))
-(define-key evil-normal-state-map (kbd "C-4") (lambda() (interactive) (elscreen-goto 4)))
-(define-key evil-normal-state-map (kbd "C-5") (lambda() (interactive) (elscreen-goto 5)))
-(define-key evil-normal-state-map (kbd "C-6") (lambda() (interactive) (elscreen-goto 6)))
-(define-key evil-normal-state-map (kbd "C-7") (lambda() (interactive) (elscreen-goto 7)))
-(define-key evil-normal-state-map (kbd "C-8") (lambda() (interactive) (elscreen-goto 8)))
-(define-key evil-normal-state-map (kbd "C-9") (lambda() (interactive) (elscreen-goto 9)))
-(define-key evil-insert-state-map (kbd "C-0") (lambda() (interactive) (elscreen-goto 0)))
-(define-key evil-insert-state-map (kbd "C-1") (lambda() (interactive) (elscreen-goto 1)))
-(define-key evil-insert-state-map (kbd "C-2") (lambda() (interactive) (elscreen-goto 2)))
-(define-key evil-insert-state-map (kbd "C-3") (lambda() (interactive) (elscreen-goto 3)))
-(define-key evil-insert-state-map (kbd "C-4") (lambda() (interactive) (elscreen-goto 4)))
-(define-key evil-insert-state-map (kbd "C-5") (lambda() (interactive) (elscreen-goto 5)))
-(define-key evil-insert-state-map (kbd "C-6") (lambda() (interactive) (elscreen-goto 6)))
-(define-key evil-insert-state-map (kbd "C-7") (lambda() (interactive) (elscreen-goto 7)))
-(define-key evil-insert-state-map (kbd "C-8") (lambda() (interactive) (elscreen-goto 8)))
-(define-key evil-insert-state-map (kbd "C-9") (lambda() (interactive) (elscreen-goto 9)))
 
 
 (require 'evil-exchange)
@@ -240,5 +213,6 @@
           (unless (or (eobp) (eolp)) (forward-char))
           ad-do-it)
       ad-do-it)))
+
 
 (provide 'init-evil)

@@ -55,6 +55,68 @@
   (require 'vkill))
 
 
+;; fiplr ignore
+(setq fiplr-root-markers '("Rakefile" "Makefile" "Jakefile.js" "bower.json" "package.json" "build.xml" ".git" ".svn"))
+(setq fiplr-ignored-globs
+      '((directories
+          ;; Version control
+          (".git"
+           ".svn"
+           ".hg"
+           ".bzr"
+           ;; intellij
+           ".idea"
+           ;; sass
+           ".sass-cache"
+           ;; NPM
+           "node_modules"
+           ;; Bower
+           "bower_components"
+           "components"
+           ;; Maven
+           "target"
+           ;; Ruby
+           "vendor"
+           "vendor/rails"
+           "vendor/gems"
+           "vendor/plugins"
+           ;; Other
+           "assets"
+           "build"
+           "tmp"
+           "log"
+           ;; Python
+           "__pycache__"))
+        (files
+          ;; Emacs
+          (".#*"
+           ;; Vim
+           "*~"
+           ;; Objects
+           "*.so"
+           "*.o"
+           "*.obj"
+           ;; Media
+           "*.jpg"
+           "*.jpeg"
+           "*.bmp"
+           "*.png"
+           "*.gif"
+           "*.pdf"
+           ;; Other
+           ".DS_Store"
+           "*.elc"
+           "*.pyc"
+           "*.swp"
+           "*.psd"
+           "*.ai"
+           "*.mov"
+           "*.aep"
+           ;; Archives
+           "*.dmg"
+           "*.gz"
+           "*.zip"))))
+
 ;; make sure $PATH is set correctly
 (if (eq system-type 'windows-nt)
     (dolist (path (split-string (getenv "PATH") ";"))
@@ -109,8 +171,8 @@
 (defun session-save ()
     "Store the elscreen tab configuration."
     (interactive)
-    (if (desktop-save emacs-configuration-directory)
-        (with-temp-file elscreen-tab-configuration-store-filename
+    (if (desktop-save user-emacs-directory)
+        (with-temp-file (concat user-emacs-directory ".elscreen")
             (insert (prin1-to-string (elscreen-get-screen-to-name-alist))))))
 
 ;; Load session including tabs
@@ -121,7 +183,7 @@
         (let ((screens (reverse
                         (read
                          (with-temp-buffer
-                          (insert-file-contents elscreen-tab-configuration-store-filename)
+                          (insert-file-contents (concat user-emacs-directory ".elscreen"))
                           (buffer-string))))))
             (while screens
                 (setq screen (car (car screens)))

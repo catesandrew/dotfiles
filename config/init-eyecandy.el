@@ -1,4 +1,5 @@
-(show-paren-mode)
+;; show matching parens
+(show-paren-mode t)
 (setq show-paren-delay 0)
 
 
@@ -101,6 +102,12 @@
 
 
 (add-hook 'find-file-hook 'hl-line-mode)
+
+
+;; relative line numbers
+(add-hook 'prog-mode-hook 'relative-line-numbers-mode t)
+(add-hook 'prog-mode-hook 'line-number-mode t)
+(add-hook 'prog-mode-hook 'column-number-mode t)
 
 
 (provide 'init-eyecandy)
