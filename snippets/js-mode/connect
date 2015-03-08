@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: connect
+# key: conn
+# --
+${1:object}.connect('${2:signal}', $0);

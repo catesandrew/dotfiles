@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Switch
+# key: switch
+# expand-env: ((yas-indent-line 'fixed) (yas-triggers-in-field 't))
+# --
+switch ($1) {
+$0
+}

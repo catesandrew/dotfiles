@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: forEach
+# key: foreach
+# --
+${1:collection}.forEach($0);

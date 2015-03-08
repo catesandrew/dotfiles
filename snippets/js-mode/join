@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: join
+# key: join
+# binding: C-c s j
+# --
+[$0].join($1)

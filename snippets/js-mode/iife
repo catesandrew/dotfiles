@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: IIFE
+# key: iife
+# binding: C-c s i
+# --
+(function () {
+$0
+})();

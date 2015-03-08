@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Year
+# key: year
+# binding: C-c s y
+# --
+`(my/get-year)`

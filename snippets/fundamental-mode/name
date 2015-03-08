@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Name
+# key: name
+# binding: C-c s n
+# --
+`(user-full-name)`
