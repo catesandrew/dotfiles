@@ -13,6 +13,7 @@
 (depends-on "buffer-move")
 (depends-on "cask")
 (depends-on "clojure-mode")
+(depends-on "cider")
 (depends-on "cmake-mode")
 (depends-on "coffee-mode") ;;
 (depends-on "color-identifiers-mode") ;;
@@ -89,6 +90,7 @@
 (depends-on "jade-mode") ;;
 (depends-on "js2-mode") ;;
 (depends-on "js2-refactor") ;;
+(depends-on "js3-mode") ;;
 (depends-on "json-mode")
 (depends-on "json-reformat")
 (depends-on "json-snatcher")
@@ -140,6 +142,7 @@
 (depends-on "vkill") ;;
 (depends-on "visual-regexp-steroids")
 (depends-on "windsize") ;;
+(depends-on "which-func") ;;
 (depends-on "web-mode") ;;
 (depends-on "wgrep") ;;
 (depends-on "wgrep-ack") ;;

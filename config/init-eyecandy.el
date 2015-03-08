@@ -35,7 +35,6 @@
 (after 'git-gutter+ (diminish 'git-gutter+-mode))
 (after 'magit (diminish 'magit-auto-revert-mode))
 (after 'highlight-symbol (diminish 'highlight-symbol-mode))
-(after 'indent-guide (diminish 'indent-guide-mode))
 
 
 (require 'smart-mode-line)
@@ -91,14 +90,6 @@
 
 (require 'highlight-quoted)
 (add-hook 'prog-mode-hook 'highlight-quoted-mode)
-
-
-;; this is pretty slow on big files
-;; (require-package 'indent-guide)
-;; (require 'indent-guide)
-;; (setq indent-guide-recursive t)
-;; (add-to-list 'indent-guide-inhibit-modes 'package-menu-mode)
-;; (indent-guide-global-mode)
 
 
 (add-hook 'find-file-hook 'hl-line-mode)

@@ -243,4 +243,15 @@ scroll-step 1)
 (add-hook 'find-file-hook #'visual-line-mode)
 (add-hook 'find-file-hook #'my-find-file-check-large-file)
 
+
+;; flyspell-mode does spell-checking on the fly as you type
+(require 'flyspell)
+(setq ispell-program-name "aspell" ; use aspell instead of ispell
+      ispell-extra-args '("--sug-mode=ultra"))
+
+(defun my-enable-flyspell ()
+  "Enable command `flyspell-mode'."
+  (when (executable-find ispell-program-name)
+    (flyspell-mode +1)))
+
 (provide 'init-core)

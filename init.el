@@ -1,6 +1,12 @@
 (setq user-full-name "Andrew Cates")
 (setq user-mail-address "catesandrew@gmail.com")
 
+(defvar current-user
+      (getenv
+       (if (equal system-type 'windows-nt) "USERNAME" "USER")))
+
+(message "Emacs is powering up… Be patient, Master %s!" current-user)
+
 ;; $brew --prefix cask --> /usr/local/opt/cask
 (require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
@@ -60,6 +66,7 @@
   (require 'init-vim)
   (require 'init-stylus)
   (require 'init-js)
+  (require 'init-clojure)
   (require 'init-go)
   (require 'init-web)
   (require 'init-markup)
