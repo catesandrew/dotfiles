@@ -214,6 +214,10 @@ scroll-step 1)
 (setq inhibit-startup-message t)
 (setq read-file-name-completion-ignore-case t)
 (setq frame-title-format '("Emacs @ : %b %+%+ %f"))
+; (setq frame-title-format
+;       '("" invocation-name " - " (:eval (if (buffer-file-name)
+;                                             (abbreviate-file-name (buffer-file-name))
+;                                           "%b"))))
 (setq mouse-yank-at-point t)
 
 
@@ -253,5 +257,13 @@ scroll-step 1)
   "Enable command `flyspell-mode'."
   (when (executable-find ispell-program-name)
     (flyspell-mode +1)))
+
+
+(defun my-wrap-with (s)
+  "Create a wrapper function for smartparens using S."
+  `(lambda (&optional arg)
+     (interactive "P")
+     (sp-wrap-with-pair ,s)))
+
 
 (provide 'init-core)

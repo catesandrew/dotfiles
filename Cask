@@ -128,6 +128,7 @@
 (depends-on "sass-mode")
 (depends-on "shut-up")
 (depends-on "skewer-mode") ;;
+(depends-on "slime")
 (depends-on "smart-mode-line") ;;
 (depends-on "smartparens") ;;
 (depends-on "smex")

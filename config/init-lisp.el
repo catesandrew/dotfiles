@@ -1,15 +1,28 @@
-(require 'elisp-slime-nav)
-(after "elisp-slime-nav-autoloads"
-  (defadvice elisp-slime-nav-find-elisp-thing-at-point (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
-    (recenter)))
+(require 'init-programming)
+(require 'rainbow-delimiters)
 
-(defun my-lisp-hook ()
-  (progn
-    (elisp-slime-nav-mode)
-    (turn-on-eldoc-mode)))
+;; Lisp configuration
+(define-key read-expression-map (kbd "TAB") 'completion-at-point)
 
-(add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
-(add-hook 'lisp-interaction-mode-hook 'my-lisp-hook)
-(add-hook 'ielm-mode-hook 'my-lisp-hook)
+;; wrap keybindings
+(define-key lisp-mode-shared-map (kbd "M-(") (my-wrap-with "("))
+(define-key lisp-mode-shared-map (kbd "M-[") (my-wrap-with "["))
+(define-key lisp-mode-shared-map (kbd "M-\"") (my-wrap-with "\""))
+
+
+;; A great lisp coding hook
+(defun my-lisp-coding-defaults ()
+  (smartparens-strict-mode +1)
+  (rainbow-delimiters-mode +1))
+
+(setq my-lisp-coding-hook 'my-lisp-coding-defaults)
+
+;; interactive modes don't need whitespace checks
+(defun my-interactive-lisp-coding-defaults ()
+  (smartparens-strict-mode +1)
+  (rainbow-delimiters-mode +1)
+  (whitespace-mode -1))
+
+(setq my-interactive-lisp-coding-hook 'my-interactive-lisp-coding-defaults)
 
 (provide 'init-lisp)
