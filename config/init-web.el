@@ -13,6 +13,8 @@
 (add-hook 'web-mode-hook 'rainbow-mode)
 (add-hook 'css-mode-hook 'rainbow-mode)
 (add-hook 'stylus-mode-hook 'rainbow-mode)
+(add-hook 'mustache-mode-hook 'rainbow-mode)
+(add-hook 'handlebars-mode-hook 'rainbow-mode)
 
 
 (defun my-emmet-mode ()

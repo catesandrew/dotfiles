@@ -10,7 +10,7 @@
   (setq ac-quick-help-height 30)
   (setq ac-show-menu-immediately-on-auto-complete t)
 
-  (dolist (mode '(vimrc-mode html-mode stylus-mode))
+  (dolist (mode '(vimrc-mode html-mode stylus-mode handlebars-mode mustache-mode))
     (add-to-list 'ac-modes mode))
 
   (ac-config-default)

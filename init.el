@@ -7,6 +7,18 @@
 
 (message "Emacs is powering up… Be patient, Master %s!" current-user)
 
+;;________________________________________________________________
+;;    Determine where we are
+;;________________________________________________________________
+
+(defvar system-type-as-string (prin1-to-string system-type))
+
+(defvar on_windows_nt (string-match "windows-nt" system-type-as-string))
+(defvar on_darwin     (string-match "darwin" system-type-as-string))
+(defvar on_gnu_linux  (string-match "gnu/linux" system-type-as-string))
+(defvar on_cygwin     (string-match "cygwin" system-type-as-string))
+(defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
+
 ;; $brew --prefix cask --> /usr/local/opt/cask
 (require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
@@ -61,6 +73,7 @@
       (require 'init-company)
     (require 'init-auto-complete))
 
+  (require 'init-programming)
   (require 'init-lisp)
   (require 'init-org)
   (require 'init-vim)
@@ -78,6 +91,8 @@
   (require 'init-flycheck)
   (require 'init-yasnippet)
   (require 'init-smartparens)
+  (require 'init-mustache)
+  (require 'init-hbs)
   (require 'init-misc)
 
   (require 'init-evil)

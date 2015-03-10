@@ -52,11 +52,9 @@
     (interactive)
     (my-stylus-async (point-min) (point-max) nil))
 
-  (add-hook 'stylus-mode-hook (lambda ()
-                                (unless (process-status "httpd")
-                                  (httpd-start))))
-
   (defun my-stylus-mode-defaults ()
+    (unless (process-status "httpd")
+      (httpd-start))
     (run-hooks 'my-prog-mode-hook))
 
   (setq my-stylus-mode-hook 'my-stylus-mode-defaults)

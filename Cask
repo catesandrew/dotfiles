@@ -79,6 +79,7 @@
 (depends-on "helm-projectile") ;;
 (depends-on "helm-company") ;;
 (depends-on "haml-mode")
+(depends-on "handlebars-mode") ;;
 (depends-on "haskell-mode")
 (depends-on "highlight-numbers") ;;
 (depends-on "highlight-symbol") ;;
@@ -101,6 +102,7 @@
 (depends-on "markdown-mode") ;;
 (depends-on "move-text")
 (depends-on "multiple-cursors") ;;
+(depends-on "mustache-mode") ;;
 (depends-on "mwim")
 (depends-on "names")
 (depends-on "org-bullets") ;;
