@@ -34,6 +34,7 @@
   (require 'js2-refactor)
   (js2r-add-keybindings-with-prefix "C-c C-m")
 
+  (setq indent-tabs-mode nil tab-width 2 js-indent-level 2)
   (setq js2-highlight-level 3)
   (setq js2-basic-offset 2)
   (setq js2-bounce-indent-p t)
