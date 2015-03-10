@@ -25,16 +25,6 @@
 (require 'editorconfig)
 
 
-(require 'aggressive-indent)
-(add-to-list 'aggressive-indent-excluded-modes #'stylus-mode)
-(add-to-list 'aggressive-indent-excluded-modes #'org-mode)
-(add-to-list 'aggressive-indent-excluded-modes #'vimrc-mode)
-(add-to-list 'aggressive-indent-excluded-modes #'js2-mode)
-(add-to-list 'aggressive-indent-excluded-modes #'js3-mode)
-(add-to-list 'aggressive-indent-excluded-modes #'clojure-mode)
-(global-aggressive-indent-mode)
-
-
 (setq etags-select-go-if-unambiguous t)
 
 
