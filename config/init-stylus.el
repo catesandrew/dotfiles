@@ -1,3 +1,5 @@
+(require 'init-programming)
+
 (add-to-list 'auto-mode-alist
              '("\\.styl$" . (lambda ()
                               (require 'stylus-mode)
@@ -52,6 +54,14 @@
 
   (add-hook 'stylus-mode-hook (lambda ()
                                 (unless (process-status "httpd")
-                                  (httpd-start)))))
+                                  (httpd-start))))
+
+  (defun my-stylus-mode-defaults ()
+    (run-hooks 'my-prog-mode-hook))
+
+  (setq my-stylus-mode-hook 'my-stylus-mode-defaults)
+
+  (add-hook 'stylus-mode-hook (lambda ()
+                             (run-hooks 'my-stylus-mode-hook))))
 
 (provide 'init-stylus)

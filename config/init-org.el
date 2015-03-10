@@ -60,6 +60,11 @@
                (executable-find "ispell")
                (executable-find "hunspell"))
        (turn-on-flyspell))
+
+     ;; disable line wrap
+     (setq truncate-lines t)
+     (setq partial-width-windows nil)
+     (setq fill-column 1000)
      (toggle-truncate-lines t))
    (add-hook 'org-mode-hook #'my-org-mode-hook)
 

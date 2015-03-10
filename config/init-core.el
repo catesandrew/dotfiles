@@ -35,9 +35,6 @@ scroll-step 1)
 (setq-default save-place t)
 
 
-;; disable line wrap
-(setq-default truncate-lines t)
-
 ;; make side by side buffers function the same as the main window
 (setq truncate-partial-width-windows nil)
 
