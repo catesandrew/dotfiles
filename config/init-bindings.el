@@ -43,6 +43,15 @@
       "x" 'evil-ace-jump-char-mode ; <leader>x for Ace Jump (char)
       "tn" 'elscreen-create        ; <leader>tn create new tab
       "tc" 'elscreen-kill          ; <leader>tc close tab
+      "p b" 'projectile-switch-to-buffer
+      "p D" 'projectile-dired
+      "p d" 'projectile-find-dir
+      "p e" 'project-explorer-open
+      "p j" 'projectile-find-tag
+      "p k" 'projectile-kill-buffers
+      "p R" 'projectile-regenerate-tags
+      "p r" 'helm-projectile-recentf
+      "p s" 'helm-projectile-switch-project
       ; "cv" 'delete-other-windows   ; <leader>cv to close other splits
       ; "im" 'helm-imenu             ; shows functions
       ; "co" 'evilnc-comment-or-uncomment-lines ; nerd commenter
@@ -65,6 +74,10 @@
                               (evil-previous-visual-line 1)
                               (evil-paste-after 1)
                               (evil-normal-state))
+      "n" (lambda() ; open project explorer
+                              (interactive)
+                              (project-explorer-open)
+                              )
       "o" (lambda () ; <leader>o open line below
                               (interactive)
                               (evil-open-below 1)
@@ -232,12 +245,29 @@
   (define-key magit-status-mode-map (kbd "C-p") 'magit-goto-previous-sibling-section))
 
 
+;; Project Explorer
+(when (require 'project-explorer nil 'noerror)
+  (global-set-key (kbd "C-x p") 'project-explorer-open))
+
 (after "project-explorer-autoloads"
-  (global-set-key [f2] 'project-explorer-open)
+  (define-prefix-command 'perly-sense-map)
+  (global-set-key (kbd ",") 'perly-sense-map)
+  (define-key perly-sense-map (kbd "N") 'project-explorer-toggle)
+
   (autoload 'pe/show-file "project-explorer")
-  (global-set-key [f3] 'pe/show-file)
   (after 'project-explorer
-    (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)))
+
+  (after 'project-explorer
+    (define-key project-explorer-mode-map
+      (kbd "C-l") 'evil-window-right)
+    (define-key project-explorer-mode-map
+      (kbd "C-l") 'evil-window-right)
+    (define-key project-explorer-mode-map
+      (kbd "t") 'pe/return)
+    (define-key project-explorer-mode-map
+      (kbd "x") 'pe/fold)
+    ))
+
 
 
 (after "multiple-cursors-autoloads"
