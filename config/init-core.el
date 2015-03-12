@@ -39,6 +39,16 @@ scroll-step 1)
 (set-default 'truncate-lines t)
 
 
+;; To get rid of the start message just set the initial-scratch-message variable to ""
+(setq initial-scratch-message "")
+
+;; To start the scratch buffer in text mode you will want to initial-major-mode variable
+(setq initial-major-mode 'text-mode)
+
+;; For setting of auto-fill when you start a specific major-mode you'll want to add an event to the mode hook
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+
+
 ;; make side by side buffers function the same as the main window
 (setq truncate-partial-width-windows nil)
 
