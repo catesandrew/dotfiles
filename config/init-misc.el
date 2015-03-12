@@ -223,4 +223,36 @@
                        helm-c-source-locate)
                      "*helm-my-buffers*")))
 
+;; http://www.shallowsky.com/dotfiles/.emacs
+;; For composing in emacs then pasting into a word processor,
+;; this un-fills all the paragraphs (i.e. turns each paragraph
+;; into one very long line) and removes any blank lines that
+;; previously separated paragraphs.
+;;
+(defun wp-munge () "un-fill paragraphs and remove blank lines" (interactive)
+  (let ((save-fill-column fill-column))
+    (set-fill-column 1000000)
+    (mark-whole-buffer)
+    (fill-individual-paragraphs (point-min) (point-max))
+    ;(delete-matching-lines "^$")
+    (set-fill-column save-fill-column)
+    ))
+
+(defun wp-unmunge () "fill paragraphs and separate them with blank lines"
+  (interactive)
+  (mark-whole-buffer)
+  (replace-regexp "\(.\)$" "\1\n")
+  (fill-individual-paragraphs (point-min) (point-max))
+  ;;(delete-matching-lines "^$")
+  ;;(replace-regexp "^$" "\n")
+  )
+
+(defun unfill() "un-fill paragraphs" (interactive)
+  (let ((save-fill-column fill-column))
+    (set-fill-column 1000000)
+    (mark-whole-buffer)
+    (fill-individual-paragraphs (point-min) (point-max))
+    (set-fill-column save-fill-column)
+    ))
+
 (provide 'init-misc)
