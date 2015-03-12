@@ -266,7 +266,7 @@
       (kbd "t") 'pe/return)
     (define-key project-explorer-mode-map
       (kbd "x") 'pe/fold)
-    ))
+    )))
 
 
 
