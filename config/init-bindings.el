@@ -21,7 +21,6 @@
 
   ; In order to define an use a <leader> prefix for your personal shortcuts
   (after 'evil-leader
-    (evil-leader/set-leader ",")
     (evil-leader/set-key
       "w" 'save-buffer
       "e" 'eval-last-sexp

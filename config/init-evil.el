@@ -45,7 +45,26 @@
 ; Don't move back the cursor one position when exiting insert mode
 (setq evil-move-cursor-back nil)
 
+; Leader key
+(require 'evil-leader)
 (require 'evil)
+
+;; https://github.com/cofi/evil-leader/issues/10
+(setq evil-leader/in-all-states t)
+(evil-leader/set-leader ",")
+(evil-mode nil) ;; no idea
+(global-evil-leader-mode)
+
+; (evil-mode nil)
+; (global-evil-leader-mode t)
+; (evil-mode 1)
+; (global-evil-surround-mode t)
+; (evil-mode 0)
+
+(after 'evil
+  (after 'evil-leader
+    (evil-mode nil))) ;; to disable call `evil-mode 0`
+
 
 (unless (display-graphic-p)
   (evil-esc-mode))
@@ -78,38 +97,8 @@
 (global-evil-tabs-mode t)
 
 
-; Leader key
-(require 'evil-leader)
-
-
-; Later, I found that the evil-leader key didn't work on some modes (like when
-; editing the .emacs file in emacs-lisp-mode), but the package FAQ solved the
-; problem, you have to add this before the `global-evil-leader-mode` setting:
-(setq evil-leader/in-all-states 1)
-(global-evil-leader-mode t)
-
-
 (require 'evil-surround)
 (global-evil-surround-mode t)
-
-
-;; https://github.com/cofi/evil-leader/issues/10
-;; Tried this, it works for adding evil-mode to the *Messages* buffer, but,
-;; also adds evil to all to the other modes as well, which I don't want.
-; (evil-mode nil)
-; (global-evil-leader-mode t)
-; (evil-mode t)
-; (global-evil-surround-mode t)
-
-;; Attempt 2 at enabling evil for *Messages* buffer and disabling for other
-;; modes, but the call to `evil-mode nil` did not work as expected.
-; (after 'evil
-;   (after 'evil-leader
-;     (after 'evil-surround
-;       (message "--Disabling global evil mode")
-;       (kill-buffer "*Messages*")
-;       (evil-mode nil)
-;       )))
 
 
 ; Easymotion => Evil Ace Jump
