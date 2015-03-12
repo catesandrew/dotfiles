@@ -11,6 +11,7 @@
     dired-mode
     comint-mode
     log-edit-mode
+    messages-buffer-mode
     compilation-mode)
   "List of modes that should start up in Evil state."
   :type '(repeat (symbol))
@@ -71,13 +72,13 @@
 ; with occur) and you'll be able to jump easily to any match.
 
 
-; Leader key
-(require 'evil-leader)
-
-
 ; Tabs
 (require 'evil-tabs)
 (global-evil-tabs-mode t)
+
+
+; Leader key
+(require 'evil-leader)
 
 
 ; Later, I found that the evil-leader key didn't work on some modes (like when
@@ -85,6 +86,29 @@
 ; problem, you have to add this before the `global-evil-leader-mode` setting:
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode t)
+
+
+(require 'evil-surround)
+(global-evil-surround-mode t)
+
+
+;; https://github.com/cofi/evil-leader/issues/10
+;; Tried this, it works for adding evil-mode to the *Messages* buffer, but,
+;; also adds evil to all to the other modes as well, which I don't want.
+; (evil-mode nil)
+; (global-evil-leader-mode t)
+; (evil-mode t)
+; (global-evil-surround-mode t)
+
+;; Attempt 2 at enabling evil for *Messages* buffer and disabling for other
+;; modes, but the call to `evil-mode nil` did not work as expected.
+; (after 'evil
+;   (after 'evil-leader
+;     (after 'evil-surround
+;       (message "--Disabling global evil mode")
+;       (kill-buffer "*Messages*")
+;       (evil-mode nil)
+;       )))
 
 
 ; Easymotion => Evil Ace Jump
@@ -110,10 +134,6 @@
 
 (setq evilnc-hotkey-comment-operator "gc")
 (require 'evil-nerd-commenter)
-
-
-(require 'evil-surround)
-(global-evil-surround-mode t)
 
 
 (require 'evil-exchange)
