@@ -3,6 +3,9 @@
   (require 'auto-complete)
   (require 'auto-complete-config)
 
+  (setq completion-ignored-extensions
+        '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".x9700" ".aux" ".elf" ))
+
   (setq ac-auto-show-menu t)
   (setq ac-auto-start t)
   (setq ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat"))
