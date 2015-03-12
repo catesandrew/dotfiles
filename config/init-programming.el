@@ -31,10 +31,15 @@ This functions should be added to the hooks of major modes for programming."
   (when (executable-find ispell-program-name)
     (flyspell-prog-mode))
   (smartparens-mode +1)
+
   ;; disable line wrap
-  (setq truncate-lines t)
-  (setq partial-width-windows nil)
-  (setq fill-column 1000)
+  ; (unless truncate-lines (set 'truncate-lines t))   ; don't fold line
+  ; (unless truncate-lines (lambda ()
+  ;                          (toggle-truncate-lines t)
+  ;                          (setq truncate-lines t)))   ; don't fold line
+
+  (set 'fill-column 1000)
+  (set 'truncate-lines t)
   (toggle-truncate-lines t)
   (my-local-comment-auto-fill)
   (my-font-lock-comment-annotations))

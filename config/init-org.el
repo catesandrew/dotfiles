@@ -64,8 +64,8 @@
      ;; disable line wrap
      (setq truncate-lines t)
      (setq partial-width-windows nil)
-     (setq fill-column 1000)
-     (toggle-truncate-lines t))
+     (toggle-truncate-lines t)
+     (setq fill-column 1000))
    (add-hook 'org-mode-hook #'my-org-mode-hook)
 
    (require 'org-bullets)
