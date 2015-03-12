@@ -46,7 +46,6 @@
       "p b" 'projectile-switch-to-buffer
       "p D" 'projectile-dired
       "p d" 'projectile-find-dir
-      "p e" 'project-explorer-open
       "p j" 'projectile-find-tag
       "p k" 'projectile-kill-buffers
       "p R" 'projectile-regenerate-tags
@@ -77,6 +76,10 @@
       "n" (lambda() ; open project explorer
                               (interactive)
                               (project-explorer-open)
+                              )
+      "N" (lambda() ; toggle project explorer
+                              (interactive)
+                              (project-explorer-toggle)
                               )
       "o" (lambda () ; <leader>o open line below
                               (interactive)
@@ -181,6 +184,40 @@
   (after "elisp-slime-nav-autoloads"
     (evil-define-key 'normal emacs-lisp-mode-map (kbd "g d") 'elisp-slime-nav-find-elisp-thing-at-point))
 
+  ;; Project Explorer
+  (after 'project-explorer
+    (evil-set-initial-state 'project-explorer-mode 'normal)
+    (evil-define-key 'normal project-explorer-mode-map
+        (kbd "+") 'pe/create-file
+        (kbd "-") 'pe/delete-file
+        (kbd "x") 'pe/fold
+        (kbd "u") 'pe/up-element
+        (kbd "a") 'pe/goto-top
+        (kbd "TAB") 'pe/tab
+        (kbd "<backtab>") 'pe/backtab
+        (kbd "J") 'pe/forward-element
+        (kbd "K") 'pe/backward-element
+        (kbd "]") 'pe/forward-element
+        (kbd "[") 'pe/backward-element
+        (kbd "n") 'next-line
+        (kbd "p") 'previous-line
+        (kbd "j") 'next-line
+        (kbd "k") 'previous-line
+        (kbd "l") 'forward-char
+        (kbd "h") 'backward-char
+        (kbd "RET") 'pe/return
+        (kbd "q") 'pe/quit
+        [escape] 'pe/quit
+        (kbd "s") 'pe/change-directory
+        (kbd "r") 'pe/rename-file
+        (kbd "c") 'pe/copy-file
+        (kbd "f") 'pe/find-file
+        (kbd "w") 'pe/copy-file-name-as-kill
+        (kbd "M-l") 'pe/set-filter-regex
+        (kbd "M-o") 'pe/toggle-omit
+    )
+  )
+
   (after 'coffee-mode
     (evil-define-key 'visual coffee-mode-map (kbd ", p") 'coffee-compile-region)
     (evil-define-key 'normal coffee-mode-map (kbd ", p") 'coffee-compile-buffer))
@@ -246,28 +283,11 @@
 
 
 ;; Project Explorer
-(when (require 'project-explorer nil 'noerror)
-  (global-set-key (kbd "C-x p") 'project-explorer-open))
-
 (after "project-explorer-autoloads"
-  (define-prefix-command 'perly-sense-map)
-  (global-set-key (kbd ",") 'perly-sense-map)
-  (define-key perly-sense-map (kbd "N") 'project-explorer-toggle)
-
   (autoload 'pe/show-file "project-explorer")
+  (global-set-key [f3] 'pe/show-file)
   (after 'project-explorer
-
-  (after 'project-explorer
-    (define-key project-explorer-mode-map
-      (kbd "C-l") 'evil-window-right)
-    (define-key project-explorer-mode-map
-      (kbd "C-l") 'evil-window-right)
-    (define-key project-explorer-mode-map
-      (kbd "t") 'pe/return)
-    (define-key project-explorer-mode-map
-      (kbd "x") 'pe/fold)
-    )))
-
+    (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)))
 
 
 (after "multiple-cursors-autoloads"

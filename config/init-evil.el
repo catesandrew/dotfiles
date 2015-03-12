@@ -12,6 +12,7 @@
     comint-mode
     log-edit-mode
     messages-buffer-mode
+    project-explorer-mode
     compilation-mode)
   "List of modes that should start up in Evil state."
   :type '(repeat (symbol))
