@@ -510,6 +510,10 @@ nnoremap <leader>h <C-w>s<C-w>j
 nnoremap <leader>s <C-w>s
 nnoremap <leader>vsa :vert sba<cr>
 
+" c-j c-k pagedown/up, I find these more 'vimish' than c-d/c-u
+nnoremap <c-j> <c-d>
+nnoremap <c-k> <c-u>
+
 " screen line scroll
 " nnoremap <silent> j gj
 " nnoremap <silent> k gk

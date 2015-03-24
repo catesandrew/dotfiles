@@ -129,28 +129,6 @@ function brew_reinstall () {
         | while read l; do echo -n "$l "; brew reinstall $l; done
 }
 
-# https://github.com/caskroom/homebrew-cask/issues/309
-function cask_update() {
-    rm -rf "$(brew --cache)"
-    local caskApps=$(ls $BREW_HOME/caskroom/) # Lists the casks in the Caskroom
-
-    for app in ${caskApps}; do # For every app there, do this
-        appToCheck=$(brew cask list | grep "${app}") # If the app is not present in `brew cask list`, this variable will be empty
-
-        if [[ -z "${appToCheck}" ]]; then # If the variable is empty, then
-            brew cask install --force "${app}" # Force an install of the app
-        fi
-    done
-}
-
-function cask_reinstall() {
-    rm -rf "$(brew --cache)"
-
-    for app in $(brew cask list); do
-        brew cask install --force "${app}"
-    done
-}
-
 ##################################################
 # Fancy PWD display function
 ##################################################
