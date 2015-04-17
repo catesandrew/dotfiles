@@ -128,7 +128,16 @@ PREVIEW="less"
 
 # Start Up Scripts #
 
-. ${BREW_HOME}/etc/profile.d/z.sh
+# . ${BREW_HOME}/etc/profile.d/z.sh
+
+# fasd
+# eval "$(fasd --init auto)"
+fasd_cache="$HOME/.fasd-init-bash"
+if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+  fasd --init posix-alias bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
+fi
+source "$fasd_cache"
+unset fasd_cache
 
 # Custom (Machine-Specific) Startup #
 . ${BASH_IT}/custom.sh
