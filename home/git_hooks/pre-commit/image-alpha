@@ -1,0 +1,66 @@
+#!/bin/bash
+set -e
+
+function run_test {
+    # Find files with trailing whitespace
+    # Doubled commands are _mac_osx_version_ || _linux_version_
+    for FILE in $(
+        git diff-index --check --cached HEAD -- | \
+        sed '/^[+-]/d' | \
+        ( sed -E 's/:[0-9]+:.*//' 2>/dev/null || \
+        sed -r 's/:[0-9]+:.*//' ) | \
+        uniq
+    ); do
+    # Only fix files that are staged
+    if [ $(git status --short $FILE | awk '{print $1}') ] ; then
+
+        ( sed -i '' -E 's/[[:space:]]*$//' "$FILE" > /dev/null 2>&1 || \
+        sed -i 's/[[:space:]]*$//' "$FILE" )
+
+        echo "Removed trailing whitespace from $FILE"
+        git add "$FILE"
+    fi
+    done
+
+    # Try to automatically compress all images from this commit
+    # with ImageOptim, and if we can, ask them to use ImageAlpha as well
+    UNSTAGED=$(git ls-files -m )
+
+    # Only run the check if we have png/jpgs staged to be commited
+    STAGED_IMAGES=$(git diff --cached --name-only --diff-filter=ACM | grep -Ei "(png|jpe?g)$")
+    IMAGEOPTIM=$(pwd)/node_modules/.bin/imageOptim
+
+    if [ -n "$STAGED_IMAGES" ]
+    then
+    if [ ! -e $IMAGEOPTIM ]
+    then
+        npm install
+    fi
+
+    echo "attempting to compress images..."
+    echo $STAGED_IMAGES | $IMAGEOPTIM -q > /dev/null
+    fi
+
+    if [ "$(git ls-files -m)" != "$UNSTAGED" ]
+    then
+    echo -en "\007"
+    echo ""
+    echo -e "\e[01;31msome of your images could be compressed automatically with ImageOptim.\e[0m"
+    echo -e "\e[01;31mThat probably means you didn't run them through ImageAlpha (http://pngmini.com/), either.\e[0m"
+    echo ""
+    echo -e "\e[01;31mPlease run the images through ImageAlpha and ImageOptim, then recommit.\e[0m"
+    echo ""
+    echo "commit aborted"
+    echo ""
+    exit 1
+    fi
+}
+
+case "${1}" in
+    --about )
+        echo "Try to automatically compress all images from this commit with ImageOptim, and if we can, use ImageAlpha as well"
+        ;;
+    * )
+        run_test
+        ;;
+esac
