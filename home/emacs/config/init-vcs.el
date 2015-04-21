@@ -1,6 +1,7 @@
 (setq vc-make-backup-files t)
 
 (after 'vc-git
+  (setq magit-last-seen-setup-instructions "1.4.0")
   (require 'magit)
 
   (after 'magit
