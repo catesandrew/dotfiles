@@ -14,4 +14,9 @@
 
 (yas-load-directory (concat user-emacs-directory "/snippets"))
 
+(setq yas-snippet-dirs
+      '("~/.emacs.d/snippets"                 ;; personal snippets
+        "~/.emacs.d/yasnippet-snippets"       ;;
+        ))
+
 (provide 'init-yasnippet)
