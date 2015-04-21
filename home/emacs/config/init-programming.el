@@ -38,7 +38,6 @@ This functions should be added to the hooks of major modes for programming."
   ;                          (toggle-truncate-lines t)
   ;                          (setq truncate-lines t)))   ; don't fold line
 
-  (set 'fill-column 1000)
   (set 'truncate-lines t)
   (toggle-truncate-lines t)
   (my-local-comment-auto-fill)
