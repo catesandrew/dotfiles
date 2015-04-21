@@ -9,6 +9,10 @@
   (defun my-js2-mode-defaults ()
     (js2-imenu-extras-mode +1)
     (setq mode-name "JS2")
+    ;; disable electric re-indenting...
+    ;; (electric-indent-local-mode -1)
+    (define-key js-mode-map "," 'self-insert-command)
+    (define-key js-mode-map ";" 'self-insert-command)
     ;; electric-layout-mode doesn't play nice with smartparens
     (setq-local electric-layout-rules '((?\; . after)))
   )
