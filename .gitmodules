@@ -271,3 +271,6 @@
 [submodule "home/vim/bundle/vim-ansible"]
 	path = home/vim/bundle/vim-ansible
 	url = git://github.com/chase/vim-ansible-yaml.git
+[submodule "home/emacs/yasnippet-snippets"]
+	path = home/emacs/yasnippet-snippets
+	url = https://github.com/AndreaCrotti/yasnippet-snippets.git
