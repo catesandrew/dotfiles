@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Throw
+# key: throw
+# --
+throw new Error("$1");

@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: var
+# key: var
+# --
+var $1 = $0;

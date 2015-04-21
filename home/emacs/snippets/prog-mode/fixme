@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: FIXME
+# key: fix
+# --
+`(my/wrap-in-comment "FIXME: ")`

@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: unless
+# key: unless
+# --
+unless ($1)
+$0

@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Auto load
+# key: autoload
+# binding: C-c s a
+# --
+;;;###autoload

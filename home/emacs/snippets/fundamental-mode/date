@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Date
+# key: date
+# binding: C-c s d
+# --
+`(yas-choose-value (mapcar 'my/get-date my/time-formats))`

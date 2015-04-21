@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: if-else
+# key: ife
+# --
+if ${1:[ $2 ]}; then
+$3
+else
+$4
+fi
+$0
