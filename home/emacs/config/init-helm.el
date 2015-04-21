@@ -18,6 +18,9 @@
 (setq helm-lisp-fuzzy-completion t)
 
 (require 'helm)
+(setq helm-swoop-pre-input-function #'ignore)
+(setq helm-swoop-use-line-number-face t)
+(setq helm-swoop-split-with-multiple-windows t)
 (require 'helm-swoop)
 (require 'helm-descbinds)
 

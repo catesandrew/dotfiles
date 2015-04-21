@@ -274,7 +274,6 @@
 
 (define-key minibuffer-local-map (kbd "C-w") 'backward-kill-word)
 
-
 (after 'magit
   (global-set-key (kbd "C-x g") 'magit-status)
   (define-key magit-status-mode-map (kbd "C-n") 'magit-goto-next-sibling-section)
