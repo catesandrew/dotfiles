@@ -23,7 +23,7 @@ alias 8="pushd +8"
 alias 9="pushd +9"
 
 # Clone this location
-alias pc="pushd \`pwd\`"
+alias pc="pushd \$(pwd)"
 
 # Push new location
 alias pu="pushd"
@@ -55,7 +55,6 @@ function dirs-help() {
   echo "9	: Chance to stack location 9."
 }
 
-
 # ADD BOOKMARKing functionality
 # usage:
 
@@ -67,18 +66,23 @@ fi
 
 alias L='cat ~/.dirs'
 
-G () {				# goes to distination dir otherwise , stay in the dir
+# goes to distination dir otherwise, stay in the dir
+G () {
     about 'goes to destination dir'
     param '1: directory'
     example '$ G ..'
     group 'dirs'
 
-    cd ${1:-$(pwd)} ;
+    cd "${1:-$(pwd)}" ;
 }
 
-S () {				# SAVE a BOOKMARK
+S () {
     about 'save a bookmark'
+    param '1: bookmark name'
+    example '$ S mybkmrk'
     group 'dirs'
+
+    [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
     sed "/$@/d" ~/.dirs > ~/.dirs1;
     \mv ~/.dirs1 ~/.dirs;
@@ -86,9 +90,13 @@ S () {				# SAVE a BOOKMARK
     source ~/.dirs ;
 }
 
-R () {				# remove a BOOKMARK
+R () {
     about 'remove a bookmark'
+    param '1: bookmark name'
+    example '$ R mybkmrk'
     group 'dirs'
+
+    [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
     sed "/$@/d" ~/.dirs > ~/.dirs1;
     \mv ~/.dirs1 ~/.dirs;
