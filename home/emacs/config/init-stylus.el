@@ -7,6 +7,14 @@
 
 (after 'stylus-mode
 
+  (defun my-stylus-mode-defaults ()
+    ;; disable electric re-indenting...
+    (electric-indent-local-mode -1)
+  )
+
+  (setq my-stylus-mode-hook 'my-stylus-mode-defaults)
+  (add-hook 'stylus-mode-hook (lambda () (run-hooks 'my-stylus-mode-hook)))
+
   (defvar my-stylus-command-args nil
     "Additional list of arguments to pass into the stylus command.")
 
