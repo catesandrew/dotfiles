@@ -57,6 +57,8 @@ export BASH_IT=$HOME/.bash
 export BASH_IT_THEME='powerline-multiline'
 #export BASH_IT_THEME='sexy'
 
+export THEME_PROMPT_CLOCK_FORMAT="%l:%M:%S"
+
 #export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
 # Set mveditor/MacVim as EDITOR.
 if [ -f "${BASH_IT}/mveditor.sh" ]; then
