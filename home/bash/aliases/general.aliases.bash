@@ -45,8 +45,6 @@ then
   alias shuf=gshuf
 fi
 
-alias c='clear'
-alias k='clear'
 alias cls='clear'
 
 alias edit="$EDITOR"
