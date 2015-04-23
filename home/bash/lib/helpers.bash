@@ -96,6 +96,7 @@ man() {
 }
 
 # http://www.cyberciti.biz/faq/linux-unix-colored-man-pages-with-less-command/
+# cd to the path of the front Finder window
 cdf() {
     target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
     if [ "$target" != "" ]; then
