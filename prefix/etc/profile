@@ -1,0 +1,10 @@
+# Place the following in /etc/profile
+
+# For those that like their PATHs from .bashrc and would like the
+# environment.plist to update itself at every start up, put the following in
+# your /etc/profile file:
+
+if [ -x /usr/libexec/path_helper ]; then
+    eval `/usr/libexec/path_helper -s`
+    defaults write $HOME/.MacOSX/environment PATH "$PATH"
+fi
