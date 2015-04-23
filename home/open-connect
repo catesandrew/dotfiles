@@ -1,0 +1,6 @@
+authgroup=AUTHORIZEDACCESSONLY
+user=$USER
+no-cert-check
+script INTERNAL_IP4_DNS="127.0.0.1 10.10.8.1 10.10.8.2" ${HOME}/.bin/vpnc-script
+background
+passwd-on-stdin
