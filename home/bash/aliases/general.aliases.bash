@@ -71,3 +71,13 @@ fi
 # Directory
 alias	md='mkdir -p'
 alias	rd='rmdir'
+
+# The problem with `open .` is that if you're inside any kind of bundle
+# (application, document, package, etc.) it will open that instead of Finder.
+# I prefer to specify the application, and I'm not sure why people take such
+# umbrage with that. It's an alias, you're just typing f either way, and my way
+# happens to work in more circumstances. So there.
+alias of='open -a Finder ./'
+
+# And if you want to quick look from the command line in bash
+alias ql='qlmanage -p'
