@@ -8,7 +8,7 @@
    <false/>
   </dict>
   <key>Label</key>
-  <string>mako.supervisord</string>
+  <string>osx.supervisord</string>
   <key>ProgramArguments</key>
   <array>
    <string>/usr/local/bin/supervisord</string>

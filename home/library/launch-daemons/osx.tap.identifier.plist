@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
  <dict>
   <key>KeepAlive</key>
   <false/>
   <key>Label</key>
-  <string>mako.tap.identifier</string>
+  <string>osx.tap.identifier</string>
   <key>ProgramArguments</key>
   <array>
    <string>/sbin/kextload</string>
