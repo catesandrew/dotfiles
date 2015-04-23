@@ -1,0 +1,7 @@
+currentOLD() {
+    for path in *; do
+        printf "$PWD/%s|1\\n" "$path"
+    done
+}
+
+_FASD_BACKENDS="native current spotlight"
