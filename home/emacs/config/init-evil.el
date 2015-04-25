@@ -224,34 +224,12 @@
           ad-do-it)
       ad-do-it)))
 
-;; Support
-;; http://www.codejury.com/bypassing-the-clipboard-in-emacs-evil-mode/
+;; On OS X, evil copies every single visual state move to the kill
+;; ring, which in turns copies it to my system clipboard. I don’t want
+;; that to happen.
 
-(defmacro without-evil-mode (&rest do-this)
-  ;; Check if evil-mode is on, and disable it temporarily
-  '(let ((evil-mode-is-on (evil-mode?)))
-     (if evil-mode-is-on
-         (disable-evil-mode))
-     (ignore-errors
-       ,@do-this)
-     (if evil-mode-is-on
-         (enable-evil-mode))))
-
-(defmacro evil-mode? ()
-  "Checks if evil-mode is active. Uses Evil's state to check."
-  'evil-state)
-
-(defmacro disable-evil-mode ()
-  "Disable evil-mode with visual cues."
-  '(progn
-     (evil-mode 0)
-     (message "Evil mode disabled")))
-
-(defmacro enable-evil-mode ()
-  "Enable evil-mode with visual cues."
-  '(progn
-     (evil-mode 1)
-     (message "Evil mode enabled")))
-
+(defadvice evil-visual-update-x-selection (around clobber-x-select-text activate)
+  (unless (featurep 'ns)
+    ad-do-it))
 
 (provide 'init-evil)

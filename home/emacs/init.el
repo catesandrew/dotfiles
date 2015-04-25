@@ -48,7 +48,7 @@
   (require 'ls-lisp)
   (setq ls-lisp-use-insert-directory-program nil))
 
-(when (eq system-type 'darwin)
+(when (and (eq system-type 'darwin) (display-graphic-p))
   ;; Treat option as meta and command as super
   (setq mac-option-key-is-meta t)
   (setq mac-command-key-is-meta nil)

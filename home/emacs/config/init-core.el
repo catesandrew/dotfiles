@@ -169,6 +169,7 @@ scroll-step 1)
 (setq scroll-conservatively 9999
       scroll-preserve-screen-position t)
 
+;; Buffer management
 
 ;; better buffer names for duplicates
 (require 'uniquify)
@@ -184,12 +185,26 @@ scroll-step 1)
         (bury-buffer)
         nil)
     t))
+
 (add-hook 'kill-buffer-query-functions 'my-do-not-kill-scratch-buffer)
 
+;; Burying a buffer (removing it from the current window and sending
+;; it to the bottom of the stack) is very common for dismissing
+;; buffers. Add a mapping for it:
+(global-set-key (kbd "C-c y") 'bury-buffer)
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+;; Add a key combination to revert the current buffer (re-read the
+;; contents from disk):
+(global-set-key (kbd "C-c r") 'revert-buffer)
+
+;; Use ibuffer instead of the feature-lacking list-buffers:
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 
 
+;; Encoding
+
+;; I want to have UTF-8 by default. Emacs unfortunately has a few
+;; settings that govern encoding, so we should set them all at once:
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-language-environment 'utf-8)
@@ -197,7 +212,9 @@ scroll-step 1)
 (prefer-coding-system 'utf-8)
 (setq locale-coding-system 'utf-8)
 
-
+;; I don’t type double-space sentences, so make sure that Emacs
+;; doesn’t look for double-spaces after periods to fill paragraphs
+;; correctly:
 (setq sentence-end-double-space nil)
 (setq delete-by-moving-to-trash t)
 (setq ring-bell-function 'ignore)

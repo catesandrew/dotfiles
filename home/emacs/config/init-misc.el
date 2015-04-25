@@ -1,3 +1,145 @@
+;; Trailing whitespace
+
+;; Most UNIX tools work best when there’s a trailing newline on all
+;; files. Enable that option:
+
+(setq require-final-newline t)
+
+;; I don’t want to leave trailing whitespace in files I touch, so set
+;; up a hook that automatically deletes trailing whitespace after
+;; every line when saving a file:
+
+(add-hook 'write-file-hooks 'delete-trailing-whitespace)
+
+;; Fix minibuffer behaviour
+
+;; When changing focus to the minibuffer, stop allowing point to move
+;; over the prompt. Code taken from ergoemacs.
+
+(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
+(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'point-entered))
+
+;; On OS X, make sure M-3 is remapped to hash:
+
+(when (eq system-type 'darwin)
+  (fset 'insert-pound "#")
+  (define-key global-map "\M-3" #'insert-pound))
+
+
+;; Tooltips
+
+;; Emacs convention is to show help and other inline documentation in
+;; the message area. Show help there instead of using an OS tooltip:
+
+(when (display-graphic-p)
+  (tooltip-mode -1))
+
+;; Dialogue boxes and windows
+
+;; Just don’t show them. Use native Emacs controls:
+
+(when (display-graphic-p)
+  (setq use-dialog-box nil))
+
+;; Make the window title display the full path of the file I’m currently editing:
+
+(when (display-graphic-p)
+  (setq frame-title-format
+        '((:eval (if (buffer-file-name)
+                     (abbreviate-file-name (buffer-file-name))
+                   "%b")))))
+
+;; Cursor
+
+;; On modern operating systems, a vertical bar is used as a cursor:
+
+(when (display-graphic-p)
+  (setq-default cursor-type 'bar))
+
+;; ;; Make the cursor blink every second:
+
+;; (when (display-graphic-p)
+;;   (setq blink-cursor-interval 1.0)
+;;   (blink-cursor-mode 1))
+
+;; Typing
+
+;; Show the modifier combinations I just typed almost immediately:
+
+;; (setq echo-keystrokes 0.1)
+
+;; Don’t make me type yes or no to boolean interface questions:
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; dired fixes
+
+;; OS X’s bundled version of ls isn’t the GNU one, so it doesn’t support the --dired flag. Emacs caters for that use case:
+
+(setq dired-use-ls-dired nil)
+
+;; sRGB display fixes
+
+;; As of Emacs 24.4, Emacs natively supports proper sRGB values on OS X:
+
+;; If you’re not using Emacs 24.4 this variable setting will have no
+;; effect. See Homebrew’s Emacs recipe for details of how to get this
+;; behaviour in earlier Emacs versions.
+
+(setq ns-use-srgb-colorspace t)
+
+;; Terminal integration
+
+;; Using this configuration, Emacs runs best in iTerm2.
+
+;; On the desktop, Emacs integrates with the OS X clipboard, so kill
+;; etc. copy to the clipboard, and yank copies from the clipboard.
+
+;; Obviously this doesn’t work in the terminal, so we need to use the
+;; interprogram-(cut|paste)-function variables to copy/paste. Most of
+;; this code gotten from this blog comment.
+
+(when (and (not (display-graphic-p)) (eq system-type 'darwin))
+  (defun my/copy-from-osx ()
+    "Copies the current clipboard content using the `pbcopy` command"
+    (shell-command-to-string "pbpaste"))
+
+  (defun my/paste-to-osx (text &optional push)
+    "Copies the top of the kill ring stack to the OSX clipboard"
+    (let ((process-connection-type nil))
+      (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+        (process-send-string proc text)
+        (process-send-eof proc))))
+
+  (setq interprogram-cut-function 'my/paste-to-osx)
+  (setq interprogram-paste-function 'my/copy-from-osx))
+
+;; Get keychain password
+
+;; If I’m on OS X, I can fetch passwords etc. from my Keychain. This
+;; is much more secure than storing them in configuration on disk:
+
+(defun my/chomp (str)
+  "Chomp leading and tailing whitespace from `str'."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
+    (setq str (replace-match "" t t str))) str)
+
+(defun my/get-keychain-password (account-name)
+  "Get `account-name' keychain password from OS X Keychain"
+  (interactive "sAccount name: ")
+  (when (executable-find "security")
+    (my/chomp
+     (shell-command-to-string
+      (concat
+       "security find-generic-password -wa "
+       account-name)))))
+
+;; VC-mode integration
+
+;; Since I use Magit I don’t need to use Emacs’s native vc-mode:
+
+(delete 'Git vc-handled-backends)
+
 (require 'undo-tree)
 (setq undo-tree-auto-save-history t)
 (setq undo-tree-history-directory-alist

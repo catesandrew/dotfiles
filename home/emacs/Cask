@@ -113,6 +113,7 @@
 (depends-on "parent-mode")
 (depends-on "pkg-info")
 (depends-on "popup")
+;; (depends-on "popwin") ;; required by guide-key
 (depends-on "powerline")
 (depends-on "powerline-evil")
 (depends-on "pretty-symbols") ;;

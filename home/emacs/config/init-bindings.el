@@ -6,11 +6,33 @@
 
 
 (require 'guide-key)
-(setq guide-key/guide-key-sequence '("C-x" "C-c" ","))
+(setq guide-key/guide-key-sequence '("C-x" "C-c"))
 (setq guide-key/recursive-key-sequence-flag t)
 (setq guide-key/popup-window-position 'bottom)
-(setq guide-key/idle-delay 0.2)
+(setq guide-key/idle-delay 0.8)
 (guide-key-mode 1)
+
+(after 'guide-key
+  (add-hook 'evil-leader-mode-hook
+            #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader))))
+
+
+(require 'popwin)
+(popwin-mode 1)
+(global-set-key (kbd "C-c P") 'popwin:popup-last-buffer)
+(when (eq system-type 'darwin)
+  (global-set-key (kbd "s-P") 'popwin:popup-last-buffer))
+
+;; As well as the defaults, I want ag, magit, flycheck and occur to
+;; ‘pop’. I don’t want to auto-select the Magit process buffer as it’s
+;; for information only.
+
+(after 'popwin
+  (add-to-list 'popwin:special-display-config `"*ag search*")
+  (add-to-list 'popwin:special-display-config `("*magit-process*" :noselect t))
+  (add-to-list 'popwin:special-display-config `"*Flycheck errors*")
+  (add-to-list 'popwin:special-display-config `"*Occur*")
+  (add-to-list 'popwin:special-display-config `("*Compile-Log*" :noselect t)))
 
 
 (after 'evil
@@ -54,7 +76,6 @@
       ; "im" 'helm-imenu             ; shows functions
       ; "co" 'evilnc-comment-or-uncomment-lines ; nerd commenter
       ; "m" 'emmet-expand-line ; emmet
-      ; "ct" 'delete-trailing-whitespace
       "=" (lambda(begin end)        ; <leader>= align selection lines by "="
                               (interactive "r")
                               (align-regexp begin end "\\(\\s-*\\)=" 1 1 ))
