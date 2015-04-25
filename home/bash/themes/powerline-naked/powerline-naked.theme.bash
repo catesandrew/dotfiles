@@ -83,7 +83,7 @@ function powerline_scm_prompt {
 }
 
 function powerline_cwd_prompt {
-    CWD_PROMPT="${THEME_PROMPT_SEPARATOR} \w "
+    CWD_PROMPT="${THEME_PROMPT_SEPARATOR} $(limited_pwd) "
 }
 
 function powerline_last_status_prompt {

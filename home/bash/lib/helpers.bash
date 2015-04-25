@@ -144,7 +144,7 @@ bash_prompt_command() {
     # How many characters of the $PWD should be kept
     local pwdmaxlen=32
     # Indicate that there has been dir truncation
-    local trunc_symbol=".."
+    local trunc_symbol="…"
     local dir=${PWD##*/}
     pwdmaxlen=$(( ( pwdmaxlen < ${#dir} ) ? ${#dir} : pwdmaxlen ))
     NEW_PWD=${PWD/#$HOME/\~}
@@ -157,7 +157,7 @@ bash_prompt_command() {
 }
 
 # Max length of PWD to display
-MAX_PWD_LENGTH=16
+MAX_PWD_LENGTH=24
 
 # Displays last X characters of pwd
 function limited_pwd() {

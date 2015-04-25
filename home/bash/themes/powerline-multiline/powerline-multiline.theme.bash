@@ -135,7 +135,7 @@ function powerline_scm_prompt {
 }
 
 function powerline_cwd_prompt {
-    CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) \w ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
+    CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) $(limited_pwd) ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
     if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
         CWD_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${CWD_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${CWD_PROMPT}
         SEGMENT_AT_LEFT=0
