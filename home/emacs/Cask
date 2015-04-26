@@ -130,6 +130,7 @@
 (depends-on "rtags")
 (depends-on "s") ;;
 (depends-on "sass-mode")
+(depends-on "shell-command")
 (depends-on "shut-up")
 (depends-on "skewer-mode") ;;
 (depends-on "slime")

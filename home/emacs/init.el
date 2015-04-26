@@ -118,9 +118,8 @@
   (require-package 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
 
-(require 'init-util)
-
 (let ((debug-on-error t))
+  (require 'init-util)
   (require 'init-core)
 
   (require 'init-eshell)
@@ -130,9 +129,16 @@
       (require 'init-company)
     (require 'init-auto-complete))
 
+  (require 'init-ido)
+  (require 'init-org)
+  (require 'init-dired)
+  (require 'init-magit)
+  (require 'init-vcs)
+  (require 'init-rgrep)
+  (require 'init-shell)
+
   (require 'init-programming)
   (require 'init-lisp)
-  (require 'init-org)
   (require 'init-vim)
   (require 'init-stylus)
   (require 'init-js)
@@ -143,9 +149,6 @@
 
   (require 'init-projectile)
   (require 'init-helm)
-  (require 'init-ido)
-  (require 'init-dired)
-  (require 'init-vcs)
   (require 'init-flycheck)
   (require 'init-yasnippet)
   (require 'init-smartparens)

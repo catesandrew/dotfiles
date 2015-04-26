@@ -1,16 +1,6 @@
 (setq vc-make-backup-files t)
 
 (after 'vc-git
-  (setq magit-last-seen-setup-instructions "1.4.0")
-  (require 'magit)
-
-  (after 'magit
-    (setq magit-diff-options '("--histogram"))
-    (setq magit-stage-all-confirm nil)
-    (setq magit-unstage-all-confirm nil)
-    (setq magit-status-buffer-switch-function 'switch-to-buffer)
-    (setq magit-show-child-count t))
-
   (after 'evil
     (after 'magit-blame
       (defadvice magit-blame-file-on (after advice-for-magit-blame-file-on activate)
