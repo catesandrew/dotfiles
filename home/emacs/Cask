@@ -13,6 +13,7 @@
 (depends-on "buster-snippets")
 (depends-on "cask")
 (depends-on "clojure-mode")
+(depends-on "clj-refactor")
 (depends-on "cider")
 (depends-on "cmake-mode")
 (depends-on "coffee-mode") ;;
@@ -62,6 +63,7 @@
 (depends-on "flycheck-cask")
 (depends-on "flycheck-package")
 (depends-on "flycheck-pos-tip")
+(depends-on "flycheck-clojure")
 (depends-on "form-feed")
 (depends-on "framemove") ;;
 (depends-on "fullscreen-mode")
