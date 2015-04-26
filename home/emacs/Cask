@@ -10,6 +10,7 @@
 (depends-on "bash-completion")
 (depends-on "browse-kill-ring")
 (depends-on "buffer-move")
+(depends-on "buster-snippets")
 (depends-on "cask")
 (depends-on "clojure-mode")
 (depends-on "cider")
