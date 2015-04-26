@@ -86,6 +86,7 @@
 (depends-on "highlight-quoted") ;;
 (depends-on "ibuffer-projectile")
 (depends-on "ido-ubiquitous") ;;
+(depends-on "ido-at-point")
 (depends-on "ido-vertical-mode") ;;
 (depends-on "jade-mode") ;;
 (depends-on "js2-mode") ;;
