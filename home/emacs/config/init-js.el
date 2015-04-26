@@ -4,18 +4,21 @@
 (add-to-list 'auto-mode-alist '("\\.pac\\'"   . js2-mode))
 (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
 
+(after 'javascript-mode
+  (setq javascript-indent-level 2)) ; javascript-mode
+
+(after 'js-mode
+  (setq js-indent-level 2)) ; js-mode
+
 (after 'js2-mode
 
   (defun my-js2-mode-defaults ()
     (js2-imenu-extras-mode +1)
     (setq mode-name "JS2")
-    ;; disable electric re-indenting...
-    ;; (electric-indent-local-mode -1)
     (define-key js-mode-map "," 'self-insert-command)
     (define-key js-mode-map ";" 'self-insert-command)
     ;; electric-layout-mode doesn't play nice with smartparens
-    (setq-local electric-layout-rules '((?\; . after)))
-  )
+    (setq-local electric-layout-rules '((?\; . after))))
 
   (setq my-js2-mode-hook 'my-js2-mode-defaults)
   (add-hook 'js2-mode-hook (lambda () (run-hooks 'my-js2-mode-hook)))
@@ -32,8 +35,8 @@
           (my-macro-ng-function-to-array-injected)))))
 
   (add-hook 'js2-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-c C-c") #'my-dotemacs-js-ctrl-c-ctrl-c)))
+    (lambda ()
+      (local-set-key (kbd "C-c C-c") #'my-dotemacs-js-ctrl-c-ctrl-c)))
 
   (require 'js2-refactor)
   (js2r-add-keybindings-with-prefix "C-c C-m")
