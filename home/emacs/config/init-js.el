@@ -3,6 +3,9 @@
 (add-to-list 'auto-mode-alist '("\\.js\\'"    . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.pac\\'"   . js2-mode))
 (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
+(add-to-list 'auto-mode-alist '("\\.jshintrc$" . javascript-mode))
+(add-to-list 'magic-mode-alist '("#!/usr/bin/env node" . js2-mode))
 
 (after 'javascript-mode
   (setq javascript-indent-level 2)) ; javascript-mode
@@ -62,6 +65,142 @@
   (setq js2-show-parse-errors nil)
   (setq js2-strict-missing-semi-warning nil)
   (setq js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
+
+  (define-key js2-mode-map (kbd "C-c RET jt") 'jump-to-test-file)
+  (define-key js2-mode-map (kbd "C-c RET ot") 'jump-to-test-file-other-window)
+  (define-key js2-mode-map (kbd "C-c RET js") 'jump-to-source-file)
+  (define-key js2-mode-map (kbd "C-c RET os") 'jump-to-source-file-other-window)
+  (define-key js2-mode-map (kbd "C-c RET jo") 'jump-between-source-and-test-files)
+  (define-key js2-mode-map (kbd "C-c RET oo") 'jump-between-source-and-test-files-other-window)
+
+  (define-key js2-mode-map (kbd "C-c RET dp") 'js2r-duplicate-object-property-node)
+
+  (define-key js2-mode-map (kbd "C-c RET ta") 'toggle-assert-refute)
+
+  (defadvice js2r-inline-var (after reindent-buffer activate)
+    (cleanup-buffer))
+
+  (defun js2-hide-test-functions ()
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (ignore-errors
+        (while (re-search-forward "\"[^\"]+\": function (")
+          (js2-mode-hide-element)))))
+
+  (define-key js2-mode-map (kbd "C-c t") 'js2-hide-test-functions)
+
+  ;; js2-mode steals TAB, let's steal it back for yasnippet
+  (defun js2-tab-properly ()
+    (interactive)
+    (let ((yas-fallback-behavior 'return-nil))
+      (unless (yas-expand)
+        (indent-for-tab-command)
+        (if (looking-back "^\s*")
+            (back-to-indentation)))))
+
+  (define-key js2-mode-map (kbd "TAB") 'js2-tab-properly)
+
+  ;; When renaming/deleting js-files, check for corresponding testfile
+  (define-key js2-mode-map (kbd "C-x C-r") 'js2r-rename-current-buffer-file)
+  (define-key js2-mode-map (kbd "C-x C-k") 'js2r-delete-current-buffer-file)
+
+  (define-key js2-mode-map (kbd "C-k") 'js2r-kill)
+
+  ;; After js2 has parsed a js file, we look for jslint globals decl comment ("/* global Fred, _, Harry */") and
+  ;; add any symbols to a buffer-local var of acceptable global vars
+  ;; Note that we also support the "symbol: true" way of specifying names via a hack (remove any ":true"
+  ;; to make it look like a plain decl, and any ':false' are left behind so they'll effectively be ignored as
+  ;; you can;t have a symbol called "someName:false"
+  (add-hook 'js2-post-parse-callbacks
+            (lambda ()
+              (when (> (buffer-size) 0)
+                (let ((btext (replace-regexp-in-string
+                              ": *true" " "
+                              (replace-regexp-in-string "[\n\t ]+" " " (buffer-substring-no-properties 1 (buffer-size)) t t))))
+                  (mapc (apply-partially 'add-to-list 'js2-additional-externs)
+                        (split-string
+                         (if (string-match "/\\* *global *\\(.*?\\) *\\*/" btext) (match-string-no-properties 1 btext) "")
+                         " *, *" t))
+                  ))))
+
+  (require 'json)
+
+  ;; Tern.JS
+  (add-to-list 'load-path (expand-file-name "tern/emacs" dotemacs-elisp-dir))
+  (autoload 'tern-mode "tern.el" nil t)
+  (eval-after-load 'auto-complete
+    '(eval-after-load 'tern
+       '(progn
+          (require 'tern-auto-complete)
+          (tern-ac-setup))))
+
+  (defun my-aget (key map)
+    (cdr (assoc key map)))
+
+  (defun js2-fetch-autolint-externs (file)
+    (let* ((settings (with-temp-buffer
+                       (insert-file-literally file)
+                       (javascript-mode)
+                       (let (kill-ring kill-ring-yank-pointer) (kill-comment 1000))
+                       (->> (buffer-substring (point-min) (point-max))
+                         (s-trim)
+                         (s-chop-prefix "module.exports = ")
+                         (s-chop-suffix ";")
+                         (json-read-from-string))))
+           (predef (->> settings
+                     (my-aget 'linterOptions)
+                     (my-aget 'predef))))
+      (--each (append predef nil)
+        (add-to-list 'js2-additional-externs it))))
+
+  (defun cjsp--eldoc-innards (beg)
+    (save-excursion
+      (goto-char beg)
+      (search-forward "=")
+      (let ((start (point)))
+        (search-forward "*/")
+        (forward-char -2)
+        (buffer-substring-no-properties start (point)))))
+
+  (defun cjsp--indentation-of-html-line (html line-number)
+    (with-temp-buffer
+      (insert html)
+      (html-mode)
+      (indent-region (point-min) (point-max))
+      (goto-line line-number)
+      (back-to-indentation)
+      (current-column)))
+
+  (defun cjsp--line-number-in-eldoc (p beg)
+    (save-excursion
+      (goto-char p)
+      (let ((l (line-number-at-pos)))
+        (goto-char beg)
+        (- l (line-number-at-pos) -1))))
+
+  (defun js2-lineup-comment (parse-status)
+    "Indent a multi-line block comment continuation line."
+    (let* ((beg (nth 8 parse-status))
+           (first-line (js2-same-line beg))
+           (p (point))
+           (offset (save-excursion
+                     (goto-char beg)
+                     (cond
+
+                      ((looking-at "/\\*:DOC ")
+                       (+ 2 (current-column)
+                          (cjsp--indentation-of-html-line
+                           (cjsp--eldoc-innards beg)
+                           (cjsp--line-number-in-eldoc p beg))))
+
+                      ((looking-at "/\\*")
+                       (+ 1 (current-column)))
+
+                      (:else 0)))))
+      (unless first-line
+        (indent-line-to offset))))
+
   (require 'js2-refactor)
   (js2r-add-keybindings-with-prefix "C-c C-m")
 
@@ -72,35 +211,6 @@
   (when (executable-find "tern")
     (require 'tern)
     (add-hook 'js2-mode-hook 'tern-mode)
-    (after 'tern
-      (after 'auto-complete
-        (require 'tern-auto-complete)
-        (tern-ac-setup))
-      (after 'company-mode
-        (require 'company-tern)))))
-
-(after 'js3-mode
-
-  (defun my-js3-mode-defaults ()
-    (setq mode-name "JS3")
-    ;; electric-layout-mode doesn't play nice with smartparens
-    (setq-local electric-layout-rules '((?\; . after)))
-  )
-
-  (setq my-js3-mode-hook 'my-js3-mode-defaults)
-  (add-hook 'js3-mode-hook (lambda () (run-hooks 'my-js3-mode-hook)))
-
-  (setq js3-expr-indent-offset 2)
-  (setq js3-paren-indent-offset 2)
-  (setq js3-square-indent-offset 2)
-  (setq js3-curly-indent-offset 2)
-  (setq js3-auto-indent-p t)         ; it's nice for commas to right themselves.
-  (setq js3-enter-indents-newline t) ; don't need to push tab before typing
-  (setq js3-indent-on-enter-key t)   ; fix indenting before moving on
-
-  (when (executable-find "tern")
-    (require 'tern)
-    (add-hook 'js3-mode-hook 'tern-mode)
     (after 'tern
       (after 'auto-complete
         (require 'tern-auto-complete)
