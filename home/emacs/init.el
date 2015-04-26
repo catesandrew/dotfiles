@@ -137,6 +137,7 @@
   (require 'init-rgrep)
   (require 'init-shell)
   (require 'init-perspective)
+  (require 'init-ffip)
 
   (require 'init-programming)
   (require 'init-lisp)

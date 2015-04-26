@@ -18,4 +18,4 @@
 
 ; (define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
 
-(provide 'setup-perspective)
+(provide 'init-perspective)
