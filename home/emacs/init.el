@@ -136,6 +136,7 @@
   (require 'init-vcs)
   (require 'init-rgrep)
   (require 'init-shell)
+  (require 'init-perspective)
 
   (require 'init-programming)
   (require 'init-lisp)

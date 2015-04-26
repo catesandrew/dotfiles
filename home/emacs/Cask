@@ -114,6 +114,7 @@
 (depends-on "paradox") ;;
 (depends-on "pallet")
 (depends-on "parent-mode")
+(depends-on "perspective")
 (depends-on "pkg-info")
 (depends-on "popup")
 ;; (depends-on "popwin") ;; required by guide-key
