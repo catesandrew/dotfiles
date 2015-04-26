@@ -1,5 +1,11 @@
-(setq user-full-name "Andrew Cates")
-(setq user-mail-address "catesandrew@gmail.com")
+;; Turn off mouse interface early in startup to avoid momentary display
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'set-fringe-mode) (set-fringe-mode -1))
+
+;; No splash screen please ... jeez
+(setq inhibit-startup-message t)
 
 (defvar current-user
       (getenv
@@ -23,6 +29,7 @@
 (require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
 
+;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
   :group 'local)
@@ -39,11 +46,19 @@
           (const :tag "auto-complete-mode" auto-complete))
   :group 'dotemacs)
 
-(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(when (fboundp 'set-fringe-mode) (set-fringe-mode -1))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(unless (display-graphic-p) (menu-bar-mode -1))
+(defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
+  "The storage location lisp."
+  :group 'dotemacs)
 
+(defcustom dotemacs-settings-dir (expand-file-name "settings" user-emacs-directory)
+  "The storage location for settings."
+  :group 'dotemacs)
+
+(defcustom dotemacs-user-settings-dir (concat user-emacs-directory "users/" user-login-name)
+  "The currently logged in user's storage location for settings."
+  :group 'dotemacs)
+
+;; mac osx settings
 (when (eq system-type 'darwin)
   (require 'ls-lisp)
   (setq ls-lisp-use-insert-directory-program nil))
@@ -66,20 +81,34 @@
   (global-set-key (kbd "s-Z") 'undo-tree-redo))
 
 
+;; Set up load path
+(add-to-list 'load-path dotemacs-settings-dir)
+(add-to-list 'load-path dotemacs-elisp-dir)
 (add-to-list 'load-path (concat user-emacs-directory "/config"))
+
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; Set up appearance early
+(require 'appearance)
+
+;; Settings for currently logged in user
+(add-to-list 'load-path dotemacs-user-settings-dir)
+
+;; Add external projects to load path
+; (let ((base (concat user-emacs-directory "/elisp")))
 (let ((base (concat user-emacs-directory "/elisp")))
   (add-to-list 'load-path base)
   (dolist (dir (directory-files base t "^[^.]"))
     (when (file-directory-p dir)
       (add-to-list 'load-path dir))))
 
+
+;;
 (require 'cl)
 (require 'init-packages)
 (require 'init-util)
-
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
 
 (let ((debug-on-error t))
   (require 'init-core)

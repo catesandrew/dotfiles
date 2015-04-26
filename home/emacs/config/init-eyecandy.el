@@ -21,6 +21,7 @@
                            count)))))
 (setq hs-set-up-overlay 'my-fold-overlay)
 
+;; Unclutter the modeline
 (require 'diminish)
 (diminish 'visual-line-mode)
 (after 'undo-tree (diminish 'undo-tree-mode))
@@ -35,6 +36,13 @@
 (after 'git-gutter+ (diminish 'git-gutter+-mode))
 (after 'magit (diminish 'magit-auto-revert-mode))
 (after 'highlight-symbol (diminish 'highlight-symbol-mode))
+(after 'paredit (diminish 'paredit-mode))
+(after 'tagedit (diminish 'tagedit-mode))
+(after 'skewer-mode (diminish 'skewer-mode))
+(after 'skewer-css (diminish 'skewer-css-mode))
+(after 'skewer-html (diminish 'skewer-html-mode))
+(after 'whitespace-cleanup-mode (diminish 'whitespace-cleanup-mode))
+(after 'subword (diminish 'subword-mode))
 
 
 (require 'smart-mode-line)

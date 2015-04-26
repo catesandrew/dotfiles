@@ -155,4 +155,5 @@
 (depends-on "yaml-mode") ;;
 (depends-on "ycmd") ;;
 (depends-on "zenburn-theme")
+(depends-on "zoom-frm")
 (depends-on "zygospore")

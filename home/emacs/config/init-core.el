@@ -31,8 +31,8 @@ scroll-step 1)
 
 ;; move cursor to the last position upon open
 (require 'saveplace)
-(setq save-place-file (concat dotemacs-cache-directory "places"))
 (setq-default save-place t)
+(setq save-place-file (expand-file-name ".places" user-emacs-directory))
 
 
 ;; disable line wrap
@@ -251,7 +251,6 @@ scroll-step 1)
 
 (xterm-mouse-mode t)
 (which-function-mode t)
-(blink-cursor-mode -1)
 (global-auto-revert-mode t)
 (electric-indent-mode t)
 (electric-pair-mode t)
