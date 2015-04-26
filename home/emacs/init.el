@@ -144,6 +144,7 @@
   (require 'init-projectile)
   (require 'init-helm)
   (require 'init-ido)
+  (require 'init-dired)
   (require 'init-vcs)
   (require 'init-flycheck)
   (require 'init-yasnippet)
