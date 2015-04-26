@@ -41,7 +41,6 @@
   (setq indent-tabs-mode nil tab-width 2 js-indent-level 2)
   (setq js2-highlight-level 3)
   (setq js2-basic-offset 2)
-  (setq js2-bounce-indent-p t)
   (setq js2-concat-multiline-strings (quote eol))
   (setq js2-include-node-externs t)
   (setq js2-indent-switch-body t)
