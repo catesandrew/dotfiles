@@ -141,6 +141,9 @@
 
   (require 'init-bindings))
 
+(autoload 'skewer-start "init-skewer" nil t)
+(autoload 'skewer-demo "init-skewer" nil t)
+
 (setq defuns-dir (expand-file-name "defuns" user-emacs-directory))
 (dolist (file (directory-files defuns-dir t "\\w+"))
   (when (file-regular-p file)
