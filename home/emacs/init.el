@@ -58,29 +58,6 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
-;; mac osx settings
-(when on_darwin
-  (require 'ls-lisp)
-  (setq ls-lisp-use-insert-directory-program nil))
-
-(when (and on_darwin (display-graphic-p))
-  ;; Treat option as meta and command as super
-  (setq mac-option-key-is-meta t)
-  (setq mac-command-key-is-meta nil)
-  (setq mac-command-modifier 'super)
-  (setq mac-option-modifier 'meta)
-
-  ;; Keybindings
-  (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-  (global-set-key (kbd "s-v") 'yank)
-  (global-set-key (kbd "s-c") 'kill-ring-save)
-  (global-set-key (kbd "s-x") 'kill-region)
-  (global-set-key (kbd "s-w") 'kill-this-buffer)
-  (global-set-key (kbd "s-z") 'undo-tree-undo)
-  (global-set-key (kbd "s-s") 'save-buffer)
-  (global-set-key (kbd "s-Z") 'undo-tree-redo))
-
-
 ;; Set up load path
 (add-to-list 'load-path dotemacs-settings-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
@@ -168,3 +145,6 @@
 (dolist (file (directory-files defuns-dir t "\\w+"))
   (when (file-regular-p file)
     (load file)))
+
+(when on_darwin
+  (require 'mac-osx))
