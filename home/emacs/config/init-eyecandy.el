@@ -3,8 +3,6 @@
 (setq show-paren-delay 0)
 
 
-(line-number-mode t)
-(column-number-mode t)
 (display-time-mode t)
 (size-indication-mode t)
 

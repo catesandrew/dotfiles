@@ -59,11 +59,11 @@
   :group 'dotemacs)
 
 ;; mac osx settings
-(when (eq system-type 'darwin)
+(when on_darwin
   (require 'ls-lisp)
   (setq ls-lisp-use-insert-directory-program nil))
 
-(when (and (eq system-type 'darwin) (display-graphic-p))
+(when (and on_darwin (display-graphic-p))
   ;; Treat option as meta and command as super
   (setq mac-option-key-is-meta t)
   (setq mac-command-key-is-meta nil)
@@ -105,9 +105,19 @@
       (add-to-list 'load-path dir))))
 
 
-;;
 (require 'cl)
+
+;; Setup packages
 (require 'init-packages)
+
+;; Lets start with a smattering of sanity
+(require 'sane-defaults)
+
+;; Setup environment variables from the user's shell.
+(when on_darwin
+  (require-package 'exec-path-from-shell)
+  (exec-path-from-shell-initialize))
+
 (require 'init-util)
 
 (let ((debug-on-error t))

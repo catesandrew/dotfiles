@@ -62,16 +62,6 @@
 ;;   (setq blink-cursor-interval 1.0)
 ;;   (blink-cursor-mode 1))
 
-;; Typing
-
-;; Show the modifier combinations I just typed almost immediately:
-
-;; (setq echo-keystrokes 0.1)
-
-;; Don’t make me type yes or no to boolean interface questions:
-
-(defalias 'yes-or-no-p 'y-or-n-p)
-
 ;; dired fixes
 
 ;; OS X’s bundled version of ls isn’t the GNU one, so it doesn’t support the --dired flag. Emacs caters for that use case:
@@ -146,7 +136,6 @@
       `(("." . ,(concat dotemacs-cache-directory "undo"))))
 (setq undo-tree-visualizer-timestamps t)
 (setq undo-tree-visualizer-diff t)
-(global-undo-tree-mode)
 
 
 (after 'evil

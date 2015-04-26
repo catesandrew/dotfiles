@@ -7,6 +7,7 @@ custom.el
 *.orig
 *~
 .cask/
+.places
 .mc-lists.el
 ac-comphist.dat
 auto-save-list

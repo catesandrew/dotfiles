@@ -7,17 +7,6 @@
 (add-to-list 'default-frame-alist '(height . 72))
 (add-to-list 'default-frame-alist '(width . 120))
 
-; Smooth scrolling
-
-; One annoying thing that most Vim users will find in Emacs is the jumpy
-; scrolling. To have Emacs scroll like Vim (that is, line by line and leaving
-; some lines before starting to scroll) the solution is to install smooth-scrolling
-(require 'smooth-scrolling)
-(setq scroll-margin 5
-scroll-conservatively 9999
-scroll-step 1)
-
-
 ; dtrt-indent
 
 ; Automatically determine the indentation settings used on the file that you're
@@ -33,10 +22,6 @@ scroll-step 1)
 (require 'saveplace)
 (setq-default save-place t)
 (setq save-place-file (expand-file-name ".places" user-emacs-directory))
-
-
-;; disable line wrap
-(set-default 'truncate-lines t)
 
 
 ;; To get rid of the start message just set the initial-scratch-message variable to ""
@@ -63,19 +48,15 @@ scroll-step 1)
 (require 'savehist)
 (setq savehist-file (concat dotemacs-cache-directory "savehist")
       savehist-additional-variables '(search ring regexp-search-ring)
-      savehist-autosave-interval 60
-      history-length 1000)
-(savehist-mode t)
+      savehist-autosave-interval 60)
 
 
 ;; recent files
 (require 'recentf)
 (setq recentf-save-file (concat dotemacs-cache-directory "recentf"))
-(setq recentf-max-saved-items 1000)
-(setq recentf-max-menu-items 500)
-(setq recentf-auto-cleanup 300)
+(setq recentf-max-menu-items 50)
+(setq recentf-auto-cleanup 30)
 (add-to-list 'recentf-exclude "COMMIT_EDITMSG\\'")
-(recentf-mode t)
 (run-with-timer 1800 1800 'recentf-save-list)
 
 
@@ -136,11 +117,6 @@ scroll-step 1)
   (fringe-mode 16))
 
 
-;; ediff
-(setq ediff-split-window-function 'split-window-horizontally) ;; side-by-side diffs
-(setq ediff-window-setup-function 'ediff-setup-windows-plain) ;; no extra frames
-
-
 ;; re-builder
 (setq reb-re-syntax 'string) ;; fix backslash madness
 
@@ -171,23 +147,6 @@ scroll-step 1)
 
 ;; Buffer management
 
-;; better buffer names for duplicates
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward
-      uniquify-separator "/"
-      uniquify-ignore-buffers-re "^\\*" ; leave special buffers alone
-      uniquify-after-kill-buffer-p t)
-
-
-(defun my-do-not-kill-scratch-buffer ()
-  (if (member (buffer-name (current-buffer)) '("*scratch*" "*Messages*"))
-      (progn
-        (bury-buffer)
-        nil)
-    t))
-
-(add-hook 'kill-buffer-query-functions 'my-do-not-kill-scratch-buffer)
-
 ;; Burying a buffer (removing it from the current window and sending
 ;; it to the bottom of the stack) is very common for dismissing
 ;; buffers. Add a mapping for it:
@@ -201,39 +160,18 @@ scroll-step 1)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
 
-;; Encoding
-
-;; I want to have UTF-8 by default. Emacs unfortunately has a few
-;; settings that govern encoding, so we should set them all at once:
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
-
-;; I don’t type double-space sentences, so make sure that Emacs
-;; doesn’t look for double-spaces after periods to fill paragraphs
-;; correctly:
-(setq sentence-end-double-space nil)
-(setq delete-by-moving-to-trash t)
 (setq ring-bell-function 'ignore)
 (setq mark-ring-max 64)
 (setq global-mark-ring-max 128)
 (setq save-interprogram-paste-before-kill t)
 (setq create-lockfiles nil)
-(setq echo-keystrokes 0.01)
 
-; flx can benefit significantly from garbage collection tuning. So if you have
-; a modern machine, I encourage you to add the following:
-(setq gc-cons-threshold 20000000)
 (setq initial-major-mode 'emacs-lisp-mode)
 
 
 ; spaces instead of tabs
 (setq-default c-basic-offset 2 c-default-style "bsd")
 (setq-default tab-width 2)
-(setq-default indent-tabs-mode nil)
 (setq-default highlight-tabs t)
 
 ;; some more interface-related settings
@@ -251,11 +189,6 @@ scroll-step 1)
 
 (xterm-mouse-mode t)
 (which-function-mode t)
-(global-auto-revert-mode t)
-(electric-indent-mode t)
-(electric-pair-mode t)
-(transient-mark-mode t)
-(delete-selection-mode t)
 (random t) ;; seed
 
 
