@@ -67,6 +67,7 @@
 (depends-on "form-feed")
 (depends-on "framemove") ;;
 (depends-on "fullscreen-mode")
+(depends-on "ggtags")
 (depends-on "git-commit-mode")
 (depends-on "git-commit-training-wheels-mode")
 (depends-on "git-gutter")
