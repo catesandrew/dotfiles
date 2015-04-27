@@ -3,13 +3,13 @@
 cite 'about-alias'
 about-alias 'homebrew abbreviations'
 
-alias bup='brew update && brew upgrade'
+alias bup='brew update && brew upgrade --all'
 
 # TODO: update to check if cask is installed (Linux)
 if [ $(uname) = "Darwin" ]; then
-    alias bup='brew update && brew cask update && brew upgrade && brew cleanup && brew cask cleanup'
+    alias bup='brew update && brew cask update && brew upgrade --all && brew cleanup && brew cask cleanup'
 elif [ $(uname) = "Linux" ]; then
-    alias bup='brew update && brew upgrade && brew cleanup'
+    alias bup='brew update && brew upgrade --all && brew cleanup'
 fi
 
 alias bout='brew outdated'
