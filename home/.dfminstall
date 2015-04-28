@@ -1,0 +1,9 @@
+.DS_Store skip
+open-connect skip
+library skip
+karabiner skip
+.hammerspoon skip
+.ssh recurse
+.vim recurse
+.mjolnir recurse
+.lein recurse
