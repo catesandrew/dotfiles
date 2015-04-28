@@ -1,0 +1,16 @@
+.DS_Store skip
+.netrwhist skip
+autocorrect.vim skip
+colors skip
+ftdetect skip
+indent skip
+syntax skip
+autoload skip
+doc skip
+ftplugin skip
+sessions skip
+tmp skip
+bundle skip
+filetype.vim skip
+functions skip
+snippets skip
