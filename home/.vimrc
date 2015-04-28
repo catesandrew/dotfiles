@@ -96,31 +96,31 @@ endfunction "}}}
 
 " }}}
 " Preamble -------------------------------------------------------------------- {{{
-let s:cache_dir='~/.vim/tmp'
+let s:cache_dir='~/.vim.d/tmp'
 
 set nocompatible
 filetype on
 filetype off
 
 " Utils {{{
-source ~/.vim/functions/util.vim
+source ~/.vim.d/functions/util.vim
 " }}}
 
 " Load external configuration before anything else {{{
-if filereadable(expand("~/.vim/before.vimrc"))
-  source ~/.vim/before.vimrc
+if filereadable(expand("~/.vim.d/before.vimrc"))
+  source ~/.vim.d/before.vimrc
 endif
 " }}}
 
 " Local vimrc configuration {{{
-let s:localrc = expand($HOME . '/.vim/local.vimrc')
+let s:localrc = expand($HOME . '/.vim.d/local.vimrc')
 if filereadable(s:localrc)
     exec ':so ' . s:localrc
 endif
 " }}}
 
 " Use pathogen to easily modify the runtime path to include all plugins under
-" the ~/.vim/bundle directory
+" the ~/.vim.d/bundle directory
 filetype off                                       " force reloading *after* pathogen loaded
 silent! call pathogen#helptags()
 silent! call pathogen#runtime_append_all_bundles()
@@ -566,7 +566,7 @@ set completeopt=longest,menuone,preview
 " edit/reload .vimrc. (I got this from Derek Wyatt’s .vimrc file.)
 nnoremap <leader>ev <C-w>s<C-w>j:e $MYVIMRC<cr>
 nnoremap <leader>sv <C-w>s<C-w>j:so $MYVIMRC<cr>
-nnoremap <leader>es <C-w>s<C-w>j:e ~/.vim/snippets/<cr>
+nnoremap <leader>es <C-w>s<C-w>j:e ~/.vim.d/snippets/<cr>
 nnoremap <leader>eg <C-w>s<C-w>j:e ~/.gitconfig<cr>
 nnoremap <leader>ez <C-w>s<C-w>j:e ~/.zshrc<cr>
 nnoremap <leader>et <C-w>s<C-w>j:e ~/.tmux.conf<cr>
@@ -1053,7 +1053,7 @@ nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 let g:session_autosave = 'no'
 let g:session_autoload = 'yes'
-let g:session_directory = '~/.vim/tmp/sessions'
+let g:session_directory = '~/.vim.d/tmp/sessions'
 let g:session_persist_colors = 0
 let g:session_menu = 0
 
@@ -1104,7 +1104,7 @@ augroup END
 
 let g:yankring_replace_n_pkey = '<leader>['
 let g:yankring_replace_n_nkey = '<leader>]'
-let g:yankring_history_dir = '~/.vim/tmp/'
+let g:yankring_history_dir = '~/.vim.d/tmp/'
 nmap <leader>y :YRShow<cr>
 
 function! YRRunAfterMaps()
@@ -1167,7 +1167,7 @@ let g:neocomplete#data_directory=s:get_cache_dir('neocomplete')
 " }}}
 " neosnippet {{{
 
-let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets,~/.vim/snippets'
+let g:neosnippet#snippets_directory='~/.vim.d/bundle/vim-snippets/snippets,~/.vim.d/snippets'
 let g:neosnippet#enable_snipmate_compatibility=1
 
 imap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ? "\<C-n>" : "\<TAB>")
@@ -1409,7 +1409,7 @@ endfunction " }}}
 " }}}
 
 " Common abbreviations / misspellings {{{
-source ~/.vim/autocorrect.vim
+source ~/.vim.d/autocorrect.vim
 " }}}
 
 " Extra vi-compatibility {{{
@@ -1517,19 +1517,19 @@ augroup END
 " EXTENSIONS {{{
 
 " _. Scratch {{{
-source ~/.vim/functions/scratch_toggle.vim
+source ~/.vim.d/functions/scratch_toggle.vim
 " }}}
 
 " _. Buffer Handling {{{
-source ~/.vim/functions/buffer_handling.vim
+source ~/.vim.d/functions/buffer_handling.vim
 " }}}
 
 " _. Tab {{{
-source ~/.vim/functions/insert_tab_wrapper.vim
+source ~/.vim.d/functions/insert_tab_wrapper.vim
 " }}}
 
 " _. Text Folding {{{
-source ~/.vim/functions/my_fold_text.vim
+source ~/.vim.d/functions/my_fold_text.vim
 " }}}
 
 " }}}
@@ -1544,7 +1544,7 @@ vnoremap ar a[
 " }}}
 
 " Load addidional configuration (ie to overwrite shorcuts) {{{
-if filereadable(expand("~/.vim/after.vimrc"))
-  source ~/.vim/after.vimrc
+if filereadable(expand("~/.vim.d/after.vimrc"))
+  source ~/.vim.d/after.vimrc
 endif
 " }}}
