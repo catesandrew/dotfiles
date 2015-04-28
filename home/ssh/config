@@ -1,0 +1,65 @@
+Host github.com
+	User git
+	Hostname github.com
+	PreferredAuthentications publickey
+	# IdentityFile ~/.ssh/id_rsa
+	IdentityFile /Users/%u/.ssh/id_rsa
+
+# -- github-keygen - begin --
+
+Host gist.github.com *.gist.github.com
+    Hostname gist.github.com
+
+# See https://help.github.com/articles/using-ssh-over-the-https-port
+Host ssh.github.com *.ssh.github.com 443.github.com *.443.github.com
+    Hostname ssh.github.com
+    Port 443
+
+# This rule must stay below more specific host rules to avoid
+# "Hostname" to be set to github.com
+Host *.github.com
+    Hostname github.com
+
+Host github.com gist.github.com ssh.github.com 443.github.com *.github.com *.gist.github.com *.ssh.github.com *.443.github.com
+    User git
+    # Force SSH2
+    Protocol 2
+    # Enforce host checks
+    StrictHostKeyChecking yes
+    UserKnownHostsFile ~/.ssh/known_hosts_github
+    # Hosts added later (identified by IP) will be hashed
+    HashKnownHosts yes
+    # GitHub has not yet (2011-05) implemented SSHFP (RFC 4255)
+    VerifyHostKeyDNS no
+    # Enable only the required authentication
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey
+    # Select algorithms recommended by Stribika
+    #  See https://stribika.github.io/2015/01/04/secure-secure-shell.html
+    #  Last in each list is the minimum supported by Github
+    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr
+    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512
+    # Trust no one, especially the remote
+    ForwardAgent no
+    ForwardX11 no
+    PermitLocalCommand no
+    # Connexion sharing for 60 seconds, for speedup
+    ControlMaster auto
+    ControlPath ~/.ssh/conn-%n
+    ControlPersist 60s
+
+Host catesandrew.github.com catesandrew.gist.github.com catesandrew.ssh.github.com catesandrew.443.github.com
+IdentitiesOnly yes
+IdentityFile ~/.ssh/id_catesandrew@github
+
+# -- github-keygen - end --
+
+Host *
+    # Set ServerAliveInterval for all connections
+    ServerAliveInterval 60
+
+    # http://interrobeng.com/2013/08/25/speed-up-git-5x-to-50x/
+    ControlMaster auto
+    ControlPath /tmp/%r@%h:%p
+    ControlPersist yes
