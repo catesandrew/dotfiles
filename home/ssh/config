@@ -1,9 +1,9 @@
-Host github.com
-	User git
-	Hostname github.com
-	PreferredAuthentications publickey
-	# IdentityFile ~/.ssh/id_rsa
-	IdentityFile /Users/%u/.ssh/id_rsa
+# Host github.com
+# 	User git
+# 	Hostname github.com
+# 	PreferredAuthentications publickey
+# 	IdentityFile ~/.ssh/id_rsa
+# 	IdentityFile /Users/%u/.ssh/id_rsa
 
 # -- github-keygen - begin --
 
@@ -50,8 +50,8 @@ Host github.com gist.github.com ssh.github.com 443.github.com *.github.com *.gis
     ControlPersist 60s
 
 Host catesandrew.github.com catesandrew.gist.github.com catesandrew.ssh.github.com catesandrew.443.github.com
-IdentitiesOnly yes
-IdentityFile ~/.ssh/id_catesandrew@github
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/id_catesandrew@github
 
 # -- github-keygen - end --
 
