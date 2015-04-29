@@ -41,6 +41,7 @@
 let s:is_windows = has('win32') || has('win64')
 let s:is_cygwin = has('win32unix')
 let s:is_macvim = has('gui_macvim')
+let s:has_lua = has('lua')
 
 " }}}
 " Useful Functions -------------------------------------------------------- {{{
@@ -1160,9 +1161,17 @@ let g:html_indent_style1 = "inc"
 " }}}
 " neocomplete {{{
 
-call EnsureExists(s:get_cache_dir('neocomplete'))
-let g:neocomplete#enable_at_startup=1
-let g:neocomplete#data_directory=s:get_cache_dir('neocomplete')
+if s:has_lua
+    call EnsureExists(s:get_cache_dir('neocomplete'))
+    " Disable AutoComplPop.
+    let g:acp_enableAtStartup=0
+    let g:neocomplete#enable_at_startup=1
+    let g:neocomplete#data_directory=s:get_cache_dir('neocomplete')
+    let g:neocomplete#enable_smart_case=1
+    " Set minimum syntax keyword length.
+    let g:neocomplete#sources#syntax#min_keyword_length = 3
+    let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+endif
 
 " }}}
 " neosnippet {{{
