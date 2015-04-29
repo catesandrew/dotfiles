@@ -1,0 +1,7 @@
+[credential]
+	helper = osxkeychain
+[diff]
+  tool = araxis
+  renamelimit = 3000
+[mergetool "araxis"]
+  path = /Applications/Araxis Merge.app/Contents/Utilities/compare

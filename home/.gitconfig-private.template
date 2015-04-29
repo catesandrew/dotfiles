@@ -1,0 +1,9 @@
+[user]
+  name = Empty Frost
+  email = emptyfrost@gmail.com
+[url "git@github.com:emptyfrost/"]
+  pushInsteadOf = "ghemptyfrost:"
+  pushInsteadOf = "ghemptyfrost://"
+[url "http://github.com/emptyfrost/"]
+  insteadOf = "ghemptyfrost:"
+  insteadOf = "ghemptyfrost://"

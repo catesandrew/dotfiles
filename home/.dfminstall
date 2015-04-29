@@ -4,6 +4,8 @@ library skip
 indent.pro skip
 karabiner skip
 .hammerspoon skip
+.gitconfig-local.template skip
+.gitconfig-private.template skip
 .ssh recurse
 .mjolnir recurse
 .lein recurse
