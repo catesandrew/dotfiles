@@ -73,6 +73,6 @@ fi
 # Don't check mail when opening terminal.
 unset MAILCHECK
 
-if [ -f "${HOME}/.bashrc" ]; then
-  source "${HOME}/.bashrc"
+if [ -f "${HOME}/.bashrc.load" ]; then
+  source "${HOME}/.bashrc.load"
 fi
