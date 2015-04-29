@@ -1,6 +1,6 @@
 # TODO: source https://github.com/mathiasbynens/dotfiles/blob/master/.gitconfig
 [core]
-  excludesfile = ~/.gitignore
+  excludesfile = ~/.gitignore-global
   quotepath = false
   autocrlf = input
 
