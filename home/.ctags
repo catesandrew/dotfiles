@@ -3,6 +3,30 @@
 --c++-kinds=+p
 --fields=+iaS
 --extra=+q
+--python-kinds=cfm --javascript-kinds=cm
+--fields=-s
+--fields=+l
+--fields=+n
+
+--languages=-html
+--languages=-javascript
+
+--exclude=flowplayer
+--exclude=.hg
+--exclude=.git
+--exclude=.ropeproject
+--exclude=libs
+--exclude=build
+--exclude=dist
+--exclude=user-data
+--exclude=node_modules
+--exclude=venv
+--exclude=static-cache
+--exclude=closure-library
+--exclude=*.min.js
+--exclude=vendors
+--langmap=Lisp:+.clj
+
 -I __THROW,__NTH,__wur,__warnattr,__nonnull,__attribute_malloc__,__attribute_pure__,__attribute_used__,__attribute_noinline__,__attribute_deprecated__,__attribute_format_arg__,__attribute_format_strfmon__,__attribute_warn_unused_result__,__always_inline,__extern_inline,__extension__,__restrict,PR_IMPLEMENT,XPT_PUBLIC_API,NSPR_API
 
 --langdef=latex
@@ -61,3 +85,45 @@
 --regex-groovy=/^[ \t][abstract ( \t)][(private|public) ( \t)]class[ \t]+([A-Za-z0-9_]+)[ \t]/\1/c,class,classes/
 --regex-groovy=/^[ \t][abstract ( \t)][(private|public) ( \t)]enum[ \t]+([A-Za-z0-9_]+)[ \t]/\1/c,class,classes/
 
+--langdef=scala
+--langmap=scala:.scala
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*(private|protected)?[ \t]*class[ \t]+([a-zA-Z0-9_]+)/\4/c,classes/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*(private|protected)?[ \t]*object[ \t]+([a-zA-Z0-9_]+)/\4/c,objects/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*(private|protected)?[ \t]*case class[ \t]+([a-zA-Z0-9_]+)/\4/c,case classes/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*(private|protected)?[ \t]*case object[ \t]+([a-zA-Z0-9_]+)/\4/c,case objects/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*(private|protected)?[ \t]*trait[ \t]+([a-zA-Z0-9_]+)/\4/t,traits/
+--regex-scala=/^[ \t]*type[ \t]+([a-zA-Z0-9_]+)/\1/T,types/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*def[ \t]+([a-zA-Z0-9_]+)/\3/m,methods/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*val[ \t]+([a-zA-Z0-9_]+)/\3/l,constants/
+--regex-scala=/^[ \t]*((abstract|final|sealed|implicit|lazy)[ \t]*)*var[ \t]+([a-zA-Z0-9_]+)/\3/l,variables/
+--regex-scala=/^[ \t]*package[ \t]+([a-zA-Z0-9_.]+)/\1/p,packages/ 
+
+--langdef=Clojure
+--langmap=Clojure:.clj
+--regex-clojure=/\([ \t]*create-ns[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/n,namespace/
+--regex-clojure=/\([ \t]*def[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/d,definition/
+--regex-clojure=/\([ \t]*defn-?[ \t]+(\^[-[:alnum:]*+!_:\/.?]+[ \t]+)?([-[:alnum:]*+!_:\/.?]+)/\2/f,function/
+--regex-clojure=/\([ \t]*defmacro[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/m,macro/
+--regex-clojure=/\([ \t]*definline[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/i,inline/
+--regex-clojure=/\([ \t]*defmulti[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/a,multimethod definition/
+--regex-clojure=/\([ \t]*defmethod[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/b,multimethod instance/
+--regex-clojure=/\([ \t]*defonce[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/c,definition (once)/
+--regex-clojure=/\([ \t]*defstruct[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/s,struct/
+--regex-clojure=/\([ \t]*intern[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/v,intern/
+--regex-clojure=/\([ \t]*ns[ \t]+([-[:alnum:]*+!_:\/.?]+)/\1/n,namespace/
+
+--langdef=less
+--langmap=less:.less
+--regex-less=/^[ t]*.([A-Za-z0-9_-]+)/1/c,class,classes/
+--regex-less=/^[ t]*#([A-Za-z0-9_-]+)/1/i,id,ids/
+--regex-less=/^[ t]*(([A-Za-z0-9_-]+[ tn,]+)+){/1/t,tag,tags/
+--regex-less=/^[ t]*@medias+([A-Za-z0-9_-]+)/1/m,media,medias/
+
+--langdef=js
+--langmap=js:.js
+--regex-js=/([A-Za-z0-9._$]+)[ t]*[:=][ t]*{/1/,object/
+--regex-js=/([A-Za-z0-9._$()]+)[ t]*[:=][ t]*function[ t]*(/1/,function/
+--regex-js=/function[ t]+([A-Za-z0-9._$]+)[ t]*(([^)]))/1/,function/
+--regex-js=/([A-Za-z0-9._$]+)[ t]*[:=][ t]*[/1/,array/
+--regex-js=/([^= ]+)[ t]*=[ t]*[^"]'[^']*/1/,string/
+--regex-js=/([^= ]+)[ t]*=[ t]*[^']"[^"]*/1/,string/
