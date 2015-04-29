@@ -55,6 +55,7 @@
 [submodule "home/vim/bundle/YankRing"]
 	path = home/.vim.d/bundle/yank-ring
 	url = git://github.com/vim-scripts/YankRing.vim.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-css-colors"]
 	path = home/.vim.d/bundle/vim-css-colors
 	url = git://github.com/ap/vim-css-color.git
@@ -79,12 +80,14 @@
 [submodule "home/vim/bundle/vim-csharp"]
 	path = home/.vim.d/bundle/vim-csharp
 	url = git://github.com/xandox/vim-csharp.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-figlet"]
 	path = home/.vim.d/bundle/vim-figlet
 	url = https://github.com/vim-scripts/Figlet.vim
 [submodule "home/vim/bundle/color_highlight"]
 	path = home/.vim.d/bundle/color_highlight
 	url = https://github.com/chrisbra/color_highlight
+	ignore = untracked
 [submodule "home/vim/bundle/emmet-vim"]
 	path = home/.vim.d/bundle/emmet-vim
 	url = https://github.com/mattn/emmet-vim.git
@@ -106,6 +109,7 @@
 [submodule "home/vim/bundle/vim-large-file"]
 	path = home/.vim.d/bundle/vim-large-file
 	url = https://github.com/vim-scripts/LargeFile.git
+	ignore = untracked
 [submodule "home/vim/bundle/apiblueprint"]
 	path = home/.vim.d/bundle/apiblueprint
 	url = https://github.com/kylef/apiblueprint.vim.git
@@ -166,18 +170,21 @@
 [submodule "home/vim/bundle/ctrlp"]
 	path = home/.vim.d/bundle/ctrlp
 	url = https://github.com/kien/ctrlp.vim.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-eunuch"]
 	path = home/.vim.d/bundle/vim-eunuch
 	url = https://github.com/tpope/vim-eunuch.git
 [submodule "home/vim/bundle/vim-textobj-user"]
 	path = home/.vim.d/bundle/vim-textobj-user
 	url = https://github.com/kana/vim-textobj-user.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-fireplace"]
 	path = home/.vim.d/bundle/vim-fireplace
 	url = https://github.com/tpope/vim-fireplace.git
 [submodule "home/vim/bundle/vim-visualstar"]
 	path = home/.vim.d/bundle/vim-visualstar
 	url = https://github.com/thinca/vim-visualstar.git
+	ignore = untracked
 [submodule "home/vim/bundle/jellybeans"]
 	path = home/.vim.d/bundle/jellybeans
 	url = https://github.com/nanotech/jellybeans.vim.git
@@ -187,6 +194,7 @@
 [submodule "home/vim/bundle/SudoEdit"]
 	path = home/.vim.d/bundle/SudoEdit
 	url = https://github.com/chrisbra/SudoEdit.vim.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-css3-syntax"]
 	path = home/.vim.d/bundle/vim-css3-syntax
 	url = https://github.com/hail2u/vim-css3-syntax.git
@@ -229,6 +237,7 @@
 [submodule "home/vim/bundle/vim-expand-region"]
 	path = home/.vim.d/bundle/vim-expand-region
 	url = https://github.com/terryma/vim-expand-region.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-sneak"]
 	path = home/.vim.d/bundle/vim-sneak
 	url = https://github.com/justinmk/vim-sneak.git
@@ -241,15 +250,19 @@
 [submodule "home/vim/bundle/ctrlp-funky"]
 	path = home/.vim.d/bundle/ctrlp-funky
 	url = https://github.com/tacahiroy/ctrlp-funky.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-textobj-indent"]
 	path = home/.vim.d/bundle/vim-textobj-indent
 	url = https://github.com/kana/vim-textobj-indent.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-textobj-entire"]
 	path = home/.vim.d/bundle/vim-textobj-entire
 	url = https://github.com/kana/vim-textobj-entire.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-textobj-underscore"]
 	path = home/.vim.d/bundle/vim-textobj-underscore
 	url = https://github.com/lucapette/vim-textobj-underscore.git
+	ignore = untracked
 [submodule "home/vim/bundle/vim-vagrant"]
 	path = home/.vim.d/bundle/vim-vagrant
 	url = https://github.com/markcornick/vim-vagrant.git
