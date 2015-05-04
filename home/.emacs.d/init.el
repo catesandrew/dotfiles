@@ -128,7 +128,7 @@
   (require 'init-projectile)
   (require 'init-helm)
   (require 'init-flycheck)
-  (require 'init-yasnippet)
+  ; (require 'init-yasnippet)
   (require 'init-smartparens)
   (require 'init-mustache)
   (require 'init-hbs)

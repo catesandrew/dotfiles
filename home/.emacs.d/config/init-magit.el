@@ -2,6 +2,16 @@
 
 (require 'magit)
   (after 'magit
+
+    (defun my-magit-mode-defaults ()
+      ; (if (boundp 'yas-minor-mode)
+      ;     (yas-minor-mode))
+      ; (run-hooks 'my-prog-mode-hook)
+      (message "my-magit-mode-defaults"))
+    (setq my-magit-mode-hook 'my-magit-mode-defaults)
+    (add-hook 'magit-mode-hook (lambda ()
+                               (run-hooks 'my-magit-mode-hook)))
+
     (setq magit-diff-options '("--histogram"))
     (setq magit-stage-all-confirm nil)
     (setq magit-unstage-all-confirm nil)
