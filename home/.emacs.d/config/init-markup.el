@@ -26,6 +26,8 @@
           (lambda ()
             (setq imenu-generic-expression markdown-imenu-generic-expression)))
 
+(when on_darwin
+  (setq markdown-open-command "mark"))
 
 (provide 'init-markup)
 
