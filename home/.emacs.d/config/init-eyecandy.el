@@ -6,6 +6,9 @@
 (display-time-mode t)
 (size-indication-mode t)
 
+;; nyan-cat
+(nyan-mode +1)
+(nyan-start-animation)
 
 (defun my-fold-overlay (ov)
   (when (eq 'code (overlay-get ov 'hs))

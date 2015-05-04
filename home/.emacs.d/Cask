@@ -112,6 +112,7 @@
 (depends-on "mustache-mode") ;;
 (depends-on "mwim")
 (depends-on "names")
+(depends-on "nyan-mode")
 (depends-on "org-bullets") ;;
 (depends-on "package-build")
 (depends-on "packed")
