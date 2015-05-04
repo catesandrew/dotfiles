@@ -21,10 +21,12 @@
     ; '(define-key js-mode-map ";" 'self-insert-command)
     ;; electric-layout-mode doesn't play nice with smartparens
     (setq-local electric-layout-rules '((?\; . after)))
+    (run-hooks 'my-prog-mode-hook)
     (message "My JS2 hook"))
 
   (setq my-js2-mode-hook 'my-js2-mode-defaults)
-  (add-hook 'js2-mode-hook (lambda () (run-hooks 'my-js2-mode-hook)))
+  (add-hook 'js2-mode-hook (lambda ()
+                             (run-hooks 'my-js2-mode-hook)))
 
   (defun my-dotemacs-js-ctrl-c-ctrl-c ()
     (interactive)

@@ -1,3 +1,4 @@
+; TODO: https://github.com/thierryvolpiatto/emacs-tv-config/blob/master/init-helm-thierry.el
 ; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
 
 ; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
