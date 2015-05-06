@@ -3,7 +3,7 @@ open-connect skip
 library skip
 indent.pro skip
 karabiner skip
-.hammerspoon skip
+.hammerspoon recurse
 .gitconfig-local.template skip
 .gitconfig-private.template skip
 .ssh recurse
