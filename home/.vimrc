@@ -120,11 +120,35 @@ if filereadable(s:localrc)
 endif
 " }}}
 
+" To disable a plugin, add it's bundle name to the following list
+let g:pathogen_disabled = []
+
+" for some reason the csscolor plugin is very slow when run on the terminal
+" but not in GVim, so disable it if no GUI is running
+if !has('gui_running')
+  call add(g:pathogen_disabled, 'csscolor')
+endif
+
+if !s:has_lua
+  call add(g:pathogen_disabled, 'neocomplete')
+endif
+
+" Gundo requires at least vim 7.3
+if v:version < '703' || !has('python')
+  call add(g:pathogen_disabled, 'gundo')
+endif
+
+if v:version < '702'
+  call add(g:pathogen_disabled, 'autocomplpop')
+  call add(g:pathogen_disabled, 'fuzzyfinder')
+  call add(g:pathogen_disabled, 'l9')
+endif
+
 " Use pathogen to easily modify the runtime path to include all plugins under
 " the ~/.vim/bundle directory
 filetype off                                       " force reloading *after* pathogen loaded
 silent! call pathogen#helptags()
-silent! call pathogen#runtime_append_all_bundles()
+silent! call pathogen#infect()
 filetype plugin indent on                          " enable detection, plugins and indenting in one step
 
 " }}}
@@ -170,7 +194,9 @@ set noshelltemp                                 " use pipes
 " }}}
 " Misc configuration {{{
 
-set breakindent
+if exists('+breakindent')
+  set breakindent showbreak=\ +
+endif
 set modelines=0
 set updatecount=50            " write swap file to disk after 50 keystrokes
 set copyindent                " copy the previous indentation on autoindenting
@@ -1432,7 +1458,9 @@ au filetype vim set formatoptions-=o
 " }}}
 
 " Extra user or machine specific settings {{{
-source ~/.user.vim
+if filereadable(expand("~/.user.vim"))
+  source ~/.user.vim
+endif
 " }}}
 
 " Creating underline/overline headings for markup languages
