@@ -16,21 +16,29 @@ if [ $(uname) = "Darwin" ]; then
     export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
     export PATH="${HOME}/perl5/bin:${PATH}"
     export PATH="${HOME}/.rbenv/shims:${PATH}"
-    export BREW_HOME="`brew --prefix`"
-    export BREW_EMACS_MAC_HOME="`brew --prefix emacs-mac`"
+
+    if hash brew 2>/dev/null; then
+        export BREW_HOME="`brew --prefix`"
+        export BREW_EMACS_MAC_HOME="`brew --prefix emacs-mac`"
+    else
+        echo "homebrew not installed, please consider installing it."
+    fi
+
     export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
     export GOPATH=/usr/local/go
 
 elif [ $(uname) = "Linux" ]; then
-
     export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
     export PATH="/usr/local/linuxbrew/bin:$PATH"
-    export BREW_HOME="`brew --prefix`"
-    export HOMEBREW_TEMP="${BREW_HOME}/tmp"
-    export MANPATH="${BREW_HOME}/share/man:$MANPATH"
-    export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
-
-    # Fix checks for gcc compiler when not present when `--env=inherit` specified
+    if hash brew 2>/dev/null; then
+        # Fix checks for gcc compiler when not present when `--env=inherit` specified
+        export BREW_HOME="`brew --prefix`"
+        export HOMEBREW_TEMP="${BREW_HOME}/tmp"
+        export MANPATH="${BREW_HOME}/share/man:$MANPATH"
+        export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
+    else
+        echo "linuxbrew not installed, please consider installing it."
+    fi
 fi
 
 export PATH="${HOME}/.cabal/bin:$PATH"
