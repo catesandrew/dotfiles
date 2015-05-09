@@ -25,8 +25,7 @@
 (defvar on_cygwin     (string-match "cygwin" system-type-as-string))
 (defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
 
-;; $brew --prefix cask --> /usr/local/opt/cask
-(require 'cask "/usr/local/opt/cask/cask.el")
+(require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
 ;; Set path to dependencies

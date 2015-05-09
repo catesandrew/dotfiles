@@ -41,6 +41,16 @@ elif [ $(uname) = "Linux" ]; then
     fi
 fi
 
+# Cask installation
+if [ ! -h "${HOME}/.cask" ]; then
+    if hash brew 2>/dev/null; then
+        if [ x"" != x"$(brew ls --versions cask)"  ]; then
+            CASK_HOME="`brew --prefix cask`"
+            ln -s "${CASK_HOME}" "${HOME}/.cask"
+        fi
+    fi
+fi
+
 export PATH="${HOME}/.cabal/bin:$PATH"
 export PATH="${HOME}/.bin:$PATH"
 export PACKER_CACHE_DIR="${HOME}/.packer_cache"
