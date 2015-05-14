@@ -134,8 +134,11 @@
 (setq undo-tree-auto-save-history t)
 (setq undo-tree-history-directory-alist
       `(("." . ,(concat dotemacs-cache-directory "undo"))))
+    (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
+        (make-directory (concat dotemacs-cache-directory "undo")))
 (setq undo-tree-visualizer-timestamps t)
 (setq undo-tree-visualizer-diff t)
+
 
 
 (after 'evil
