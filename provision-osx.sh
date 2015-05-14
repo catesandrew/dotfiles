@@ -76,6 +76,47 @@ case $response in
 esac
 
 ###############################################################################
+# Homebrew
+###############################################################################
+
+PREFIX=/usr/local
+HOMEBREW_PREFIX="${PREFIX}/homebrew"
+
+echo ""
+echo "Install homebrew?  (y/n)"
+read -r response
+case $response in
+  [yY])
+    sudo mkdir -p ${HOMEBREW_PREFIX}
+    sudo chmod g+rwx ${PREFIX}
+    sudo chgrp admin ${PREFIX}
+    sudo chmod g+rwx ${HOMEBREW_PREFIX}
+    # the group is set to wheel by default for some reason
+    sudo chgrp admin ${HOMEBREW_PREFIX}
+    git clone https://github.com/Homebrew/homebrew.git ${HOMEBREW_PREFIX}
+
+    sudo mkdir -p ${PREFIX}/bin
+    sudo chmod g+rwx ${PREFIX}/bin
+    sudo chgrp admin ${PREFIX}/bin
+
+    sudo -u $USER -H ln -s ${HOMEBREW_PREFIX}/bin/brew ${PREFIX}/bin
+
+    break;;
+  *) break;;
+esac
+
+echo ""
+echo "Would you like to install your dotfiles?  (y/n)"
+read -r response
+case $response in
+  [yY])
+      git clone --recursive https://github.com/catesandrew/dotfiles.git .dotfiles
+      DFM_REPO=.dotfiles .dotfiles/home/.bin/dfm install
+      break;;
+  *) break;;
+esac
+
+###############################################################################
 # General UI/UX
 ###############################################################################
 
