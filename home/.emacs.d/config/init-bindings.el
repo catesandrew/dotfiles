@@ -51,6 +51,8 @@
       "c" 'my-new-eshell-split
       "C" 'customize-group
       "b d" 'kill-this-buffer
+      "b p" 'previous-buffer
+      "b n" 'next-buffer
       "V" (bind (term "vim"))
       "h" help-map
       "h h" 'help-for-help-internal
