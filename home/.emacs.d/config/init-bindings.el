@@ -121,6 +121,8 @@
     ;   (evil-leader/set-key "en" 'flycheck-next-error))
 
     (after "magit-autoloads"
+      ;; Set the initial evil state that certain major modes will be in.
+      (evil-set-initial-state 'magit-log-edit-mode 'emacs)
       (evil-leader/set-key
         "g s" 'magit-status
         "g b" 'magit-blame-mode
