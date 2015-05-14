@@ -38,6 +38,10 @@
 (after 'evil
   (require 'key-chord)
   (key-chord-mode 1)
+  ;; Set the initial evil state that certain major modes will be in.
+  (evil-set-initial-state 'nav-mode 'emacs)
+  (evil-set-initial-state 'grep-mode 'emacs)
+  (evil-set-initial-state 'ibuffer-mode 'normal)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
 
