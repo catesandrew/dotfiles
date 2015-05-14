@@ -2,6 +2,9 @@
 (show-paren-mode t)
 (setq show-paren-delay 0)
 
+; set transparency of background
+(set-frame-parameter (selected-frame) 'alpha '(95 95))
+(add-to-list 'default-frame-alist '(alpha 95 95))
 
 (display-time-mode t)
 (size-indication-mode t)
