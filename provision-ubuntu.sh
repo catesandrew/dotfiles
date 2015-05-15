@@ -306,3 +306,79 @@ git co home/.fzf.bash
 cd .emacs.d/
 sudo apt-get install editorconfig
 cask install
+
+# Test for known flags
+for opt in $@
+do
+    case $opt in
+        --no-packages) no_packages=true ;;
+        --no-sync) no_sync=true ;;
+        -*|--*) e_warning "Warning: invalid option $opt" ;;
+    esac
+done
+
+# Before relying on Homebrew, check that packages can be compiled
+if ! type_exists 'gcc'; then
+    e_error "The XCode Command Line Tools must be installed first."
+    printf "  Download them from: https://developer.apple.com/downloads\n"
+    printf "  Then run: bash ~/.dotfiles/bin/dotfiles\n"
+    exit 1
+fi
+
+# Check for Homebrew
+if ! type_exists 'brew'; then
+    e_header "Installing Homebrew..."
+    ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
+fi
+
+# Check for git
+if ! type_exists 'git'; then
+    e_header "Updating Homebrew..."
+    brew update
+    e_header "Installing Git..."
+    brew install git
+fi
+
+# Initialize the git repository if it's missing
+if ! is_git_repo; then
+    e_header "Initializing git repository..."
+    git init
+    git remote add origin ${DOTFILES_GIT_REMOTE}
+    git fetch origin master
+    # Reset the index and working tree to the fetched HEAD
+    # (submodules are cloned in the subsequent sync step)
+    git reset --hard FETCH_HEAD
+    # Remove any untracked files
+    git clean -fd
+fi
+
+# Conditionally sync with the remote repository
+if [[ $no_sync ]]; then
+    printf "Skipped dotfiles sync.\n"
+else
+    e_header "Syncing dotfiles..."
+    # Pull down the latest changes
+    git pull --rebase origin master
+    # Update submodules
+    git submodule update --recursive --init --quiet
+fi
+
+# Install and update packages
+if [[ $no_packages ]]; then
+    printf "Skipped package installations.\n"
+else
+    printf "Updating packages...\n"
+    # Install Homebrew formulae
+    run_brew
+    # Install Node packages
+    run_npm
+fi
+# Ask before potentially overwriting OS X defaults
+seek_confirmation "Warning: This step may modify your OS X system defaults."
+
+if is_confirmed; then
+    bash ./bin/osxdefaults
+    e_success "OS X settings updated! You may need to restart."
+else
+    printf "Skipped OS X settings update.\n"
+fi
