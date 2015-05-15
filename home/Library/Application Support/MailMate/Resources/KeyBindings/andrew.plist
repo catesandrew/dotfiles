@@ -70,7 +70,17 @@
     "J" = "nextThread:";
     "K" = "previousThread:";
 
-    "g" = {
+    // Two of my favorite MailMate keybindings, thanks to Brett Terpstra
+    //
+    // g,g jumps to first message in message list
+    // G jumps to last message in list
+	"g" = {
+		"g" = ( "makeFirstResponder:", "mainOutline", "selectFirstMessageRow:");
+	};
+	"G" = ( "makeFirstResponder:", "mainOutline", "selectLastMessageRow:");
+
+    // `T` as in `to` similar how apparix works
+    "t" = {
         "p" = "goToMailbox:"; // Prompt
         "1" = ( "makeFirstResponder:", "mailboxesOutline" );
         "2" = ( "makeFirstResponder:", "mainOutline" );
