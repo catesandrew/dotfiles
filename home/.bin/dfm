@@ -878,7 +878,8 @@ sub _load_dfminstall {
         foreach my $line (<$skip_fh>) {
             chomp($line);
             if ( length($line) ) {
-                my ( $filename, @options ) = split( q{ }, $line );
+                # Split on last space to deal with dirs with spaces in them, like Application Support
+                my ( $filename, @options ) = split(/ ([^ ]+)$/, $line );
                 DEBUG(".dfminstall file $filename has @options");
                 if ( !defined $options[0] ) {
                     WARN(
