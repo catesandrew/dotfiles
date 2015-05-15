@@ -1,0 +1,99 @@
+{
+    // Andrew's person key bindings for MailMate
+
+    // Email Creation
+    "c" = "newMessage:";
+    "r" = "replyAll:";
+    "R" = "replySender:";
+    "f" =  "forwardMessage:";
+
+    // Sending
+    "@\U000A" = "send:"; // ⌘+return
+    "@\U000D" = "send:"; // ⌘+enter
+    "\U007F" = ( "setTag:", "\\Seen", "deleteMessage:" ); // ⌫ delete and mark as read
+    "@\\" = ( "sendAndMoveParentToMailbox:", "/Delegated" );
+
+    // Filtering
+    "s" = "moveToJunk:";
+    "h" = (
+        "copyToMailbox:", "/Spam.TrainGood",
+        "moveToMailbox:", "INBOX" );
+    "x" = "deleteMessage:";
+    "X" = ( "moveThreadToMailbox:", "trash" );
+    "m" = "moveToMailbox:";
+    "M" = "moveThreadToMailbox:";
+    "d" = ( "moveToMailbox:", "/Deferred" );
+    "D" = ( "moveThreadToMailbox:", "/Deferred" );
+    "e" = ( "moveToMailbox:", "/Delegated" );
+    "E" = ( "moveThreadToMailbox:", "/Delegated" );
+
+    // One arguably strange behavior in MailMate is that when you archive
+    // a message, other messages in the thread can stay in your inbox.
+
+    // Fortunately, it's possible to re-map the archive keyboard shortcut to
+    // archive all messages in a thread. Using the instructions for adding
+    // custom keybindings, add the following:
+    "a" = ( "setTag:", "\\Seen", "archive:"); // archive and mark read
+    "A" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "setTag:", "\\Seen", "archive:" ); // Select whole thread, mark as read and archive
+
+
+    // Selecting messages
+    "*" = {
+        "a" = "selectAll:";
+        "n" = "deselectAll:";
+        "r" = ( "selectWithFilter:", "#flags.flag = '\\Seen'"); // Selects all mail you've read.
+        "u" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Seen'"); // Selects all unread mail.
+        "s" = ( "selectWithFilter:", "#flags.flag = '\\Flagged'"); // Selects all starred mail.
+        "t" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Flagged'"); // Selects all unstarred mail.
+    };
+
+    // Composer
+    "@S" = "sendAndArchiveParent:"; // ⌘⇧S
+    "@$=" = ( "sendAndMoveParentToMailbox:",'/Action'); // ⌘⇧=
+    "@]" = "increaseQuoteLevel:";
+    "@[" = "decreaseQuoteLevel:";
+
+    // Markdown shortcuts thanks to Brett Terpstra: https://github.com/ttscoff/KeyBindings/
+    // bold selection
+    "@b" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "**", yank:, insertText:, " ", moveLeft:, insertText:, "**", moveRight:, deleteBackward:);
+    // italicize selection
+    "@i" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "*", yank:, insertText:, " ", moveLeft:, insertText:, "*", moveRight:, deleteBackward:);
+    // ` selection
+    "@k" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "`", yank:, insertText:, " ", moveLeft:, insertText:, "`", moveRight:, deleteBackward:);
+
+    // Navigation
+    "." = "rootOfThread:";
+    "," = "lastOfThread:";
+    "/" = "searchAllMessages:";
+    "j" = "nextMessage:";
+    "k" = "previousMessage:";
+    "J" = "nextThread:";
+    "K" = "previousThread:";
+
+    "g" = {
+        "p" = "goToMailbox:"; // Prompt
+        "1" = ( "makeFirstResponder:", "mailboxesOutline" );
+        "2" = ( "makeFirstResponder:", "mainOutline" );
+        "3" = ( "makeFirstResponder:", "messageView" );
+        " " = ( "goToMailbox:", "INBOX"); // Inbox
+        "g" = ( "goToMailbox:", "INBOX:catesandrew@imap.gmail.com", "makeFirstResponder:", "mainOutline" ); // Gmail
+        "i" = ( "goToMailbox:", "INBOX:tsidomain%5Cacates@imap.ibaset.com", "makeFirstResponder:", "mainOutline" ); // ibaset
+        "f" = ( "goToMailbox:", "FLAGGED" );
+        "a" = ( "goToMailbox:", "ALL_MESSAGES" );
+        "A" = ( "goToMailbox:", "ARCHIVE" );
+        "d" = ( "goToMailbox:", "DD86095A-ABB6-4599-BC36-EA36B001D82C" ); // Deferred
+        "e" = ( "goToMailbox:", "C7AC6F38-C415-4DB9-A7B6-66DA0CAB8C2C" ); // Delegated
+        "w" = ( "goToMailbox:", "6C6FE5E3-540B-4320-AB0D-00C0DBEEFB84" ); // Waiting on Reply
+        "s" = ( "goToMailbox:", "Spam" );
+    };
+
+    // Message State
+    "!" = "toggleFlag:";
+    "n" = "toggleReadState:";
+    "-" = "toggleMuteState:";
+
+    // Miscellaneous
+    "u" = "undo:";
+    "z" = "redo:";
+    "o" = "showThread:";
+}

@@ -1,6 +1,6 @@
 .DS_Store skip
 open-connect skip
-library skip
+Library recurse
 indent.pro skip
 karabiner skip
 .hammerspoon recurse

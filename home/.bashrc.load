@@ -92,10 +92,6 @@ fi
 umask 002
 mesg n
 
-# Let me have core dumps
-#ulimit -c unlimited
-ulimit -n 4096
-
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
 

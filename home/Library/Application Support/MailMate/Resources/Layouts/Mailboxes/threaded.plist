@@ -1,0 +1,169 @@
+{
+	name = "Threaded";
+	rootViewer =
+	{
+		viewerType = "MmSplitView";
+		orientation = "horizontal";
+		children =
+		(
+			{
+				viewerType = "MmBoxView";
+				orientation = "vertical";
+				defaultSize = 200;
+				minWidth = 100;
+				autoresize = 0;
+				toggleMenuTitle = "Mailboxes";
+				toggleKeyEquivalent = "^~@d";
+
+				dragRect = { width = 16.0; height = 16.0; location = "bottomRight"; };
+
+				children =
+				(
+					{
+						identifier = "mailboxesOutline";
+						viewerType = "MmMailboxesOutlineView";
+						stickyMessages = 1;
+					},
+					{
+						viewerType = "MmMailboxesStatusBar";
+					},
+				);
+			},
+			{
+				viewerType = "MmSplitView";
+				orientation = "vertical";
+				collapsibleSubview = 2; // Incomplete support -- no way to get it back (1 = first, 2 = last)
+				children =
+				(
+					{
+						identifier = "pathOutlineBox";
+						viewerType = "MmBoxView";
+						orientation = "vertical";
+						defaultSize = 250;
+						autoresize = 0;
+						children =
+						(
+							{
+								identifier = "pathControl";
+								viewerType = "MmPathControlView";
+								sources = ( { sourceIdentifier = "mailboxesOutline"; } );
+							},
+							{	viewerType = "MmSeparatorView"; showWithViews = ( "pathControl" ); },
+							{
+								viewerType = "MmSplitView";
+								minHeight = 50;
+								orientation = "horizontal";
+								children =
+								(
+									{
+										identifier = "mainOutline";
+										viewerType = "MmMessagesOutlineView";
+										// columnSettings = "outlineColumns";
+										sources = ( { sourceIdentifier = "pathControl"; } );
+										defaultSize = 350;
+									},
+									// {
+									// 	identifier = "locator";
+									// 	viewerType = "MmLocatorView";
+									// 	sources = ( { sourceIdentifier = "mainOutline"; } );
+									// 	canBecomeKeyView = 0; // Not implemented
+									// },
+								);
+							},
+						);
+					},
+					{
+						viewerType = "MmSplitView";
+						orientation = "horizontal";
+						children =
+						(
+							{
+								viewerType = "MmBoxView";
+								orientation = "vertical";
+								defaultSize = 200;
+								autoresize = 0;
+								children =
+								(
+									{
+										viewerType = "MmLabelView";
+										label = "Thread";
+									},
+									{	viewerType = "MmSeparatorView"; },
+									{
+										identifier = "threadedOutline";
+										viewerType = "MmMessagesOutlineView";
+										minWidth = 100;
+										sources = ( { sourceIdentifier = "mainOutline"; } );
+										selectionSources = ( { sourceIdentifier = "mainOutline"; } );
+										// mailmate does not always honor thread-id found in references so we try
+										// and make it pickup other threads by using the subject body to find 
+										// the related threads. Has the advantage to also find forwarded mails 
+										// or separate mails that have 'broken' off the thread.
+										transformation = "$ALL_MESSAGES.filter(#thread-id = $mainOutline.#thread-id or subject.body = $mainOutline.subject.body)";
+										defaultColumns = ( "relativeDate", "from" );
+										outlineColumn = "relativeDate";
+									},
+								);
+
+								toggleMenuTitle = "Threaded View";
+								toggleKeyEquivalent = "^~@c";
+							},
+							{
+								viewerType = "MmBoxView";
+								orientation = "vertical";
+								children =
+								(
+									{
+										identifier = "headersView";
+										viewerType = "MmHeadersView";
+										sources = ( { sourceIdentifier = "threadedOutline"; } );
+										inject = ( "headersFormatting.plist" );
+									},
+									{	viewerType = "MmSeparatorView"; showWithViews = ( "headersView" ); },
+									{
+										identifier = "tagsEditor";
+										viewerType = "MmTagsEditor";
+										sources = ( { sourceIdentifier = "threadedOutline"; } );
+									},
+									{	viewerType = "MmSeparatorView"; showWithViews = ( "tagsEditor" ); },
+									{
+										identifier = "blockingView";
+										viewerType = "MmImageBlockingView";
+										sources = ( { sourceIdentifier = "threadedOutline"; } );
+										transformation = "$threadedOutline.filter(##blocked-count exists)";
+									},
+									{	viewerType = "MmSeparatorView"; showWithViews = ( "blockingView" ); },
+									{
+										identifier = "securityView";
+										viewerType = "MmSecurityView";
+										sources = ( { sourceIdentifier = "threadedOutline"; } );
+										transformation = "$threadedOutline.filter(##security-problem exists)";
+									},
+									{	viewerType = "MmSeparatorView"; showWithViews = ( "securityView" ); },
+									{
+										identifier = "messageView";
+										viewerType = "MmWebView";
+										sources = ( { sourceIdentifier = "threadedOutline"; } );
+										minWidth = 175;
+										minHeight = 50;
+									},
+								);
+							}
+						);
+
+						toggleMenuTitle = "Message View";
+						toggleKeyEquivalent = "^~@h";
+					},
+					// {
+					// 	identifier = "messageEditor";
+					// 	viewerType = "MmMessageTextView";
+					// 	sources = ( { sourceIdentifier = "threadedOutline"; } );
+					// 	minimumNumberOfMessages = 1;
+					// 	maximumNumberOfMessages = 1;
+					// 	match = "$threadedOutline.filter(#flags.flag = '\\Draft')"; // Only match drafts
+					// },
+				);
+			},
+		);
+	};
+}

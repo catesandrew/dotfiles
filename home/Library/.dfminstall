@@ -1,0 +1,5 @@
+.DS_Store skip
+extensions skip
+launch-daemons skip
+preferences skip
+Application\ Support recurse
