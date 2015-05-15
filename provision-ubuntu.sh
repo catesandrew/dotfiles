@@ -271,7 +271,6 @@ echo "Would you like to install nvm?  (y/n)"
 read -r response
 case $response in
   [yY])
-
       print_status "Installing native build tools..."
       apt-get install -y build-essential libssl-dev
       exec_cmd 'brew install nvm'
@@ -279,6 +278,10 @@ case $response in
       # Load NVM into a shell session *as a function*
       NVM_TARGET="$(brew --prefix nvm)"
       [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh"
+
+      exec_sudo_cmd 'mkdir -p ${PREFIX}/nvm'
+      exec_sudo_cmd 'chmod g+rwx ${PREFIX}/nvm'
+      exec_sudo_cmd 'chgrp adm ${PREFIX}/nvm'
 
       exec_cmd 'nvm install -s v0.12.3'
       exec_cmd 'nvm alias default 0.12.3'
