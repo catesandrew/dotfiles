@@ -26,6 +26,35 @@ cecho() {
   return
 }
 
+print_status() {
+  echo
+  echo "## $1"
+  echo
+}
+
+bail() {
+  echo 'Error executing command, exiting'
+  exit 1
+}
+
+exec_cmd_nobail() {
+  echo "+ $1"
+  bash -c "$1"
+}
+
+exec_cmd() {
+  exec_cmd_nobail "$1" || bail
+}
+
+exec_sudo_cmd_nobail() {
+  echo "+ $1"
+  sudo bash -c "$1"
+}
+
+exec_sudo_cmd() {
+  exec_sudo_cmd_nobail "$1" || bail
+}
+
 # Set continue to false by default
 CONTINUE=false
 
@@ -110,8 +139,16 @@ echo "Would you like to install your dotfiles?  (y/n)"
 read -r response
 case $response in
   [yY])
+      DFM_REPO="${HOME}/.dotfiles"
       git clone --recursive https://github.com/catesandrew/dotfiles.git .dotfiles
       DFM_REPO=.dotfiles .dotfiles/home/.bin/dfm install
+      cd "${HOME}/.vim/bundle/vimproc"
+      exec_cmd 'make'
+      exec_cmd 'cd -'
+      exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-local.template ${HOME}/.gitconfig-local"'
+      exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-private.template ${HOME}/.gitconfig-private"'
+
+      print_status 'Edit the .gitconfig-local and .gitconfig-private files'
       break;;
   *) break;;
 esac
