@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+  dir="."
+else
+  dir=$1
+fi
+
+find $dir -type d -maxdepth 1 -mindepth 1 -exec du -sh '{}' \; 2>/dev/null \
+| perl -pe "s/\t.*\/(.*)$/\t$(echo '\033[01;32m')\1$(echo '\033[0m')/gi" 
+echo
+echo "Total: " $(du -sh $dir 2>/dev/null | awk '{print $1}')
