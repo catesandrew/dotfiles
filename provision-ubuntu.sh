@@ -1,5 +1,10 @@
 #!/bin/sh
 
+LIB=home/.bash/lib
+source "${LIB}/utils.sh"
+source "${LIB}/brew.sh"
+source "${LIB}/npm.sh"
+
 # Set the colours you can use
 black='\033[0;30m'
 white='\033[0;37m'
@@ -21,35 +26,6 @@ cecho() {
   echo "${2}${1}"
   Reset # Reset to normal.
   return
-}
-
-print_status() {
-  echo
-  echo "## $1"
-  echo
-}
-
-bail() {
-  echo 'Error executing command, exiting'
-  exit 1
-}
-
-exec_cmd_nobail() {
-  echo "+ $1"
-  bash -c "$1"
-}
-
-exec_cmd() {
-  exec_cmd_nobail "$1" || bail
-}
-
-exec_sudo_cmd_nobail() {
-  echo "+ $1"
-  sudo bash -c "$1"
-}
-
-exec_sudo_cmd() {
-  exec_sudo_cmd_nobail "$1" || bail
 }
 
 # Set continue to false by default

@@ -1,3 +1,8 @@
+# Path to the bash it configuration
+export BASH_IT=$HOME/.bash
+
+source "${BASH_IT}/lib/utils.sh"
+
 if [ $(uname) = "Darwin" ]; then
 
     export CHEATCOLORS=true
@@ -55,9 +60,6 @@ export PATH="${HOME}/.cabal/bin:$PATH"
 export PATH="${HOME}/.bin:$PATH"
 export PACKER_CACHE_DIR="${HOME}/.packer_cache"
 export DFM_REPO="${HOME}/.dotfiles"
-
-# Path to the bash it configuration
-export BASH_IT=$HOME/.bash
 
 # Lock and load a custom theme file location /.bash/themes/
 export BASH_IT_THEME='powerline-multiline'
