@@ -49,30 +49,6 @@ set -o vi
 # I hate noise
 set bell-style visible
 
-# Path to the bash it configuration
-export BASH_IT=$HOME/.bash
-
-# Lock and Load a custom theme file
-# location /.bash_it/themes/
-export BASH_IT_THEME='powerline-multiline'
-#export BASH_IT_THEME='sexy'
-
-export THEME_PROMPT_CLOCK_FORMAT="%l:%M:%S"
-
-#export EDITOR='mvim -f -c "au VimLeave * !open -a iTerm"'
-# Set mveditor/MacVim as EDITOR.
-if [ -f "${BASH_IT}/mveditor.sh" ]; then
-    export EDITOR="${BASH_IT}/mveditor.sh"
-    export GIT_EDITOR="${BASH_IT}/mveditor.sh"
-else
-    echo "WARNING: Can't find mac vim editor. Using vim instead."
-    export EDITOR="vim"
-    export GIT_EDITOR="vim"
-fi
-
-# Don't check mail when opening terminal.
-unset MAILCHECK
-
 if [ -f "${HOME}/.bashrc" ]; then
   source "${HOME}/.bashrc"
 fi

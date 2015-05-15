@@ -56,6 +56,26 @@ export PATH="${HOME}/.bin:$PATH"
 export PACKER_CACHE_DIR="${HOME}/.packer_cache"
 export DFM_REPO="${HOME}/.dotfiles"
 
+# Path to the bash it configuration
+export BASH_IT=$HOME/.bash
+
+# Lock and load a custom theme file location /.bash/themes/
+export BASH_IT_THEME='powerline-multiline'
+export THEME_PROMPT_CLOCK_FORMAT="%l:%M:%S"
+
+# Set mveditor/MacVim as EDITOR.
+if [ -f "${BASH_IT}/mveditor.sh" ]; then
+    export EDITOR="${BASH_IT}/mveditor.sh"
+    export GIT_EDITOR="${BASH_IT}/mveditor.sh"
+else
+    echo "WARNING: Can't find mac vim editor. Using vim instead."
+    export EDITOR="vim"
+    export GIT_EDITOR="vim"
+fi
+
+# Don't check mail when opening terminal.
+unset MAILCHECK
+
 # vim and gnome-terminal have support for 256 colours in fedora 8 at least
 # Note debian/ubuntu users need to install the ncurses-term package for this
 # Note this should be set in ~/.profile for Fedora startup scripts to
@@ -72,7 +92,7 @@ mesg n
 
 # Let me have core dumps
 #ulimit -c unlimited
-ulimit -n 2048
+ulimit -n 4096
 
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
