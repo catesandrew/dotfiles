@@ -1,0 +1,16 @@
+{
+	//
+	// Trackpad Gestures
+	//
+
+	"→"      = "nextMessage:";           // \U2193 - Swipe right
+	"←"      = "previousMessage:";    // \U2190 - Swipe left
+	"↑"      = "previousThread:";         // \U2192 - Swipe up
+	"↓"      = "nextThread:";                // \U2191 - Swipe down
+
+	"^→"      = "nextUnreadMessage:";
+	"^←"      = "previousUnreadMessage:";
+	"^↑"      = "previousUnreadThread:";
+	"^↓"      = "nextUnreadThread:";
+
+}
