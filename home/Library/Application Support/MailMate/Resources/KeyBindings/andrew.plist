@@ -79,8 +79,7 @@
 	};
 	"G" = ( "makeFirstResponder:", "mainOutline", "selectLastMessageRow:");
 
-    // `T` as in `to` similar how apparix works
-    "t" = {
+    "z" = {
         "p" = "goToMailbox:"; // Prompt
         "1" = ( "makeFirstResponder:", "mailboxesOutline" );
         "2" = ( "makeFirstResponder:", "mainOutline" );
@@ -104,6 +103,6 @@
 
     // Miscellaneous
     "u" = "undo:";
-    "z" = "redo:";
+    /* "z" = "redo:"; */
     "o" = "showThread:";
 }
