@@ -18,10 +18,10 @@
 
   (ac-config-default)
 
-  (after 'linum
+  (with-eval-after-load 'linum
     (ac-linum-workaround))
 
-  (after 'yasnippet
+  (with-eval-after-load 'yasnippet
     (add-hook 'yas-before-expand-snippet-hook (lambda () (auto-complete-mode -1)))
     (add-hook 'yas-after-exit-snippet-hook (lambda () (auto-complete-mode t)))
     (defadvice ac-expand (before advice-for-ac-expand activate)
@@ -30,7 +30,7 @@
 
   (require 'ac-etags)
   (setq ac-etags-requires 1)
-  (after 'etags
+  (with-eval-after-load 'etags
     (ac-etags-setup))
 
   )

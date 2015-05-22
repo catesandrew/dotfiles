@@ -25,14 +25,14 @@
 (require 'helm-swoop)
 (require 'helm-descbinds)
 
-(after "projectile-autoloads"
+(with-eval-after-load "projectile-autoloads"
   (require 'helm-projectile))
 
-(after "company-autoloads"
+(with-eval-after-load "company-autoloads"
   (require 'helm-company))
 
 (require 'helm-config)
-(after 'helm
+(with-eval-after-load 'helm
   (helm-autoresize-mode t))
 
 (provide 'init-helm)

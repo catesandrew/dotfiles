@@ -16,7 +16,7 @@
                               (require 'handlebars-mode)
                               (handlebars-mode))))
 
-(after 'handlebars-mode
+(with-eval-after-load 'handlebars-mode
   (defun my-handlebars-mode-defaults ()
     ; (toggle-truncate-lines 1)
     ; (setq truncate-lines 0)

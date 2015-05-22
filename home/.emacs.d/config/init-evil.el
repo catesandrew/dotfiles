@@ -61,8 +61,8 @@
 ; (global-evil-surround-mode t)
 ; (evil-mode 0)
 
-(after 'evil
-  (after 'evil-leader
+(with-eval-after-load 'evil
+  (with-eval-after-load 'evil-leader
     (evil-mode nil))) ;; to disable call `evil-mode 0`
 
 
@@ -196,13 +196,13 @@
 (defadvice evil-ex-search-previous (after advice-for-evil-ex-search-previous activate)
   (recenter))
 
-(after 'edebug
+(with-eval-after-load 'edebug
   (add-hook 'edebug-mode-hook (lambda ()
                                 (if edebug-mode
                                     (evil-emacs-state)
                                   (evil-normal-state)))))
 
-(after 'paren
+(with-eval-after-load 'paren
   ;; the default behavior only highlights with the point one-after the closing paren
   ;; this changes it such it will match with the point on the closing paren
   (defadvice show-paren-function (around show-paren-closing-before activate)

@@ -11,7 +11,7 @@
 
 (require 'clj-refactor)
 
-(after 'clojure-mode
+(with-eval-after-load 'clojure-mode
   (defun my-clojure-mode-defaults ()
     (clj-refactor-mode 1)
     (subword-mode +1)
@@ -21,7 +21,7 @@
   (add-hook 'clojure-mode-hook (lambda ()
                                (run-hooks 'my-clojure-mode-hook))))
 
-(after 'cider
+(with-eval-after-load 'cider
   (setq nrepl-log-messages t)
 
   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)

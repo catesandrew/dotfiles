@@ -40,13 +40,13 @@
                               (org-agenda-files :maxlevel . 9)))
    (setq org-completion-use-ido t)
 
-   (after 'org-mobile
+   (with-eval-after-load 'org-mobile
      (setq org-mobile-directory (concat org-directory "/MobileOrg"))
      (unless (file-exists-p org-mobile-directory)
        (make-directory org-mobile-directory))
      (setq org-mobile-inbox-for-pull (concat org-directory "/from-mobile.org")))
 
-   (after 'evil
+   (with-eval-after-load 'evil
      (add-hook 'org-capture-mode-hook #'evil-emacs-state))
 
    (when (boundp 'org-plantuml-jar-path)

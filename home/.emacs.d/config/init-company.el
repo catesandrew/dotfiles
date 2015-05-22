@@ -37,7 +37,7 @@
     (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
 
   (when (executable-find "tern")
-    (after "company-tern-autoloads"
+    (with-eval-after-load "company-tern-autoloads"
       (add-to-list 'company-backends 'company-tern)))
 
   (setq company-global-modes

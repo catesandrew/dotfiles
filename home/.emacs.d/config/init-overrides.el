@@ -1,5 +1,5 @@
 ;; always 2 char jumping
-(after 'ace-jump-mode
+(with-eval-after-load 'ace-jump-mode
   (defun ace-jump-char-mode (query-char1 query-char2)
     "AceJump char mode"
     (interactive (list (read-char "Query Char (1/2):") (read-char "Query Char (2/2):")))

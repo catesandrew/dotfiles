@@ -5,7 +5,7 @@
                               (require 'stylus-mode)
                               (stylus-mode))))
 
-(after 'stylus-mode
+(with-eval-after-load 'stylus-mode
 
   (defun my-stylus-mode-defaults ()
     ;; disable electric re-indenting...

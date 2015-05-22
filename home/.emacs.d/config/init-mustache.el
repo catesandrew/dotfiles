@@ -2,7 +2,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.mustache\\'"    . mustache-mode))
 
-(after 'mustache-mode
+(with-eval-after-load 'mustache-mode
 
   (defun my-mustache-mode-defaults ()
     (run-hooks 'my-prog-mode-hook))

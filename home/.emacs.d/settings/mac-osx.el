@@ -6,11 +6,11 @@
 ; (setq mac-command-modifier 'super)
 ; (setq mac-option-modifier 'meta)
 
-;; change command to meta
+;; Treat command as meta and option as super
 (setq mac-option-key-is-meta nil)
 (setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
 (setq mac-option-modifier 'super)
+(setq mac-command-modifier 'meta)
 
 ;; Keybindings
 (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)

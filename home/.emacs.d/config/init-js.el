@@ -7,13 +7,13 @@
 (add-to-list 'auto-mode-alist '("\\.jshintrc$" . javascript-mode))
 (add-to-list 'magic-mode-alist '("#!/usr/bin/env node" . js2-mode))
 
-(after 'javascript-mode
+(with-eval-after-load 'javascript-mode
   (setq javascript-indent-level 2)) ; javascript-mode
 
-(after 'js-mode
+(with-eval-after-load 'js-mode
   (setq js-indent-level 2)) ; js-mode
 
-(after 'js2-mode
+(with-eval-after-load 'js2-mode
   (defun my-js2-mode-defaults ()
     (js2-imenu-extras-mode +1)
     (setq mode-name "JS2")
@@ -213,11 +213,11 @@
   (when (executable-find "tern")
     (require 'tern)
     (add-hook 'js2-mode-hook 'tern-mode)
-    (after 'tern
-      (after 'auto-complete
+    (with-eval-after-load 'tern
+      (with-eval-after-load 'auto-complete
         (require 'tern-auto-complete)
         (tern-ac-setup))
-      (after 'company-mode
+      (with-eval-after-load 'company-mode
         (require 'company-tern)))))
 
 (provide 'init-js)

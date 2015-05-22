@@ -88,6 +88,7 @@
 ;; Set up load path
 (add-to-list 'load-path dotemacs-settings-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
+(add-to-list 'load-path (concat user-emacs-directory "/settings"))
 (add-to-list 'load-path (concat user-emacs-directory "/config"))
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -110,15 +111,36 @@
 
 (require 'cl)
 
-;; Setup packages
-(require 'init-packages)
+;;; Package management
+
+;; Please don't load outdated byte code
+(setq load-prefer-newer t)
+
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives '(("melpa" . "http://melpa.org/packages/")
+                                 ("org" . "http://orgmode.org/elpa/")
+                                 ;; ("marmalade" . "http://marmalade-repo.org/packages/")
+                                 ("gnu" . "http://elpa.gnu.org/packages/")))
+
+(package-initialize)
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Requires
+
+(eval-when-compile
+  (require 'use-package))
 
 ;; Lets start with a smattering of sanity
 (require 'sane-defaults)
 
 ;; Setup environment variables from the user's shell.
 (when on_darwin
-  (require-package 'exec-path-from-shell)
+  (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
 
 (let ((debug-on-error t))
@@ -176,8 +198,10 @@
   (when (file-regular-p file)
     (load file)))
 
-(when on_darwin
-  (require 'mac-osx))
+(use-package mac-osx              ; Personal OS X tools
+  :if (eq system-type 'darwin)
+  :load-path "settings/"
+  :defer t)
 
 (add-hook 'c-mode-common-hook
           (lambda ()

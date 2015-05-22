@@ -141,7 +141,7 @@
 
 
 
-(after 'evil
+(with-eval-after-load 'evil
   (add-hook 'multiple-cursors-mode-enabled-hook #'evil-emacs-state)
   (add-hook 'multiple-cursors-mode-disabled-hook #'evil-normal-state))
 
@@ -151,7 +151,7 @@
   (add-hook 'ag-mode-hook (lambda () (toggle-truncate-lines t))))
 
 
-(after 'project-explorer
+(with-eval-after-load 'project-explorer
   (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))
   (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$")))
 

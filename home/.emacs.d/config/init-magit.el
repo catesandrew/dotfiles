@@ -1,7 +1,7 @@
 (setq magit-last-seen-setup-instructions "1.4.0")
 
 (require 'magit)
-  (after 'magit
+  (with-eval-after-load 'magit
 
     (defun my-magit-mode-defaults ()
       ; (if (boundp 'yas-minor-mode)
@@ -25,7 +25,7 @@
     (set-face-foreground 'diff-added "#00cc33")
     (set-face-foreground 'diff-removed "#ff0000"))
 
-(after 'ediff
+(with-eval-after-load 'ediff
   '(progn
      (set-face-foreground 'ediff-odd-diff-B "#ffffff")
      (set-face-background 'ediff-odd-diff-B "#292521")
@@ -135,7 +135,7 @@
 
 ;; Show blame for current line
 
-(require-package 'git-messenger)
+(require 'git-messenger)
 ; (global-set-key (kbd "C-x v p") #'git-messenger:popup-message)
 
 (provide 'init-magit)

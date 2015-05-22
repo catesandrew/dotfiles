@@ -2,7 +2,7 @@
 (lazy-major-mode "\\.jade$" jade-mode)
 
 
-(after "js2-mode-autoloads"
+(with-eval-after-load "js2-mode-autoloads"
   (require 'skewer-mode)
   (skewer-setup))
 
@@ -29,12 +29,12 @@
 (lazy-major-mode "\\.html?$" web-mode)
 
 
-(after 'web-mode
+(with-eval-after-load 'web-mode
   (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
   (setq web-mode-css-indent-offset 2) ; web-mode, css in html file
   (setq web-mode-code-indent-offset 2) ; web-mode, js code in html file
 
-  (after 'yasnippet
+  (with-eval-after-load 'yasnippet
     (require 'angular-snippets)
     (angular-snippets-initialize)))
 

@@ -38,7 +38,7 @@
 
 ;; plan 9 smart shell
 (when dotemacs-eshell/plan9
-  (after 'esh-module
+  (with-eval-after-load 'esh-module
     (add-to-list 'eshell-modules-list 'eshell-smart)
     (setq eshell-where-to-jump 'begin)
     (setq eshell-review-quick-commands nil)

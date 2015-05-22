@@ -1,6 +1,8 @@
 (source gnu)
 (source melpa)
 
+(files ("*.el" "defuns/*.el" "settings/*.el" "config/*.el" "users/**/*.el"))
+
 (depends-on "ac-etags") ;;
 (depends-on "ace-jump-mode") ;;
 (depends-on "ag") ;;
@@ -72,6 +74,7 @@
 (depends-on "git-commit-training-wheels-mode")
 (depends-on "git-gutter")
 (depends-on "git-gutter+") ;;
+(depends-on "git-messenger")
 (depends-on "git-gutter-fringe+") ;;
 (depends-on "git-rebase-mode")
 (depends-on "gitconfig-mode")
@@ -150,6 +153,7 @@
 (depends-on "tern-auto-complete") ;;
 (depends-on "toml-mode") ;;
 (depends-on "undo-tree") ;;
+(depends-on "use-package")
 (depends-on "vala-mode")
 (depends-on "vimrc-mode") ;;
 (depends-on "vkill") ;;

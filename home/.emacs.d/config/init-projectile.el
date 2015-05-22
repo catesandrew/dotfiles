@@ -7,7 +7,7 @@
 (setq projectile-indexing-method 'alien)
 ; To enable caching unconditionally
 (setq projectile-enable-caching t)
-(after "helm-autoloads"
+(with-eval-after-load "helm-autoloads"
   (setq projectile-completion-system 'helm))
 
 

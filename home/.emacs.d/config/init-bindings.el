@@ -5,6 +5,7 @@
      ,@commands))
 
 
+(require 'evil)
 (require 'guide-key)
 (setq guide-key/guide-key-sequence '("C-x" "C-c"))
 (guide-key-mode 1)
@@ -12,7 +13,7 @@
 (setq guide-key/popup-window-position 'bottom)
 (setq guide-key/idle-delay 0.8)
 
-(after 'guide-key
+(with-eval-after-load 'guide-key
   (add-hook 'evil-leader-mode-hook
             #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader))))
 
@@ -27,7 +28,7 @@
 ;; ‘pop’. I don’t want to auto-select the Magit process buffer as it’s
 ;; for information only.
 
-(after 'popwin
+(with-eval-after-load 'popwin
   (add-to-list 'popwin:special-display-config `"*ag search*")
   (add-to-list 'popwin:special-display-config `("*magit-process*" :noselect t))
   (add-to-list 'popwin:special-display-config `"*Flycheck errors*")
@@ -35,7 +36,7 @@
   (add-to-list 'popwin:special-display-config `("*Compile-Log*" :noselect t)))
 
 
-(after 'evil
+(with-eval-after-load 'evil
   (require 'key-chord)
   (key-chord-mode 1)
   ;; Set the initial evil state that certain major modes will be in.
@@ -46,7 +47,7 @@
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
 
   ; In order to define an use a <leader> prefix for your personal shortcuts
-  (after 'evil-leader
+  (with-eval-after-load 'evil-leader
     (evil-leader/set-key
       "w" 'save-buffer
       "e" 'eval-last-sexp
@@ -117,14 +118,14 @@
                               (evil-normal-state)))
 
 
-    (after "paradox-autoloads"
+    (with-eval-after-load "paradox-autoloads"
       (evil-leader/set-key "P" 'paradox-list-packages))
 
-    ; (after "flycheck-autoloads"
+    ; (with-eval-after-load "flycheck-autoloads"
     ;   (evil-leader/set-key "ea" 'flycheck-list-errors)
     ;   (evil-leader/set-key "en" 'flycheck-next-error))
 
-    (after "magit-autoloads"
+    (with-eval-after-load "magit-autoloads"
       ;; Set the initial evil state that certain major modes will be in.
       (evil-set-initial-state 'magit-log-edit-mode 'emacs)
       (evil-leader/set-key
@@ -133,11 +134,11 @@
         "g c" 'magit-commit
         "g l" 'magit-log)))
 
-  (after "evil-numbers-autoloads"
+  (with-eval-after-load "evil-numbers-autoloads"
     (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
     (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/dec-at-pt))
 
-  (after "git-gutter+-autoloads"
+  (with-eval-after-load "git-gutter+-autoloads"
     (define-key evil-normal-state-map (kbd "[ h") 'git-gutter+-previous-hunk)
     (define-key evil-normal-state-map (kbd "] h") 'git-gutter+-next-hunk)
     (define-key evil-normal-state-map (kbd ", g a") 'git-gutter+-stage-hunks)
@@ -149,7 +150,7 @@
   (define-key evil-normal-state-map (kbd "SPC k") 'ido-kill-buffer)
   (define-key evil-normal-state-map (kbd "SPC f") 'ido-find-file)
 
-  (after "helm-autoloads"
+  (with-eval-after-load "helm-autoloads"
     (define-key evil-visual-state-map (kbd "SPC SPC") 'helm-M-x)
     (define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
     (define-key evil-normal-state-map (kbd "SPC b") 'helm-mini)
@@ -161,7 +162,7 @@
     (define-key evil-normal-state-map (kbd "SPC y") 'helm-show-kill-ring)
     (define-key evil-normal-state-map (kbd "SPC m") 'helm-bookmarks)
     (define-key evil-normal-state-map (kbd "SPC r") 'helm-register)
-    (after "helm-swoop-autoloads"
+    (with-eval-after-load "helm-swoop-autoloads"
       (define-key evil-normal-state-map (kbd "SPC l") 'helm-swoop)
       (define-key evil-normal-state-map (kbd "SPC L") 'helm-multi-swoop)))
 
@@ -188,7 +189,7 @@
 
   (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
-  (after "etags-select-autoloads"
+  (with-eval-after-load "etags-select-autoloads"
     (define-key evil-normal-state-map (kbd "g ]") 'etags-select-find-tag-at-point))
 
   (global-set-key (kbd "C-w") 'evil-window-map)
@@ -209,11 +210,11 @@
 
   ;; emacs lisp
   (evil-define-key 'normal emacs-lisp-mode-map "K" (bind (help-xref-interned (symbol-at-point))))
-  (after "elisp-slime-nav-autoloads"
+  (with-eval-after-load "elisp-slime-nav-autoloads"
     (evil-define-key 'normal emacs-lisp-mode-map (kbd "g d") 'elisp-slime-nav-find-elisp-thing-at-point))
 
   ;; Project Explorer
-  (after 'project-explorer
+  (with-eval-after-load 'project-explorer
     (evil-set-initial-state 'project-explorer-mode 'normal)
     (evil-define-key 'normal project-explorer-mode-map
         (kbd "+") 'pe/create-file
@@ -246,16 +247,16 @@
     )
   )
 
-  (after 'coffee-mode
+  (with-eval-after-load 'coffee-mode
     (evil-define-key 'visual coffee-mode-map (kbd ", p") 'coffee-compile-region)
     (evil-define-key 'normal coffee-mode-map (kbd ", p") 'coffee-compile-buffer))
 
-  (after 'stylus-mode
+  (with-eval-after-load 'stylus-mode
     (define-key stylus-mode-map [remap eval-last-sexp] 'my-stylus-compile-and-eval-buffer)
     (evil-define-key 'visual stylus-mode-map (kbd ", p") 'my-stylus-compile-and-show-region)
     (evil-define-key 'normal stylus-mode-map (kbd ", p") 'my-stylus-compile-and-show-buffer))
 
-  (after "projectile-autoloads"
+  (with-eval-after-load "projectile-autoloads"
     (define-key evil-normal-state-map (kbd "SPC e") 'projectile-recentf)
     (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
     (let ((binding (kbd "SPC /")))
@@ -270,17 +271,17 @@
              (define-key evil-normal-state-map binding 'projectile-ack))
             (t
              (define-key evil-normal-state-map binding 'projectile-grep))))
-    (after "helm-projectile-autoloads"
+    (with-eval-after-load "helm-projectile-autoloads"
       (helm-projectile-on)
       (define-key evil-normal-state-map (kbd "SPC e") 'helm-projectile-recentf)
       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)))
 
-  (after "multiple-cursors-autoloads"
-    (after 'js2-mode
+  (with-eval-after-load "multiple-cursors-autoloads"
+    (with-eval-after-load 'js2-mode
       (evil-define-key 'normal js2-mode-map (kbd "g r") 'js2r-rename-var))
     (define-key evil-normal-state-map (kbd "g r") 'mc/mark-all-like-this-dwim))
 
-  (after "ace-jump-mode-autoloads"
+  (with-eval-after-load "ace-jump-mode-autoloads"
     (evil-leader/set-key "e" 'evil-ace-jump-word-mode) ; ,e for Ace Jump (word)
     (evil-leader/set-key "l" 'evil-ace-jump-line-mode) ; ,l for Ace Jump (line)
     (evil-leader/set-key "x" 'evil-ace-jump-char-mode) ; ,x for Ace Jump (char)
@@ -303,53 +304,53 @@
 
 (define-key minibuffer-local-map (kbd "C-w") 'backward-kill-word)
 
-(after 'magit
+(with-eval-after-load 'magit
   (global-set-key (kbd "C-x g") 'magit-status)
   (define-key magit-status-mode-map (kbd "C-n") 'magit-goto-next-sibling-section)
   (define-key magit-status-mode-map (kbd "C-p") 'magit-goto-previous-sibling-section))
 
 
 ;; Project Explorer
-(after "project-explorer-autoloads"
+(with-eval-after-load "project-explorer-autoloads"
   (autoload 'pe/show-file "project-explorer")
   (global-set-key [f3] 'pe/show-file)
-  (after 'project-explorer
+  (with-eval-after-load 'project-explorer
     (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)))
 
 
-(after "multiple-cursors-autoloads"
+(with-eval-after-load "multiple-cursors-autoloads"
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-unset-key (kbd "M-<down-mouse-1>"))
   (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click))
 
 
-(after 'comint
+(with-eval-after-load 'comint
   (define-key comint-mode-map [up] 'comint-previous-input)
   (define-key comint-mode-map [down] 'comint-next-input))
 
 
-(after 'auto-complete
+(with-eval-after-load 'auto-complete
   (define-key ac-completing-map (kbd "C-n") 'ac-next)
   (define-key ac-completing-map (kbd "C-p") 'ac-previous))
 
 
-(after 'company
+(with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (define-key company-active-map (kbd "<tab>") 'my-company-tab)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
-  (after "helm-company-autoloads"
+  (with-eval-after-load "helm-company-autoloads"
     (define-key company-mode-map (kbd "<C-return>") 'helm-company)
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
 
 
-(after "expand-region-autoloads"
+(with-eval-after-load "expand-region-autoloads"
   (global-set-key (kbd "C-=") 'er/expand-region))
 
 
-(after 'web-mode
-  (after "angular-snippets-autoloads"
+(with-eval-after-load 'web-mode
+  (with-eval-after-load "angular-snippets-autoloads"
     (define-key web-mode-map (kbd "C-c C-d") 'ng-snip-show-docs-at-point)))
 
 
@@ -359,7 +360,7 @@
   (global-set-key [mouse-5] (bind (scroll-up 1))))
 
 
-(after "helm-autoloads"
+(with-eval-after-load "helm-autoloads"
   (global-set-key (kbd "M-x") 'helm-M-x)
   (global-set-key (kbd "C-x C-m") 'helm-M-x)
   (global-set-key (kbd "C-c C-m") 'helm-M-x)
@@ -371,7 +372,7 @@
             (local-set-key (kbd "C-c h") #'my-eshell-ido-complete-command-history)))
 
 
-(after 'help-mode
+(with-eval-after-load 'help-mode
   (define-key help-mode-map (kbd "n") 'next-line)
   (define-key help-mode-map (kbd "p") 'previous-line)
   (define-key help-mode-map (kbd "j") 'next-line)
@@ -392,7 +393,7 @@
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 
 (global-set-key (kbd "C-x p") 'proced)
-(after "vkill-autoloads"
+(with-eval-after-load "vkill-autoloads"
   (autoload 'vkill "vkill" nil t)
   (global-set-key (kbd "C-x p") 'vkill))
 
@@ -409,7 +410,7 @@
 ;; replace with [r]eally [q]uit
 (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c") (bind (message "Thou shall not quit!")))
-(after 'evil
+(with-eval-after-load 'evil
   (defadvice evil-quit (around advice-for-evil-quit activate)
     (message "Thou shall not quit!"))
   (defadvice evil-quit-all (around advice-for-evil-quit-all activate)

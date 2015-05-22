@@ -77,7 +77,7 @@
 
 
 ;; comint
-(after 'comint
+(with-eval-after-load 'comint
   (defun my-toggle-comint-scroll-to-bottom-on-output ()
     (interactive)
     (if comint-scroll-to-bottom-on-output

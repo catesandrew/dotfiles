@@ -1,8 +1,8 @@
 (setq vc-make-backup-files t)
 
-(after 'vc-git
-  (after 'evil
-    (after 'magit-blame
+(with-eval-after-load 'vc-git
+  (with-eval-after-load 'evil
+    (with-eval-after-load 'magit-blame
       (defadvice magit-blame-file-on (after advice-for-magit-blame-file-on activate)
         (evil-emacs-state))
       (defadvice magit-blame-file-off (after advice-for-magit-blame-file-off activate)

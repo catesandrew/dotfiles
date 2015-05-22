@@ -43,7 +43,7 @@
 (sp-pair "[" nil :post-handlers '(:add (my-open-block-c-mode "RET")))
 
 ;; fix conflict where smartparens clobbers yas' key bindings
-(after 'yasnippet
+(with-eval-after-load 'yasnippet
   (defadvice yas-expand (before advice-for-yas-expand activate)
     (sp-remove-active-pair-overlay)))
 

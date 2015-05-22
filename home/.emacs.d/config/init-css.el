@@ -3,7 +3,7 @@
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.scss$" . css-mode))
 
-(after 'css-mode
+(with-eval-after-load 'css-mode
 
   (setq css-indent-offset 2)
 

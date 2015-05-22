@@ -1,25 +1,59 @@
 ; "After" macro definition
 
-; I have an "after" macro defined that I copied from someone config file (can't
-; remember who - sorry). This is useful to specifiy code to be executed after
-; some plugin has loaded.
+(defmacro after (feature &rest forms)
+  "After FEATURE is loaded, evaluate FORMS.
 
-(if (fboundp 'with-eval-after-load)
-    (defmacro after (feature &rest body)
-      "After FEATURE is loaded, evaluate BODY."
-      (declare (indent defun))
-      `(with-eval-after-load ,feature ,@body))
-  (defmacro after (feature &rest body)
-    "After FEATURE is loaded, evaluate BODY."
-    (declare (indent defun))
-    `(eval-after-load ,feature
-       '(progn ,@body))))
+FORMS is byte compiled.
+
+FEATURE may be a named feature or a file name, see
+`eval-after-load' for details."
+  (declare (indent 1) (debug t))
+  ;; Byte compile the body.  If the feature is not available, ignore warnings.
+  ;; Taken from
+  ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2012-11/msg01262.html
+  `(,(if (or (not byte-compile-current-file)
+             (if (symbolp feature)
+                 (require feature nil :no-error)
+               (load feature :no-message :no-error)))
+         'progn
+       (message "after: cannot find %s" feature)
+       'with-no-warnings)
+    (eval-after-load ',feature
+      `(funcall (function ,(lambda () ,@forms))))))
+
+;
+; http://www.lunaryorn.com/2013/06/25/introducing-with-eval-after-load.html
+;
+; At June, 13th Emacs trunk introduced a new macro `with-eval-after-load`. It
+; behaves like `eval-after-load`, except that it takes multiple unquoted forms
+; and wraps them into a lambda to enable byte compilation:
+;
+; This supersedes much of my last post about byte compilation in
+; `eval-after-load`. However, the new macro does not load the corresponding
+; features during byte compilation, so I’ll wrap my old `after` macro
+; around it to avoid bogus warnings:
+(defmacro after (feature &rest forms)
+  (declare (indent 1) (debug t))
+  `(,(if (or (not byte-compile-current-file)
+             (if (symbolp feature)
+                 (require feature nil :no-error)
+               (load feature :no-message :no-error)))
+         'progn
+       (message "after: cannot find %s" feature)
+       'with-no-warnings)
+    (with-eval-after-load ',feature ,@forms)))
+
+; To ensure compatibility with releases and older snapshot builds, I define
+; with-eval-after-load if it is absent:
+(unless (fboundp 'with-eval-after-load)
+  (defmacro with-eval-after-load (file &rest body)
+    `(eval-after-load ,file
+       `(funcall (function ,(lambda () ,@body))))))
 
 (defmacro lazy-major-mode (pattern mode)
-  "Defines a new major-mode matched by PATTERN, installs MODE if necessary, and activates it."
+  "Defines a new major-mode matched by PATTERN and activates it."
   `(add-to-list 'auto-mode-alist
                 '(,pattern . (lambda ()
-                               (require-package (quote ,mode))
                                (,mode)))))
 
 (defun my-recompile-init ()

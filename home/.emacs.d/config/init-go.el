@@ -1,10 +1,10 @@
 (lazy-major-mode "\\.go$" go-mode)
 
-(after 'go-mode
+(with-eval-after-load 'go-mode
   (require 'go-eldoc)
   (add-hook 'go-mode-hook 'go-eldoc-setup)
 
-  (after "company-autoloads"
+  (with-eval-after-load "company-autoloads"
     (require 'company-go)
     (require 'company-go)
     (add-hook 'go-mode-hook (lambda ()
