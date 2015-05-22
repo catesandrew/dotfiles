@@ -38,6 +38,11 @@ This functions should be added to the hooks of major modes for programming."
   ;                          (toggle-truncate-lines t)
   ;                          (setq truncate-lines t)))   ; don't fold line
 
+  ; http://stackoverflow.com/questions/10088168/how-to-check-whether-a-minor-mode-e-g-flymake-mode-is-on
+  ; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
+  (unless (bound-and-true-p hs-minor-mode)
+    (hs-minor-mode t))
+
   (set 'truncate-lines t)
   (toggle-truncate-lines t)
   (my-local-comment-auto-fill)
