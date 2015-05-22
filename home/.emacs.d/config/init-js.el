@@ -128,15 +128,6 @@
 
   (require 'json)
 
-  ;; Tern.JS
-  (add-to-list 'load-path (expand-file-name "tern/emacs" dotemacs-elisp-dir))
-  (autoload 'tern-mode "tern.el" nil t)
-  (eval-after-load 'auto-complete
-    '(eval-after-load 'tern
-       '(progn
-          (require 'tern-auto-complete)
-          (tern-ac-setup))))
-
   (defun my-aget (key map)
     (cdr (assoc key map)))
 
