@@ -39,10 +39,6 @@
 (with-eval-after-load 'evil
   (require 'key-chord)
   (key-chord-mode 1)
-  ;; Set the initial evil state that certain major modes will be in.
-  (evil-set-initial-state 'nav-mode 'emacs)
-  (evil-set-initial-state 'grep-mode 'emacs)
-  (evil-set-initial-state 'ibuffer-mode 'normal)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
 
@@ -69,8 +65,8 @@
       "," 'evil-ace-jump-word-mode ; <leader>, for Ace Jump (word)
       "l" 'evil-ace-jump-line-mode ; <leader>l for Ace Jump (line)
       "x" 'evil-ace-jump-char-mode ; <leader>x for Ace Jump (char)
-      "tn" 'elscreen-create        ; <leader>tn create new tab
-      "tc" 'elscreen-kill          ; <leader>tc close tab
+      ; "tn" 'elscreen-create        ; <leader>tn create new tab
+      ; "tc" 'elscreen-kill          ; <leader>tc close tab
       "p b" 'projectile-switch-to-buffer
       "p D" 'projectile-dired
       "p d" 'projectile-find-dir
@@ -244,6 +240,16 @@
         (kbd "w") 'pe/copy-file-name-as-kill
         (kbd "M-l") 'pe/set-filter-regex
         (kbd "M-o") 'pe/toggle-omit
+    )
+  )
+
+  ;; Evil Tabs
+  (with-eval-after-load 'evil-tabs
+    (evil-define-key 'normal evil-tabs-mode-map
+        ; (kbd "M-{") 'elscreen-previous
+        ; (kbd "M-}") 'elscreen-next
+        ; (kbd "M-t") 'elscreen-create
+        ; (kbd "M-w") 'elscreen-kill
     )
   )
 
