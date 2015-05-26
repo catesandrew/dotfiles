@@ -244,14 +244,14 @@
   )
 
   ;; Evil Tabs
-  (with-eval-after-load 'evil-tabs
-    (evil-define-key 'normal evil-tabs-mode-map
-        ; (kbd "M-{") 'elscreen-previous
-        ; (kbd "M-}") 'elscreen-next
-        ; (kbd "M-t") 'elscreen-create
-        ; (kbd "M-w") 'elscreen-kill
-    )
-  )
+  ; (with-eval-after-load 'evil-tabs
+  ;   (evil-define-key 'normal evil-tabs-mode-map
+  ;     (kbd "M-{") 'elscreen-previous
+  ;     (kbd "M-}") 'elscreen-next
+  ;     (kbd "M-t") 'elscreen-create
+  ;     (kbd "M-w") 'elscreen-kill
+  ;   )
+  ; )
 
   (with-eval-after-load 'coffee-mode
     (evil-define-key 'visual coffee-mode-map (kbd ", p") 'coffee-compile-region)
