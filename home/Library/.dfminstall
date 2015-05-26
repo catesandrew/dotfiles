@@ -2,5 +2,6 @@
 extensions skip
 launch-daemons skip
 preferences skip
+LaunchAgents recurse
 KeyBindings recurse
 Application Support recurse

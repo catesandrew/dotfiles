@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+	  <key>Disabled</key>
+	  <false/>
+	  <key>Label</key>
+	  <string>osx.rinker</string>
+	  <key>ProgramArguments</key>
+	  <array>
+      <string>/Users/andrew/.bin/rinker.sh</string>
+		  <string>google</string>
+		  <string>USER</string>
+		  <string>PASS</string>
+		  <string>DOMAIN</string>
+		  <string>\"'https://domains.google.com/nic/update?hostname=$HOST&amp;myip=$IP'\"</string>
+	  </array>
+	  <key>RunAtLoad</key>
+	  <true/>
+	  <key>StandardErrorPath</key>
+	  <string>$HOME/Library/Logs/rinker-errors.log</string>
+	  <key>StandardOutPath</key>
+	  <string>$HOME/Library/Logs/rinker-out.log</string>
+	  <key>StartCalendarInterval</key>
+	  <dict>
+		  <key>Minute</key>
+		  <integer>20</integer>
+	  </dict>
+	  <key>StartInterval</key>
+	  <integer>1800</integer>
+  </dict>
+</plist>
