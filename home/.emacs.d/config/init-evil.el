@@ -224,12 +224,4 @@
           ad-do-it)
       ad-do-it)))
 
-;; On OS X, evil copies every single visual state move to the kill
-;; ring, which in turns copies it to my system clipboard. I don’t want
-;; that to happen.
-
-(defadvice evil-visual-update-x-selection (around clobber-x-select-text activate)
-  (unless (featurep 'ns)
-    ad-do-it))
-
 (provide 'init-evil)
