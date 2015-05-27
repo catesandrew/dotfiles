@@ -1,6 +1,7 @@
 .DS_Store skip
 open-connect skip
 Library recurse
+Documents recurse
 indent.pro skip
 .hammerspoon recurse
 .gitconfig-local.template skip
