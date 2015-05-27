@@ -302,7 +302,7 @@
   "@$\UF728" = (deleteToEndOfParagraph:);
   // Delete to beginning of paragraph
   "@$\177" = (deleteToBeginningOfParagraph:);
-  // Right mouse click (useless, doesn't maintain cursor position)
+  // Right mouse click (useless, doesn\'t maintain cursor position)
   "@~7" = (setMark:, rightMouseDown:, swapWithMark:);
 
   // Hyper up arrow: move cursor to preceeding paragraph
