@@ -7,6 +7,8 @@ cheatsheet do
   introduction "DefaultKeyBinding.dict file for Mac OS X, created by [Brett Terpstra](http://brettterpstra.com) and based heavily on work done by [Lri](http://www.cs.helsinki.fi/u/lranta/keybindings/). Please note that these bindings won't work in all applications: TextWrangler and TextMate, for example, override these with their own settings.
 See Lri's [gists](https://gist.github.com/Lri) and [website](http://www.cs.helsinki.fi/u/lranta/) for more coding madness.
 
+@ is ⌘, ~ is ⌥, ^ is Control, and $ is ⇧
+
 <b>Documentation</b> <i>(last updated 05/27/2015.)</i>
 
 *Grouped items begin with the groups shortcut (if exists), followed by a subgroup (if exists) followed by the keys specified.*"
@@ -80,13 +82,25 @@ See Lri's [gists](https://gist.github.com/Lri) and [website](http://www.cs.helsi
       name 'select entire line/paragraph'
       command '⌥⇧s'
       notes <<-END
-
+If you want to make sure you get everything, including the last line break, use
+`⌥⇧s`
       END
     end
     entry do
       name 'select from beginning of paragrah to last character'
       command '⌥s'
       notes <<-END
+You can select a paragraph by hitting `⌘←`, using the up arrow to get to the
+beginning, then hitting `⌘⇧→` and using the down arrow to get to the end. That’s
+horrible.
+
+You can use `^a` to jump straight to the beginning of the paragraph instead of
+the edge of the screen. Then hit `^⇧e` to select to the end of the actual
+paragraph instantly. That’s much better.
+
+If you’re me, though, you want to do that in a single stroke. This keybinding
+lets you select the current line/paragraph with `⌥s`. If you want to make sure
+you get everything, including the last line break, use `⌥⇧s`.
 
       END
     end
@@ -206,7 +220,13 @@ See Lri's [gists](https://gist.github.com/Lri) and [website](http://www.cs.helsi
       name 'move line up'
       command '^⌘↑'
       notes <<-END
-        ( same commands but with arrow keys)
+This one is especially handy when working with lists in Markdown, but is good
+for arranging paragraphs or lines of text anywhere. With `^⌘↑` and `^⌘↓` you can
+move the current line of text above or below whatever precedes or follows it.
+
+Note: this will balk if you try to move into an area with no newline where it’s
+trying to go. Thus, the last item in a list that’s the last thing on the page is
+a little problematic. Beyond that minor snag, this is something I use daily.
       END
     end
     entry do
@@ -325,7 +345,13 @@ See Lri's [gists](https://gist.github.com/Lri) and [website](http://www.cs.helsi
       name 'TextMate Command-Return (Command Enter)'
       command '⌘↩'
       notes <<-END
+One of the keybindings that I miss the most when I’m outside of a good code
+editor is `⌘↩`. In most editors (and first in TextMate to the best of my
+knowledge), hitting this combination will insert a new line after the current
+paragraph and jump you to it, regardless of where the cursor is in the
+paragraph.
 
+I also use one with `⌘⇧↩` that will do the same, but above the current paragraph.
       END
     end
     entry do
@@ -337,20 +363,36 @@ See Lri's [gists](https://gist.github.com/Lri) and [website](http://www.cs.helsi
     end
     entry do
       name 'hyphenate next space and move to next word'
+      command '⌘⌥⇧-'
+      notes <<-END
+> this will kill non alphanumeric symbols and punctuation, use only on *words*
+
+If you blog at all, you’re used to creating slugs (hyphenated words). If you do
+anything with file naming and prefer to keep spaces out of your titles, you’ve
+probably done this as well. This keystroke (`⌘⌥⇧-`) lets you add a hyphen between
+the next two words from the cursor, then advance so that repeated keystrokes
+continue to hyphenate.
+      END
+    end
+    entry do
+      name 'hyphenate next space and move to next word'
       command '⌘⌥_'
       notes <<-END
         ( this will kill non alphanumeric symbols and punctuation, use only on *words*)
       END
     end
     entry do
-      name 'bookmark'
+      name 'set bookmark - save your spot in a text file'
       command '⌥1'
       notes <<-END
-
+With two simple commands you can have a pair of keyboard shortcuts that will
+store the cursor position in your text so you can go and making an edit or check
+a reference elsewhere in the document, then jump right back to where you were. I
+bind these to `⌥1` and `⌥2`.
       END
     end
     entry do
-      name 'jump to bookmark'
+      name 'jump to bookmark - save your spot in a text file'
       command '⌥2'
       notes <<-END
 
