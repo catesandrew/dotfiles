@@ -382,3 +382,5 @@ if is_confirmed; then
 else
     printf "Skipped OS X settings update.\n"
 fi
+
+sudo apt-get install apparix
