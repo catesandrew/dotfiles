@@ -53,15 +53,20 @@
   "The storage location for settings."
   :group 'dotemacs)
 
+(defcustom dotemacs-config-dir (expand-file-name "config" user-emacs-directory)
+  "The config location lisp."
+  :group 'dotemacs)
+
 (defcustom dotemacs-user-settings-dir (concat user-emacs-directory "users/" user-login-name)
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
-;; Set up load path
+;; Set up load path(s)
 (add-to-list 'load-path dotemacs-settings-dir)
+(add-to-list 'load-path dotemacs-config-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
-(add-to-list 'load-path (concat user-emacs-directory "/settings"))
-(add-to-list 'load-path (concat user-emacs-directory "/config"))
+;; Settings for currently logged in user
+(add-to-list 'load-path dotemacs-user-settings-dir)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
@@ -70,12 +75,8 @@
 ;; Set up appearance early
 (require 'appearance)
 
-;; Settings for currently logged in user
-(add-to-list 'load-path dotemacs-user-settings-dir)
-
 ;; Add external projects to load path
-; (let ((base (concat user-emacs-directory "/elisp")))
-(let ((base (concat user-emacs-directory "/elisp")))
+(let ((base dotemacs-elisp-dir))
   (add-to-list 'load-path base)
   (dolist (dir (directory-files base t "^[^.]"))
     (when (file-directory-p dir)
