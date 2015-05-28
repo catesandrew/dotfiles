@@ -1,12 +1,8 @@
 (setq visible-bell t
-      font-lock-maximum-decoration t
-      color-theme-is-global t)
+      font-lock-maximum-decoration t)
 
 ;; Highlight current line
 (global-hl-line-mode 1)
-
-;; Don't defer screen updates when performing operations
-(setq redisplay-dont-pause t)
 
 ;; org-mode colors
 (setq org-todo-keyword-faces
