@@ -57,34 +57,6 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
-(defcustom dotemacs-buffer-keymap-prefix (kbd "C-c b")
-  "dotemacs buffer keymap prefix."
-  :group 'dotemacs
-  :type 'string)
-
-;;; Minor mode
-(defvar dotemacs-buffer-command-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "p") 'previous-buffer)
-    (define-key map (kbd "n") 'next-buffer)
-    map)
-  "Keymap for dotemacs buffer commands after `dotemacs-buffer-keymap-prefix'.")
-(fset 'dotemacs-buffer-command-map dotemacs-buffer-command-map)
-
-(defvar dotemacs-buffer-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map dotemacs-buffer-keymap-prefix 'dotemacs-buffer-command-map)
-    map)
-  "Keymap for dotemacs buffer mode.")
-
-(define-minor-mode dotemacs-buffer-mode
-  "Minor mode for dotemacs buffer mode"
-  :keymap dotemacs-buffer-mode-map)
-
-(define-globalized-minor-mode dotemacs-buffer-global-mode
-  dotemacs-buffer-mode
-  dotemacs-buffer-mode)
-
 ;; Set up load path
 (add-to-list 'load-path dotemacs-settings-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
