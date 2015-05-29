@@ -66,6 +66,25 @@
      (toggle-truncate-lines t))
    (add-hook 'org-mode-hook #'my-org-mode-hook)
 
+   (require 'ox-md)
+   (require 'ox-ascii)
+   ;; ox-confluence.el lets you convert Org files to confluence files
+   ;; using the ox.el export engine.
+   (require 'ox-confluence)
+   ;; Installation
+   ;; -------------
+   ;; Get a copy of deck.js from http://imakewebthings.com/deck.js/ or
+   ;; the gitub repository at https://github.com/imakewebthings/deck.js.
+   ;;
+   ;; Add the path to the extracted code to the variable
+   ;; `org-deck-directories' There are a number of customization in the
+   ;; org-export-deck group, most of which can be overrriden with buffer
+   ;; local customization (starting with DECK_.)
+   (require 'ox-deck)
+   (require 'ox-html)
+   ;;   (add-to-list 'org-export-backends 'taskjuggler)
+   (require 'ox-taskjuggler)
+
    (require 'org-bullets)
    (setq org-bullets-bullet-list '("✿" "❀" "☢" "☯" "✸" ))
    (add-hook 'org-mode-hook #'org-bullets-mode)))

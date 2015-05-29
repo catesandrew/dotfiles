@@ -1,5 +1,6 @@
 (source gnu)
 (source melpa)
+(source org)
 
 (files ("*.el" "defuns/*.el" "settings/*.el" "config/*.el" "users/**/*.el"))
 
@@ -116,6 +117,13 @@
 (depends-on "mwim")
 (depends-on "names")
 (depends-on "nyan-mode")
+
+;; Note that unlike the gnu archive, which also provides an org package, this
+;; archive provides the org-plus-contrib package, which installs additional
+;; extensions for Org Mode maintained by the Org Mode maintainers, which are not
+;; included in the standard gnu packages for copyright reasons.
+(depends-on "org-plus-contrib")
+
 (depends-on "org-bullets") ;;
 (depends-on "package-build")
 (depends-on "packed")
