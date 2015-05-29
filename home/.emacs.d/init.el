@@ -25,6 +25,8 @@
 (defvar on_cygwin     (string-match "cygwin" system-type-as-string))
 (defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
 
+;; TODO: Remove Cask. Cask is yet another dependency). Great for making packages;
+;; horrible for configuration management.
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
@@ -168,10 +170,13 @@
   (when (file-regular-p file)
     (load file)))
 
+;; TODO convert to use-package https://github.com/jwiegley/use-package
 (use-package mac-osx              ; Personal OS X tools
   :if (eq system-type 'darwin)
   :load-path "settings/"
   :defer t)
+
+;; TODO https://github.com/IvanMalison/org-projectile
 
 (add-hook 'c-mode-common-hook
           (lambda ()
