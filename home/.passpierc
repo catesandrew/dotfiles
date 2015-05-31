@@ -1,0 +1,13 @@
+short_commands: true
+genpass_length: 32
+genpass_symbols: "_-#|+= "
+table_format: orgtbl
+headers:
+  - name
+  - login
+  - password
+  - comment
+colors:
+  login: green
+  name: yellow
+  password: cyan
