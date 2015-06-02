@@ -7,6 +7,7 @@ headers:
   - login
   - password
   - comment
+  - fullname
 colors:
   login: green
   name: yellow
