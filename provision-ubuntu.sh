@@ -192,15 +192,12 @@ echo "Would you like to install node via ppa?  (y/n)"
 read -r response
 case $response in
   [yY])
-      curl -sL https://deb.nodesource.com/setup | sudo bash -
-
       dpkg -s npm &>/dev/null || {
         # curl -sL https://deb.nodesource.com/setup | sudo bash -
 
         print_status "Updating NodeJS PPA..."
 
         ## NodeSource's Node.js PPA
-        # echo deb https://deb.nodesource.com/node trusty main > /etc/apt/sources.list.d/nodesource.list
         sudo bash -c 'echo "deb https://deb.nodesource.com/node ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
         sudo bash -c 'echo "deb-src https://deb.nodesource.com/node ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68576280
@@ -384,3 +381,85 @@ else
 fi
 
 sudo apt-get install apparix
+
+#ruby
+sudo apt-get install rbenv
+sudo gem update system
+
+# nokogiri requirements
+# mkmf is part of the ruby-dev package
+sudo apt-get install ruby-dev
+sudo gem install nokogiri
+sudo gem install chef
+
+
+sudo apt-get install vagrant
+# vagrant plugins
+vagrant-aws (0.6.0)
+vagrant-hostmanager (1.5.0)
+vagrant-librarian-chef (0.2.1)
+vagrant-list (0.0.6)
+vagrant-share (1.1.3, system)
+
+
+
+
+echo ""
+echo "Would you like to install latest virtualbox via ppa?  (y/n)"
+read -r response
+case $response in
+  [yY])
+      print_status "Updating VirtualBox PPA..."
+
+      VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
+      VBOX_MAJOR_MINOR=$(echo "${VBOX_LATEST_VERSION%.*}")
+      exec_sudo_cmd 'echo "deb http://download.virtualbox.org/virtualbox/debian ${DISTRO} contrib" > /etc/apt/sources.list.d/virtualbox.list'
+      wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+      exec_sudo_cmd 'apt-get -yqq update'
+      exec_sudo_cmd 'apt-get -y install dkms virtualbox-${VBOX_MAJOR_MINOR}'
+
+      wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack -O /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack
+      exec_sudo_cmd 'VBoxManage extpack uninstall "Oracle VM VirtualBox Extension Pack"'
+      exec_sudo_cmd 'VBoxManage extpack cleanup'
+      exec_sudo_cmd 'VBoxManage extpack install /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack'
+      exec_sudo_cmd 'usermod -a -G vboxusers nodemanager'
+
+
+  *) break;;
+esac
+
+echo ""
+echo "Would you like to install latest virtualbox guest additions?  (y/n)"
+read -r response
+case $response in
+  [yY])
+      print_status "Updating vbox guest additions"
+
+      VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
+      wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso -O /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso
+
+      exec_sudo_cmd 'mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions'
+      exec_sudo_cmd '/media/guestadditions/VBoxLinuxAdditions.run'
+      exec_sudo_cmd 'umount /media/guestadditions'
+      exec_sudo_cmd 'rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions'
+
+      print_status 'You may safely ignore the message that reads: "Could not find the X.Org or XFree86 Window System."'
+
+      break;;
+  *) break;;
+esac
+
+As of Ubuntu 14.04, the
+`add-apt-repository` command is now included in the `software-properties-common` package rather than the `python-software-properties` package.
+
+Install the Basics
+The first thing we’ll use is the apt-get command to install our packages:
+
+sudo apt-get install curl wget unzip git ack-grep htop vim tmux software-properties-common
+
+
+# disallow remote log in directly as root user with ssh
+# /etc/ssh/sshd_config change the following property to no
+PermitRootLogin no
+# restart ssh
+sudo service ssh restart
