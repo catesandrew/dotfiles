@@ -463,3 +463,54 @@ sudo apt-get install curl wget unzip git ack-grep htop vim tmux software-propert
 PermitRootLogin no
 # restart ssh
 sudo service ssh restart
+
+# install iptables
+-P INPUT ACCEPT
+-P FORWARD ACCEPT
+-P OUTPUT ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+-A INPUT -j LOGGING
+-A LOGGING -m limit --limit 2/min -j LOG --log-prefix "IPTables Packet Dropped: " --log-level 7
+-A LOGGING -j DROP
+
+On Ubuntu, we can use the iptables-persistent package to do this:
+
+1 # Install the package
+2 sudo apt-get install -y iptables-persistent
+3
+4 # Start the service
+5 sudo service iptables-persistent start
+
+
+#install Fail2Ban
+sudo apt-get install -y fail2ban
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo service fail2ban reload
+
+
+# automatic security updates
+sudo apt-get install -y unattended-upgrades
+
+# ack
+sudo apt-get install -y ack-grep
+# Renaming ack-grep on Debian-derived distros. On Debian-derived distros, ack is
+# packaged as "ack-grep" because "ack" already existed. Your ack will be called
+# "ack-grep", which is 167% more characters to type per invocation. This is
+# tragic for your poor fingers.
+
+# To create a local diversion, renaming ack-grep to ack, first install the
+# ack-grep package as shown above. Then, run:
+sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+
+# ssmlate
+sudo wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list
+sudo wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg
+sudo apt-get update
+sudo apt-get install sslmate
+
+# silver surfer
+sudo apt-get install silversearcher-ag
