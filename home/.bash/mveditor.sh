@@ -28,10 +28,51 @@
 #             export EDITOR="vim"
 #         fi
 #
-if [ -f "`which mvim`" ]; then
-    mvim -f -c "au VimLeave * maca hide:" "$@"
-else
-    echo "ERROR: Can't find mvim. Did you install the MacVim utility?"
-    echo "NOTICE: Using vim instead."
-    vim "$@"
+
+if [ "$(uname)" == "Darwin"  ]; then
+    # Do something under Mac OS X platform
+    case "$1" in
+        *_EDITMSG|*MERGE_MSG|*_TAGMSG )
+            if [ -f "`which mvim`" ]; then
+                mvim -f -c "au VimLeave * maca hide:" "$@"
+            else
+                vim "$@"
+            fi
+            # /usr/local/bin/vim "$1"
+            ;;
+        *.md )
+            /usr/local/bin/mmdc "$1"
+            ;;
+        *.txt )
+            /usr/local/bin/mmdc "$1"
+            ;;
+        * )
+            if [ -f "`which mvim`" ]; then
+                mvim -f -c "au VimLeave * maca hide:" "$@"
+            else
+                vim "$@"
+            fi
+            ;;
+    esac
+
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux"  ]; then
+    # Do something under Linux platform
+    case "$1" in
+        *_EDITMSG|*MERGE_MSG|*_TAGMSG )
+            vim "$@"
+            # vim "$1"
+            ;;
+        *.md )
+            mmdc "$1"
+            ;;
+        *.txt )
+            mmdc "$1"
+            ;;
+        * )
+            vim "$@"
+            ;;
+    esac
+
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT"  ]; then
+    # Do something under Windows NT platform
 fi
