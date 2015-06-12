@@ -81,10 +81,6 @@
 (add-to-list 'load-path dotemacs-elisp-dir)
 (add-to-list 'load-path dotemacs-user-settings-dir)
 
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
-
 ;; Set up appearance early
 (require 'init-appearance)
 
@@ -95,7 +91,6 @@
     (when (file-directory-p dir)
       (add-to-list 'load-path dir))))
 
-(eval-when-compile (require 'cl))
 
 ;;; Package management
 
@@ -131,8 +126,16 @@
 (eval-when-compile
   (require 'use-package))
 
+(eval-when-compile
+  (require 'cl))
+
 ;; Lets start with a smattering of sanity
 (require 'init-sane-defaults)
+(require 'init-util)
+
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 ;; Setup environment variables from the user's shell.
 (when on_darwin
@@ -140,51 +143,9 @@
   (exec-path-from-shell-initialize))
 
 (let ((debug-on-error t))
-  (require 'init-util)
-  (require 'init-core)
-
-  (require 'init-eshell)
-  (require 'init-erc)
-
-  (if (eq dotemacs-completion-engine 'company)
-      (require 'init-company)
-    (require 'init-auto-complete))
-
-  (require 'init-ido)
-  (require 'init-org)
-  (require 'init-dired)
-  (require 'init-magit)
-  (require 'init-vcs)
-  (require 'init-rgrep)
-  (require 'init-shell)
-  (require 'init-perspective)
-  (require 'init-ffip)
-
-  (require 'init-programming)
-  (require 'init-lisp)
-  (require 'init-vim)
-  (require 'init-stylus)
-  (require 'init-js)
-  (require 'init-clojure)
-  (require 'init-go)
-  (require 'init-web)
-  (require 'init-markup)
-
-  (require 'init-projectile)
-  (require 'init-helm)
-  (require 'init-flycheck)
-  ; (require 'init-yasnippet)
-  (require 'init-smartparens)
-  (require 'init-mustache)
-  (require 'init-hbs)
-  (require 'init-misc)
-
-  (require 'init-evil)
-  (require 'init-macros)
-  (require 'init-eyecandy)
-  (require 'init-overrides)
-
-  (require 'init-bindings))
+  (cl-loop for file in (directory-files (concat user-emacs-directory "config/"))
+    if (not (file-directory-p file))
+      do (require (intern (file-name-base file)))))
 
 (autoload 'skewer-start "init-skewer" nil t)
 (autoload 'skewer-demo "init-skewer" nil t)
