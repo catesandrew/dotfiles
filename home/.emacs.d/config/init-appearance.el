@@ -17,7 +17,4 @@
   (tooltip-mode -1)
   (blink-cursor-mode -1))
 
-;; Make zooming affect frame instead of buffers
-(require 'zoom-frm)
-
 (provide 'init-appearance)
