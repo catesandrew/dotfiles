@@ -25,12 +25,27 @@ if [ $(uname) = "Darwin" ]; then
     if hash brew 2>/dev/null; then
         export BREW_HOME="`brew --prefix`"
         export BREW_EMACS_MAC_HOME="`brew --prefix emacs-mac`"
+
+        # Cask installation
+        if [ ! -h "${HOME}/.cask" ]; then
+            if [ x"" != x"$(brew ls --versions cask)"  ]; then
+                CASK_HOME="`brew --prefix cask`"
+                ln -s "${CASK_HOME}" "${HOME}/.cask"
+            fi
+        fi
+
+        if brew cask info vagrant 1>/dev/null 2>&1; then
+            export VAGRANT_CHECKPOINT_DISABLE=1
+            export VAGRANT_HOME=~/.vagrant.d
+            export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
+            # Time Machine ignore this directory
+            export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
+        fi
+
     else
         echo "homebrew not installed, please consider installing it."
     fi
 
-    export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
-    export GOPATH=/usr/local/go
 
 elif [ $(uname) = "Linux" ]; then
     export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
@@ -44,22 +59,27 @@ elif [ $(uname) = "Linux" ]; then
     else
         echo "linuxbrew not installed, please consider installing it."
     fi
+
+    dpkg -s vagrant &>/dev/null || {
+        export VAGRANT_CHECKPOINT_DISABLE=1
+        export VAGRANT_HOME=~/.vagrant.d
+        export VAGRANT_DOTFILE_PATH=".vagrant-"`hostname`
+    }
 fi
 
-# Cask installation
-if [ ! -h "${HOME}/.cask" ]; then
-    if hash brew 2>/dev/null; then
-        if [ x"" != x"$(brew ls --versions cask)"  ]; then
-            CASK_HOME="`brew --prefix cask`"
-            ln -s "${CASK_HOME}" "${HOME}/.cask"
-        fi
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions go)"  ]; then
+        export GOROOT=$(brew --prefix go)
+        export GOPATH=/usr/local/go
     fi
 fi
 
 export PATH="${HOME}/.cabal/bin:$PATH"
 export PATH="${HOME}/.bin:$PATH"
-export PACKER_CACHE_DIR="${HOME}/.packer_cache"
 export DFM_REPO="${HOME}/.dotfiles"
+if hash packer 2>/dev/null; then
+    export PACKER_CACHE_DIR="${HOME}/.packer_cache"
+fi
 
 # Lock and load a custom theme file location /.bash/themes/
 export BASH_IT_THEME='powerline-multiline'
@@ -112,9 +132,13 @@ export MANPAGER="less -X"
 export IRC_CLIENT='irssi'
 
 # Node Version Manager
-export NVM_TARGET="$(brew --prefix nvm)"
-export NVM_DIR="/usr/local/nvm"
-[[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions nvm)" ]; then
+        export NVM_TARGET="$(brew --prefix nvm)"
+        export NVM_DIR="/usr/local/nvm"
+        [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
+    fi
+fi
 
 # Load composure first, so we support function metadata
 source "${BASH_IT}/lib/composure.sh"
