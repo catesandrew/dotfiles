@@ -11,8 +11,6 @@
       (getenv
        (if (equal system-type 'windows-nt) "USERNAME" "USER")))
 
-(message "Emacs is powering up… Be patient, Master %s!" current-user)
-
 ;;________________________________________________________________
 ;;    Determine where we are
 ;;________________________________________________________________
@@ -103,7 +101,7 @@
     (when (file-directory-p dir)
       (add-to-list 'load-path dir))))
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 ;;; Package management
 
