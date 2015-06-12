@@ -157,4 +157,18 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (interactive)
   (set-buffer-file-coding-system 'undecided-dos nil))
 
+;; lunaryorn-expand-private-file
+(defun my-expand-private-file (file-name)
+  "Get the absolute path for a private file with FILE-NAME."
+  (expand-file-name file-name dotemacs-private-dir))
+
+;; lunaryorn-load-private-file
+(defun my-load-private-file (file-name &optional noerror nomessage)
+  "Load a private file with FILE-NAME.
+
+NOERROR and NOMESSAGE are passed to `load'."
+  (load (my-expand-private-file file-name)
+        noerror nomessage))
+
+
 (provide 'init-util)

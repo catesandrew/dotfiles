@@ -1,7 +1,3 @@
-(require 'server)
-(unless (server-running-p)
-  (server-start))
-
 ; Start 120x72
 
 (add-to-list 'default-frame-alist '(height . 72))

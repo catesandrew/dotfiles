@@ -34,6 +34,16 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
+;; lunaryorn-private-dir
+(defcustom dotemacs-private-dir (locate-user-emacs-file "private")
+  "Directory for private settings."
+  :group 'dotemacs)
+
+;; lunaryorn-custom-file
+(defcustom dotemacs-custom-file (locate-user-emacs-file "custom.el")
+  "File used to store settings from Customization UI."
+  :group 'dotemacs)
+
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | elapsed | timestamp |\n")
   (insert "|---------+---------+-----------|\n"))
@@ -160,33 +170,16 @@
           (add-to-list 'Info-directory-list dir))))))
 
 ;;; Customization, init file and package management
-(defconst my-private-dir (locate-user-emacs-file "private")
-  "Directory for private settings.")
-
-(defun my-expand-private-file (file-name)
-  "Get the absolute path for a private file with FILE-NAME."
-  (expand-file-name file-name my-private-dir))
-
-(defun my-load-private-file (file-name &optional noerror nomessage)
-  "Load a private file with FILE-NAME.
-
-NOERROR and NOMESSAGE are passed to `load'."
-  (load (my-expand-private-file file-name)
-        noerror nomessage))
-
-(defconst my-custom-file (locate-user-emacs-file "custom.el")
-  "File used to store settings from Customization UI.")
-
 (use-package cus-edit
   :defer t
   :config
-  (setq custom-file my-custom-file
+  (setq custom-file dotemacs-custom-file
         custom-buffer-done-kill nil            ; Kill when existing
         custom-buffer-verbose-help nil         ; Remove redundant help text
         ;; Show me the real variable name
         custom-unlispify-tag-names nil
         custom-unlispify-menu-entries nil)
-  :init (load my-custom-file 'no-error 'no-message))
+  :init (load dotemacs-custom-file 'no-error 'no-message))
 
 (use-package paradox                    ; Better package menu
   :ensure t
@@ -197,13 +190,19 @@ NOERROR and NOMESSAGE are passed to `load'."
   (setq paradox-github-token t
         paradox-execute-asynchronously nil))
 
+(use-package bug-hunter                 ; Search init file for bugs
+  :ensure t)
+
+(use-package server                     ; The server of `emacsclient'
+  :defer t
+  :init (server-mode)
+  :diminish server-buffer-clients)
+
 ;; Set up appearance early
-;; (require 'init-appearance)
+; (use-package init-appearance :load-path "config/")
 
 ;; Lets start with a smattering of sanity
 ;; (require 'init-sane-defaults)
-;; (require 'init-util)
-
 
 
 (let ((debug-on-error t))
