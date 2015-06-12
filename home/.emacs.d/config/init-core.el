@@ -143,7 +143,8 @@
 
 ;; better scrolling
 (setq scroll-conservatively 9999
-      scroll-preserve-screen-position t)
+      scroll-preserve-screen-position t
+      scroll-margin 3)
 
 ;; Buffer management
 
