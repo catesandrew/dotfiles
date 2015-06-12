@@ -165,4 +165,4 @@
 
 (add-to-list 'find-file-not-found-functions 'my-create-non-existent-directory)
 
-(provide 'sane-defaults)
+(provide 'init-sane-defaults)

@@ -48,4 +48,4 @@
 (require 'ls-lisp)
 (setq ls-lisp-use-insert-directory-program nil)
 
-(provide 'mac-osx)
+(provide 'init-macosx)
