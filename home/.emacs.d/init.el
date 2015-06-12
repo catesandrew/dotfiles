@@ -1,3 +1,22 @@
+(with-current-buffer (get-buffer-create "*Require Times*")
+  (insert "| feature | elapsed | timestamp |\n")
+  (insert "|---------+---------+-----------|\n"))
+
+(defadvice require (around require-advice activate)
+  (let ((elapsed)
+        (loaded (memq feature features))
+        (start (current-time)))
+    (prog1
+        ad-do-it
+      (unless loaded
+        (with-current-buffer (get-buffer-create "*Require Times*")
+          (goto-char (point-max))
+          (setq elapsed (float-time (time-subtract (current-time) start)))
+          (insert (format "| %s | %s | %f |\n"
+                          feature
+                          (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
+                          elapsed)))))))
+
 ;; Turn off mouse interface early in startup to avoid momentary display
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -45,24 +64,6 @@
           (const :tag "auto-complete-mode" auto-complete))
   :group 'dotemacs)
 
-(with-current-buffer (get-buffer-create "*Require Times*")
-  (insert "| feature | elapsed | timestamp |\n")
-  (insert "|---------+---------+-----------|\n"))
-
-(defadvice require (around require-advice activate)
-  (let ((elapsed)
-        (loaded (memq feature features))
-        (start (current-time)))
-    (prog1
-        ad-do-it
-      (unless loaded
-        (with-current-buffer (get-buffer-create "*Require Times*")
-          (goto-char (point-max))
-          (setq elapsed (float-time (time-subtract (current-time) start)))
-          (insert (format "| %s | %s | %f |\n"
-                          feature
-                          (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
-                          elapsed)))))))
 
 (defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
   "The storage location lisp."

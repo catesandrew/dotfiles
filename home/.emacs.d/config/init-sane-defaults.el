@@ -123,13 +123,14 @@
 
 
 (defun my-do-not-kill-scratch-buffer ()
-  (if (member (buffer-name (current-buffer)) '("*scratch*" "*Messages*"))
+  (if (member (buffer-name (current-buffer))
+              '("*scratch*" "*Messages*" "*Require Times*"))
       (progn
         (bury-buffer)
         nil)
     t))
-
 (add-hook 'kill-buffer-query-functions 'my-do-not-kill-scratch-buffer)
+
 
 ;; A saner ediff
 (setq ediff-diff-options "-w")
