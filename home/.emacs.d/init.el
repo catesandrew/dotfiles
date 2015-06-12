@@ -159,6 +159,15 @@
         (when dir
           (add-to-list 'Info-directory-list dir))))))
 
+(use-package paradox                    ; Better package menu
+  :ensure t
+  :bind (("C-c l p" . paradox-list-packages)
+         ("C-c l P" . package-list-packages-no-fetch))
+  :config
+  ;; Don't ask for a token, please, and don't bug me about asynchronous updates
+  (setq paradox-github-token t
+        paradox-execute-asynchronously nil))
+
 ;; Set up appearance early
 ;; (require 'init-appearance)
 

@@ -178,9 +178,6 @@
 (setq framemove-hook-into-windmove t)
 
 
-(setq paradox-execute-asynchronously nil)
-
-
 (when (eq system-type 'darwin)
   (require 'vkill))
 

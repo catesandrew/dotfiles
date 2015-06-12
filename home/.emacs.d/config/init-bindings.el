@@ -138,9 +138,6 @@
                               (evil-normal-state)))
 
 
-    (with-eval-after-load "paradox-autoloads"
-      (evil-leader/set-key "P" 'paradox-list-packages))
-
     ; (with-eval-after-load "flycheck-autoloads"
     ;   (evil-leader/set-key "ea" 'flycheck-list-errors)
     ;   (evil-leader/set-key "en" 'flycheck-next-error))
