@@ -159,6 +159,35 @@
         (when dir
           (add-to-list 'Info-directory-list dir))))))
 
+;;; Customization, init file and package management
+(defconst my-private-dir (locate-user-emacs-file "private")
+  "Directory for private settings.")
+
+(defun my-expand-private-file (file-name)
+  "Get the absolute path for a private file with FILE-NAME."
+  (expand-file-name file-name my-private-dir))
+
+(defun my-load-private-file (file-name &optional noerror nomessage)
+  "Load a private file with FILE-NAME.
+
+NOERROR and NOMESSAGE are passed to `load'."
+  (load (my-expand-private-file file-name)
+        noerror nomessage))
+
+(defconst my-custom-file (locate-user-emacs-file "custom.el")
+  "File used to store settings from Customization UI.")
+
+(use-package cus-edit
+  :defer t
+  :config
+  (setq custom-file my-custom-file
+        custom-buffer-done-kill nil            ; Kill when existing
+        custom-buffer-verbose-help nil         ; Remove redundant help text
+        ;; Show me the real variable name
+        custom-unlispify-tag-names nil
+        custom-unlispify-menu-entries nil)
+  :init (load my-custom-file 'no-error 'no-message))
+
 (use-package paradox                    ; Better package menu
   :ensure t
   :bind (("C-c l p" . paradox-list-packages)
@@ -175,9 +204,6 @@
 ;; (require 'init-sane-defaults)
 ;; (require 'init-util)
 
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
 
 
 (let ((debug-on-error t))
