@@ -1,19 +1,46 @@
 dotemacs
 ========
 
-this is a emacs configuration targeted for vim users.
+My Emacs configuration. This is a emacs configuration targeted for vim users.
 
-install
-=======
+### OS X support ###
 
-`git clone https://github.com/bling/dotemacs.git ~/.emacs.d`
+```console
+$ brew install trash coreutils
+```
 
-disclaimer
-==========
+### Spell checking ###
 
-here be dragons.
+```console
+$ brew install aspell --with-lang-en
+```
 
-license
-==========
+### Python support ###
 
-MIT
+```console
+$ pip install -U --user virtualenv pylint ipython
+```
+
+### Haskell support ###
+
+```console
+$ cabal install hlint hasktags hoogle present
+```
+
+### Shell scripting ###
+
+```console
+$ brew install shellcheck
+```
+
+### Markdown support ###
+
+```console
+$ brew install pandoc
+```
+
+### Ansible support ###
+
+```console
+$ brew install ansible
+```
