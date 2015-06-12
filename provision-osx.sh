@@ -110,6 +110,24 @@ case $response in
   *) break;;
 esac
 
+# install homebrew cask
+
+# brew cask install virtualbox
+# https://github.com/caskroom/homebrew-cask/issues/3333
+(
+  cd /tmp;
+  vbox_full_version=$(brew cask info virtualbox | head -1 | cut -d' ' -f2);
+  vbox_short_version=${vbox_full_version/-*};
+  curl -L -O http://download.virtualbox.org/virtualbox/${vbox_short_version}/Oracle_VM_VirtualBox_Extension_Pack-${vbox_full_version}.vbox-extpack;
+  sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-${vbox_full_version}.vbox-extpack;
+  rm *.vbox-extpack;
+)
+
+# brew cask install vagrant
+# brew cask install vagrant-manager
+
+# install homebrew fonts
+
 echo ""
 echo "Would you like to install your dotfiles?  (y/n)"
 read -r response

@@ -393,7 +393,19 @@ sudo gem install nokogiri
 sudo gem install chef
 
 
+# sudo apt-get install vagrant
+
+# If you are running Vagrant on Ubuntu (14.04) and installed through apt-get,
+# the latest version of Vagrant in the Ubuntu repository is 1.4. Downloading the
+# latest (1.7.2 at this time) from the vagrant downloads page resolves the
+# issue. As discussed
+# [here](https://github.com/Varying-Vagrant-Vagrants/VVV/issues/354)
+
+sudo bash -c 'echo deb http://vagrant-deb.linestarve.com/ any main > /etc/apt/sources.list.d/wolfgang42-vagrant.list'
+sudo apt-key adv --keyserver pgp.mit.edu --recv-key 2099F7A4
+sudo apt-get update
 sudo apt-get install vagrant
+
 # vagrant plugins
 vagrant-aws (0.6.0)
 vagrant-hostmanager (1.5.0)
@@ -514,3 +526,8 @@ sudo apt-get install sslmate
 
 # silver surfer
 sudo apt-get install silversearcher-ag
+
+# ansible
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install -y ansible
