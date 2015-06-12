@@ -247,14 +247,6 @@
            "*.gz"
            "*.zip"))))
 
-;; make sure $PATH is set correctly
-(if (eq system-type 'windows-nt)
-    (dolist (path (split-string (getenv "PATH") ";"))
-      (add-to-list 'exec-path (replace-regexp-in-string "\\\\" "/" path)))
-  (progn
-    (require 'exec-path-from-shell)
-    (exec-path-from-shell-initialize)))
-
 
 ;; http://emacs.stackexchange.com/questions/7308/define-key-to-toggle-between-javascript-implementation-and-test-file
 (defun js-jump-to (current from to format-name)

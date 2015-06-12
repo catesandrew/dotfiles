@@ -1,6 +1,9 @@
 ;; No splash screen please ... jeez
 (setq inhibit-startup-message t)
 
+;;; Debugging
+(setq message-log-max 10000)
+
 ;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
@@ -56,30 +59,15 @@
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'set-fringe-mode) (set-fringe-mode -1))
 
-;;________________________________________________________________
-;;    Determine where we are
-;;________________________________________________________________
-
-(defvar system-type-as-string (prin1-to-string system-type))
-
-(defvar on_windows_nt (string-match "windows-nt" system-type-as-string))
-(defvar on_darwin     (string-match "darwin" system-type-as-string))
-(defvar on_gnu_linux  (string-match "gnu/linux" system-type-as-string))
-(defvar on_cygwin     (string-match "cygwin" system-type-as-string))
-(defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
-
 ;; TODO: Remove Cask. Cask is yet another dependency). Great for making packages;
 ;; horrible for configuration management.
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
+; (require 'cask "~/.cask/cask.el")
+; (cask-initialize)
 
 ;; Set up load path(s)
 (add-to-list 'load-path dotemacs-config-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
 (add-to-list 'load-path dotemacs-user-settings-dir)
-
-;; Set up appearance early
-(require 'init-appearance)
 
 ;; Add external projects to load path
 (let ((base dotemacs-elisp-dir))
@@ -90,33 +78,23 @@
 
 
 ;;; Package management
-
-;; Please don't load outdated byte code
 (setq load-prefer-newer t)
 
-(add-to-list 'package-archives '(("melpa" . "http://melpa.org/packages/")))
-(add-to-list 'package-archives '(("org" . "http://orgmode.org/elpa/")))
+;; Please don't load outdated byte code
+(require 'package)
 
-;; The reason automatic package loading occurs after loading the init file is
-;; that user options only receive their customized values after loading the init
-;; file, including user options which affect the packaging system. In some
-;; circumstances, you may want to load packages explicitly in your init file
-;; (usually because some other code in your init file depends on a package). In
-;; that case, your init file should call the function `package-initialize`. It is
-;; up to you to ensure that relevant user options, such as `package-load-list`
-;; (see below), are set up prior to the `package-initialize` call. You should also
-;; set `package-enable-at-startup` to `nil`, to avoid loading the packages again
-;; after processing the init file. Alternatively, you may choose to completely
-;; inhibit package loading at startup, and invoke the command
-;; `M-x package-initialize` to load your packages manually.
 ;; http://stackoverflow.com/questions/11127109/
 (setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+
 (package-initialize)
 
 ;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
 
 ;; Requires
 
@@ -126,18 +104,69 @@
 (eval-when-compile
   (require 'cl))
 
+(require 'bind-key)
+(require 'diminish)
+
+(require 'subr-x)
+(require 'rx)
+(require 'time-date)
+
+;;; Initialization
+
+(when (version< emacs-version "25")
+  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
+  (warn "brew install emacs --HEAD --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+
+;; And disable the site default settings
+(setq inhibit-default-init t)
+
+;; Warn if the current build is more than a week old
+(run-with-idle-timer
+ 2 nil
+ (lambda ()
+   (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
+     (when (> (time-to-number-of-days time-since-build) 7)
+       (lwarn 'emacs :warning "Your Emacs build is more than a week old!")))))
+
+
+;;; Setup environment variables from the user's shell.
+(use-package exec-path-from-shell
+  :ensure t
+  :if (and (eq system-type 'darwin) (display-graphic-p))
+  :config
+  (progn
+    (when (string-match-p "/zsh$" (getenv "SHELL"))
+      ;; Use a non-interactive shell. We use a login shell, even though we have
+      ;; our paths setup in .zshenv. However, OS X adds global settings to the
+      ;; login profile. Notably, this affects /usr/texbin from MacTeX
+      (setq exec-path-from-shell-arguments '("-l")))
+
+    (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
+      (add-to-list 'exec-path-from-shell-variables var))
+
+    (exec-path-from-shell-initialize)
+
+    (setq user-mail-address (getenv "EMAIL"))
+
+    ;; Re-initialize the `Info-directory-list' from $INFOPATH. Since package.el
+    ;; already initializes info, we need to explicitly add the $INFOPATH
+    ;; directories to `Info-directory-list'.
+    (with-eval-after-load 'info
+      (dolist (dir (parse-colon-path (getenv "INFOPATH")))
+        (when dir
+          (add-to-list 'Info-directory-list dir))))))
+
+;; Set up appearance early
+;; (require 'init-appearance)
+
 ;; Lets start with a smattering of sanity
-(require 'init-sane-defaults)
-(require 'init-util)
+;; (require 'init-sane-defaults)
+;; (require 'init-util)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
 
-;; Setup environment variables from the user's shell.
-(when on_darwin
-  (require 'exec-path-from-shell)
-  (exec-path-from-shell-initialize))
 
 (let ((debug-on-error t))
   ;; (cl-loop for file in (directory-files (concat user-emacs-directory "config/"))
@@ -188,23 +217,23 @@
   ;; (require 'init-bindings)
   )
 
-(autoload 'skewer-start "init-skewer" nil t)
-(autoload 'skewer-demo "init-skewer" nil t)
+;; (autoload 'skewer-start "init-skewer" nil t)
+;; (autoload 'skewer-demo "init-skewer" nil t)
 
-(setq defuns-dir (expand-file-name "defuns" user-emacs-directory))
-(dolist (file (directory-files defuns-dir t "\\w+"))
-  (when (file-regular-p file)
-    (load file)))
+; (setq defuns-dir (expand-file-name "defuns" user-emacs-directory))
+; (dolist (file (directory-files defuns-dir t "\\w+"))
+;   (when (file-regular-p file)
+;     (load file)))
 
 ;; TODO convert to use-package https://github.com/jwiegley/use-package
-(use-package init-macosx              ; Personal OS X tools
-  :if (eq system-type 'darwin)
-  :load-path "config/"
-  :defer t)
+; (use-package init-macosx              ; Personal OS X tools
+;   :if (eq system-type 'darwin)
+;   :load-path "config/"
+;   :defer t)
 
 ;; TODO https://github.com/IvanMalison/org-projectile
 
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-              (ggtags-mode 1))))
+; (add-hook 'c-mode-common-hook
+;           (lambda ()
+;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+;               (ggtags-mode 1))))
