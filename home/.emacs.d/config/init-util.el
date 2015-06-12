@@ -1,26 +1,4 @@
 ; "After" macro definition
-
-(defmacro after (feature &rest forms)
-  "After FEATURE is loaded, evaluate FORMS.
-
-FORMS is byte compiled.
-
-FEATURE may be a named feature or a file name, see
-`eval-after-load' for details."
-  (declare (indent 1) (debug t))
-  ;; Byte compile the body.  If the feature is not available, ignore warnings.
-  ;; Taken from
-  ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2012-11/msg01262.html
-  `(,(if (or (not byte-compile-current-file)
-             (if (symbolp feature)
-                 (require feature nil :no-error)
-               (load feature :no-message :no-error)))
-         'progn
-       (message "after: cannot find %s" feature)
-       'with-no-warnings)
-    (eval-after-load ',feature
-      `(funcall (function ,(lambda () ,@forms))))))
-
 ;
 ; http://www.lunaryorn.com/2013/06/25/introducing-with-eval-after-load.html
 ;
@@ -33,6 +11,12 @@ FEATURE may be a named feature or a file name, see
 ; features during byte compilation, so I’ll wrap my old `after` macro
 ; around it to avoid bogus warnings:
 (defmacro after (feature &rest forms)
+  "After FEATURE is loaded, evaluate FORMS.
+
+FORMS is byte compiled.
+
+FEATURE may be a named feature or a file name, see
+`with-eval-after-load' for details."
   (declare (indent 1) (debug t))
   `(,(if (or (not byte-compile-current-file)
              (if (symbolp feature)
