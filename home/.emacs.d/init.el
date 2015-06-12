@@ -1,51 +1,5 @@
-(with-current-buffer (get-buffer-create "*Require Times*")
-  (insert "| feature | elapsed | timestamp |\n")
-  (insert "|---------+---------+-----------|\n"))
-
-(defadvice require (around require-advice activate)
-  (let ((elapsed)
-        (loaded (memq feature features))
-        (start (current-time)))
-    (prog1
-        ad-do-it
-      (unless loaded
-        (with-current-buffer (get-buffer-create "*Require Times*")
-          (goto-char (point-max))
-          (setq elapsed (float-time (time-subtract (current-time) start)))
-          (insert (format "| %s | %s | %f |\n"
-                          feature
-                          (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
-                          elapsed)))))))
-
-;; Turn off mouse interface early in startup to avoid momentary display
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'set-fringe-mode) (set-fringe-mode -1))
-
 ;; No splash screen please ... jeez
 (setq inhibit-startup-message t)
-
-(defvar current-user
-      (getenv
-       (if (equal system-type 'windows-nt) "USERNAME" "USER")))
-
-;;________________________________________________________________
-;;    Determine where we are
-;;________________________________________________________________
-
-(defvar system-type-as-string (prin1-to-string system-type))
-
-(defvar on_windows_nt (string-match "windows-nt" system-type-as-string))
-(defvar on_darwin     (string-match "darwin" system-type-as-string))
-(defvar on_gnu_linux  (string-match "gnu/linux" system-type-as-string))
-(defvar on_cygwin     (string-match "cygwin" system-type-as-string))
-(defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
-
-;; TODO: Remove Cask. Cask is yet another dependency). Great for making packages;
-;; horrible for configuration management.
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
 
 ;; Set path to dependencies
 (defgroup dotemacs nil
@@ -76,6 +30,48 @@
 (defcustom dotemacs-user-settings-dir (concat user-emacs-directory "users/" user-login-name)
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
+
+(with-current-buffer (get-buffer-create "*Require Times*")
+  (insert "| feature | elapsed | timestamp |\n")
+  (insert "|---------+---------+-----------|\n"))
+
+(defadvice require (around require-advice activate)
+  (let ((elapsed)
+        (loaded (memq feature features))
+        (start (current-time)))
+    (prog1
+        ad-do-it
+      (unless loaded
+        (with-current-buffer (get-buffer-create "*Require Times*")
+          (goto-char (point-max))
+          (setq elapsed (float-time (time-subtract (current-time) start)))
+          (insert (format "| %s | %s | %f |\n"
+                          feature
+                          (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
+                          elapsed)))))))
+
+;; Turn off mouse interface early in startup to avoid momentary display
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'set-fringe-mode) (set-fringe-mode -1))
+
+;;________________________________________________________________
+;;    Determine where we are
+;;________________________________________________________________
+
+(defvar system-type-as-string (prin1-to-string system-type))
+
+(defvar on_windows_nt (string-match "windows-nt" system-type-as-string))
+(defvar on_darwin     (string-match "darwin" system-type-as-string))
+(defvar on_gnu_linux  (string-match "gnu/linux" system-type-as-string))
+(defvar on_cygwin     (string-match "cygwin" system-type-as-string))
+(defvar on_solaris    (string-match "usg-unix-v" system-type-as-string))
+
+;; TODO: Remove Cask. Cask is yet another dependency). Great for making packages;
+;; horrible for configuration management.
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
 
 ;; Set up load path(s)
 (add-to-list 'load-path dotemacs-config-dir)
