@@ -128,6 +128,9 @@
      (when (> (time-to-number-of-days time-since-build) 7)
        (lwarn 'emacs :warning "Your Emacs build is more than a week old!")))))
 
+(use-package init-util              ; Personal OS X tools
+  :load-path "config/"
+  )
 
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
@@ -151,7 +154,7 @@
     ;; Re-initialize the `Info-directory-list' from $INFOPATH. Since package.el
     ;; already initializes info, we need to explicitly add the $INFOPATH
     ;; directories to `Info-directory-list'.
-    (with-eval-after-load 'info
+    (after "info"
       (dolist (dir (parse-colon-path (getenv "INFOPATH")))
         (when dir
           (add-to-list 'Info-directory-list dir))))))
