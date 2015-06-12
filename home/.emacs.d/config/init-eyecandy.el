@@ -50,22 +50,9 @@
 (with-eval-after-load 'subword (diminish 'subword-mode))
 
 
-(require 'smart-mode-line)
-(setq sml/show-client t)
-(setq sml/show-eol t)
-(setq sml/show-frame-identification t)
-(sml/setup)
-
-
-; (require 'powerline)
-; (powerline-default-theme)
-; (powerline-center-evil-theme)
-; (powerline-vim-theme)
-
 
 ; (require 'powerline-evil)
 ; (powerline-evil-vim-theme)
-
 
 
 (if (fboundp 'global-prettify-symbols-mode)

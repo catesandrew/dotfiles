@@ -242,6 +242,7 @@
 (setq ring-bell-function #'ignore
       inhibit-startup-screen t
       initial-scratch-message "Hello there!\n")
+;; Answering just 'y' or 'n' will do
 (fset 'yes-or-no-p #'y-or-n-p)
 ;; Opt out from the startup message in the echo area by simply disabling this
 ;; ridiculously bizarre thing entirely.
@@ -332,6 +333,73 @@
   :init (load-theme 'zenburn 'no-confirm))
 
 (bind-key "C-c t v" #'variable-pitch-mode)
+
+;;; The mode line
+
+(setq-default header-line-format
+              '(which-func-mode ("" which-func-format " "))
+              mode-line-format
+              '("%e" mode-line-front-space
+                "🐮"                   ; My branding :)
+                ;; Standard info about the current buffer
+                mode-line-mule-info
+                mode-line-client
+                mode-line-modified
+                mode-line-remote
+                mode-line-frame-identification
+                mode-line-buffer-identification " " mode-line-position
+                ;; Some specific information about the current buffer:
+                ;; - Paredit
+                ;; - Dired Omit Mode
+                (paredit-mode (:propertize " ()" face bold))
+                (smartparens-strict-mode (:propertize " ()" face bold))
+                (dired-omit-mode " 👻")
+                (server-buffer-clients " 💻")
+                (projectile-mode projectile-mode-line)
+                (vc-mode vc-mode)
+                " "
+                (flycheck-mode flycheck-mode-line) ; Flycheck status
+                (firestarter-mode firestarter-lighter)
+                (isearch-mode " 🔍")
+                (anzu-mode (:eval                  ; isearch pos/matches
+                            (when (> anzu--total-matched 0)
+                              (anzu--update-mode-line))))
+                (multiple-cursors-mode mc/mode-line) ; Number of cursors
+                ;; And the modes, which we don't really care for anyway
+                " " mode-line-misc-info mode-line-modes mode-line-end-spaces)
+              mode-line-remote
+              '(:eval
+                (when-let (host (file-remote-p default-directory 'host))
+                  (propertize (concat "@" host) 'face
+                              '(italic warning))))
+              ;; Remove which func from the mode line, since we have it in the
+              ;; header line
+              mode-line-misc-info
+              (assq-delete-all 'which-func-mode mode-line-misc-info))
+
+(use-package smart-mode-line   ; smart-mode-line-powerline-theme
+  :ensure t
+  :defer t
+  :init
+  (setq sml/no-confirm-load-theme t
+        sml/show-client t
+        sml/show-frame-identification t
+        sml/theme 'dark
+        sml/shorten-directory t
+        sml/shorten-modes t
+        sml/name-width 20
+        sml/mode-width 'full)
+  ; (powerline-default-theme)
+  (sml/setup)
+  :config
+  (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
+  (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t))
+
+
+;; Standard stuff
+(line-number-mode)
+(column-number-mode)
+
 
 
 
