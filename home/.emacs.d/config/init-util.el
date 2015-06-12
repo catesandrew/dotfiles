@@ -99,8 +99,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (defun my-eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
-  (let ((value (eval (preceding-sexp))))
-    (backware-kill-sexp)
+  (let ((value (eval (elisp--preceding-sexp))))
+    (backward-kill-sexp)
     (insert (format "%s" value))))
 
 (defun my-rename-current-buffer-file ()
