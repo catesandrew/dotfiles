@@ -122,7 +122,7 @@
 ; without having to provide the leading character.
 
 
-(setq evilnc-hotkey-comment-operator "gc")
+(require-package 'evil-nerd-commenter)
 (require 'evil-nerd-commenter)
 
 
