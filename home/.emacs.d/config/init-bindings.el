@@ -89,9 +89,6 @@
       "f" 'end-of-defun            ; <leader>f/F end/start of function
       "F" 'beginning-of-defun
       "gof" 'open-explorer-path    ; open explorer window of buffer path
-      "," 'evil-ace-jump-word-mode ; <leader>, for Ace Jump (word)
-      "l" 'evil-ace-jump-line-mode ; <leader>l for Ace Jump (line)
-      "x" 'evil-ace-jump-char-mode ; <leader>x for Ace Jump (char)
       ; "tn" 'elscreen-create        ; <leader>tn create new tab
       ; "tc" 'elscreen-kill          ; <leader>tc close tab
       "p b" 'projectile-switch-to-buffer
@@ -314,19 +311,15 @@
       (evil-define-key 'normal js2-mode-map (kbd "g r") 'js2r-rename-var))
     (define-key evil-normal-state-map (kbd "g r") 'mc/mark-all-like-this-dwim))
 
-  (with-eval-after-load "ace-jump-mode-autoloads"
-    (evil-leader/set-key "e" 'evil-ace-jump-word-mode) ; ,e for Ace Jump (word)
-    (evil-leader/set-key "l" 'evil-ace-jump-line-mode) ; ,l for Ace Jump (line)
-    (evil-leader/set-key "x" 'evil-ace-jump-char-mode) ; ,x for Ace Jump (char)
-    (define-key evil-operator-state-map (kbd "z") 'evil-ace-jump-char-mode)
-    (define-key evil-normal-state-map (kbd "s") 'evil-ace-jump-char-mode)
-    (define-key evil-motion-state-map (kbd "S-SPC") 'evil-ace-jump-line-mode))
+  (after "avy-autoloads"
+    (define-key evil-operator-state-map (kbd "z") 'avy-goto-char-2)
+    (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)
+    (define-key evil-motion-state-map (kbd "S-SPC") 'avy-goto-line))
 
   ;; butter fingers
   (evil-ex-define-cmd "Q" 'evil-quit)
   (evil-ex-define-cmd "Qa" 'evil-quit-all)
   (evil-ex-define-cmd "QA" 'evil-quit-all))
-
 
 ;; escape minibuffer
 (define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
