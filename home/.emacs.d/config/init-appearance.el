@@ -2,7 +2,8 @@
       font-lock-maximum-decoration t)
 
 ;; Highlight current line
-(global-hl-line-mode 1)
+(use-package hl-line                    ; Highlight the current line
+  :init (global-hl-line-mode 1))
 
 (when window-system
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
