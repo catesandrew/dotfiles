@@ -198,6 +198,42 @@
   :init (server-mode)
   :diminish server-buffer-clients)
 
+;;; OS X support
+(use-package ns-win                     ; OS X window support
+  :defer t
+  :if (eq system-type 'darwin)
+  :init
+  (progn
+    (global-set-key (kbd "M-V") 'yank)
+    (global-set-key (kbd "M-C") 'kill-ring-save)
+    (global-set-key (kbd "M-X") 'kill-region)
+    (global-set-key (kbd "M-W") 'kill-this-buffer)
+    (global-set-key (kbd "M-Z") 'undo-tree-undo)
+    (global-set-key (kbd "M-S") 'save-buffer))
+  :config
+  (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
+                                        ; workspace
+        mac-option-modifier 'meta       ; Option is simply the natural Meta
+        mac-command-modifier 'meta      ; But command is a lot easier to hit
+        mac-right-command-modifier 'left
+        mac-right-option-modifier 'none ; Keep right option for accented input
+        ;; Just in case we ever need these keys
+        mac-function-modifier 'hyper))
+
+(use-package init-macosx              ; Personal OS X tools
+  :if (eq system-type 'darwin)
+  :load-path "config/"
+  :defer t
+  :config
+  ;; Ignore .DS_Store files with ido mode
+  (add-to-list 'ido-ignore-files "\\.DS_Store")
+  :bind ("C-c C-S-o" . dotemacs-mac-open-current-file))
+
+(use-package osx-trash                  ; Trash support for OS X
+  :if (eq system-type 'darwin)
+  :ensure t
+  :init (osx-trash-setup))
+
 ;; Set up appearance early
 ; (use-package init-appearance :load-path "config/")
 
@@ -261,12 +297,6 @@
 ; (dolist (file (directory-files defuns-dir t "\\w+"))
 ;   (when (file-regular-p file)
 ;     (load file)))
-
-;; TODO convert to use-package https://github.com/jwiegley/use-package
-; (use-package init-macosx              ; Personal OS X tools
-;   :if (eq system-type 'darwin)
-;   :load-path "config/"
-;   :defer t)
 
 ;; TODO https://github.com/IvanMalison/org-projectile
 

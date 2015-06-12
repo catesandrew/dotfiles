@@ -1,51 +1,47 @@
-(require 'dash)
+(defun dotemacs-id-of-bundle (bundle)
+  "Get the ID of a BUNDLE.
 
-;; Treat option as meta and command as super
-; (setq mac-option-key-is-meta t)
-; (setq mac-command-key-is-meta nil)
-; (setq mac-command-modifier 'super)
-; (setq mac-option-modifier 'meta)
+BUNDLE is the user-visible name of the bundle as string.  Return
+the id of the bundle as string.
 
-;; Treat command as meta and option as super
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
-(setq mac-option-modifier 'super)
-(setq mac-command-modifier 'meta)
+These bundle IDs are normally constant.  Thus you may use this
+function to determine the ID once, and then hard-code it in your
+code."
+  (let ((script (format "id of app \"%s\"" bundle)))
+    (car (process-lines "osascript" "-e" script))))
 
-;; Keybindings
-(global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-(global-set-key (kbd "s-v") 'yank)
-(global-set-key (kbd "s-c") 'kill-ring-save)
-(global-set-key (kbd "s-x") 'kill-region)
-(global-set-key (kbd "s-w") 'kill-this-buffer)
-(global-set-key (kbd "s-z") 'undo-tree-undo)
-(global-set-key (kbd "s-s") 'save-buffer)
-(global-set-key (kbd "s-Z") 'undo-tree-redo)
+(defun dotemacs-path-of-bundle (id)
+  "Get the path of a bundle with ID.
 
-;; keybinding to toggle full screen mode
-(global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))
+ID is the bundle ID (see `my-id-of-bundle' as string.  Return
+the directory path of the bundle as string."
+  (let ((query (format "kMDItemCFBundleIdentifier == '%s'" id)))
+    (car (process-lines "mdfind" query))))
 
-;; Move to trash when deleting stuff
-(setq delete-by-moving-to-trash t
-      trash-directory "~/.Trash/emacs")
+(defun dotemacs-homebrew-prefix (&optional formula)
+  "Get the homebrew prefix for FORMULA.
 
-;; Ignore .DS_Store files with ido mode
-(add-to-list 'ido-ignore-files "\\.DS_Store")
+Without FORMULA, get the homebrew prefix itself.
 
-;; Don't open files from the workspace in a new frame
-(setq ns-pop-up-frames nil)
+Return nil, if homebrew is not available, or if the prefix
+directory does not exist."
+  (let ((prefix (ignore-errors (car (apply #'process-lines "brew" "--prefix"
+                                           (when formula (list formula)))))))
+    (when (and prefix (file-directory-p prefix))
+      prefix)))
 
-;; Use aspell for spell checking: brew install aspell --lang=en
-(setq ispell-program-name "/usr/local/bin/aspell")
+(defun dotemacs-homebrew-installed-p (&optional formula)
+  "Determine whether a homebrew FORMULA is installed.
+
+Without FORMULA determine whether Homebrew itself is available."
+  (if formula
+      (my-homebrew-prefix formula)
+    (executable-find "brew")))
 
 ;; Open files
-(defun mac-open-current-file ()
+(defun dotemacs-open-current-file ()
+  "Open current file using shell `open` command"
   (interactive)
   (shell-command (concat "open " (buffer-file-name))))
-
-(global-set-key (kbd "C-c C-S-o") 'mac-open-current-file)
-
-(require 'ls-lisp)
-(setq ls-lisp-use-insert-directory-program nil)
 
 (provide 'init-macosx)
