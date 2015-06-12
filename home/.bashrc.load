@@ -34,6 +34,10 @@ if [ $(uname) = "Darwin" ]; then
             fi
         fi
 
+        if [ x"" != x"$(brew ls --versions openconnect)" ]; then
+            export VPNC_SCRIPT=$BREW_HOME/etc/vpnc-script
+        fi
+
         if brew cask info vagrant 1>/dev/null 2>&1; then
             export VAGRANT_CHECKPOINT_DISABLE=1
             export VAGRANT_HOME=~/.vagrant.d
@@ -63,7 +67,11 @@ elif [ $(uname) = "Linux" ]; then
     dpkg -s vagrant &>/dev/null || {
         export VAGRANT_CHECKPOINT_DISABLE=1
         export VAGRANT_HOME=~/.vagrant.d
-        export VAGRANT_DOTFILE_PATH=".vagrant-"`hostname`
+        export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
+    }
+
+    dpkg -s vpnc-scripts &>/dev/null || {
+        export VPNC_SCRIPT=/usr/share/vpnc-scripts/vpnc-script
     }
 fi
 
