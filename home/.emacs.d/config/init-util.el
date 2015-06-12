@@ -34,6 +34,14 @@ FEATURE may be a named feature or a file name, see
     `(eval-after-load ,file
        `(funcall (function ,(lambda () ,@body))))))
 
+(defun require-package (package)
+  "Ensures that PACKAGE is installed."
+  (unless (or (package-installed-p package)
+              (require package nil 'noerror))
+    (unless (assoc package package-archive-contents)
+      (package-refresh-contents))
+    (package-install package)))
+
 (defmacro lazy-major-mode (pattern mode)
   "Defines a new major-mode matched by PATTERN and activates it."
   `(add-to-list 'auto-mode-alist
@@ -148,13 +156,5 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   "Converts the current buffer to DOS file format."
   (interactive)
   (set-buffer-file-coding-system 'undecided-dos nil))
-
- (defun require-package (package)
-  "Ensures that PACKAGE is installed."
-  (unless (or (package-installed-p package)
-              (require package nil 'noerror))
-    (unless (assoc package package-archive-contents)
-      (package-refresh-contents))
-    (package-install package)))
 
 (provide 'init-util)
