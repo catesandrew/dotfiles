@@ -8,7 +8,9 @@
 ; To enable caching unconditionally
 (setq projectile-enable-caching t)
 (with-eval-after-load "helm-autoloads"
-  (setq projectile-completion-system 'helm))
+  (setq projectile-completion-system 'helm)
+  (after 'helm-projectile
+    (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)))
 
 
 (require 'projectile)
@@ -16,14 +18,11 @@
 
 (add-to-list 'projectile-globally-ignored-directories "elpa")
 (add-to-list 'projectile-globally-ignored-directories ".cache")
-(add-to-list 'projectile-globally-ignored-directories "node_modules")
 (add-to-list 'projectile-globally-ignored-directories "assets")
 (add-to-list 'projectile-globally-ignored-directories "build")
 (add-to-list 'projectile-globally-ignored-directories "tmp")
 (add-to-list 'projectile-globally-ignored-directories "log")
 (add-to-list 'projectile-globally-ignored-directories "vendor")
-(add-to-list 'projectile-globally-ignored-directories "bower_components")
-(add-to-list 'projectile-globally-ignored-directories "components")
 (add-to-list 'projectile-globally-ignored-directories ".cask")
 (add-to-list 'projectile-globally-ignored-directories ".git")
 (add-to-list 'projectile-globally-ignored-directories ".hg")
