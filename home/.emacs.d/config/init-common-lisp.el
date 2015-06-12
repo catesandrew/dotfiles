@@ -1,21 +1,8 @@
-(require 'init)
+(require 'init-programming)
+(require-package 'rainbow-delimiters)
+(require 'rainbow-delimiters)
 
-
-(require 'elisp-slime-nav)
-(with-eval-after-load "elisp-slime-nav-autoloads"
-  (defadvice elisp-slime-nav-find-elisp-thing-at-point (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
-    (recenter)))
-
-(defun my-lisp-hook ()
-  (progn
-    (elisp-slime-nav-mode)
-    (turn-on-eldoc-mode)))
-
-(add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
-(add-hook 'lisp-interaction-mode-hook 'my-lisp-hook)
-(add-hook 'ielm-mode-hook 'my-lisp-hook)
-
-
+(require-package 'slime)
 (require 'slime)
 
 ;; the SBCL configuration file is in Common Lisp
