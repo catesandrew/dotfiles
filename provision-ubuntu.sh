@@ -193,13 +193,13 @@ read -r response
 case $response in
   [yY])
       dpkg -s npm &>/dev/null || {
-        # curl -sL https://deb.nodesource.com/setup | sudo bash -
+        # curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 
         print_status "Updating NodeJS PPA..."
 
         ## NodeSource's Node.js PPA
-        sudo bash -c 'echo "deb https://deb.nodesource.com/node ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
-        sudo bash -c 'echo "deb-src https://deb.nodesource.com/node ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
+        sudo bash -c 'echo "deb https://deb.nodesource.com/node_0.12 ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
+        sudo bash -c 'echo "deb-src https://deb.nodesource.com/node_0.12 ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68576280
 
         exec_sudo_cmd 'apt-get -yqq update'
