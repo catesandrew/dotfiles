@@ -29,6 +29,14 @@
          '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
            (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
 
+    ;; org-mode colors
+    (setq org-todo-keyword-faces
+      '(
+         ("INPR" . (:foreground "yellow" :weight bold))
+         ("DONE" . (:foreground "green" :weight bold))
+         ("IMPEDED" . (:foreground "red" :weight bold))
+         ))
+
    (setq org-todo-state-tags-triggers
          ' (("CANCELLED" ("CANCELLED" . t))
             ("WAITING" ("WAITING" . t))
