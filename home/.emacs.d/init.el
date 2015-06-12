@@ -63,17 +63,6 @@
                           (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
                           elapsed)))))))
 
-;; Turn off mouse interface early in startup to avoid momentary display
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'set-fringe-mode) (set-fringe-mode -1))
-
-;; TODO: Remove Cask. Cask is yet another dependency). Great for making packages;
-;; horrible for configuration management.
-; (require 'cask "~/.cask/cask.el")
-; (cask-initialize)
-
 ;; Set up load path(s)
 (add-to-list 'load-path dotemacs-config-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
@@ -234,8 +223,117 @@
   :ensure t
   :init (osx-trash-setup))
 
-;; Set up appearance early
-; (use-package init-appearance :load-path "config/")
+;;; User interface
+
+;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
+;; bar, since the top menu bar is always visible anyway, and we'd just empty it
+;; which is rather pointless.
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (and (not (eq system-type 'darwin)) (fboundp 'menu-bar-mode))
+  (menu-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+
+;; No blinking and beeping, no startup screen, no scratch message and short
+;; Yes/No questions.
+(blink-cursor-mode -1)
+(tooltip-mode -1)
+(setq ring-bell-function #'ignore
+      inhibit-startup-screen t
+      initial-scratch-message "Hello there!\n")
+(fset 'yes-or-no-p #'y-or-n-p)
+;; Opt out from the startup message in the echo area by simply disabling this
+;; ridiculously bizarre thing entirely.
+(fset 'display-startup-echo-area-message #'ignore)
+
+(use-package init-scratch          ; My logo in the scratch buffer
+  :commands (dotemacs-insert-logo
+             dotemacs-insert-logo-into-scratch)
+  :init (add-hook 'after-init-hook #'dotemacs-insert-logo-into-scratch))
+
+(use-package dynamic-fonts              ; Select best available font
+  :ensure t
+  :config
+  (progn
+    (setq dynamic-fonts-preferred-monospace-fonts
+          '(
+            ;; Best fonts for Powerline
+            "Source Code Pro for Powerline"   ; https://github.com/adobe-fonts/source-code-pro
+            "Anonymous Pro for Powerline" ; http://www.marksimonson.com/fonts/view/anonymous-pro
+            ;; Consolas and its free alternative.  Ok, but not my preference
+            "Inconsolata for Powerline"
+            "Consolas for Powerline"
+            ;; Also still kind of ok
+            "Fira Mono for Powerline"
+            ;; Best fonts
+            "Source Code Pro"   ; https://github.com/adobe-fonts/source-code-pro
+            "Anonymous Pro" ; http://www.marksimonson.com/fonts/view/anonymous-pro
+            ;; Consolas and its free alternative.  Ok, but not my preference
+            "Inconsolata"
+            "Consolas"
+            ;; Also still kind of ok
+            "Fira Mono for Powerline"
+            ;; System fonts, as last resort
+            "Menlo"
+            "DejaVu Sans Mono"
+            "Bitstream Vera Mono"
+            "Courier New")
+          dynamic-fonts-preferred-monospace-point-size (pcase system-type
+                                                         (`darwin 13)
+                                                         (_ 10))
+          dynamic-fonts-preferred-proportional-fonts
+          '(
+            ;; Best, from
+            ;; https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/
+            "Fira Sans"
+            ;; System fonts, as last resort
+            "Helvetica"
+            "Segoe UI"
+            "DejaVu Sans"
+            "Bitstream Vera"
+            "Tahoma"
+            "Verdana"
+            "Arial Unicode MS"
+            "Arial")
+          dynamic-fonts-preferred-proportional-point-size (pcase system-type
+                                                            (`darwin 13)
+                                                            (_ 10)))
+
+    (dynamic-fonts-setup)))
+
+(use-package unicode-fonts              ; Map Unicode blocks to fonts
+  :ensure t
+  ;; Enable emoticon mappings
+  :config (progn (setq unicode-fonts-skip-font-groups '(low-quality-glyphs)
+                       unicode-fonts-use-prepend t)
+                 (unicode-fonts-setup)))
+
+(use-package solarized                  ; My colour theme
+  :disabled t
+  :ensure solarized-theme
+  :defer t
+  :init (load-theme 'solarized-light 'no-confirm)
+  :config
+  ;; Disable variable pitch fonts in Solarized theme
+  (setq solarized-use-variable-pitch nil
+        ;; Don't add too much colours to the fringe
+        solarized-emphasize-indicators nil
+        ;; I find different font sizes irritating.
+        solarized-height-minus-1 1.0
+        solarized-height-plus-1 1.0
+        solarized-height-plus-2 1.0
+        solarized-height-plus-3 1.0
+        solarized-height-plus-4 1.0))
+
+(use-package zenburn
+  :ensure zenburn-theme
+  :defer t
+  :init (load-theme 'zenburn 'no-confirm))
+
+(bind-key "C-c t v" #'variable-pitch-mode)
+
+
 
 ;; Lets start with a smattering of sanity
 ;; (require 'init-sane-defaults)

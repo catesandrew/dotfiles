@@ -56,12 +56,6 @@
 (when (display-graphic-p)
   (setq-default cursor-type 'bar))
 
-;; ;; Make the cursor blink every second:
-
-;; (when (display-graphic-p)
-;;   (setq blink-cursor-interval 1.0)
-;;   (blink-cursor-mode 1))
-
 ;; dired fixes
 
 ;; OS X’s bundled version of ls isn’t the GNU one, so it doesn’t support the --dired flag. Emacs caters for that use case:

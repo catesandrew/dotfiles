@@ -157,7 +157,6 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
 
-(setq ring-bell-function 'ignore)
 (setq mark-ring-max 64)
 (setq global-mark-ring-max 128)
 (setq save-interprogram-paste-before-kill t)

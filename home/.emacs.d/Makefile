@@ -5,7 +5,9 @@ PKGDIR = $(EMACSBATCH) -l package --eval '(princ (expand-file-name package-user-
 
 export EMACS
 
-LIB_SRCS = config/init-util.el
+LIB_SRCS = config/init-util.el \
+		   config/init-macosx.el \
+		   config/init-scratch.el
 
 SRCS = init.el $(LIB_SRCS)
 OBJECTS = $(SRCS:.el=.elc)
