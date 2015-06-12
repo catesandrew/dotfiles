@@ -68,10 +68,6 @@
   "The storage location lisp."
   :group 'dotemacs)
 
-(defcustom dotemacs-settings-dir (expand-file-name "settings" user-emacs-directory)
-  "The storage location for settings."
-  :group 'dotemacs)
-
 (defcustom dotemacs-config-dir (expand-file-name "config" user-emacs-directory)
   "The config location lisp."
   :group 'dotemacs)
@@ -81,10 +77,8 @@
   :group 'dotemacs)
 
 ;; Set up load path(s)
-(add-to-list 'load-path dotemacs-settings-dir)
 (add-to-list 'load-path dotemacs-config-dir)
 (add-to-list 'load-path dotemacs-elisp-dir)
-;; Settings for currently logged in user
 (add-to-list 'load-path dotemacs-user-settings-dir)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -92,7 +86,7 @@
   (load custom-file))
 
 ;; Set up appearance early
-(require 'appearance)
+(require 'init-appearance)
 
 ;; Add external projects to load path
 (let ((base dotemacs-elisp-dir))
@@ -138,7 +132,7 @@
   (require 'use-package))
 
 ;; Lets start with a smattering of sanity
-(require 'sane-defaults)
+(require 'init-sane-defaults)
 
 ;; Setup environment variables from the user's shell.
 (when on_darwin
@@ -201,9 +195,9 @@
     (load file)))
 
 ;; TODO convert to use-package https://github.com/jwiegley/use-package
-(use-package mac-osx              ; Personal OS X tools
+(use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
-  :load-path "settings/"
+  :load-path "config/"
   :defer t)
 
 ;; TODO https://github.com/IvanMalison/org-projectile
