@@ -1,8 +1,3 @@
-; Start 120x72
-
-(add-to-list 'default-frame-alist '(height . 72))
-(add-to-list 'default-frame-alist '(width . 120))
-
 ; dtrt-indent
 
 ; Automatically determine the indentation settings used on the file that you're
@@ -32,8 +27,6 @@
 
 ;; make side by side buffers function the same as the main window
 (setq truncate-partial-width-windows nil)
-
-(load-theme 'zenburn t)
 
 ;; disable backup files
 (setq make-backup-files nil) ; stop creating backup~ files
@@ -168,11 +161,6 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq read-file-name-completion-ignore-case t)
-(setq frame-title-format '("Emacs @ : %b %+%+ %f"))
-; (setq frame-title-format
-;       '("" invocation-name " - " (:eval (if (buffer-file-name)
-;                                             (abbreviate-file-name (buffer-file-name))
-;                                           "%b"))))
 (setq mouse-yank-at-point t)
 
 

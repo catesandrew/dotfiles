@@ -41,14 +41,6 @@
 (when (display-graphic-p)
   (setq use-dialog-box nil))
 
-;; Make the window title display the full path of the file I’m currently editing:
-
-(when (display-graphic-p)
-  (setq frame-title-format
-        '((:eval (if (buffer-file-name)
-                     (abbreviate-file-name (buffer-file-name))
-                   "%b")))))
-
 ;; Cursor
 
 ;; On modern operating systems, a vertical bar is used as a cursor:

@@ -1,9 +1,3 @@
-(source gnu)
-(source melpa)
-(source org)
-
-(files ("*.el" "defuns/*.el" "settings/*.el" "config/*.el" "users/**/*.el"))
-
 (depends-on "ac-etags") ;;
 (depends-on "ace-jump-mode") ;;
 (depends-on "ag") ;;

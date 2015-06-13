@@ -516,11 +516,25 @@ mouse-3: go to end"))))
 
   :diminish helm-mode)
 
-
 (use-package helm-unicode
   :ensure t
   :bind ("C-c b 8" . helm-unicode))
+
+;;; Buffer, Windows and Frames
+(setq frame-resize-pixelwise t          ; Resize by pixels
+      frame-title-format
+      '(:eval (if (buffer-file-name)
+                  (abbreviate-file-name (buffer-file-name)) "%b")))
 
+
+; Start 120x72
+(use-package frame
+  :bind (("C-c t F" . toggle-frame-fullscreen))
+  :init (progn
+          ;; Kill `suspend-frame'
+          (global-set-key (kbd "C-z") nil)
+          (global-set-key (kbd "C-x C-z") nil))
+  :config (add-to-list 'initial-frame-alist '(height . 72) '(width . 120))) ; '(fullscreen . maximized)
 
 
 
