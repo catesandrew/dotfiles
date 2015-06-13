@@ -48,12 +48,6 @@
 (when (display-graphic-p)
   (setq-default cursor-type 'bar))
 
-;; dired fixes
-
-;; OS X’s bundled version of ls isn’t the GNU one, so it doesn’t support the --dired flag. Emacs caters for that use case:
-
-(setq dired-use-ls-dired nil)
-
 ;; sRGB display fixes
 
 ;; As of Emacs 24.4, Emacs natively supports proper sRGB values on OS X:

@@ -483,7 +483,6 @@ mouse-3: go to end"))))
             helm-bookmark-show-location t
             helm-M-x-fuzzy-match t
             helm-apropos-fuzzy-match t
-            helm-recentf-fuzzy-match t
             helm-locate-fuzzy-match t
             helm-file-cache-fuzzy-match t
             helm-semantic-fuzzy-match t
@@ -657,6 +656,176 @@ mouse-3: go to end"))))
   :bind (("C-c t R" . writeroom-mode)))
 
 
+
+;;; File handling
+
+;; Keep backup and auto save files out of the way
+(setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
+      auto-save-file-name-transforms `((".*" ,(concat dotemacs-cache-directory "backups") t))
+      auto-save-list-file-prefix (concat dotemacs-cache-directory "auto-save-list/saves-"))
+
+;; Delete files to trash
+(setq delete-by-moving-to-trash t)
+
+(use-package files
+  ;; Revert the current buffer (re-read the contents from disk). Burying
+  ;; a buffer (removing it from the current window and sending it to the bottom
+  ;; of the stack) is very common for dismissing buffers.
+  :bind (("C-c f u" . revert-buffer)
+         ("C-c f y" . bury-buffer))
+  :config
+  ;; Use GNU ls for Emacs
+  (when-let (gnu-ls (and (eq system-type 'darwin) (executable-find "gls")))
+    (setq insert-directory-program gnu-ls)))
+
+(use-package tramp                      ; Access remote files
+  :defer t
+  :config
+  ;; Store auto-save files locally
+  (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
+
+(use-package dired                      ; Edit directories
+  :defer t
+  :config
+  (progn
+    (require 'dired-x)
+
+    (setq dired-auto-revert-buffer t    ; Revert on re-visiting
+          ;; Move files between split panes
+          dired-dwim-target t
+          ;; Better dired flags: `-l' is mandatory, `-a' shows all files, `-h'
+          ;; uses human-readable sizes, and `-F' appends file-type classifiers
+          ;; to file names (for better highlighting)
+          dired-listing-switches "-alhF"
+          dired-ls-F-marks-symlinks t   ; -F marks links with @
+          ;; Inhibit prompts for simple recursive operations
+          dired-recursive-copies 'always)
+
+    (when (or (memq system-type '(gnu gnu/linux))
+              (string= (file-name-nondirectory insert-directory-program) "gls"))
+      ;; If we are on a GNU system or have GNU ls, add some more `ls' switches:
+      ;; `--group-directories-first' lists directories before files, and `-v'
+      ;; sorts numbers in file names naturally, i.e. "image1" goes before
+      ;; "image02"
+      (setq dired-listing-switches
+            (concat dired-listing-switches " --group-directories-first -v")))))
+
+(use-package dired-x                    ; Additional tools for Dired
+  :bind (("C-x C-j" . dired-jump))
+  :init (add-hook 'dired-mode-hook #'dired-omit-mode)
+  :config
+  (progn
+    (setq dired-omit-verbose nil)        ; Shut up, dired
+
+    (when (eq system-type 'darwin)
+      ;; OS X bsdtar is mostly compatible with GNU Tar
+      (setq dired-guess-shell-gnutar "tar"))
+
+    ;; Diminish dired-omit-mode. We need this hack, because Dired Omit Mode has
+    ;; a very peculiar way of registering its lighter explicitly in
+    ;; `dired-omit-startup'.  We can't just use `:diminish' because the lighter
+    ;; isn't there yet after dired-omit-mode is loaded.
+    (add-function :after (symbol-function 'dired-omit-startup)
+                  (lambda () (diminish 'dired-omit-mode))
+                  '((name . dired-omit-mode-diminish)))))
+
+(use-package helm-files
+  :ensure helm
+  :defer t
+  :config (setq helm-recentf-fuzzy-match t
+                ;; Use recentf to find recent files
+                helm-ff-file-name-history-use-recentf t
+                ;; Find library from `require', `declare-function' and friends
+                helm-ff-search-library-in-sexp t))
+
+(use-package ignoramus                  ; Ignore uninteresting files everywhere
+  :ensure t
+  :config (progn (dolist (name '(".cask" ".vagrant"))
+                   ;; Ignore some additional directories
+                   (add-to-list 'ignoramus-file-basename-exact-names name))
+                 (ignoramus-setup)))
+
+(use-package hardhat ; Protect user-writable files
+  :ensure t
+  :init (global-hardhat-mode)
+  :config (setq hardhat-mode-lighter "🔒"))
+
+(use-package tramp                      ; Access remote files
+  :defer t
+  :config
+  ;; Store auto-save files locally
+  (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
+
+(use-package bookmark                   ; Bookmarks for Emacs buffers
+  :bind (("C-c l b" . list-bookmarks))
+  ;; Save bookmarks immediately after a bookmark was added
+  :config
+  (setq bookmark-save-flag 1)
+  ;; Store auto-save files locally
+  (setq bookmark-default-file (concat dotemacs-cache-directory "bookmarks")))
+
+
+;; original
+(run-with-timer 1800 1800 'recentf-save-list)
+;; original
+
+(use-package recentf                    ; Save recently visited files
+  :init
+  (setq recentf-save-file (concat dotemacs-cache-directory "recentf"))
+  (recentf-mode)
+
+  :config
+  (setq recentf-max-saved-items 200
+        recentf-max-menu-items 50
+        ;; Cleanup recent files only when Emacs is idle, but not when the mode
+        ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+        ;; idles often enough to have the recent files list clean up regularly
+        recentf-auto-cleanup 300
+        recentf-exclude (list "COMMIT_EDITMSG\\'"
+                              "/\\.git/.*\\'" ; Git contents
+                              "/elpa/.*\\'" ; Package files
+                              "/itsalltext/" ; It's all text temp files
+                              ;; And all other kinds of boring files
+                              #'ignoramus-boring-p)))
+
+;; move cursor to the last position upon open
+(use-package saveplace                  ; Save point position in files
+  :config (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory)))
+
+(setq view-read-only t)                 ; View read-only files
+
+(use-package autorevert                 ; Auto-revert buffers of changed files
+  :init (global-auto-revert-mode)
+  :config (setq auto-revert-verbose nil ; Shut up, please!
+                ;; Revert Dired buffers, too
+                global-auto-revert-non-file-buffers t))
+
+(use-package image-file                 ; Visit images as images
+  :init (auto-image-file-mode))
+
+(use-package launch                     ; Open files in external programs
+  :ensure t
+  :defer t)
+
+(use-package reveal-in-finder           ; Reveal current buffer in finder
+  :ensure t
+  :bind (("C-c f f" . reveal-in-finder)))
+
+(use-package init-files            ; Personal file tools
+  :load-path "config/"
+  :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
+         ("C-c f i" . dotemacs-open-in-intellij)
+         ("C-c f o" . dotemacs-launch-dwim)
+         ("C-c f R" . dotemacs-rename-file-and-buffer)
+         ("C-c f w" . dotemacs-copy-filename-as-kill)
+         ("C-c f u" . dotemacs-find-user-init-file-other-window)
+         ("C-c w ." . dotemacs-browse-feature-url)))
+
+;;; Additional bindings for built-ins
+(bind-key "C-c f v d" #'add-dir-local-variable)
+(bind-key "C-c f v l" #'add-file-local-variable)
+(bind-key "C-c f v p" #'add-file-local-variable-prop-line)
 
 
 

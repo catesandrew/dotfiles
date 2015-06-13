@@ -9,10 +9,6 @@
 (dtrt-indent-mode 1)
 
 
-;; move cursor to the last position upon open
-(require 'saveplace)
-(setq-default save-place t)
-(setq save-place-file (expand-file-name ".places" user-emacs-directory))
 
 
 ;; To get rid of the start message just set the initial-scratch-message variable to ""
@@ -33,15 +29,6 @@
 (setq auto-save-default nil) ; stop creating #autosave# files
 
 
-;; recent files
-(require 'recentf)
-(setq recentf-save-file (concat dotemacs-cache-directory "recentf"))
-(setq recentf-max-menu-items 50)
-(setq recentf-auto-cleanup 30)
-(add-to-list 'recentf-exclude "COMMIT_EDITMSG\\'")
-(run-with-timer 1800 1800 'recentf-save-list)
-
-
 ;; pcomplete
 (setq pcomplete-ignore-case t)
 
@@ -52,10 +39,6 @@
 
 ;; narrowing
 (put 'narrow-to-region 'disabled nil)
-
-
-;; dired
-(require 'dired-x)
 
 
 ;; comint
@@ -89,11 +72,6 @@
 ; To delete bookmarks, press TAB inside the helm sub-window to see the list of
 ; actions and choose "Delete Bookmark(s)".
 
-;; bookmarks
-(setq bookmark-default-file (concat dotemacs-cache-directory "bookmarks"))
-(setq bookmark-save-flag 1) ;; save after every change
-
-
 ;; fringe
 (when (display-graphic-p)
   (fringe-mode 16))
@@ -108,30 +86,11 @@
 (midnight-delay-set 'midnight-delay 0)
 
 
-;; store most files in the cache
-(setq backup-directory-alist
-      `((".*" . ,(concat dotemacs-cache-directory "backups")))
-      auto-save-file-name-transforms
-      `((".*" ,(concat dotemacs-cache-directory "backups") t))
-      auto-save-list-file-prefix
-      (concat dotemacs-cache-directory "auto-save-list/saves-"))
-
-
 ;; better scrolling
 (setq scroll-conservatively 9999
       scroll-preserve-screen-position t
       scroll-margin 3)
 
-;; Buffer management
-
-;; Burying a buffer (removing it from the current window and sending
-;; it to the bottom of the stack) is very common for dismissing
-;; buffers. Add a mapping for it:
-(global-set-key (kbd "C-c y") 'bury-buffer)
-
-;; Add a key combination to revert the current buffer (re-read the
-;; contents from disk):
-(global-set-key (kbd "C-c r") 'revert-buffer)
 
 (setq mark-ring-max 64)
 (setq global-mark-ring-max 128)

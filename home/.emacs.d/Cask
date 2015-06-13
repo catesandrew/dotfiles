@@ -21,9 +21,7 @@
 (depends-on "company-restclient")
 (depends-on "company-tern") ;;
 (depends-on "company-ycmd") ;;
-(depends-on "dash")
 (depends-on "diff-hl") ;;
-(depends-on "dired-details")
 (depends-on "discover-my-major") ;;
 (depends-on "dtrt-indent") ;;
 (depends-on "dummy-h-mode")
