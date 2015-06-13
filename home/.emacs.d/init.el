@@ -387,20 +387,18 @@
 (use-package smart-mode-line   ; smart-mode-line-powerline-theme
   :ensure t
   :defer t
-  :init
-  (setq sml/no-confirm-load-theme t
-        sml/show-client t
-        sml/show-frame-identification t
-        sml/theme 'dark
-        sml/shorten-directory t
-        sml/shorten-modes t
-        sml/name-width 20
-        sml/mode-width 'full)
-  ; (powerline-default-theme)
-  (sml/setup)
   :config
-  (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
-  (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t))
+  (progn
+    (setq sml/no-confirm-load-theme t
+          sml/theme 'dark
+           sml/shorten-directory t
+           sml/shorten-modes t
+           sml/name-width 20
+           sml/mode-width 'full)
+    ; (powerline-default-theme)
+    (sml/setup)
+    (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
+    (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t)))
 
 
 ;; Standard stuff
