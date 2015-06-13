@@ -642,10 +642,21 @@ mouse-3: go to end"))))
         ediff-window-setup-function #'ediff-setup-windows-plain
         ediff-split-window-function #'split-window-horizontally))
 
+;; http://stackoverflow.com/a/4485083/740527
+(use-package init-desktop
+  :load-path "config/"
+  :defer t
+  :bind ("C-c d d" . dotemacs-enable-desktop))
+
 (use-package desktop                    ; Save buffers, windows and frames
-  :init (desktop-save-mode)
-  :config (progn
-            ;; Save desktops a minute after Emacs was idle.
+  :init
+  (setq desktop-dirname (concat dotemacs-cache-directory "desktop/")
+        desktop-path                (list desktop-dirname)
+        ; desktop-save                t
+        desktop-files-not-to-save   "^$" ;reload tramp paths
+        desktop-load-locked-desktop nil)
+  (desktop-save-mode 0)
+  :config (progn ;; Save desktops a minute after Emacs was idle.
             (setq desktop-auto-save-timeout 60)
 
             (dolist (mode '(magit-mode git-commit-mode))
@@ -826,6 +837,154 @@ mouse-3: go to end"))))
 (bind-key "C-c f v d" #'add-dir-local-variable)
 (bind-key "C-c f v l" #'add-file-local-variable)
 (bind-key "C-c f v p" #'add-file-local-variable-prop-line)
+
+
+;;; LaTeX with AUCTeX
+(use-package tex-site                   ; AUCTeX initialization
+  :ensure auctex)
+
+(use-package tex                        ; TeX editing/processing
+  :ensure auctex
+  :defer t
+  :config
+  (progn
+    (setq TeX-parse-self t              ; Parse documents to provide completion
+                                        ; for packages, etc.
+          TeX-auto-save t               ; Automatically save style information
+          TeX-electric-sub-and-superscript t ; Automatically insert braces after
+                                        ; sub- and superscripts in math mode
+          TeX-electric-math '("\\(" "\\)")
+          ;; Don't insert magic quotes right away.
+          TeX-quote-after-quote t
+          ;; Don't ask for confirmation when cleaning
+          TeX-clean-confirm nil
+          ;; Provide forward and inverse search with SyncTeX
+          TeX-source-correlate-mode t
+          TeX-source-correlate-method 'synctex)
+    (setq-default TeX-master nil        ; Ask for the master file
+                  TeX-engine 'luatex    ; Use a modern engine
+                  ;; Redundant in 11.88, but keep for older AUCTeX
+                  TeX-PDF-mode t)
+
+    ;; Move to chktex
+    (setcar (cdr (assoc "Check" TeX-command-list)) "chktex -v6 %s")))
+
+(use-package tex-buf                    ; TeX buffer management
+  :ensure auctex
+  :defer t
+  ;; Don't ask for confirmation when saving before processing
+  :config (setq TeX-save-query nil))
+
+(use-package tex-style                  ; TeX style
+  :ensure auctex
+  :defer t
+  :config
+  ;; Enable support for csquotes
+  (setq LaTeX-csquotes-close-quote "}"
+        LaTeX-csquotes-open-quote "\\enquote{"))
+
+(use-package tex-fold                   ; TeX folding
+  :ensure auctex
+  :defer t
+  :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
+
+(use-package tex-mode                   ; TeX mode
+  :ensure auctex
+  :defer t
+  :config
+  (font-lock-add-keywords 'latex-mode
+                          `((,(rx "\\"
+                                  symbol-start
+                                  "fx" (1+ (or (syntax word) (syntax symbol)))
+                                  symbol-end)
+                             . font-lock-warning-face))))
+
+(use-package latex                      ; LaTeX editing
+  :ensure auctex
+  :defer t
+  :config
+  (progn
+    ;; Teach TeX folding about KOMA script sections
+    (setq TeX-outline-extra `((,(rx (0+ space) "\\section*{") 2)
+                              (,(rx (0+ space) "\\subsection*{") 3)
+                              (,(rx (0+ space) "\\subsubsection*{") 4)
+                              (,(rx (0+ space) "\\minisec{") 5))
+          ;; No language-specific hyphens please
+          LaTeX-babel-hyphen nil)
+
+    (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)))    ; Easy math input
+
+(use-package auctex-latexmk             ; latexmk command for AUCTeX
+  :ensure t
+  :defer t
+  :init (after "latex"
+          (auctex-latexmk-setup)))
+
+(use-package bibtex                     ; BibTeX editing
+  :defer t
+  :config
+  (progn
+    ;; Run prog mode hooks for bibtex
+    (add-hook 'bibtex-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+
+    ;; Use a modern BibTeX dialect
+    (bibtex-set-dialect 'biblatex)))
+
+(defun dotemacs-reftex-find-ams-environment-caption (environment)
+  "Find the caption of an AMS ENVIRONMENT."
+  (let ((re (rx-to-string `(and "\\begin{" ,environment "}"))))
+    ;; Go to the beginning of the label first
+    (re-search-backward re)
+    (goto-char (match-end 0)))
+  (if (not (looking-at (rx (zero-or-more space) "[")))
+      (error "Environment %s has no title" environment)
+    (let ((beg (match-end 0)))
+      ;; Move point onto the title start bracket and move over to the end,
+      ;; skipping any other brackets in between, and eventually extract the text
+      ;; between the brackets
+      (goto-char (1- beg))
+      (forward-list)
+      (buffer-substring-no-properties beg (1- (point))))))
+
+(use-package reftex                     ; TeX/BibTeX cross-reference management
+  :defer t
+  :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  :config
+  (progn
+    ;; Plug into AUCTeX
+    (setq reftex-plug-into-AUCTeX t
+          ;; Automatically derive labels, and prompt for confirmation
+          reftex-insert-label-flags '(t t)
+          reftex-label-alist
+          '(
+            ;; Additional label definitions for RefTeX.
+            ("definition" ?d "def:" "~\\ref{%s}"
+             dotemacs-reftex-find-ams-environment-caption
+             ("definition" "def.") -3)
+            ("theorem" ?h "thm:" "~\\ref{%s}"
+             dotemacs-reftex-find-ams-environment-caption
+             ("theorem" "th.") -3)
+            ("example" ?x "ex:" "~\\ref{%s}"
+             dotemacs-reftex-find-ams-environment-caption
+             ("example" "ex") -3)
+            ;; Algorithms package
+            ("algorithm" ?a "alg:" "~\\ref{%s}"
+             "\\\\caption[[{]" ("algorithm" "alg") -3)))
+
+    ;; Provide basic RefTeX support for biblatex
+    (unless (assq 'biblatex reftex-cite-format-builtin)
+      (add-to-list 'reftex-cite-format-builtin
+                   '(biblatex "The biblatex package"
+                              ((?\C-m . "\\cite[]{%l}")
+                               (?t . "\\textcite{%l}")
+                               (?a . "\\autocite[]{%l}")
+                               (?p . "\\parencite{%l}")
+                               (?f . "\\footcite[][]{%l}")
+                               (?F . "\\fullcite[]{%l}")
+                               (?x . "[]{%l}")
+                               (?X . "{%l}"))))
+      (setq reftex-cite-format 'biblatex)))
+  :diminish reftex-mode)
 
 
 
