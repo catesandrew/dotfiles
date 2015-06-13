@@ -18,7 +18,9 @@ LIB_SRCS = config/init-util.el \
 		   config/init-lisp.el \
 		   config/flycheck-auto-scalastyle.el \
 		   config/flycheck-virtualenv.el \
-		   config/flycheck-ensime.el
+		   config/flycheck-ensime.el \
+		   config/init-compile.el \
+		   config/init-firestarter.el
 
 SRCS = init.el $(LIB_SRCS)
 OBJECTS = $(SRCS:.el=.elc)

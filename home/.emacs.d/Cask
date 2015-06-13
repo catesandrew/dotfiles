@@ -1,30 +1,22 @@
-(depends-on "ac-etags") ;;
-(depends-on "ag") ;;
 (depends-on "angular-snippets") ;;
 (depends-on "auto-compile")
 (depends-on "bash-completion")
 (depends-on "browse-kill-ring")
 (depends-on "buffer-move")
 (depends-on "buster-snippets")
-(depends-on "cask")
 (depends-on "clojure-mode")
 (depends-on "clj-refactor")
 (depends-on "cider")
-(depends-on "cmake-mode")
 (depends-on "coffee-mode") ;;
 (depends-on "color-identifiers-mode") ;;
-(depends-on "diff-hl") ;;
 (depends-on "discover-my-major") ;;
 (depends-on "dtrt-indent") ;;
 (depends-on "dummy-h-mode")
 (depends-on "editorconfig") ;;
-(depends-on "elisp-slime-nav") ;;
 (depends-on "emmet-mode") ;;
 (depends-on "emr")
 (depends-on "epl")
 (depends-on "etags-select") ;;
-(depends-on "exec-path-from-shell") ;;
-(depends-on "expand-region") ;;
 (depends-on "evil") ;;
 (depends-on "evil-args") ;;
 (depends-on "evil-leader") ;;
@@ -45,42 +37,30 @@
 (depends-on "fiplr") ;;
 (depends-on "flx")
 (depends-on "flx-ido") ;;
-(depends-on "flycheck-cask")
-(depends-on "flycheck-package")
 (depends-on "flycheck-pos-tip")
 (depends-on "flycheck-clojure")
 (depends-on "form-feed")
 (depends-on "framemove") ;;
 (depends-on "fullscreen-mode")
 (depends-on "ggtags")
-(depends-on "git-commit-mode")
-(depends-on "git-commit-training-wheels-mode")
 (depends-on "git-gutter")
 (depends-on "git-gutter+") ;;
 (depends-on "git-messenger")
 (depends-on "git-gutter-fringe+") ;;
-(depends-on "git-rebase-mode")
-(depends-on "gitconfig-mode")
-(depends-on "gitignore-mode")
 (depends-on "go-eldoc") ;;
 (depends-on "go-mode") ;;
 (depends-on "guide-key") ;;
-(depends-on "helm-descbinds") ;;
-(depends-on "helm-projectile") ;;
 (depends-on "haml-mode")
 (depends-on "handlebars-mode") ;;
-(depends-on "haskell-mode")
 (depends-on "ido-ubiquitous") ;;
 (depends-on "ido-at-point")
 (depends-on "ido-vertical-mode") ;;
 (depends-on "jade-mode") ;;
-(depends-on "js2-mode") ;;
 (depends-on "js2-refactor") ;;
 (depends-on "json-snatcher")
 (depends-on "key-chord") ;;
 (depends-on "let-alist")
 (depends-on "lua-mode")
-(depends-on "magit") ;;
 (depends-on "magit-gitflow")
 (depends-on "move-text")
 (depends-on "mustache-mode") ;;
@@ -101,39 +81,27 @@
 (depends-on "perspective")
 (depends-on "pkg-info")
 (depends-on "pretty-symbols") ;;
-(depends-on "projectile") ;;
 (depends-on "project-explorer") ;;
-(depends-on "puppet-mode") ;;
 (depends-on "pt") ;;
 (depends-on "relative-line-numbers")
-(depends-on "restclient")
 (depends-on "rtags")
-(depends-on "s") ;;
 (depends-on "sass-mode")
 (depends-on "shell-command")
 (depends-on "shut-up")
 (depends-on "skewer-mode") ;;
 (depends-on "slime")
-(depends-on "smartparens") ;;
 (depends-on "smex")
 (depends-on "smooth-scrolling") ;;
 (depends-on "stylus-mode") ;;
 (depends-on "tern") ;;
 (depends-on "tern-auto-complete") ;;
-(depends-on "toml-mode") ;;
-(depends-on "undo-tree") ;;
 (depends-on "vala-mode")
 (depends-on "vimrc-mode") ;;
 (depends-on "vkill") ;;
 (depends-on "visual-regexp-steroids")
 (depends-on "windsize") ;;
-(depends-on "which-func") ;;
-(depends-on "web-mode") ;;
-(depends-on "wgrep") ;;
 (depends-on "wgrep-ack") ;;
-(depends-on "wgrep-ag") ;;
 (depends-on "wgrep-pt") ;;
 (depends-on "yasnippet") ;;
-(depends-on "yaml-mode") ;;
 (depends-on "ycmd") ;;
 (depends-on "zygospore")

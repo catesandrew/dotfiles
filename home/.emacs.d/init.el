@@ -38,12 +38,10 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
-;; lunaryorn-private-dir
 (defcustom dotemacs-private-dir (locate-user-emacs-file "private")
   "Directory for private settings."
   :group 'dotemacs)
 
-;; lunaryorn-custom-file
 (defcustom dotemacs-custom-file (locate-user-emacs-file "custom.el")
   "File used to store settings from Customization UI."
   :group 'dotemacs)
@@ -1326,7 +1324,9 @@ Disable the highlighting of overlong lines."
   :ensure t
   :if (eq dotemacs-completion-engine 'company)
   :defer t
-  :init (company-statistics-mode))
+  :init
+  (setq company-statistics-file (concat dotemacs-cache-directory "company-statistics-cache.el"))
+  (company-statistics-mode))
 
 (use-package company-math               ; Completion for Math symbols
   :ensure t
@@ -1800,6 +1800,986 @@ Disable the highlighting of overlong lines."
   :ensure t
   :defer t)
 
+
+;;; Programming utilities
+(use-package prog-mode                  ; Prog Mode
+  :bind (("C-c t p" . prettify-symbols-mode)))
+
+(use-package compile                    ; Compile from Emacs
+  :bind (("C-c c" . compile)
+         ("C-c C" . recompile))
+  :config (progn
+            (setq compilation-ask-about-save nil
+                  ;; Kill old compilation processes before starting new ones,
+                  ;; and automatically scroll up to the first error.
+                  compilation-scroll-output 'first-error)
+
+            (add-to-list 'display-buffer-alist
+                         `(,(rx bos "*compilation")
+                           (display-buffer-reuse-window
+                            display-buffer-in-side-window)
+                           (side            . bottom)
+                           (reusable-frames . visible)
+                           (window-height   . 0.4)))))
+
+(use-package init-compile          ; Personal helpers for compilation
+  :load-path "config/"
+  :commands (dotemacs-colorize-compilation-buffer)
+  ;; Colorize output of Compilation Mode, see
+  ;; http://stackoverflow.com/a/3072831/355252
+  :init (add-hook 'compilation-filter-hook
+                  #'dotemacs-colorize-compilation-buffer))
+
+; (use-package elide-head                 ; Elide lengthy GPL headers
+;   :bind (("C-c u h" . elide-head))
+;   :init (add-hook 'prog-mode-hook #'elide-head))
+;
+; (use-package eldoc                      ; Documentation in minibuffer
+;   :defer t
+;   ;; Enable Eldoc for `eval-expression', too
+;   :init (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
+;   :config
+;   (setq-default eldoc-documentation-function #'describe-char-eldoc))
+;
+; (use-package restclient                ; ReST REPL for Emacs
+;   :ensure t
+;   :defer t)
+;
+; (use-package company-restclient
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'company
+;           (add-to-list 'company-backends 'company-restclient)))
+;
+; 
+; ;;; Emacs Lisp
+; (use-package elisp-slime-nav            ; Jump to definition of symbol at point
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode)
+;   :diminish elisp-slime-nav-mode)
+;
+; (use-package flycheck-cask              ; Setup Flycheck by Cask projects
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
+;
+; (use-package flycheck-package           ; Check package conventions with Flycheck
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
+;
+; (use-package pcre2el                    ; Convert regexps to RX and back
+;   :disabled t
+;   :ensure t
+;   :init (rxt-global-mode))
+;
+; (use-package macrostep                  ; Interactively expand macros in code
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'lisp-mode
+;           (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
+;           (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map)))
+;
+; (use-package ielm                       ; Emacs Lisp REPL
+;   :bind (("C-c z" . ielm)))
+;
+; (use-package lisp-mode                  ; Emacs Lisp editing
+;   :defer t
+;   :interpreter ("emacs" . emacs-lisp-mode)
+;   :mode ("/Cask\\'" . emacs-lisp-mode)
+;   :config (require 'ert))
+;
+; (use-package init-lisp             ; Personal tools for Emacs Lisp
+;   :load-path "config/"
+;   :commands (dotemacs-find-cask-file
+;              dotemacs-add-use-package-to-imenu)
+;   :init (progn
+;           (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
+;
+;           (with-eval-after-load 'lisp-mode
+;             (bind-key "C-c f c" #'dotemacs-find-cask-file
+;                       emacs-lisp-mode-map))))
+;
+; (bind-key "C-c t d" #'toggle-debug-on-error)
+
+
+;;; Scala
+
+; (use-package scala-mode2                ; Scala editing
+;   :ensure t
+;   :defer t
+;   :config (progn (setq scala-indent:default-run-on-strategy
+;                        scala-indent:operator-strategy)
+;
+;                  (bind-key "C-c z" #'ensime scala-mode-map)))
+;
+; (use-package flycheck-auto-scalastyle   ; Scalastyle setup
+;   :load-path "lisp/"
+;   :defer t
+;   :commands (flycheck-auto-scalastyle-configure
+;              flycheck-auto-scalastyle-setup)
+;   :init (with-eval-after-load 'scala-mode2
+;           (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
+;
+; (use-package sbt-mode                   ; Scala build tool
+;   :ensure t
+;   :defer t
+;   :config (progn
+;             (setq sbt:sbt-prompt-regexp
+;                   (rx bol (or (and (optional "scala") ">") ; Default prompt
+;                               ;; Sbt Prompt plugin
+;                               (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
+;                       (0+ " ")))
+;
+;             (with-eval-after-load 'scala-mode2
+;               (bind-key "C-c c" #'sbt-command scala-mode-map))
+;
+;             (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
+;               "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
+;               (string-prefix-p sbt:buffer-name-base buffer-name))
+;
+;             ;; Get SBT buffers under control: Display them below the current
+;             ;; window, at a third of the height of the current window, but try
+;             ;; to reuse any existing and visible window for the SBT buffer
+;             ;; first.
+;             (add-to-list 'display-buffer-alist
+;                          '(dotemacs-sbt-buffer-p
+;                            (display-buffer-reuse-window
+;                             display-buffer-in-side-window)
+;                            (side            . bottom)
+;                            (reusable-frames . visible)
+;                            (window-height   . 0.4)))))
+;
+; (use-package ensime                     ; Scala interaction mode
+;   :ensure t
+;   :defer t
+;   :config (progn
+;             ;; Automatically open new Ensime sessions if needed
+;             (setq ensime-auto-connect 'always)
+;
+;             ;; Enable Ensime for all Scala buffers.  We don't do this in :init,
+;             ;; because `ensime-mode' isn't autoloaded, and ensime-mode makes no
+;             ;; sense before the first session was started anyway
+;             (add-hook 'scala-mode-hook #'ensime-mode)
+;
+;             ;; Disable Flycheck in Ensime, since Ensime features its own error
+;             ;; checking.  TODO: Maybe write a Flycheck checker for Ensime
+;             (with-eval-after-load 'flycheck
+;               (add-hook 'ensime-mode-hook (lambda () (flycheck-mode -1))))
+;
+;             ;; Free M-n and M-p again
+;             (bind-key "M-n" nil ensime-mode-map)
+;             (bind-key "M-p" nil ensime-mode-map)
+;             (bind-key "C-c M-n" #'ensime-forward-note ensime-mode-map)
+;             (bind-key "C-c M-p" #'ensime-backward-note ensime-mode-map)))
+;
+; (use-package ensime-sbt
+;   :ensure ensime
+;   :defer t
+;   ;; Compile on save.  My projects are small enough :)
+;   :config (setq ensime-sbt-perform-on-save "test:compile"))
+;
+; (use-package flycheck-ensime
+;   :disabled t
+;   :load-path "lisp/"
+;   :defer t)
+
+
+;;; Python
+; (use-package python
+;   :defer t
+;   :config
+;   (progn
+;     ;; PEP 8 compliant filling rules, 79 chars maximum
+;     (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
+;     (add-hook 'python-mode-hook #'subword-mode)
+;
+;     (let ((ipython (executable-find "ipython")))
+;
+;       (if ipython
+;           (setq python-shell-interpreter ipython)
+;         (warn "IPython is missing, falling back to default python")))))
+;
+; (use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
+;   :load-path "lisp/"
+;   :commands (flycheck-virtualenv-setup)
+;   :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
+;
+; (use-package anaconda-mode              ; Powerful Python backend for Emacs
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'python-mode-hook #'anaconda-mode))
+;
+; (use-package company-anaconda           ; Python backend for Company
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'company
+;           (add-to-list 'company-backends 'company-anaconda)))
+;
+; (use-package pip-requirements           ; requirements.txt files
+;   :ensure t
+;   :defer t)
+
+
+;;; Ruby
+; (use-package inf-ruby                   ; Ruby REPL
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode)
+;   :config
+;   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
+;   (inf-ruby-switch-setup))
+;
+; (use-package robe                       ; Ruby backend for Emacs
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'company
+;           (add-to-list 'company-backends 'company-robe)))
+
+
+;;; Rust
+; (use-package rust-mode                  ; Rust
+;   :ensure t
+;   :defer t)
+;
+; (use-package flycheck-rust              ; Flycheck setup for Rust
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+;
+; (use-package toml-mode                  ; Toml for Cargo files
+;   :ensure t
+;   :defer t)
+
+
+;;; Haskell
+
+;; This Haskell setup needs:
+;;
+;; cabal install hasktags haskell-docs hoogle hindent
+;;
+;; Additionally, to be installed from source:
+;;
+;; - https://github.com/chrisdone/ghci-ng
+
+; (use-package haskell-mode
+;   :ensure t
+;   :defer t
+;   :config
+;   (progn
+;     (add-hook 'haskell-mode-hook #'subword-mode)           ; Subword navigation
+;     (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate
+;                                         ; declarations
+;     ;; Insert module templates into new buffers
+;     (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
+;
+;     ;; Automatically run hasktags
+;     (setq haskell-tags-on-save t
+;           ;; Suggest adding/removing imports as by GHC warnings and Hoggle/GHCI
+;           ;; loaded modules respectively
+;           haskell-process-suggest-remove-import-lines t
+;           haskell-process-auto-import-loaded-modules t
+;           haskell-process-use-presentation-mode t ; Don't clutter the echo area
+;           haskell-process-show-debug-tips nil     ; Disable tips
+;           haskell-process-log t                   ; Log debugging information
+;           ;; Suggest imports automatically with Hayoo.  Hayoo is slower because
+;           ;; it's networked, but it covers all of hackage, which is really an
+;           ;; advantage.
+;           haskell-process-suggest-hoogle-imports nil
+;           haskell-process-suggest-hayoo-imports t)
+;
+;     (when-let (ghci-ng (executable-find "ghci-ng"))
+;       ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
+;       (setq haskell-process-path-ghci ghci-ng)
+;       (add-to-list 'haskell-process-args-cabal-repl
+;                    (concat "--with-ghc=" ghci-ng)))
+;
+;     (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
+;     (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
+;     (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)))
+;
+; (use-package haskell
+;   :ensure haskell-mode
+;   :defer t
+;   :init (dolist (hook '(haskell-mode-hook haskell-cabal-mode-hook))
+;           (add-hook hook #'interactive-haskell-mode))
+;   :config
+;   (progn
+;     (bind-key "C-c C-t" #'haskell-mode-show-type-at
+;               interactive-haskell-mode-map)
+;     (bind-key "M-." #'haskell-mode-goto-loc
+;               interactive-haskell-mode-map)
+;     (bind-key "C-c u u" #'haskell-mode-find-uses
+;               interactive-haskell-mode-map)))
+;
+; (use-package haskell-interactive-mode
+;   :ensure haskell-mode
+;   :defer t
+;   :config (add-hook 'haskell-interactive-mode-hook #'subword-mode))
+;
+; (use-package haskell-simple-indent      ; Primitive Haskell indentation
+;   :ensure haskell-mode
+;   :disabled t
+;   :defer t
+;   :init (add-hook 'haskell-mode-hook #'haskell-simple-indent-mode))
+;
+; (use-package haskell-indentation
+;   :ensure haskell-mode
+;   :defer t
+;   :init (add-hook 'haskell-mode-hook #'haskell-indentation-mode))
+;
+; (use-package hindent                    ; Automated Haskell indentation
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'haskell-mode-hook #'hindent-mode))
+;
+; (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
+;
+; (use-package helm-hayoo
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'haskell-mode
+;           (bind-key "C-c h h" #'helm-hayoo haskell-mode-map)))
+;
+; (use-package helm-hoogle
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'haskell-mode
+;           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
+
+
+;;; OCaml
+; (use-package opam                       ; Initialize Emacs with OPAM env
+;   :ensure t
+;   :init (opam-init))
+;
+; (use-package tuareg                     ; OCaml editing
+;   :ensure t
+;   :defer t
+;   :config
+;   (progn
+;     ;; Disable SMIE indentation in Tuareg.  It's just broken currently…
+;     (setq tuareg-use-smie nil)
+;
+;     ;; Please, Tuareg, don't kill my imenu
+;     (define-key tuareg-mode-map [?\C-c ?i] nil)))
+;
+; (use-package merlin                     ; Powerful Emacs backend for OCaml
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'tuareg-mode-hook #'merlin-mode)
+;   :config
+;   ;; Use Merlin from current OPAM env
+;   (setq merlin-command 'opam
+;         ;; Disable Merlin's own error checking in favour of Flycheck
+;         merlin-error-after-save nil))
+;
+; (use-package flycheck-ocaml             ; Check OCaml code with Merlin
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'merlin
+;           (flycheck-ocaml-setup)))
+
+
+;;; Web languages
+
+; (use-package web-mode                   ; Template editing
+;   :ensure t
+;   :defer t
+;   :mode "/templates?/.*\\.\\(php\\|html\\)\\'"
+;   :config
+;   (setq web-mode-markup-indent-offset 2))
+;
+; (use-package js2-mode                   ; Javascript editing
+;   :ensure t
+;   :mode "\\.js\\'"
+;   :config (progn (setq-default js2-basic-offset 2)
+;                  (setq js2-global-externs '("angular"))
+;
+;                  (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
+;
+; (use-package css-mode
+;   :defer t
+;   :config
+;   (progn
+;     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+;     ;; `fundamental-mode'.
+;     (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+;
+;     ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
+;     (put 'css-indent-offset 'safe-local-variable #'integerp)))
+;
+; (use-package css-eldoc                  ; Basic Eldoc for CSS
+;   :ensure t
+;   :commands (turn-on-css-eldoc)
+;   :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+;
+; (use-package php-mode                   ; Because sometimes you have to
+;   :ensure t)
+
+
+;;; Misc programming languages
+; (use-package sh-script                  ; Shell scripts
+;   :mode ("\\.zsh\\'" . sh-mode)
+;   :config
+;   ;; Use two spaces in shell scripts.
+;   (setq sh-indentation 2                ; The basic indentation
+;         sh-basic-offset 2               ; The offset for nested indentation
+;         ))
+;
+; (use-package puppet-mode                ; Puppet manifests
+;   :ensure t
+;   :defer t
+;   :config
+;   ;; Fontify variables in Puppet comments
+;   (setq puppet-fontify-variables-in-comments t))
+;
+; (use-package nxml-mode                  ; XML editing
+;   :defer t
+;   ;; Complete closing tags, and insert XML declarations into empty files
+;   :config (setq nxml-slash-auto-complete-flag t
+;                 nxml-auto-insert-xml-declaration-flag t))
+;
+; (use-package feature-mode               ; Feature files for ecukes/cucumber
+;   :ensure t
+;   :defer t
+;   :config
+;   (progn
+;     ;; Add standard hooks for Feature Mode, since it is no derived mode
+;     (add-hook 'feature-mode-hook #'whitespace-mode)
+;     (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
+;     (add-hook 'feature-mode-hook #'flyspell-mode)))
+;
+; (use-package cmake-mode                 ; CMake files
+;   :ensure t
+;   :defer t)
+;
+; (use-package thrift                     ; Thrift interface files
+;   :ensure t
+;   :defer t
+;   :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
+;
+; (use-package swift-mode                 ; Swift sources
+;   :ensure t
+;   :defer t
+;   :config (with-eval-after-load 'flycheck
+;             (add-to-list 'flycheck-checkers 'swift)))
+
+
+;;; Proof General & Coq
+; (defun dotemacs-have-proofgeneral-p ()
+;   "Determine whether we have Proof General installed."
+;   (file-exists-p (locate-user-emacs-file "vendor/ProofGeneral/generic")))
+;
+; (use-package proof-site                 ; Enable ProofGeneral if present
+;   ;; Don't :defer this one, since it sets up `load-path' and stuff for
+;   ;; ProofGeneral
+;   :load-path "vendor/ProofGeneral/generic"
+;   :if (dotemacs-have-proofgeneral-p))
+;
+; ;; Proof General has a rather strange way of creating this variable
+; (defvar coq-one-command-per-line)
+; (setq coq-one-command-per-line nil)
+;
+; (use-package proof-splash               ; ProofGeneral Splash screen
+;   :if (dotemacs-have-proofgeneral-p)
+;   :defer t
+;   ;; Shut up, ProofGeneral
+;   :config (setq proof-splash-enable nil))
+;
+; (use-package proof-useropts             ; ProofGeneral options
+;   :if (dotemacs-have-proofgeneral-p)
+;   :defer t
+;   :config (setq proof-three-window-mode-policy 'hybrid
+;                 ;; Automatically process the script up to point when inserting a
+;                 ;; terminator.  Really handy in Coq.
+;                 proof-electric-terminator-enable t))
+;
+; (use-package proof-config               ; ProofGeneral proof configuration
+;   :if (dotemacs-have-proofgeneral-p)
+;   :defer t
+;   ;; Skip over consecutive comments when processing
+;   :config (setq proof-script-fly-past-comments t))
+;
+; (use-package proof-script
+;   :if (dotemacs-have-proofgeneral-p)
+;   :defer t
+;   :config
+;   (add-hook 'proof-mode-hook (lambda () (run-hooks 'prog-mode-hook))))
+;
+; (use-package isar                       ; Isabelle syntax for PG
+;   :if (dotemacs-have-proofgeneral-p)
+;   :defer t
+;   :config
+;   ;; Don't highlight overlong lines in Isar, since Unicode Tokens conceal the
+;   ;; true line length
+;   (add-hook 'isar-mode-hook #'dotemacs-whitespace-style-no-long-lines 'append))
+;
+; (use-package company-coq
+;   :if (dotemacs-have-proofgeneral-p)
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'coq-mode-hook #'company-coq-initialize))
+
+
+;;; Databases
+; (use-package sql
+;   :bind (("C-c d c" . sql-connect)
+;          ("C-c d m" . sql-mysql))
+;   :config (progn (dotemacs-load-private-file "sql-connections" 'noerror)
+;
+;                  (add-to-list 'display-buffer-alist
+;                               `(,(rx bos "*SQL")
+;                                 (display-buffer-reuse-window
+;                                  display-buffer-in-side-window
+;                                  (side            . bottom)
+;                                  (reusable-frames . visible)
+;                                  (window-height   . 0.4))))))
+
+
+;;; Version control
+; (use-package vc-hooks                   ; Simple version control
+;   :defer t
+;   :config
+;   ;; Always follow symlinks to files in VCS repos
+;   (setq vc-follow-symlinks t))
+;
+; (use-package diff-hl                    ; Highlight hunks in fringe
+;   :ensure t
+;   :defer t
+;   :init (progn
+;           ;; Highlight changes to the current file in the fringe
+;           (global-diff-hl-mode)
+;           ;; Highlight changed files in the fringe of Dired
+;           (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+;
+;           ;; Fall back to the display margin, if the fringe is unavailable
+;           (unless (display-graphic-p)
+;             (diff-hl-margin-mode))))
+;
+; (use-package magit                      ; The one and only Git frontend
+;   :ensure t
+;   :bind (("C-c g"   . magit-status)
+;          ("C-c v g" . magit-status)
+;          ("C-c v v" . magit-status)
+;          ("C-c v g" . magit-blame-mode)
+;          ("C-c v l" . magit-file-log))
+;   :init
+;   ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
+;   ;; most stupid warning ever
+;   (setq magit-last-seen-setup-instructions "1.4.0")
+;   :config
+;   (progn
+;     ;; Shut up, Magit!
+;     (setq magit-save-some-buffers 'dontask
+;           magit-stage-all-confirm nil
+;           magit-unstage-all-confirm nil
+;           ;; Except when you ask something useful…
+;           magit-set-upstream-on-push t)
+;
+;     ;; Set Magit's repo dirs for `magit-status' from Projectile's known
+;     ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
+;     ;; was loaded, and update it every time we switched projects, because the
+;     ;; new project might have been unknown before
+;     (defun dotemacs-magit-set-repo-dirs-from-projectile ()
+;       "Set `magit-repo-dirs' from known Projectile projects."
+;       (let ((project-dirs (bound-and-true-p projectile-known-projects)))
+;         ;; Remove trailing slashes from project directories, because Magit adds
+;         ;; trailing slashes again, which breaks the presentation in the Magit
+;         ;; prompt.
+;         (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
+;
+;     (with-eval-after-load 'projectile
+;       (dotemacs-magit-set-repo-dirs-from-projectile))
+;
+;     (add-hook 'projectile-switch-project-hook
+;               #'dotemacs-magit-set-repo-dirs-from-projectile))
+;
+;   :diminish magit-auto-revert-mode)
+;
+; (use-package magit-gh-pulls
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls))
+;
+; (use-package git-commit-mode            ; Git commit message mode
+;   :ensure t
+;   :defer t)
+;
+; (use-package gitconfig-mode             ; Git configuration mode
+;   :ensure t
+;   :defer t)
+;
+; (use-package gitignore-mode             ; .gitignore mode
+;   :ensure t
+;   :defer t)
+;
+; (use-package gitattributes-mode         ; Git attributes mode
+;   :ensure t
+;   :defer t)
+;
+; (use-package git-rebase-mode            ; Mode for git rebase -i
+;   :ensure t
+;   :defer t)
+;
+; (use-package git-timemachine            ; Go back in Git time
+;   :ensure t
+;   :bind (("C-c v t" . git-timemachine)))
+
+
+;;; Search
+; (use-package isearch                   ; Search buffers
+;   :bind (("C-c s s" . isearch-forward-symbol-at-point))
+;   ;; `:diminish' doesn't work for isearch, because it uses eval-after-load on
+;   ;; the feature name, but isearch.el does not provide any feature
+;   :init (diminish 'isearch-mode))
+;
+; (use-package grep
+;   :defer t
+;   :config
+;   (progn
+;     (when-let (gnu-find (and (eq system-type 'darwin)
+;                              (executable-find "gfind")))
+;       (setq find-program gnu-find))
+;
+;     (when-let (gnu-xargs (and (eq system-type 'darwin)
+;                               (executable-find "gxargs")))
+;       (setq xargs-program gnu-xargs))))
+;
+; (use-package locate                     ; Search files on the system
+;   :defer t
+;   :config
+;   ;; Use mdfind as locate substitute on OS X, to utilize the Spotlight database
+;   (when-let (mdfind (and (eq system-type 'darwin) (executable-find "mdfind")))
+;     (setq locate-command mdfind)))
+;
+; (use-package ag                         ; Search code in files/projects
+;   :ensure t
+;   :bind (("C-c a d" . ag-dired-regexp)
+;          ("C-c a D" . ag-dired)
+;          ("C-c a f" . ag-files)
+;          ("C-c a k" . ag-kill-other-buffers)
+;          ("C-c a K" . ag-kill-buffers))
+;   :config
+;   (setq ag-reuse-buffers t            ; Don't spam buffer list with ag buffers
+;         ag-highlight-search t         ; A little fanciness
+;         ;; Use Projectile to find the project root
+;         ag-project-root-function (lambda (d) (let ((default-directory d))
+;                                                (projectile-project-root)))))
+;
+; (use-package wgrep                      ; Edit grep/occur/ag results in-place
+;   :ensure t
+;   :defer t)
+;
+; (use-package wgrep-ag                   ; Wgrep for ag
+;   :ensure t
+;   :defer t)
+;
+; (use-package helm-ag
+;   :ensure t
+;   :bind (("C-c a a" . helm-do-ag)
+;          ("C-c a A" . helm-ag))
+;   :config (setq helm-ag-fuzzy-match t
+;                 helm-ag-insert-at-point 'symbol
+;                 helm-ag-source-type 'file-line))
+
+;;; Project management with Projectile
+; (use-package projectile
+;   :ensure t
+;   :init (projectile-global-mode)
+;   :config
+;   (progn
+;     ;; Remove dead projects when Emacs is idle
+;     (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+;
+;     (setq projectile-completion-system 'helm
+;           projectile-find-dir-includes-top-level t
+;           projectile-mode-line '(:propertize
+;                                  (:eval (concat " " (projectile-project-name)))
+;                                  face font-lock-constant-face)))
+;   :diminish projectile-mode)
+;
+; (use-package helm-projectile
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'projectile (helm-projectile-on))
+;   :config (setq projectile-switch-project-action #'helm-projectile))
+
+
+;;; Processes and commands
+; (use-package proced                     ; Edit system processes
+;   ;; Proced isn't available on OS X
+;   :if (not (eq system-type 'darwin))
+;   :bind ("C-x p" . proced))
+;
+; (use-package firestarter                ; Run commands after save
+;   :ensure t
+;   :init (firestarter-mode)
+;   :config (progn (setq firestarter-default-type 'failure)
+;                  (dotemacs-load-private-file "firestarter-safe-values.el"
+;                                               'noerror))
+;   ;; Remove space from firestarter lighter
+;   :diminish firestarter-mode)
+;
+; (use-package init-firestarter
+;   :load-path "config/"
+;   :commands (dotemacs-firestarter-mode-line)
+;   :init (with-eval-after-load 'firestarter
+;           (setq firestarter-lighter
+;                 '(:eval (dotemacs-firestarter-mode-line)))))
+
+
+;;; Date and time
+; (use-package calendar                   ; Built-in calendar
+;   :bind ("C-c u c" . calendar)
+;   :config
+;   ;; In Europe we start on Monday
+;   (setq calendar-week-start-day 1))
+;
+; (use-package time                       ; Show current time
+;   :bind (("C-c u i" . emacs-init-time)
+;          ("C-c u t" . display-time-world))
+;   :config
+;   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
+;         display-time-world-list '(("Europe/Berlin"    "Berlin")
+;                                   ("Europe/London"    "London")
+;                                   ("Europe/Istanbul"  "Istanbul")
+;                                   ("America/Winnipeg" "Winnipeg (CA)")
+;                                   ("America/New_York" "New York (USA)")
+;                                   ("Asia/Tokyo"       "Tokyo (JP)"))))
+
+
+;;; Terminal emulation and shells
+; (use-package shell                      ; Dump shell in Emacs
+;   :bind ("C-c u s" . shell)
+;   :config (add-to-list 'display-buffer-alist
+;                        `(,(rx bos "*shell")
+;                          (display-buffer-reuse-window
+;                           display-buffer-in-side-window
+;                           (side            . bottom)
+;                           (reusable-frames . visible)
+;                           (window-height   . 0.4)))))
+;
+; (use-package term                       ; Terminal emulator in Emacs
+;   :bind ("C-c u S" . ansi-term))
+
+
+;;; Net & Web
+; (use-package browse-url                 ; Browse URLs
+;   :bind (("C-c w u" . browse-url)))
+
+; (use-package bug-reference              ; Turn bug refs into browsable buttons
+;   :defer t
+;   :init (progn (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
+;                (add-hook 'text-mode-hook #'bug-reference-mode)))
+;
+; (use-package eww                        ; Emacs' built-in web browser
+;   :bind (("C-c w b" . eww-list-bookmarks)
+;          ("C-c w w" . eww)))
+;
+; (use-package sx                         ; StackExchange client for Emacs
+;   :ensure t
+;   :bind (("C-c w s" . sx-tab-frontpage)
+;          ("C-c w S" . sx-tab-newest)
+;          ("C-c w a" . sx-ask)))
+;
+; (use-package sx-compose
+;   :ensure sx
+;   :defer t
+;   :config
+;   (progn
+;     ;; Don't fill in SX questions/answers, and use visual lines instead.  Plays
+;     ;; more nicely with the website.
+;     (add-hook 'sx-compose-mode-hook #'turn-off-auto-fill)
+;     (add-hook 'sx-compose-mode-hook #'visual-line-mode)
+;     (add-hook 'sx-compose-mode-hook
+;               #'dotemacs-whitespace-style-no-long-lines)
+;
+;     ;; Clean up whitespace before sending questions
+;     (add-hook 'sx-compose-before-send-hook
+;               (lambda ()
+;                 (whitespace-cleanup)
+;                 t))
+;
+;     (bind-key "M-q" #'ignore sx-compose-mode-map)))
+;
+; (use-package sx-question-mode
+;   :ensure sx
+;   :defer t
+;   ;; Display questions in the same window
+;   :config (setq sx-question-mode-display-buffer-function #'switch-to-buffer))
+;
+; (use-package sendmail                   ; Send mails from Emacs
+;   :defer t
+;   :config (setq send-mail-function 'smtpmail-send-it))
+;
+; (use-package message                    ; Compose mails from Emacs
+;   :defer t
+;   :config (setq message-send-mail-function 'smtpmail-send-it
+;                 ;; Don't keep message buffers around
+;                 message-kill-buffer-on-exit t))
+;
+; (use-package erc                        ; Powerful IRC client
+;   :defer t
+;   :config
+;   (progn
+;     ;; Default server and nick
+;     (setq erc-server "chat.freenode.net"
+;           erc-port 7000
+;           erc-nick "lunaryorn"
+;           erc-nick-uniquifier "_"
+;           ;; Never open unencrypted ERC connections
+;           erc-server-connect-function 'erc-open-tls-stream)
+;
+;     ;; Spell-check ERC buffers
+;     (add-to-list 'erc-modules 'spelling)
+;     (erc-update-modules)))
+;
+; (use-package erc-join                   ; Automatically join channels with ERC
+;   :defer t
+;   :config
+;   ;; Standard channels on Freenode
+;   (setq erc-autojoin-channels-alist '(("\\.freenode\\.net" . ("#emacs")))))
+;
+; (use-package erc-track                  ; Track status of ERC in mode line
+;   :defer t
+;   :config
+;   ;; Switch to newest buffer by default, and don't ask before rebinding the keys
+;   (setq erc-track-switch-direction 'newest
+;         erc-track-enable-keybindings t))
+;
+; (use-package rcirc                      ; Simply ERC client
+;   :defer t
+;   :config
+;   (progn
+;     (setq rcirc-default-full-name (format "%s (http://www.lunaryorn.com)"
+;                                           user-full-name)
+;           rcirc-default-nick "lunaryorn"
+;           rcirc-time-format "%Y-%m-%d %H:%M "
+;           rcirc-server-alist
+;           '(("chat.freenode.not" :port 7000 :user-name "lunaryorn"
+;              :encryption tls :channels ("#emacs" "#haskell" "#hakyll" "#zsh"))))
+;
+;     (add-hook 'rcirc-mode-hook #'flyspell-mode)
+;
+;     (rcirc-track-minor-mode)))
+
+
+;;; Online Help
+; (use-package find-func                  ; Find function/variable definitions
+;   :bind (("C-x F"   . find-function)
+;          ("C-x 4 F" . find-function-other-window)
+;          ("C-x K"   . find-function-on-key)
+;          ("C-x V"   . find-variable)
+;          ("C-x 4 V" . find-variable-other-window)))
+;
+; (use-package info                       ; Info manual viewer
+;   :defer t
+;   :config
+;   ;; Fix the stupid `Info-quoted' face.  Courier is an abysmal face, so go back
+;   ;; to the default face.
+;   (set-face-attribute 'Info-quoted nil :family 'unspecified
+;                       :inherit font-lock-type-face))
+;
+; (use-package helm-descbinds
+;   :ensure t
+;   :init (helm-descbinds-mode))
+;
+; (use-package ansible-doc                ; Documentation lookup for Ansible
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'yaml-mode-hook #'ansible-doc-mode)
+;   :diminish (ansible-doc-mode . "❓"))
+;
+; (use-package dash-at-point
+;   :ensure t
+;   :defer t
+;   :bind (("C-c h d" . dash-at-point)
+;          ("C-c h D" . dash-at-point-with-docset))
+;   :config (add-to-list 'dash-at-point-mode-alist
+;                        '(swift-mode . "ios,swift")))
+;
+; (bind-key "C-c h b" #'describe-personal-keybindings)
+
+;; Andrew added this as an example
+; (use-package evil
+;   :init
+;   (progn
+;     ;; if we don't have this evil overwrites the cursor color
+;     (setq evil-default-cursor t)
+;
+;     ;; leader shortcuts
+;
+;     ;; This has to be before we invoke evil-mode due to:
+;     ;; https://github.com/cofi/evil-leader/issues/10
+;     (use-package evil-leader
+;       :init (global-evil-leader-mode)
+;       :config
+;       (progn
+;         (setq evil-leader/in-all-states t)
+;         ;; keyboard shortcuts
+;         (evil-leader/set-key
+;           "a" 'ag-project
+;           "A" 'ag
+;           "b" 'ido-switch-buffer
+;           "c" 'mc/mark-next-like-this
+;           "C" 'mc/mark-all-like-this
+;           "e" 'er/expand-region
+;           "E" 'mc/edit-lines
+;           "f" 'ido-find-file
+;           "g" 'magit-status
+;           "i" 'idomenu
+;           "j" 'ace-jump-mode
+;           "k" 'kill-buffer
+;           "K" 'kill-this-buffer
+;           "o" 'occur
+;           "p" 'magit-find-file-completing-read
+;           "r" 'recentf-ido-find-file
+;           "s" 'ag-project
+;           "t" 'bw-open-term
+;           "T" 'eshell
+;           "w" 'save-buffer
+;           "x" 'smex
+;           )))
+;
+;     ;; boot evil by default
+;     (evil-mode 1))
+;   :config
+;   (progn
+;     ;; use ido to open files
+;     (define-key evil-ex-map "e " 'ido-find-file)
+;     (define-key evil-ex-map "b " 'ido-switch-buffer)
+;
+;     ;; jj escapes to normal mode
+;     (define-key evil-insert-state-map (kbd "j") 'bw-evil-escape-if-next-char-is-j)
+;     (setq
+;      ;; h/l wrap around to next lines
+;      evil-cross-lines t
+;      ;; Training wheels: start evil-mode in emacs mode
+;      evil-default-state 'emacs)
+;
+;     ;; esc should always quit: http://stackoverflow.com/a/10166400/61435
+;     (define-key evil-normal-state-map [escape] 'keyboard-quit)
+;     (define-key evil-visual-state-map [escape] 'keyboard-quit)
+;     (define-key minibuffer-local-map [escape] 'abort-recursive-edit)
+;     (define-key minibuffer-local-ns-map [escape] 'abort-recursive-edit)
+;     (define-key minibuffer-local-completion-map [escape] 'abort-recursive-edit)
+;     (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
+;     (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
+;
+;     ;; modes to map to different default states
+;     (dolist (mode-map '((comint-mode . emacs)
+;                         (term-mode . emacs)
+;                         (eshell-mode . emacs)
+;                         (help-mode . emacs)
+;                         (fundamental-mode . emacs)))
+;       (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))))
+;
+
 
 
 
@@ -1870,3 +2850,10 @@ Disable the highlighting of overlong lines."
 ;           (lambda ()
 ;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
 ;               (ggtags-mode 1))))
+
+;; Local Variables:
+;; coding: utf-8
+;; indent-tabs-mode: nil
+;; End:
+
+;;; init.el ends here
