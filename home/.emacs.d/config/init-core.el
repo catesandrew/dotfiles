@@ -108,12 +108,6 @@
 (midnight-delay-set 'midnight-delay 0)
 
 
-;; ibuffer
-(setq ibuffer-expert t)
-(setq ibuffer-show-empty-filter-groups nil)
-(add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode)
-
-
 ;; store most files in the cache
 (setq backup-directory-alist
       `((".*" . ,(concat dotemacs-cache-directory "backups")))
@@ -138,10 +132,6 @@
 ;; Add a key combination to revert the current buffer (re-read the
 ;; contents from disk):
 (global-set-key (kbd "C-c r") 'revert-buffer)
-
-;; Use ibuffer instead of the feature-lacking list-buffers:
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
 
 (setq mark-ring-max 64)
 (setq global-mark-ring-max 128)

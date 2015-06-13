@@ -481,7 +481,6 @@ mouse-3: go to end"))))
             helm-command-prefix-key "C-c b"
             helm-quick-update t
             helm-bookmark-show-location t
-            helm-buffers-fuzzy-matching t
             helm-M-x-fuzzy-match t
             helm-apropos-fuzzy-match t
             helm-recentf-fuzzy-match t
@@ -519,6 +518,7 @@ mouse-3: go to end"))))
 (use-package helm-unicode
   :ensure t
   :bind ("C-c b 8" . helm-unicode))
+
 
 ;;; Buffer, Windows and Frames
 (setq frame-resize-pixelwise t          ; Resize by pixels
@@ -527,15 +527,99 @@ mouse-3: go to end"))))
                   (abbreviate-file-name (buffer-file-name)) "%b")))
 
 
-; Start 120x72
 (use-package frame
   :bind (("C-c t F" . toggle-frame-fullscreen))
   :init (progn
           ;; Kill `suspend-frame'
           (global-set-key (kbd "C-z") nil)
           (global-set-key (kbd "C-x C-z") nil))
-  :config (add-to-list 'initial-frame-alist '(height . 72) '(width . 120))) ; '(fullscreen . maximized)
+  :config (add-to-list 'initial-frame-alist '(height . 72) '(width . 140))) ; '(fullscreen . maximized)
 
+(use-package init-buffers          ; Personal buffer tools
+  :load-path "config/"
+  :commands (dotemacs-force-save-some-buffers
+             dotemacs-do-not-kill-important-buffers)
+  :init (progn
+          (add-hook 'kill-buffer-query-functions
+                    #'dotemacs-do-not-kill-important-buffers)
+
+          ;; Autosave buffers when focus is lost, see
+          ;; http://emacsredux.com/blog/2014/03/22/a-peek-at-emacs-24-dot-4-focus-hooks/
+          (add-hook 'focus-out-hook #'dotemacs-force-save-some-buffers)))
+
+(use-package uniquify                   ; Make buffer names unique
+  :config (setq uniquify-buffer-name-style 'forward
+                uniquify-separator "/"
+                uniquify-ignore-buffers-re "^\\*" ; leave special buffers alone
+                uniquify-after-kill-buffer-p t))
+
+(use-package helm-buffers
+  :ensure helm
+  :defer t
+  :config (setq helm-buffers-fuzzy-matching t))
+
+;; http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
+(use-package ibuffer                    ; Better buffer list
+  :bind (([remap list-buffers] . ibuffer))
+  ;; Show VC Status in ibuffer
+  :init (progn
+          (add-hook 'ibuffer-hook
+                    (lambda ()
+                      ; (ibuffer-switch-to-saved-filter-groups "home")
+                      (ibuffer-auto-mode 1)))
+
+          (setq ibuffer-expert t
+                ibuffer-show-empty-filter-groups nil))
+
+  :config (setq ibuffer-formats
+                '((mark modified read-only vc-status-mini " "
+                        (name 18 18 :left :elide)
+                        " "
+                        (size 9 -1 :right)
+                        " "
+                        (mode 16 16 :left :elide)
+                        " "
+                        (vc-status 16 16 :left)
+                        " "
+                        filename-and-process)
+                  (mark modified read-only " "
+                        (name 18 18 :left :elide)
+                        " "
+                        (size 9 -1 :right)
+                        " "
+                        (mode 16 16 :left :elide)
+                        " " filename-and-process)
+                  (mark " "
+                        (name 16 -1)
+                        " " filename)))
+    (setq ibuffer-saved-filter-groups
+          '(("home"
+             ("emacs-config" (or (filename . ".emacs.d")
+                                 (filename . "emacs-config")))
+             ("Org" (or (mode . org-mode)
+                        (filename . "OrgMode")))
+             ("code" (filename . "code"))
+             ("Dev" (or (mode . html-mode)
+                        (mode . css-mode)))
+             ("Subversion" (name . "\*svn"))
+             ("Magit" (name . "\*magit"))
+             ("ERC" (mode . erc-mode))
+             ("Help" (or (name . "\*Help\*")
+                         (name . "\*Apropos\*")
+                         (name . "\*info\*")))))))
+
+(use-package ibuffer-vc                 ; Group buffers by VC project and status
+  :ensure t
+  :defer t
+  :init (add-hook 'ibuffer-hook
+                  (lambda ()
+                    (ibuffer-vc-set-filter-groups-by-vc-root)
+                    (unless (eq ibuffer-sorting-mode 'alphabetic)
+                      (ibuffer-do-sort-by-alphabetic)))))
+
+(use-package ibuffer-projectile         ; Group buffers by Projectile project
+  :ensure t
+  :defer t)
 
 
 

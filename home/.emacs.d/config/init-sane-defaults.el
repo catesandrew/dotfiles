@@ -50,15 +50,6 @@
 ;; Sentences do not need double spaces to end. Period.
 (set-default 'sentence-end-double-space nil)
 
-(defun my-do-not-kill-scratch-buffer ()
-  (if (member (buffer-name (current-buffer))
-              '("*scratch*" "*Messages*" "*Require Times*"))
-      (progn
-        (bury-buffer)
-        nil)
-    t))
-(add-hook 'kill-buffer-query-functions 'my-do-not-kill-scratch-buffer)
-
 ;; enable electric indent
 (setq electric-indent-mode t)
 

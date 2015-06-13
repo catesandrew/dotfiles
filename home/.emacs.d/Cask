@@ -85,7 +85,6 @@
 (depends-on "highlight-numbers") ;;
 (depends-on "highlight-symbol") ;;
 (depends-on "highlight-quoted") ;;
-(depends-on "ibuffer-projectile")
 (depends-on "ido-ubiquitous") ;;
 (depends-on "ido-at-point")
 (depends-on "ido-vertical-mode") ;;
