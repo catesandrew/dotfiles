@@ -40,13 +40,6 @@
 (setq auto-save-default nil) ; stop creating #autosave# files
 
 
-;; minibuffer history
-(require 'savehist)
-(setq savehist-file (concat dotemacs-cache-directory "savehist")
-      savehist-additional-variables '(search ring regexp-search-ring)
-      savehist-autosave-interval 60)
-
-
 ;; recent files
 (require 'recentf)
 (setq recentf-save-file (concat dotemacs-cache-directory "recentf"))

@@ -76,6 +76,7 @@
       (add-to-list 'load-path dir))))
 
 
+
 ;;; Package management
 (setq load-prefer-newer t)
 
@@ -94,7 +95,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-
+
 ;; Requires
 
 (eval-when-compile
@@ -110,6 +111,7 @@
 (require 'rx)
 (require 'time-date)
 
+
 ;;; Initialization
 
 (when (version< emacs-version "25")
@@ -131,6 +133,7 @@
   :load-path "config/"
   )
 
+
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
   :ensure t
@@ -158,6 +161,7 @@
         (when dir
           (add-to-list 'Info-directory-list dir))))))
 
+
 ;;; Customization, init file and package management
 (use-package cus-edit
   :defer t
@@ -187,6 +191,7 @@
   :init (server-mode)
   :diminish server-buffer-clients)
 
+
 ;;; OS X support
 (use-package ns-win                     ; OS X window support
   :defer t
@@ -223,6 +228,7 @@
   :ensure t
   :init (osx-trash-setup))
 
+
 ;;; User interface
 
 ;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
@@ -334,6 +340,7 @@
 
 (bind-key "C-c t v" #'variable-pitch-mode)
 
+
 ;;; The mode line
 
 (setq-default header-line-format
@@ -399,6 +406,75 @@
 ;; Standard stuff
 (line-number-mode)
 (column-number-mode)
+
+(use-package fancy-battery              ; Fancy battery info for mode line
+  :ensure t
+  :defer t
+  :init (fancy-battery-mode))
+
+(use-package anzu                       ; Position/matches count for isearch
+  :ensure t
+  :init (global-anzu-mode)
+  :config (setq anzu-cons-mode-line-p nil)
+  :diminish anzu-mode)
+
+(use-package which-func                 ; Current function name in header line
+  :init (which-function-mode)
+  :config
+  (setq which-func-unknown "⊥" ; The default is really boring…
+        which-func-format
+        `((:propertize (" ➤ " which-func-current)
+                       local-map ,which-func-keymap
+                       face which-func
+                       mouse-face mode-line-highlight
+                       help-echo "mouse-1: go to beginning\n\
+mouse-2: toggle rest visibility\n\
+mouse-3: go to end"))))
+
+
+;;; Minibuffer and Helm
+(setq history-length 1000)              ; Store more history
+
+(use-package savehist                   ; Save minibuffer history
+  :init (savehist-mode t)
+  :config (setq savehist-save-minibuffer-history t
+                savehist-file (concat dotemacs-cache-directory "savehist")
+                savehist-additional-variables '(search ring regexp-search-ring)
+                savehist-autosave-interval 180))
+
+(use-package helm
+  :ensure t
+  :bind (
+         ;; Replace some standard bindings with Helm equivalents
+         ([remap execute-extended-command] . helm-M-x)
+         ([remap find-file]                . helm-find-files)
+         ([remap switch-to-buffer]         . helm-mini)
+         ([remap yank-pop]                 . helm-show-kill-ring)
+         ([remap insert-register]          . helm-register)
+         ([remap occur]                    . helm-occur)
+         ;; Special helm bindings
+         ("C-c b b"                        . helm-resume)
+         ("C-c b C"                        . helm-colors)
+         ("C-c b *"                        . helm-calcul-expression)
+         ("C-c b M-:"                      . helm-eval-expression-with-eldoc)
+         ;; Helm features in other maps
+         ("C-c i"                          . helm-semantic-or-imenu)
+         ("C-c h a"                        . helm-apropos)
+         ("C-c h e"                        . helm-info-emacs)
+         ("C-c h i"                        . helm-info-at-point)
+         ("C-c h m"                        . helm-man-woman)
+         ("C-c f r"                        . helm-recentf)
+         ("C-c f l"                        . helm-locate-library))
+  :init (progn (helm-mode 1)
+
+               (with-eval-after-load 'helm-config
+                 (warn "`helm-config' loaded! Get rid of it ASAP!")))
+  :config (setq helm-split-window-in-side-p t)
+  :diminish helm-mode)
+
+(use-package helm-unicode
+  :ensure t
+  :bind ("C-c b 8" . helm-unicode))
 
 
 
@@ -470,3 +546,15 @@
 ;           (lambda ()
 ;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
 ;               (ggtags-mode 1))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (exec-path-from-shell use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

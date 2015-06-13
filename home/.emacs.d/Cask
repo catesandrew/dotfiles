@@ -29,7 +29,6 @@
 (depends-on "company-ycmd") ;;
 (depends-on "dash")
 (depends-on "diff-hl") ;;
-(depends-on "diminish") ;;
 (depends-on "dired-details")
 (depends-on "discover-my-major") ;;
 (depends-on "dtrt-indent") ;;
@@ -83,7 +82,6 @@
 (depends-on "go-eldoc") ;;
 (depends-on "go-mode") ;;
 (depends-on "guide-key") ;;
-(depends-on "helm") ;;
 (depends-on "helm-swoop") ;;
 (depends-on "helm-descbinds") ;;
 (depends-on "helm-projectile") ;;
@@ -116,7 +114,6 @@
 (depends-on "mustache-mode") ;;
 (depends-on "mwim")
 (depends-on "names")
-(depends-on "nyan-mode")
 
 ;; Note that unlike the gnu archive, which also provides an org package, this
 ;; archive provides the org-plus-contrib package, which installs additional
@@ -127,15 +124,10 @@
 (depends-on "org-bullets") ;;
 (depends-on "package-build")
 (depends-on "packed")
-(depends-on "paradox") ;;
 (depends-on "pallet")
 (depends-on "parent-mode")
 (depends-on "perspective")
 (depends-on "pkg-info")
-(depends-on "popup")
-;; (depends-on "popwin") ;; required by guide-key
-(depends-on "powerline")
-(depends-on "powerline-evil")
 (depends-on "pretty-symbols") ;;
 (depends-on "projectile") ;;
 (depends-on "project-explorer") ;;
@@ -152,7 +144,6 @@
 (depends-on "shut-up")
 (depends-on "skewer-mode") ;;
 (depends-on "slime")
-(depends-on "smart-mode-line") ;;
 (depends-on "smartparens") ;;
 (depends-on "smex")
 (depends-on "smooth-scrolling") ;;
@@ -161,7 +152,6 @@
 (depends-on "tern-auto-complete") ;;
 (depends-on "toml-mode") ;;
 (depends-on "undo-tree") ;;
-(depends-on "use-package")
 (depends-on "vala-mode")
 (depends-on "vimrc-mode") ;;
 (depends-on "vkill") ;;
@@ -176,6 +166,4 @@
 (depends-on "yasnippet") ;;
 (depends-on "yaml-mode") ;;
 (depends-on "ycmd") ;;
-(depends-on "zenburn-theme")
-(depends-on "zoom-frm")
 (depends-on "zygospore")
