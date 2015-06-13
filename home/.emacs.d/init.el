@@ -757,7 +757,9 @@ mouse-3: go to end"))))
 (use-package hardhat ; Protect user-writable files
   :ensure t
   :init (global-hardhat-mode)
+  (setq hardhat-buffer-protected-functions '(hardhat-protected-by-ignoramus))
   :config (setq hardhat-mode-lighter "🔒"))
+
 
 (use-package tramp                      ; Access remote files
   :defer t
