@@ -21,7 +21,6 @@
           (const :tag "auto-complete-mode" auto-complete))
   :group 'dotemacs)
 
-
 (defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
   "The storage location lisp."
   :group 'dotemacs)
@@ -501,12 +500,6 @@ mouse-3: go to end"))))
       (after "projectile"
         (warn "projectile loaded, now load helm-projectile")
         (use-package helm-projectile
-                     :ensure t
-                     :defer t))
-
-      (after "company"
-        (warn "company loaded, now load helm-company")
-        (use-package helm-company
                      :ensure t
                      :defer t)))
 
@@ -1169,63 +1162,178 @@ Disable the highlighting of overlong lines."
   :diminish highlight-symbol-mode)
 
 
-; ;;; Skeletons, completion and expansion
+;;; Skeletons, completion and expansion
+
+;; In `completion-at-point', do not pop up silly completion buffers for less
+;; than five candidates.  Cycle instead.
+(setq completion-cycle-threshold 5)
+
+(use-package hippie-exp                 ; Powerful expansion and completion
+  :bind (([remap dabbrev-expand] . hippie-expand))
+  :config
+  (setq hippie-expand-try-functions-list
+        '(try-expand-dabbrev
+          try-expand-dabbrev-all-buffers
+          try-expand-dabbrev-from-kill
+          try-complete-file-name-partially
+          try-complete-file-name
+          try-expand-all-abbrevs
+          try-expand-list
+          try-complete-lisp-symbol-partially
+          try-complete-lisp-symbol
+          dotemacs-try-complete-lisp-symbol-without-namespace)))
+
+(use-package init-hippie-exp       ; Custom expansion functions
+  :load-path "config/"
+  :commands (dotemacs-try-complete-lisp-symbol-without-namespace))
+
+;; TODO: Incorporate this into `use-package company` below
+;; original `init-company`
+; (defgroup dotemacs-company nil
+;   "Configuration options for company-mode."
+;   :group 'dotemacs
+;   :prefix 'dotemacs-company)
 ;
-; ;; In `completion-at-point', do not pop up silly completion buffers for less
-; ;; than five candidates.  Cycle instead.
-; (setq completion-cycle-threshold 5)
+; (defcustom dotemacs-company/ycmd-server-command nil
+;   "The path to the ycmd package."
+;   :group 'dotemacs-company)
 ;
-; (use-package hippie-exp                 ; Powerful expansion and completion
-;   :bind (([remap dabbrev-expand] . hippie-expand))
-;   :config
-;   (setq hippie-expand-try-functions-list
-;         '(try-expand-dabbrev
-;           try-expand-dabbrev-all-buffers
-;           try-expand-dabbrev-from-kill
-;           try-complete-file-name-partially
-;           try-complete-file-name
-;           try-expand-all-abbrevs
-;           try-expand-list
-;           try-complete-lisp-symbol-partially
-;           try-complete-lisp-symbol
-;           lunaryorn-try-complete-lisp-symbol-without-namespace)))
+; (require 'company)
 ;
-; (use-package lunaryorn-hippie-exp       ; Custom expansion functions
-;   :load-path "lisp/"
-;   :commands (lunaryorn-try-complete-lisp-symbol-without-namespace))
+; (setq company-idle-delay 0.5)
+; (setq company-minimum-prefix-length 2)
+; (setq company-show-numbers t)
+; (setq company-tooltip-limit 10)
+; ;; invert the navigation direction if the the completion popup-isearch-match
+; ;; is displayed on top (happens near the bottom of windows)
+; (setq company-tooltip-flip-when-above t)
 ;
-; (use-package company                    ; Graphical (auto-)completion
-;   :ensure t
-;   :init (global-company-mode)
-;   :config
-;   (progn
-;     (setq company-tooltip-align-annotations t
-;           ;; Easy navigation to candidates with M-<n>
-;           company-show-numbers t))
-;   :diminish company-mode)
 ;
-; (use-package company-statistics
-;   :ensure t
-;   :defer t
-;   :init (company-statistics-mode))
+; (setq company-dabbrev-downcase nil)
+; (setq company-dabbrev-ignore-case t)
 ;
-; (use-package company-math               ; Completion for Math symbols
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'company
-;           ;; Add backends for math characters
-;           (add-to-list 'company-backends 'company-math-symbols-unicode)
-;           (add-to-list 'company-backends 'company-math-symbols-latex)))
+; (setq company-dabbrev-code-ignore-case t)
+; (setq company-dabbrev-code-everywhere t)
 ;
-; (use-package helm-company
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'company
-;           ;; Use Company for completion
-;           (bind-key [remap completion-at-point] #'helm-company company-mode-map)
-;           (bind-key "C-:" #'helm-company company-mode-map)
-;           (bind-key "C-:" #'helm-company company-active-map)))
+; (setq company-etags-ignore-case t)
 ;
+; (unless (face-attribute 'company-tooltip :background)
+;   (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
+;   (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
+;   (set-face-attribute 'company-preview nil :background "black")
+;   (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
+;   (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
+;   (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
+;
+; (when (executable-find "tern")
+;   (with-eval-after-load "company-tern-autoloads"
+;     (add-to-list 'company-backends 'company-tern)))
+;
+; (setq company-global-modes
+;       '(not
+;         eshell-mode comint-mode org-mode erc-mode))
+;
+; (defadvice company-complete-common (around advice-for-company-complete-common activate)
+;   (when (null (yas-expand))
+;     ad-do-it))
+;
+; (defun my-company-tab ()
+;   (interactive)
+;   (when (null (yas-expand))
+;     (company-select-next)))
+;
+; (when dotemacs-company/ycmd-server-command
+;   (setq ycmd-server-command `("python" ,dotemacs-company/ycmd-server-command))
+;   (require 'ycmd)
+;   (ycmd-setup)
+;
+;   (require 'company-ycmd)
+;   (company-ycmd-setup))
+;
+; (global-company-mode)
+;
+; (when (display-graphic-p)
+;   (require 'company-quickhelp)
+;   (setq company-quickhelp-delay 0.2)
+;   (company-quickhelp-mode t))
+;; end origianl `init-company`
+
+(use-package company                    ; Graphical (auto-)completion
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :init (global-company-mode)
+  :config
+  (progn
+    (setq company-tooltip-align-annotations t
+          ;; Easy navigation to candidates with M-<n>
+          company-show-numbers t))
+  :diminish company-mode)
+
+(use-package company-statistics
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init (company-statistics-mode))
+
+(use-package company-math               ; Completion for Math symbols
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init (after "company"
+          ;; Add backends for math characters
+          (add-to-list 'company-backends 'company-math-symbols-unicode)
+          (add-to-list 'company-backends 'company-math-symbols-latex)))
+
+(use-package helm-company
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init (after "company"
+          ;; Use Company for completion
+          (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+          (bind-key "C-:" #'helm-company company-mode-map)
+          (bind-key "C-:" #'helm-company company-active-map)))
+
+;; TODO: Incorporate this into `use-package auto-complete` below
+;; original `init-auto-complete`
+; (require 'auto-complete)
+; (require 'auto-complete-config)
+;
+; (setq completion-ignored-extensions
+;       '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".x9700" ".aux" ".elf" ))
+;
+; (setq ac-auto-show-menu t)
+; (setq ac-auto-start t)
+; (setq ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat"))
+; (setq ac-quick-help-delay 0.3)
+; (setq ac-quick-help-height 30)
+; (setq ac-show-menu-immediately-on-auto-complete t)
+;
+; (dolist (mode '(vimrc-mode html-mode stylus-mode handlebars-mode mustache-mode))
+;   (add-to-list 'ac-modes mode))
+;
+; (ac-config-default)
+;
+; (with-eval-after-load 'linum
+;   (ac-linum-workaround))
+;
+; (with-eval-after-load 'yasnippet
+;   (add-hook 'yas-before-expand-snippet-hook (lambda () (auto-complete-mode -1)))
+;   (add-hook 'yas-after-exit-snippet-hook (lambda () (auto-complete-mode t)))
+;   (defadvice ac-expand (before advice-for-ac-expand activate)
+;     (when (yas-expand)
+;       (ac-stop))))
+;
+; (require 'ac-etags)
+; (setq ac-etags-requires 1)
+; (after "etags"
+;   (ac-etags-setup))
+;; end origianl `init-auto-complete`
+
+(use-package auto-complete
+  :ensure t
+  :if (eq dotemacs-completion-engine 'auto-complete))
+
 ; 
 ; ;;; Spelling and syntax checking
 ; (use-package ispell                     ; Spell checking
@@ -1286,17 +1394,18 @@ Disable the highlighting of overlong lines."
 ;   :ensure t
 ;   :bind (("C-c ! L" . helm-flycheck)))
 ;
-; (use-package lunaryorn-flycheck         ; Personal Flycheck helpers
+; (use-package init-flycheck         ; Personal Flycheck helpers
+;   :load-path "config/"
 ;   :defer t
-;   :commands (lunaryorn-discard-undesired-html-tidy-error
-;              lunaryorn-flycheck-mode-line-status)
+;   :commands (dotemacs-discard-undesired-html-tidy-error
+;              dotemacs-flycheck-mode-line-status)
 ;   :init (with-eval-after-load 'flycheck
 ;           ;; Don't highlight undesired errors from html tidy
 ;           (add-hook 'flycheck-process-error-functions
-;                     #'lunaryorn-discard-undesired-html-tidy-error)
+;                     #'dotemacs-discard-undesired-html-tidy-error)
 ;
 ;           (setq flycheck-mode-line
-;                 '(:eval (lunaryorn-flycheck-mode-line-status)))))
+;                 '(:eval (dotemacs-flycheck-mode-line-status)))))
 ;
 ; 
 ; ;;; Text editing

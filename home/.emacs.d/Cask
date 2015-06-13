@@ -2,7 +2,6 @@
 (depends-on "ag") ;;
 (depends-on "angular-snippets") ;;
 (depends-on "auto-compile")
-(depends-on "auto-complete") ;;
 (depends-on "bash-completion")
 (depends-on "browse-kill-ring")
 (depends-on "buffer-move")
@@ -14,12 +13,6 @@
 (depends-on "cmake-mode")
 (depends-on "coffee-mode") ;;
 (depends-on "color-identifiers-mode") ;;
-(depends-on "company") ;;
-(depends-on "company-go") ;;
-(depends-on "company-quickhelp") ;;
-(depends-on "company-restclient")
-(depends-on "company-tern") ;;
-(depends-on "company-ycmd") ;;
 (depends-on "diff-hl") ;;
 (depends-on "discover-my-major") ;;
 (depends-on "dtrt-indent") ;;
@@ -75,7 +68,6 @@
 (depends-on "guide-key") ;;
 (depends-on "helm-descbinds") ;;
 (depends-on "helm-projectile") ;;
-(depends-on "helm-company") ;;
 (depends-on "haml-mode")
 (depends-on "handlebars-mode") ;;
 (depends-on "haskell-mode")
