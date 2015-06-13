@@ -1,3 +1,8 @@
+;;; package --- emacs init.el
+;;; Commentary:
+
+;;; Code:
+
 ;; No splash screen please ... jeez
 (setq inhibit-startup-message t)
 
@@ -1068,6 +1073,54 @@ mouse-3: go to end"))))
     (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-splice-sexp))
   :diminish paredit-mode)
 
+;; TODO: Incorporate this into `use-package smartparens` below
+;; original `init-smartparens`
+; (defgroup dotemacs-smartparens nil
+;   "Configuration options for smartparens."
+;   :group 'dotemacs
+;   :prefix 'dotemacs-smartparens)
+;
+; (defcustom dotemacs-smartparens/autoinsert nil
+;   "When non-nil, turn on smartparens auto pairing instead of the default Emacs electric-pair-mode."
+;   :group 'dotemacs-smartparens)
+;
+; (defcustom dotemacs-smartparens/show-paren nil
+;   "When non-nil, turn on smartparens paren matching instead of the default Emacs show-paren-mode."
+;   :group 'dotemacs-smartparens)
+;
+; (setq sp-autoescape-string-quote nil)
+; (setq sp-autoinsert-quote-if-followed-by-closing-pair nil)
+;
+; (if dotemacs-smartparens/autoinsert
+;     (progn
+;       (setq sp-autoinsert-pair t)
+;       (electric-pair-mode -1))
+;   (setq sp-autoinsert-pair nil))
+;
+; (sp-use-smartparens-bindings)
+;
+; (when dotemacs-smartparens/show-paren
+;   (setq sp-show-pair-delay 0)
+;   (setq sp-show-pair-from-inside t)
+;   (show-paren-mode -1)
+;   (show-smartparens-global-mode t))
+;
+; (defun my-open-block-c-mode (id action context)
+;   (when (eq action 'insert)
+;     (newline)
+;     (indent-according-to-mode)
+;     (forward-line -1)
+;     (indent-according-to-mode)))
+;
+; (sp-pair "{" nil :post-handlers '(:add (my-open-block-c-mode "RET")))
+; (sp-pair "[" nil :post-handlers '(:add (my-open-block-c-mode "RET")))
+;
+; ;; fix conflict where smartparens clobbers yas' key bindings
+; (with-eval-after-load 'yasnippet
+;   (defadvice yas-expand (before advice-for-yas-expand activate)
+;     (sp-remove-active-pair-overlay)))
+;; end origianl `init-smartparens`
+
 (use-package smartparens                ; Parenthesis editing and balancing
   :ensure t
   :init (progn (smartparens-global-mode)
@@ -1334,101 +1387,153 @@ Disable the highlighting of overlong lines."
   :ensure t
   :if (eq dotemacs-completion-engine 'auto-complete))
 
-; 
-; ;;; Spelling and syntax checking
-; (use-package ispell                     ; Spell checking
-;   :defer t
-;   :config
-;   (progn
-;     (setq ispell-program-name (if (eq system-type 'darwin)
-;                                   (executable-find "aspell")
-;                                 (executable-find "hunspell"))
-;           ispell-dictionary "en_GB"     ; Default dictionnary
-;           ispell-silently-savep t       ; Don't ask when saving the private dict
-;           ;; Increase the height of the choices window to take our header line
-;           ;; into account.
-;           ispell-choices-win-default-height 5)
+
+;;; Spelling and syntax checking
+
+(use-package ispell                     ; Spell checking
+  :defer t
+  :config
+  (progn
+    (setq ispell-program-name (if (eq system-type 'darwin)
+                                  (executable-find "aspell")
+                                (executable-find "hunspell"))
+          ; ispell-extra-args '("--sug-mode=ultra")
+          ispell-dictionary "en_US"     ; Default dictionnary
+          ispell-silently-savep t       ; Don't ask when saving the private dict
+          ;; Increase the height of the choices window to take our header line
+          ;; into account.
+          ispell-choices-win-default-height 5)
+
+    (unless ispell-program-name
+      (warn "No spell checker available. Install Hunspell or ASpell for OS X."))))
+
+(use-package flyspell                   ; On-the-fly spell checking
+  :bind (("C-c t s" . flyspell-mode))
+  :init (progn (dolist (hook '(text-mode-hook message-mode-hook org-mode-hook))
+                 (add-hook hook 'turn-on-flyspell))
+               (add-hook 'prog-mode-hook 'flyspell-prog-mode))
+  :config
+  (progn
+    (setq flyspell-use-meta-tab nil
+          ;; Make Flyspell less chatty
+          flyspell-issue-welcome-flag nil
+          flyspell-issue-message-flag nil)
+
+    ;; Free C-M-i for completion
+    (define-key flyspell-mode-map "\M-\t" nil))
+  :diminish (flyspell-mode . "✓"))
+
+;; TODO: Incorporate this into `use-package flycheck` below
+;; original `init-flycheck`
+; (require 'flycheck)
 ;
-;     (unless ispell-program-name
-;       (warn "No spell checker available.  Install Hunspell or ASpell for OS X."))))
+; (after "flycheck"
+;   ;; Remove newline checks, since they would trigger an immediate check
+;   ;; when we want the idle-change-delay to be in effect while editing.
+;   (setq flycheck-check-syntax-automatically '(save
+;                                               idle-change
+;                                               mode-enabled))
+;   (setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
+;   (setq flycheck-checkers (delq 'html-tidy flycheck-checkers))
+;   (setq flycheck-standard-error-navigation nil))
 ;
-; (use-package flyspell                   ; On-the-fly spell checking
-;   :bind (("C-c t s" . flyspell-mode))
-;   :init (progn (dolist (hook '(text-mode-hook message-mode-hook))
-;                  (add-hook hook 'turn-on-flyspell))
-;                (add-hook 'prog-mode-hook 'flyspell-prog-mode))
-;   :config
-;   (progn
-;     (setq flyspell-use-meta-tab nil
-;           ;; Make Flyspell less chatty
-;           flyspell-issue-welcome-flag nil
-;           flyspell-issue-message-flag nil)
+; (global-flycheck-mode t)
 ;
-;     ;; Free C-M-i for completion
-;     (define-key flyspell-mode-map "\M-\t" nil))
-;   :diminish (flyspell-mode . "✓"))
+; ;; flycheck errors on a tooltip (doesnt work on console)
+; (when (display-graphic-p (selected-frame))
+;   (eval-after-load 'flycheck
+;     '(custom-set-variables
+;       '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))))
 ;
-; (use-package flycheck                   ; On-the-fly syntax checking
-;   :ensure t
-;   :bind (("C-c l e" . list-flycheck-errors)
-;          ("C-c t f" . flycheck-mode))
-;   :init (global-flycheck-mode)
-;   :config (progn
-;             (setq flycheck-display-errors-function
-;                   #'flycheck-display-error-messages-unless-error-list)
+; (defun my/adjust-flycheck-automatic-syntax-eagerness ()
+;   "Adjust how often we check for errors based on if there are any.
 ;
-;             ;; Use italic face for checker name
-;             (set-face-attribute 'flycheck-error-list-checker-name nil
-;                                 :inherit 'italic)
+; This lets us fix any errors as quickly as possible, but in a
+; clean buffer we're an order of magnitude laxer about checking."
+;   (setq flycheck-idle-change-delay
+;         (if flycheck-current-errors 0.5 30.0)))
 ;
-;             (add-to-list 'display-buffer-alist
-;                          `(,(rx bos "*Flycheck errors*" eos)
-;                            (display-buffer-reuse-window
-;                             display-buffer-in-side-window)
-;                            (side            . bottom)
-;                            (reusable-frames . visible)
-;                            (window-height   . 0.4))))
-;   :diminish flycheck-mode)
+; ;; Each buffer gets its own idle-change-delay because of the
+; ;; buffer-sensitive adjustment above.
+; (make-variable-buffer-local 'flycheck-idle-change-delay)
 ;
-; (use-package helm-flycheck
-;   :ensure t
-;   :bind (("C-c ! L" . helm-flycheck)))
+; (add-hook 'flycheck-after-syntax-check-hook
+;           'my/adjust-flycheck-automatic-syntax-eagerness)
 ;
-; (use-package init-flycheck         ; Personal Flycheck helpers
-;   :load-path "config/"
-;   :defer t
-;   :commands (dotemacs-discard-undesired-html-tidy-error
-;              dotemacs-flycheck-mode-line-status)
-;   :init (with-eval-after-load 'flycheck
-;           ;; Don't highlight undesired errors from html tidy
-;           (add-hook 'flycheck-process-error-functions
-;                     #'dotemacs-discard-undesired-html-tidy-error)
+; (defun flycheck-handle-idle-change ()
+;   "Handle an expired idle time since the last change.
 ;
-;           (setq flycheck-mode-line
-;                 '(:eval (dotemacs-flycheck-mode-line-status)))))
-;
-; 
-; ;;; Text editing
-; (use-package tildify
-;   :bind (("C-c e t" . tildify-region))
-;   :init (dolist (hook '(markdown-mode-hook
-;                         latex-mode-hook
-;                         rst-mode-hook))
-;           (add-hook hook #'tildify-mode))
-;   ;; Use the right space for LaTeX
-;   :config (add-hook 'latex-mode-hook
-;                     (lambda () (setq-local tildify-space-string "~"))))
-;
-; (use-package typo
-;   :ensure t
-;   :bind (("C-c t t" . typo-mode))
-;   :init (progn
-;           (typo-global-mode)
-;
-;           (dolist (hook '(markdown-mode-hook
-;                           rst-mode-hook))
-;             (add-hook hook 'typo-mode)))
-;   :diminish (typo-mode . "𝕿"))
+; This is an overwritten version of the original
+; flycheck-handle-idle-change, which removes the forced deferred.
+; Timers should only trigger inbetween commands in a single
+; threaded system and the forced deferred makes errors never show
+; up before you execute another command."
+;   (flycheck-clear-idle-change-timer)
+;   (flycheck-buffer-automatically 'idle-change))
+;; end origianl `init-auto-flycheck`
+
+
+(use-package flycheck                   ; On-the-fly syntax checking
+  :ensure t
+  :bind (("C-c l e" . list-flycheck-errors)
+         ("C-c t f" . flycheck-mode))
+  :init (global-flycheck-mode)
+  :config (progn
+            (setq flycheck-display-errors-function
+                  #'flycheck-display-error-messages-unless-error-list)
+
+            ;; Use italic face for checker name
+            (set-face-attribute 'flycheck-error-list-checker-name nil
+                                :inherit 'italic)
+
+            (add-to-list 'display-buffer-alist
+                         `(,(rx bos "*Flycheck errors*" eos)
+                           (display-buffer-reuse-window
+                            display-buffer-in-side-window)
+                           (side            . bottom)
+                           (reusable-frames . visible)
+                           (window-height   . 0.4))))
+  :diminish flycheck-mode)
+
+(use-package helm-flycheck
+  :ensure t
+  :bind (("C-c ! L" . helm-flycheck)))
+
+(use-package init-flycheck         ; Personal Flycheck helpers
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-discard-undesired-html-tidy-error
+             dotemacs-flycheck-mode-line-status)
+  :init (after "flycheck"
+          ;; Don't highlight undesired errors from html tidy
+          (add-hook 'flycheck-process-error-functions
+                    #'dotemacs-discard-undesired-html-tidy-error)
+
+          (setq flycheck-mode-line
+                '(:eval (dotemacs-flycheck-mode-line-status)))))
+
+
+;; Text editing
+(use-package tildify
+  :bind (("C-c e t" . tildify-region))
+  :init (dolist (hook '(markdown-mode-hook
+                        latex-mode-hook
+                        rst-mode-hook))
+          (add-hook hook #'tildify-mode))
+  ;; Use the right space for LaTeX
+  :config (add-hook 'latex-mode-hook
+                    (lambda () (setq-local tildify-space-string "~"))))
+
+(use-package typo
+  :ensure t
+  :bind (("C-c t t" . typo-mode))
+  :init (progn
+          (typo-global-mode)
+
+          (dolist (hook '(markdown-mode-hook
+                          rst-mode-hook))
+            (add-hook hook 'typo-mode)))
+  :diminish (typo-mode . "𝕿"))
 
 
 

@@ -63,11 +63,6 @@
       '((plantuml . t))))
 
    (defun my-org-mode-hook ()
-     (when (or (executable-find "aspell")
-               (executable-find "ispell")
-               (executable-find "hunspell"))
-       (turn-on-flyspell))
-
      ;; disable line wrap
      (setq truncate-lines t)
      (setq partial-width-windows nil)

@@ -45,7 +45,6 @@
 (depends-on "fiplr") ;;
 (depends-on "flx")
 (depends-on "flx-ido") ;;
-(depends-on "flycheck") ;;
 (depends-on "flycheck-cask")
 (depends-on "flycheck-package")
 (depends-on "flycheck-pos-tip")

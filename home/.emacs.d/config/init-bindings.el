@@ -372,9 +372,11 @@
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
 
 
-; TODO remote this
+; TODO removee this, but use as an example for BEFORE to AFTER
+; BEFORE
 ; (with-eval-after-load "expand-region-autoloads"
 ;   (global-set-key (kbd "C-=") 'er/expand-region))
+; AFTER
 ; (use-package expand-region              ; Expand region by semantic units
 ;   :ensure t
 ;   :bind (("C-=" . er/expand-region)))

@@ -1,4 +1,5 @@
-; TODO Go through the following commented code
+;; TODO: Incorporate this into `use-package lisp` below
+;; original `init-lisp`
 ; (require 'init-programming)
 ;
 ; (require-package 'elisp-slime-nav)
@@ -44,6 +45,7 @@
 ;   (whitespace-mode -1))
 ;
 ; (setq my-interactive-lisp-coding-hook 'my-interactive-lisp-coding-defaults)
+;; end origianl `init-lisp`
 
 
 (require 'rx)

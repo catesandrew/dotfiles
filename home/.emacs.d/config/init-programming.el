@@ -28,8 +28,6 @@ This functions should be added to the hooks of major modes for programming."
 
 (defun my-prog-mode-defaults ()
   "Default coding hook, useful with any programming language."
-  (when (executable-find ispell-program-name)
-    (flyspell-prog-mode))
   (smartparens-mode +1)
 
   ;; disable line wrap
