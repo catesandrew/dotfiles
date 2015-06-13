@@ -90,15 +90,12 @@
 (depends-on "js2-mode") ;;
 (depends-on "js2-refactor") ;;
 (depends-on "js3-mode") ;;
-(depends-on "json-mode")
-(depends-on "json-reformat")
 (depends-on "json-snatcher")
 (depends-on "key-chord") ;;
 (depends-on "let-alist")
 (depends-on "lua-mode")
 (depends-on "magit") ;;
 (depends-on "magit-gitflow")
-(depends-on "markdown-mode") ;;
 (depends-on "move-text")
 (depends-on "multiple-cursors") ;;
 (depends-on "mustache-mode") ;;

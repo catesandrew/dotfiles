@@ -986,6 +986,121 @@ mouse-3: go to end"))))
       (setq reftex-cite-format 'biblatex)))
   :diminish reftex-mode)
 
+
+;; Other markup languages
+(use-package rst                        ; ReStructuredText
+  :defer t
+  :config
+  ;; Indent with 3 spaces after all kinds of literal blocks
+  (setq rst-indent-literal-minimized 3
+        rst-indent-literal-normal 3)
+
+  (bind-key "C-=" nil rst-mode-map)
+  ;; For similarity with AUCTeX
+  (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
+  ;; …and with Markdown Mode
+  (bind-key "M-RET" #'rst-insert-list rst-mode-map))
+
+(use-package markdown-mode              ; Markdown
+  :ensure t
+  :mode (("\\.md$" . markdown-mode)
+         ("\\.markdown$" . markdown-mode)
+         ("\\.apib$" . markdown-mode))
+
+  ;; http://www.tychoish.com/posts/imenu-for-markdown-and-writing/
+  :init (setq markdown-imenu-generic-expression
+               '(("title"  "^\\(.*\\)[\n]=+$" 1)
+                 ("h2-"    "^\\(.*\\)[\n]-+$" 1)
+                 ("h1"   "^# \\(.*\\)$" 1)
+                 ("h2"   "^## \\(.*\\)$" 1)
+                 ("h3"   "^### \\(.*\\)$" 1)
+                 ("h4"   "^#### \\(.*\\)$" 1)
+                 ("h5"   "^##### \\(.*\\)$" 1)
+                 ("h6"   "^###### \\(.*\\)$" 1)
+                 ("fn"   "^\\[\\^\\(.*\\)\\]" 1)))
+  :config
+  (progn
+    ;; Process Markdown with Pandoc, using a custom stylesheet for nice output
+    (let ((stylesheet (expand-file-name
+                       (locate-user-emacs-file "etc/pandoc.css"))))
+      (setq markdown-command
+            (mapconcat #'shell-quote-argument
+                       `("pandoc" "--toc" "--section-divs"
+                         "--css" ,(concat "file://" stylesheet)
+                         "--standalone" "-f" "markdown" "-t" "html5")
+                       " ")))
+
+    (when (eq system-type 'darwin)
+      (setq markdown-open-command "mark"))
+
+    ;; disable auto indent
+    (add-hook 'markdown-mode-hook
+              (lambda ()
+                (electric-indent-local-mode -1)
+                (setq imenu-generic-expression markdown-imenu-generic-expression)))
+
+    ;; No filling in GFM, because line breaks are significant.
+    (add-hook 'gfm-mode-hook #'turn-off-auto-fill)
+    ;; Use visual lines instead
+    (add-hook 'gfm-mode-hook #'visual-line-mode)
+    (add-hook 'gfm-mode-hook #'init-whitespace-style-no-long-lines)
+
+    (bind-key "C-c C-s C" #'markdown-insert-gfm-code-block markdown-mode-map)
+    (bind-key "C-c C-s P" #'markdown-insert-gfm-code-block markdown-mode-map)
+
+    ;; Fight my habit of constantly pressing M-q.  We should not fill in GFM Mode.
+    (bind-key "M-q" #'ignore gfm-mode-map)))
+
+(use-package init-markdown
+  :bind (("C-c t h" . dotemacs-markdown-post-header)))
+
+(use-package init-markdown
+  :if (and (eq system-type 'darwin) (display-graphic-p))
+  :bind (("C-c m" . dotemacs-preview-md-file)))
+
+(use-package jira-markup-mode           ; Jira markup
+  :ensure t
+  :defer t)
+
+(use-package yaml-mode                  ; YAML
+  :ensure t
+  :defer t
+  :mode (("\\.yaml$" . yaml-mode)
+         ("\\.yml$" . yaml-mode))
+  :config
+    (add-hook 'yaml-mode-hook
+              (lambda ()
+                (electric-indent-local-mode -1)
+                (run-hooks 'prog-mode-hook))))
+
+(use-package toml-mode                  ; TOML
+  :ensure t
+  :defer t
+  :mode ("\\.toml$" . toml-mode)
+  :config
+    (add-hook 'toml-mode-hook
+              (lambda ()
+                (electric-indent-local-mode -1)
+                (run-hooks 'prog-mode-hook))))
+
+(use-package json-mode                  ; JSON files
+  :ensure t
+  :defer t)
+
+(use-package json-reformat              ; Reformat JSON
+  :ensure t
+  :defer t
+  :bind (("C-c e j" . json-reformat-region)))
+
+(use-package graphviz-dot-mode          ; Graphviz
+  :ensure t
+  :defer t
+  :config
+  (setq graphviz-dot-indent-width 4))
+
+(use-package systemd                    ; Mode for systemd unit files
+  :ensure t
+  :defer t)
 
 
 
