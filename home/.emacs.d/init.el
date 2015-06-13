@@ -1042,6 +1042,276 @@ mouse-3: go to end"))))
 (bind-key [remap just-one-space] #'cycle-spacing)
 
 
+;;; Paired delimiters
+(use-package elec-pair                  ; Electric pairs
+  :disabled t
+  :init (electric-pair-mode))
+
+(use-package paren                      ; Highlight paired delimiters
+  :disabled t
+  :init
+  (show-paren-mode)
+  (setq show-paren-delay 0)
+  :config (setq show-paren-when-point-inside-paren t
+                show-paren-when-point-in-periphery t))
+
+(use-package paredit                    ; Balanced sexp editing
+  :disabled t
+  :ensure t
+  :defer t
+  :init (dolist (hook '(eval-expression-minibuffer-setup-hook
+                        emacs-lisp-mode-hook
+                        inferior-emacs-lisp-mode-hook
+                        clojure-mode-hook))
+          (add-hook hook #'paredit-mode))
+  :config
+  (progn
+    ;; Free M-s.  There are some useful bindings in that prefix map.
+    (define-key paredit-mode-map (kbd "M-s") nil)
+    (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-splice-sexp))
+  :diminish paredit-mode)
+
+(use-package smartparens                ; Parenthesis editing and balancing
+  :ensure t
+  :init (progn (smartparens-global-mode)
+               (show-smartparens-global-mode)
+
+               (dolist (hook '(inferior-emacs-lisp-mode-hook
+                               emacs-lisp-mode-hook))
+                 (add-hook hook #'smartparens-strict-mode)))
+  :config (setq sp-autoskip-closing-pair 'always
+                ;; Don't kill entire symbol on C-k
+                sp-hybrid-kill-entire-symbol nil)
+  :diminish smartparens-mode)
+
+(use-package init-smartparens      ; Personal Smartparens extensions
+  :load-path "config/")
+
+; 
+; ;;; Highlights and fontification
+; (defun lunaryorn-whitespace-style-no-long-lines ()
+;   "Configure `whitespace-mode' for Org.
+;
+; Disable the highlighting of overlong lines."
+;   (setq-local whitespace-style (-difference whitespace-style
+;                                             '(lines lines-tail))))
+;
+; (defun lunaryorn-whitespace-mode-local ()
+;   "Enable `whitespace-mode' after local variables where set up."
+;   (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
+;
+; (use-package whitespace                 ; Highlight bad whitespace
+;   :bind (("C-c t w" . whitespace-mode))
+;   :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+;           (add-hook hook #'lunaryorn-whitespace-mode-local))
+;   :config
+;   ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
+;   ;; portions of lines via faces.  Also indicate tabs via characters
+;   (setq whitespace-style '(face indentation space-after-tab space-before-tab
+;                                 tab-mark empty trailing lines-tail)
+;         whitespace-line-column nil)     ; Use `fill-column' for overlong lines
+;   :diminish (whitespace-mode . "▢"))
+;
+; (use-package hl-line                    ; Highlight the current line
+;   :init (global-hl-line-mode 1))
+;
+; (use-package rainbow-delimiters         ; Highlight delimiters by depth
+;   :ensure t
+;   :defer t
+;   :init (dolist (hook '(text-mode-hook prog-mode-hook))
+;           (add-hook hook #'rainbow-delimiters-mode)))
+;
+; (use-package hi-lock                    ; Custom regexp highlights
+;   :init (global-hi-lock-mode))
+;
+; (use-package highlight-numbers          ; Fontify number literals
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+;
+; (use-package highlight-quoted
+;   :ensure t
+;   :defer t
+;   :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
+;
+; (use-package rainbow-mode               ; Fontify color values in code
+;   :ensure t
+;   :bind (("C-c t r" . rainbow-mode))
+;   :config (add-hook 'css-mode-hook #'rainbow-mode))
+;
+; (use-package highlight-symbol           ; Highlighting and commands for symbols
+;   :ensure t
+;   :defer t
+;   :bind
+;   (("C-c s %" . highlight-symbol-query-replace)
+;    ("C-c s n" . highlight-symbol-next-in-defun)
+;    ("C-c s o" . highlight-symbol-occur)
+;    ("C-c s p" . highlight-symbol-prev-in-defun))
+;   ;; Navigate occurrences of the symbol under point with M-n and M-p, and
+;   ;; highlight symbol occurrences
+;   :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+;                (add-hook 'prog-mode-hook #'highlight-symbol-mode))
+;   :config
+;   (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
+;         highlight-symbol-on-navigation-p t) ; Highlight immediately after
+;                                         ; navigation
+;   :diminish highlight-symbol-mode)
+;
+; 
+; ;;; Skeletons, completion and expansion
+;
+; ;; In `completion-at-point', do not pop up silly completion buffers for less
+; ;; than five candidates.  Cycle instead.
+; (setq completion-cycle-threshold 5)
+;
+; (use-package hippie-exp                 ; Powerful expansion and completion
+;   :bind (([remap dabbrev-expand] . hippie-expand))
+;   :config
+;   (setq hippie-expand-try-functions-list
+;         '(try-expand-dabbrev
+;           try-expand-dabbrev-all-buffers
+;           try-expand-dabbrev-from-kill
+;           try-complete-file-name-partially
+;           try-complete-file-name
+;           try-expand-all-abbrevs
+;           try-expand-list
+;           try-complete-lisp-symbol-partially
+;           try-complete-lisp-symbol
+;           lunaryorn-try-complete-lisp-symbol-without-namespace)))
+;
+; (use-package lunaryorn-hippie-exp       ; Custom expansion functions
+;   :load-path "lisp/"
+;   :commands (lunaryorn-try-complete-lisp-symbol-without-namespace))
+;
+; (use-package company                    ; Graphical (auto-)completion
+;   :ensure t
+;   :init (global-company-mode)
+;   :config
+;   (progn
+;     (setq company-tooltip-align-annotations t
+;           ;; Easy navigation to candidates with M-<n>
+;           company-show-numbers t))
+;   :diminish company-mode)
+;
+; (use-package company-statistics
+;   :ensure t
+;   :defer t
+;   :init (company-statistics-mode))
+;
+; (use-package company-math               ; Completion for Math symbols
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'company
+;           ;; Add backends for math characters
+;           (add-to-list 'company-backends 'company-math-symbols-unicode)
+;           (add-to-list 'company-backends 'company-math-symbols-latex)))
+;
+; (use-package helm-company
+;   :ensure t
+;   :defer t
+;   :init (with-eval-after-load 'company
+;           ;; Use Company for completion
+;           (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+;           (bind-key "C-:" #'helm-company company-mode-map)
+;           (bind-key "C-:" #'helm-company company-active-map)))
+;
+; 
+; ;;; Spelling and syntax checking
+; (use-package ispell                     ; Spell checking
+;   :defer t
+;   :config
+;   (progn
+;     (setq ispell-program-name (if (eq system-type 'darwin)
+;                                   (executable-find "aspell")
+;                                 (executable-find "hunspell"))
+;           ispell-dictionary "en_GB"     ; Default dictionnary
+;           ispell-silently-savep t       ; Don't ask when saving the private dict
+;           ;; Increase the height of the choices window to take our header line
+;           ;; into account.
+;           ispell-choices-win-default-height 5)
+;
+;     (unless ispell-program-name
+;       (warn "No spell checker available.  Install Hunspell or ASpell for OS X."))))
+;
+; (use-package flyspell                   ; On-the-fly spell checking
+;   :bind (("C-c t s" . flyspell-mode))
+;   :init (progn (dolist (hook '(text-mode-hook message-mode-hook))
+;                  (add-hook hook 'turn-on-flyspell))
+;                (add-hook 'prog-mode-hook 'flyspell-prog-mode))
+;   :config
+;   (progn
+;     (setq flyspell-use-meta-tab nil
+;           ;; Make Flyspell less chatty
+;           flyspell-issue-welcome-flag nil
+;           flyspell-issue-message-flag nil)
+;
+;     ;; Free C-M-i for completion
+;     (define-key flyspell-mode-map "\M-\t" nil))
+;   :diminish (flyspell-mode . "✓"))
+;
+; (use-package flycheck                   ; On-the-fly syntax checking
+;   :ensure t
+;   :bind (("C-c l e" . list-flycheck-errors)
+;          ("C-c t f" . flycheck-mode))
+;   :init (global-flycheck-mode)
+;   :config (progn
+;             (setq flycheck-display-errors-function
+;                   #'flycheck-display-error-messages-unless-error-list)
+;
+;             ;; Use italic face for checker name
+;             (set-face-attribute 'flycheck-error-list-checker-name nil
+;                                 :inherit 'italic)
+;
+;             (add-to-list 'display-buffer-alist
+;                          `(,(rx bos "*Flycheck errors*" eos)
+;                            (display-buffer-reuse-window
+;                             display-buffer-in-side-window)
+;                            (side            . bottom)
+;                            (reusable-frames . visible)
+;                            (window-height   . 0.4))))
+;   :diminish flycheck-mode)
+;
+; (use-package helm-flycheck
+;   :ensure t
+;   :bind (("C-c ! L" . helm-flycheck)))
+;
+; (use-package lunaryorn-flycheck         ; Personal Flycheck helpers
+;   :defer t
+;   :commands (lunaryorn-discard-undesired-html-tidy-error
+;              lunaryorn-flycheck-mode-line-status)
+;   :init (with-eval-after-load 'flycheck
+;           ;; Don't highlight undesired errors from html tidy
+;           (add-hook 'flycheck-process-error-functions
+;                     #'lunaryorn-discard-undesired-html-tidy-error)
+;
+;           (setq flycheck-mode-line
+;                 '(:eval (lunaryorn-flycheck-mode-line-status)))))
+;
+; 
+; ;;; Text editing
+; (use-package tildify
+;   :bind (("C-c e t" . tildify-region))
+;   :init (dolist (hook '(markdown-mode-hook
+;                         latex-mode-hook
+;                         rst-mode-hook))
+;           (add-hook hook #'tildify-mode))
+;   ;; Use the right space for LaTeX
+;   :config (add-hook 'latex-mode-hook
+;                     (lambda () (setq-local tildify-space-string "~"))))
+;
+; (use-package typo
+;   :ensure t
+;   :bind (("C-c t t" . typo-mode))
+;   :init (progn
+;           (typo-global-mode)
+;
+;           (dolist (hook '(markdown-mode-hook
+;                           rst-mode-hook))
+;             (add-hook hook 'typo-mode)))
+;   :diminish (typo-mode . "𝕿"))
+
+
+
 ;;; LaTeX with AUCTeX
 (use-package tex-site                   ; AUCTeX initialization
   :ensure auctex)
