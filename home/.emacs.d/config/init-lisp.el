@@ -1,7 +1,5 @@
 ; TODO Go through the following commented code
 ; (require 'init-programming)
-; (require-package 'rainbow-delimiters)
-; (require 'rainbow-delimiters)
 ;
 ; (require-package 'elisp-slime-nav)
 ; (after "elisp-slime-nav-autoloads"
@@ -36,15 +34,13 @@
 ;
 ; ;; A great lisp coding hook
 ; (defun my-lisp-coding-defaults ()
-;   (smartparens-strict-mode +1)
-;   (rainbow-delimiters-mode +1))
+;   (smartparens-strict-mode +1))
 ;
 ; (setq my-lisp-coding-hook 'my-lisp-coding-defaults)
 ;
 ; ;; interactive modes don't need whitespace checks
 ; (defun my-interactive-lisp-coding-defaults ()
 ;   (smartparens-strict-mode +1)
-;   (rainbow-delimiters-mode +1)
 ;   (whitespace-mode -1))
 ;
 ; (setq my-interactive-lisp-coding-hook 'my-interactive-lisp-coding-defaults)
