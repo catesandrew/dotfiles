@@ -82,7 +82,6 @@
 (depends-on "go-eldoc") ;;
 (depends-on "go-mode") ;;
 (depends-on "guide-key") ;;
-(depends-on "helm-swoop") ;;
 (depends-on "helm-descbinds") ;;
 (depends-on "helm-projectile") ;;
 (depends-on "helm-company") ;;

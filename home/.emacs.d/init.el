@@ -442,6 +442,11 @@ mouse-3: go to end"))))
                 savehist-additional-variables '(search ring regexp-search-ring)
                 savehist-autosave-interval 180))
 
+; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
+
+; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
+; can also enable Helm to manage the command buffer, which is pretty awesome
+; with: (helm-mode 1)
 (use-package helm
   :ensure t
   :bind (
@@ -467,14 +472,57 @@ mouse-3: go to end"))))
          ("C-c f l"                        . helm-locate-library))
   :init (progn (helm-mode 1)
 
-               (with-eval-after-load 'helm-config
+               (after "helm-config"
                  (warn "`helm-config' loaded! Get rid of it ASAP!")))
-  :config (setq helm-split-window-in-side-p t)
+  :config
+    (progn
+      (helm-autoresize-mode t)
+      (setq helm-split-window-in-side-p t
+            helm-command-prefix-key "C-c b"
+            helm-quick-update t
+            helm-bookmark-show-location t
+            helm-buffers-fuzzy-matching t
+            helm-M-x-fuzzy-match t
+            helm-apropos-fuzzy-match t
+            helm-recentf-fuzzy-match t
+            helm-locate-fuzzy-match t
+            helm-file-cache-fuzzy-match t
+            helm-semantic-fuzzy-match t
+            helm-imenu-fuzzy-match t
+            helm-lisp-fuzzy-completion t)
+
+      (use-package helm-swoop
+        :ensure t
+        :defer t
+        :config (setq helm-swoop-pre-input-function #'ignore
+                      helm-swoop-use-line-number-face t
+                      helm-swoop-split-with-multiple-windows t))
+
+      (use-package helm-descbinds
+                   :ensure t
+                   :defer t)
+
+      (after "projectile"
+        (warn "projectile loaded, now load helm-projectile")
+        (use-package helm-projectile
+                     :ensure t
+                     :defer t))
+
+      (after "company"
+        (warn "company loaded, now load helm-company")
+        (use-package helm-company
+                     :ensure t
+                     :defer t)))
+
   :diminish helm-mode)
+
 
 (use-package helm-unicode
   :ensure t
   :bind ("C-c b 8" . helm-unicode))
+
+
+
 
 
 

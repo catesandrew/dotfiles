@@ -7,13 +7,11 @@
 (setq projectile-indexing-method 'alien)
 ; To enable caching unconditionally
 (setq projectile-enable-caching t)
-(with-eval-after-load "helm-autoloads"
+(after "helm-autoloads"
   (setq projectile-completion-system 'helm)
-  (after 'helm-projectile
+  (after "helm-projectile"
     (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)))
 
-
-(require 'projectile)
 
 
 (add-to-list 'projectile-globally-ignored-directories "elpa")
