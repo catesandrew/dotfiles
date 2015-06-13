@@ -7,16 +7,6 @@
   (skewer-setup))
 
 
-(require 'rainbow-mode)
-(add-hook 'js2-mode-hook 'rainbow-mode)
-(add-hook 'html-mode-hook 'rainbow-mode)
-(add-hook 'web-mode-hook 'rainbow-mode)
-(add-hook 'css-mode-hook 'rainbow-mode)
-(add-hook 'stylus-mode-hook 'rainbow-mode)
-(add-hook 'mustache-mode-hook 'rainbow-mode)
-(add-hook 'handlebars-mode-hook 'rainbow-mode)
-
-
 (defun my-emmet-mode ()
   (require 'emmet-mode)
   (emmet-mode))

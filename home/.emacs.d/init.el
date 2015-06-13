@@ -1087,77 +1087,84 @@ mouse-3: go to end"))))
 (use-package init-smartparens      ; Personal Smartparens extensions
   :load-path "config/")
 
-; 
-; ;;; Highlights and fontification
-; (defun lunaryorn-whitespace-style-no-long-lines ()
-;   "Configure `whitespace-mode' for Org.
-;
-; Disable the highlighting of overlong lines."
-;   (setq-local whitespace-style (-difference whitespace-style
-;                                             '(lines lines-tail))))
-;
-; (defun lunaryorn-whitespace-mode-local ()
-;   "Enable `whitespace-mode' after local variables where set up."
-;   (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
-;
-; (use-package whitespace                 ; Highlight bad whitespace
-;   :bind (("C-c t w" . whitespace-mode))
-;   :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-;           (add-hook hook #'lunaryorn-whitespace-mode-local))
-;   :config
-;   ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
-;   ;; portions of lines via faces.  Also indicate tabs via characters
-;   (setq whitespace-style '(face indentation space-after-tab space-before-tab
-;                                 tab-mark empty trailing lines-tail)
-;         whitespace-line-column nil)     ; Use `fill-column' for overlong lines
-;   :diminish (whitespace-mode . "▢"))
-;
-; (use-package hl-line                    ; Highlight the current line
-;   :init (global-hl-line-mode 1))
-;
-; (use-package rainbow-delimiters         ; Highlight delimiters by depth
-;   :ensure t
-;   :defer t
-;   :init (dolist (hook '(text-mode-hook prog-mode-hook))
-;           (add-hook hook #'rainbow-delimiters-mode)))
-;
-; (use-package hi-lock                    ; Custom regexp highlights
-;   :init (global-hi-lock-mode))
-;
-; (use-package highlight-numbers          ; Fontify number literals
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
-;
-; (use-package highlight-quoted
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
-;
-; (use-package rainbow-mode               ; Fontify color values in code
-;   :ensure t
-;   :bind (("C-c t r" . rainbow-mode))
-;   :config (add-hook 'css-mode-hook #'rainbow-mode))
-;
-; (use-package highlight-symbol           ; Highlighting and commands for symbols
-;   :ensure t
-;   :defer t
-;   :bind
-;   (("C-c s %" . highlight-symbol-query-replace)
-;    ("C-c s n" . highlight-symbol-next-in-defun)
-;    ("C-c s o" . highlight-symbol-occur)
-;    ("C-c s p" . highlight-symbol-prev-in-defun))
-;   ;; Navigate occurrences of the symbol under point with M-n and M-p, and
-;   ;; highlight symbol occurrences
-;   :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-;                (add-hook 'prog-mode-hook #'highlight-symbol-mode))
-;   :config
-;   (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
-;         highlight-symbol-on-navigation-p t) ; Highlight immediately after
-;                                         ; navigation
-;   :diminish highlight-symbol-mode)
-;
-; 
+
+;;; Highlights and fontification
+(defun dotemacs-whitespace-style-no-long-lines ()
+  "Configure `whitespace-mode' for Org.
+
+Disable the highlighting of overlong lines."
+  (setq-local whitespace-style (-difference whitespace-style
+                                            '(lines lines-tail))))
+
+(defun dotemacs-whitespace-mode-local ()
+  "Enable `whitespace-mode' after local variables where set up."
+  (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
+
+;; Trailing whitespace
+;; I don’t want to leave trailing whitespace in files I touch, so set
+;; up a hook that automatically deletes trailing whitespace after
+;; every line when saving a file:
+; (add-hook 'write-file-hooks 'delete-trailing-whitespace)
+
+(use-package whitespace                 ; Highlight bad whitespace
+  :bind (("C-c t w" . whitespace-mode))
+  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+          (add-hook hook #'dotemacs-whitespace-mode-local))
+  :config
+  ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
+  ;; portions of lines via faces.  Also indicate tabs via characters
+  (setq whitespace-style '(face indentation space-after-tab space-before-tab
+                                tab-mark empty trailing lines-tail)
+        whitespace-line-column nil)     ; Use `fill-column' for overlong lines
+  :diminish (whitespace-mode . "▢"))
+
+(use-package hl-line                    ; Highlight the current line
+  :init (global-hl-line-mode 1))
+
+(use-package rainbow-delimiters         ; Highlight delimiters by depth
+  :ensure t
+  :defer t
+  :init (dolist (hook '(text-mode-hook prog-mode-hook))
+          (add-hook hook #'rainbow-delimiters-mode)))
+
+(use-package hi-lock                    ; Custom regexp highlights
+  :init (global-hi-lock-mode))
+
+(use-package highlight-numbers          ; Fontify number literals
+  :ensure t
+  :defer t
+  :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+
+(use-package highlight-quoted
+  :ensure t
+  :defer t
+  :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
+
+(use-package rainbow-mode               ; Fontify color values in code
+  :ensure t
+  :bind (("C-c t r" . rainbow-mode))
+  :init (dolist (hook '(js-mode-hook js2-mode-hook html-mode-hook web-mode-hook css-mode-hook stylus-mode-hook stylus-mode-hook handlebars-mode-hook))
+          (add-hook hook #'rainbow-mode)))
+
+(use-package highlight-symbol           ; Highlighting and commands for symbols
+  :ensure t
+  :defer t
+  :bind
+  (("C-c s %" . highlight-symbol-query-replace)
+   ("C-c s n" . highlight-symbol-next-in-defun)
+   ("C-c s o" . highlight-symbol-occur)
+   ("C-c s p" . highlight-symbol-prev-in-defun))
+  ;; Navigate occurrences of the symbol under point with M-n and M-p, and
+  ;; highlight symbol occurrences
+  :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+               (add-hook 'prog-mode-hook #'highlight-symbol-mode))
+  :config
+  (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
+        highlight-symbol-on-navigation-p t) ; Highlight immediately after
+                                        ; navigation
+  :diminish highlight-symbol-mode)
+
+
 ; ;;; Skeletons, completion and expansion
 ;
 ; ;; In `completion-at-point', do not pop up silly completion buffers for less

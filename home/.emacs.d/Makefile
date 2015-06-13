@@ -12,7 +12,13 @@ LIB_SRCS = config/init-util.el \
 		   config/init-window.el \
 		   config/init-markdown.el \
 		   config/init-simple.el \
-		   config/init-smartparens.el
+		   config/init-smartparens.el \
+		   config/init-hippie-exp.el \
+		   config/init-flycheck.el \
+		   config/init-lisp.el \
+		   config/flycheck-auto-scalastyle.el \
+		   config/flycheck-virtualenv.el \
+		   config/flycheck-ensime.el
 
 SRCS = init.el $(LIB_SRCS)
 OBJECTS = $(SRCS:.el=.elc)

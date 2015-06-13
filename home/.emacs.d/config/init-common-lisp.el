@@ -1,6 +1,4 @@
 (require 'init-programming)
-(require-package 'rainbow-delimiters)
-(require 'rainbow-delimiters)
 
 (require-package 'slime)
 (require 'slime)

@@ -79,16 +79,12 @@
 (depends-on "haml-mode")
 (depends-on "handlebars-mode") ;;
 (depends-on "haskell-mode")
-(depends-on "highlight-numbers") ;;
-(depends-on "highlight-symbol") ;;
-(depends-on "highlight-quoted") ;;
 (depends-on "ido-ubiquitous") ;;
 (depends-on "ido-at-point")
 (depends-on "ido-vertical-mode") ;;
 (depends-on "jade-mode") ;;
 (depends-on "js2-mode") ;;
 (depends-on "js2-refactor") ;;
-(depends-on "js3-mode") ;;
 (depends-on "json-snatcher")
 (depends-on "key-chord") ;;
 (depends-on "let-alist")
@@ -96,7 +92,6 @@
 (depends-on "magit") ;;
 (depends-on "magit-gitflow")
 (depends-on "move-text")
-(depends-on "multiple-cursors") ;;
 (depends-on "mustache-mode") ;;
 (depends-on "mwim")
 (depends-on "names")
@@ -119,8 +114,6 @@
 (depends-on "project-explorer") ;;
 (depends-on "puppet-mode") ;;
 (depends-on "pt") ;;
-(depends-on "rainbow-delimiters") ;;
-(depends-on "rainbow-mode") ;;
 (depends-on "relative-line-numbers")
 (depends-on "restclient")
 (depends-on "rtags")

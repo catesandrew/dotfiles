@@ -1,11 +1,3 @@
-;; Trailing whitespace
-
-;; I don’t want to leave trailing whitespace in files I touch, so set
-;; up a hook that automatically deletes trailing whitespace after
-;; every line when saving a file:
-
-(add-hook 'write-file-hooks 'delete-trailing-whitespace)
-
 ;; Fix minibuffer behaviour
 
 ;; When changing focus to the minibuffer, stop allowing point to move
@@ -131,9 +123,6 @@
 (setq windsize-cols 16)
 (setq windsize-rows 8)
 (windsize-default-keybindings)
-
-
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 
 (require 'framemove)
