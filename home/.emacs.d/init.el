@@ -621,6 +621,43 @@ mouse-3: go to end"))))
   :ensure t
   :defer t)
 
+(use-package init-window
+  :load-path "config/"
+  :defer t
+  :bind ("C-c q" . dotemacs-quit-bottom-side-windows))
+
+(use-package windmove                   ; Move between windows with Shift+Arrow
+  :bind (("S-<left>"  . windmove-left)
+         ("S-<right>" . windmove-right)
+         ("S-<up>"    . windmove-up)
+         ("S-<down>"  . windmove-down)))
+
+(use-package winner                     ; Undo and redo window configurations
+  :init (winner-mode))
+
+(use-package ediff-wind
+  :defer t
+  :config
+  ;; Prevent Ediff from spamming the frame
+  (setq ediff-diff-options "-w"
+        ediff-window-setup-function #'ediff-setup-windows-plain
+        ediff-split-window-function #'split-window-horizontally))
+
+(use-package desktop                    ; Save buffers, windows and frames
+  :init (desktop-save-mode)
+  :config (progn
+            ;; Save desktops a minute after Emacs was idle.
+            (setq desktop-auto-save-timeout 60)
+
+            (dolist (mode '(magit-mode git-commit-mode))
+              (add-to-list 'desktop-modes-not-to-save mode))))
+
+(use-package writeroom-mode             ; Distraction-free editing
+  :ensure t
+  :bind (("C-c t R" . writeroom-mode)))
+
+
+
 
 
 

@@ -7,7 +7,9 @@ export EMACS
 
 LIB_SRCS = config/init-util.el \
 		   config/init-macosx.el \
-		   config/init-scratch.el
+		   config/init-scratch.el \
+		   config/init-buffer.el \
+		   config/init-window.el
 
 SRCS = init.el $(LIB_SRCS)
 OBJECTS = $(SRCS:.el=.elc)
