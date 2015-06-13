@@ -8,9 +8,6 @@
 (require 'dtrt-indent)
 (dtrt-indent-mode 1)
 
-
-
-
 ;; To get rid of the start message just set the initial-scratch-message variable to ""
 (setq initial-scratch-message "")
 
@@ -19,7 +16,6 @@
 
 ;; For setting of auto-fill when you start a specific major-mode you'll want to add an event to the mode hook
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
-
 
 ;; make side by side buffers function the same as the main window
 (setq truncate-partial-width-windows nil)
@@ -35,10 +31,6 @@
 
 ;; imenu
 (setq-default imenu-auto-rescan t)
-
-
-;; narrowing
-(put 'narrow-to-region 'disabled nil)
 
 
 ;; comint
@@ -86,24 +78,12 @@
 (midnight-delay-set 'midnight-delay 0)
 
 
-;; better scrolling
-(setq scroll-conservatively 9999
-      scroll-preserve-screen-position t
-      scroll-margin 3)
-
-
-(setq mark-ring-max 64)
-(setq global-mark-ring-max 128)
-(setq save-interprogram-paste-before-kill t)
-(setq create-lockfiles nil)
 
 (setq initial-major-mode 'emacs-lisp-mode)
 
 
 ; spaces instead of tabs
 (setq-default c-basic-offset 2 c-default-style "bsd")
-(setq-default tab-width 2)
-(setq-default highlight-tabs t)
 
 ;; some more interface-related settings
 (setq inhibit-splash-screen t)

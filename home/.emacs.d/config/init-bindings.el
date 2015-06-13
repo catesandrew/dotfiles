@@ -372,8 +372,12 @@
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
 
 
-(with-eval-after-load "expand-region-autoloads"
-  (global-set-key (kbd "C-=") 'er/expand-region))
+; TODO remote this
+; (with-eval-after-load "expand-region-autoloads"
+;   (global-set-key (kbd "C-=") 'er/expand-region))
+; (use-package expand-region              ; Expand region by semantic units
+;   :ensure t
+;   :bind (("C-=" . er/expand-region)))
 
 
 (with-eval-after-load 'web-mode

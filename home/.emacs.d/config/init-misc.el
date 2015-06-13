@@ -1,10 +1,5 @@
 ;; Trailing whitespace
 
-;; Most UNIX tools work best when there’s a trailing newline on all
-;; files. Enable that option:
-
-(setq require-final-newline t)
-
 ;; I don’t want to leave trailing whitespace in files I touch, so set
 ;; up a hook that automatically deletes trailing whitespace after
 ;; every line when saving a file:
@@ -110,16 +105,6 @@
 
 (delete 'Git vc-handled-backends)
 
-(require 'undo-tree)
-(setq undo-tree-auto-save-history t)
-(setq undo-tree-history-directory-alist
-      `(("." . ,(concat dotemacs-cache-directory "undo"))))
-    (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
-        (make-directory (concat dotemacs-cache-directory "undo")))
-(setq undo-tree-visualizer-timestamps t)
-(setq undo-tree-visualizer-diff t)
-
-
 
 (with-eval-after-load 'evil
   (add-hook 'multiple-cursors-mode-enabled-hook #'evil-emacs-state)
@@ -135,9 +120,6 @@
   (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))
   (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$")))
 
-
-(require-package 'avy)
-(require-package 'expand-region)
 
 (require 'editorconfig)
 

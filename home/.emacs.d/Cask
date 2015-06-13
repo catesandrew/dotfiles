@@ -1,5 +1,4 @@
 (depends-on "ac-etags") ;;
-(depends-on "ace-jump-mode") ;;
 (depends-on "ag") ;;
 (depends-on "angular-snippets") ;;
 (depends-on "auto-compile")

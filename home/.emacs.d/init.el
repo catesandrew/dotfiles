@@ -837,6 +837,211 @@ mouse-3: go to end"))))
 (bind-key "C-c f v p" #'add-file-local-variable-prop-line)
 
 
+
+;;; Navigation and scrolling
+(setq scroll-margin 3                   ; 0 to drag the point along while scrolling
+      scroll-conservatively 1000        ; Never recenter the screen while scrolling
+      scroll-error-top-bottom t         ; Move to beg/end of buffer before
+                                        ; signalling an error
+      ;; scroll-preserve-screen-position t
+      ;; These settings make trackpad scrolling on OS X much more predictable
+      ;; and smooth
+      mouse-wheel-progressive-speed nil
+      mouse-wheel-scroll-amount '(1))
+
+(use-package avy-jump                   ; Jump to characters in buffers
+  :ensure avy
+  :bind (("C-c j s" . avy-isearch)
+         ("C-c j j" . avy-goto-char-2)
+         ("C-c j w" . avy-goto-word-1)))
+
+(use-package ace-link                   ; Fast link jumping
+  :ensure t
+  :defer t
+  :init (progn (after "info"
+                 (bind-key "C-c j l" #'ace-link-info Info-mode-map))
+
+               (after "help-mode"
+                 (defvar help-mode-map)  ; Silence the byte compiler
+                 (bind-key "C-c j l" #'ace-link-help help-mode-map))))
+
+(use-package ace-window                 ; Fast window switching
+  :ensure t
+  :bind (("C-x o" . ace-window)
+         ("C-c o" . ace-window)))
+
+(use-package page-break-lines           ; Turn page breaks into lines
+  :ensure t
+  :init (global-page-break-lines-mode)
+  :diminish page-break-lines-mode)
+
+(use-package outline                    ; Navigate outlines in buffers
+  :defer t
+  :init (dolist (hook '(text-mode-hook prog-mode-hook))
+          (add-hook hook #'outline-minor-mode))
+  :diminish (outline-minor-mode . "📑"))
+
+(use-package imenu-anywhere             ; IDO-based imenu across open buffers
+  ;; The Helm matching doesn't seem to work properly…
+  :disabled t
+  :ensure t
+  :bind (("C-c i" . helm-imenu-anywhere)))
+
+(use-package nlinum                     ; Line numbers in display margin
+  :ensure t
+  :bind (("C-c t l" . nlinum-mode)))
+
+
+;;; Basic editing
+
+;; Disable tabs, but given them proper width
+(setq-default indent-tabs-mode nil
+              highlight-tabs t
+              tab-width 8)
+;; Make Tab complete if the line is indented
+(setq tab-always-indent 'complete)
+
+;; Indicate empty lines at the end of a buffer in the fringe, but require a
+;; final new line
+(setq indicate-empty-lines t
+      require-final-newline t)
+
+(setq kill-ring-max 200                 ; More killed items
+      ;; Save the contents of the clipboard to kill ring before killing
+      save-interprogram-paste-before-kill t)
+
+(setq mark-ring-max 64
+      global-mark-ring-max 128
+      create-lockfiles nil)
+
+;; Configure a reasonable fill column, indicate it in the buffer and enable
+;; automatic filling
+(setq-default fill-column 80)
+(add-hook 'text-mode-hook #'auto-fill-mode)
+(diminish 'auto-fill-function "↵")
+
+(use-package init-simple           ; Personal editing helpers
+  :load-path "config/"
+  :bind (([remap kill-whole-line]        . dotemacs-smart-kill-whole-line)
+         ([remap move-beginning-of-line] . dotemacs-back-to-indentation-or-beginning-of-line)
+         ("C-<backspace>"                . dotemacs-smart-backward-kill-line)
+         ("C-S-j"                        . dotemacs-smart-open-line)
+         ;; Additional utilities
+         ("C-c e d"                      . dotemacs-insert-current-date))
+  :commands (dotemacs-auto-fill-comments-mode)
+  ;; Auto-fill comments in programming modes
+  :init (add-hook 'prog-mode-hook #'dotemacs-auto-fill-comments-mode))
+
+(use-package delsel                     ; Delete the selection instead of insert
+  :defer t
+  :init (delete-selection-mode))
+
+(use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
+  :ensure t
+  :bind (("C-c t c" . whitespace-cleanup-mode)
+         ("C-c e w" . whitespace-cleanup))
+  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+          (add-hook hook #'whitespace-cleanup-mode))
+  :diminish (whitespace-cleanup-mode . "⌫"))
+
+(use-package subword                    ; Subword/superword editing
+  :defer t
+  :diminish subword-mode)
+
+(use-package adaptive-wrap              ; Choose wrap prefix automatically
+  :ensure t
+  :defer t
+  :init (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode))
+
+(use-package visual-fill-column
+  :ensure t
+  :defer t
+  :init (add-hook 'visual-line-mode-hook #'visual-fill-column-mode))
+
+(use-package visual-regexp              ; Regexp replace with in-buffer display
+  :ensure t
+  :bind (("C-c r" . vr/query-replace)
+         ("C-c R" . vr/replace)))
+
+(use-package zop-to-char
+  :ensure t
+  :bind (("M-z" . zop-to-char)
+         ("M-Z" . zop-up-to-char)))
+
+(use-package easy-kill                  ; Easy killing and marking on C-w
+  :ensure t
+  :bind (([remap kill-ring-save] . easy-kill)
+         ([remap mark-sexp]      . easy-mark)))
+
+(use-package align                      ; Align text in buffers
+  :bind (("C-c e a" . align)
+         ("C-c e c" . align-current)
+         ("C-c e r" . align-regexp)))
+
+(use-package multiple-cursors           ; Edit text with multiple cursors
+  :ensure t
+  :bind (("C-c m <SPC>" . mc/vertical-align-with-space)
+         ("C-c m a"     . mc/vertical-align)
+         ("C-c m e"     . mc/mark-more-like-this-extended)
+         ("C-c m h"     . mc/mark-all-like-this-dwim)
+         ("C-c m l"     . mc/edit-lines)
+         ("C-c m n"     . mc/mark-next-like-this)
+         ("C-c m p"     . mc/mark-previous-like-this)
+         ("C-c m r"     . vr/mc-mark)
+         ("C-c m C-a"   . mc/edit-beginnings-of-lines)
+         ("C-c m C-e"   . mc/edit-ends-of-lines)
+         ("C-c m C-s"   . mc/mark-all-in-region))
+  :config
+  (setq mc/mode-line
+        ;; Simplify the MC mode line indicator
+        '(:propertize (:eval (concat " " (number-to-string (mc/num-cursors))))
+                      face font-lock-warning-face)))
+
+(use-package expand-region              ; Expand region by semantic units
+  :ensure t
+  :bind (("C-=" . er/expand-region)))
+
+;; Represent undo-history as an actual tree (visualize with C-x u)
+; (setq undo-tree-mode-lighter "")
+; (setq undo-tree-auto-save-history t)
+; (setq undo-tree-history-directory-alist
+;       `(("." . ,(concat dotemacs-cache-directory "undo"))))
+;     (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
+;         (make-directory (concat dotemacs-cache-directory "undo")))
+; (setq undo-tree-visualizer-timestamps t)
+; (setq undo-tree-visualizer-diff t)
+
+(use-package undo-tree                  ; Branching undo
+  :ensure t
+  :init (global-undo-tree-mode)
+  :diminish (undo-tree-mode . "↺"))
+
+;; Give us narrowing back!
+(put 'narrow-to-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-defun 'disabled nil)
+
+;; Same for region casing
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(use-package auto-insert                ; Automatic insertion into new files
+  :defer t
+  :bind (("C-c e i" . auto-insert)))
+
+(use-package copyright                  ; Deal with copyright notices
+  :defer t
+  :bind (("C-c e C" . copyright-update))
+  ;; Update copyright when visiting files
+  :init (add-hook 'find-file-hook #'copyright-update)
+  ;; Use ranges to denote consecutive years
+  :config (setq copyright-year-ranges t
+                copyright-names-regexp (regexp-quote user-full-name)))
+
+;; Additional keybindings
+(bind-key [remap just-one-space] #'cycle-spacing)
+
+
 ;;; LaTeX with AUCTeX
 (use-package tex-site                   ; AUCTeX initialization
   :ensure auctex)

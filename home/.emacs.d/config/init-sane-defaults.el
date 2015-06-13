@@ -26,9 +26,6 @@
 ;; Don't highlight matches with jump-char - it's distracting
 (setq jump-char-lazy-highlight-face nil)
 
-;; Easily navigate sillycased words
-(global-subword-mode 1)
-
 ;; Don't break lines for me, please
 (setq-default truncate-lines t)
 
@@ -43,9 +40,6 @@
 
 ;; Fontify org-mode code blocks
 (setq org-src-fontify-natively t)
-
-;; Represent undo-history as an actual tree (visualize with C-x u)
-(setq undo-tree-mode-lighter "")
 
 ;; Sentences do not need double spaces to end. Period.
 (set-default 'sentence-end-double-space nil)

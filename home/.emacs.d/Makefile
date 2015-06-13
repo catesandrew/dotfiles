@@ -10,7 +10,8 @@ LIB_SRCS = config/init-util.el \
 		   config/init-scratch.el \
 		   config/init-buffer.el \
 		   config/init-window.el \
-		   config/init-markdown.el
+		   config/init-markdown.el \
+		   config/init-simple.el
 
 SRCS = init.el $(LIB_SRCS)
 OBJECTS = $(SRCS:.el=.elc)
