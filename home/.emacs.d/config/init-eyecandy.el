@@ -21,7 +21,6 @@
 ;; Unclutter the modeline
 (require 'diminish)
 (diminish 'visual-line-mode)
-(with-eval-after-load 'auto-complete (diminish 'auto-complete-mode))
 (with-eval-after-load 'yasnippet (diminish 'yas-minor-mode))
 (with-eval-after-load 'guide-key (diminish 'guide-key-mode))
 (with-eval-after-load 'eldoc (diminish 'eldoc-mode))
@@ -30,22 +29,6 @@
 (with-eval-after-load 'skewer-mode (diminish 'skewer-mode))
 (with-eval-after-load 'skewer-css (diminish 'skewer-css-mode))
 (with-eval-after-load 'skewer-html (diminish 'skewer-html-mode))
-
-
-(if (fboundp 'global-prettify-symbols-mode)
-    (progn
-      (global-prettify-symbols-mode)
-      (add-hook 'js2-mode-hook
-                (lambda ()
-                  (push '("function" . 955) prettify-symbols-alist)
-                  (push '("return" . 8592) prettify-symbols-alist))))
-  (progn
-    (require 'pretty-symbols)
-    (diminish 'pretty-symbols-mode)
-    (add-to-list 'pretty-symbol-categories 'js)
-    (add-to-list 'pretty-symbol-patterns '(955 js "\\<function\\>" (js2-mode)))
-    (add-to-list 'pretty-symbol-patterns '(8592 js "\\<return\\>" (js2-mode)))
-    (add-hook 'find-file-hook 'pretty-symbols-mode)))
 
 
 (delayed-init

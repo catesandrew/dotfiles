@@ -1804,7 +1804,30 @@ Disable the highlighting of overlong lines."
 
 ;;; Programming utilities
 (use-package prog-mode                  ; Prog Mode
-  :bind (("C-c t p" . prettify-symbols-mode)))
+  :bind (("C-c t p" . prettify-symbols-mode))
+  :init
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (push '("function" . 955) prettify-symbols-alist)
+              (push '("return" . 8592) prettify-symbols-alist))))
+
+
+; This works and sets the mode correctly but the symbols do not show up
+(use-package prettify-symbols-mode
+  :init
+  (progn
+    (setq prettify-symbol-categories '(lambda relational logical))
+    (dolist (mode '(emacs-lisp
+                    js2
+                    java
+                    python
+                    ruby))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (prettify-symbols-mode))))))
+
+; Instead set the mode globally
+(global-prettify-symbols-mode)
 
 (use-package compile                    ; Compile from Emacs
   :bind (("C-c c" . compile)
@@ -2194,15 +2217,15 @@ Disable the highlighting of overlong lines."
 ;   :mode "/templates?/.*\\.\\(php\\|html\\)\\'"
 ;   :config
 ;   (setq web-mode-markup-indent-offset 2))
-;
-; (use-package js2-mode                   ; Javascript editing
-;   :ensure t
-;   :mode "\\.js\\'"
-;   :config (progn (setq-default js2-basic-offset 2)
-;                  (setq js2-global-externs '("angular"))
-;
-;                  (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
-;
+
+(use-package js2-mode                   ; Javascript editing
+  :ensure t
+  :mode "\\.js\\'"
+  :config (progn (setq-default js2-basic-offset 2)
+                 (setq js2-global-externs '("angular"))
+
+                 (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
+
 ; (use-package css-mode
 ;   :defer t
 ;   :config
