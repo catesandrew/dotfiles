@@ -1385,7 +1385,8 @@ Disable the highlighting of overlong lines."
 
 (use-package auto-complete
   :ensure t
-  :if (eq dotemacs-completion-engine 'auto-complete))
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :diminish auto-complete-mode)
 
 
 ;;; Spelling and syntax checking
