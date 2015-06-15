@@ -1,5 +1,24 @@
-;;; package --- emacs init.el
+;;; init.el --- Emacs configuration
+
 ;;; Commentary:
+
+;; User key prefixes:
+;;
+;; - C-c A: Align
+;; - C-c a: Ag
+;; - C-c b: Helm commands (b for "browse")
+;; - C-c d: Data stuff
+;; - C-c e: Edit commands, general and mode specific
+;; - C-c f: Files
+;; - C-c h: Help and documentation
+;; - C-c j: Jumping and navigation
+;; - C-c l: List things
+;; - C-c m: Multiple cursors
+;; - C-c s: Symbol commands
+;; - C-c t: Toggle things and skeletons
+;; - C-c u: Miscellaneous utilities
+;; - C-c v: Version control
+;; - C-c w: Web stuff
 
 ;;; Code:
 
@@ -449,27 +468,7 @@ mouse-3: go to end"))))
 ; with: (helm-mode 1)
 (use-package helm
   :ensure t
-  :bind (
-         ;; Replace some standard bindings with Helm equivalents
-         ([remap execute-extended-command] . helm-M-x)
-         ([remap find-file]                . helm-find-files)
-         ([remap switch-to-buffer]         . helm-mini)
-         ([remap yank-pop]                 . helm-show-kill-ring)
-         ([remap insert-register]          . helm-register)
-         ([remap occur]                    . helm-occur)
-         ;; Special helm bindings
-         ("C-c b b"                        . helm-resume)
-         ("C-c b C"                        . helm-colors)
-         ("C-c b *"                        . helm-calcul-expression)
-         ("C-c b M-:"                      . helm-eval-expression-with-eldoc)
-         ;; Helm features in other maps
-         ("C-c i"                          . helm-semantic-or-imenu)
-         ("C-c h a"                        . helm-apropos)
-         ("C-c h e"                        . helm-info-emacs)
-         ("C-c h i"                        . helm-info-at-point)
-         ("C-c h m"                        . helm-man-woman)
-         ("C-c f r"                        . helm-recentf)
-         ("C-c f l"                        . helm-locate-library))
+  :bind (("C-c b b" . helm-resume))
   :init (progn (helm-mode 1)
 
                (after "helm-config"
@@ -508,7 +507,24 @@ mouse-3: go to end"))))
 
   :diminish helm-mode)
 
-(use-package helm-unicode
+(use-package helm-misc                  ; Misc helm commands
+  :ensure helm
+  :bind (([remap switch-to-buffer] . helm-mini)))
+
+(use-package helm-command               ; M-x in Helm
+  :ensure helm
+  :bind (([remap execute-extended-command] . helm-M-x)))
+
+(use-package helm-eval                  ; Evaluate expressions with Helm
+  :ensure helm
+  :bind (("C-c b M-:" . helm-eval-expression-with-eldoc)
+         ("C-c b *"   . helm-calcul-expression)))
+
+(use-package helm-color                 ; Input colors with Helm
+  :ensure helm
+  :bind (("C-c b c" . helm-colors)))
+
+(use-package helm-unicode               ; Unicode input with Helm
   :ensure t
   :bind ("C-c b 8" . helm-unicode))
 
@@ -676,8 +692,8 @@ mouse-3: go to end"))))
   ;; Revert the current buffer (re-read the contents from disk). Burying
   ;; a buffer (removing it from the current window and sending it to the bottom
   ;; of the stack) is very common for dismissing buffers.
-  :bind (("C-c f u" . revert-buffer)
-         ("C-c f y" . bury-buffer))
+  :bind (("C-c e u" . revert-buffer)
+         ("C-c e y" . bury-buffer))
   :config
   ;; Use GNU ls for Emacs
   (when-let (gnu-ls (and (eq system-type 'darwin) (executable-find "gls")))
@@ -737,6 +753,8 @@ mouse-3: go to end"))))
 (use-package helm-files
   :ensure helm
   :defer t
+  :bind (([remap find-file] . helm-find-files)
+         ("C-c f r"         . helm-recentf))
   :config (setq helm-recentf-fuzzy-match t
                 ;; Use recentf to find recent files
                 helm-ff-file-name-history-use-recentf t
@@ -879,15 +897,13 @@ mouse-3: go to end"))))
           (add-hook hook #'outline-minor-mode))
   :diminish (outline-minor-mode . "📑"))
 
-(use-package imenu-anywhere             ; IDO-based imenu across open buffers
-  ;; The Helm matching doesn't seem to work properly…
-  :disabled t
-  :ensure t
-  :bind (("C-c i" . helm-imenu-anywhere)))
-
 (use-package nlinum                     ; Line numbers in display margin
   :ensure t
   :bind (("C-c t l" . nlinum-mode)))
+
+(use-package helm-imenu
+  :ensure helm
+  :bind (("C-c i" . helm-imenu-in-all-buffers)))
 
 
 ;;; Basic editing
@@ -931,6 +947,11 @@ mouse-3: go to end"))))
   :commands (dotemacs-auto-fill-comments-mode)
   ;; Auto-fill comments in programming modes
   :init (add-hook 'prog-mode-hook #'dotemacs-auto-fill-comments-mode))
+
+(use-package helm-ring                  ; Helm commands for rings
+  :ensure helm
+  :bind (([remap yank-pop]        . helm-show-kill-ring)
+         ([remap insert-register] . helm-register)))
 
 (use-package delsel                     ; Delete the selection instead of insert
   :defer t
@@ -1001,6 +1022,7 @@ mouse-3: go to end"))))
   :ensure t
   :bind (("C-=" . er/expand-region)))
 
+;; TODO: Incorporate this into `use-package undo-tree` below
 ;; Represent undo-history as an actual tree (visualize with C-x u)
 ; (setq undo-tree-mode-lighter "")
 ; (setq undo-tree-auto-save-history t)
@@ -1871,6 +1893,13 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Emacs Lisp
+(bind-key "C-c t d" #'toggle-debug-on-error)
+
+(use-package helm-elisp                 ; Helm commands for Emacs Lisp
+  :ensure helm
+  :bind (("C-c f l" . helm-locate-library)
+         ("C-c h a" . helm-apropos)))
+
 (use-package elisp-slime-nav            ; Jump to definition of symbol at point
   ;; Elisp go-to-definition with M-. and back again with M-,
   :ensure t
@@ -1973,8 +2002,6 @@ Disable the highlighting of overlong lines."
           (after "lisp-mode"
             (bind-key "C-c f c" #'dotemacs-find-cask-file
                       emacs-lisp-mode-map))))
-
-(bind-key "C-c t d" #'toggle-debug-on-error)
 
 
 ;;; Scala
@@ -2266,13 +2293,164 @@ Disable the highlighting of overlong lines."
 
 ;;; Web languages
 
-; (use-package web-mode                   ; Template editing
-;   :ensure t
-;   :defer t
-;   :mode "/templates?/.*\\.\\(php\\|html\\)\\'"
-;   :config
-;   (setq web-mode-markup-indent-offset 2))
+;; TODO: Incorporate this into various `use-packages` below
+;; original `init-web`
+; (lazy-major-mode "\\.coffee\\'" coffee-mode)
+; (lazy-major-mode "\\.jade$" jade-mode)
+;
+;
+; (defun my-emmet-mode ()
+;   (require 'emmet-mode)
+;   (emmet-mode))
+;
+; (add-hook 'css-mode-hook 'my-emmet-mode)
+; (add-hook 'sgml-mode-hook 'my-emmet-mode)
+; (add-hook 'web-mode-hook 'my-emmet-mode)
+;
+;
+; (lazy-major-mode "\\.html?$" web-mode)
+;
+;
+; (with-eval-after-load 'web-mode
+;   (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
+;   (setq web-mode-css-indent-offset 2) ; web-mode, css in html file
+;   (setq web-mode-code-indent-offset 2) ; web-mode, js code in html file
+;
+;   (with-eval-after-load 'yasnippet
+;     (require 'angular-snippets)
+;     (angular-snippets-initialize)))
+;
+; ;; indent after deleting a tag
+; (defadvice sgml-delete-tag (after reindent activate)
+;   (indent-region (point-min) (point-max)))
+;; end origianl `init-web`
 
+(use-package web-mode                   ; Template editing
+  :ensure t
+  :defer t
+  :mode "/templates?/.*\\.\\(php\\|html\\)\\'"
+  :config
+  (setq web-mode-markup-indent-offset 2))
+
+;; TODO: Incorporate this into `use-package js2-mode` below
+;; original `init-js`
+; (require 'init-programming)
+;
+; (add-to-list 'auto-mode-alist '("\\.js\\'"    . js2-mode))
+; (add-to-list 'auto-mode-alist '("\\.pac\\'"   . js2-mode))
+; (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+; (add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
+; (add-to-list 'auto-mode-alist '("\\.jshintrc$" . javascript-mode))
+; (add-to-list 'magic-mode-alist '("#!/usr/bin/env node" . js2-mode))
+;
+; (with-eval-after-load 'javascript-mode
+;   (setq javascript-indent-level 2)) ; javascript-mode
+;
+; (with-eval-after-load 'js-mode
+;   (setq js-indent-level 2)) ; js-mode
+;
+; (with-eval-after-load 'js2-mode
+;   (defun my-js2-mode-defaults ()
+;     (js2-imenu-extras-mode +1)
+;     (setq mode-name "JS2")
+;     ; '(define-key js-mode-map "," 'self-insert-command)
+;     ; '(define-key js-mode-map ";" 'self-insert-command)
+;     ;; electric-layout-mode doesn't play nice with smartparens
+;     (setq-local electric-layout-rules '((?\; . after)))
+;     (run-hooks 'my-prog-mode-hook)
+;     (message "My JS2 hook"))
+;
+;   (setq my-js2-mode-hook 'my-js2-mode-defaults)
+;   (add-hook 'js2-mode-hook (lambda ()
+;                              (run-hooks 'my-js2-mode-hook)))
+;
+;   (add-hook 'js2-mode-hook (lambda ()
+;     (local-set-key (kbd "C-c C-c") #'dotemacs-js-ctrl-c-ctrl-c)))
+;
+;   (setq indent-tabs-mode nil
+;         tab-width 2
+;         js-indent-level 2)
+;   (setq js2-highlight-level 3)
+;   (setq js2-basic-offset 2)
+;   (setq js2-concat-multiline-strings (quote eol))
+;   (setq js2-include-node-externs t)
+;   (setq js2-indent-switch-body t)
+;
+;   (setq js2-allow-rhino-new-expr-initializer nil)
+;   (setq js2-auto-indent-p nil)
+;   (setq js2-enter-indents-newline nil)
+;   (setq js2-global-externs '("setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
+;   (setq js2-idle-timer-delay 0.8)
+;   (setq js2-indent-on-enter-key nil)
+;   (setq js2-mirror-mode nil)
+;   (setq js2-strict-inconsistent-return-warning nil)
+;   (setq js2-include-rhino-externs nil)
+;   (setq js2-include-gears-externs nil)
+;   (setq js2-rebind-eol-bol-keys nil)
+;
+;   ;; Let flycheck handle parse errors
+;   (setq js2-show-parse-errors nil)
+;   (setq js2-strict-missing-semi-warning nil)
+;   (setq js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
+;
+;   (define-key js2-mode-map (kbd "C-c RET jt") 'jump-to-test-file)
+;   (define-key js2-mode-map (kbd "C-c RET ot") 'jump-to-test-file-other-window)
+;   (define-key js2-mode-map (kbd "C-c RET js") 'jump-to-source-file)
+;   (define-key js2-mode-map (kbd "C-c RET os") 'jump-to-source-file-other-window)
+;   (define-key js2-mode-map (kbd "C-c RET jo") 'jump-between-source-and-test-files)
+;   (define-key js2-mode-map (kbd "C-c RET oo") 'jump-between-source-and-test-files-other-window)
+;
+;   (define-key js2-mode-map (kbd "C-c RET dp") 'js2r-duplicate-object-property-node)
+;
+;   (define-key js2-mode-map (kbd "C-c RET ta") 'toggle-assert-refute)
+;
+;   (defadvice js2r-inline-var (after reindent-buffer activate)
+;     (cleanup-buffer))
+;
+;   (define-key js2-mode-map (kbd "C-c t") 'dotemacs-hide-test-functions)
+;
+;   (define-key js2-mode-map (kbd "TAB") 'dotemacs-tab-properly)
+;
+;   ;; When renaming/deleting js-files, check for corresponding testfile
+;   (define-key js2-mode-map (kbd "C-x C-r") 'js2r-rename-current-buffer-file)
+;   (define-key js2-mode-map (kbd "C-x C-k") 'js2r-delete-current-buffer-file)
+;
+;   (define-key js2-mode-map (kbd "C-k") 'js2r-kill)
+;
+;   ;; After js2 has parsed a js file, we look for jslint globals decl comment ("/* global Fred, _, Harry */") and
+;   ;; add any symbols to a buffer-local var of acceptable global vars
+;   ;; Note that we also support the "symbol: true" way of specifying names via a hack (remove any ":true"
+;   ;; to make it look like a plain decl, and any ':false' are left behind so they'll effectively be ignored as
+;   ;; you can;t have a symbol called "someName:false"
+;   (add-hook 'js2-post-parse-callbacks
+;             (lambda ()
+;               (when (> (buffer-size) 0)
+;                 (let ((btext (replace-regexp-in-string
+;                               ": *true" " "
+;                               (replace-regexp-in-string "[\n\t ]+" " " (buffer-substring-no-properties 1 (buffer-size)) t t))))
+;                   (mapc (apply-partially 'add-to-list 'js2-additional-externs)
+;                         (split-string
+;                          (if (string-match "/\\* *global *\\(.*?\\) *\\*/" btext) (match-string-no-properties 1 btext) "")
+;                          " *, *" t))
+;                   ))))
+;
+;   (require 'js2-refactor)
+;   (js2r-add-keybindings-with-prefix "C-c C-m")
+;
+;   (require 'js2-imenu-extras)
+;   (js2-imenu-extras-setup)
+;
+;   ;; jshintrc
+;   (when (executable-find "tern")
+;     (require 'tern)
+;     (add-hook 'js2-mode-hook 'tern-mode)
+;     (with-eval-after-load 'tern
+;       (with-eval-after-load 'auto-complete
+;         (require 'tern-auto-complete)
+;         (tern-ac-setup))
+;       (with-eval-after-load 'company-mode
+;         (require 'company-tern)))))
+;; end origianl `init-js`
 (use-package js2-mode                   ; Javascript editing
   :ensure t
   :mode "\\.js\\'"
@@ -2281,24 +2459,45 @@ Disable the highlighting of overlong lines."
 
                  (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
 
-; (use-package css-mode
-;   :defer t
-;   :config
-;   (progn
-;     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
-;     ;; `fundamental-mode'.
-;     (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+(use-package skewer-mode
+  :init (after "js2-mode"
+          (skewer-setup)))
+
+;; TODO: Incorporate this into `use-package css-mode` below
+;; original `init-css`
+; (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+; (add-to-list 'auto-mode-alist '("\\.scss$" . css-mode))
 ;
-;     ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
-;     (put 'css-indent-offset 'safe-local-variable #'integerp)))
+; (after "css-mode"
 ;
-; (use-package css-eldoc                  ; Basic Eldoc for CSS
-;   :ensure t
-;   :commands (turn-on-css-eldoc)
-;   :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+;   (setq css-indent-offset 2)
 ;
-; (use-package php-mode                   ; Because sometimes you have to
-;   :ensure t)
+;   (defun my-css-mode-defaults ()
+;     (run-hooks 'my-prog-mode-hook))
+;
+;   (setq my-css-mode-hook 'my-css-mode-defaults)
+;
+;   (add-hook 'css-mode-hook (lambda ()
+;                            (run-hooks 'my-css-mode-hook))))
+;; end origianl `init-css`
+(use-package css-mode
+  :defer t
+  :config
+  (progn
+    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+    ;; `fundamental-mode'.
+    (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+
+    ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
+    (put 'css-indent-offset 'safe-local-variable #'integerp)))
+
+(use-package css-eldoc                  ; Basic Eldoc for CSS
+  :ensure t
+  :commands (turn-on-css-eldoc)
+  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+
+(use-package php-mode                   ; Because sometimes you have to
+  :ensure t)
 
 
 ;;; Misc programming languages
@@ -2517,6 +2716,11 @@ Disable the highlighting of overlong lines."
 ;   ;; the feature name, but isearch.el does not provide any feature
 ;   :init (diminish 'isearch-mode))
 ;
+; (use-package helm-regex                 ; Helm regex tools
+;   :ensure helm
+;   :bind (([remap occur] . helm-occur)
+;          ("C-c e o"     . helm-multi-occur)))
+;
 ; (use-package grep
 ;   :defer t
 ;   :config
@@ -2590,26 +2794,27 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Processes and commands
-; (use-package proced                     ; Edit system processes
-;   ;; Proced isn't available on OS X
-;   :if (not (eq system-type 'darwin))
-;   :bind ("C-x p" . proced))
-;
-; (use-package firestarter                ; Run commands after save
-;   :ensure t
-;   :init (firestarter-mode)
-;   :config (progn (setq firestarter-default-type 'failure)
-;                  (dotemacs-load-private-file "firestarter-safe-values.el"
-;                                               'noerror))
-;   ;; Remove space from firestarter lighter
-;   :diminish firestarter-mode)
-;
-; (use-package init-firestarter
-;   :load-path "config/"
-;   :commands (dotemacs-firestarter-mode-line)
-;   :init (with-eval-after-load 'firestarter
-;           (setq firestarter-lighter
-;                 '(:eval (dotemacs-firestarter-mode-line)))))
+(use-package proced                     ; Edit system processes
+  ;; Proced isn't available on OS X
+  :if (not (eq system-type 'darwin))
+  :bind ("C-x p" . proced))
+
+(use-package firestarter                ; Run commands after save
+  :ensure t
+  :init (firestarter-mode)
+  :config (progn (setq firestarter-default-type 'failure)
+                 (dotemacs-load-private-file "firestarter-safe-values.el"
+                                              'noerror))
+
+  ;; Remove space from firestarter lighter
+  :diminish firestarter-mode)
+
+(use-package init-firestarter
+  :load-path "config/"
+  :commands (dotemacs-firestarter-mode-line)
+  :init (after "firestarter"
+          (setq firestarter-lighter
+                '(:eval (dotemacs-firestarter-mode-line)))))
 
 
 ;;; Date and time
@@ -2763,6 +2968,15 @@ Disable the highlighting of overlong lines."
 ;   ;; to the default face.
 ;   (set-face-attribute 'Info-quoted nil :family 'unspecified
 ;                       :inherit font-lock-type-face))
+;
+; (use-package helm-info                  ; Helm tools for Info
+;   :ensure helm
+;   :bind (("C-c h e" . helm-info-emacs)
+;          ("C-c h i" . helm-info-at-point)))
+;
+; (use-package helm-man                   ; Browse manpages with Heml
+;   :ensure helm
+;   :bind (("C-c h m" . helm-man-woman)))
 ;
 ; (use-package helm-descbinds
 ;   :ensure t
