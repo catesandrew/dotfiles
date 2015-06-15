@@ -1928,6 +1928,51 @@ Disable the highlighting of overlong lines."
   :mode ("/Cask\\'" . emacs-lisp-mode)
   :config (require 'ert))
 
+;; TODO: Incorporate this into `use-package lisp` below
+;; original `init-lisp`
+; (require 'init-programming)
+;
+;
+; (defun my-lisp-hook ()
+;   (progn
+;     (elisp-slime-nav-mode)
+;     (eldoc-mode)))
+;
+; (defun my-lisp-after-save-hook ()
+;   (when (or (string-prefix-p (file-truename (concat user-emacs-directory "/config"))
+;                              (file-truename buffer-file-name))
+;             (equal (file-truename buffer-file-name)
+;                    (file-truename custom-file)))
+;     (emacs-lisp-byte-compile)))
+;
+; (add-hook 'emacs-lisp-mode-hook #'my-lisp-hook)
+; (add-hook 'lisp-interaction-mode-hook #'my-lisp-hook)
+; (add-hook 'ielm-mode-hook #'my-lisp-hook)
+; (add-hook 'after-save-hook #'my-lisp-after-save-hook)
+;
+; ;; Lisp configuration
+; (define-key read-expression-map (kbd "TAB") 'completion-at-point)
+;
+; ;; wrap keybindings
+; (define-key lisp-mode-shared-map (kbd "M-(") (my-wrap-with "("))
+; (define-key lisp-mode-shared-map (kbd "M-[") (my-wrap-with "["))
+; (define-key lisp-mode-shared-map (kbd "M-\"") (my-wrap-with "\""))
+;
+;
+; ;; A great lisp coding hook
+; (defun my-lisp-coding-defaults ()
+;   (smartparens-strict-mode +1))
+;
+; (setq my-lisp-coding-hook 'my-lisp-coding-defaults)
+;
+; ;; interactive modes don't need whitespace checks
+; (defun my-interactive-lisp-coding-defaults ()
+;   (smartparens-strict-mode +1)
+;   (whitespace-mode -1))
+;
+; (setq my-interactive-lisp-coding-hook 'my-interactive-lisp-coding-defaults)
+;; end origianl `init-lisp`
+
 (use-package init-lisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
   :commands (dotemacs-find-cask-file
@@ -1935,7 +1980,7 @@ Disable the highlighting of overlong lines."
   :init (progn
           (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
 
-          (with-eval-after-load 'lisp-mode
+          (after "lisp-mode"
             (bind-key "C-c f c" #'dotemacs-find-cask-file
                       emacs-lisp-mode-map))))
 
@@ -1944,120 +1989,120 @@ Disable the highlighting of overlong lines."
 
 ;;; Scala
 
-; (use-package scala-mode2                ; Scala editing
-;   :ensure t
-;   :defer t
-;   :config (progn (setq scala-indent:default-run-on-strategy
-;                        scala-indent:operator-strategy)
-;
-;                  (bind-key "C-c z" #'ensime scala-mode-map)))
-;
-; (use-package flycheck-auto-scalastyle   ; Scalastyle setup
-;   :load-path "lisp/"
-;   :defer t
-;   :commands (flycheck-auto-scalastyle-configure
-;              flycheck-auto-scalastyle-setup)
-;   :init (with-eval-after-load 'scala-mode2
-;           (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
-;
-; (use-package sbt-mode                   ; Scala build tool
-;   :ensure t
-;   :defer t
-;   :config (progn
-;             (setq sbt:sbt-prompt-regexp
-;                   (rx bol (or (and (optional "scala") ">") ; Default prompt
-;                               ;; Sbt Prompt plugin
-;                               (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
-;                       (0+ " ")))
-;
-;             (with-eval-after-load 'scala-mode2
-;               (bind-key "C-c c" #'sbt-command scala-mode-map))
-;
-;             (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
-;               "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
-;               (string-prefix-p sbt:buffer-name-base buffer-name))
-;
-;             ;; Get SBT buffers under control: Display them below the current
-;             ;; window, at a third of the height of the current window, but try
-;             ;; to reuse any existing and visible window for the SBT buffer
-;             ;; first.
-;             (add-to-list 'display-buffer-alist
-;                          '(dotemacs-sbt-buffer-p
-;                            (display-buffer-reuse-window
-;                             display-buffer-in-side-window)
-;                            (side            . bottom)
-;                            (reusable-frames . visible)
-;                            (window-height   . 0.4)))))
-;
-; (use-package ensime                     ; Scala interaction mode
-;   :ensure t
-;   :defer t
-;   :config (progn
-;             ;; Automatically open new Ensime sessions if needed
-;             (setq ensime-auto-connect 'always)
-;
-;             ;; Enable Ensime for all Scala buffers.  We don't do this in :init,
-;             ;; because `ensime-mode' isn't autoloaded, and ensime-mode makes no
-;             ;; sense before the first session was started anyway
-;             (add-hook 'scala-mode-hook #'ensime-mode)
-;
-;             ;; Disable Flycheck in Ensime, since Ensime features its own error
-;             ;; checking.  TODO: Maybe write a Flycheck checker for Ensime
-;             (with-eval-after-load 'flycheck
-;               (add-hook 'ensime-mode-hook (lambda () (flycheck-mode -1))))
-;
-;             ;; Free M-n and M-p again
-;             (bind-key "M-n" nil ensime-mode-map)
-;             (bind-key "M-p" nil ensime-mode-map)
-;             (bind-key "C-c M-n" #'ensime-forward-note ensime-mode-map)
-;             (bind-key "C-c M-p" #'ensime-backward-note ensime-mode-map)))
-;
-; (use-package ensime-sbt
-;   :ensure ensime
-;   :defer t
-;   ;; Compile on save.  My projects are small enough :)
-;   :config (setq ensime-sbt-perform-on-save "test:compile"))
-;
-; (use-package flycheck-ensime
-;   :disabled t
-;   :load-path "lisp/"
-;   :defer t)
+(use-package scala-mode2                ; Scala editing
+  :ensure t
+  :defer t
+  :config (progn (setq scala-indent:default-run-on-strategy
+                       scala-indent:operator-strategy)
+
+                 (bind-key "C-c z" #'ensime scala-mode-map)))
+
+(use-package flycheck-auto-scalastyle   ; Scalastyle setup
+  :load-path "config/"
+  :defer t
+  :commands (flycheck-auto-scalastyle-configure
+             flycheck-auto-scalastyle-setup)
+  :init (with-eval-after-load 'scala-mode2
+          (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
+
+(use-package sbt-mode                   ; Scala build tool
+  :ensure t
+  :defer t
+  :config (progn
+            (setq sbt:sbt-prompt-regexp
+                  (rx bol (or (and (optional "scala") ">") ; Default prompt
+                              ;; Sbt Prompt plugin
+                              (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
+                      (0+ " ")))
+
+            (with-eval-after-load 'scala-mode2
+              (bind-key "C-c c" #'sbt-command scala-mode-map))
+
+            (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
+              "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
+              (string-prefix-p sbt:buffer-name-base buffer-name))
+
+            ;; Get SBT buffers under control: Display them below the current
+            ;; window, at a third of the height of the current window, but try
+            ;; to reuse any existing and visible window for the SBT buffer
+            ;; first.
+            (add-to-list 'display-buffer-alist
+                         '(dotemacs-sbt-buffer-p
+                           (display-buffer-reuse-window
+                            display-buffer-in-side-window)
+                           (side            . bottom)
+                           (reusable-frames . visible)
+                           (window-height   . 0.4)))))
+
+(use-package ensime                     ; Scala interaction mode
+  :ensure t
+  :defer t
+  :config (progn
+            ;; Automatically open new Ensime sessions if needed
+            (setq ensime-auto-connect 'always)
+
+            ;; Enable Ensime for all Scala buffers.  We don't do this in :init,
+            ;; because `ensime-mode' isn't autoloaded, and ensime-mode makes no
+            ;; sense before the first session was started anyway
+            (add-hook 'scala-mode-hook #'ensime-mode)
+
+            ;; Disable Flycheck in Ensime, since Ensime features its own error
+            ;; checking.  TODO: Maybe write a Flycheck checker for Ensime
+            (with-eval-after-load 'flycheck
+              (add-hook 'ensime-mode-hook (lambda () (flycheck-mode -1))))
+
+            ;; Free M-n and M-p again
+            (bind-key "M-n" nil ensime-mode-map)
+            (bind-key "M-p" nil ensime-mode-map)
+            (bind-key "C-c M-n" #'ensime-forward-note ensime-mode-map)
+            (bind-key "C-c M-p" #'ensime-backward-note ensime-mode-map)))
+
+(use-package ensime-sbt
+  :ensure ensime
+  :defer t
+  ;; Compile on save.
+  :config (setq ensime-sbt-perform-on-save "test:compile"))
+
+(use-package flycheck-ensime
+  :disabled t
+  :load-path "config/"
+  :defer t)
 
 
 ;;; Python
-; (use-package python
-;   :defer t
-;   :config
-;   (progn
-;     ;; PEP 8 compliant filling rules, 79 chars maximum
-;     (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
-;     (add-hook 'python-mode-hook #'subword-mode)
-;
-;     (let ((ipython (executable-find "ipython")))
-;
-;       (if ipython
-;           (setq python-shell-interpreter ipython)
-;         (warn "IPython is missing, falling back to default python")))))
-;
-; (use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
-;   :load-path "lisp/"
-;   :commands (flycheck-virtualenv-setup)
-;   :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
-;
-; (use-package anaconda-mode              ; Powerful Python backend for Emacs
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'python-mode-hook #'anaconda-mode))
-;
-; (use-package company-anaconda           ; Python backend for Company
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'company
-;           (add-to-list 'company-backends 'company-anaconda)))
-;
-; (use-package pip-requirements           ; requirements.txt files
-;   :ensure t
-;   :defer t)
+(use-package python
+  :defer t
+  :config
+  (progn
+    ;; PEP 8 compliant filling rules, 79 chars maximum
+    (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
+    (add-hook 'python-mode-hook #'subword-mode)
+
+    (let ((ipython (executable-find "ipython")))
+
+      (if ipython
+          (setq python-shell-interpreter ipython)
+        (warn "IPython is missing, falling back to default python")))))
+
+(use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
+  :load-path "lisp/"
+  :commands (flycheck-virtualenv-setup)
+  :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
+
+(use-package anaconda-mode              ; Powerful Python backend for Emacs
+  :ensure t
+  :defer t
+  :init (add-hook 'python-mode-hook #'anaconda-mode))
+
+(use-package company-anaconda           ; Python backend for Company
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'company
+          (add-to-list 'company-backends 'company-anaconda)))
+
+(use-package pip-requirements           ; requirements.txt files
+  :ensure t
+  :defer t)
 
 
 ;;; Ruby

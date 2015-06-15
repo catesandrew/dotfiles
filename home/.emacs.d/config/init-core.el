@@ -64,10 +64,6 @@
 (midnight-delay-set 'midnight-delay 0)
 
 
-
-(setq initial-major-mode 'emacs-lisp-mode)
-
-
 ; spaces instead of tabs
 (setq-default c-basic-offset 2 c-default-style "bsd")
 

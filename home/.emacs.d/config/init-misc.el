@@ -227,40 +227,6 @@
      )))
 
 
-; Here, I define a "helm-my-buffers" function that when called will show Helm
-; interface but searching (fuzzy, real time as you write, unordered) in open
-; buffers, recent files, project files (see below for more on that), tags
-; inside the files, tabs and results from the Linux command `locate` that
-; searches quickly from a database of all the files in the file system.
-
-; But this is only the tip of the iceberg of Helm power. There are sources for
-; searching the symbols (functions, classes, globals, etc) in the current
-; buffer (helm-imenu), bookmarks (including Chrome/Firefox bookmarks), HTML
-; colors (showing the color, name, and hexadecimal code), apt packages and
-; more.
-
-; If you check the sources of the helm-my-buffers function above you can see
-; that I'm also using helm-c-source-projectile-files-list. This will use
-; another installable third party package called `Projectile` that will search
-; for a git/hg/svn file in the current directory and its parents and extract
-; the current project files. Linking it will Helm makes it super easy to open
-; any file in your current project (providing you've it under version control)
-; without having the browse the filesystem, even for files that you have never
-; opened (and thus are not in Emacs' recent files list).
-
-(defun helm-my-buffers ()
-  (interactive)
-  (require 'helm-files)
-  (let ((helm-ff-transformer-show-only-basename nil))
-  (helm-other-buffer '(helm-c-source-buffers-list
-                       helm-c-source-elscreen
-                       helm-c-source-occur
-;;                        helm-c-source-projectile-files-list
-                       helm-c-source-ctags
-                       helm-c-source-recentf
-                       helm-c-source-locate)
-                     "*helm-my-buffers*")))
-
 ;; http://www.shallowsky.com/dotfiles/.emacs
 ;; For composing in emacs then pasting into a word processor,
 ;; this un-fills all the paragraphs (i.e. turns each paragraph
