@@ -1478,7 +1478,9 @@ Disable the highlighting of overlong lines."
   :ensure t
   :bind (("C-c l e" . list-flycheck-errors)
          ("C-c t f" . flycheck-mode))
-  :init (global-flycheck-mode)
+  :init
+  (global-flycheck-mode)
+  ; (add-hook 'prog-mode-hook #'flycheck-mode)
   :config (progn
             (setq flycheck-display-errors-function
                   #'flycheck-display-error-messages-unless-error-list)
@@ -1867,67 +1869,77 @@ Disable the highlighting of overlong lines."
     (add-hook 'ielm-mode-hook #'eldoc-mode))
   :diminish eldoc-mode)
 
-; (use-package restclient                ; ReST REPL for Emacs
-;   :ensure t
-;   :defer t)
-;
-; (use-package company-restclient
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'company
-;           (add-to-list 'company-backends 'company-restclient)))
-;
-; 
-; ;;; Emacs Lisp
-; (use-package elisp-slime-nav            ; Jump to definition of symbol at point
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode)
-;   :diminish elisp-slime-nav-mode)
-;
-; (use-package flycheck-cask              ; Setup Flycheck by Cask projects
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
-;
-; (use-package flycheck-package           ; Check package conventions with Flycheck
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
-;
-; (use-package pcre2el                    ; Convert regexps to RX and back
-;   :disabled t
-;   :ensure t
-;   :init (rxt-global-mode))
-;
-; (use-package macrostep                  ; Interactively expand macros in code
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'lisp-mode
-;           (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
-;           (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map)))
-;
-; (use-package ielm                       ; Emacs Lisp REPL
-;   :bind (("C-c z" . ielm)))
-;
-; (use-package lisp-mode                  ; Emacs Lisp editing
-;   :defer t
-;   :interpreter ("emacs" . emacs-lisp-mode)
-;   :mode ("/Cask\\'" . emacs-lisp-mode)
-;   :config (require 'ert))
-;
-; (use-package init-lisp             ; Personal tools for Emacs Lisp
-;   :load-path "config/"
-;   :commands (dotemacs-find-cask-file
-;              dotemacs-add-use-package-to-imenu)
-;   :init (progn
-;           (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
-;
-;           (with-eval-after-load 'lisp-mode
-;             (bind-key "C-c f c" #'dotemacs-find-cask-file
-;                       emacs-lisp-mode-map))))
-;
-; (bind-key "C-c t d" #'toggle-debug-on-error)
+(use-package restclient                ; ReST REPL for Emacs
+  :ensure t
+  :defer t)
+
+(use-package company-restclient
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'company
+          (add-to-list 'company-backends 'company-restclient)))
+
+
+;;; Emacs Lisp
+(use-package elisp-slime-nav            ; Jump to definition of symbol at point
+  ;; Elisp go-to-definition with M-. and back again with M-,
+  :ensure t
+  :defer t
+  :init
+  (progn
+    ; (evil-leader/set-key-for-mode 'emacs-lisp-mode
+    ;   "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
+    ;   "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)
+    (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode))
+  :config
+  (defadvice elisp-slime-nav-find-elisp-thing-at-point
+             (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
+    (recenter))
+  :diminish elisp-slime-nav-mode)
+
+(use-package flycheck-cask              ; Setup Flycheck by Cask projects
+  :ensure t
+  :defer t
+  :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
+
+(use-package flycheck-package           ; Check package conventions with Flycheck
+  :ensure t
+  :defer t
+  :init (after "flycheck" (flycheck-package-setup)))
+
+(use-package pcre2el                    ; Convert regexps to RX and back
+  :disabled t
+  :ensure t
+  :init (rxt-global-mode))
+
+(use-package macrostep                  ; Interactively expand macros in code
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'lisp-mode
+          (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
+          (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map)))
+
+(use-package ielm                       ; Emacs Lisp REPL
+  :bind (("C-c z" . ielm)))
+
+(use-package lisp-mode                  ; Emacs Lisp editing
+  :defer t
+  :interpreter ("emacs" . emacs-lisp-mode)
+  :mode ("/Cask\\'" . emacs-lisp-mode)
+  :config (require 'ert))
+
+(use-package init-lisp             ; Personal tools for Emacs Lisp
+  :load-path "config/"
+  :commands (dotemacs-find-cask-file
+             dotemacs-add-use-package-to-imenu)
+  :init (progn
+          (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
+
+          (with-eval-after-load 'lisp-mode
+            (bind-key "C-c f c" #'dotemacs-find-cask-file
+                      emacs-lisp-mode-map))))
+
+(bind-key "C-c t d" #'toggle-debug-on-error)
 
 
 ;;; Scala
