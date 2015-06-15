@@ -1774,16 +1774,6 @@ Disable the highlighting of overlong lines."
                 (electric-indent-local-mode -1)
                 (run-hooks 'prog-mode-hook))))
 
-(use-package toml-mode                  ; TOML
-  :ensure t
-  :defer t
-  :mode ("\\.toml$" . toml-mode)
-  :config
-    (add-hook 'toml-mode-hook
-              (lambda ()
-                (electric-indent-local-mode -1)
-                (run-hooks 'prog-mode-hook))))
-
 (use-package json-mode                  ; JSON files
   :ensure t
   :defer t)
@@ -1876,7 +1866,7 @@ Disable the highlighting of overlong lines."
 (use-package company-restclient
   :ensure t
   :defer t
-  :init (with-eval-after-load 'company
+  :init (after "company"
           (add-to-list 'company-backends 'company-restclient)))
 
 
@@ -1915,7 +1905,7 @@ Disable the highlighting of overlong lines."
 (use-package macrostep                  ; Interactively expand macros in code
   :ensure t
   :defer t
-  :init (with-eval-after-load 'lisp-mode
+  :init (after "lisp-mode"
           (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
           (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map)))
 
@@ -2002,7 +1992,7 @@ Disable the highlighting of overlong lines."
   :defer t
   :commands (flycheck-auto-scalastyle-configure
              flycheck-auto-scalastyle-setup)
-  :init (with-eval-after-load 'scala-mode2
+  :init (after "scala-mode2"
           (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
 
 (use-package sbt-mode                   ; Scala build tool
@@ -2015,7 +2005,7 @@ Disable the highlighting of overlong lines."
                               (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
                       (0+ " ")))
 
-            (with-eval-after-load 'scala-mode2
+            (after "scala-mode2"
               (bind-key "C-c c" #'sbt-command scala-mode-map))
 
             (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
@@ -2048,7 +2038,7 @@ Disable the highlighting of overlong lines."
 
             ;; Disable Flycheck in Ensime, since Ensime features its own error
             ;; checking.  TODO: Maybe write a Flycheck checker for Ensime
-            (with-eval-after-load 'flycheck
+            (after "flycheck"
               (add-hook 'ensime-mode-hook (lambda () (flycheck-mode -1))))
 
             ;; Free M-n and M-p again
@@ -2085,7 +2075,7 @@ Disable the highlighting of overlong lines."
         (warn "IPython is missing, falling back to default python")))))
 
 (use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
-  :load-path "lisp/"
+  :load-path "config/"
   :commands (flycheck-virtualenv-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
 
@@ -2097,7 +2087,7 @@ Disable the highlighting of overlong lines."
 (use-package company-anaconda           ; Python backend for Company
   :ensure t
   :defer t
-  :init (with-eval-after-load 'company
+  :init (after "company"
           (add-to-list 'company-backends 'company-anaconda)))
 
 (use-package pip-requirements           ; requirements.txt files
@@ -2106,34 +2096,40 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Ruby
-; (use-package inf-ruby                   ; Ruby REPL
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode)
-;   :config
-;   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
-;   (inf-ruby-switch-setup))
-;
-; (use-package robe                       ; Ruby backend for Emacs
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'company
-;           (add-to-list 'company-backends 'company-robe)))
+(use-package inf-ruby                   ; Ruby REPL
+  :ensure t
+  :defer t
+  :init (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode)
+  :config
+  ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
+  (inf-ruby-switch-setup))
+
+(use-package robe                       ; Ruby backend for Emacs
+  :ensure t
+  :defer t
+  :init (after "company"
+          (add-to-list 'company-backends 'company-robe)))
 
 
 ;;; Rust
-; (use-package rust-mode                  ; Rust
-;   :ensure t
-;   :defer t)
-;
-; (use-package flycheck-rust              ; Flycheck setup for Rust
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-;
-; (use-package toml-mode                  ; Toml for Cargo files
-;   :ensure t
-;   :defer t)
+(use-package rust-mode                  ; Rust
+  :ensure t
+  :defer t)
+
+(use-package flycheck-rust              ; Flycheck setup for Rust
+  :ensure t
+  :defer t
+  :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(use-package toml-mode                  ; Toml for Cargo files
+  :ensure t
+  :defer t
+  :mode ("\\.toml$" . toml-mode)
+  :config
+    (add-hook 'toml-mode-hook
+              (lambda ()
+                (electric-indent-local-mode -1)
+                (run-hooks 'prog-mode-hook))))
 
 
 ;;; Haskell
@@ -2146,126 +2142,126 @@ Disable the highlighting of overlong lines."
 ;;
 ;; - https://github.com/chrisdone/ghci-ng
 
-; (use-package haskell-mode
-;   :ensure t
-;   :defer t
-;   :config
-;   (progn
-;     (add-hook 'haskell-mode-hook #'subword-mode)           ; Subword navigation
-;     (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate
-;                                         ; declarations
-;     ;; Insert module templates into new buffers
-;     (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
-;
-;     ;; Automatically run hasktags
-;     (setq haskell-tags-on-save t
-;           ;; Suggest adding/removing imports as by GHC warnings and Hoggle/GHCI
-;           ;; loaded modules respectively
-;           haskell-process-suggest-remove-import-lines t
-;           haskell-process-auto-import-loaded-modules t
-;           haskell-process-use-presentation-mode t ; Don't clutter the echo area
-;           haskell-process-show-debug-tips nil     ; Disable tips
-;           haskell-process-log t                   ; Log debugging information
-;           ;; Suggest imports automatically with Hayoo.  Hayoo is slower because
-;           ;; it's networked, but it covers all of hackage, which is really an
-;           ;; advantage.
-;           haskell-process-suggest-hoogle-imports nil
-;           haskell-process-suggest-hayoo-imports t)
-;
-;     (when-let (ghci-ng (executable-find "ghci-ng"))
-;       ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
-;       (setq haskell-process-path-ghci ghci-ng)
-;       (add-to-list 'haskell-process-args-cabal-repl
-;                    (concat "--with-ghc=" ghci-ng)))
-;
-;     (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
-;     (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
-;     (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)))
-;
-; (use-package haskell
-;   :ensure haskell-mode
-;   :defer t
-;   :init (dolist (hook '(haskell-mode-hook haskell-cabal-mode-hook))
-;           (add-hook hook #'interactive-haskell-mode))
-;   :config
-;   (progn
-;     (bind-key "C-c C-t" #'haskell-mode-show-type-at
-;               interactive-haskell-mode-map)
-;     (bind-key "M-." #'haskell-mode-goto-loc
-;               interactive-haskell-mode-map)
-;     (bind-key "C-c u u" #'haskell-mode-find-uses
-;               interactive-haskell-mode-map)))
-;
-; (use-package haskell-interactive-mode
-;   :ensure haskell-mode
-;   :defer t
-;   :config (add-hook 'haskell-interactive-mode-hook #'subword-mode))
-;
-; (use-package haskell-simple-indent      ; Primitive Haskell indentation
-;   :ensure haskell-mode
-;   :disabled t
-;   :defer t
-;   :init (add-hook 'haskell-mode-hook #'haskell-simple-indent-mode))
-;
-; (use-package haskell-indentation
-;   :ensure haskell-mode
-;   :defer t
-;   :init (add-hook 'haskell-mode-hook #'haskell-indentation-mode))
-;
-; (use-package hindent                    ; Automated Haskell indentation
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'haskell-mode-hook #'hindent-mode))
-;
-; (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
-;
-; (use-package helm-hayoo
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'haskell-mode
-;           (bind-key "C-c h h" #'helm-hayoo haskell-mode-map)))
-;
-; (use-package helm-hoogle
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'haskell-mode
-;           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
+(use-package haskell-mode
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (add-hook 'haskell-mode-hook #'subword-mode)           ; Subword navigation
+    (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate
+                                        ; declarations
+    ;; Insert module templates into new buffers
+    (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
+
+    ;; Automatically run hasktags
+    (setq haskell-tags-on-save t
+          ;; Suggest adding/removing imports as by GHC warnings and Hoggle/GHCI
+          ;; loaded modules respectively
+          haskell-process-suggest-remove-import-lines t
+          haskell-process-auto-import-loaded-modules t
+          haskell-process-use-presentation-mode t ; Don't clutter the echo area
+          haskell-process-show-debug-tips nil     ; Disable tips
+          haskell-process-log t                   ; Log debugging information
+          ;; Suggest imports automatically with Hayoo.  Hayoo is slower because
+          ;; it's networked, but it covers all of hackage, which is really an
+          ;; advantage.
+          haskell-process-suggest-hoogle-imports nil
+          haskell-process-suggest-hayoo-imports t)
+
+    (when-let (ghci-ng (executable-find "ghci-ng"))
+      ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
+      (setq haskell-process-path-ghci ghci-ng)
+      (add-to-list 'haskell-process-args-cabal-repl
+                   (concat "--with-ghc=" ghci-ng)))
+
+    (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
+    (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
+    (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)))
+
+(use-package haskell
+  :ensure haskell-mode
+  :defer t
+  :init (dolist (hook '(haskell-mode-hook haskell-cabal-mode-hook))
+          (add-hook hook #'interactive-haskell-mode))
+  :config
+  (progn
+    (bind-key "C-c C-t" #'haskell-mode-show-type-at
+              interactive-haskell-mode-map)
+    (bind-key "M-." #'haskell-mode-goto-loc
+              interactive-haskell-mode-map)
+    (bind-key "C-c u u" #'haskell-mode-find-uses
+              interactive-haskell-mode-map)))
+
+(use-package haskell-interactive-mode
+  :ensure haskell-mode
+  :defer t
+  :config (add-hook 'haskell-interactive-mode-hook #'subword-mode))
+
+(use-package haskell-simple-indent      ; Primitive Haskell indentation
+  :ensure haskell-mode
+  :disabled t
+  :defer t
+  :init (add-hook 'haskell-mode-hook #'haskell-simple-indent-mode))
+
+(use-package haskell-indentation
+  :ensure haskell-mode
+  :defer t
+  :init (add-hook 'haskell-mode-hook #'haskell-indentation-mode))
+
+(use-package hindent                    ; Automated Haskell indentation
+  :ensure t
+  :defer t
+  :init (add-hook 'haskell-mode-hook #'hindent-mode))
+
+(use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
+  :ensure t
+  :defer t
+  :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
+
+(use-package helm-hayoo
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'haskell-mode
+          (bind-key "C-c h h" #'helm-hayoo haskell-mode-map)))
+
+(use-package helm-hoogle
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'haskell-mode
+          (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
 
 
 ;;; OCaml
-; (use-package opam                       ; Initialize Emacs with OPAM env
-;   :ensure t
-;   :init (opam-init))
-;
-; (use-package tuareg                     ; OCaml editing
-;   :ensure t
-;   :defer t
-;   :config
-;   (progn
-;     ;; Disable SMIE indentation in Tuareg.  It's just broken currently…
-;     (setq tuareg-use-smie nil)
-;
-;     ;; Please, Tuareg, don't kill my imenu
-;     (define-key tuareg-mode-map [?\C-c ?i] nil)))
-;
-; (use-package merlin                     ; Powerful Emacs backend for OCaml
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'tuareg-mode-hook #'merlin-mode)
-;   :config
-;   ;; Use Merlin from current OPAM env
-;   (setq merlin-command 'opam
-;         ;; Disable Merlin's own error checking in favour of Flycheck
-;         merlin-error-after-save nil))
-;
-; (use-package flycheck-ocaml             ; Check OCaml code with Merlin
-;   :ensure t
-;   :defer t
-;   :init (with-eval-after-load 'merlin
-;           (flycheck-ocaml-setup)))
+(use-package opam                       ; Initialize Emacs with OPAM env
+  :ensure t
+  :init (opam-init))
+
+(use-package tuareg                     ; OCaml editing
+  :ensure t
+  :defer t
+  :config
+  (progn
+    ;; Disable SMIE indentation in Tuareg.  It's just broken currently…
+    (setq tuareg-use-smie nil)
+
+    ;; Please, Tuareg, don't kill my imenu
+    (define-key tuareg-mode-map [?\C-c ?i] nil)))
+
+(use-package merlin                     ; Powerful Emacs backend for OCaml
+  :ensure t
+  :defer t
+  :init (add-hook 'tuareg-mode-hook #'merlin-mode)
+  :config
+  ;; Use Merlin from current OPAM env
+  (setq merlin-command 'opam
+        ;; Disable Merlin's own error checking in favour of Flycheck
+        merlin-error-after-save nil))
+
+(use-package flycheck-ocaml             ; Check OCaml code with Merlin
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'merlin
+          (flycheck-ocaml-setup)))
 
 
 ;;; Web languages
