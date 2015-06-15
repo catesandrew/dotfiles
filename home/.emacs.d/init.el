@@ -1851,17 +1851,22 @@ Disable the highlighting of overlong lines."
   :init (add-hook 'compilation-filter-hook
                   #'dotemacs-colorize-compilation-buffer))
 
-; (use-package elide-head                 ; Elide lengthy GPL headers
-;   :bind (("C-c u h" . elide-head))
-;   :init (add-hook 'prog-mode-hook #'elide-head))
-;
-; (use-package eldoc                      ; Documentation in minibuffer
-;   :defer t
-;   ;; Enable Eldoc for `eval-expression', too
-;   :init (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
-;   :config
-;   (setq-default eldoc-documentation-function #'describe-char-eldoc))
-;
+(use-package elide-head                 ; Elide lengthy GPL headers
+  :bind (("C-c u h" . elide-head))
+  :init (add-hook 'prog-mode-hook #'elide-head))
+
+(use-package eldoc                      ; Documentation in minibuffer
+  :defer t
+  :init (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+  :config
+  (progn
+    (setq-default eldoc-documentation-function #'describe-char-eldoc)
+    ;; enable eldoc in `eval-expression'
+    (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
+     ;; enable eldoc in IELM
+    (add-hook 'ielm-mode-hook #'eldoc-mode))
+  :diminish eldoc-mode)
+
 ; (use-package restclient                ; ReST REPL for Emacs
 ;   :ensure t
 ;   :defer t)

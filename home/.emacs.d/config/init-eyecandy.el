@@ -23,7 +23,6 @@
 (diminish 'visual-line-mode)
 (with-eval-after-load 'yasnippet (diminish 'yas-minor-mode))
 (with-eval-after-load 'guide-key (diminish 'guide-key-mode))
-(with-eval-after-load 'eldoc (diminish 'eldoc-mode))
 (with-eval-after-load 'git-gutter+ (diminish 'git-gutter+-mode))
 (with-eval-after-load 'tagedit (diminish 'tagedit-mode))
 (with-eval-after-load 'skewer-mode (diminish 'skewer-mode))
