@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ;; Setup shell
 
 ;; Note: Emacs runs .bashrc in *shell*

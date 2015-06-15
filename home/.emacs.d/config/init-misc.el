@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ;; Fix minibuffer behaviour
 
 ;; When changing focus to the minibuffer, stop allowing point to move

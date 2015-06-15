@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ;; Load Perspective
 (require 'perspective)
 

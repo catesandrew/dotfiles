@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (setq vc-make-backup-files t)
 
 (with-eval-after-load 'vc-git

@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (require 's)
 
 (defun rgrep-fullscreen (regexp &optional files dir confirm)

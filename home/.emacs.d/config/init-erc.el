@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (with-eval-after-load 'erc
   (setq erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs"))
   (setq erc-hide-list '("JOIN" "PART" "QUIT"))

@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ; set transparency of background
 (set-frame-parameter (selected-frame) 'alpha '(95 95))
 (add-to-list 'default-frame-alist '(alpha 95 95))

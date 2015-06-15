@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ; dtrt-indent
 
 ; Automatically determine the indentation settings used on the file that you're

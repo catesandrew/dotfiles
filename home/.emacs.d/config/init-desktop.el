@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (defun dotemacs-enable-desktop ()
   "Load the desktop and enable autosaving"
   (interactive)

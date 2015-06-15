@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (require 'init-lisp)
 (require 'clojure-mode)
 (require 'cider)

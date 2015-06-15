@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (defgroup dotemacs-eshell nil
   "Configuration options for eshell-mode."
   :group 'dotemacs

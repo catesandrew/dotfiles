@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (lazy-major-mode "\\.coffee\\'" coffee-mode)
 (lazy-major-mode "\\.jade$" jade-mode)
 

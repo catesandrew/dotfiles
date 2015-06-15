@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (require 'projectile)
 
 (setq projectile-mode-line

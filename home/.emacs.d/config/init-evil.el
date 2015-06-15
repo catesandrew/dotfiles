@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (defgroup dotemacs-evil nil
   "Configuration options for evil-mode."
   :group 'dotemacs

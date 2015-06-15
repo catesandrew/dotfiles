@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ;; Show the modifier combinations I just typed almost immediately:
 (setq echo-keystrokes 0.1)
 

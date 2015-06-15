@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (require 'init-programming)
 
 (add-to-list 'auto-mode-alist

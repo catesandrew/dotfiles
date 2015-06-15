@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (delayed-init
   (require-package 'yasnippet)
 

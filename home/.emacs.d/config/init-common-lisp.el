@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (require 'init-programming)
 
 (require-package 'slime)

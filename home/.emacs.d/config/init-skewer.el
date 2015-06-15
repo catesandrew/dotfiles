@@ -1,3 +1,4 @@
+;; TODO to be deleted
 ;; Bookmarklet to load skewer:
 ;;
 ;;     javascript:(function(){var d=document ;var s=d.createElement('script');s.src='http://localhost:8023/skewer';d.body.appendChild(s);})()

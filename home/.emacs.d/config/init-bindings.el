@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (defmacro bind (&rest commands)
   "Convience macro which creates a lambda interactive command."
   `(lambda ()

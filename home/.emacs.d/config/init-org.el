@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (add-hook
  'org-load-hook
  (lambda ()

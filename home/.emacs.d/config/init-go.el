@@ -1,3 +1,4 @@
+;; TODO to be deleted
 (lazy-major-mode "\\.go$" go-mode)
 
 (with-eval-after-load 'go-mode
