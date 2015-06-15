@@ -16,4 +16,15 @@ Add this to `kill-buffer-query-functions'."
   "Save all modified buffers, without prompts."
   (save-some-buffers 'dont-ask))
 
+(defun dotemacs-fold-overlay (ov)
+  (when (eq 'code (overlay-get ov 'hs))
+    (let ((col (save-excursion
+                 (move-end-of-line 0)
+                 (current-column)))
+          (count (count-lines (overlay-start ov) (overlay-end ov))))
+      (overlay-put ov 'after-string
+                   (format "%s [ %d ] ... "
+                           (make-string (- (window-width) col 32) (string-to-char "."))
+                           count)))))
+
 (provide 'init-buffers)

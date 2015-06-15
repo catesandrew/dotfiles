@@ -156,4 +156,18 @@ none."
               (browse-url url)
             (user-error "Library %s has no URL header" library)))))))
 
+(defun dotemacs-find-file-check-large-file ()
+  (when (> (buffer-size) (* 1024 1024))
+    (setq buffer-read-only t)
+    (buffer-disable-undo)
+    (when (fboundp #'undo-tree-mode)
+      (undo-tree-mode -1))
+    (fundamental-mode)))
+
+(defun dotemacs-wrap-with (s)
+  "Create a wrapper function for smartparens using S."
+  `(lambda (&optional arg)
+     (interactive "P")
+     (sp-wrap-with-pair ,s)))
+
 (provide 'init-files)

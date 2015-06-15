@@ -24,6 +24,8 @@
 
 ;; No splash screen please ... jeez
 (setq inhibit-startup-message t)
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-echo-area-message t)
 
 ;;; Debugging
 (setq message-log-max 10000)
@@ -60,6 +62,17 @@
 (defcustom dotemacs-private-dir (locate-user-emacs-file "private")
   "Directory for private settings."
   :group 'dotemacs)
+
+(defun dotemacs-expand-private-file (file-name)
+  "Get the absolute path for a private file with FILE-NAME."
+  (expand-file-name file-name dotemacs-private-dir))
+
+(defun dotemacs-load-private-file (file-name &optional noerror nomessage)
+  "Load a private file with FILE-NAME.
+
+NOERROR and NOMESSAGE are passed to `load'."
+  (load (dotemacs-expand-private-file file-name)
+        noerror nomessage))
 
 (defcustom dotemacs-custom-file (locate-user-emacs-file "custom.el")
   "File used to store settings from Customization UI."
@@ -156,6 +169,10 @@
 
 
 ;;; Setup environment variables from the user's shell.
+
+;; Disable case insensitivity for filename autocompletion in shell-mode
+(setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
+
 (use-package exec-path-from-shell
   :ensure t
   :if (and (eq system-type 'darwin) (display-graphic-p))
@@ -181,6 +198,61 @@
       (dolist (dir (parse-colon-path (getenv "INFOPATH")))
         (when dir
           (add-to-list 'Info-directory-list dir))))))
+
+;; TODO: Incorporate this into new `use-package eshell` below
+;; original `init-eshell`
+; (defgroup dotemacs-eshell nil
+;   "Configuration options for eshell-mode."
+;   :group 'dotemacs
+;   :prefix 'dotemacs-eshell)
+;
+; (defcustom dotemacs-eshell/plan9
+;   nil
+;   "Turns on Plan9 style prompt in eshell when non-nil."
+;   :group 'dotemacs-eshell)
+;
+; ;; eshell
+; (setq eshell-directory-name (concat dotemacs-cache-directory "eshell"))
+; (setq eshell-scroll-to-bottom-on-input 'all)
+; (setq eshell-buffer-shorthand t)
+;
+; (when (executable-find "fortune")
+;   (defadvice eshell (before advice-for-eshell activate)
+;     (setq eshell-banner-message (concat (shell-command-to-string "fortune") "\n"))))
+;
+;
+; ;; em-alias
+; (setq eshell-aliases-file (concat user-emacs-directory ".eshell-aliases"))
+;
+;
+; ;; em-glob
+; (setq eshell-glob-case-insensitive t)
+; (setq eshell-error-if-no-glob t)
+;
+; ;; em-hist
+; (setq eshell-history-size 1024)
+;
+; ;; em-compl
+; (setq eshell-cmpl-ignore-case t)
+;
+; ;; em-prompt
+; (setq eshell-prompt-function #'dotemacs-eshell-prompt)
+;
+; (add-hook 'eshell-mode-hook
+; 	  (lambda ()
+; 	    ;; get rid of annoying 'terminal is not fully functional' warning
+; 	    (when (executable-find "cat")
+; 	      (setenv "PAGER" "cat"))))
+;
+;
+; ;; plan 9 smart shell
+; (when dotemacs-eshell/plan9
+;   (with-eval-after-load 'esh-module
+;     (add-to-list 'eshell-modules-list 'eshell-smart)
+;     (setq eshell-where-to-jump 'begin)
+;     (setq eshell-review-quick-commands nil)
+;     (setq eshell-smart-space-goes-to-end t)))
+;; end origianl `init-eshell`
 
 
 ;;; Customization, init file and package management
@@ -210,6 +282,7 @@
 (use-package server                     ; The server of `emacsclient'
   :defer t
   :init (server-mode)
+  ; :config (setenv "EDITOR" "emacsclient")
   :diminish server-buffer-clients)
 
 
@@ -269,6 +342,10 @@
 (setq ring-bell-function #'ignore
       inhibit-startup-screen t
       initial-scratch-message "Hello there!\n")
+
+(set-frame-parameter (selected-frame) 'alpha '(95 95))
+(add-to-list 'default-frame-alist '(alpha 95 95))
+
 ;; Answering just 'y' or 'n' will do
 (fset 'yes-or-no-p #'y-or-n-p)
 ;; Opt out from the startup message in the echo area by simply disabling this
@@ -530,11 +607,13 @@ mouse-3: go to end"))))
 
 
 ;;; Buffer, Windows and Frames
-(setq frame-resize-pixelwise t          ; Resize by pixels
+
+(setq truncate-partial-width-windows nil ; Make side by side buffers function
+                                         ; the same as the main window.
+      frame-resize-pixelwise t           ; Resize by pixels
       frame-title-format
       '(:eval (if (buffer-file-name)
                   (abbreviate-file-name (buffer-file-name)) "%b")))
-
 
 (use-package frame
   :bind (("C-c t F" . toggle-frame-fullscreen))
@@ -679,6 +758,9 @@ mouse-3: go to end"))))
 
 
 ;;; File handling
+
+; (setq make-backup-files nil) ; Stop creating backup~ files
+; (setq auto-save-default nil) ; Stop creating #autosave# files
 
 ;; Keep backup and auto save files out of the way
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
@@ -847,6 +929,17 @@ mouse-3: go to end"))))
          ("C-c f u" . dotemacs-find-user-init-file-other-window)
          ("C-c w ." . dotemacs-browse-feature-url)))
 
+(use-package find-file-hook
+  :defer t
+  :init (after "init-files"
+  (progn
+    (add-hook 'find-file-hook
+              (lambda ()
+                (unless (eq major-mode 'org-mode)
+                  (setq show-trailing-whitespace t))))
+    (add-hook 'find-file-hook #'visual-line-mode)
+    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file))))
+
 ;;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
 (bind-key "C-c f v l" #'add-file-local-variable)
@@ -978,6 +1071,9 @@ mouse-3: go to end"))))
   :ensure t
   :defer t
   :init (add-hook 'visual-line-mode-hook #'visual-fill-column-mode))
+
+;;https://www.masteringemacs.org/article/re-builder-interactive-regexp-builder
+(setq reb-re-syntax 'string) ;; fix backslash madness
 
 (use-package visual-regexp              ; Regexp replace with in-buffer display
   :ensure t
@@ -1817,6 +1913,20 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Programming utilities
+
+;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
+;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
+(use-package color-identifiers-mode
+  :ensure t
+  :defer t
+  :diminish color-identifiers-mode
+  :init
+  (progn
+    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (global-color-identifiers-mode))))))
+
 (use-package prog-mode                  ; Prog Mode
   :bind (("C-c t p" . prettify-symbols-mode))
   :init
@@ -1825,9 +1935,15 @@ Disable the highlighting of overlong lines."
               (push '("function" . 955) prettify-symbols-alist)
               (push '("return" . 8592) prettify-symbols-alist))))
 
+(use-package hs-minor-mode
+  :defer t
+  :init (after "init-buffers"
+    (setq hs-set-up-overlay 'dotemacs-fold-overlay)
+    (add-hook 'prog-mode-hook #'hs-minor-mode)))
 
 ; This works and sets the mode correctly but the symbols do not show up
 (use-package prettify-symbols-mode
+  :defer t
   :init
   (progn
     ; (dolist (mode '(emacs-lisp js2 java python ruby))
@@ -1940,6 +2056,52 @@ Disable the highlighting of overlong lines."
 
 (use-package ielm                       ; Emacs Lisp REPL
   :bind (("C-c z" . ielm)))
+
+;; TODO: Incorporate this into `use-package lisp-mode` below
+;; original `init-common-lisp`
+; (require 'init-programming)
+;
+; (require-package 'slime)
+; (require 'slime)
+;
+; ;; the SBCL configuration file is in Common Lisp
+; (add-to-list 'auto-mode-alist '("\\.sbclrc\\'" . lisp-mode))
+;
+; ;; Open files with .cl extension in lisp-mode
+; (add-to-list 'auto-mode-alist '("\\.cl\\'" . lisp-mode))
+;
+; ;; a list of alternative Common Lisp implementations that can be
+; ;; used with SLIME. Note that their presence render
+; ;; inferior-lisp-program useless. This variable holds a list of
+; ;; programs and if you invoke SLIME with a negative prefix
+; ;; argument, M-- M-x slime, you can select a program from that list.
+; (setq slime-lisp-implementations
+;       '((ccl ("ccl"))
+;         (clisp ("clisp" "-q"))
+;         (cmucl ("cmucl" "-quiet"))
+;         (sbcl ("sbcl" "--noinform") :coding-system utf-8-unix)))
+;
+; ;; select the default value from slime-lisp-implementations
+; (if (eq system-type 'darwin)
+;     ;; default to Clozure CL on OS X
+;     (setq slime-default-lisp 'ccl)
+;   ;; default to SBCL on Linux and Windows
+;   (setq slime-default-lisp 'sbcl))
+;
+; (add-hook 'lisp-mode-hook (lambda () (run-hooks 'my-lisp-coding-hook)))
+; (add-hook 'slime-repl-mode-hook (lambda () (run-hooks 'my-interactive-lisp-coding-hook)))
+;
+; (eval-after-load "slime"
+;   '(progn
+;      (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol
+;            slime-fuzzy-completion-in-place t
+;            slime-enable-evaluate-in-emacs t
+;            slime-autodoc-use-multiline-p t
+;            slime-auto-start 'always)
+;
+;      (define-key slime-mode-map (kbd "TAB") 'slime-indent-and-complete-symbol)
+;      (define-key slime-mode-map (kbd "C-c C-s") 'slime-selector)))
+;; end origianl `init-commo-lisp`
 
 (use-package lisp-mode                  ; Emacs Lisp editing
   :defer t
@@ -2258,6 +2420,145 @@ Disable the highlighting of overlong lines."
           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
 
 
+;;; Clojure
+
+;; TODO: Incorporate this into `use-package clojure` below
+;; original `init-clojure`
+; (require 'init-lisp)
+; (require 'clojure-mode)
+; (require 'cider)
+;
+; (defadvice clojure-test-run-tests (before save-first activate)
+;   (save-buffer))
+;
+; (defadvice nrepl-load-current-buffer (before save-first activate)
+;   (save-buffer))
+;
+; (require 'clj-refactor)
+;
+; (with-eval-after-load 'clojure-mode
+;   (defun my-clojure-mode-defaults ()
+;     (clj-refactor-mode 1)
+;     (subword-mode +1)
+;     (run-hooks 'my-lisp-coding-hook))
+;
+;   (setq my-clojure-mode-hook 'my-clojure-mode-defaults)
+;   (add-hook 'clojure-mode-hook (lambda ()
+;                                (run-hooks 'my-clojure-mode-hook))))
+;
+; (with-eval-after-load 'cider
+;   (setq nrepl-log-messages t)
+;
+;   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+;
+;   (defun my-cider-repl-mode-defaults ()
+;     (subword-mode +1)
+;     (run-hooks 'my-interactive-lisp-coding-hook))
+;
+;    (setq my-cider-repl-mode-hook 'my-cider-repl-mode-defaults)
+;    (add-hook 'cider-repl-mode-hook (lambda ()
+;                                    (run-hooks 'my-cider-repl-mode-hook))))
+;
+; ;; Indent and highlight more commands
+; (put-clojure-indent 'match 'defun)
+;
+; ;; Hide nrepl buffers when switching buffers (switch to by prefixing with space)
+; (setq nrepl-hide-special-buffers t)
+;
+; ;; Enable error buffer popping also in the REPL:
+; (setq cider-repl-popup-stacktraces t)
+;
+; ;; Specify history file
+; (setq cider-history-file "~/.emacs.d/nrepl-history")
+;
+; ;; auto-select the error buffer when it's displayed
+; (setq cider-auto-select-error-buffer t)
+;
+; ;; Prevent the auto-display of the REPL buffer in a separate window after connection is established
+; (setq cider-repl-pop-to-buffer-on-connect nil)
+;
+; ;; Enable eldoc in Clojure buffers
+; (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+;
+; ;; Cycle between () {} []
+;
+; (defun live-delete-and-extract-sexp ()
+;   "Delete the sexp and return it."
+;   (interactive)
+;   (let* ((begin (point)))
+;     (forward-sexp)
+;     (let* ((result (buffer-substring-no-properties begin (point))))
+;       (delete-region begin (point))
+;       result)))
+;
+; (defun live-cycle-clj-coll ()
+;   "convert the coll at (point) from (x) -> {x} -> [x] -> (x) recur"
+;   (interactive)
+;   (let* ((original-point (point)))
+;     (while (and (> (point) 1)
+;                 (not (equal "(" (buffer-substring-no-properties (point) (+ 1 (point)))))
+;                 (not (equal "{" (buffer-substring-no-properties (point) (+ 1 (point)))))
+;                 (not (equal "[" (buffer-substring-no-properties (point) (+ 1 (point))))))
+;       (backward-char))
+;     (cond
+;      ((equal "(" (buffer-substring-no-properties (point) (+ 1 (point))))
+;       (insert "{" (substring (live-delete-and-extract-sexp) 1 -1) "}"))
+;      ((equal "{" (buffer-substring-no-properties (point) (+ 1 (point))))
+;       (insert "[" (substring (live-delete-and-extract-sexp) 1 -1) "]"))
+;      ((equal "[" (buffer-substring-no-properties (point) (+ 1 (point))))
+;       (insert "(" (substring (live-delete-and-extract-sexp) 1 -1) ")"))
+;      ((equal 1 (point))
+;       (message "beginning of file reached, this was probably a mistake.")))
+;     (goto-char original-point)))
+;
+; (define-key clojure-mode-map (kbd "C-´") 'live-cycle-clj-coll)
+;
+; ;; Warn about missing nREPL instead of doing stupid things
+;
+; (defun nrepl-warn-when-not-connected ()
+;   (interactive)
+;   (message "Oops! You're not connected to an nREPL server. Please run M-x cider or M-x cider-jack-in to connect."))
+;
+; (define-key clojure-mode-map (kbd "C-M-x")   'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-x C-e") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-e") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-l") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-r") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-z") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-k") 'nrepl-warn-when-not-connected)
+; (define-key clojure-mode-map (kbd "C-c C-n") 'nrepl-warn-when-not-connected)
+;
+; (setq cljr-magic-require-namespaces
+;       '(("io"   . "clojure.java.io")
+;         ("set"  . "clojure.set")
+;         ("str"  . "clojure.string")
+;         ("walk" . "clojure.walk")
+;         ("zip"  . "clojure.zip")
+;         ("time" . "clj-time.core")))
+;
+; ;; Set up linting of clojure code with eastwood
+;
+; ;; Make sure to add [acyclic/squiggly-clojure "0.1.2-SNAPSHOT"]
+; ;; to your :user :dependencies in .lein/profiles.clj
+;
+; (require 'flycheck-clojure)
+; (add-hook 'cider-mode-hook (lambda () (flycheck-mode 1)))
+;
+; (eval-after-load 'flycheck '(add-to-list 'flycheck-checkers 'clojure-cider-eastwood))
+;
+; ;; Make some clj-refactor commands more snappy by populating caches in the
+; ;; background:
+;
+; (add-hook 'nrepl-connected-hook #'cljr-update-artifact-cache)
+; (add-hook 'nrepl-connected-hook #'cljr-warm-ast-cache)
+;
+; ;; Make q quit out of find-usages to previous window config
+;
+; (defadvice cljr-find-usages (before setup-grep activate)
+;   (window-configuration-to-register ?$))
+;; end origianl `init-clojure`
+
+
 ;;; OCaml
 (use-package opam                       ; Initialize Emacs with OPAM env
   :ensure t
@@ -2293,11 +2594,48 @@ Disable the highlighting of overlong lines."
 
 ;;; Web languages
 
+(use-package init-yasnippet
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-load-yasnippet
+             dotemacs-force-yasnippet-off))
+
+;; TODO: Incorporate this into `use-package yasnippet` below
+;; original `init-yasnippet`
+; (let* ((yas-install-dir (car (file-expand-wildcards (concat package-user-dir "/yasnippet-*"))))
+;        (dir (concat yas-install-dir "/snippets/js-mode")))
+;   (if (file-exists-p dir)
+;       (delete-directory dir t)))
+;
+; (setq yas-fallback-behavior 'return-nil)
+; (setq yas-also-auto-indent-first-line t)
+; (setq yas-prompt-functions '(yas/ido-prompt yas/completing-prompt))
+;
+; (yas-load-directory (concat user-emacs-directory "/snippets"))
+;; end origianl `init-yasnippet`
+
+(use-package yasnippet
+  :commands yas-global-mode
+  :disabled t
+  :ensure t
+  :init
+  (progn
+    ;; disable yas minor mode map, use hippie-expand instead
+    (setq yas-minor-mode-map (make-sparse-keymap)))
+    (dolist (mode '(js2 markdown html css org))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (dotemacs-load-yasnippet))))
+    (dolist (mode '(term shell))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (dotemacs-force-yasnippet-off))))
+  :diminish yas-minor-mode)
+
 ;; TODO: Incorporate this into various `use-packages` below
 ;; original `init-web`
 ; (lazy-major-mode "\\.coffee\\'" coffee-mode)
 ; (lazy-major-mode "\\.jade$" jade-mode)
-;
 ;
 ; (defun my-emmet-mode ()
 ;   (require 'emmet-mode)
@@ -2307,9 +2645,7 @@ Disable the highlighting of overlong lines."
 ; (add-hook 'sgml-mode-hook 'my-emmet-mode)
 ; (add-hook 'web-mode-hook 'my-emmet-mode)
 ;
-;
 ; (lazy-major-mode "\\.html?$" web-mode)
-;
 ;
 ; (with-eval-after-load 'web-mode
 ;   (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
@@ -2459,7 +2795,14 @@ Disable the highlighting of overlong lines."
 
                  (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
 
+;; TODO Diminish these modes after I config them
+; (with-eval-after-load 'skewer-mode (diminish 'skewer-mode))
+; (with-eval-after-load 'skewer-css (diminish 'skewer-css-mode))
+; (with-eval-after-load 'skewer-html (diminish 'skewer-html-mode))
+
 (use-package skewer-mode
+  :ensure t
+  :defer t
   :init (after "js2-mode"
           (skewer-setup)))
 
@@ -2906,6 +3249,23 @@ Disable the highlighting of overlong lines."
 ;   :config (setq message-send-mail-function 'smtpmail-send-it
 ;                 ;; Don't keep message buffers around
 ;                 message-kill-buffer-on-exit t))
+;
+;; TODO: Incorporate this into `use-package erc` below
+;; original `init-erc`
+; (after "erc"
+;   (setq erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs"))
+;   (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+;
+;   (setq erc-timestamp-only-if-changed-flag nil)
+;   (setq erc-timestamp-format "[%H:%M] ")
+;   (setq erc-insert-timestamp-function 'erc-insert-timestamp-left)
+;
+;   (setq erc-truncate-mode t)
+;
+;   (add-hook 'window-configuration-change-hook
+;             (lambda ()
+;               (setq erc-fill-column (- (window-width) 2)))))
+;; end origianl `init-erc`
 ;
 ; (use-package erc                        ; Powerful IRC client
 ;   :defer t
