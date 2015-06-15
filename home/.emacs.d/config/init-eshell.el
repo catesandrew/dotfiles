@@ -11,11 +11,6 @@
           (propertize (dotemacs-current-git-branch) 'face 'font-lock-function-name-face)
           (propertize " $ " 'face 'font-lock-constant-face)))
 
-(defun eshell/j ()
-  "Quickly jump to previous directories."
-  (eshell/cd (ido-completing-read "Jump to directory: "
-                                  (delete-dups (ring-elements eshell-last-dir-ring)))))
-
 (setq dotemacs-eshell-buffer-count 0)
 (defun dotemacs-new-eshell-split ()
   (interactive)

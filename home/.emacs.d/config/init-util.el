@@ -1,60 +1,3 @@
-; "After" macro definition
-;
-; http://www.lunaryorn.com/2013/06/25/introducing-with-eval-after-load.html
-;
-; At June, 13th Emacs trunk introduced a new macro `with-eval-after-load`. It
-; behaves like `eval-after-load`, except that it takes multiple unquoted forms
-; and wraps them into a lambda to enable byte compilation:
-;
-; This supersedes much of my last post about byte compilation in
-; `eval-after-load`. However, the new macro does not load the corresponding
-; features during byte compilation, so I’ll wrap my old `after` macro
-; around it to avoid bogus warnings:
-(defmacro after (feature &rest forms)
-  "After FEATURE is loaded, evaluate FORMS.
-
-FORMS is byte compiled.
-
-FEATURE may be a named feature or a file name, see
-`with-eval-after-load' for details."
-  (declare (indent 1) (debug t))
-  `(,(if (or (not byte-compile-current-file)
-             (if (symbolp feature)
-                 (require feature nil :no-error)
-               (load feature :no-message :no-error)))
-         'progn
-       (message "after: cannot find %s" feature)
-       'with-no-warnings)
-    (with-eval-after-load ',feature ,@forms)))
-
-; To ensure compatibility with releases and older snapshot builds, I define
-; with-eval-after-load if it is absent:
-(unless (fboundp 'with-eval-after-load)
-  (defmacro with-eval-after-load (file &rest body)
-    `(eval-after-load ,file
-       `(funcall (function ,(lambda () ,@body))))))
-
-(defun require-package (package)
-  "Ensures that PACKAGE is installed."
-  (unless (or (package-installed-p package)
-              (require package nil 'noerror))
-    (unless (assoc package package-archive-contents)
-      (package-refresh-contents))
-    (package-install package)))
-
-(defmacro lazy-major-mode (pattern mode)
-  "Defines a new major-mode matched by PATTERN and activates it."
-  `(add-to-list 'auto-mode-alist
-                '(,pattern . (lambda ()
-                               (,mode)))))
-
-(defmacro delayed-init (&rest body)
-  "Runs BODY after idle for a predetermined amount of time."
-  `(run-with-idle-timer
-    1.5
-    nil
-    (lambda () ,@body)))
-
 (defun my-recompile-init ()
   "Byte-compile all your dotfiles again."
   (interactive)
@@ -156,19 +99,5 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   "Converts the current buffer to DOS file format."
   (interactive)
   (set-buffer-file-coding-system 'undecided-dos nil))
-
-;; lunaryorn-expand-private-file
-(defun my-expand-private-file (file-name)
-  "Get the absolute path for a private file with FILE-NAME."
-  (expand-file-name file-name dotemacs-private-dir))
-
-;; lunaryorn-load-private-file
-(defun my-load-private-file (file-name &optional noerror nomessage)
-  "Load a private file with FILE-NAME.
-
-NOERROR and NOMESSAGE are passed to `load'."
-  (load (my-expand-private-file file-name)
-        noerror nomessage))
-
 
 (provide 'init-util)

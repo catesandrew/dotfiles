@@ -163,9 +163,86 @@ NOERROR and NOMESSAGE are passed to `load'."
      (when (> (time-to-number-of-days time-since-build) 7)
        (lwarn 'emacs :warning "Your Emacs build is more than a week old!")))))
 
+; "After" macro definition
+;
+; http://www.lunaryorn.com/2013/06/25/introducing-with-eval-after-load.html
+;
+; At June, 13th Emacs trunk introduced a new macro `with-eval-after-load`. It
+; behaves like `eval-after-load`, except that it takes multiple unquoted forms
+; and wraps them into a lambda to enable byte compilation:
+;
+; This supersedes much of my last post about byte compilation in
+; `eval-after-load`. However, the new macro does not load the corresponding
+; features during byte compilation, so I’ll wrap my old `after` macro
+; around it to avoid bogus warnings:
+(defmacro after (feature &rest forms)
+  "After FEATURE is loaded, evaluate FORMS.
+
+FORMS is byte compiled.
+
+FEATURE may be a named feature or a file name, see
+`with-eval-after-load' for details."
+  (declare (indent 1) (debug t))
+  `(,(if (or (not byte-compile-current-file)
+             (if (symbolp feature)
+                 (require feature nil :no-error)
+               (load feature :no-message :no-error)))
+         'progn
+       (message "after: cannot find %s" feature)
+       'with-no-warnings)
+    (with-eval-after-load ',feature ,@forms)))
+
+; To ensure compatibility with releases and older snapshot builds, I define
+; with-eval-after-load if it is absent:
+(unless (fboundp 'with-eval-after-load)
+  (defmacro with-eval-after-load (file &rest body)
+    `(eval-after-load ,file
+       `(funcall (function ,(lambda () ,@body))))))
+
+(defmacro lazy-major-mode (pattern mode)
+  "Defines a new major-mode matched by PATTERN and activates it."
+  `(add-to-list 'auto-mode-alist
+                '(,pattern . (lambda ()
+                               (,mode)))))
+
+(defmacro delayed-init (&rest body)
+  "Runs BODY after idle for a predetermined amount of time."
+  `(run-with-idle-timer
+    1.5
+    nil
+    (lambda () ,@body)))
+
+(defun require-package (package)
+  "Ensures that PACKAGE is installed."
+  (unless (or (package-installed-p package)
+              (require package nil 'noerror))
+    (unless (assoc package package-archive-contents)
+      (package-refresh-contents))
+    (package-install package)))
+
 (use-package init-util              ; Personal OS X tools
   :load-path "config/"
-  )
+  :defer t
+  :commands(my-recompile-init
+            my-window-killer
+            my-minibuffer-keyboard-quit
+            my-set-transparency
+            my-google
+            my-copy-file-name-to-clipboard
+            my-eval-and-replace
+            my-rename-current-buffer-file
+            my-delete-current-buffer-file
+            my-goto-scratch-buffer
+            my-insert-last-kbd-macro
+            my-buffer-to-unix-format
+            my-buffer-to-dos-format))
+
+(use-package init-eshell
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-new-eshell-split
+             dotemacs-eshell-prompt
+             dotemacs-current-git-branch))
 
 
 ;;; Setup environment variables from the user's shell.
@@ -198,6 +275,13 @@ NOERROR and NOMESSAGE are passed to `load'."
       (dolist (dir (parse-colon-path (getenv "INFOPATH")))
         (when dir
           (add-to-list 'Info-directory-list dir))))))
+
+(use-package init-eshell
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-new-eshell-split
+             dotemacs-eshell-prompt
+             dotemacs-current-git-branch))
 
 ;; TODO: Incorporate this into new `use-package eshell` below
 ;; original `init-eshell`
@@ -1820,6 +1904,37 @@ Disable the highlighting of overlong lines."
   ;; …and with Markdown Mode
   (bind-key "M-RET" #'rst-insert-list rst-mode-map))
 
+;; TODO: Incorporate this into new `use-package handlebars-mode` below
+;; original `init-hbs`
+; (defun my-handlebars-load ()
+;   (require 'handlebars-mode)
+;   (handlebars-mode))
+;
+; (setq my-handlebars-load-hook 'my-handlebars-load)
+;
+; (add-to-list 'auto-mode-alist
+;              '("\\.hbs$" . (lambda ()
+;                               (require 'handlebars-mode)
+;                               (handlebars-mode))))
+;
+; (add-to-list 'auto-mode-alist
+;              '("\\.handlebars$" . (lambda ()
+;                               (require 'handlebars-mode)
+;                               (handlebars-mode))))
+;
+; (with-eval-after-load 'handlebars-mode
+;   (defun my-handlebars-mode-defaults ()
+;     ; (toggle-truncate-lines 1)
+;     ; (setq truncate-lines 0)
+;     (run-hooks 'my-prog-mode-hook))
+;
+;   (setq my-handlebars-mode-hook 'my-handlebars-mode-defaults)
+;
+;   (add-hook 'handlebars-mode-hook (lambda ()
+;                                     (run-hooks 'my-handlebars-mode-hook))))
+;
+;; end origianl `init-hbs`
+
 (use-package markdown-mode              ; Markdown
   :ensure t
   :mode (("\\.md$" . markdown-mode)
@@ -2420,6 +2535,24 @@ Disable the highlighting of overlong lines."
           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
 
 
+;;; Go
+
+;; TODO: Incorporate this into new `use-package go-mode` below
+;; original `init-go`
+; (lazy-major-mode "\\.go$" go-mode)
+;
+; (with-eval-after-load 'go-mode
+;   (require 'go-eldoc)
+;   (add-hook 'go-mode-hook 'go-eldoc-setup)
+;
+;   (with-eval-after-load "company-autoloads"
+;     (require 'company-go)
+;     (require 'company-go)
+;     (add-hook 'go-mode-hook (lambda ()
+;                               (set (make-local-variable 'company-backends) '(company-go))))))
+;; end origianl `init-go`
+
+
 ;;; Clojure
 
 ;; TODO: Incorporate this into `use-package clojure` below
@@ -2799,6 +2932,10 @@ Disable the highlighting of overlong lines."
 ; (with-eval-after-load 'skewer-mode (diminish 'skewer-mode))
 ; (with-eval-after-load 'skewer-css (diminish 'skewer-css-mode))
 ; (with-eval-after-load 'skewer-html (diminish 'skewer-html-mode))
+;; TODO What are these two lines?
+; (autoload 'skewer-start "init-skewer" nil t)
+; (autoload 'skewer-demo "init-skewer" nil t)
+
 
 (use-package skewer-mode
   :ensure t
@@ -2844,212 +2981,208 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Misc programming languages
-; (use-package sh-script                  ; Shell scripts
-;   :mode ("\\.zsh\\'" . sh-mode)
-;   :config
-;   ;; Use two spaces in shell scripts.
-;   (setq sh-indentation 2                ; The basic indentation
-;         sh-basic-offset 2               ; The offset for nested indentation
-;         ))
-;
-; (use-package puppet-mode                ; Puppet manifests
-;   :ensure t
-;   :defer t
-;   :config
-;   ;; Fontify variables in Puppet comments
-;   (setq puppet-fontify-variables-in-comments t))
-;
-; (use-package nxml-mode                  ; XML editing
-;   :defer t
-;   ;; Complete closing tags, and insert XML declarations into empty files
-;   :config (setq nxml-slash-auto-complete-flag t
-;                 nxml-auto-insert-xml-declaration-flag t))
-;
-; (use-package feature-mode               ; Feature files for ecukes/cucumber
-;   :ensure t
-;   :defer t
-;   :config
-;   (progn
-;     ;; Add standard hooks for Feature Mode, since it is no derived mode
-;     (add-hook 'feature-mode-hook #'whitespace-mode)
-;     (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
-;     (add-hook 'feature-mode-hook #'flyspell-mode)))
-;
-; (use-package cmake-mode                 ; CMake files
-;   :ensure t
-;   :defer t)
-;
-; (use-package thrift                     ; Thrift interface files
-;   :ensure t
-;   :defer t
-;   :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
-;
-; (use-package swift-mode                 ; Swift sources
-;   :ensure t
-;   :defer t
-;   :config (with-eval-after-load 'flycheck
-;             (add-to-list 'flycheck-checkers 'swift)))
+(use-package sh-script                  ; Shell scripts
+  :mode ("\\.zsh\\'" . sh-mode)
+  :config
+  ;; Use two spaces in shell scripts.
+  (setq sh-indentation 2                ; The basic indentation
+        sh-basic-offset 2               ; The offset for nested indentation
+        ))
+
+(use-package puppet-mode                ; Puppet manifests
+  :ensure t
+  :defer t
+  :config
+  ;; Fontify variables in Puppet comments
+  (setq puppet-fontify-variables-in-comments t))
+
+(use-package nxml-mode                  ; XML editing
+  :defer t
+  ;; Complete closing tags, and insert XML declarations into empty files
+  :config (setq nxml-slash-auto-complete-flag t
+                nxml-auto-insert-xml-declaration-flag t))
+
+(use-package feature-mode               ; Feature files for ecukes/cucumber
+  :ensure t
+  :defer t
+  :config
+  (progn
+    ;; Add standard hooks for Feature Mode, since it is no derived mode
+    (add-hook 'feature-mode-hook #'whitespace-mode)
+    (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
+    (add-hook 'feature-mode-hook #'flyspell-mode)))
+
+(use-package cmake-mode                 ; CMake files
+  :ensure t
+  :defer t)
+
+(use-package thrift                     ; Thrift interface files
+  :ensure t
+  :defer t
+  :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
+
+(use-package swift-mode                 ; Swift sources
+  :ensure t
+  :defer t
+  :config (with-eval-after-load 'flycheck
+            (add-to-list 'flycheck-checkers 'swift)))
 
 
-;;; Proof General & Coq
-; (defun dotemacs-have-proofgeneral-p ()
-;   "Determine whether we have Proof General installed."
-;   (file-exists-p (locate-user-emacs-file "vendor/ProofGeneral/generic")))
-;
-; (use-package proof-site                 ; Enable ProofGeneral if present
-;   ;; Don't :defer this one, since it sets up `load-path' and stuff for
-;   ;; ProofGeneral
-;   :load-path "vendor/ProofGeneral/generic"
-;   :if (dotemacs-have-proofgeneral-p))
-;
-; ;; Proof General has a rather strange way of creating this variable
-; (defvar coq-one-command-per-line)
-; (setq coq-one-command-per-line nil)
-;
-; (use-package proof-splash               ; ProofGeneral Splash screen
-;   :if (dotemacs-have-proofgeneral-p)
-;   :defer t
-;   ;; Shut up, ProofGeneral
-;   :config (setq proof-splash-enable nil))
-;
-; (use-package proof-useropts             ; ProofGeneral options
-;   :if (dotemacs-have-proofgeneral-p)
-;   :defer t
-;   :config (setq proof-three-window-mode-policy 'hybrid
-;                 ;; Automatically process the script up to point when inserting a
-;                 ;; terminator.  Really handy in Coq.
-;                 proof-electric-terminator-enable t))
-;
-; (use-package proof-config               ; ProofGeneral proof configuration
-;   :if (dotemacs-have-proofgeneral-p)
-;   :defer t
-;   ;; Skip over consecutive comments when processing
-;   :config (setq proof-script-fly-past-comments t))
-;
-; (use-package proof-script
-;   :if (dotemacs-have-proofgeneral-p)
-;   :defer t
-;   :config
-;   (add-hook 'proof-mode-hook (lambda () (run-hooks 'prog-mode-hook))))
-;
-; (use-package isar                       ; Isabelle syntax for PG
-;   :if (dotemacs-have-proofgeneral-p)
-;   :defer t
-;   :config
-;   ;; Don't highlight overlong lines in Isar, since Unicode Tokens conceal the
-;   ;; true line length
-;   (add-hook 'isar-mode-hook #'dotemacs-whitespace-style-no-long-lines 'append))
-;
-; (use-package company-coq
-;   :if (dotemacs-have-proofgeneral-p)
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'coq-mode-hook #'company-coq-initialize))
+;; Databases
+(use-package sql
+  :bind (("C-c d c" . sql-connect)
+         ("C-c d m" . sql-mysql))
+  :config (progn (dotemacs-load-private-file "sql-connections" 'noerror)
 
-
-;;; Databases
-; (use-package sql
-;   :bind (("C-c d c" . sql-connect)
-;          ("C-c d m" . sql-mysql))
-;   :config (progn (dotemacs-load-private-file "sql-connections" 'noerror)
-;
-;                  (add-to-list 'display-buffer-alist
-;                               `(,(rx bos "*SQL")
-;                                 (display-buffer-reuse-window
-;                                  display-buffer-in-side-window
-;                                  (side            . bottom)
-;                                  (reusable-frames . visible)
-;                                  (window-height   . 0.4))))))
+                 (add-to-list 'display-buffer-alist
+                              `(,(rx bos "*SQL")
+                                (display-buffer-reuse-window
+                                 display-buffer-in-side-window
+                                 (side            . bottom)
+                                 (reusable-frames . visible)
+                                 (window-height   . 0.4))))))
 
 
 ;;; Version control
-; (use-package vc-hooks                   ; Simple version control
-;   :defer t
-;   :config
-;   ;; Always follow symlinks to files in VCS repos
-;   (setq vc-follow-symlinks t))
+
+;; TODO: Incorporate this code from `init-vcs`
+;; original `init-vcs`
+; (with-eval-after-load 'vc-git
+;   (with-eval-after-load 'evil
+;     (with-eval-after-load 'magit-blame
+;       (defadvice magit-blame-file-on (after advice-for-magit-blame-file-on activate)
+;         (evil-emacs-state))
+;       (defadvice magit-blame-file-off (after advice-for-magit-blame-file-off activate)
+;         (evil-exit-emacs-state))))
 ;
-; (use-package diff-hl                    ; Highlight hunks in fringe
-;   :ensure t
-;   :defer t
-;   :init (progn
-;           ;; Highlight changes to the current file in the fringe
-;           (global-diff-hl-mode)
-;           ;; Highlight changed files in the fringe of Dired
-;           (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+;   (if (display-graphic-p)
+;       (progn
+;         (require 'git-gutter-fringe+))
+;     (require 'git-gutter+))
 ;
-;           ;; Fall back to the display margin, if the fringe is unavailable
-;           (unless (display-graphic-p)
-;             (diff-hl-margin-mode))))
+;   (global-git-gutter+-mode))
 ;
-; (use-package magit                      ; The one and only Git frontend
-;   :ensure t
-;   :bind (("C-c g"   . magit-status)
-;          ("C-c v g" . magit-status)
-;          ("C-c v v" . magit-status)
-;          ("C-c v g" . magit-blame-mode)
-;          ("C-c v l" . magit-file-log))
-;   :init
-;   ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
-;   ;; most stupid warning ever
-;   (setq magit-last-seen-setup-instructions "1.4.0")
-;   :config
-;   (progn
-;     ;; Shut up, Magit!
-;     (setq magit-save-some-buffers 'dontask
-;           magit-stage-all-confirm nil
-;           magit-unstage-all-confirm nil
-;           ;; Except when you ask something useful…
-;           magit-set-upstream-on-push t)
+; (require 'diff-hl)
+; (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+; (unless (display-graphic-p)
+;   (diff-hl-margin-mode))
+;; end origianl `init-vcs`
+
+(use-package vc-hooks                   ; Simple version control
+  :defer t
+  :config
+  ;; Always follow symlinks to files in VCS repos
+  (setq vc-follow-symlinks t))
+
+(use-package diff-hl                    ; Highlight hunks in fringe
+  :ensure t
+  :defer t
+  :init (progn
+          ;; Highlight changes to the current file in the fringe
+          (global-diff-hl-mode)
+          ;; Highlight changed files in the fringe of Dired
+          (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+
+          ;; Fall back to the display margin, if the fringe is unavailable
+          (unless (display-graphic-p)
+            (diff-hl-margin-mode))))
+
+(use-package init-magit
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-magit-toggle-whitespace
+             dotemacs-magit-ignore-whitespace
+             dotemacs-magit-dont-ignore-whitespace))
+
+;; TODO: Incorporate this into `use-package magit` below
+; (setq magit-last-seen-setup-instructions "1.4.0")
 ;
-;     ;; Set Magit's repo dirs for `magit-status' from Projectile's known
-;     ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
-;     ;; was loaded, and update it every time we switched projects, because the
-;     ;; new project might have been unknown before
-;     (defun dotemacs-magit-set-repo-dirs-from-projectile ()
-;       "Set `magit-repo-dirs' from known Projectile projects."
-;       (let ((project-dirs (bound-and-true-p projectile-known-projects)))
-;         ;; Remove trailing slashes from project directories, because Magit adds
-;         ;; trailing slashes again, which breaks the presentation in the Magit
-;         ;; prompt.
-;         (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
+; (require 'magit)
+; (with-eval-after-load 'magit
 ;
-;     (with-eval-after-load 'projectile
-;       (dotemacs-magit-set-repo-dirs-from-projectile))
-;
-;     (add-hook 'projectile-switch-project-hook
-;               #'dotemacs-magit-set-repo-dirs-from-projectile))
-;
-;   :diminish magit-auto-revert-mode)
-;
-; (use-package magit-gh-pulls
-;   :ensure t
-;   :defer t
-;   :init (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls))
-;
-; (use-package git-commit-mode            ; Git commit message mode
-;   :ensure t
-;   :defer t)
-;
-; (use-package gitconfig-mode             ; Git configuration mode
-;   :ensure t
-;   :defer t)
-;
-; (use-package gitignore-mode             ; .gitignore mode
-;   :ensure t
-;   :defer t)
-;
-; (use-package gitattributes-mode         ; Git attributes mode
-;   :ensure t
-;   :defer t)
-;
-; (use-package git-rebase-mode            ; Mode for git rebase -i
-;   :ensure t
-;   :defer t)
-;
-; (use-package git-timemachine            ; Go back in Git time
-;   :ensure t
-;   :bind (("C-c v t" . git-timemachine)))
+;   (defun my-magit-mode-defaults ()
+;     ; (if (boundp 'yas-minor-mode)
+;     ;     (yas-minor-mode))
+;     ; (run-hooks 'my-prog-mode-hook)
+;     (message "my-magit-mode-defaults"))
+;   (setq my-magit-mode-hook 'my-magit-mode-defaults)
+;   (add-hook 'magit-mode-hook (lambda ()
+;                              (run-hooks 'my-magit-mode-hook)))
+;    (setq magit-diff-options '("--histogram"))
+;   (setq magit-stage-all-confirm nil)
+;   (setq magit-unstage-all-confirm nil)
+;   (setq magit-status-buffer-switch-function 'switch-to-buffer)
+;   (setq magit-show-child-count t))
+;; original `init-magit`
+
+(use-package magit                      ; The one and only Git frontend
+  :ensure t
+  :bind (("C-c g"   . magit-status)
+         ("C-c v g" . magit-status)
+         ("C-c v v" . magit-status)
+         ("C-c v g" . magit-blame-mode)
+         ("C-c v l" . magit-file-log))
+  :init
+  ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
+  ;; most stupid warning ever
+  (setq magit-last-seen-setup-instructions "1.4.0")
+  :config
+  (progn
+    ;; Shut up, Magit!
+    (setq magit-save-some-buffers 'dontask
+          magit-stage-all-confirm nil
+          magit-unstage-all-confirm nil
+          ;; Except when you ask something useful…
+          magit-set-upstream-on-push t)
+
+    ;; Set Magit's repo dirs for `magit-status' from Projectile's known
+    ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
+    ;; was loaded, and update it every time we switched projects, because the
+    ;; new project might have been unknown before
+    (defun dotemacs-magit-set-repo-dirs-from-projectile ()
+      "Set `magit-repo-dirs' from known Projectile projects."
+      (let ((project-dirs (bound-and-true-p projectile-known-projects)))
+        ;; Remove trailing slashes from project directories, because Magit adds
+        ;; trailing slashes again, which breaks the presentation in the Magit
+        ;; prompt.
+        (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
+
+    (with-eval-after-load 'projectile
+      (dotemacs-magit-set-repo-dirs-from-projectile))
+
+    (add-hook 'projectile-switch-project-hook
+              #'dotemacs-magit-set-repo-dirs-from-projectile))
+
+  :diminish magit-auto-revert-mode)
+
+(use-package magit-gh-pulls
+  :ensure t
+  :defer t
+  :init (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls))
+
+(use-package git-commit-mode            ; Git commit message mode
+  :ensure t
+  :defer t)
+
+(use-package gitconfig-mode             ; Git configuration mode
+  :ensure t
+  :defer t)
+
+(use-package gitignore-mode             ; .gitignore mode
+  :ensure t
+  :defer t)
+
+(use-package gitattributes-mode         ; Git attributes mode
+  :ensure t
+  :defer t)
+
+(use-package git-rebase-mode            ; Mode for git rebase -i
+  :ensure t
+  :defer t)
+
+(use-package git-timemachine            ; Go back in Git time
+  :ensure t
+  :bind (("C-c v t" . git-timemachine)))
 
 
 ;;; Search
@@ -3436,66 +3569,10 @@ Disable the highlighting of overlong lines."
 
 
 
-;; Lets start with a smattering of sanity
-;; (require 'init-sane-defaults)
 
-
-(let ((debug-on-error t))
-  ;; (cl-loop for file in (directory-files (concat user-emacs-directory "config/"))
-  ;;   if (not (file-directory-p file))
-  ;;     do (require (intern (file-name-base file)))))
-  ;; (require 'init-core)
-
-  ;; (require 'init-eshell)
-  ;; (require 'init-erc)
-
-  ;; (if (eq dotemacs-completion-engine 'company)
-  ;;     (require 'init-company)
-  ;;   (require 'init-auto-complete))
-
-  ;; (require 'init-ido)
-  ;; (require 'init-org)
-  ;; (require 'init-dired)
-  ;; (require 'init-magit)
-  ;; (require 'init-vcs)
-  ;; (require 'init-rgrep)
-  ;; (require 'init-shell)
-  ;; (require 'init-perspective)
-  ;; (require 'init-ffip)
-
-  ;; (require 'init-programming)
-  ;; (require 'init-lisp)
-  ;; (require 'init-vim)
-  ;; (require 'init-stylus)
-  ;; (require 'init-js)
-  ;; (require 'init-clojure)
-  ;; (require 'init-go)
-  ;; (require 'init-web)
-  ;; (require 'init-markup)
-
-  ;; (require 'init-projectile)
-  ;; (require 'init-helm)
-  ;; (require 'init-flycheck)
-  ;; (require 'init-yasnippet)
-  ;; (require 'init-smartparens)
-  ;; (require 'init-mustache)
-  ;; (require 'init-hbs)
-  ;; (require 'init-misc)
-
-  ;; (require 'init-evil)
-  ;; (require 'init-macros)
-  ;; (require 'init-eyecandy)
-
-  ;; (require 'init-bindings)
-  )
-
-;; (autoload 'skewer-start "init-skewer" nil t)
-;; (autoload 'skewer-demo "init-skewer" nil t)
-
-; (setq defuns-dir (expand-file-name "defuns" user-emacs-directory))
-; (dolist (file (directory-files defuns-dir t "\\w+"))
-;   (when (file-regular-p file)
-;     (load file)))
+;; (cl-loop for file in (directory-files (concat user-emacs-directory "defuns/"))
+;;   if (not (file-directory-p file))
+;;     do (require (intern (file-name-base file)))))
 
 ;; TODO https://github.com/IvanMalison/org-projectile
 
