@@ -199,27 +199,6 @@ FEATURE may be a named feature or a file name, see
     `(eval-after-load ,file
        `(funcall (function ,(lambda () ,@body))))))
 
-(defmacro lazy-major-mode (pattern mode)
-  "Defines a new major-mode matched by PATTERN and activates it."
-  `(add-to-list 'auto-mode-alist
-                '(,pattern . (lambda ()
-                               (,mode)))))
-
-(defmacro delayed-init (&rest body)
-  "Runs BODY after idle for a predetermined amount of time."
-  `(run-with-idle-timer
-    1.5
-    nil
-    (lambda () ,@body)))
-
-(defun require-package (package)
-  "Ensures that PACKAGE is installed."
-  (unless (or (package-installed-p package)
-              (require package nil 'noerror))
-    (unless (assoc package package-archive-contents)
-      (package-refresh-contents))
-    (package-install package)))
-
 (use-package init-util              ; Personal OS X tools
   :load-path "config/"
   :defer t
