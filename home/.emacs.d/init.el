@@ -1830,6 +1830,7 @@ Disable the highlighting of overlong lines."
          ("C-c C" . recompile))
   :config (progn
             (setq compilation-ask-about-save nil
+                  compilation-always-kill t
                   ;; Kill old compilation processes before starting new ones,
                   ;; and automatically scroll up to the first error.
                   compilation-scroll-output 'first-error)

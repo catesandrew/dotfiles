@@ -8,9 +8,6 @@
 (require 'dtrt-indent)
 (dtrt-indent-mode 1)
 
-;; To get rid of the start message just set the initial-scratch-message variable to ""
-(setq initial-scratch-message "")
-
 ;; To start the scratch buffer in text mode you will want to initial-major-mode variable
 (setq initial-major-mode 'text-mode)
 
@@ -40,17 +37,6 @@
     (if comint-scroll-to-bottom-on-output
         (setq comint-scroll-to-bottom-on-output nil)
       (setq comint-scroll-to-bottom-on-output t))))
-
-
-;; compile
-(setq compilation-always-kill t)
-(setq compilation-ask-about-save nil)
-(add-hook 'compilation-filter-hook
-          (lambda ()
-            (when (eq major-mode 'compilation-mode)
-              (require 'ansi-color)
-              (let ((inhibit-read-only t))
-                (ansi-color-apply-on-region (point-min) (point-max))))))
 
 ; Vim's Marks => Evil's Marks + Emacs' Bookmarks
 
