@@ -1,3 +1,13 @@
+;;; init-smartparens.el
+
+;;; Commentary:
+
+;; Personal smartparens configuration.
+;;
+;; Extends the default `smartparens-config' with key-bindings and
+;; additional pairs.
+
+;;; Code:
 (require 'smartparens-config)
 
 
@@ -8,7 +18,7 @@
                "(" nil :bind "M-(")
 
 
-;;; My key bindings
+;;; Key bindings
 
 (let ((map smartparens-mode-map))
   ;; Movement and navigation
