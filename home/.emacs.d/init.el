@@ -1816,15 +1816,11 @@ Disable the highlighting of overlong lines."
 (use-package prettify-symbols-mode
   :init
   (progn
-    (setq prettify-symbol-categories '(lambda relational logical))
-    (dolist (mode '(emacs-lisp
-                    js2
-                    java
-                    python
-                    ruby))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (prettify-symbols-mode))))))
+    ; (dolist (mode '(emacs-lisp js2 java python ruby))
+    ;   (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+    ;             (lambda ()
+    ;               (prettify-symbols-mode))))
+    (setq prettify-symbol-categories '(lambda relational logical))))
 
 ; Instead set the mode globally
 (global-prettify-symbols-mode)
