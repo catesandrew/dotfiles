@@ -436,6 +436,12 @@ FEATURE may be a named feature or a file name, see
              dotemacs-insert-logo-into-scratch)
   :init (add-hook 'after-init-hook #'dotemacs-insert-logo-into-scratch))
 
+
+(defvar pcache-directory
+  (let ((dir (concat dotemacs-cache-directory "pcache")))
+    (make-directory dir t)
+    dir))
+
 (use-package dynamic-fonts              ; Select best available font
   :ensure t
   :config
@@ -1453,6 +1459,9 @@ Disable the highlighting of overlong lines."
 ;; In `completion-at-point', do not pop up silly completion buffers for less
 ;; than five candidates.  Cycle instead.
 (setq completion-cycle-threshold 5)
+
+;; tell emacs where to read abbrev
+(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
 
 (use-package hippie-exp                 ; Powerful expansion and completion
   :bind (([remap dabbrev-expand] . hippie-expand))
