@@ -1983,6 +1983,25 @@ Disable the highlighting of overlong lines."
   ;; …and with Markdown Mode
   (bind-key "M-RET" #'rst-insert-list rst-mode-map))
 
+(use-package mustache-mode              ; Mustache mode
+  :ensure t
+  :defer t
+  :mode (("\\.mustache$" . markdown-mode)))
+
+(use-package rst                        ; ReStructuredText
+  :ensure t
+  :defer t
+  :config
+  ;; Indent with 3 spaces after all kinds of literal blocks
+  (setq rst-indent-literal-minimized 3
+        rst-indent-literal-normal 3)
+
+  (bind-key "C-=" nil rst-mode-map)
+  ;; For similarity with AUCTeX
+  (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
+  ;; …and with Markdown Mode
+  (bind-key "M-RET" #'rst-insert-list rst-mode-map))
+
 ;; TODO: Incorporate this into new `use-package handlebars-mode` below
 ;; original `init-hbs`
 ; (defun my-handlebars-load ()
