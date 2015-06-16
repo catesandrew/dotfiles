@@ -3657,6 +3657,138 @@ Disable the highlighting of overlong lines."
         erc-track-enable-keybindings t))
 
 
+;;; Org Mode
+(use-package org-plus-contrib
+  :ensure t
+  :defer t
+  :mode ("\\.org$" . org-mode)
+  :init
+  (progn
+    (setq org-replace-disputed-keys t ;; Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
+          org-src-fontify-natively t ;; Fontify org-mode code blocks
+          org-log-done t
+          org-startup-indented t)
+
+    (add-hook 'org-load-hook
+              (lambda ()
+                (unless (file-exists-p org-directory)
+                  (make-directory org-directory))
+
+                (setq my-inbox-org-file (concat org-directory "/inbox.org")
+                      org-indent-indentation-per-level 2
+                      org-use-fast-todo-selection t
+                      org-completion-use-ido t
+                      org-treat-S-cursor-todo-selection-as-state-change nil
+                      org-agenda-files `(,org-directory))
+
+                (setq org-capture-templates
+                      '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
+                         "* TODO %?\n%U\n%a\n")
+                        ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
+                         "* %? :NOTE:\n%U\n%a\n")
+                        ("m" "Meeting" entry (file my-inbox-org-file)
+                         "* MEETING %? :MEETING:\n%U")
+                        ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
+                         "* %?\n%U\n")))
+
+                ;; org-mode colors
+                (setq org-todo-keyword-faces
+                      '(
+                        ("INPR" . (:foreground "yellow" :weight bold))
+                        ("DONE" . (:foreground "green" :weight bold))
+                        ("IMPEDED" . (:foreground "red" :weight bold))
+                        ))
+
+                (setq org-refile-targets '((nil :maxlevel . 9)
+                              (org-agenda-files :maxlevel . 9)))
+
+                (setq org-todo-keywords
+                      '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
+                        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
+
+                (setq org-todo-state-tags-triggers
+                      ' (("CANCELLED" ("CANCELLED" . t))
+                         ("WAITING" ("WAITING" . t))
+                         ("TODO" ("WAITING") ("CANCELLED"))
+                         ("NEXT" ("WAITING") ("CANCELLED"))
+                         ("DONE" ("WAITING") ("CANCELLED"))))
+
+                ))
+    ; (evil-leader/set-key-for-mode 'org-mode
+    ;   "mc" 'org-capture
+    ;   "md" 'org-deadline
+    ;   "me" 'org-export-dispatch
+    ;   "mf" 'org-set-effort
+    ;   "mi" 'org-clock-in
+    ;   "mj" 'helm-org-in-buffer-headings
+    ;   "mo" 'org-clock-out
+    ;   "mm" 'org-ctrl-c-ctrl-c
+    ;   "mq" 'org-clock-cancel
+    ;   "mr" 'org-refile
+    ;   "ms" 'org-schedule)
+
+    (require 'ox-md)
+    (require 'ox-ascii)
+    (require 'ox-confluence)
+    (require 'ox-html)
+    (require 'org-bullets)
+
+    ; (after "evil" (add-hook 'org-capture-mode-hook #'evil-emacs-state))
+
+    (after "org-agenda"
+      '(progn
+         (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+         (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
+         ;; Since we override SPC, let's make RET do that functionality
+         (define-key org-agenda-mode-map
+           (kbd "RET") 'org-agenda-show-and-scroll-up)
+         (define-key org-agenda-mode-map
+           (kbd "SPC") evil-leader--default-map))))
+  :config
+  (progn
+    (require 'org-indent)
+    (define-key global-map "\C-cl" 'org-store-link)
+    (define-key global-map "\C-ca" 'org-agenda)))
+
+(use-package org-bullets
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq org-bullets-bullet-list '("✿" "❀" "☢" "☯" "✸" ))
+    (add-hook 'org-mode-hook #'org-bullets-mode)))
+
+(use-package org-repo-todo
+  :ensure t
+  :defer t
+  :commands (ort/capture-todo
+             ort/capture-todo-check
+             ort/goto-todos)
+  :init
+  (progn
+    ; (evil-leader/set-key
+    ;   "Ct"  'ort/capture-todo
+    ;   "CT"  'ort/capture-todo-check)
+    ; (evil-leader/set-key-for-mode 'org-mode
+    ;   "mgt" 'ort/goto-todos)
+    ))
+
+; (use-package evil-org
+;   :disabled t
+;   :commands evil-org-mode
+;   :init
+;   (add-hook 'org-mode-hook 'evil-org-mode)
+;   :config
+;   (progn
+;     (evil-leader/set-key-for-mode 'org-mode
+;          "a" nil "ma" 'org-agenda
+;          "c" nil "mA" 'org-archive-subtree
+;          "o" nil "mC" 'evil-org-recompute-clocks
+;          "l" nil "ml" 'evil-org-open-links
+;          "t" nil "mt" 'org-show-todo-tree)
+;     (diminish evil-org-mode " ⓔ" " e"))
+
+
 ;;; Online Help
 (use-package find-func                  ; Find function/variable definitions
   :bind (("C-x F"   . find-function)
