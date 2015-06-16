@@ -19,6 +19,7 @@
 ;; - C-c u: Miscellaneous utilities
 ;; - C-c v: Version control
 ;; - C-c w: Web stuff
+;; - C-x x: Perspective
 
 ;;; Code:
 
@@ -3425,6 +3426,65 @@ Disable the highlighting of overlong lines."
   (progn
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
     (setq projectile-switch-project-action #'helm-projectile)))
+
+
+;;; Perspective
+(use-package init-perspective
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-persp-switch-project
+             dotemacs-custom-persp-last))
+
+(use-package perspective
+  :ensure t
+  :defer t
+  :commands (custom-persp
+             persp-add-buffer
+             persp-set-buffer
+             persp-kill
+             persp-remove-buffer
+             persp-rename
+             persp-switch
+             projectile-persp-bridge)
+  :init
+  (progn
+    (persp-mode t)
+    ;; muh perspectives
+    ; (defun custom-persp/emacs ()
+    ;   (interactive)
+    ;   (custom-persp ".emacs.d"
+    ;                 (find-file (locate-user-emacs-file "init.el"))))
+
+    ; (defun custom-persp/org ()
+    ;   (interactive)
+    ;   (custom-persp "@org"
+    ;                   (find-file (first org-agenda-files))))
+  )
+  :config
+  (progn
+    ;; loading code for our custom perspectives
+    ;; taken from Magnar Sveen
+    (defmacro custom-persp (name &rest body)
+      `(let ((initialize (not (gethash ,name perspectives-hash)))
+             (current-perspective persp-curr))
+         (persp-switch ,name)
+         (when initialize ,@body)
+         (setq persp-last current-perspective)))
+
+    (define-key persp-mode-map (kbd "C-x x l") 'dotemacs-custom-persp-last)
+    (add-hook 'after-init-hook '(lambda ()
+                                  (persp-rename "@dotfiles")))
+    ))
+
+(use-package persp-projectile
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (projectile-persp-bridge helm-projectile-switch-project)
+    ; (evil-leader/set-key
+    ;   "pp" 'dotemacs-persp-switch-project)
+    ))
 
 
 ;;; Processes and commands

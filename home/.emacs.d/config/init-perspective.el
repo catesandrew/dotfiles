@@ -1,22 +1,16 @@
-;; TODO to be deleted
-;; Load Perspective
-(require 'perspective)
-
-;; Enable perspective mode
-(persp-mode t)
-
-(defmacro custom-persp (name &rest body)
-  `(let ((initialize (not (gethash ,name perspectives-hash)))
-         (current-perspective persp-curr))
-     (persp-switch ,name)
-     (when initialize ,@body)
-     (setq persp-last current-perspective)))
+(defun dotemacs-persp-switch-project ()
+  (interactive)
+  ; (evil-leader/set-key
+  ;   "pp" 'helm-projectile-switch-project)
+  (find-file "~/.dotfiles")
+  (helm-projectile-switch-project)
+  (persp-add-buffer "*dotfiles")
+  (persp-kill "@dotfiles"))
 
 ;; Jump to last perspective
-(defun custom-persp-last ()
+;; taken from Magnar Sveen
+(defun dotemacs-custom-persp-last ()
   (interactive)
   (persp-switch (persp-name persp-last)))
-
-; (define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
 
 (provide 'init-perspective)
