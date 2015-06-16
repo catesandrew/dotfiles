@@ -3255,11 +3255,17 @@ Disable the highlighting of overlong lines."
   :defer t
   :config
   (progn
+
     ;; Don't recurse into some directories
     (add-to-list 'grep-find-ignored-directories "node_modules")
-    (add-to-list 'grep-find-ignored-directories "bower_components")
     (add-to-list 'grep-find-ignored-directories "build")
     (add-to-list 'grep-find-ignored-directories "vendor")
+    (add-to-list 'grep-find-ignored-directories "elpa")
+    (add-to-list 'grep-find-ignored-directories ".git")
+    (add-to-list 'grep-find-ignored-directories ".hg")
+    (add-to-list 'grep-find-ignored-directories ".svn")
+    (add-to-list 'grep-find-ignored-directories ".idea")
+    (add-to-list 'grep-find-ignored-directories ".sass-cache")
 
     ;; Add custom keybindings
     (define-key grep-mode-map "q" #'dotemacs-rgrep-quit-window)
@@ -3366,13 +3372,30 @@ Disable the highlighting of overlong lines."
 
 (use-package projectile
   :ensure t
-  :init (projectile-global-mode)
+  :init
+  (progn
+    (add-to-list 'projectile-globally-ignored-directories "elpa")
+    (add-to-list 'projectile-globally-ignored-directories "node_modules")
+    (add-to-list 'projectile-globally-ignored-directories ".cache")
+    (add-to-list 'projectile-globally-ignored-directories "build")
+    (add-to-list 'projectile-globally-ignored-directories "vendor")
+    (add-to-list 'projectile-globally-ignored-directories ".cask")
+    (add-to-list 'projectile-globally-ignored-directories ".git")
+    (add-to-list 'projectile-globally-ignored-directories ".hg")
+    (add-to-list 'projectile-globally-ignored-directories ".svn")
+    (add-to-list 'projectile-globally-ignored-directories ".idea")
+    (add-to-list 'projectile-globally-ignored-directories ".sass-cache")
+    (projectile-global-mode))
   :config
   (progn
     ;; Remove dead projects when Emacs is idle
     (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
 
     (setq projectile-completion-system 'helm
+          projectile-cache-file (concat dotemacs-cache-directory "projectile.cache")
+          projectile-known-projects-file (concat dotemacs-cache-directory "projectile-bookmarks.eld")
+          projectile-indexing-method 'alien ; force alien for Windwos
+          projectile-enable-caching t       ; To enable caching unconditionally
           projectile-find-dir-includes-top-level t
           projectile-mode-line '(:propertize
                                  (:eval (concat " " (projectile-project-name)))
@@ -3383,7 +3406,10 @@ Disable the highlighting of overlong lines."
   :ensure t
   :defer t
   :init (after "projectile" (helm-projectile-on))
-  :config (setq projectile-switch-project-action #'helm-projectile))
+  :config
+  (progn
+    ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
+    (setq projectile-switch-project-action #'helm-projectile)))
 
 
 ;;; Processes and commands
