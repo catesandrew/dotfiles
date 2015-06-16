@@ -2845,14 +2845,6 @@ Disable the highlighting of overlong lines."
 ; (lazy-major-mode "\\.coffee\\'" coffee-mode)
 ; (lazy-major-mode "\\.jade$" jade-mode)
 ;
-; (defun my-emmet-mode ()
-;   (require 'emmet-mode)
-;   (emmet-mode))
-;
-; (add-hook 'css-mode-hook 'my-emmet-mode)
-; (add-hook 'sgml-mode-hook 'my-emmet-mode)
-; (add-hook 'web-mode-hook 'my-emmet-mode)
-;
 ; (lazy-major-mode "\\.html?$" web-mode)
 ;
 ; (with-eval-after-load 'web-mode
@@ -2868,6 +2860,23 @@ Disable the highlighting of overlong lines."
 ; (defadvice sgml-delete-tag (after reindent activate)
 ;   (indent-region (point-min) (point-max)))
 ;; end origianl `init-web`
+
+(use-package emmet-mode
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'web-mode-hook 'emmet-mode)
+    (add-hook 'html-mode-hook 'emmet-mode)
+    ; (add-hook 'sgml-mode-hook 'emmet-mode)
+    (add-hook 'css-mode-hook 'emmet-mode))
+  :config
+  (progn
+    ; (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    ; (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    ; (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    ; (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    ))
 
 (use-package web-mode                   ; Template editing
   :ensure t
