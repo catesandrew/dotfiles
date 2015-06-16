@@ -1,8 +1,18 @@
-;; TODO to be deleted
-(defun my-local-comment-auto-fill ()
+(defun dotemacs-fold-overlay (ov)
+  (when (eq 'code (overlay-get ov 'hs))
+    (let ((col (save-excursion
+                 (move-end-of-line 0)
+                 (current-column)))
+          (count (count-lines (overlay-start ov) (overlay-end ov))))
+      (overlay-put ov 'after-string
+                   (format "%s [ %d ] ... "
+                           (make-string (- (window-width) col 32) (string-to-char "."))
+                           count)))))
+
+(defun dotemacs-local-comment-auto-fill ()
   (set (make-local-variable 'comment-auto-fill-only-comments) t))
 
-(defun my-font-lock-comment-annotations ()
+(defun dotemacs-font-lock-comment-annotations ()
   "Highlight a bunch of well known comment annotations.
 
 This functions should be added to the hooks of major modes for programming."
@@ -10,46 +20,33 @@ This functions should be added to the hooks of major modes for programming."
    nil '(("\\<\\(\\(FIX\\(ME\\)?\\|TODO\\|OPTIMIZE\\|HACK\\|REFACTOR\\):\\)"
           1 font-lock-warning-face t))))
 
-;; show the name of the current function definition in the modeline
-(require 'which-func)
-(which-function-mode 1)
-
-;; in Emacs 24 programming major modes generally derive from a common
-;; mode named prog-mode; for others, we'll arrange for our mode
-;; defaults function to run my-prog-mode-hook directly. To
-;; augment and/or counteract these defaults your own function
-;; to my-prog-mode-hook, using:
+;; To augment and/or counteract these defaults your own function
+;; to dotemacs-prog-mode-hook, using:
 ;;
-;;     (add-hook 'my-prog-mode-hook 'my-prog-mode-defaults t)
+;; (add-hook 'dotemacs-prog-mode-hook 'dotemacs-prog-mode-defaults t)
 ;;
 ;; (the final optional t sets the *append* argument)
 
-;; enlist a more liberal guru
-(setq guru-warn-only t)
-
-(defun my-prog-mode-defaults ()
+(defun dotemacs-prog-mode-defaults ()
   "Default coding hook, useful with any programming language."
-  (smartparens-mode +1)
 
-  ;; disable line wrap
-  ; (unless truncate-lines (set 'truncate-lines t))   ; don't fold line
-  ; (unless truncate-lines (lambda ()
-  ;                          (toggle-truncate-lines t)
-  ;                          (setq truncate-lines t)))   ; don't fold line
+  (unless (bound-and-true-p my-pmh-ran)
+    ;; add buffer-local indicator for whether prog-mode-hook has run.
+    (set (make-local-variable 'my-pmh-ran) t)
 
-  ; http://stackoverflow.com/questions/10088168/how-to-check-whether-a-minor-mode-e-g-flymake-mode-is-on
-  ; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
-  (unless (bound-and-true-p hs-minor-mode)
-    (hs-minor-mode t))
+    ;; disable line wrap
+    (unless (bound-and-true-p truncate-lines)
+      ; (set (make-local-variable 'truncate-lines) t)
+      (setq truncate-lines t))
 
-  (set 'truncate-lines t)
-  (toggle-truncate-lines t)
-  (my-local-comment-auto-fill)
-  (my-font-lock-comment-annotations))
+    ; (smartparens-mode +1)
 
-(setq my-prog-mode-hook 'my-prog-mode-defaults)
-
-(add-hook 'prog-mode-hook (lambda ()
-                            (run-hooks 'my-prog-mode-hook)))
+    ; how-to-check-whether-a-minor-mode-e-g-flymake-mode-is-on
+    ; http://stackoverflow.com/questions/10088168/
+    ; however, hs-minor-mode already set in `init.el`
+    ; (unless (bound-and-true-p hs-minor-mode)
+    ;   (hs-minor-mode t))
+    (dotemacs-local-comment-auto-fill)
+    (dotemacs-font-lock-comment-annotations)))
 
 (provide 'init-programming)

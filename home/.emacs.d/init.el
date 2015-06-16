@@ -1127,8 +1127,8 @@ mouse-3: go to end"))))
 (setq indicate-empty-lines t
       require-final-newline t)
 
-;; Don't break lines for me, please
-(setq-default truncate-lines t)
+;; Globally don't break lines for me, please
+; (setq-default truncate-lines t)
 
 (setq kill-ring-max 200                 ; More killed items
       ;; Save the contents of the clipboard to kill ring before killing
@@ -2111,6 +2111,24 @@ Disable the highlighting of overlong lines."
                 (lambda ()
                   (global-color-identifiers-mode))))))
 
+;; enlist a more liberal guru
+; (setq guru-warn-only t)
+
+(use-package init-programming
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-local-comment-auto-fill
+             dotemacs-font-lock-comment-annotations
+             dotemacs-fold-overlay
+             dotemacs-prog-mode-defaults)
+  :init
+  (progn
+    (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
+    (add-hook 'prog-mode-hook
+              (lambda ()
+                (run-hooks #'dotemacs-prog-mode-hook)))
+    ))
+
 (use-package prog-mode                  ; Prog Mode
   :bind (("C-c t p" . prettify-symbols-mode))
   :init
@@ -2119,9 +2137,10 @@ Disable the highlighting of overlong lines."
               (push '("function" . 955) prettify-symbols-alist)
               (push '("return" . 8592) prettify-symbols-alist))))
 
+; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
 (use-package hs-minor-mode
   :defer t
-  :init (after "init-buffers"
+  :init (progn
     (setq hs-set-up-overlay 'dotemacs-fold-overlay)
     (add-hook 'prog-mode-hook #'hs-minor-mode)))
 
@@ -3372,8 +3391,12 @@ Disable the highlighting of overlong lines."
 
 (use-package projectile
   :ensure t
-  :init
+  :init (projectile-global-mode)
+  :config
   (progn
+    ;; Remove dead projects when Emacs is idle
+    (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+
     (add-to-list 'projectile-globally-ignored-directories "elpa")
     (add-to-list 'projectile-globally-ignored-directories "node_modules")
     (add-to-list 'projectile-globally-ignored-directories ".cache")
@@ -3385,11 +3408,6 @@ Disable the highlighting of overlong lines."
     (add-to-list 'projectile-globally-ignored-directories ".svn")
     (add-to-list 'projectile-globally-ignored-directories ".idea")
     (add-to-list 'projectile-globally-ignored-directories ".sass-cache")
-    (projectile-global-mode))
-  :config
-  (progn
-    ;; Remove dead projects when Emacs is idle
-    (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
 
     (setq projectile-completion-system 'helm
           projectile-cache-file (concat dotemacs-cache-directory "projectile.cache")
