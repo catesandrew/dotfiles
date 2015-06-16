@@ -285,9 +285,9 @@
     (evil-define-key 'normal coffee-mode-map (kbd ", p") 'coffee-compile-buffer))
 
   (with-eval-after-load 'stylus-mode
-    (define-key stylus-mode-map [remap eval-last-sexp] 'my-stylus-compile-and-eval-buffer)
-    (evil-define-key 'visual stylus-mode-map (kbd ", p") 'my-stylus-compile-and-show-region)
-    (evil-define-key 'normal stylus-mode-map (kbd ", p") 'my-stylus-compile-and-show-buffer))
+    (define-key stylus-mode-map [remap eval-last-sexp] 'dotemacs-stylus-compile-and-eval-buffer)
+    (evil-define-key 'visual stylus-mode-map (kbd ", p") 'dotemacs-stylus-compile-and-show-region)
+    (evil-define-key 'normal stylus-mode-map (kbd ", p") 'dotemacs-stylus-compile-and-show-buffer))
 
   (with-eval-after-load "projectile-autoloads"
     (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)

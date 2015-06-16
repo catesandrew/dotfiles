@@ -2944,9 +2944,23 @@ Disable the highlighting of overlong lines."
   :ensure t)
 
 
+;;; Stylus
+
+(use-package init-stylus
+  :load-path "config/"
+  :defer t
+  :commands(dotemacs-stylus-mode-defaults))
+
+(use-package stylus-mode
+  :ensure t
+  :defer t
+  :mode ("\\.styl$" . stylus-mode)
+  :init (add-hook 'stylus-mode-hook #'dotemacs-stylus-mode-defaults))
+
+
 ;;; Skewer
 
-(use-package init-skewer              ; Personal OS X tools
+(use-package init-skewer
   :load-path "config/"
   :defer t
   :commands(dotemacs-skewer-start
