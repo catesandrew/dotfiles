@@ -30,6 +30,9 @@
 ;;; Debugging
 (setq message-log-max 10000)
 
+;; Don't be so stingy on the memory, we have lots now. It's the distant future.
+(setq gc-cons-threshold 20000000)
+
 ;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
@@ -116,6 +119,14 @@ NOERROR and NOMESSAGE are passed to `load'."
 
 
 
+;;; Locality
+(setq locale-coding-system 'utf-8) ; pretty
+(set-terminal-coding-system 'utf-8) ; pretty
+(set-keyboard-coding-system 'utf-8) ; pretty
+(set-selection-coding-system 'utf-8) ; please
+(prefer-coding-system 'utf-8) ; with sugar on top
+
+
 ;;; Package management
 (setq load-prefer-newer t)
 
@@ -152,7 +163,6 @@ NOERROR and NOMESSAGE are passed to `load'."
 
 
 ;;; Initialization
-
 (when (version< emacs-version "25")
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
   (warn "brew install emacs --HEAD --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
@@ -508,7 +518,6 @@ FEATURE may be a named feature or a file name, see
 
 
 ;;; The mode line
-
 (setq-default header-line-format
               '(which-func-mode ("" which-func-format " "))
               mode-line-format
@@ -599,6 +608,9 @@ mouse-3: go to end"))))
 ;;; Minibuffer and Helm
 (setq history-length 1000)              ; Store more history
 
+;; Allow recursive minibuffers
+(setq enable-recursive-minibuffers t)
+
 ;; Show the modifier combinations I just typed almost immediately:
 (setq echo-keystrokes 0.1)
 
@@ -672,7 +684,6 @@ mouse-3: go to end"))))
 
 
 ;;; Buffer, Windows and Frames
-
 (setq truncate-partial-width-windows nil ; Make side by side buffers function
                                          ; the same as the main window.
       frame-resize-pixelwise t           ; Resize by pixels
@@ -823,7 +834,6 @@ mouse-3: go to end"))))
 
 
 ;;; File handling
-
 ; (setq make-backup-files nil) ; Stop creating backup~ files
 ; (setq auto-save-default nil) ; Stop creating #autosave# files
 
@@ -831,6 +841,9 @@ mouse-3: go to end"))))
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
       auto-save-file-name-transforms `((".*" ,(concat dotemacs-cache-directory "backups") t))
       auto-save-list-file-prefix (concat dotemacs-cache-directory "auto-save-list/saves-"))
+
+;; Transparently open compressed files
+(auto-compression-mode t)
 
 ;; Delete files to trash
 (setq delete-by-moving-to-trash t)
@@ -986,6 +999,10 @@ mouse-3: go to end"))))
 
 (use-package init-files            ; Personal file tools
   :load-path "config/"
+  :defer t
+  :commands (dotemacs-create-non-existent-directory)
+  :init
+  (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
   :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
          ("C-c f i" . dotemacs-open-in-intellij)
          ("C-c f o" . dotemacs-launch-dwim)
@@ -1005,13 +1022,12 @@ mouse-3: go to end"))))
     (add-hook 'find-file-hook #'visual-line-mode)
     (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file))))
 
-;;; Additional bindings for built-ins
+;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
 (bind-key "C-c f v l" #'add-file-local-variable)
 (bind-key "C-c f v p" #'add-file-local-variable-prop-line)
 
 
-
 ;;; Navigation and scrolling
 (setq scroll-margin 3                   ; 0 to drag the point along while scrolling
       scroll-conservatively 1000        ; Never recenter the screen while scrolling
@@ -1022,6 +1038,17 @@ mouse-3: go to end"))))
       ;; and smooth
       mouse-wheel-progressive-speed nil
       mouse-wheel-scroll-amount '(1))
+
+;; When popping the mark, continue popping until the cursor actually moves
+;; Also, if the last command was a copy - skip past all the expand-region cruft.
+(defadvice pop-to-mark-command (around ensure-new-position activate)
+  (let ((p (point)))
+    (when (eq last-command 'save-region-or-current-line)
+      ad-do-it
+      ad-do-it
+      ad-do-it)
+    (dotimes (i 10)
+      (when (= p (point)) ad-do-it))))
 
 (use-package avy-jump                   ; Jump to characters in buffers
   :ensure avy
@@ -1066,6 +1093,28 @@ mouse-3: go to end"))))
 
 ;;; Basic editing
 
+;; Show active region
+(transient-mark-mode 1)
+(make-variable-buffer-local 'transient-mark-mode)
+(put 'transient-mark-mode 'permanent-local t)
+(setq-default transient-mark-mode t)
+
+;; Nic says eval-expression-print-level needs to be set to nil (turned off) so
+;; that you can always see what's happening.
+(setq eval-expression-print-level nil)
+
+;; Don't highlight matches with jump-char - it's distracting
+(setq jump-char-lazy-highlight-face nil)
+
+;; Real emacs knights don't use shift to mark things
+(setq shift-select-mode nil)
+
+;; Sentences do not need double spaces to end. Period.
+(set-default 'sentence-end-double-space nil)
+
+;; enable electric indent
+(setq electric-indent-mode t)
+
 ;; Disable tabs, but given them proper width
 (setq-default indent-tabs-mode nil
               highlight-tabs t
@@ -1078,6 +1127,7 @@ mouse-3: go to end"))))
 (setq indicate-empty-lines t
       require-final-newline t)
 
+;; Don't break lines for me, please
 (setq-default truncate-lines t)
 
 (setq kill-ring-max 200                 ; More killed items
@@ -1612,7 +1662,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Spelling and syntax checking
-
 (use-package ispell                     ; Spell checking
   :defer t
   :config
@@ -2302,7 +2351,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Scala
-
 (use-package scala-mode2                ; Scala editing
   :ensure t
   :defer t
@@ -2948,7 +2996,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Stylus
-
 (use-package init-stylus
   :load-path "config/"
   :defer t
@@ -2962,7 +3009,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Skewer
-
 (use-package init-skewer
   :load-path "config/"
   :defer t
@@ -3248,11 +3294,11 @@ Disable the highlighting of overlong lines."
                 helm-ag-insert-at-point 'symbol
                 helm-ag-source-type 'file-line))
 
-;;; Project management with Projectile
-
+
+;;; Project management with Projectile
 (use-package ido
   :preface
-  :disable t
+  :disabled t
   (progn
     ;; `defvar's to prevent compile warnings
     ;; https://github.com/DarwinAwardWinner/ido-ubiquitous/issues/68
@@ -3280,7 +3326,7 @@ Disable the highlighting of overlong lines."
     (ido-everywhere 1)))
 
 (use-package flx-ido
-  :disable t
+  :disabled t
   :defer t
   :init
   (progn
@@ -3288,7 +3334,7 @@ Disable the highlighting of overlong lines."
     (flx-ido-mode 1)))
 
 (use-package ido-ubiquitous
-  :disable t
+  :disabled t
   :defer t
   :preface
   (progn

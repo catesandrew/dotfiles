@@ -29,7 +29,6 @@ The file is the buffer's file name, or the `default-directory' in
       default-directory
     (buffer-file-name)))
 
-;;;###autoload
 (defun dotemacs-copy-filename-as-kill (&optional arg)
   "Copy the name of the currently visited file to kill ring.
 
@@ -54,7 +53,6 @@ Otherwise copy the non-directory part only."
         (message "%s" name-to-copy))
     (user-error "This buffer is not visiting a file")))
 
-;;;###autoload
 (defun dotemacs-rename-file-and-buffer ()
   "Rename the current file and buffer."
   (interactive)
@@ -70,7 +68,6 @@ Otherwise copy the non-directory part only."
       (rename-file filename new-name 'force-overwrite)
       (set-visited-file-name new-name 'no-query 'along-with-file)))))
 
-;;;###autoload
 (defun dotemacs-delete-file-and-buffer ()
   "Delete the current file and kill the buffer."
   (interactive)
@@ -82,13 +79,11 @@ Otherwise copy the non-directory part only."
       (delete-file filename)
       (kill-buffer)))))
 
-;;;###autoload
 (defun dotemacs-find-user-init-file-other-window ()
   "Edit the `user-init-file', in another window."
   (interactive)
   (find-file-other-window user-init-file))
 
-;;;###autoload
 (defun dotemacs-launch-dwim ()
   "Open the current file externally."
   (interactive)
@@ -123,7 +118,6 @@ nil if no project root was found."
        (expand-file-name "Contents/MacOS/idea" bundle)))
     (_ (user-error "No launcher for system %S" system-type))))
 
-;;;###autoload
 (defun dotemacs-open-in-intellij ()
   "Open the current file in IntelliJ IDEA."
   (interactive)
@@ -169,5 +163,13 @@ none."
   `(lambda (&optional arg)
      (interactive "P")
      (sp-wrap-with-pair ,s)))
+
+;; Offer to create parent directories if they do not exist
+;; http://iqbalansari.github.io/blog/2014/12/07/automatically-create-parent-directories-on-visiting-a-new-file-in-emacs/
+(defun dotemacs-create-non-existent-directory ()
+  (let ((parent-directory (file-name-directory buffer-file-name)))
+    (when (and (not (file-exists-p parent-directory))
+               (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
+      (make-directory parent-directory t))))
 
 (provide 'init-files)
