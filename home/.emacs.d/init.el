@@ -3188,9 +3188,6 @@ Disable the highlighting of overlong lines."
 
 ;;; Version control
 
-;; Since I use Magit I don't need to use Emacs's native vc-mode:
-(delete 'Git vc-handled-backends)
-
 ;; TODO: Incorporate this code from `init-vcs`
 ;; original `init-vcs`
 ; (with-eval-after-load 'vc-git
@@ -3241,8 +3238,6 @@ Disable the highlighting of overlong lines."
              dotemacs-magit-dont-ignore-whitespace))
 
 ;; TODO: Incorporate this into `use-package magit` below
-; (setq magit-last-seen-setup-instructions "1.4.0")
-;
 ; (require 'magit)
 ; (with-eval-after-load 'magit
 ;
@@ -3520,9 +3515,42 @@ Disable the highlighting of overlong lines."
   :defer t
   :init
   (progn
-    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))
     ; (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$"))
-  ))
+    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))))
+
+
+;;; Project management with NeoTree
+
+; ignore directory patery "[\/]((assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins)|bower_components|components)|(\.(git|hg|svn|idea|sass-cache)))$"
+; ignore file pattern "(\.(#.+|DS_Store|svn|png|jpe?g|gif|elc|rbc|pyc|swp|psd|ai|pdf|mov|aep|dmg|zip|gz|bmp)|(Thumbs\.db))$"
+
+(use-package neotree
+  :ensure t
+  :defer t
+  :init
+  (after "projectile"
+         (setq projectile-switch-project-action #'neotree-projectile-action))
+  (setq neo-theme 'nerd
+        ; neo-show-hidden-files t
+        neo-vc-integration '(face)
+        ; neo-hidden-regexp-list '("^\\." "~$")
+        neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
+        neo-window-width 35)
+  :config
+  (progn
+    (when neo-persist-show
+      (add-hook 'popwin:before-popup-hook
+                (lambda () (setq neo-persist-show nil)))
+      (add-hook 'popwin:after-popup-hook
+                (lambda () (setq neo-persist-show t))))
+
+    (add-hook 'neotree-mode-hook
+              (lambda ()
+                ; (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+                ; (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+                ; (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+                ; (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+                ))))
 
 
 ;;; Perspective
