@@ -1,6 +1,4 @@
 ;; TODO to be deleted
-;; Show the modifier combinations I just typed almost immediately:
-(setq echo-keystrokes 0.1)
 
 ;; Real emacs knights don't use shift to mark things
 (setq shift-select-mode nil)

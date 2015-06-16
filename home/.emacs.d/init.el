@@ -599,6 +599,9 @@ mouse-3: go to end"))))
 ;;; Minibuffer and Helm
 (setq history-length 1000)              ; Store more history
 
+;; Show the modifier combinations I just typed almost immediately:
+(setq echo-keystrokes 0.1)
+
 (use-package savehist                   ; Save minibuffer history
   :init (savehist-mode t)
   :config (setq savehist-save-minibuffer-history t
@@ -1568,6 +1571,44 @@ Disable the highlighting of overlong lines."
   :ensure t
   :if (eq dotemacs-completion-engine 'auto-complete)
   :diminish auto-complete-mode)
+
+(use-package init-yasnippet
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-load-yasnippet
+             dotemacs-force-yasnippet-off))
+
+;; TODO: Incorporate this into `use-package yasnippet` below
+;; original `init-yasnippet`
+; (let* ((yas-install-dir (car (file-expand-wildcards (concat package-user-dir "/yasnippet-*"))))
+;        (dir (concat yas-install-dir "/snippets/js-mode")))
+;   (if (file-exists-p dir)
+;       (delete-directory dir t)))
+;
+; (setq yas-fallback-behavior 'return-nil)
+; (setq yas-also-auto-indent-first-line t)
+; (setq yas-prompt-functions '(yas/ido-prompt yas/completing-prompt))
+;
+; (yas-load-directory (concat user-emacs-directory "/snippets"))
+;; end origianl `init-yasnippet`
+
+(use-package yasnippet
+  :commands yas-global-mode
+  :disabled t
+  :ensure t
+  :init
+  (progn
+    ;; disable yas minor mode map, use hippie-expand instead
+    (setq yas-minor-mode-map (make-sparse-keymap)))
+    (dolist (mode '(js2 markdown html css org))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (dotemacs-load-yasnippet))))
+    (dolist (mode '(term shell))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (dotemacs-force-yasnippet-off))))
+  :diminish (yas-minor-mode " ⓨ" " y"))
 
 
 ;;; Spelling and syntax checking
@@ -2706,44 +2747,6 @@ Disable the highlighting of overlong lines."
 
 ;;; Web languages
 
-(use-package init-yasnippet
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-load-yasnippet
-             dotemacs-force-yasnippet-off))
-
-;; TODO: Incorporate this into `use-package yasnippet` below
-;; original `init-yasnippet`
-; (let* ((yas-install-dir (car (file-expand-wildcards (concat package-user-dir "/yasnippet-*"))))
-;        (dir (concat yas-install-dir "/snippets/js-mode")))
-;   (if (file-exists-p dir)
-;       (delete-directory dir t)))
-;
-; (setq yas-fallback-behavior 'return-nil)
-; (setq yas-also-auto-indent-first-line t)
-; (setq yas-prompt-functions '(yas/ido-prompt yas/completing-prompt))
-;
-; (yas-load-directory (concat user-emacs-directory "/snippets"))
-;; end origianl `init-yasnippet`
-
-(use-package yasnippet
-  :commands yas-global-mode
-  :disabled t
-  :ensure t
-  :init
-  (progn
-    ;; disable yas minor mode map, use hippie-expand instead
-    (setq yas-minor-mode-map (make-sparse-keymap)))
-    (dolist (mode '(js2 markdown html css org))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (dotemacs-load-yasnippet))))
-    (dolist (mode '(term shell))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (dotemacs-force-yasnippet-off))))
-  :diminish (yas-minor-mode " ⓨ" " y"))
-
 ;; TODO: Incorporate this into various `use-packages` below
 ;; original `init-web`
 ; (lazy-major-mode "\\.coffee\\'" coffee-mode)
@@ -3246,6 +3249,53 @@ Disable the highlighting of overlong lines."
                 helm-ag-source-type 'file-line))
 
 ;;; Project management with Projectile
+
+(use-package ido
+  :preface
+  :disable t
+  (progn
+    ;; `defvar's to prevent compile warnings
+    ;; https://github.com/DarwinAwardWinner/ido-ubiquitous/issues/68
+    (defvar ido-cur-item nil)
+    (defvar ido-default-item nil)
+    (defvar predicate nil)
+    (defvar inherit-input-method nil)
+    (defvar ido-cur-list nil)
+    (defvar ido-context-switch-command nil))
+  :init
+  (progn
+    (setq ido-enable-flex-matching t
+          ido-use-faces nil       ;; disable ido faces to see flx highlights.
+          ido-enable-prefix nil
+          ido-create-new-buffer 'always
+          ido-use-filename-at-point 'guess
+          ido-max-prospects 10
+          ido-save-directory-list-file (concat dotemacs-cache-directory "ido.hist")
+          ido-default-file-method 'selected-window
+          ido-everywhere t
+          ido-auto-merge-work-directories-length 0))
+  :config
+  (progn
+    (ido-mode 1)
+    (ido-everywhere 1)))
+
+(use-package flx-ido
+  :disable t
+  :defer t
+  :init
+  (progn
+    (setq flx-ido-use-faces 1)
+    (flx-ido-mode 1)))
+
+(use-package ido-ubiquitous
+  :disable t
+  :defer t
+  :preface
+  (progn
+    (defvar ido-ubiquitous-debug-mode nil))
+  :init (after "flx-ido"
+          (ido-ubiquitous-mode 1)))
+
 (use-package projectile
   :ensure t
   :init (projectile-global-mode)
