@@ -2914,6 +2914,18 @@ Disable the highlighting of overlong lines."
   :config
   (setq web-mode-markup-indent-offset 2))
 
+(use-package init-js
+  :load-path "config/"
+  :defer t
+  :commands(dotemacs-js-ctrl-c-ctrl-c
+            dotemacs-hide-test-functions
+            dotemacs-tab-properly
+            dotemacs-fetch-autolint-externs
+            dotemacs-js-jump-to
+            dotemacs-js-format-impl-name
+            dotemacs-js-format-test-name
+            dotemacs-js-jump-to-implementation-or-test))
+
 ;; TODO: Incorporate this into `use-package js2-mode` below
 ;; original `init-js`
 ; (require 'init-programming)
@@ -3411,7 +3423,7 @@ Disable the highlighting of overlong lines."
                 helm-ag-source-type 'file-line))
 
 
-;;; Project management with Projectile
+;;; Project management for Interactively Do Things (IDO)
 (use-package ido
   :preface
   :disabled t
@@ -3458,6 +3470,8 @@ Disable the highlighting of overlong lines."
   :init (after "flx-ido"
           (ido-ubiquitous-mode 1)))
 
+
+;;; Project management with Projectile
 (use-package projectile
   :ensure t
   :init (projectile-global-mode)
@@ -3497,6 +3511,18 @@ Disable the highlighting of overlong lines."
   (progn
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
     (setq projectile-switch-project-action #'helm-projectile)))
+
+
+;;; Project management with Project Explorer
+(use-package project-explorer
+  :disabled t
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))
+    ; (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$"))
+  ))
 
 
 ;;; Perspective
