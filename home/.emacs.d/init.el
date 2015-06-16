@@ -3245,10 +3245,26 @@ Disable the highlighting of overlong lines."
   :bind (([remap occur] . helm-occur)
          ("C-c e o"     . helm-multi-occur)))
 
+(use-package init-rgrep
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-rgrep-quit-window
+             dotemacs-rgrep-goto-file-and-close-rgrep))
+
 (use-package grep
   :defer t
   :config
   (progn
+    ;; Don't recurse into some directories
+    (add-to-list 'grep-find-ignored-directories "node_modules")
+    (add-to-list 'grep-find-ignored-directories "bower_components")
+    (add-to-list 'grep-find-ignored-directories "build")
+    (add-to-list 'grep-find-ignored-directories "vendor")
+
+    ;; Add custom keybindings
+    (define-key grep-mode-map "q" #'dotemacs-rgrep-quit-window)
+    (define-key grep-mode-map (kbd "C-<return>") #'dotemacs-rgrep-goto-file-and-close-rgrep)
+
     (when-let (gnu-find (and (eq system-type 'darwin)
                              (executable-find "gfind")))
       (setq find-program gnu-find))
@@ -3280,7 +3296,13 @@ Disable the highlighting of overlong lines."
 
 (use-package wgrep                      ; Edit grep/occur/ag results in-place
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (progn
+    ;; Add custom keybindings
+    (define-key grep-mode-map (kbd "C-x C-s") #'wgrep-save-all-buffers)
+    ;; Use same keybinding as occur
+    (setq wgrep-enable-key "e")))
 
 (use-package wgrep-ag                   ; Wgrep for ag
   :ensure t
