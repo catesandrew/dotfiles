@@ -4,8 +4,6 @@
   (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))
   (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$")))
 
-(setq etags-select-go-if-unambiguous t)
-
 (require 'windsize)
 (setq windsize-cols 16)
 (setq windsize-rows 8)

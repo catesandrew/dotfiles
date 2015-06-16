@@ -653,8 +653,8 @@ mouse-3: go to end"))))
 
 ;; When changing focus to the minibuffer, stop allowing point to move
 ;; over the prompt. Code taken from ergoemacs.
-(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
-(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'point-entered))
+; (setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
+; (setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'point-entered))
 
 (use-package savehist                   ; Save minibuffer history
   :init (savehist-mode t)
@@ -663,16 +663,15 @@ mouse-3: go to end"))))
                 savehist-additional-variables '(search ring regexp-search-ring)
                 savehist-autosave-interval 180))
 
-; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
-
-; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
-; can also enable Helm to manage the command buffer, which is pretty awesome
-; with: (helm-mode 1)
+;; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
+;;
+;; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
+;; can also enable Helm to manage the command buffer, which is pretty awesome
+;; with: (helm-mode 1)
 (use-package helm
   :ensure t
   :bind (("C-c b b" . helm-resume))
   :init (progn (helm-mode 1)
-
                (after "helm-config"
                  (warn "`helm-config' loaded! Get rid of it ASAP!")))
   :config
