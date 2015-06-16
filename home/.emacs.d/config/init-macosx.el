@@ -44,4 +44,35 @@ Without FORMULA determine whether Homebrew itself is available."
   (interactive)
   (shell-command (concat "open " (buffer-file-name))))
 
+(defun dotemacs-copy-from-osx ()
+  "Copies the current clipboard content using the `pbcopy` command"
+  (shell-command-to-string "pbpaste"))
+
+(defun dotemacs-paste-to-osx (text &optional push)
+  "Copies the top of the kill ring stack to the OSX clipboard"
+  (let ((process-connection-type nil))
+    (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+      (process-send-string proc text)
+      (process-send-eof proc))))
+
+;; Get keychain password
+
+;; If I'm on OS X, I can fetch passwords etc. from my Keychain. This
+;; is much more secure than storing them in configuration on disk:
+
+(defun dotemacs-chomp (str)
+  "Chomp leading and tailing whitespace from `str'."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
+    (setq str (replace-match "" t t str))) str)
+
+(defun dotemacs-get-keychain-password (account-name)
+  "Get `account-name' keychain password from OS X Keychain"
+  (interactive "sAccount name: ")
+  (when (executable-find "security")
+    (dotemacs-chomp
+     (shell-command-to-string
+      (concat
+       "security find-generic-password -wa "
+       account-name)))))
+
 (provide 'init-macosx)

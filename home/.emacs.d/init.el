@@ -166,7 +166,7 @@ NOERROR and NOMESSAGE are passed to `load'."
 ;;; Initialization
 (when (version< emacs-version "25")
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
-  (warn "brew install emacs --HEAD --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
 
 ;; And disable the site default settings
 (setq inhibit-default-init t)
@@ -391,10 +391,33 @@ FEATURE may be a named feature or a file name, see
   :if (eq system-type 'darwin)
   :load-path "config/"
   :defer t
+  :commands (dotemacs-id-of-bundle
+             dotemacs-path-of-bundle
+             dotemacs-homebrew-prefix
+             dotemacs-homebrew-installed-p
+             dotemacs-open-current-file
+             dotemacs-copy-from-osx
+             dotemacs-paste-to-osx
+             dotemacs-chomp
+             dotemacs-get-keychain-password)
+  :init
+  (progn
+    ;; Using this configuration, Emacs runs best in iTerm2.
+
+    ;; On the desktop, Emacs integrates with the OS X clipboard, so kill
+    ;; etc. copy to the clipboard, and yank copies from the clipboard.
+
+    ;; Obviously this doesn’t work in the terminal, so we need to use the
+    ;; interprogram-(cut|paste)-function variables to copy/paste. Most of
+    ;; this code gotten from this blog comment.
+    (unless (display-graphic-p)
+      (setq interprogram-cut-function 'dotemacs-paste-to-osx)
+      (setq interprogram-paste-function 'dotemacs-copy-from-osx)))
   :config
-  ;; Ignore .DS_Store files with ido mode
-  (add-to-list 'ido-ignore-files "\\.DS_Store")
-  :bind ("C-c C-S-o" . dotemacs-mac-open-current-file))
+  (progn
+    ;; Ignore .DS_Store files with ido mode
+    (add-to-list 'ido-ignore-files "\\.DS_Store"))
+  :bind ("C-c f o" . dotemacs-open-current-file))
 
 (use-package osx-trash                  ; Trash support for OS X
   :if (eq system-type 'darwin)
@@ -413,6 +436,13 @@ FEATURE may be a named feature or a file name, see
   (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
+
+;; Just don’t show them. Use native Emacs controls:
+(setq use-dialog-box nil)
+
+;; On modern operating systems, a vertical bar is used as a cursor:
+;; TODO: With evil mode, use bar for INSERT mode
+; (setq-default cursor-type 'bar)
 
 ;; No blinking and beeping, no startup screen, no scratch message and short
 ;; Yes/No questions.
@@ -621,6 +651,11 @@ mouse-3: go to end"))))
 ;; Show the modifier combinations I just typed almost immediately:
 (setq echo-keystrokes 0.1)
 
+;; When changing focus to the minibuffer, stop allowing point to move
+;; over the prompt. Code taken from ergoemacs.
+(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
+(setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'point-entered))
+
 (use-package savehist                   ; Save minibuffer history
   :init (savehist-mode t)
   :config (setq savehist-save-minibuffer-history t
@@ -700,11 +735,16 @@ mouse-3: go to end"))))
 
 (use-package frame
   :bind (("C-c t F" . toggle-frame-fullscreen))
-  :init (progn
-          ;; Kill `suspend-frame'
-          (global-set-key (kbd "C-z") nil)
-          (global-set-key (kbd "C-x C-z") nil))
-  :config (add-to-list 'initial-frame-alist '(height . 72) '(width . 140))) ; '(fullscreen . maximized)
+  :init
+  (progn
+    ;; Kill `suspend-frame'
+    (global-set-key (kbd "C-z") nil)
+    (global-set-key (kbd "C-x C-z") nil))
+  :config
+  (progn
+    ; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+    (add-to-list 'initial-frame-alist '(width . 140))
+    (add-to-list 'initial-frame-alist '(height . 72))))
 
 (use-package init-buffers          ; Personal buffer tools
   :load-path "config/"
@@ -838,6 +878,11 @@ mouse-3: go to end"))))
   :ensure t
   :bind (("C-c t R" . writeroom-mode)))
 
+(setq editorconfig-packages '(editorconfig))
+(use-package editorconfig
+  :defer t
+  :ensure t
+  :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
 
 
 ;;; File handling
@@ -3132,6 +3177,9 @@ Disable the highlighting of overlong lines."
 
 ;;; Version control
 
+;; Since I use Magit I don't need to use Emacs's native vc-mode:
+(delete 'Git vc-handled-backends)
+
 ;; TODO: Incorporate this code from `init-vcs`
 ;; original `init-vcs`
 ; (with-eval-after-load 'vc-git
@@ -3333,8 +3381,10 @@ Disable the highlighting of overlong lines."
          ("C-c a k" . ag-kill-other-buffers)
          ("C-c a K" . ag-kill-buffers))
   :config
+  ; (add-hook 'ag-mode-hook (lambda () (toggle-truncate-lines t)))
   (setq ag-reuse-buffers t            ; Don't spam buffer list with ag buffers
         ag-highlight-search t         ; A little fanciness
+
         ;; Use Projectile to find the project root
         ag-project-root-function (lambda (d) (let ((default-directory d))
                                                (projectile-project-root)))))
