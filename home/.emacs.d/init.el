@@ -1127,7 +1127,7 @@ mouse-3: go to end"))))
 (setq indicate-empty-lines t
       require-final-newline t)
 
-;; Globally don't break lines for me, please
+;; Globally on't break lines for me, please
 ; (setq-default truncate-lines t)
 
 (setq kill-ring-max 200                 ; More killed items
@@ -2110,9 +2110,6 @@ Disable the highlighting of overlong lines."
       (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
                 (lambda ()
                   (global-color-identifiers-mode))))))
-
-;; enlist a more liberal guru
-; (setq guru-warn-only t)
 
 (use-package init-programming
   :load-path "config/"
