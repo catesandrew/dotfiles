@@ -689,6 +689,13 @@ mouse-3: go to end"))))
             helm-imenu-fuzzy-match t
             helm-lisp-fuzzy-completion t)
 
+      ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
+      ;; brew tap homebrew/dupes
+      ;; brew install homebrew/dupes/grep
+      (when-let (gnu-grep (and (eq system-type 'darwin)
+                             (executable-find "ggrep")))
+      (setq helm-grep-default gnu-grep))
+
       (use-package helm-swoop
         :ensure t
         :defer t
