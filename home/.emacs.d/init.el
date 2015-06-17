@@ -3572,6 +3572,34 @@ Disable the highlighting of overlong lines."
   (progn
     ;; Remove dead projects when Emacs is idle
     (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+    (setq projectile-project-root-files '(
+            ; "rebar.config"       ; Rebar project file
+            "project.clj"        ; Leiningen project file
+            ; "SConstruct"         ; Scons project file
+            "pom.xml"            ; Maven project file
+            ; "build.sbt"          ; SBT project file
+            ; "build.gradle"       ; Gradle project file
+            "Gemfile"            ; Bundler file
+            ; "requirements.txt"   ; Pip file
+            ; "setup.py"           ; Setuptools file
+            ; "tox.ini"            ; Tox file
+            "package.json"       ; npm package file
+            "gulpfile.js"        ; Gulp build file
+            "Gruntfile.js"       ; Grunt project file
+            "bower.json"         ; Bower project file
+            "composer.json"      ; Composer project file
+            "Cargo.toml"         ; Cargo project file
+            ; "mix.exs"            ; Elixir mix project file
+            ))
+
+    (setq projectile-project-root-files-bottom-up '(
+            ".projectile" ; projectile project marker
+            ".git"        ; Git VCS root dir
+            ".hg"         ; Mercurial VCS root dir
+            ; ".fslckout"   ; Fossil VCS root dir
+            ; ".bzr"        ; Bazaar VCS root dir
+            ; "_darcs"      ; Darcs VCS root dir
+            ))
 
     (setq projectile-globally-ignored-files
           '("TAGS"
