@@ -3349,16 +3349,81 @@ Disable the highlighting of overlong lines."
   :config
   (progn
 
-    ;; Don't recurse into some directories
-    (add-to-list 'grep-find-ignored-directories "node_modules")
-    (add-to-list 'grep-find-ignored-directories "build")
-    (add-to-list 'grep-find-ignored-directories "vendor")
-    (add-to-list 'grep-find-ignored-directories "elpa")
-    (add-to-list 'grep-find-ignored-directories ".git")
-    (add-to-list 'grep-find-ignored-directories ".hg")
-    (add-to-list 'grep-find-ignored-directories ".svn")
-    (add-to-list 'grep-find-ignored-directories ".idea")
-    (add-to-list 'grep-find-ignored-directories ".sass-cache")
+    (setq grep-find-ignored-files
+          '("Thumbs.db"
+            ".DS_Store"
+            ".#*"
+            "*.o"
+            "*~"
+            "*.pyc"
+            "*.pyo"
+            "*.png"
+            "*.odg"
+            "*.jpe?g"
+            "*.gif"
+            "*.rbc"
+            "*.swp"
+            "*.psd"
+            "*.ai"
+            "*.pdf"
+            "*.mov"
+            "*.aep"
+            "*.dmg"
+            "*.zip"
+            "*.gz"
+            "*.bmp"
+            "*.dxl"
+            "*.lo"
+            "*.la"
+            "*.gmo"
+            "*.mo"
+            "*.toc"
+            "*.aux"
+            "*.cp"
+            "*.fn"
+            "*.ky"
+            "*.bin"
+            "*.lbin"
+            "*.so"
+            "*.a"
+            "*.ln"
+            "*.blg"
+            "*.bbl"
+            "*.elc"
+            "*.lof"
+            "*.glo"
+            "*.idx"
+            "*.fmt"
+            "*.class"
+            "*.lib"
+            "*.fsl"
+            ))
+
+    (setq grep-find-ignored-directories
+          '("CVS"
+          ; ".svn"
+          ; ".hg"
+          ; "_darcs"
+          ; ".git"
+          ; ".idea"
+          ; ".hg"
+          ; ".bzr"
+          "elpa"
+          "/assets"
+          "/node_modules"
+          "/build"
+          "/tmp"
+          "/log"
+          "/vendor/rails"
+          "/vendor/gems"
+          "/vendor/plugins"
+          "/bower_components"
+          "/components"
+          "/.git"
+          "/.hg"
+          "/.svn"
+          "/.idea"
+          "/.sass-cache"))
 
     ;; Add custom keybindings
     (define-key grep-mode-map "q" #'dotemacs-rgrep-quit-window)
@@ -3467,6 +3532,39 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Project management with Projectile
+
+;; To ignore files for grepping with `helm-projectile-grep/ack`, you must
+;; customize either one of these four variables:
+;; - `grep-find-ignored-files`: List of file names which rgrep and lgrep
+;;   shall exclude. helm-projectile-grep also uses this variable.
+;; - `grep-find-ignored-directories`: List of names of sub-directories which
+;;   rgrep shall not recurse into. helm-projectile-grep also uses this
+;;   variable.
+;; - `projectile-globally-ignored-files`: A list of files globally ignored by
+;;   Projectile.
+;; - `projectile-globally-ignored-directories`: A list of directories
+;;   globally ignored by Projectile.
+;;
+;; You can add to this to your `init.el`:
+;;
+;; ```
+;; (add-to-list 'projectile-globally-ignored-files "*.png")
+;; ```
+;;
+;; Add more if you want.
+;;
+;; Alternatively, `C-h v` then type `projectile-globally-ignored-files`. In the
+;; customization window, press `INS` button and add "*.png", then press `State`
+;; button and choose `Save for future session`.
+;;
+;; You can read [the guide][1] for `helm-projectile-grep/ack/ag`
+;;
+;; **EDIT**: Don't put it in `.projectile` files or your files won't be ignored when grepping.
+;;
+;; my ignore directory pattern "[\/]((assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins)|bower_components|components)|(\.(git|hg|svn|idea|sass-cache)))$"
+;; my ignore file pattern "(\.(#.+|DS_Store|svn|png|jpe?g|gif|elc|rbc|pyc|swp|psd|ai|pdf|mov|aep|dmg|zip|gz|bmp)|(Thumbs\.db))$"
+;;
+;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
   :init (projectile-global-mode)
@@ -3475,17 +3573,91 @@ Disable the highlighting of overlong lines."
     ;; Remove dead projects when Emacs is idle
     (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
 
-    (add-to-list 'projectile-globally-ignored-directories "elpa")
-    (add-to-list 'projectile-globally-ignored-directories "node_modules")
-    (add-to-list 'projectile-globally-ignored-directories ".cache")
-    (add-to-list 'projectile-globally-ignored-directories "build")
-    (add-to-list 'projectile-globally-ignored-directories "vendor")
-    (add-to-list 'projectile-globally-ignored-directories ".cask")
-    (add-to-list 'projectile-globally-ignored-directories ".git")
-    (add-to-list 'projectile-globally-ignored-directories ".hg")
-    (add-to-list 'projectile-globally-ignored-directories ".svn")
-    (add-to-list 'projectile-globally-ignored-directories ".idea")
-    (add-to-list 'projectile-globally-ignored-directories ".sass-cache")
+    (setq projectile-globally-ignored-files
+          '("TAGS"
+            "GRTAGS"
+            "GTAGS"
+            "GPATH"
+            "Thumbs.db"
+            ".DS_Store"
+            ".#*"
+            "*.o"
+            "*~"
+            "*.pyc"
+            "*.pyo"
+            "*.png"
+            "*.odg"
+            "*.jpe?g"
+            "*.gif"
+            "*.rbc"
+            "*.swp"
+            "*.psd"
+            "*.ai"
+            "*.pdf"
+            "*.mov"
+            "*.aep"
+            "*.dmg"
+            "*.zip"
+            "*.gz"
+            "*.bmp"
+            "*.dxl"
+            "*.lo"
+            "*.la"
+            "*.gmo"
+            "*.mo"
+            "*.toc"
+            "*.aux"
+            "*.cp"
+            "*.fn"
+            "*.ky"
+            "*.bin"
+            "*.lbin"
+            "*.so"
+            "*.a"
+            "*.ln"
+            "*.blg"
+            "*.bbl"
+            "*.elc"
+            "*.lof"
+            "*.glo"
+            "*.idx"
+            "*.fmt"
+            "*.class"
+            "*.lib"
+            "*.fsl"))
+
+    (setq projectile-globally-ignored-file-suffixes
+          '("class"
+            "elc"))
+
+    (setq projectile-globally-ignored-directories
+          '("CVS"
+            ;".idea"
+            ; ".eunit"
+            ; ".git"
+            ; ".hg"
+            ; ".fslckout"
+            ; ".bzr"
+            ; "_darcs"
+            ; ".tox"
+            ; ".svn"
+            "elpa"
+            "/assets"
+            "/node_modules"
+            "/build"
+            "/tmp"
+            "/log"
+            "/vendor/rails"
+            "/vendor/gems"
+            "/vendor/plugins"
+            "/bower_components"
+            "/components"
+            "/.git"
+            "/.hg"
+            "/.cache"
+            "/.svn"
+            "/.idea"
+            "/.sass-cache"))
 
     (setq projectile-completion-system 'helm
           projectile-cache-file (concat dotemacs-cache-directory "projectile.cache")
@@ -3520,9 +3692,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Project management with NeoTree
-
-; ignore directory patery "[\/]((assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins)|bower_components|components)|(\.(git|hg|svn|idea|sass-cache)))$"
-; ignore file pattern "(\.(#.+|DS_Store|svn|png|jpe?g|gif|elc|rbc|pyc|swp|psd|ai|pdf|mov|aep|dmg|zip|gz|bmp)|(Thumbs\.db))$"
 
 (use-package neotree
   :ensure t
