@@ -3486,6 +3486,9 @@ Disable the highlighting of overlong lines."
   :bind (("C-c a a" . helm-do-ag)
          ("C-c a A" . helm-ag))
   :config (setq helm-ag-fuzzy-match t
+                helm-ag-use-grep-ignore-list t ;; Use `grep-find-ignored-files'
+                                               ;; and `grep-find-ignored-directories'
+                                               ;; as ignore pattern
                 helm-ag-insert-at-point 'symbol
                 helm-ag-source-type 'file-line))
 
