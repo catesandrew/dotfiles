@@ -219,6 +219,9 @@ FEATURE may be a named feature or a file name, see
     `(eval-after-load ,file
        `(funcall (function ,(lambda () ,@body))))))
 
+;; Disable case insensitivity for filename autocompletion in shell-mode
+(setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
+
 (use-package init-util              ; Personal OS X tools
   :load-path "config/"
   :defer t
@@ -245,9 +248,6 @@ FEATURE may be a named feature or a file name, see
 
 
 ;;; Setup environment variables from the user's shell.
-
-;; Disable case insensitivity for filename autocompletion in shell-mode
-(setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
 
 (use-package exec-path-from-shell
   :ensure t
