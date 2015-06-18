@@ -171,6 +171,10 @@ NOERROR and NOMESSAGE are passed to `load'."
 ;; And disable the site default settings
 (setq inhibit-default-init t)
 
+;; start scratch in text mode (usefull to get a faster Emacs load time
+;; because it avoids autoloads of elisp modes)
+(setq initial-major-mode 'text-mode)
+
 ;; Warn if the current build is more than a week old
 (run-with-idle-timer
  2 nil
