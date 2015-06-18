@@ -56,9 +56,9 @@
   "The erc nickname to use"
   :group 'dotemacs)
 
-(defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
-  "The storage location lisp."
-  :group 'dotemacs)
+; (defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
+;   "The storage location lisp."
+;   :group 'dotemacs)
 
 (defcustom dotemacs-config-dir (expand-file-name "config" user-emacs-directory)
   "The config location lisp."
@@ -108,15 +108,15 @@ NOERROR and NOMESSAGE are passed to `load'."
 
 ;; Set up load path(s)
 (add-to-list 'load-path dotemacs-config-dir)
-(add-to-list 'load-path dotemacs-elisp-dir)
+; (add-to-list 'load-path dotemacs-elisp-dir)
 (add-to-list 'load-path dotemacs-user-settings-dir)
 
-;; Add external projects to load path
-(let ((base dotemacs-elisp-dir))
-  (add-to-list 'load-path base)
-  (dolist (dir (directory-files base t "^[^.]"))
-    (when (file-directory-p dir)
-      (add-to-list 'load-path dir))))
+; ;; Add external projects to load path
+; (let ((base dotemacs-elisp-dir))
+;   (add-to-list 'load-path base)
+;   (dolist (dir (directory-files base t "^[^.]"))
+;     (when (file-directory-p dir)
+;       (add-to-list 'load-path dir))))
 
 
 
