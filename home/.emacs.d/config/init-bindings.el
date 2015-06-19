@@ -36,83 +36,9 @@
 
 
 
-
-
-
 (with-eval-after-load 'evil
   ; In order to define an use a <leader> prefix for your personal shortcuts
   (with-eval-after-load 'evil-leader
-    (evil-leader/set-key
-      "w" 'save-buffer
-      "e" 'eval-last-sexp
-      ", e" 'eval-defun
-      "E" 'eval-defun
-      "c" 'my-new-eshell-split
-      "C" 'customize-group
-      "b d" 'kill-this-buffer
-      "b p" 'previous-buffer
-      "b n" 'next-buffer
-      "V" (bind (term "vim"))
-      "h" help-map
-      "h h" 'help-for-help-internal
-      "SPC" 'lazy-highlight-cleanup
-      "SPC" 'evil-search-highlight-persist-remove-all
-      "f" 'end-of-defun            ; <leader>f/F end/start of function
-      "F" 'beginning-of-defun
-      "gof" 'open-explorer-path    ; open explorer window of buffer path
-      ; "tn" 'elscreen-create        ; <leader>tn create new tab
-      ; "tc" 'elscreen-kill          ; <leader>tc close tab
-      "p b" 'projectile-switch-to-buffer
-      "p D" 'projectile-dired
-      "p d" 'projectile-find-dir
-      "p j" 'projectile-find-tag
-      "p k" 'projectile-kill-buffers
-      "p R" 'projectile-regenerate-tags
-      "p r" 'helm-projectile-recentf
-      "p s" 'helm-projectile-switch-project
-      ; "cv" 'delete-other-windows   ; <leader>cv to close other splits
-      ; "im" 'helm-imenu             ; shows functions
-      ; "co" 'evilnc-comment-or-uncomment-lines ; nerd commenter
-      ; "m" 'emmet-expand-line ; emmet
-      "=" (lambda(begin end)        ; <leader>= align selection lines by "="
-                              (interactive "r")
-                              (align-regexp begin end "\\(\\s-*\\)=" 1 1 ))
-      "v" (lambda () (interactive)
-                              (split-window-horizontally)
-                              (evil-window-right 1))
-      "p" (lambda()                 ; paste on a new line below current
-                              (interactive)
-                              (evil-open-below 1)
-                              (evil-paste-after 1)
-                              (evil-normal-state))
-      "P" (lambda()                 ; paste on a new line below current
-                              (interactive)
-                              (evil-open-above 1)
-                              (evil-previous-visual-line 1)
-                              (evil-paste-after 1)
-                              (evil-normal-state))
-      "n" (lambda() ; open project explorer
-                              (interactive)
-                              (project-explorer-open)
-                              )
-      "N" (lambda() ; toggle project explorer
-                              (interactive)
-                              (project-explorer-toggle)
-                              )
-      "o" (lambda () ; <leader>o open line below
-                              (interactive)
-                              (evil-open-below 1)
-                              (evil-normal-state))
-      "O" (lambda () ; <leader>o open line below
-                              (interactive)
-                              (evil-open-above 1)
-                              (evil-normal-state)))
-
-
-    ; (with-eval-after-load "flycheck-autoloads"
-    ;   (evil-leader/set-key "ea" 'flycheck-list-errors)
-    ;   (evil-leader/set-key "en" 'flycheck-next-error))
-
     (with-eval-after-load "magit-autoloads"
       ;; Set the initial evil state that certain major modes will be in.
       (evil-set-initial-state 'magit-log-edit-mode 'emacs)
@@ -121,10 +47,6 @@
         "g b" 'magit-blame-mode
         "g c" 'magit-commit
         "g l" 'magit-log)))
-
-  (with-eval-after-load "evil-numbers-autoloads"
-    (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
-    (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/dec-at-pt))
 
   (with-eval-after-load "git-gutter+-autoloads"
     (define-key evil-normal-state-map (kbd "[ h") 'git-gutter+-previous-hunk)
@@ -155,32 +77,15 @@
       (define-key evil-normal-state-map (kbd "SPC l") 'helm-swoop)
       (define-key evil-normal-state-map (kbd "SPC L") 'helm-multi-swoop)))
 
-  ; c-k/c-j for page down/up
-
-  ; One thing that surprised me considering how complete Evil is, is the lack
-  ; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
-  ; pretty important in Emacs (it's the shortcut to give a numeric parameter to
-  ; other commands). I've in fact these mapped on my .vimrc to c-k/c-j
-  ; (because I think they're more consistent with Vim's j/k movement keys) so
-  ; that's how I mapped them in Emacs:
-
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
 
   (define-key evil-normal-state-map (kbd "[ SPC") (bind (evil-insert-newline-above) (forward-line)))
   (define-key evil-normal-state-map (kbd "] SPC") (bind (evil-insert-newline-below) (forward-line -1)))
-  (define-key evil-normal-state-map (kbd "[ e") (kbd "ddkP"))
-  (define-key evil-normal-state-map (kbd "] e") (kbd "ddp"))
   (define-key evil-normal-state-map (kbd "[ b") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "] b") 'next-buffer)
   (define-key evil-normal-state-map (kbd "[ q") 'previous-error)
   (define-key evil-normal-state-map (kbd "] q") 'next-error)
 
   (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
-
-  (after "evil-nerd-commenter-autoloads"
-    (define-key evil-normal-state-map "gc" 'evilnc-comment-operator)
-    (define-key evil-visual-state-map "gc" 'evilnc-comment-operator))
 
   (with-eval-after-load "etags-select-autoloads"
     (define-key evil-normal-state-map (kbd "g ]") 'etags-select-find-tag-at-point))
@@ -206,40 +111,6 @@
   (with-eval-after-load "elisp-slime-nav-autoloads"
     (evil-define-key 'normal emacs-lisp-mode-map (kbd "g d") 'elisp-slime-nav-find-elisp-thing-at-point))
 
-  ;; Project Explorer
-  (with-eval-after-load 'project-explorer
-    (evil-set-initial-state 'project-explorer-mode 'normal)
-    (evil-define-key 'normal project-explorer-mode-map
-        (kbd "+") 'pe/create-file
-        (kbd "-") 'pe/delete-file
-        (kbd "x") 'pe/fold
-        (kbd "u") 'pe/up-element
-        (kbd "a") 'pe/goto-top
-        (kbd "TAB") 'pe/tab
-        (kbd "<backtab>") 'pe/backtab
-        (kbd "J") 'pe/forward-element
-        (kbd "K") 'pe/backward-element
-        (kbd "]") 'pe/forward-element
-        (kbd "[") 'pe/backward-element
-        (kbd "n") 'next-line
-        (kbd "p") 'previous-line
-        (kbd "j") 'next-line
-        (kbd "k") 'previous-line
-        (kbd "l") 'forward-char
-        (kbd "h") 'backward-char
-        (kbd "RET") 'pe/return
-        (kbd "q") 'pe/quit
-        [escape] 'pe/quit
-        (kbd "s") 'pe/change-directory
-        (kbd "r") 'pe/rename-file
-        (kbd "c") 'pe/copy-file
-        (kbd "f") 'pe/find-file
-        (kbd "w") 'pe/copy-file-name-as-kill
-        (kbd "M-l") 'pe/set-filter-regex
-        (kbd "M-o") 'pe/toggle-omit
-    )
-  )
-
   ;; Evil Tabs
   ; (with-eval-after-load 'evil-tabs
   ;   (evil-define-key 'normal evil-tabs-mode-map
@@ -249,10 +120,6 @@
   ;     (kbd "M-w") 'elscreen-kill
   ;   )
   ; )
-
-  (with-eval-after-load 'coffee-mode
-    (evil-define-key 'visual coffee-mode-map (kbd ", p") 'coffee-compile-region)
-    (evil-define-key 'normal coffee-mode-map (kbd ", p") 'coffee-compile-buffer))
 
   (with-eval-after-load 'stylus-mode
     (define-key stylus-mode-map [remap eval-last-sexp] 'dotemacs-stylus-compile-and-eval-buffer)
@@ -278,20 +145,8 @@
       (define-key evil-normal-state-map (kbd "SPC e") 'helm-projectile-recentf)
       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)))
 
-  (with-eval-after-load "multiple-cursors-autoloads"
-    (with-eval-after-load 'js2-mode
-      (evil-define-key 'normal js2-mode-map (kbd "g r") 'js2r-rename-var))
-    (define-key evil-normal-state-map (kbd "g r") 'mc/mark-all-like-this-dwim))
 
-  (after "avy-autoloads"
-    (define-key evil-operator-state-map (kbd "z") 'avy-goto-char-2)
-    (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)
-    (define-key evil-motion-state-map (kbd "S-SPC") 'avy-goto-line))
-
-  ;; butter fingers
-  (evil-ex-define-cmd "Q" 'evil-quit)
-  (evil-ex-define-cmd "Qa" 'evil-quit-all)
-  (evil-ex-define-cmd "QA" 'evil-quit-all))
+  )
 
 ;; escape minibuffer
 (define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
@@ -306,21 +161,6 @@
   (global-set-key (kbd "C-x g") 'magit-status)
   (define-key magit-status-mode-map (kbd "C-n") 'magit-goto-next-sibling-section)
   (define-key magit-status-mode-map (kbd "C-p") 'magit-goto-previous-sibling-section))
-
-
-;; Project Explorer
-(with-eval-after-load "project-explorer-autoloads"
-  (autoload 'pe/show-file "project-explorer")
-  (global-set-key [f3] 'pe/show-file)
-  (with-eval-after-load 'project-explorer
-    (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)))
-
-
-(with-eval-after-load "multiple-cursors-autoloads"
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-unset-key (kbd "M-<down-mouse-1>"))
-  (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click))
 
 
 (with-eval-after-load 'comint
@@ -343,16 +183,6 @@
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
 
 
-(with-eval-after-load 'web-mode
-  (with-eval-after-load "angular-snippets-autoloads"
-    (define-key web-mode-map (kbd "C-c C-d") 'ng-snip-show-docs-at-point)))
-
-;; mouse scrolling in terminal
-(unless (display-graphic-p)
-  (global-set-key [mouse-4] (bind (scroll-down 1)))
-  (global-set-key [mouse-5] (bind (scroll-up 1))))
-
-
 (with-eval-after-load "helm-autoloads"
   (global-set-key (kbd "M-x") 'helm-M-x)
   (global-set-key (kbd "C-x C-m") 'helm-M-x)
@@ -362,7 +192,6 @@
   (add-hook 'eshell-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c h") #'helm-eshell-history))))
-
 
 (with-eval-after-load 'help-mode
   (define-key help-mode-map (kbd "n") 'next-line)
@@ -398,14 +227,8 @@
 ;; have no use for these default bindings
 (global-unset-key (kbd "C-x m"))
 
-
 ;; replace with [r]eally [q]uit
 (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c") (bind (message "Thou shall not quit!")))
-(with-eval-after-load 'evil
-  (defadvice evil-quit (around advice-for-evil-quit activate)
-    (message "Thou shall not quit!"))
-  (defadvice evil-quit-all (around advice-for-evil-quit-all activate)
-    (message "Thou shall not quit!")))
 
 (provide 'init-bindings)

@@ -134,7 +134,7 @@ can be toggled through `toggle-transparency'."
   :group 'dotemacs
 
 (defcustom dotemacs-fullscreen-use-non-native nil
-  "If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen. Use
+  "If non nil `dotemacs-toggle-fullscreen' will not use native fullscreen. Use
 to disable fullscreen animations in OSX."
   :group 'dotemacs)
 
@@ -732,8 +732,8 @@ mouse-3: go to end"))))
 ;; Allow recursive minibuffers
 (setq enable-recursive-minibuffers t)
 
-;; Show the modifier combinations I just typed almost immediately:
-(setq echo-keystrokes 0.1)
+;; Display current keystrokes almost immediately in mini buffer
+(setq echo-keystrokes 0.2)
 
 ;; When changing focus to the minibuffer, stop allowing point to move
 ;; over the prompt. Code taken from ergoemacs.
@@ -933,6 +933,7 @@ mouse-3: go to end"))))
          ("S-<up>"    . windmove-up)
          ("S-<down>"  . windmove-down)))
 
+; activate winner mode use to undo and redo windows layout
 (use-package winner                     ; Undo and redo window configurations
   :init (winner-mode))
 
@@ -1227,7 +1228,12 @@ mouse-3: go to end"))))
   :ensure avy
   :bind (("C-c j s" . avy-isearch)
          ("C-c j j" . avy-goto-char-2)
-         ("C-c j w" . avy-goto-word-1)))
+         ("C-c j w" . avy-goto-word-1))
+  :init (after "evil"
+    ; (define-key evil-operator-state-map (kbd "z") 'avy-goto-char-2)
+    ; (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)
+    ; (define-key evil-motion-state-map (kbd "S-SPC") 'avy-goto-line)
+    ))
 
 (use-package ace-link                   ; Fast link jumping
   :ensure t
@@ -2298,6 +2304,10 @@ Disable the highlighting of overlong lines."
              dotemacs-prog-mode-defaults)
   :init
   (progn
+    ;; Highlight and allow to open http link at point in programming buffers
+    ;; goto-address-prog-mode only highlights links in strings and comments
+    (add-hook 'prog-mode-hook 'goto-address-prog-mode)
+
     (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
     (add-hook 'prog-mode-hook
               (lambda ()
@@ -3886,40 +3896,146 @@ Disable the highlighting of overlong lines."
 (use-package project-explorer
   :disabled t
   :ensure t
-  :defer t
   :init
   (progn
-    ; (setq pe/omit-regex (concat pe/omit-regex "\\|^node_modules$"))
-    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer"))))
+    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer")))
+  :config
+  (progn
+    (after "evil"
+      (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)
+      (evil-set-initial-state 'project-explorer-mode 'normal)
+      (evil-define-key 'normal project-explorer-mode-map
+        (kbd "+") 'pe/create-file
+        (kbd "-") 'pe/delete-file
+        (kbd "x") 'pe/fold
+        (kbd "u") 'pe/up-element
+        (kbd "a") 'pe/goto-top
+        (kbd "TAB") 'pe/tab
+        (kbd "<backtab>") 'pe/backtab
+        (kbd "J") 'pe/forward-element
+        (kbd "K") 'pe/backward-element
+        (kbd "]") 'pe/forward-element
+        (kbd "[") 'pe/backward-element
+        (kbd "n") 'next-line
+        (kbd "p") 'previous-line
+        (kbd "j") 'next-line
+        (kbd "k") 'previous-line
+        (kbd "l") 'forward-char
+        (kbd "h") 'backward-char
+        (kbd "RET") 'pe/return
+        (kbd "q") 'pe/quit
+        [escape] 'pe/quit
+        (kbd "s") 'pe/change-directory
+        (kbd "r") 'pe/rename-file
+        (kbd "c") 'pe/copy-file
+        (kbd "f") 'pe/find-file
+        (kbd "w") 'pe/copy-file-name-as-kill
+        (kbd "M-l") 'pe/set-filter-regex
+        (kbd "M-o") 'pe/toggle-omit))
+
+    (after "evil-leader"
+      (evil-leader/set-key
+        "ft" (lambda()
+              (interactive)
+              (project-explorer-open))
+        "fT" (lambda()
+              (interactive)
+              (project-explorer-toggle))))))
 
 
 ;;; Project management with NeoTree
-
 (use-package neotree
   :ensure t
   :defer t
+  :commands neo-global--window-exists-p
   :init
-  (after "projectile"
-         (setq projectile-switch-project-action #'neotree-projectile-action))
-  (setq neo-theme 'nerd
-        neo-vc-integration '(face)
-        neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
-        neo-window-width 35)
-  :config
   (progn
-    (when neo-persist-show
-      (add-hook 'popwin:before-popup-hook
-                (lambda () (setq neo-persist-show nil)))
-      (add-hook 'popwin:after-popup-hook
-                (lambda () (setq neo-persist-show t))))
+    (setq neo-window-width 32
+          neo-theme 'nerd
+          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
+          neo-create-file-auto-open t
+          neo-banner-message nil
+          neo-show-updir-line nil
+          neo-mode-line-type 'neotree
+          neo-smart-open t
+          neo-dont-be-alone t
+          neo-persist-show nil
+          neo-show-hidden-files t
+          neo-auto-indent-point t)
 
-    (add-hook 'neotree-mode-hook
-              (lambda ()
-                (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
-                (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
-                (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-                (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
-                ))))
+    (defun dotemacs-init-neotree ()
+      "Initialize the neotree mode.")
+
+    (defun dotemacs-neotree-expand-or-open ()
+      "Collapse a neotree node."
+      (interactive)
+      (let ((node (neo-buffer--get-filename-current-line)))
+        (when node
+          (if (file-directory-p node)
+              (progn
+                (neo-buffer--set-expand node t)
+                (neo-buffer--refresh t)
+                (when neo-auto-indent-point
+                  (next-line)
+                  (neo-point-auto-indent)))
+            (call-interactively 'neotree-enter)))))
+
+    (defun dotemacs-neotree-collapse ()
+      "Collapse a neotree node."
+      (interactive)
+      (let ((node (neo-buffer--get-filename-current-line)))
+        (when node
+          (when (file-directory-p node)
+            (neo-buffer--set-expand node nil)
+            (neo-buffer--refresh t))
+          (when neo-auto-indent-point
+            (neo-point-auto-indent)))))
+
+    (defun dotemacs-neotree-collapse-or-up ()
+      "Collapse an expanded directory node or go to the parent node."
+      (interactive)
+      (let ((node (neo-buffer--get-filename-current-line)))
+        (when node
+          (if (file-directory-p node)
+              (if (neo-buffer--expanded-node-p node)
+                  (dotemacs-neotree-collapse)
+                (neotree-select-up-node))
+            (neotree-select-up-node)))))
+
+    (defun neotree-find-project-root ()
+      (interactive)
+      (if (neo-global--window-exists-p)
+          (neotree-hide)
+        (neotree-find (projectile-project-root))))
+
+    (defun dotemacs-neotree-key-bindings ()
+      "Set the key bindings for a neotree buffer."
+      (define-key evil-motion-state-local-map (kbd "TAB") 'neotree-stretch-toggle)
+      (define-key evil-motion-state-local-map (kbd "RET") 'neotree-enter)
+      (define-key evil-motion-state-local-map (kbd "|")   'neotree-enter-vertical-split)
+      (define-key evil-motion-state-local-map (kbd "-")   'neotree-enter-horizontal-split)
+      (define-key evil-motion-state-local-map (kbd "?")   'evil-search-backward)
+      (define-key evil-motion-state-local-map (kbd "c")   'neotree-create-node)
+      (define-key evil-motion-state-local-map (kbd "d")   'neotree-delete-node)
+      (define-key evil-motion-state-local-map (kbd "g")   'neotree-refresh)
+      (define-key evil-motion-state-local-map (kbd "h")   'dotemacs-neotree-collapse-or-up)
+      (define-key evil-motion-state-local-map (kbd "H")   'neotree-select-previous-sibling-node)
+      (define-key evil-motion-state-local-map (kbd "J")   'neotree-select-down-node)
+      (define-key evil-motion-state-local-map (kbd "K")   'neotree-select-up-node)
+      (define-key evil-motion-state-local-map (kbd "l")   'dotemacs-neotree-expand-or-open)
+      (define-key evil-motion-state-local-map (kbd "L")   'neotree-select-next-sibling-node)
+      (define-key evil-motion-state-local-map (kbd "q")   'neotree-hide)
+      (define-key evil-motion-state-local-map (kbd "r")   'neotree-rename-node)
+      (define-key evil-motion-state-local-map (kbd "R")   'neotree-change-root)
+      (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
+
+    (evil-leader/set-key
+      "ft" 'neotree-toggle
+      "pt" 'neotree-find-project-root))
+
+  :config
+    (add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
+                                      dotemacs-neotree-key-bindings)))
 
 
 ;;; Perspective
@@ -4322,7 +4438,6 @@ Disable the highlighting of overlong lines."
 
 (bind-key "C-c h b" #'describe-personal-keybindings)
 
-
 (use-package guide-key-tip
   :ensure t
   :defer t
@@ -4460,6 +4575,16 @@ Disable the highlighting of overlong lines."
     (evil-mode 1))
   :config
   (progn
+    ; c-k/c-j for page down/up
+    ;
+    ; One thing that surprised me considering how complete Evil is, is the lack
+    ; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
+    ; pretty important in Emacs (it's the shortcut to give a numeric parameter to
+    ; other commands). I've in fact these mapped on my .vimrc to c-k/c-j
+    ; (because I think they're more consistent with Vim's j/k movement keys) so
+    ; that's how I mapped them in Emacs:
+    (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
+    (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
 
     ;; evil ex-command key
     (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
@@ -4484,6 +4609,16 @@ Disable the highlighting of overlong lines."
                          'evil-visual-paste-paste-micro-state)
       (ad-activate 'evil-visual-paste))
 
+    (defadvice evil-quit (around advice-for-evil-quit activate)
+      (message "Thou shall not quit!"))
+    (defadvice evil-quit-all (around advice-for-evil-quit-all activate)
+      (message "Thou shall not quit!"))
+
+    ;; butter fingers
+    (evil-ex-define-cmd "Q" 'evil-quit)
+    (evil-ex-define-cmd "Qa" 'evil-quit-all)
+    (evil-ex-define-cmd "QA" 'evil-quit-all)
+
     (defmacro evil-map (state key seq)
       "Map for a given STATE a KEY to a sequence SEQ of keys.
 
@@ -4507,8 +4642,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (define-key evil-normal-state-map
       (kbd "gd") 'dotemacs-evil-smart-goto-definition)
 
-
-      ;; define text objects
+    ;; define text objects
     (defmacro dotemacs-define-text-object (key name start end)
       (let ((inner-name (make-symbol (concat "evil-inner-" name)))
             (outer-name (make-symbol (concat "evil-outer-" name)))
@@ -4527,7 +4661,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
                              (cons ,start ,end)
                            ,start))
                    evil-surround-pairs-alist)))))
-
 
     (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
 
