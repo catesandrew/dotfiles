@@ -373,20 +373,9 @@
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
 
 
-; TODO removee this, but use as an example for BEFORE to AFTER
-; BEFORE
-; (with-eval-after-load "expand-region-autoloads"
-;   (global-set-key (kbd "C-=") 'er/expand-region))
-; AFTER
-; (use-package expand-region              ; Expand region by semantic units
-;   :ensure t
-;   :bind (("C-=" . er/expand-region)))
-
-
 (with-eval-after-load 'web-mode
   (with-eval-after-load "angular-snippets-autoloads"
     (define-key web-mode-map (kbd "C-c C-d") 'ng-snip-show-docs-at-point)))
-
 
 ;; mouse scrolling in terminal
 (unless (display-graphic-p)

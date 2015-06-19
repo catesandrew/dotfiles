@@ -68,6 +68,72 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
+(defcustom dotemacs-leader-key ","
+  "The leader key."
+  :group 'dotemacs)
+
+(defcustom dotemacs-emacs-leader-key "M-m"
+  "The leader key accessible in `emacs state' and `insert state'"
+  :group 'dotemacs)
+
+(defcustom dotemacs-major-mode-leader-key nil
+  "Major mode leader key is a shortcut key which is the equivalent of
+pressing `<leader> m`. Set it to `nil` to disable it."
+  :group 'dotemacs)
+
+(defcustom dotemacs-major-mode-emacs-leader-key nil
+  "Major mode leader key accessible in `emacs state' and `insert state'"
+  :group 'dotemacs)
+
+(defcustom dotemacs-command-key ":"
+  "The key used for Evil commands (ex-commands) and Emacs commands (M-x).
+By default the command key is `:' so ex-commands are executed like in Vim
+with `:' and Emacs commands are executed with `<leader> :'."
+  :group 'dotemacs)
+
+(defcustom dotemacs-enable-paste-micro-state t
+  "If non nil the paste micro-state is enabled. While enabled pressing `p`
+several times cycle between the kill ring content.'"
+  :group 'dotemacs)
+
+;; Regexp for useful and useless buffers for smarter buffer switching
+(defcustom dotemacs-useless-buffers-regexp '("*\.\+")
+  "Regexp used to determine if a buffer is not useful."
+  :group 'dotemacs)
+
+(defcustom dotemacs-useful-buffers-regexp '("\\*\\(scratch\\|terminal\.\+\\|ansi-term\\|eshell\\)\\*")
+  "Regexp used to define buffers that are useful despite matching
+`dotemacs-useless-buffers-regexp'."
+  :group 'dotemacs)
+
+(defcustom dotemacs-active-transparency 90
+  "A value from the range (0..100), in increasing opacity, which describes the
+transparency level of a frame when it's active or selected. Transparency
+can be toggled through `toggle-transparency'."
+  :group 'dotemacs)
+
+(defcustom dotemacs-inactive-transparency 90
+  "A value from the range (0..100), in increasing opacity, which describes the
+transparency level of a frame when it's inactive or deselected. Transparency
+can be toggled through `toggle-transparency'."
+  :group 'dotemacs)
+
+(defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
+  "Filepath to the installed dotfile.")
+
+(defcustom dotemacs-persistent-server nil
+  "If non nil advises quit functions to keep server open when quitting.")
+  :group 'dotemacs
+
+(defcustom dotemacs-mode-line-unicode-symbols t
+  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
+  :group 'dotemacs
+
+(defcustom dotemacs-fullscreen-use-non-native nil
+  "If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen. Use
+to disable fullscreen animations in OSX."
+  :group 'dotemacs)
+
 (defcustom dotemacs-private-dir (locate-user-emacs-file "private")
   "Directory for private settings."
   :group 'dotemacs)
@@ -88,8 +154,8 @@ NOERROR and NOMESSAGE are passed to `load'."
   :group 'dotemacs)
 
 (with-current-buffer (get-buffer-create "*Require Times*")
-  (insert "| feature | elapsed | timestamp |\n")
-  (insert "|---------+---------+-----------|\n"))
+  (insert "| feature | timestamp | elapsed |\n")
+  (insert "|---------+-----------+---------|\n"))
 
 (defadvice require (around require-advice activate)
   (let ((elapsed)
@@ -245,6 +311,18 @@ FEATURE may be a named feature or a file name, see
   :commands (dotemacs-new-eshell-split
              dotemacs-eshell-prompt
              dotemacs-current-git-branch))
+
+(use-package init-funcs
+  :load-path "config/")
+
+(use-package core-funcs
+  :load-path "config/")
+
+(use-package core-micro-state
+  :load-path "config/")
+
+(use-package core-use-package
+  :load-path "config/")
 
 
 ;;; Setup environment variables from the user's shell.
@@ -444,10 +522,6 @@ FEATURE may be a named feature or a file name, see
 ;; Just don’t show them. Use native Emacs controls:
 (setq use-dialog-box nil)
 
-;; On modern operating systems, a vertical bar is used as a cursor:
-;; TODO: With evil mode, use bar for INSERT mode
-; (setq-default cursor-type 'bar)
-
 ;; No blinking and beeping, no startup screen, no scratch message and short
 ;; Yes/No questions.
 (blink-cursor-mode -1)
@@ -456,8 +530,7 @@ FEATURE may be a named feature or a file name, see
       inhibit-startup-screen t
       initial-scratch-message "Hello there!\n")
 
-(set-frame-parameter (selected-frame) 'alpha '(95 95))
-(add-to-list 'default-frame-alist '(alpha 95 95))
+(toggle-transparency)
 
 ;; Answering just 'y' or 'n' will do
 (fset 'yes-or-no-p #'y-or-n-p)
@@ -753,7 +826,7 @@ mouse-3: go to end"))))
   :config
   (progn
     ; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-    (add-to-list 'initial-frame-alist '(width . 140))
+    (add-to-list 'initial-frame-alist '(width . 120))
     (add-to-list 'initial-frame-alist '(height . 72))))
 
 (use-package init-buffers          ; Personal buffer tools
@@ -1381,7 +1454,6 @@ mouse-3: go to end"))))
 ;   "When non-nil, turn on smartparens paren matching instead of the default Emacs show-paren-mode."
 ;   :group 'dotemacs-smartparens)
 ;
-; (setq sp-autoescape-string-quote nil)
 ; (setq sp-autoinsert-quote-if-followed-by-closing-pair nil)
 ;
 ; (if dotemacs-smartparens/autoinsert
@@ -2291,9 +2363,10 @@ Disable the highlighting of overlong lines."
   :defer t
   :init
   (progn
-    ; (evil-leader/set-key-for-mode 'emacs-lisp-mode
-    ;   "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
-    ;   "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)
+    (after "evil-leader"
+      (evil-leader/set-key-for-mode 'emacs-lisp-mode
+        "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
+        "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point))
     (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode))
   :config
   (defadvice elisp-slime-nav-find-elisp-thing-at-point
@@ -2912,10 +2985,10 @@ Disable the highlighting of overlong lines."
     (add-hook 'css-mode-hook 'emmet-mode))
   :config
   (progn
-    ; (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    ; (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    ; (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    ; (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
     ))
 
 (use-package web-mode                   ; Template editing
@@ -3507,7 +3580,6 @@ Disable the highlighting of overlong lines."
 ; (setq ido-enable-prefix nil)
 ; (setq ido-use-virtual-buffers t)
 ; ;; disable ido faces to see flx highlights.
-; (setq ido-enable-flex-matching t)
 ; (setq ido-use-faces nil)
 ; (setq ido-create-new-buffer 'always)
 ; (setq ido-use-filename-at-point 'guess)
@@ -3793,9 +3865,7 @@ Disable the highlighting of overlong lines."
   (after "projectile"
          (setq projectile-switch-project-action #'neotree-projectile-action))
   (setq neo-theme 'nerd
-        ; neo-show-hidden-files t
         neo-vc-integration '(face)
-        ; neo-hidden-regexp-list '("^\\." "~$")
         neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
         neo-window-width 35)
   :config
@@ -3808,10 +3878,10 @@ Disable the highlighting of overlong lines."
 
     (add-hook 'neotree-mode-hook
               (lambda ()
-                ; (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
-                ; (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
-                ; (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-                ; (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+                (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+                (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+                (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+                (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
                 ))))
 
 
@@ -3869,8 +3939,8 @@ Disable the highlighting of overlong lines."
   :config
   (progn
     (projectile-persp-bridge helm-projectile-switch-project)
-    ; (evil-leader/set-key
-    ;   "pp" 'dotemacs-persp-switch-project)
+    (evil-leader/set-key
+      "pp" 'dotemacs-persp-switch-project)
     ))
 
 
@@ -4092,18 +4162,19 @@ Disable the highlighting of overlong lines."
                          ("DONE" ("WAITING") ("CANCELLED"))))
 
                 ))
-    ; (evil-leader/set-key-for-mode 'org-mode
-    ;   "mc" 'org-capture
-    ;   "md" 'org-deadline
-    ;   "me" 'org-export-dispatch
-    ;   "mf" 'org-set-effort
-    ;   "mi" 'org-clock-in
-    ;   "mj" 'helm-org-in-buffer-headings
-    ;   "mo" 'org-clock-out
-    ;   "mm" 'org-ctrl-c-ctrl-c
-    ;   "mq" 'org-clock-cancel
-    ;   "mr" 'org-refile
-    ;   "ms" 'org-schedule)
+
+    (evil-leader/set-key-for-mode 'org-mode
+      "mc" 'org-capture
+      "md" 'org-deadline
+      "me" 'org-export-dispatch
+      "mf" 'org-set-effort
+      "mi" 'org-clock-in
+      "mj" 'helm-org-in-buffer-headings
+      "mo" 'org-clock-out
+      "mm" 'org-ctrl-c-ctrl-c
+      "mq" 'org-clock-cancel
+      "mr" 'org-refile
+      "ms" 'org-schedule)
 
     (require 'ox-md)
     (require 'ox-ascii)
@@ -4111,17 +4182,19 @@ Disable the highlighting of overlong lines."
     (require 'ox-html)
     (require 'org-bullets)
 
-    ; (after "evil" (add-hook 'org-capture-mode-hook #'evil-emacs-state))
+    (after "evil" (add-hook 'org-capture-mode-hook #'evil-emacs-state))
 
     (after "org-agenda"
       '(progn
          (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
          (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
-         ;; Since we override SPC, let's make RET do that functionality
-         (define-key org-agenda-mode-map
-           (kbd "RET") 'org-agenda-show-and-scroll-up)
-         (define-key org-agenda-mode-map
-           (kbd "SPC") evil-leader--default-map))))
+         ;; Since we could override SPC with <leader>, let's make RET do that functionality
+         ;; TODO: Check if <leader> equals SPC
+         ; (define-key org-agenda-mode-map
+         ;   (kbd "RET") 'org-agenda-show-and-scroll-up)
+         ; (define-key org-agenda-mode-map
+         ;   (kbd "SPC") evil-leader--default-map)
+         )))
   :config
   (progn
     (require 'org-indent)
@@ -4144,27 +4217,27 @@ Disable the highlighting of overlong lines."
              ort/goto-todos)
   :init
   (progn
-    ; (evil-leader/set-key
-    ;   "Ct"  'ort/capture-todo
-    ;   "CT"  'ort/capture-todo-check)
-    ; (evil-leader/set-key-for-mode 'org-mode
-    ;   "mgt" 'ort/goto-todos)
+    (evil-leader/set-key
+      "Ct"  'ort/capture-todo
+      "CT"  'ort/capture-todo-check)
+    (evil-leader/set-key-for-mode 'org-mode
+      "mgt" 'ort/goto-todos)
     ))
 
-; (use-package evil-org
-;   :disabled t
-;   :commands evil-org-mode
-;   :init
-;   (add-hook 'org-mode-hook 'evil-org-mode)
-;   :config
-;   (progn
-;     (evil-leader/set-key-for-mode 'org-mode
-;          "a" nil "ma" 'org-agenda
-;          "c" nil "mA" 'org-archive-subtree
-;          "o" nil "mC" 'evil-org-recompute-clocks
-;          "l" nil "ml" 'evil-org-open-links
-;          "t" nil "mt" 'org-show-todo-tree)
-;     (diminish evil-org-mode " ⓔ" " e"))
+(use-package evil-org
+  :disabled t
+  :commands evil-org-mode
+  :init
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'org-mode
+         "a" nil "ma" 'org-agenda
+         "c" nil "mA" 'org-archive-subtree
+         "o" nil "mC" 'evil-org-recompute-clocks
+         "l" nil "ml" 'evil-org-open-links
+         "t" nil "mt" 'org-show-todo-tree)
+    (diminish evil-org-mode " ⓔ" " e")))
 
 
 ;;; Online Help
@@ -4212,90 +4285,399 @@ Disable the highlighting of overlong lines."
 
 (bind-key "C-c h b" #'describe-personal-keybindings)
 
-;; Andrew added this as an example
-; (use-package evil
-;   :init
-;   (progn
-;     ;; if we don't have this evil overwrites the cursor color
-;     (setq evil-default-cursor t)
-;
-;     ;; leader shortcuts
-;
-;     ;; This has to be before we invoke evil-mode due to:
-;     ;; https://github.com/cofi/evil-leader/issues/10
-;     (use-package evil-leader
-;       :init (global-evil-leader-mode)
-;       :config
-;       (progn
-;         (setq evil-leader/in-all-states t)
-;         ;; keyboard shortcuts
-;         (evil-leader/set-key
-;           "a" 'ag-project
-;           "A" 'ag
-;           "b" 'ido-switch-buffer
-;           "c" 'mc/mark-next-like-this
-;           "C" 'mc/mark-all-like-this
-;           "e" 'er/expand-region
-;           "E" 'mc/edit-lines
-;           "f" 'ido-find-file
-;           "g" 'magit-status
-;           "i" 'idomenu
-;           "j" 'ace-jump-mode
-;           "k" 'kill-buffer
-;           "K" 'kill-this-buffer
-;           "o" 'occur
-;           "p" 'magit-find-file-completing-read
-;           "r" 'recentf-ido-find-file
-;           "s" 'ag-project
-;           "t" 'bw-open-term
-;           "T" 'eshell
-;           "w" 'save-buffer
-;           "x" 'smex
-;           )))
-;
-;     ;; boot evil by default
-;     (evil-mode 1))
-;   :config
-;   (progn
-;     ;; use ido to open files
-;     (define-key evil-ex-map "e " 'ido-find-file)
-;     (define-key evil-ex-map "b " 'ido-switch-buffer)
-;
-;     ;; jj escapes to normal mode
-;     (define-key evil-insert-state-map (kbd "j") 'bw-evil-escape-if-next-char-is-j)
-;     (setq
-;      ;; h/l wrap around to next lines
-;      evil-cross-lines t
-;      ;; Training wheels: start evil-mode in emacs mode
-;      evil-default-state 'emacs)
-;
-;     ;; esc should always quit: http://stackoverflow.com/a/10166400/61435
-;     (define-key evil-normal-state-map [escape] 'keyboard-quit)
-;     (define-key evil-visual-state-map [escape] 'keyboard-quit)
-;     (define-key minibuffer-local-map [escape] 'abort-recursive-edit)
-;     (define-key minibuffer-local-ns-map [escape] 'abort-recursive-edit)
-;     (define-key minibuffer-local-completion-map [escape] 'abort-recursive-edit)
-;     (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
-;     (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
-;
-;     ;; modes to map to different default states
-;     (dolist (mode-map '((comint-mode . emacs)
-;                         (term-mode . emacs)
-;                         (eshell-mode . emacs)
-;                         (help-mode . emacs)
-;                         (fundamental-mode . emacs)))
-;       (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))))
-;
+
+;;; Evil
+(defgroup dotemacs-evil nil
+  "Configuration options for evil-mode."
+  :group 'dotemacs
+  :prefix 'dotemacs-evil)
+
+(defcustom dotemacs-evil/evil-state-modes
+  '(fundamental-mode
+    text-mode
+    prog-mode
+    sws-mode
+    dired-mode
+    comint-mode
+    log-edit-mode
+    messages-buffer-mode
+    project-explorer-mode
+    compilation-mode)
+  "List of modes that should start up in Evil state."
+  :type '(repeat (symbol))
+  :group 'dotemacs-evil)
+
+(defcustom dotemacs-evil/emacs-state-modes
+  '(debugger-mode
+    git-commit-mode
+    git-rebase-mode)
+  "List of modes that should start up in Evil Emacs state."
+  :type '(repeat (symbol))
+  :group 'dotemacs-evil)
+
+(use-package init-evil
+  :load-path "config/")
+
+(use-package evil
+  :ensure t
+  :init
+  (progn
+    ;; put back refresh of the cursor on post-command-hook see status of:
+    ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
+    (add-hook 'post-command-hook 'evil-refresh-cursor)
+
+    ; (add-hook 'after-change-major-mode-hook #'dotemacs-major-mode-evil-state-adjust)
+
+    ; (after "paren"
+    ;   ;; the default behavior only highlights with the point one-after the closing paren
+    ;   ;; this changes it such it will match with the point on the closing paren
+    ;   (defadvice show-paren-function (around show-paren-closing-before activate)
+    ;     (if (and (or
+    ;               (evil-normal-state-p)
+    ;               (evil-visual-state-p))
+    ;              (eq (syntax-class (syntax-after (point))) 5))
+    ;         (save-excursion
+    ;           (forward-char)
+    ;           ad-do-it)
+    ;       ad-do-it)))
+
+    (dotemacs-set-state-faces)
+
+    (set-default-evil-emacs-state-cursor)
+    (set-default-evil-evilified-state-cursor)
+    (set-default-evil-normal-state-cursor)
+    (set-default-evil-insert-state-cursor)
+    (set-default-evil-visual-state-cursor)
+    (set-default-evil-motion-state-cursor)
+    (set-default-evil-lisp-state-cursor)
+    (set-default-evil-iedit-state-cursor)
+    (set-default-evil-iedit-insert-state-cursor)
+    (set-default-evil-replace-state-cursor)
+    (set-default-evil-operator-state-cursor)
+
+    ; Don't move back the cursor one position when exiting insert mode
+    (setq evil-move-cursor-back nil)
+    ; (setq evil-search-module 'evil-search)
+    ; (setq evil-magic 'very-magic)
+
+    (evil-mode 1))
+  :config
+  (progn
+
+    ;; evil ex-command key
+    (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
+    (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
+    (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; Make the current definition and/or comment visible.
+    (define-key evil-normal-state-map "zf" 'reposition-window)
+    ;; toggle maximize buffer
+    (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
+    (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
+
+    (evil-leader/set-key "re" 'evil-show-registers)
+
+    (unless dotemacs-enable-paste-micro-state
+      (ad-disable-advice 'evil-paste-before 'after
+                         'evil-paste-before-paste-micro-state)
+      (ad-activate 'evil-paste-before)
+      (ad-disable-advice 'evil-paste-after 'after
+                         'evil-paste-after-paste-micro-state)
+      (ad-activate 'evil-paste-after)
+      (ad-disable-advice 'evil-visual-paste 'after
+                         'evil-visual-paste-paste-micro-state)
+      (ad-activate 'evil-visual-paste))
+
+    (defmacro evil-map (state key seq)
+      "Map for a given STATE a KEY to a sequence SEQ of keys.
+
+Can handle recursive definition only if KEY is the first key of SEQ.
+Example: (evil-map visual \"<\" \"<gv\")"
+      (let ((map (intern (format "evil-%S-state-map" state))))
+        `(define-key ,map ,key
+           (lambda ()
+             (interactive)
+             ,(if (string-equal key (substring seq 0 1))
+                  `(progn
+                     (call-interactively ',(lookup-key evil-normal-state-map key))
+                     (execute-kbd-macro ,(substring seq 1)))
+                (execute-kbd-macro ,seq))))))
+    ;; Keep the region active when shifting
+    (evil-map visual "<" "<gv")
+    (evil-map visual ">" ">gv")
+
+    (define-key evil-normal-state-map (kbd "K") 'dotemacs-evil-smart-doc-lookup)
+
+    (define-key evil-normal-state-map
+      (kbd "gd") 'dotemacs-evil-smart-goto-definition)
 
 
+      ;; define text objects
+    (defmacro dotemacs-define-text-object (key name start end)
+      (let ((inner-name (make-symbol (concat "evil-inner-" name)))
+            (outer-name (make-symbol (concat "evil-outer-" name)))
+            (start-regex (regexp-opt (list start)))
+            (end-regex (regexp-opt (list end))))
+        `(progn
+           (evil-define-text-object ,inner-name (count &optional beg end type)
+             (evil-select-paren ,start-regex ,end-regex beg end type count nil))
+           (evil-define-text-object ,outer-name (count &optional beg end type)
+             (evil-select-paren ,start-regex ,end-regex beg end type count t))
+           (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
+           (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
+           (when (configuration-layer/package-usedp 'evil-surround)
+             (push (cons (string-to-char ,key)
+                         (if ,end
+                             (cons ,start ,end)
+                           ,start))
+                   evil-surround-pairs-alist)))))
 
 
+    (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
 
-;; (cl-loop for file in (directory-files (concat user-emacs-directory "defuns/"))
-;;   if (not (file-directory-p file))
-;;     do (require (intern (file-name-base file)))))
+    ;; support smart-parens-strict-mode
+    (after "smartparens"
+      (defadvice evil-delete-backward-char-and-join
+          (around dotemacs-evil-delete-backward-char-and-join activate)
+        (if smartparens-strict-mode
+            (call-interactively 'sp-backward-delete-char)
+          ad-do-it)))))
 
-;; TODO https://github.com/IvanMalison/org-projectile
+(use-package evil-anzu
+  :ensure t
+  :defer t
+  :init
+  (global-anzu-mode t)
+  :config
+  (progn
+    (dotemacs-hide-lighter anzu-mode)
+    (setq anzu-search-threshold 1000
+          anzu-cons-mode-line-p nil)))
+
+(use-package evil-args
+  :ensure t
+  :defer t
+  :init
+  (progn
+    ;; bind evil-args text objects
+    (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
+    (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)))
+
+(use-package evil-escape
+  :ensure t
+  :defer t
+  :init
+  (evil-escape-mode)
+  :config
+  (dotemacs-hide-lighter evil-escape-mode))
+
+(use-package evil-exchange
+  :ensure t
+  :defer t
+  :init (evil-exchange-install))
+
+(use-package evil-iedit-state
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (require 'evil-iedit-state)
+    (defun dotemacs-evil-state-lazy-loading ()
+      ;; activate leader in iedit and iedit-insert states
+      (define-key evil-iedit-state-map
+        (kbd evil-leader/leader) evil-leader--default-map))
+
+    (after "evil-leader"
+      (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
+      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading)
+      )))
+
+(use-package evil-jumper
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps")
+          evil-jumper-auto-center t
+          evil-jumper-auto-save-interval 3600)
+    (evil-jumper-mode t)))
+
+(use-package evil-leader
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq evil-leader/leader dotemacs-leader-key)
+    (global-evil-leader-mode))
+  :config
+  (progn
+    ;; Unset shortcuts which shadow evil leader
+    (eval-after-load "compile"
+      '(progn
+         (define-key compilation-mode-map (kbd "h") nil)))
+    ;; make leader available in visual and motion states
+    (mapc (lambda (s)
+            (eval `(define-key
+                     ,(intern (format "evil-%S-state-map" s))
+                     ,(kbd dotemacs-leader-key)
+                     evil-leader--default-map)))
+          '(motion visual))
+    ;; emacs and insert states (make it also available in other states
+    ;; for consistency and POLA.)
+    (mapc (lambda (s)
+            (eval `(define-key
+                     ,(intern (format "evil-%S-state-map" s))
+                     ,(kbd dotemacs-emacs-leader-key)
+                     evil-leader--default-map)))
+          '(emacs insert normal visual motion))
+    ;; experimental: map `<leader> m` to `dotemacs-major-mode-leader-key`
+    (when dotemacs-major-mode-leader-key
+      (add-hook 'after-change-major-mode-hook
+                'dotemacs-activate-major-mode-leader))))
+
+(use-package evil-lisp-state
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq evil-lisp-state-global t)
+    (setq evil-lisp-state-leader-prefix "k")))
+
+(use-package evil-commentary
+  :ensure t
+  :defer t
+  :init (evil-commentary-mode))
+
+(use-package evil-nerd-commenter
+  :disabled t
+  :ensure t
+  :defer t
+  :commands (evilnc-comment-operator
+             evilnc-comment-or-uncomment-lines
+             evilnc-toggle-invert-comment-line-by-line
+             evilnc-comment-or-uncomment-paragraphs
+             evilnc-quick-comment-or-uncomment-to-the-line
+             evilnc-copy-and-comment-lines)
+  :init
+  (progn
+    (evil-leader/set-key
+      ";"  'evilnc-comment-operator
+      "cl" 'evilnc-comment-or-uncomment-lines
+      "ci" 'evilnc-toggle-invert-comment-line-by-line
+      "cp" 'evilnc-comment-or-uncomment-paragraphs
+      "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
+      "cy" 'evilnc-copy-and-comment-lines)))
+
+(use-package evil-matchit
+  :ensure t
+  :defer t
+  :init (global-evil-matchit-mode))
+
+(use-package evil-indent-textobject
+  :ensure t
+  :defer t)
+
+(use-package evil-easymotion
+  :ensure t
+  :defer t
+  :init (after "evil"))
+
+(use-package evil-numbers
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (defun dotemacs-evil-numbers-micro-state-doc ()
+      "Display a short documentation in the mini buffer."
+      (echo "+/= to increase the value or - to decrease it"))
+
+    (defun dotemacs-evil-numbers-micro-state-overlay-map ()
+      "Set a temporary overlay map to easily increase or decrease a number"
+      (set-temporary-overlay-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map (kbd "+") 'dotemacs-evil-numbers-increase)
+         (define-key map (kbd "=") 'dotemacs-evil-numbers-increase)
+         (define-key map (kbd "-") 'dotemacs-evil-numbers-decrease)
+         map) t)
+      (dotemacs-evil-numbers-micro-state-doc))
+
+    (defun dotemacs-evil-numbers-increase (amount &optional no-region)
+      "Increase number at point."
+      (interactive "p*")
+      (evil-numbers/inc-at-pt amount no-region)
+      (dotemacs-evil-numbers-micro-state-overlay-map))
+    (defun dotemacs-evil-numbers-decrease (amount)
+      "Decrease number at point."
+      (interactive "p*")
+      (evil-numbers/dec-at-pt amount)
+      (dotemacs-evil-numbers-micro-state-overlay-map))
+    (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
+    (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
+    (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease)))
+
+(use-package evil-search-highlight-persist
+  :ensure t
+  :init
+  (progn
+    (global-evil-search-highlight-persist)
+    ;; (set-face-attribute )
+    (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all)
+    (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
+    (evil-ex-define-cmd "nohlsearch"
+                        'evil-search-highlight-persist-remove-all)
+    (defun dotemacs-adaptive-evil-highlight-persist-face ()
+      (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
+                          :inherit 'region
+                          :background nil
+                          :foreground nil))
+    (dotemacs-adaptive-evil-highlight-persist-face)))
+
+(use-package evil-surround
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (global-evil-surround-mode 1)
+    ;; `s' for surround instead of `substitute'
+    ;; see motivation for this change in the documentation
+    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
+    (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute)))
+
+(use-package evil-terminal-cursor-changer
+  :if (not (display-graphic-p))
+  :ensure t
+  :init
+  (progn
+    (require 'evil-terminal-cursor-changer)
+    (setq evil-visual-state-cursor 'box ; █
+          evil-insert-state-cursor 'bar ; ⎸
+          evil-emacs-state-cursor 'hbar)) ; _
+  :defer t)
+
+(use-package evil-tutor
+  :disabled t
+  :ensure t
+  :defer t
+  :commands (evil-tutor-start
+             evil-tutor-resume)
+  :init
+  (progn
+    (setq evil-tutor-working-directory
+          (concat dotemacs-cache-directory ".tutor/"))
+    (evil-leader/set-key "hT" 'evil-tutor-start)))
+
+(use-package evil-visualstar
+  :ensure t
+  :defer t
+  :commands (evil-visualstar/begin-search-forward
+             evil-visualstar/begin-search-backward)
+  :init
+  (progn
+    ; (global-evil-visualstar-mode)
+    (define-key evil-visual-state-map (kbd "*")
+      'evil-visualstar/begin-search-forward)
+    (define-key evil-visual-state-map (kbd "#")
+      'evil-visualstar/begin-search-backward)))
+
 
 ; (add-hook 'c-mode-common-hook
 ;           (lambda ()
