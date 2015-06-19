@@ -96,6 +96,10 @@ with `:' and Emacs commands are executed with `<leader> :'."
 several times cycle between the kill ring content.'"
   :group 'dotemacs)
 
+(defcustom dotemacs-guide-key-delay 0.4
+  "Guide-key delay in seconds."
+  :group 'dotemacs)
+
 ;; Regexp for useful and useless buffers for smarter buffer switching
 (defcustom dotemacs-useless-buffers-regexp '("*\.\+")
   "Regexp used to determine if a buffer is not useful."
@@ -322,6 +326,9 @@ FEATURE may be a named feature or a file name, see
   :load-path "config/")
 
 (use-package core-use-package
+  :load-path "config/")
+
+(use-package core-toggle
   :load-path "config/")
 
 
@@ -966,6 +973,37 @@ mouse-3: go to end"))))
   :defer t
   :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
+
+(use-package popwin
+  :ensure t
+  :bind ("C-c P" . popwin:popup-last-buffer)
+  :init
+  (progn
+    ;; don't use default value but manage it ourselves
+    (setq popwin:special-display-config nil)
+
+    ;; buffers that we manage
+    (push '("*Help*"                 :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+    (push '("*compilation*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+    (push '("*Shell Command Output*" :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
+    (push '("*Async Shell Command*"  :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
+    (push '(" *undo-tree*"           :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+    (push '("*ert*"                  :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
+    (push '("*grep*"                 :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
+    (push '("*nosetests*"            :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
+    (push '("^\*WoMan.+\*$" :regexp t             :position bottom                                   ) popwin:special-display-config)
+
+    (defun dotemacs-remove-popwin-display-config (str)
+      "Removes the popwin display configurations that matches the passed STR"
+      (setq popwin:special-display-config
+            (-remove (lambda (x) (if (and (listp x) (stringp (car x)))
+                                     (string-match str (car x))))
+                     popwin:special-display-config))))
+  :config
+  (progn
+    (popwin-mode 1)
+    (evil-leader/set-key "wpm" 'popwin:messages)
+    (evil-leader/set-key "wpp" 'popwin:close-popup-window)))
 
 
 ;;; File handling
@@ -1945,7 +1983,6 @@ Disable the highlighting of overlong lines."
                           rst-mode-hook))
             (add-hook hook 'typo-mode)))
   :diminish (typo-mode . "𝕿"))
-
 
 
 ;;; LaTeX with AUCTeX
@@ -4284,6 +4321,66 @@ Disable the highlighting of overlong lines."
                        '(swift-mode . "ios,swift")))
 
 (bind-key "C-c h b" #'describe-personal-keybindings)
+
+
+(use-package guide-key-tip
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (defun dotemacs-toggle-guide-key ()
+      "Toggle golden-ratio mode on and off."
+      (interactive)
+      (if (symbol-value guide-key-mode)
+          (guide-key-mode -1)
+        (guide-key-mode)))
+
+    (defadvice guide-key/popup-guide-buffer-p
+        (around dotemacs-inhibit-guide-buffer activate)
+      "Prevent the popup of the guide-key buffer in some case."
+      ;; a micro-state is running
+      ;; or
+      ;; bzg-big-fringe-mode is on
+      (unless (or overriding-terminal-local-map
+                  bzg-big-fringe-mode)
+        ad-do-it))
+
+    (dotemacs-add-toggle guide-key
+                    :status guide-key-mode
+                    :on (guide-key-mode)
+                    :off (guide-key-mode -1)
+                    :documentation
+                    "Display a buffer with available key bindings."
+                    :evil-leader "tG")
+
+    (setq guide-key/guide-key-sequence `("C-x"
+                                         "C-c"
+                                         "C-w"
+                                         ,dotemacs-leader-key
+                                         ,dotemacs-emacs-leader-key
+                                         ; ,dotemacs-major-mode-leader-key
+                                         ; ,dotemacs-major-mode-emacs-leader-key
+                                         ;; M-m in terminal
+                                         "<ESC>m"
+                                         ;; C-M-m in terminal
+                                         "<ESC><RET>"
+                                         "g"
+                                         "\["
+                                         "\]"
+                                         "z"
+                                         "C-h")
+          guide-key/recursive-key-sequence-flag t
+          guide-key/popup-window-position 'bottom
+          guide-key/idle-delay dotemacs-guide-key-delay
+          guide-key/text-scale-amount 0
+          guide-key-tip/enabled nil)
+    (setq guide-key/highlight-command-regexp
+                 (cons dotemacs-prefix-command-string font-lock-warning-face))
+    (guide-key-mode 1))
+  :config
+  (add-hook 'evil-leader-mode-hook
+            #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader)))
+  :diminish (guide-key-mode " Ⓖ" " G"))
 
 
 ;;; Evil

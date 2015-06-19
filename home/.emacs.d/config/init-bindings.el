@@ -33,43 +33,13 @@
   dotemacs-buffer-mode
   dotemacs-buffer-mode)
 
-(require 'evil)
-(require 'guide-key)
-(setq guide-key/guide-key-sequence '("C-x" "C-c"))
-(guide-key-mode 1)
-(setq guide-key/recursive-key-sequence-flag t)
-(setq guide-key/popup-window-position 'bottom)
-(setq guide-key/idle-delay 0.8)
-
-(with-eval-after-load 'guide-key
-  (add-hook 'evil-leader-mode-hook
-            #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader))))
 
 
-(require 'popwin)
-(popwin-mode 1)
-(global-set-key (kbd "C-c P") 'popwin:popup-last-buffer)
-(when (eq system-type 'darwin)
-  (global-set-key (kbd "s-P") 'popwin:popup-last-buffer))
 
-;; As well as the defaults, I want ag, magit, flycheck and occur to
-;; ‘pop’. I don’t want to auto-select the Magit process buffer as it’s
-;; for information only.
 
-(with-eval-after-load 'popwin
-  (add-to-list 'popwin:special-display-config `"*ag search*")
-  (add-to-list 'popwin:special-display-config `("*magit-process*" :noselect t))
-  (add-to-list 'popwin:special-display-config `"*Flycheck errors*")
-  (add-to-list 'popwin:special-display-config `"*Occur*")
-  (add-to-list 'popwin:special-display-config `("*Compile-Log*" :noselect t)))
 
 
 (with-eval-after-load 'evil
-  (require 'key-chord)
-  (key-chord-mode 1)
-  (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-  (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
-
   ; In order to define an use a <leader> prefix for your personal shortcuts
   (with-eval-after-load 'evil-leader
     (evil-leader/set-key
