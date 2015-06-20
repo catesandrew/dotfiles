@@ -32,17 +32,6 @@
 
 
 (with-eval-after-load 'evil
-  ; In order to define an use a <leader> prefix for your personal shortcuts
-  (with-eval-after-load 'evil-leader
-    (with-eval-after-load "magit-autoloads"
-      ;; Set the initial evil state that certain major modes will be in.
-      (evil-set-initial-state 'magit-log-edit-mode 'emacs)
-      (evil-leader/set-key
-        "g s" 'magit-status
-        "g b" 'magit-blame-mode
-        "g c" 'magit-commit
-        "g l" 'magit-log)))
-
   (with-eval-after-load "git-gutter+-autoloads"
     (define-key evil-normal-state-map (kbd "[ h") 'git-gutter+-previous-hunk)
     (define-key evil-normal-state-map (kbd "] h") 'git-gutter+-next-hunk)
@@ -90,16 +79,6 @@
   (with-eval-after-load "elisp-slime-nav-autoloads"
     (evil-define-key 'normal emacs-lisp-mode-map (kbd "g d") 'elisp-slime-nav-find-elisp-thing-at-point))
 
-  ;; Evil Tabs
-  ; (with-eval-after-load 'evil-tabs
-  ;   (evil-define-key 'normal evil-tabs-mode-map
-  ;     (kbd "M-{") 'elscreen-previous
-  ;     (kbd "M-}") 'elscreen-next
-  ;     (kbd "M-t") 'elscreen-create
-  ;     (kbd "M-w") 'elscreen-kill
-  ;   )
-  ; )
-
   (with-eval-after-load "projectile-autoloads"
     (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
     (let ((binding (kbd "SPC /")))
@@ -120,12 +99,6 @@
       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)))
   )
 
-(with-eval-after-load 'magit
-  (global-set-key (kbd "C-x g") 'magit-status)
-  (define-key magit-status-mode-map (kbd "C-n") 'magit-goto-next-sibling-section)
-  (define-key magit-status-mode-map (kbd "C-p") 'magit-goto-previous-sibling-section))
-
-
 (with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
@@ -134,23 +107,6 @@
   (with-eval-after-load "helm-company-autoloads"
     (define-key company-mode-map (kbd "<C-return>") 'helm-company)
     (define-key company-active-map (kbd "<C-return>") 'helm-company)))
-
-
-(with-eval-after-load "helm-autoloads"
-  (global-set-key (kbd "M-x") 'helm-M-x)
-  (global-set-key (kbd "C-x C-m") 'helm-M-x)
-  (global-set-key (kbd "C-c C-m") 'helm-M-x)
-  (global-set-key (kbd "C-x b") 'helm-buffers-list)
-
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-c h") #'helm-eshell-history))))
-
-(with-eval-after-load 'help-mode
-  (define-key help-mode-map (kbd "n") 'next-line)
-  (define-key help-mode-map (kbd "p") 'previous-line)
-  (define-key help-mode-map (kbd "j") 'next-line)
-  (define-key help-mode-map (kbd "k") 'previous-line))
 
 
 (global-set-key (kbd "C-c c") 'org-capture)

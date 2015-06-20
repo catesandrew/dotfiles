@@ -157,6 +157,51 @@ NOERROR and NOMESSAGE are passed to `load'."
   "File used to store settings from Customization UI."
   :group 'dotemacs)
 
+;; magit settings
+(defgroup dotemacs-magit nil
+  "Configuration options for magit."
+  :group 'dotemacs
+  :prefix 'dotemacs-evil)
+
+(defcustom dotemacs-git-enable-magit-svn-plugin nil
+  "If non nil `magit-svn' plugin is enabled."
+  :group 'dotemacs-magit)
+
+(defcustom dotemacs-git-magit-status-fullscreen t
+  "If non nil magit-status buffer is displayed in fullscreen."
+  :group 'dotemacs-magit)
+
+;; evil settings
+(defgroup dotemacs-evil nil
+  "Configuration options for evil-mode."
+  :group 'dotemacs
+  :prefix 'dotemacs-evil)
+
+(defcustom dotemacs-evil/evil-state-modes
+  '(fundamental-mode
+    text-mode
+    prog-mode
+    sws-mode
+    dired-mode
+    comint-mode
+    log-edit-mode
+    messages-buffer-mode
+    project-explorer-mode
+    compilation-mode)
+  "List of modes that should start up in Evil state."
+  :type '(repeat (symbol))
+  :group 'dotemacs-evil)
+
+(defcustom dotemacs-evil/emacs-state-modes
+  '(debugger-mode
+    git-commit-mode
+    git-rebase-mode)
+  "List of modes that should start up in Evil Emacs state."
+  :type '(repeat (symbol))
+  :group 'dotemacs-evil)
+
+
+;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
   (insert "|---------+-----------+---------|\n"))
@@ -187,7 +232,6 @@ NOERROR and NOMESSAGE are passed to `load'."
 ;   (dolist (dir (directory-files base t "^[^.]"))
 ;     (when (file-directory-p dir)
 ;       (add-to-list 'load-path dir))))
-
 
 
 ;;; Locality
@@ -3382,33 +3426,13 @@ Disable the highlighting of overlong lines."
           (unless (display-graphic-p)
             (diff-hl-margin-mode))))
 
+;; magit
 (use-package init-magit
   :load-path "config/"
-  :defer t
-  :commands (dotemacs-magit-toggle-whitespace
-             dotemacs-magit-ignore-whitespace
-             dotemacs-magit-dont-ignore-whitespace))
-
-;; TODO: Incorporate this into `use-package magit` below
-; (require 'magit)
-; (with-eval-after-load 'magit
-;
-;   (defun my-magit-mode-defaults ()
-;     ; (if (boundp 'yas-minor-mode)
-;     ;     (yas-minor-mode))
-;     ; (run-hooks 'my-prog-mode-hook)
-;     (message "my-magit-mode-defaults"))
-;   (setq my-magit-mode-hook 'my-magit-mode-defaults)
-;   (add-hook 'magit-mode-hook (lambda ()
-;                              (run-hooks 'my-magit-mode-hook)))
-;    (setq magit-diff-options '("--histogram"))
-;   (setq magit-stage-all-confirm nil)
-;   (setq magit-unstage-all-confirm nil)
-;   (setq magit-status-buffer-switch-function 'switch-to-buffer)
-;   (setq magit-show-child-count t))
-;; original `init-magit`
+  :defer t)
 
 (use-package magit                      ; The one and only Git frontend
+  :defer t
   :ensure t
   :bind (("C-c g"   . magit-status)
          ("C-c v g" . magit-status)
@@ -3416,17 +3440,121 @@ Disable the highlighting of overlong lines."
          ("C-c v g" . magit-blame-mode)
          ("C-c v l" . magit-file-log))
   :init
-  ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
-  ;; most stupid warning ever
-  (setq magit-last-seen-setup-instructions "1.4.0")
-  :config
   (progn
-    ;; Shut up, Magit!
-    (setq magit-save-some-buffers 'dontask
+    ; (after "evil-leader" (progn
+    ;   ;; Set the initial evil state that certain major modes will be in.
+    ;   (evil-set-initial-state 'magit-log-edit-mode 'emacs)
+    ; ))
+
+    ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
+    ;; most stupid warning ever
+    (setq magit-last-seen-setup-instructions "1.4.0"
+          magit-completing-read-function 'magit-ido-completing-read
+          magit-save-some-buffers 'dontask
           magit-stage-all-confirm nil
           magit-unstage-all-confirm nil
+          magit-show-child-count t
           ;; Except when you ask something useful…
           magit-set-upstream-on-push t)
+
+    (add-hook 'git-commit-mode-hook 'fci-mode)
+    ;; must enable auto-fill-mode again because somehow fci-mode disable it
+    (add-hook 'git-commit-mode-hook 'auto-fill-mode)
+    ;; On Windows, we must use Git GUI to enter username and password
+    ;; See: https://github.com/magit/magit/wiki/FAQ#windows-cannot-push-via-https
+    (when (eq window-system 'w32)
+      (setenv "GIT_ASKPASS" "git-gui--askpass"))
+
+    (defun dotemacs-magit-diff-head ()
+      "Execute `magit-diff' against current HEAD."
+      (interactive)
+      (magit-diff "HEAD"))
+
+    (evil-leader/set-key
+      "gb" 'magit-blame-mode
+      "gl" 'magit-log
+      "gs" 'magit-status
+      "gd" 'dotemacs-magit-diff-head
+      "gC" 'magit-commit)
+
+    (after "evil-evilified-state"
+      (evilify magit-commit-mode magit-commit-mode-map
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)
+      (evilify magit-log-mode magit-log-mode-map
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)
+      (evilify magit-process-mode magit-process-mode-map
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)
+      (evilify magit-branch-manager-mode magit-branch-manager-mode-map
+             "K" 'magit-discard-item
+             "L" 'magit-key-mode-popup-logging
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)
+      (evilify magit-status-mode magit-status-mode-map
+             "K" 'magit-discard-item
+             "L" 'magit-key-mode-popup-logging
+             "H" 'magit-key-mode-popup-diff-options
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)
+      (evilify magit-diff-mode magit-diff-mode-map
+             "K" 'magit-discard-item
+             "L" 'magit-key-mode-popup-logging
+             "H" 'magit-key-mode-popup-diff-options
+             (kbd "C-j") 'magit-goto-next-section
+             (kbd "C-k") 'magit-goto-previous-section
+             (kbd "C-n") 'magit-goto-next-section
+             (kbd "C-p") 'magit-goto-previous-section
+             (kbd "C-v") 'magit-revert-item)))
+  :config
+  (progn
+    (dotemacs-hide-lighter magit-auto-revert-mode)
+    ;; full screen magit-status
+    (when dotemacs-git-magit-status-fullscreen
+      (defadvice magit-status (around magit-fullscreen activate)
+        (window-configuration-to-register :magit-fullscreen)
+        ad-do-it
+        (delete-other-windows))
+
+      (defun magit-quit-session ()
+        "Restores the previous window configuration and kills the magit buffer"
+        (interactive)
+        (kill-buffer)
+        (jump-to-register :magit-fullscreen))
+      (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
+
+    (defun magit-toggle-whitespace ()
+      (interactive)
+      (if (member "-w" magit-diff-options)
+          (magit-dont-ignore-whitespace)
+        (magit-ignore-whitespace)))
+
+    (defun magit-ignore-whitespace ()
+      (interactive)
+      (add-to-list 'magit-diff-options "-w")
+      (magit-refresh))
+
+    (defun magit-dont-ignore-whitespace ()
+      (interactive)
+      (setq magit-diff-options (remove "-w" magit-diff-options))
+      (magit-refresh))
+    (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace)
 
     ;; Set Magit's repo dirs for `magit-status' from Projectile's known
     ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
@@ -3445,7 +3573,6 @@ Disable the highlighting of overlong lines."
 
     (add-hook 'projectile-switch-project-hook
               #'dotemacs-magit-set-repo-dirs-from-projectile))
-
   :diminish magit-auto-revert-mode)
 
 (use-package magit-gh-pulls
@@ -3453,9 +3580,36 @@ Disable the highlighting of overlong lines."
   :defer t
   :init (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls))
 
+(use-package magit-gitflow
+  :ensure t
+  :commands turn-on-magit-gitflow
+  :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+  :diminish (magit-gitflow-mode . "Flow"))
+
+(use-package magit-svn
+  :if dotemacs-git-enable-magit-svn-plugin
+  :ensure t
+  :commands turn-on-magit-svn
+  :init (add-hook 'magit-mode-hook 'turn-on-magit-svn)
+  :config
+  (progn
+    (evil-define-key 'emacs magit-status-mode-map
+      "N" 'magit-key-mode-popup-svn)))
+
 (use-package git-commit-mode            ; Git commit message mode
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (evil-leader/set-key-for-mode 'git-commit-mode
+    "mcc" 'git-commit-commit
+    "mk" 'git-commit-abort))
+
+(use-package git-messenger
+  :ensure t
+  :defer t
+  :init
+  (evil-leader/set-key
+    "gm" 'git-messenger:popup-message))
 
 (use-package gitconfig-mode             ; Git configuration mode
   :ensure t
@@ -3471,11 +3625,46 @@ Disable the highlighting of overlong lines."
 
 (use-package git-rebase-mode            ; Mode for git rebase -i
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (progn
+    (after "evil-evilified-state"
+      (evilify git-rebase-mode git-rebase-mode-map
+              "J" 'git-rebase-move-line-down
+              "K" 'git-rebase-move-line-up
+              "u" 'git-rebase-undo
+              "y" 'git-rebase-insert))
+    (evil-leader/set-key-for-mode 'git-rebase-mode
+      "mcc" 'git-rebase-server-edit
+      "mk" 'git-rebase-abort)))
 
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
-  :bind (("C-c v t" . git-timemachine)))
+  :defer t
+  :bind (("C-c v t" . git-timemachine))
+  :commands dotemacs-time-machine-micro-state
+  :init
+  (evil-leader/set-key
+    "gt" 'dotemacs-time-machine-micro-state)
+
+  :config
+  (progn
+
+    (defun dotemacs-time-machine-ms-on-enter ()
+      "Initiate git-timemachine")
+
+    (dotemacs-define-micro-state time-machine
+      :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
+      :on-enter (dotemacs-time-machine-ms-on-enter)
+      :on-exit (git-timemachine-quit)
+      :persistent t
+      :bindings
+      ("c" git-timemachine-show-current-revision)
+      ("p" git-timemachine-show-previous-revision)
+      ("n" git-timemachine-show-next-revision)
+      ("N" git-timemachine-show-previous-revision)
+      ("Y" git-timemachine-kill-revision)
+      ("q" nil :exit t))))
 
 
 ;;; Search
@@ -4553,6 +4742,7 @@ Disable the highlighting of overlong lines."
 
 (use-package evil
   :ensure t
+  :defer t
   :init
   (progn
     ;; put back refresh of the cursor on post-command-hook see status of:
@@ -4593,7 +4783,10 @@ Disable the highlighting of overlong lines."
     ; (setq evil-search-module 'evil-search)
     ; (setq evil-magic 'very-magic)
 
-    (evil-mode 1))
+    (evil-mode 1)
+
+    (use-package evil-evilified-state
+      :load-path "extensions/"))
   :config
   (progn
     ; c-k/c-j for page down/up
