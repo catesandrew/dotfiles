@@ -1,9 +1,4 @@
 ;; TODO to be deleted
-(defmacro bind (&rest commands)
-  "Convience macro which creates a lambda interactive command."
-  `(lambda ()
-     (interactive)
-     ,@commands))
 
 (defcustom dotemacs-buffer-keymap-prefix (kbd "C-c b")
   "dotemacs buffer keymap prefix."
@@ -53,7 +48,7 @@
     (define-key evil-normal-state-map (kbd "] h") 'git-gutter+-next-hunk)
     (define-key evil-normal-state-map (kbd ", g a") 'git-gutter+-stage-hunks)
     (define-key evil-normal-state-map (kbd ", g r") 'git-gutter+-revert-hunks)
-    (evil-ex-define-cmd "Gw" (bind (git-gutter+-stage-whole-buffer))))
+    (evil-ex-define-cmd "Gw" (dotemacs-bind (git-gutter+-stage-whole-buffer))))
 
   (define-key evil-normal-state-map (kbd "SPC o") 'imenu)
   (define-key evil-normal-state-map (kbd "SPC b") 'switch-to-buffer)
@@ -78,8 +73,8 @@
       (define-key evil-normal-state-map (kbd "SPC L") 'helm-multi-swoop)))
 
 
-  (define-key evil-normal-state-map (kbd "[ SPC") (bind (evil-insert-newline-above) (forward-line)))
-  (define-key evil-normal-state-map (kbd "] SPC") (bind (evil-insert-newline-below) (forward-line -1)))
+  (define-key evil-normal-state-map (kbd "[ SPC") (dotemacs-bind (evil-insert-newline-above) (forward-line)))
+  (define-key evil-normal-state-map (kbd "] SPC") (dotemacs-bind (evil-insert-newline-below) (forward-line -1)))
   (define-key evil-normal-state-map (kbd "[ b") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "] b") 'next-buffer)
   (define-key evil-normal-state-map (kbd "[ q") 'previous-error)
@@ -90,24 +85,8 @@
   (with-eval-after-load "etags-select-autoloads"
     (define-key evil-normal-state-map (kbd "g ]") 'etags-select-find-tag-at-point))
 
-  (global-set-key (kbd "C-w") 'evil-window-map)
-  (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
-  (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
-
-
-  (define-key evil-motion-state-map "j" 'evil-next-visual-line)
-  (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
-
-  (define-key evil-normal-state-map (kbd "Q") 'my-window-killer)
-  (define-key evil-normal-state-map (kbd "Y") (kbd "y$"))
-
-  (define-key evil-visual-state-map (kbd ", e") 'eval-region)
-
   ;; emacs lisp
-  (evil-define-key 'normal emacs-lisp-mode-map "K" (bind (help-xref-interned (symbol-at-point))))
+  (evil-define-key 'normal emacs-lisp-mode-map "K" (dotemacs-bind (help-xref-interned (symbol-at-point))))
   (with-eval-after-load "elisp-slime-nav-autoloads"
     (evil-define-key 'normal emacs-lisp-mode-map (kbd "g d") 'elisp-slime-nav-find-elisp-thing-at-point))
 
@@ -121,11 +100,6 @@
   ;   )
   ; )
 
-  (with-eval-after-load 'stylus-mode
-    (define-key stylus-mode-map [remap eval-last-sexp] 'dotemacs-stylus-compile-and-eval-buffer)
-    (evil-define-key 'visual stylus-mode-map (kbd ", p") 'dotemacs-stylus-compile-and-show-region)
-    (evil-define-key 'normal stylus-mode-map (kbd ", p") 'dotemacs-stylus-compile-and-show-buffer))
-
   (with-eval-after-load "projectile-autoloads"
     (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
     (let ((binding (kbd "SPC /")))
@@ -133,7 +107,7 @@
              (define-key evil-normal-state-map binding 'projectile-pt))
             ((executable-find "ag")
              (define-key evil-normal-state-map binding
-	       (bind
+	       (dotemacs-bind
 		(setq current-prefix-arg t)
 		(call-interactively #'projectile-ag))))
             ((executable-find "ack")
@@ -144,33 +118,12 @@
       (helm-projectile-on)
       (define-key evil-normal-state-map (kbd "SPC e") 'helm-projectile-recentf)
       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)))
-
-
   )
-
-;; escape minibuffer
-(define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'my-minibuffer-keyboard-quit)
-
-(define-key minibuffer-local-map (kbd "C-w") 'backward-kill-word)
 
 (with-eval-after-load 'magit
   (global-set-key (kbd "C-x g") 'magit-status)
   (define-key magit-status-mode-map (kbd "C-n") 'magit-goto-next-sibling-section)
   (define-key magit-status-mode-map (kbd "C-p") 'magit-goto-previous-sibling-section))
-
-
-(with-eval-after-load 'comint
-  (define-key comint-mode-map [up] 'comint-previous-input)
-  (define-key comint-mode-map [down] 'comint-next-input))
-
-
-(with-eval-after-load 'auto-complete
-  (define-key ac-completing-map (kbd "C-n") 'ac-next)
-  (define-key ac-completing-map (kbd "C-p") 'ac-previous))
 
 
 (with-eval-after-load 'company
@@ -200,9 +153,6 @@
   (define-key help-mode-map (kbd "k") 'previous-line))
 
 
-(global-set-key [prior] 'previous-buffer)
-(global-set-key [next] 'next-buffer)
-
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c l") 'org-store-link)
@@ -214,21 +164,11 @@
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 
 (global-set-key (kbd "C-x p") 'proced)
-(with-eval-after-load "vkill-autoloads"
-  (autoload 'vkill "vkill" nil t)
-  (global-set-key (kbd "C-x p") 'vkill))
 
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
-
-;; have no use for these default bindings
-(global-unset-key (kbd "C-x m"))
-
-;; replace with [r]eally [q]uit
-(global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-(global-set-key (kbd "C-x C-c") (bind (message "Thou shall not quit!")))
 
 (provide 'init-bindings)

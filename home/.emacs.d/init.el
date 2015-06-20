@@ -289,6 +289,12 @@ FEATURE may be a named feature or a file name, see
     `(eval-after-load ,file
        `(funcall (function ,(lambda () ,@body))))))
 
+(defmacro dotemacs-bind (&rest commands)
+  "Convience macro which creates a lambda interactive command."
+  `(lambda ()
+     (interactive)
+     ,@commands))
+
 ;; Disable case insensitivity for filename autocompletion in shell-mode
 (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
 
@@ -734,6 +740,21 @@ mouse-3: go to end"))))
 
 ;; Display current keystrokes almost immediately in mini buffer
 (setq echo-keystrokes 0.2)
+
+;; escape minibuffer
+(define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
+(define-key minibuffer-local-ns-map [escape] 'my-minibuffer-keyboard-quit)
+(define-key minibuffer-local-completion-map [escape] 'my-minibuffer-keyboard-quit)
+(define-key minibuffer-local-must-match-map [escape] 'my-minibuffer-keyboard-quit)
+(define-key minibuffer-local-isearch-map [escape] 'my-minibuffer-keyboard-quit)
+(define-key minibuffer-local-map (kbd "C-w") 'backward-kill-word)
+
+;; have no use for these default bindings
+(global-unset-key (kbd "C-x m"))
+
+;; replace with [r]eally [q]uit
+(global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
+(global-set-key (kbd "C-x C-c") (dotemacs-bind (message "Thou shall not quit!")))
 
 ;; When changing focus to the minibuffer, stop allowing point to move
 ;; over the prompt. Code taken from ergoemacs.
@@ -4585,6 +4606,21 @@ Disable the highlighting of overlong lines."
     ; that's how I mapped them in Emacs:
     (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
     (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
+
+    (global-set-key (kbd "C-w") 'evil-window-map)
+    (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
+    (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
+    (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
+    (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
+    (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
+
+    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
+
+    (define-key evil-normal-state-map (kbd "Q") 'my-window-killer)
+    (define-key evil-normal-state-map (kbd "Y") (kbd "y$"))
+
+    (define-key evil-visual-state-map (kbd ", e") 'eval-region)
 
     ;; evil ex-command key
     (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
