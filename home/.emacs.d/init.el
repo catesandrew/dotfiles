@@ -177,7 +177,7 @@ NOERROR and NOMESSAGE are passed to `load'."
   :group 'dotemacs
   :prefix 'dotemacs-evil)
 
-(defcustom dotemacs-evil/evil-state-modes
+(defcustom dotemacs-evil-evil-state-modes
   '(fundamental-mode
     text-mode
     prog-mode
@@ -192,11 +192,24 @@ NOERROR and NOMESSAGE are passed to `load'."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 
-(defcustom dotemacs-evil/emacs-state-modes
+(defcustom dotemacs-evil-emacs-state-modes
   '(debugger-mode
     git-commit-mode
     git-rebase-mode)
   "List of modes that should start up in Evil Emacs state."
+  :type '(repeat (symbol))
+  :group 'dotemacs-evil)
+
+(defcustom dotemacs-evil-cursor-colors '((normal . "DarkGoldenrod2")
+                                       (insert . "chartreuse3")
+                                       (emacs  . "SkyBlue2")
+                                       (evilified . "LightGoldenrod3")
+                                       (visual . "gray")
+                                       (motion . "plum3")
+                                       (lisp   . "HotPink1")
+                                       (iedit  . "firebrick1")
+                                       (iedit-insert  . "firebrick1"))
+  "Colors assigned to evil states."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 

@@ -1,14 +1,3 @@
-(defvar dotemacs-evil-cursor-colors '((normal . "DarkGoldenrod2")
-                                       (insert . "chartreuse3")
-                                       (emacs  . "SkyBlue2")
-                                       (evilified . "LightGoldenrod3")
-                                       (visual . "gray")
-                                       (motion . "plum3")
-                                       (lisp   . "HotPink1")
-                                       (iedit  . "firebrick1")
-                                       (iedit-insert  . "firebrick1"))
-  "Colors assigned to evil states.")
-
 ;; hack for speeding up the use of ace-jump-line as a motion
 ;; https://bitbucket.org/lyro/evil/issue/472/evil-half-cursor-makes-evil-ace-jump-mode
 (defun evil-half-cursor ()
@@ -193,9 +182,9 @@
   (dotemacs-define-text-object "%" "percent" "%" "%"))
 
 (defun dotemacs-major-mode-evil-state-adjust ()
-  (if (apply 'derived-mode-p dotemacs-evil/evil-state-modes)
+  (if (apply 'derived-mode-p dotemacs-evil-evil-state-modes)
       (turn-on-evil-mode))
-  (when (apply 'derived-mode-p dotemacs-evil/emacs-state-modes)
+  (when (apply 'derived-mode-p dotemacs-evil-emacs-state-modes)
     (turn-off-evil-mode)))
 
 ; (when (>= emacs-major-version 25)
