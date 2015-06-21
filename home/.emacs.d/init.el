@@ -4651,6 +4651,14 @@ Disable the highlighting of overlong lines."
   :init (add-hook 'yaml-mode-hook #'ansible-doc-mode)
   :diminish (ansible-doc-mode . "❓"))
 
+(use-package help-mode
+  :config
+  (progn
+    (define-key help-mode-map (kbd "n") 'next-line)
+    (define-key help-mode-map (kbd "p") 'previous-line)
+    (define-key help-mode-map (kbd "j") 'next-line)
+    (define-key help-mode-map (kbd "k") 'previous-line)))
+
 (use-package dash-at-point
   :ensure t
   :defer t
@@ -4696,8 +4704,8 @@ Disable the highlighting of overlong lines."
                                          "C-w"
                                          ,dotemacs-leader-key
                                          ,dotemacs-emacs-leader-key
-                                         ; ,dotemacs-major-mode-leader-key
-                                         ; ,dotemacs-major-mode-emacs-leader-key
+                                         ,dotemacs-major-mode-leader-key
+                                         ,dotemacs-major-mode-emacs-leader-key
                                          ;; M-m in terminal
                                          "<ESC>m"
                                          ;; C-M-m in terminal
@@ -4722,34 +4730,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Evil
-(defgroup dotemacs-evil nil
-  "Configuration options for evil-mode."
-  :group 'dotemacs
-  :prefix 'dotemacs-evil)
-
-(defcustom dotemacs-evil/evil-state-modes
-  '(fundamental-mode
-    text-mode
-    prog-mode
-    sws-mode
-    dired-mode
-    comint-mode
-    log-edit-mode
-    messages-buffer-mode
-    project-explorer-mode
-    compilation-mode)
-  "List of modes that should start up in Evil state."
-  :type '(repeat (symbol))
-  :group 'dotemacs-evil)
-
-(defcustom dotemacs-evil/emacs-state-modes
-  '(debugger-mode
-    git-commit-mode
-    git-rebase-mode)
-  "List of modes that should start up in Evil Emacs state."
-  :type '(repeat (symbol))
-  :group 'dotemacs-evil)
-
 (use-package init-evil
   :load-path "config/")
 
