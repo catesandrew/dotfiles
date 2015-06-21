@@ -1858,8 +1858,10 @@ Disable the highlighting of overlong lines."
   :if (eq dotemacs-completion-engine 'company)
   :defer t
   :init
-  (setq company-statistics-file (concat dotemacs-cache-directory "company-statistics-cache.el"))
-  (company-statistics-mode))
+  (progn
+    (setq company-statistics-file (concat dotemacs-cache-directory
+                                          "company-statistics-cache.el"))
+    (add-hook 'company-mode-hook 'company-statistics-mode)))
 
 (use-package company-math               ; Completion for Math symbols
   :ensure t
@@ -1880,46 +1882,54 @@ Disable the highlighting of overlong lines."
           (bind-key "C-:" #'helm-company company-mode-map)
           (bind-key "C-:" #'helm-company company-active-map)))
 
-;; TODO: Incorporate this into `use-package auto-complete` below
-;; original `init-auto-complete`
-; (require 'auto-complete)
-; (require 'auto-complete-config)
-;
-; (setq completion-ignored-extensions
-;       '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".x9700" ".aux" ".elf" ))
-;
-; (setq ac-auto-show-menu t)
-; (setq ac-auto-start t)
-; (setq ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat"))
-; (setq ac-quick-help-delay 0.3)
-; (setq ac-quick-help-height 30)
-; (setq ac-show-menu-immediately-on-auto-complete t)
-;
-; (dolist (mode '(vimrc-mode html-mode stylus-mode handlebars-mode mustache-mode))
-;   (add-to-list 'ac-modes mode))
-;
-; (ac-config-default)
-;
-; (with-eval-after-load 'linum
-;   (ac-linum-workaround))
-;
-; (with-eval-after-load 'yasnippet
-;   (add-hook 'yas-before-expand-snippet-hook (lambda () (auto-complete-mode -1)))
-;   (add-hook 'yas-after-exit-snippet-hook (lambda () (auto-complete-mode t)))
-;   (defadvice ac-expand (before advice-for-ac-expand activate)
-;     (when (yas-expand)
-;       (ac-stop))))
-;
-; (require 'ac-etags)
-; (setq ac-etags-requires 1)
-; (after "etags"
-;   (ac-etags-setup))
-;; end origianl `init-auto-complete`
-
 (use-package auto-complete
   :ensure t
   :if (eq dotemacs-completion-engine 'auto-complete)
   :diminish auto-complete-mode)
+
+(use-package auto-complete
+  :ensure t
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :defer t
+  :init
+  (setq ac-auto-start 0
+        ac-delay 0.2
+        ac-quick-help-delay 1.
+        ac-use-fuzzy t
+        ; ac-auto-show-menu t
+        ; ac-quick-help-height 30
+        ; ac-show-menu-immediately-on-auto-complete t
+        ; completion-ignored-extensions '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".aux" ".elf" )
+        ac-fuzzy-enable t
+        ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat")
+        ;; use 'complete when auto-complete is disabled
+        tab-always-indent 'complete
+        ac-dwim t)
+  :config
+  (progn
+    (require 'auto-complete-config)
+    (setq-default ac-sources '(ac-source-abbrev
+                               ac-source-dictionary
+                               ac-source-words-in-same-mode-buffers))
+    (after "yasnippet"
+      (push 'ac-source-yasnippet ac-sources))
+
+    (add-to-list 'completion-styles 'initials t)
+    (define-key ac-completing-map (kbd "C-j") 'ac-next)
+    (define-key ac-completing-map (kbd "C-k") 'ac-previous)
+    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous))
+  :diminish (auto-complete-mode " ⓐ" " a"))
+
+(use-package ac-ispell
+  :ensure t
+  :defer t
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :init
+  (progn
+    (setq ac-ispell-requires 4)
+    (eval-after-load 'auto-complete
+      '(ac-ispell-setup))
+    ))
 
 (use-package init-yasnippet
   :load-path "config/"
