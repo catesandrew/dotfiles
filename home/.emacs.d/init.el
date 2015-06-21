@@ -481,11 +481,6 @@ FEATURE may be a named feature or a file name, see
 ;   :group 'dotemacs
 ;   :prefix 'dotemacs-eshell)
 ;
-; (defcustom dotemacs-eshell/plan9
-;   nil
-;   "Turns on Plan9 style prompt in eshell when non-nil."
-;   :group 'dotemacs-eshell)
-;
 ; ;; eshell
 ; (setq eshell-directory-name (concat dotemacs-cache-directory "eshell"))
 ; (setq eshell-scroll-to-bottom-on-input 'all)
@@ -495,10 +490,8 @@ FEATURE may be a named feature or a file name, see
 ;   (defadvice eshell (before advice-for-eshell activate)
 ;     (setq eshell-banner-message (concat (shell-command-to-string "fortune") "\n"))))
 ;
-;
 ; ;; em-alias
 ; (setq eshell-aliases-file (concat user-emacs-directory ".eshell-aliases"))
-;
 ;
 ; ;; em-glob
 ; (setq eshell-glob-case-insensitive t)
@@ -519,14 +512,6 @@ FEATURE may be a named feature or a file name, see
 ; 	    (when (executable-find "cat")
 ; 	      (setenv "PAGER" "cat"))))
 ;
-;
-; ;; plan 9 smart shell
-; (when dotemacs-eshell/plan9
-;   (with-eval-after-load 'esh-module
-;     (add-to-list 'eshell-modules-list 'eshell-smart)
-;     (setq eshell-where-to-jump 'begin)
-;     (setq eshell-review-quick-commands nil)
-;     (setq eshell-smart-space-goes-to-end t)))
 ;; end origianl `init-eshell`
 
 
@@ -1577,20 +1562,18 @@ mouse-3: go to end"))))
   :ensure t
   :bind (("C-=" . er/expand-region)))
 
-;; TODO: Incorporate this into `use-package undo-tree` below
-;; Represent undo-history as an actual tree (visualize with C-x u)
-; (setq undo-tree-mode-lighter "")
-; (setq undo-tree-auto-save-history t)
-; (setq undo-tree-history-directory-alist
-;       `(("." . ,(concat dotemacs-cache-directory "undo"))))
-;     (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
-;         (make-directory (concat dotemacs-cache-directory "undo")))
-; (setq undo-tree-visualizer-timestamps t)
-; (setq undo-tree-visualizer-diff t)
-
 (use-package undo-tree                  ; Branching undo
   :ensure t
-  :init (global-undo-tree-mode)
+  :init
+  (global-undo-tree-mode)
+  ;; (setq undo-tree-auto-save-history t
+  ;;       undo-tree-history-directory-alist
+  ;;       `(("." . ,(concat dotemacs-cache-directory "undo"))))
+  ;; (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
+  ;;     (make-directory (concat dotemacs-cache-directory "undo")))
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t)
+  :config
   :diminish (undo-tree-mode . "↺"))
 
 ;; Give us narrowing back!
