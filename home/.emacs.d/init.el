@@ -213,6 +213,43 @@ NOERROR and NOMESSAGE are passed to `load'."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 
+;; auto-completion settings
+(defgroup dotemacs-ac nil
+  "Configuration options for auto completion."
+  :group 'dotemacs
+  :prefix 'dotemacs-ac)
+
+(defcustom auto-completion-return-key-behavior 'complete
+  "What the RET key should do when auto-completion menu is active.
+Possible values are `complete' or `nil'."
+  :group 'dotemacs-ac)
+
+(defcustom auto-completion-tab-key-behavior 'cycle
+  "What the TAB key should do when auto-completion menu is active.
+Possible values are `complete', `cycle' or `nil'."
+  :group 'dotemacs-ac)
+
+(defcustom auto-completion-complete-with-key-sequence nil
+  "Provide a key sequence (string) to complete the current
+selection."
+  :group 'dotemacs-ac)
+
+(defcustom auto-completion-enable-sort-by-usage nil
+  "If non nil suggestions are sorted by how often they are used."
+  :group 'dotemacs-ac)
+
+(defcustom auto-completion-enable-help-tooltip t
+  "If non nil the docstring appears in a tooltip."
+  :group 'dotemacs-ac)
+
+(defcustom company-mode-completion-cancel-keywords
+  '("do"
+    "then"
+    "begin"
+    "case")
+  "Keywords on which to cancel completion so that you can use RET
+to complet without blocking common line endings."
+  :group 'dotemacs-ac)
 
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
@@ -1743,6 +1780,8 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Skeletons, completion and expansion
+(use-package init-auto-completions
+  :load-path "config/")
 
 ;; In `completion-at-point', do not pop up silly completion buffers for less
 ;; than five candidates.  Cycle instead.
@@ -1751,107 +1790,114 @@ Disable the highlighting of overlong lines."
 ;; tell emacs where to read abbrev
 (setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
 
-(use-package hippie-exp                 ; Powerful expansion and completion
-  :bind (([remap dabbrev-expand] . hippie-expand))
-  :config
-  (setq hippie-expand-try-functions-list
-        '(try-expand-dabbrev
-          try-expand-dabbrev-all-buffers
-          try-expand-dabbrev-from-kill
-          try-complete-file-name-partially
-          try-complete-file-name
-          try-expand-all-abbrevs
-          try-expand-list
-          try-complete-lisp-symbol-partially
-          try-complete-lisp-symbol
-          dotemacs-try-complete-lisp-symbol-without-namespace)))
-
 (use-package init-hippie-exp       ; Custom expansion functions
   :load-path "config/"
   :commands (dotemacs-try-complete-lisp-symbol-without-namespace))
 
-;; TODO: Incorporate this into `use-package company` below
-;; original `init-company`
-; (defgroup dotemacs-company nil
-;   "Configuration options for company-mode."
-;   :group 'dotemacs
-;   :prefix 'dotemacs-company)
-;
-; (defcustom dotemacs-company/ycmd-server-command nil
-;   "The path to the ycmd package."
-;   :group 'dotemacs-company)
-;
-; (require 'company)
-;
-; (setq company-idle-delay 0.5)
-; (setq company-minimum-prefix-length 2)
-; (setq company-show-numbers t)
-; (setq company-tooltip-limit 10)
-; ;; invert the navigation direction if the the completion popup-isearch-match
-; ;; is displayed on top (happens near the bottom of windows)
-; (setq company-tooltip-flip-when-above t)
-;
-;
-; (setq company-dabbrev-downcase nil)
-; (setq company-dabbrev-ignore-case t)
-;
-; (setq company-dabbrev-code-ignore-case t)
-; (setq company-dabbrev-code-everywhere t)
-;
-; (setq company-etags-ignore-case t)
-;
-; (unless (face-attribute 'company-tooltip :background)
-;   (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
-;   (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
-;   (set-face-attribute 'company-preview nil :background "black")
-;   (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
-;   (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
-;   (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
-;
-; (when (executable-find "tern")
-;   (with-eval-after-load "company-tern-autoloads"
-;     (add-to-list 'company-backends 'company-tern)))
-;
-; (setq company-global-modes
-;       '(not
-;         eshell-mode comint-mode org-mode erc-mode))
-;
-; (defadvice company-complete-common (around advice-for-company-complete-common activate)
-;   (when (null (yas-expand))
-;     ad-do-it))
-;
-; (defun my-company-tab ()
-;   (interactive)
-;   (when (null (yas-expand))
-;     (company-select-next)))
-;
-; (when dotemacs-company/ycmd-server-command
-;   (setq ycmd-server-command `("python" ,dotemacs-company/ycmd-server-command))
-;   (require 'ycmd)
-;   (ycmd-setup)
-;
-;   (require 'company-ycmd)
-;   (company-ycmd-setup))
-;
-; (global-company-mode)
-;
-; (when (display-graphic-p)
-;   (require 'company-quickhelp)
-;   (setq company-quickhelp-delay 0.2)
-;   (company-quickhelp-mode t))
-;; end origianl `init-company`
+(use-package hippie-exp                 ; Powerful expansion and completion
+  :bind (([remap dabbrev-expand] . hippie-expand))
+  :init
+  (after "yasnippet"
+    ;; Try to expand yasnippet snippets based on prefix
+    (push 'yas-hippie-try-expand hippie-expand-try-functions-list))
+  :config
+  ;; replace dabbrev-expand
+  (global-set-key (kbd "M-/") 'hippie-expand)
+  (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
+  (setq hippie-expand-try-functions-list
+        '(
+          ;; Try to expand word "dynamically", searching the current buffer.
+          try-expand-dabbrev
+          ;; Try to expand word "dynamically", searching all other buffers.
+          try-expand-dabbrev-all-buffers
+          ;; Try to expand word "dynamically", searching the kill ring.
+          try-expand-dabbrev-from-kill
+          ;; Try to complete text as a file name, as many characters as unique.
+          try-complete-file-name-partially
+          ;; Try to complete text as a file name.
+          try-complete-file-name
+          ;; Try to expand word before point according to all abbrev tables.
+          try-expand-all-abbrevs
+          ;; Try to complete the current line to an entire line in the buffer.
+          try-expand-list
+          ;; Try to complete the current line to an entire line in the buffer.
+          try-expand-line
+          ;; Try to complete as an Emacs Lisp symbol, as many characters as
+          ;; unique.
+          try-complete-lisp-symbol-partially
+          ;; Try to complete word as an Emacs Lisp symbol.
+          try-complete-lisp-symbol
+          dotemacs-try-complete-lisp-symbol-without-namespace)))
 
 (use-package company                    ; Graphical (auto-)completion
   :ensure t
   :defer t
   :if (eq dotemacs-completion-engine 'company)
-  :init (global-company-mode)
+  :init
+  (progn
+    (setq company-idle-delay 0.2
+          company-tooltip-align-annotations t
+          ; company-tooltip-limit 10
+          company-minimum-prefix-length 2
+          ;; invert the navigation direction if the the completion popup-isearch-match
+          ;; is displayed on top (happens near the bottom of windows)
+          ; company-tooltip-flip-when-above t
+          company-require-match nil
+          ; company-dabbrev-code-ignore-case t
+          ; company-dabbrev-code-everywhere t
+          company-show-numbers t ;; Easy navigation to candidates with M-<n>
+          company-dabbrev-ignore-case nil
+          company-dabbrev-downcase nil
+          company-frontends '(company-pseudo-tooltip-frontend)
+          company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+          (defvar-local company-fci-mode-on-p nil)
+
+    (defun company-turn-off-fci (&rest ignore)
+      (when (boundp 'fci-mode)
+        (setq company-fci-mode-on-p fci-mode)
+        (when fci-mode (fci-mode -1))))
+
+    (defun company-maybe-turn-on-fci (&rest ignore)
+      (when company-fci-mode-on-p (fci-mode 1)))
+
+    (add-hook 'company-completion-started-hook 'company-turn-off-fci)
+    (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
   :config
   (progn
-    (setq company-tooltip-align-annotations t
-          ;; Easy navigation to candidates with M-<n>
-          company-show-numbers t))
-  :diminish company-mode)
+    ;; key bindings
+    (defun dotemacs-company-complete-common-or-cycle-backward ()
+      "Complete common prefix or cycle backward."
+      (interactive)
+      (company-complete-common-or-cycle -1))
+
+    (dotemacs-auto-completion-set-RET-key-behavior 'company)
+    (dotemacs-auto-completion-set-TAB-key-behavior 'company)
+    (dotemacs-auto-completion-setup-key-sequence 'company)
+    (let ((map company-active-map))
+      (define-key map (kbd "C-/") 'company-search-candidates)
+      (define-key map (kbd "C-M-/") 'company-filter-candidates)
+      (define-key map (kbd "C-d") 'company-show-doc-buffer)
+      (define-key map (kbd "C-j") 'company-select-next)
+      (define-key map (kbd "C-k") 'company-select-previous)
+      (define-key map (kbd "C-l") 'company-complete-selection))
+
+    ;; Nicer looking faces
+    (custom-set-faces
+     '(company-tooltip-common
+       ((t (:inherit company-tooltip :weight bold :underline nil))))
+     '(company-tooltip-common-selection
+       ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+
+    ;; Transformers
+    (defun dotemacs-company-transformer-cancel (candidates)
+      "Cancel completion if prefix is in the list
+`company-mode-completion-cancel-keywords'"
+      (unless (member company-prefix company-mode-completion-cancel-keywords)
+        candidates))
+    (setq company-transformers '(dotemacs-company-transformer-cancel
+                                   company-sort-by-occurrence)))
+  :diminish (company-mode " ⓐ" " a"))
 
 (use-package company-statistics
   :ensure t
@@ -1862,6 +1908,16 @@ Disable the highlighting of overlong lines."
     (setq company-statistics-file (concat dotemacs-cache-directory
                                           "company-statistics-cache.el"))
     (add-hook 'company-mode-hook 'company-statistics-mode)))
+
+(use-package company-quickhelp
+  :defer t
+  :disabled t
+  :if (and auto-completion-enable-help-tooltip
+           (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
+                                                  ;; is not compatible with 24.3 anymore
+           (eq dotemacs-completion-engine 'company)
+           (display-graphic-p))
+  :init (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
 (use-package company-math               ; Completion for Math symbols
   :ensure t
@@ -1935,39 +1991,81 @@ Disable the highlighting of overlong lines."
   :load-path "config/"
   :defer t
   :commands (dotemacs-load-yasnippet
+             dotemacs-auto-yasnippet-expand
              dotemacs-force-yasnippet-off))
 
-;; TODO: Incorporate this into `use-package yasnippet` below
-;; original `init-yasnippet`
-; (let* ((yas-install-dir (car (file-expand-wildcards (concat package-user-dir "/yasnippet-*"))))
-;        (dir (concat yas-install-dir "/snippets/js-mode")))
-;   (if (file-exists-p dir)
-;       (delete-directory dir t)))
-;
-; (setq yas-fallback-behavior 'return-nil)
-; (setq yas-also-auto-indent-first-line t)
-; (setq yas-prompt-functions '(yas/ido-prompt yas/completing-prompt))
-;
-; (yas-load-directory (concat user-emacs-directory "/snippets"))
-;; end origianl `init-yasnippet`
-
 (use-package yasnippet
-  :commands yas-global-mode
-  :disabled t
   :ensure t
+  :commands yas-global-mode
   :init
   (progn
     ;; disable yas minor mode map, use hippie-expand instead
-    (setq yas-minor-mode-map (make-sparse-keymap)))
-    (dolist (mode '(js2 markdown html css org))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (dotemacs-load-yasnippet))))
-    (dolist (mode '(term shell))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (dotemacs-force-yasnippet-off))))
+    (setq yas-minor-mode-map (make-sparse-keymap))
+
+    ;; allow nested expansions
+    (setq yas-triggers-in-field t)
+
+    ;; this makes it easy to get out of a nested expansion
+    (define-key yas-minor-mode-map
+      (kbd "M-s-/") 'yas-next-field)
+
+    ;; add key into candidate list
+    (setq helm-yas-display-key-on-candidate t)
+
+    (add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
+                                             markdown-mode-hook
+                                             org-mode-hook))
+    (dotemacs-add-toggle yasnippet
+                         :status yas-minor-mode
+                         :on (yas-minor-mode)
+                         :off (yas-minor-mode -1)
+                         :documentation "Enable yasnippet."
+                         :evil-leader "ty")
+
+    (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
+                                                  shell-mode-hook
+                                                  eshell-mode-hook)))
+  :config
+  (progn
+    ;;  We need to know whether the smartparens was enabled, see
+    ;; `yas-before-expand-snippet-hook' below.
+    (defvar smartparens-enabled-initially t
+      "Stored whether smartparens is originally enabled or not.")
+
+    (add-hook 'yas-before-expand-snippet-hook (lambda ()
+                                                ;; If enabled, smartparens will mess snippets expanded by `hippie-expand`
+                                                (setq smartparens-enabled-initially smartparens-mode)
+                                                (smartparens-mode -1)))
+    (add-hook 'yas-after-exit-snippet-hook (lambda ()
+                                             (when smartparens-enabled-initially
+                                               (smartparens-mode 1)))))
   :diminish (yas-minor-mode " ⓨ" " y"))
+
+(use-package auto-yasnippet
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
+
+    (evil-leader/set-key
+      "iSc" 'aya-create
+      "iSe" 'dotemacs-auto-yasnippet-expand
+      "iSw" 'aya-persist-snippet)))
+
+(use-package helm-c-yasnippet
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (defun dotemacs-helm-yas ()
+      "Properly lazy load helm-c-yasnipper."
+      (interactive)
+      (dotemacs-load-yasnippet)
+      (require 'helm-c-yasnippet)
+      (call-interactively 'helm-yas-complete))
+    (evil-leader/set-key "is" 'dotemacs-helm-yas)
+    (setq helm-c-yas-space-match-any-greedy t)))
 
 
 ;;; Spelling and syntax checking
