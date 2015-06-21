@@ -265,7 +265,7 @@ NOERROR and NOMESSAGE are passed to `load'."
 (setq use-package-inject-hooks t)
 
 
-;; Requires
+;;; Requires
 
 (eval-when-compile
   (require 'use-package))
@@ -281,25 +281,7 @@ NOERROR and NOMESSAGE are passed to `load'."
 (require 'time-date)
 
 
-;;; Initialization
-(when (version< emacs-version "25")
-  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
-  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
-
-;; And disable the site default settings
-(setq inhibit-default-init t)
-
-;; start scratch in text mode (usefull to get a faster Emacs load time
-;; because it avoids autoloads of elisp modes)
-(setq initial-major-mode 'text-mode)
-
-;; Warn if the current build is more than a week old
-(run-with-idle-timer
- 2 nil
- (lambda ()
-   (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
-     (when (> (time-to-number-of-days time-since-build) 7)
-       (lwarn 'emacs :warning "Your Emacs build is more than a week old!")))))
+;;; After and other macros
 
 ; "After" macro definition
 ;
@@ -342,6 +324,28 @@ FEATURE may be a named feature or a file name, see
   `(lambda ()
      (interactive)
      ,@commands))
+
+
+;;; Initialization
+(when (version< emacs-version "25")
+  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
+  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+
+;; And disable the site default settings
+(setq inhibit-default-init t)
+
+;; start scratch in text mode (usefull to get a faster Emacs load time
+;; because it avoids autoloads of elisp modes)
+(setq initial-major-mode 'text-mode)
+
+;; Warn if the current build is more than a week old
+(run-with-idle-timer
+ 2 nil
+ (lambda ()
+   (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
+     (when (> (time-to-number-of-days time-since-build) 7)
+       (lwarn 'emacs :warning "Your Emacs build is more than a week old!")))))
+
 
 ;; Disable case insensitivity for filename autocompletion in shell-mode
 (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
@@ -932,36 +936,37 @@ mouse-3: go to end"))))
 (use-package ibuffer                    ; Better buffer list
   :bind (([remap list-buffers] . ibuffer))
   ;; Show VC Status in ibuffer
-  :init (progn
-          (add-hook 'ibuffer-hook
-                    (lambda ()
-                      ; (ibuffer-switch-to-saved-filter-groups "home")
-                      (ibuffer-auto-mode 1)))
-
-          (setq ibuffer-expert t
-                ibuffer-show-empty-filter-groups nil))
-
-  :config (setq ibuffer-formats
-                '((mark modified read-only vc-status-mini " "
-                        (name 18 18 :left :elide)
-                        " "
-                        (size 9 -1 :right)
-                        " "
-                        (mode 16 16 :left :elide)
-                        " "
-                        (vc-status 16 16 :left)
-                        " "
-                        filename-and-process)
-                  (mark modified read-only " "
-                        (name 18 18 :left :elide)
-                        " "
-                        (size 9 -1 :right)
-                        " "
-                        (mode 16 16 :left :elide)
-                        " " filename-and-process)
-                  (mark " "
-                        (name 16 -1)
-                        " " filename)))
+  :init
+  (progn
+    (add-hook 'ibuffer-hook
+              (lambda ()
+                ; (ibuffer-switch-to-saved-filter-groups "home")
+                (ibuffer-auto-mode 1)))
+    (setq ibuffer-expert t
+          ibuffer-show-empty-filter-groups nil))
+  :config
+  (progn
+    (setq ibuffer-formats
+          '((mark modified read-only vc-status-mini " "
+                  (name 18 18 :left :elide)
+                  " "
+                  (size 9 -1 :right)
+                  " "
+                  (mode 16 16 :left :elide)
+                  " "
+                  (vc-status 16 16 :left)
+                  " "
+                  filename-and-process)
+            (mark modified read-only " "
+                  (name 18 18 :left :elide)
+                  " "
+                  (size 9 -1 :right)
+                  " "
+                  (mode 16 16 :left :elide)
+                  " " filename-and-process)
+            (mark " "
+                  (name 16 -1)
+                  " " filename)))
     (setq ibuffer-saved-filter-groups
           '(("home"
              ("emacs-config" (or (filename . ".emacs.d")
@@ -976,7 +981,7 @@ mouse-3: go to end"))))
              ("ERC" (mode . erc-mode))
              ("Help" (or (name . "\*Help\*")
                          (name . "\*Apropos\*")
-                         (name . "\*info\*")))))))
+                         (name . "\*info\*"))))))))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
