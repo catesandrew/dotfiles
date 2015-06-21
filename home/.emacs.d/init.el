@@ -866,18 +866,45 @@ mouse-3: go to end"))))
                              (executable-find "ggrep")))
       (setq helm-grep-default gnu-grep))
 
-      (use-package helm-swoop
-        :ensure t
-        :defer t
-        :config (setq helm-swoop-pre-input-function #'ignore
-                      helm-swoop-use-line-number-face t
-                      helm-swoop-split-with-multiple-windows t))
 
       (use-package helm-descbinds
                    :ensure t
                    :defer t))
 
   :diminish helm-mode)
+
+(use-package helm-swoop
+  :ensure t
+  :defer t
+  :init
+  (after "helm"
+    (progn
+      (setq helm-swoop-split-with-multiple-windows t
+            helm-swoop-use-line-number-face t
+            helm-swoop-split-direction 'split-window-vertically
+            helm-swoop-speed-or-color t
+            helm-swoop-split-window-function 'helm-default-display-buffer
+            helm-swoop-pre-input-function (lambda () ""))
+
+      (defun dotemacs-helm-swoop-region-or-symbol ()
+        "Call `helm-swoop' with default input."
+        (interactive)
+        (let ((helm-swoop-pre-input-function
+               (lambda ()
+                 (if (region-active-p)
+                     (buffer-substring-no-properties (region-beginning)
+                                                     (region-end))
+                   (let ((thing (thing-at-point 'symbol t)))
+                     (if thing thing ""))))))
+          (call-interactively 'helm-swoop)))
+
+      (after "evil-leader"
+        (evil-leader/set-key
+          "ss"    'helm-swoop
+          "sS"    'dotemacs-helm-swoop-region-or-symbol
+          "s C-s" 'helm-multi-swoop-all))
+      (defadvice helm-swoop (before add-evil-jump activate)
+        (evil-set-jump)))))
 
 (use-package helm-misc                  ; Misc helm commands
   :ensure helm
