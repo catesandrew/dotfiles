@@ -1803,6 +1803,7 @@ Disable the highlighting of overlong lines."
 
 (use-package company                    ; Graphical (auto-)completion
   :ensure t
+  :defer t
   :if (eq dotemacs-completion-engine 'company)
   :init (global-company-mode)
   :config
