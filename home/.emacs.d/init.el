@@ -896,6 +896,8 @@ mouse-3: go to end"))))
       '(:eval (if (buffer-file-name)
                   (abbreviate-file-name (buffer-file-name)) "%b")))
 
+(setq-default line-spacing 0.1)         ; A bit more spacing between lines
+
 (use-package frame
   :bind (("C-c t F" . toggle-frame-fullscreen))
   :init
