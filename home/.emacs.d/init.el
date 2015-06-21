@@ -4135,9 +4135,16 @@ Disable the highlighting of overlong lines."
 ;;; Project management with Project Explorer
 (use-package project-explorer
   :disabled t
+  :defer t
   :ensure t
+  :commands (project-explorer-open
+             project-explorer-toggle)
   :init
   (progn
+    (after "evil-leader"
+      (evil-leader/set-key
+        "ft" 'project-explorer-open
+        "fT" 'project-explorer-toggle))
     (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer")))
   :config
   (progn
@@ -4171,16 +4178,7 @@ Disable the highlighting of overlong lines."
         (kbd "f") 'pe/find-file
         (kbd "w") 'pe/copy-file-name-as-kill
         (kbd "M-l") 'pe/set-filter-regex
-        (kbd "M-o") 'pe/toggle-omit))
-
-    (after "evil-leader"
-      (evil-leader/set-key
-        "ft" (lambda()
-              (interactive)
-              (project-explorer-open))
-        "fT" (lambda()
-              (interactive)
-              (project-explorer-toggle))))))
+        (kbd "M-o") 'pe/toggle-omit))))
 
 
 ;;; Project management with NeoTree
