@@ -1248,7 +1248,8 @@ mouse-3: go to end"))))
 (use-package init-files            ; Personal file tools
   :load-path "config/"
   :defer t
-  :commands (dotemacs-create-non-existent-directory)
+  :commands (dotemacs-create-non-existent-directory
+             dotemacs-recompile-packages)
   :init
   (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
   :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
