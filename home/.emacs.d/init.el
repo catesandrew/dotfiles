@@ -260,6 +260,10 @@ NOERROR and NOMESSAGE are passed to `load'."
   (package-refresh-contents)
   (package-install 'use-package))
 
+;; inject use-package hooks for easy customization of
+;; stock package configuration
+(setq use-package-inject-hooks t)
+
 
 ;; Requires
 
