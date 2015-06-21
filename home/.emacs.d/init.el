@@ -157,19 +157,19 @@ NOERROR and NOMESSAGE are passed to `load'."
   "File used to store settings from Customization UI."
   :group 'dotemacs)
 
-;; magit settings
-(defgroup dotemacs-magit nil
-  "Configuration options for magit."
+;; git settings
+(defgroup dotemacs-git nil
+  "Configuration options for git."
   :group 'dotemacs
-  :prefix 'dotemacs-evil)
+  :prefix 'dotemacs-git)
 
 (defcustom dotemacs-git-enable-magit-svn-plugin nil
   "If non nil `magit-svn' plugin is enabled."
-  :group 'dotemacs-magit)
+  :group 'dotemacs-git)
 
 (defcustom dotemacs-git-magit-status-fullscreen t
   "If non nil magit-status buffer is displayed in fullscreen."
-  :group 'dotemacs-magit)
+  :group 'dotemacs-git)
 
 ;; evil settings
 (defgroup dotemacs-evil nil
