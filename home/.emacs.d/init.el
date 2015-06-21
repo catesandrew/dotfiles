@@ -391,16 +391,16 @@ FEATURE may be a named feature or a file name, see
   :load-path "config/")
 
 (use-package core-funcs
-  :load-path "config/")
+  :load-path "core/")
 
 (use-package core-micro-state
-  :load-path "config/")
+  :load-path "core/")
 
 (use-package core-use-package
-  :load-path "config/")
+  :load-path "core/")
 
 (use-package core-toggle
-  :load-path "config/")
+  :load-path "core/")
 
 
 ;;; Setup environment variables from the user's shell.
