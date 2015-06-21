@@ -441,7 +441,6 @@ FEATURE may be a named feature or a file name, see
 
 
 ;;; Setup environment variables from the user's shell.
-
 (use-package exec-path-from-shell
   :ensure t
   :if (and (eq system-type 'darwin) (display-graphic-p))
@@ -742,6 +741,18 @@ FEATURE may be a named feature or a file name, see
   :ensure zenburn-theme
   :defer t
   :init (load-theme 'zenburn 'no-confirm))
+
+(use-package linum-relative
+  :ensure t
+  :commands linum-relative-toggle
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key "tr" 'linum-relative-toggle))
+  :config
+  (progn
+    (setq linum-format 'linum-relative)
+    (setq linum-relative-current-symbol "")
+    (linum-relative-toggle)))
 
 (bind-key "C-c t v" #'variable-pitch-mode)
 
