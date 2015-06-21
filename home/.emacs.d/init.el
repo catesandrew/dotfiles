@@ -122,6 +122,10 @@ transparency level of a frame when it's inactive or deselected. Transparency
 can be toggled through `toggle-transparency'."
   :group 'dotemacs)
 
+(defcustom dotemacs-smartparens-strict-mode t
+  "If non-nil smartparens-strict-mode will be enabled in programming modes."
+  :group 'dotemacs)
+
 (defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
   "Filepath to the installed dotfile.")
 
@@ -473,46 +477,6 @@ FEATURE may be a named feature or a file name, see
   :commands (dotemacs-new-eshell-split
              dotemacs-eshell-prompt
              dotemacs-current-git-branch))
-
-;; TODO: Incorporate this into new `use-package eshell` below
-;; original `init-eshell`
-; (defgroup dotemacs-eshell nil
-;   "Configuration options for eshell-mode."
-;   :group 'dotemacs
-;   :prefix 'dotemacs-eshell)
-;
-; ;; eshell
-; (setq eshell-directory-name (concat dotemacs-cache-directory "eshell"))
-; (setq eshell-scroll-to-bottom-on-input 'all)
-; (setq eshell-buffer-shorthand t)
-;
-; (when (executable-find "fortune")
-;   (defadvice eshell (before advice-for-eshell activate)
-;     (setq eshell-banner-message (concat (shell-command-to-string "fortune") "\n"))))
-;
-; ;; em-alias
-; (setq eshell-aliases-file (concat user-emacs-directory ".eshell-aliases"))
-;
-; ;; em-glob
-; (setq eshell-glob-case-insensitive t)
-; (setq eshell-error-if-no-glob t)
-;
-; ;; em-hist
-; (setq eshell-history-size 1024)
-;
-; ;; em-compl
-; (setq eshell-cmpl-ignore-case t)
-;
-; ;; em-prompt
-; (setq eshell-prompt-function #'dotemacs-eshell-prompt)
-;
-; (add-hook 'eshell-mode-hook
-; 	  (lambda ()
-; 	    ;; get rid of annoying 'terminal is not fully functional' warning
-; 	    (when (executable-find "cat")
-; 	      (setenv "PAGER" "cat"))))
-;
-;; end origianl `init-eshell`
 
 
 ;;; Customization, init file and package management
@@ -1631,69 +1595,57 @@ mouse-3: go to end"))))
     (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-splice-sexp))
   :diminish paredit-mode)
 
-;; TODO: Incorporate this into `use-package smartparens` below
-;; original `init-smartparens`
-; (defgroup dotemacs-smartparens nil
-;   "Configuration options for smartparens."
-;   :group 'dotemacs
-;   :prefix 'dotemacs-smartparens)
-;
-; (defcustom dotemacs-smartparens/autoinsert nil
-;   "When non-nil, turn on smartparens auto pairing instead of the default Emacs electric-pair-mode."
-;   :group 'dotemacs-smartparens)
-;
-; (defcustom dotemacs-smartparens/show-paren nil
-;   "When non-nil, turn on smartparens paren matching instead of the default Emacs show-paren-mode."
-;   :group 'dotemacs-smartparens)
-;
-; (setq sp-autoinsert-quote-if-followed-by-closing-pair nil)
-;
-; (if dotemacs-smartparens/autoinsert
-;     (progn
-;       (setq sp-autoinsert-pair t)
-;       (electric-pair-mode -1))
-;   (setq sp-autoinsert-pair nil))
-;
-; (sp-use-smartparens-bindings)
-;
-; (when dotemacs-smartparens/show-paren
-;   (setq sp-show-pair-delay 0)
-;   (setq sp-show-pair-from-inside t)
-;   (show-paren-mode -1)
-;   (show-smartparens-global-mode t))
-;
-; (defun my-open-block-c-mode (id action context)
-;   (when (eq action 'insert)
-;     (newline)
-;     (indent-according-to-mode)
-;     (forward-line -1)
-;     (indent-according-to-mode)))
-;
-; (sp-pair "{" nil :post-handlers '(:add (my-open-block-c-mode "RET")))
-; (sp-pair "[" nil :post-handlers '(:add (my-open-block-c-mode "RET")))
-;
-; ;; fix conflict where smartparens clobbers yas' key bindings
-; (with-eval-after-load 'yasnippet
-;   (defadvice yas-expand (before advice-for-yas-expand activate)
-;     (sp-remove-active-pair-overlay)))
-;; end origianl `init-smartparens`
+(use-package init-smartparens      ; Personal Smartparens extensions
+  :load-path "config/")
 
 ;; Use SmartParens instead of Paredit and Electric Pair
 (use-package smartparens                ; Parenthesis editing and balancing
   :ensure t
-  :init (progn (smartparens-global-mode)
-               (show-smartparens-global-mode)
+  :defer t
+  :init
+  (progn
+    (add-to-hooks (if dotemacs-smartparens-strict-mode
+                      'smartparens-strict-mode
+                    'smartparens-mode)
+                  '(prog-mode-hook))
 
-               (dolist (hook '(inferior-emacs-lisp-mode-hook
-                               emacs-lisp-mode-hook))
-                 (add-hook hook #'smartparens-strict-mode)))
-  :config (setq sp-autoskip-closing-pair 'always
-                ;; Don't kill entire symbol on C-k
-                sp-hybrid-kill-entire-symbol nil)
-  :diminish smartparens-mode)
+    (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
-(use-package init-smartparens      ; Personal Smartparens extensions
-  :load-path "config/")
+    (dotemacs-add-toggle smartparens
+                         :status smartparens-mode
+                         :on (smartparens-mode)
+                         :off (smartparens-mode -1)
+                         :documentation "Enable smartparens."
+                         :evil-leader "tp")
+
+    (dotemacs-add-toggle smartparens-globally
+                         :status smartparens-mode
+                         :on (smartparens-global-mode)
+                         :off (smartparens-global-mode -1)
+                         :documentation "Enable smartparens globally."
+                         :evil-leader "t C-p")
+
+    (setq sp-show-pair-delay 0
+          sp-show-pair-from-inside t ; fix paren highlighting in normal mode
+          sp-cancel-autoskip-on-backward-movement nil))
+  :config
+  (progn
+    (require 'smartparens-config)
+
+    (setq sp-autoskip-closing-pair 'always
+          ;; Don't kill entire symbol on C-k
+          sp-hybrid-kill-entire-symbol nil)
+
+    (show-smartparens-global-mode +1)
+
+    ;; don't create a pair with single quote in minibuffer
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+
+    (sp-pair "{" nil :post-handlers
+             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
+    (sp-pair "[" nil :post-handlers
+             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET"))))
+  :diminish (smartparens-mode " ⓟ" " p"))
 
 
 ;;; Highlights and fontification
