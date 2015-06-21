@@ -1,6 +1,0 @@
-# -*- mode: snippet; require-final-newline: nil -*-
-# name: License
-# key: license
-# binding: C-c s l
-# --
-`(my/yas-choose-license)`

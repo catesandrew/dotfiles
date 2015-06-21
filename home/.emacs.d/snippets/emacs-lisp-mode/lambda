@@ -1,6 +1,0 @@
-# -*- mode: snippet; require-final-newline: nil -*-
-# name: lambda
-# key: lambda
-# --
-lambda ($2)
-$0

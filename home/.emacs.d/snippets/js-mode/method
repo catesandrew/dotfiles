@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# name: Method
-# key: method
-# --
-
-${1:method}: function(${2:args}) {
-    $0
-},
