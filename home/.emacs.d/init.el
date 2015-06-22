@@ -265,6 +265,12 @@ to complet without blocking common line endings."
   "If non nil some feedback are displayed in tooltips."
   :group 'dotemacs-s)
 
+;;helm
+(defface dotemacs-helm-navigation-ms-face
+      `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
+      "Face for helm heder when helm micro-state is activated."
+      :group 'dotemacs)
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -304,45 +310,6 @@ to complet without blocking common line endings."
 (set-keyboard-coding-system 'utf-8) ; pretty
 (set-selection-coding-system 'utf-8) ; please
 (prefer-coding-system 'utf-8) ; with sugar on top
-
-
-;;; Package management
-(setq load-prefer-newer t)
-
-;; Please don't load outdated byte code
-(require 'package)
-
-;; http://stackoverflow.com/questions/11127109/
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-
-(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-;; inject use-package hooks for easy customization of
-;; stock package configuration
-(setq use-package-inject-hooks t)
-
-
-;;; Requires
-
-(eval-when-compile
-  (require 'use-package))
-
-(eval-when-compile
-  (require 'cl))
-
-(require 'bind-key)
-(require 'diminish)
-
-(require 'subr-x)
-(require 'rx)
-(require 'time-date)
 
 
 ;;; After and other macros
@@ -388,6 +355,54 @@ FEATURE may be a named feature or a file name, see
   `(lambda ()
      (interactive)
      ,@commands))
+
+
+;;; Package management
+(setq load-prefer-newer t)
+
+;; Please don't load outdated byte code
+(require 'package)
+
+;; http://stackoverflow.com/questions/11127109/
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+
+(package-initialize)
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; inject use-package hooks for easy customization of
+;; stock package configuration
+(setq use-package-inject-hooks t)
+
+
+;;; Requires
+
+(eval-when-compile
+  (require 'use-package))
+
+(eval-when-compile
+  (require 'cl))
+
+(require 'bind-key)
+(require 'diminish)
+;; Minor modes abbrev --------------------------------------------------------
+(when (display-graphic-p)
+  (after "eproject"
+    '(diminish 'eproject-mode " eⓅ"))
+  (after "flymake"
+    '(diminish 'flymake-mode " Ⓕ2")))
+;; Minor Mode (hidden) ------------------------------------------------------
+(after "abbrev"
+  '(diminish 'abbrev-mode))
+
+(require 'subr-x)
+(require 'rx)
+(require 'time-date)
 
 
 ;;; Initialization
@@ -469,7 +484,8 @@ FEATURE may be a named feature or a file name, see
     (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
       (add-to-list 'exec-path-from-shell-variables var))
 
-    (exec-path-from-shell-initialize)
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
 
     (setq user-mail-address (getenv "EMAIL"))
 
@@ -784,10 +800,13 @@ FEATURE may be a named feature or a file name, see
   :defer t
   :init (fancy-battery-mode))
 
-(use-package anzu                       ; Position/matches count for isearch
+(use-package evil-anzu                  ; Position/matches count for isearch
   :ensure t
   :init (global-anzu-mode)
-  :config (setq anzu-cons-mode-line-p nil)
+  :config
+  (progn
+    (setq anzu-search-threshold 1000
+          anzu-cons-mode-line-p nil))
   :diminish anzu-mode)
 
 (use-package which-func                 ; Current function name in header line
@@ -845,40 +864,129 @@ mouse-3: go to end"))))
 ;; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
 ;; can also enable Helm to manage the command buffer, which is pretty awesome
 ;; with: (helm-mode 1)
+(use-package init-helm
+  :load-path "config/")
+
 (use-package helm
   :ensure t
   :bind (("C-c b b" . helm-resume))
-  :init (progn (helm-mode 1)
-               (after "helm-config"
-                 (warn "`helm-config' loaded! Get rid of it ASAP!")))
+  :commands dotemacs-helm-find-files
+  :init
+  (progn
+    (after "helm-config"
+           (warn "`helm-config' loaded! Get rid of it ASAP!"))
+
+    (setq helm-prevent-escaping-from-minibuffer t
+          helm-bookmark-show-location t
+          helm-display-header-line nil
+          helm-split-window-in-side-p t
+          helm-always-two-windows t)
+
+    ;; fuzzy matching setting
+    (setq helm-M-x-fuzzy-match t
+          helm-apropos-fuzzy-match t
+          helm-file-cache-fuzzy-match t
+          helm-imenu-fuzzy-match t
+          helm-lisp-fuzzy-completion t
+          helm-locate-fuzzy-match t
+          helm-recentf-fuzzy-match t
+          helm-semantic-fuzzy-match t
+          helm-buffers-fuzzy-matching t)
+
+    ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
+    ;; brew tap homebrew/dupes
+    ;; brew install homebrew/dupes/grep
+    (when-let (gnu-grep (and (eq system-type 'darwin)
+                           (executable-find "ggrep")))
+    (setq helm-grep-default gnu-grep))
+
+    (defadvice helm-ff-delete-char-backward
+        (around dotemacs-helm-find-files-navigate-back activate)
+      (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
+          (helm-find-files-up-one-level 1)
+        ad-do-it))
+
+    ;; use helm by default for M-x
+    (global-set-key (kbd "M-x") 'helm-M-x)
+
+    (after "evil-leader"
+      (evil-leader/set-key
+        "<f1>" 'helm-apropos
+        "bb"   'helm-mini
+        "Cl"   'helm-colors
+        "ff"   'dotemacs-helm-find-files
+        "fF"   'helm-find-files
+        "fr"   'helm-recentf
+        "hb"   'helm-pp-bookmarks
+        "hi"   'helm-info-at-point
+        "hl"   'helm-resume
+        "hm"   'helm-man-woman
+        "ry"   'helm-show-kill-ring
+        "rr"   'helm-register
+        "rm"   'helm-all-mark-rings
+        "sL"   'dotemacs-last-search-buffer
+        "sl"   'dotemacs-jump-in-buffer)
+
+      ;; search with grep
+      (evil-leader/set-key
+        "sgb"  'dotemacs-helm-buffers-do-grep
+        "sgB"  'dotemacs-helm-buffers-do-grep-region-or-symbol
+        "sgf"  'dotemacs-helm-files-do-grep
+        "sgF"  'dotemacs-helm-files-do-grep-region-or-symbol
+        "sgg"  'dotemacs-helm-file-do-grep
+        "sgG"  'dotemacs-helm-file-do-grep-region-or-symbol)
+
+      (evil-leader/set-key
+        dotemacs-command-key 'helm-M-x))
+
+    (add-hook 'helm-after-initialize-hook 'dotemacs-display-helm-at-bottom)
+    ;;  Restore popwin-mode after a Helm session finishes.
+    (add-hook 'helm-cleanup-hook 'dotemacs-restore-previous-display-config)
+
+    ;; Add minibuffer history with `helm-minibuffer-history'
+    (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
+
+    (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
   :config
-    (progn
-      (helm-autoresize-mode t)
-      (setq helm-split-window-in-side-p t
-            helm-command-prefix-key "C-c b"
-            helm-quick-update t
-            helm-bookmark-show-location t
-            helm-M-x-fuzzy-match t
-            helm-apropos-fuzzy-match t
-            helm-locate-fuzzy-match t
-            helm-file-cache-fuzzy-match t
-            helm-semantic-fuzzy-match t
-            helm-imenu-fuzzy-match t
-            helm-lisp-fuzzy-completion t)
+  (progn
+    (helm-mode +1)
+    (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
 
-      ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
-      ;; brew tap homebrew/dupes
-      ;; brew install homebrew/dupes/grep
-      (when-let (gnu-grep (and (eq system-type 'darwin)
-                             (executable-find "ggrep")))
-      (setq helm-grep-default gnu-grep))
+    (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
 
+    (dotemacs-helm-hjkl-navigation t)
 
-      (use-package helm-descbinds
-                   :ensure t
-                   :defer t))
+    (dotemacs-define-micro-state helm-navigation
+      :persistent t
+      :disable-evil-leader t
+      :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
+      :on-enter (dotemacs-helm-navigation-ms-on-enter)
+      :on-exit  (dotemacs-helm-navigation-ms-on-exit)
+      :bindings
+      ("<tab>" helm-select-action :exit t)
+      ("C-i" helm-select-action :exit t)
+      ("<RET>" helm-maybe-exit-minibuffer :exit t)
+      ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
+      ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
+      ("e" dotemacs-helm-edit)
+      ("h" helm-previous-source)
+      ("j" helm-next-line)
+      ("k" helm-previous-line)
+      ("l" helm-next-source)
+      ("q" nil :exit t)
+      ("t" helm-toggle-visible-mark)
+      ("T" helm-toggle-all-marks)
+      ("v" helm-execute-persistent-action))
 
-  :diminish helm-mode)
+    ;; Swap default TAB and C-z commands.
+    ;; For GUI.
+    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+    ;; For terminal.
+    (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
+    (define-key helm-map (kbd "C-z") 'helm-select-action)
+
+    (eval-after-load "helm-mode" ; required
+      '(dotemacs-hide-lighter helm-mode))))
 
 (use-package helm-swoop
   :ensure t
@@ -944,6 +1052,16 @@ mouse-3: go to end"))))
                   (abbreviate-file-name (buffer-file-name)) "%b")))
 
 (setq-default line-spacing 0.1)         ; A bit more spacing between lines
+
+(use-package buffer-move
+  :defer t
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key
+      "bmh" 'buf-move-left
+      "bmj" 'buf-move-down
+      "bmk" 'buf-move-up
+      "bml" 'buf-move-right)))
 
 (use-package frame
   :bind (("C-c t F" . toggle-frame-fullscreen))
@@ -1248,7 +1366,6 @@ mouse-3: go to end"))))
   ;; Store auto-save files locally
   (setq bookmark-default-file (concat dotemacs-cache-directory "bookmarks")))
 
-
 ;; original
 (run-with-timer 1800 1800 'recentf-save-list)
 ;; original
@@ -1461,6 +1578,11 @@ mouse-3: go to end"))))
   ;; Auto-fill comments in programming modes
   :init (add-hook 'prog-mode-hook #'dotemacs-auto-fill-comments-mode))
 
+(use-package clean-aindent-mode ; Keeps track of the last auto-indent operation and trims down white space
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook 'clean-aindent-mode))
+
 (use-package helm-ring                  ; Helm commands for rings
   :ensure helm
   :bind (([remap yank-pop]        . helm-show-kill-ring)
@@ -1536,7 +1658,41 @@ mouse-3: go to end"))))
 
 (use-package expand-region              ; Expand region by semantic units
   :ensure t
-  :bind (("C-=" . er/expand-region)))
+  :bind (("C-=" . er/expand-region))
+  :defer t
+  :init (after "evil-leader"
+          (evil-leader/set-key "v" 'er/expand-region))
+  :config
+  (progn
+    ;; add search capability to expand-region
+    (after "helm-ag"
+      (defadvice er/prepare-for-more-expansions-internal
+          (around helm-ag/prepare-for-more-expansions-internal activate)
+        ad-do-it
+        (let ((new-msg (concat (car ad-return-value)
+                               ", / to search in project, "
+                               "f to search in files, "
+                               "b to search in opened buffers"))
+              (new-bindings (cdr ad-return-value)))
+          (cl-pushnew
+           '("/" (lambda ()
+                   (call-interactively
+                    'dotemacs-helm-project-smart-do-search-region-or-symbol)))
+           new-bindings)
+          (cl-pushnew
+           '("f" (lambda ()
+                   (call-interactively
+                    'dotemacs-helm-files-smart-do-search-region-or-symbol)))
+           new-bindings)
+          (cl-pushnew
+           '("b" (lambda ()
+                   (call-interactively
+                    'dotemacs-helm-buffers-smart-do-search-region-or-symbol)))
+           new-bindings)
+            (setq ad-return-value (cons new-msg new-bindings)))))
+    (custom-set-variables
+     '(expand-region-contract-fast-key "V")
+     '(expand-region-reset-fast-key "r"))))
 
 (use-package undo-tree                  ; Branching undo
   :ensure t
@@ -1701,7 +1857,8 @@ Disable the highlighting of overlong lines."
           (add-hook hook #'rainbow-delimiters-mode)))
 
 (use-package hi-lock                    ; Custom regexp highlights
-  :init (global-hi-lock-mode))
+  :init (global-hi-lock-mode)
+  :diminish hi-lock-mode)
 
 (use-package highlight-numbers          ; Fontify number literals
   :ensure t
@@ -2075,48 +2232,6 @@ Disable the highlighting of overlong lines."
     (flyspell-prog-mode))
   :diminish (flyspell-mode . " Ⓢ"))
 
-;; TODO: Incorporate this into `use-package flycheck` below
-;; original `init-flycheck`
-; (require 'flycheck)
-;
-; (after "flycheck"
-;   ;; Remove newline checks, since they would trigger an immediate check
-;   ;; when we want the idle-change-delay to be in effect while editing.
-;   (setq flycheck-check-syntax-automatically '(save
-;                                               idle-change
-;                                               mode-enabled))
-;   (setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
-;   (setq flycheck-checkers (delq 'html-tidy flycheck-checkers))
-;   (setq flycheck-standard-error-navigation nil))
-;
-; (defun my/adjust-flycheck-automatic-syntax-eagerness ()
-;   "Adjust how often we check for errors based on if there are any.
-;
-; This lets us fix any errors as quickly as possible, but in a
-; clean buffer we're an order of magnitude laxer about checking."
-;   (setq flycheck-idle-change-delay
-;         (if flycheck-current-errors 0.5 30.0)))
-;
-; ;; Each buffer gets its own idle-change-delay because of the
-; ;; buffer-sensitive adjustment above.
-; (make-variable-buffer-local 'flycheck-idle-change-delay)
-;
-; (add-hook 'flycheck-after-syntax-check-hook
-;           'my/adjust-flycheck-automatic-syntax-eagerness)
-;
-; (defun flycheck-handle-idle-change ()
-;   "Handle an expired idle time since the last change.
-;
-; This is an overwritten version of the original
-; flycheck-handle-idle-change, which removes the forced deferred.
-; Timers should only trigger inbetween commands in a single
-; threaded system and the forced deferred makes errors never show
-; up before you execute another command."
-;   (flycheck-clear-idle-change-timer)
-;   (flycheck-buffer-automatically 'idle-change))
-;; end origianl `init-auto-flycheck`
-
-
 (use-package init-flycheck         ; Personal Flycheck helpers
   :load-path "config/"
   :defer t
@@ -2135,6 +2250,13 @@ Disable the highlighting of overlong lines."
   (progn
     (setq flycheck-check-syntax-automatically '(save mode-enabled)
           flycheck-standard-error-navigation nil)
+
+    ;; Each buffer gets its own idle-change-delay because of the
+    ;; buffer-sensitive adjustment above.
+    (make-variable-buffer-local 'flycheck-idle-change-delay)
+
+    (add-hook 'flycheck-after-syntax-check-hook
+              #'dotemacs-adjust-flycheck-automatic-syntax-eagerness)
 
     (dotemacs-add-toggle syntax-checking
                          :status flycheck-mode
@@ -2205,7 +2327,7 @@ Disable the highlighting of overlong lines."
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap 'my-flycheck-fringe-indicator
       :fringe-face 'flycheck-fringe-info))
-  :diminish (flycheck-mode " ⓢ" " s"))
+  :diminish (flycheck-mode . " ⓢ"))
 
 (use-package flycheck-pos-tip
   :ensure t
@@ -2698,102 +2820,11 @@ Disable the highlighting of overlong lines."
 (use-package ielm                       ; Emacs Lisp REPL
   :bind (("C-c z" . ielm)))
 
-;; TODO: Incorporate this into `use-package lisp-mode` below
-;; original `init-common-lisp`
-; (require 'init-programming)
-;
-; (require-package 'slime)
-; (require 'slime)
-;
-; ;; the SBCL configuration file is in Common Lisp
-; (add-to-list 'auto-mode-alist '("\\.sbclrc\\'" . lisp-mode))
-;
-; ;; Open files with .cl extension in lisp-mode
-; (add-to-list 'auto-mode-alist '("\\.cl\\'" . lisp-mode))
-;
-; ;; a list of alternative Common Lisp implementations that can be
-; ;; used with SLIME. Note that their presence render
-; ;; inferior-lisp-program useless. This variable holds a list of
-; ;; programs and if you invoke SLIME with a negative prefix
-; ;; argument, M-- M-x slime, you can select a program from that list.
-; (setq slime-lisp-implementations
-;       '((ccl ("ccl"))
-;         (clisp ("clisp" "-q"))
-;         (cmucl ("cmucl" "-quiet"))
-;         (sbcl ("sbcl" "--noinform") :coding-system utf-8-unix)))
-;
-; ;; select the default value from slime-lisp-implementations
-; (if (eq system-type 'darwin)
-;     ;; default to Clozure CL on OS X
-;     (setq slime-default-lisp 'ccl)
-;   ;; default to SBCL on Linux and Windows
-;   (setq slime-default-lisp 'sbcl))
-;
-; (add-hook 'lisp-mode-hook (lambda () (run-hooks 'my-lisp-coding-hook)))
-; (add-hook 'slime-repl-mode-hook (lambda () (run-hooks 'my-interactive-lisp-coding-hook)))
-;
-; (eval-after-load "slime"
-;   '(progn
-;      (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol
-;            slime-fuzzy-completion-in-place t
-;            slime-enable-evaluate-in-emacs t
-;            slime-autodoc-use-multiline-p t
-;            slime-auto-start 'always)
-;
-;      (define-key slime-mode-map (kbd "TAB") 'slime-indent-and-complete-symbol)
-;      (define-key slime-mode-map (kbd "C-c C-s") 'slime-selector)))
-;; end origianl `init-commo-lisp`
-
 (use-package lisp-mode                  ; Emacs Lisp editing
   :defer t
   :interpreter ("emacs" . emacs-lisp-mode)
   :mode ("/Cask\\'" . emacs-lisp-mode)
   :config (require 'ert))
-
-;; TODO: Incorporate this into `use-package lisp` below
-;; original `init-lisp`
-; (require 'init-programming)
-;
-;
-; (defun my-lisp-hook ()
-;   (progn
-;     (elisp-slime-nav-mode)
-;     (eldoc-mode)))
-;
-; (defun my-lisp-after-save-hook ()
-;   (when (or (string-prefix-p (file-truename (concat user-emacs-directory "/config"))
-;                              (file-truename buffer-file-name))
-;             (equal (file-truename buffer-file-name)
-;                    (file-truename custom-file)))
-;     (emacs-lisp-byte-compile)))
-;
-; (add-hook 'emacs-lisp-mode-hook #'my-lisp-hook)
-; (add-hook 'lisp-interaction-mode-hook #'my-lisp-hook)
-; (add-hook 'ielm-mode-hook #'my-lisp-hook)
-; (add-hook 'after-save-hook #'my-lisp-after-save-hook)
-;
-; ;; Lisp configuration
-; (define-key read-expression-map (kbd "TAB") 'completion-at-point)
-;
-; ;; wrap keybindings
-; (define-key lisp-mode-shared-map (kbd "M-(") (my-wrap-with "("))
-; (define-key lisp-mode-shared-map (kbd "M-[") (my-wrap-with "["))
-; (define-key lisp-mode-shared-map (kbd "M-\"") (my-wrap-with "\""))
-;
-;
-; ;; A great lisp coding hook
-; (defun my-lisp-coding-defaults ()
-;   (smartparens-strict-mode +1))
-;
-; (setq my-lisp-coding-hook 'my-lisp-coding-defaults)
-;
-; ;; interactive modes don't need whitespace checks
-; (defun my-interactive-lisp-coding-defaults ()
-;   (smartparens-strict-mode +1)
-;   (whitespace-mode -1))
-;
-; (setq my-interactive-lisp-coding-hook 'my-interactive-lisp-coding-defaults)
-;; end origianl `init-lisp`
 
 (use-package init-lisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
@@ -3062,159 +3093,10 @@ Disable the highlighting of overlong lines."
 
 ;;; Go
 
-;; TODO: Incorporate this into new `use-package go-mode` below
-;; original `init-go`
-; (lazy-major-mode "\\.go$" go-mode)
-;
-; (with-eval-after-load 'go-mode
-;   (require 'go-eldoc)
-;   (add-hook 'go-mode-hook 'go-eldoc-setup)
-;
-;   (with-eval-after-load "company-autoloads"
-;     (require 'company-go)
-;     (require 'company-go)
-;     (add-hook 'go-mode-hook (lambda ()
-;                               (set (make-local-variable 'company-backends) '(company-go))))))
-;; end origianl `init-go`
 
 
 ;;; Clojure
 
-;; TODO: Incorporate this into `use-package clojure` below
-;; original `init-clojure`
-; (require 'init-lisp)
-; (require 'clojure-mode)
-; (require 'cider)
-;
-; (defadvice clojure-test-run-tests (before save-first activate)
-;   (save-buffer))
-;
-; (defadvice nrepl-load-current-buffer (before save-first activate)
-;   (save-buffer))
-;
-; (require 'clj-refactor)
-;
-; (with-eval-after-load 'clojure-mode
-;   (defun my-clojure-mode-defaults ()
-;     (clj-refactor-mode 1)
-;     (subword-mode +1)
-;     (run-hooks 'my-lisp-coding-hook))
-;
-;   (setq my-clojure-mode-hook 'my-clojure-mode-defaults)
-;   (add-hook 'clojure-mode-hook (lambda ()
-;                                (run-hooks 'my-clojure-mode-hook))))
-;
-; (with-eval-after-load 'cider
-;   (setq nrepl-log-messages t)
-;
-;   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-;
-;   (defun my-cider-repl-mode-defaults ()
-;     (subword-mode +1)
-;     (run-hooks 'my-interactive-lisp-coding-hook))
-;
-;    (setq my-cider-repl-mode-hook 'my-cider-repl-mode-defaults)
-;    (add-hook 'cider-repl-mode-hook (lambda ()
-;                                    (run-hooks 'my-cider-repl-mode-hook))))
-;
-; ;; Indent and highlight more commands
-; (put-clojure-indent 'match 'defun)
-;
-; ;; Hide nrepl buffers when switching buffers (switch to by prefixing with space)
-; (setq nrepl-hide-special-buffers t)
-;
-; ;; Enable error buffer popping also in the REPL:
-; (setq cider-repl-popup-stacktraces t)
-;
-; ;; Specify history file
-; (setq cider-history-file "~/.emacs.d/nrepl-history")
-;
-; ;; auto-select the error buffer when it's displayed
-; (setq cider-auto-select-error-buffer t)
-;
-; ;; Prevent the auto-display of the REPL buffer in a separate window after connection is established
-; (setq cider-repl-pop-to-buffer-on-connect nil)
-;
-; ;; Enable eldoc in Clojure buffers
-; (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-;
-; ;; Cycle between () {} []
-;
-; (defun live-delete-and-extract-sexp ()
-;   "Delete the sexp and return it."
-;   (interactive)
-;   (let* ((begin (point)))
-;     (forward-sexp)
-;     (let* ((result (buffer-substring-no-properties begin (point))))
-;       (delete-region begin (point))
-;       result)))
-;
-; (defun live-cycle-clj-coll ()
-;   "convert the coll at (point) from (x) -> {x} -> [x] -> (x) recur"
-;   (interactive)
-;   (let* ((original-point (point)))
-;     (while (and (> (point) 1)
-;                 (not (equal "(" (buffer-substring-no-properties (point) (+ 1 (point)))))
-;                 (not (equal "{" (buffer-substring-no-properties (point) (+ 1 (point)))))
-;                 (not (equal "[" (buffer-substring-no-properties (point) (+ 1 (point))))))
-;       (backward-char))
-;     (cond
-;      ((equal "(" (buffer-substring-no-properties (point) (+ 1 (point))))
-;       (insert "{" (substring (live-delete-and-extract-sexp) 1 -1) "}"))
-;      ((equal "{" (buffer-substring-no-properties (point) (+ 1 (point))))
-;       (insert "[" (substring (live-delete-and-extract-sexp) 1 -1) "]"))
-;      ((equal "[" (buffer-substring-no-properties (point) (+ 1 (point))))
-;       (insert "(" (substring (live-delete-and-extract-sexp) 1 -1) ")"))
-;      ((equal 1 (point))
-;       (message "beginning of file reached, this was probably a mistake.")))
-;     (goto-char original-point)))
-;
-; (define-key clojure-mode-map (kbd "C-´") 'live-cycle-clj-coll)
-;
-; ;; Warn about missing nREPL instead of doing stupid things
-;
-; (defun nrepl-warn-when-not-connected ()
-;   (interactive)
-;   (message "Oops! You're not connected to an nREPL server. Please run M-x cider or M-x cider-jack-in to connect."))
-;
-; (define-key clojure-mode-map (kbd "C-M-x")   'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-x C-e") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-e") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-l") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-r") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-z") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-k") 'nrepl-warn-when-not-connected)
-; (define-key clojure-mode-map (kbd "C-c C-n") 'nrepl-warn-when-not-connected)
-;
-; (setq cljr-magic-require-namespaces
-;       '(("io"   . "clojure.java.io")
-;         ("set"  . "clojure.set")
-;         ("str"  . "clojure.string")
-;         ("walk" . "clojure.walk")
-;         ("zip"  . "clojure.zip")
-;         ("time" . "clj-time.core")))
-;
-; ;; Set up linting of clojure code with eastwood
-;
-; ;; Make sure to add [acyclic/squiggly-clojure "0.1.2-SNAPSHOT"]
-; ;; to your :user :dependencies in .lein/profiles.clj
-;
-; (require 'flycheck-clojure)
-; (add-hook 'cider-mode-hook (lambda () (flycheck-mode 1)))
-;
-; (eval-after-load 'flycheck '(add-to-list 'flycheck-checkers 'clojure-cider-eastwood))
-;
-; ;; Make some clj-refactor commands more snappy by populating caches in the
-; ;; background:
-;
-; (add-hook 'nrepl-connected-hook #'cljr-update-artifact-cache)
-; (add-hook 'nrepl-connected-hook #'cljr-warm-ast-cache)
-;
-; ;; Make q quit out of find-usages to previous window config
-;
-; (defadvice cljr-find-usages (before setup-grep activate)
-;   (window-configuration-to-register ?$))
-;; end origianl `init-clojure`
 
 
 ;;; OCaml
@@ -3251,28 +3133,6 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Web languages
-
-;; TODO: Incorporate this into various `use-packages` below
-;; original `init-web`
-; (lazy-major-mode "\\.coffee\\'" coffee-mode)
-; (lazy-major-mode "\\.jade$" jade-mode)
-;
-; (lazy-major-mode "\\.html?$" web-mode)
-;
-; (with-eval-after-load 'web-mode
-;   (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
-;   (setq web-mode-css-indent-offset 2) ; web-mode, css in html file
-;   (setq web-mode-code-indent-offset 2) ; web-mode, js code in html file
-;
-;   (with-eval-after-load 'yasnippet
-;     (require 'angular-snippets)
-;     (angular-snippets-initialize)))
-;
-; ;; indent after deleting a tag
-; (defadvice sgml-delete-tag (after reindent activate)
-;   (indent-region (point-min) (point-max)))
-;; end origianl `init-web`
-
 (use-package emmet-mode
   :ensure t
   :defer t
@@ -3297,6 +3157,40 @@ Disable the highlighting of overlong lines."
   :config
   (setq web-mode-markup-indent-offset 2))
 
+;; TODO: Incorporate this into `use-package css-mode` below
+;; original `init-css`
+; (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+; (add-to-list 'auto-mode-alist '("\\.scss$" . css-mode))
+;
+; (after "css-mode"
+;
+;   (setq css-indent-offset 2)
+;
+;   (defun my-css-mode-defaults ()
+;     (run-hooks 'my-prog-mode-hook))
+;
+;   (setq my-css-mode-hook 'my-css-mode-defaults)
+;
+;   (add-hook 'css-mode-hook (lambda ()
+;                            (run-hooks 'my-css-mode-hook))))
+;; end origianl `init-css`
+(use-package css-mode
+  :defer t
+  :config
+  (progn
+    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+    ;; `fundamental-mode'.
+    (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+
+    ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
+    (put 'css-indent-offset 'safe-local-variable #'integerp)))
+
+(use-package css-eldoc                  ; Basic Eldoc for CSS
+  :ensure t
+  :commands (turn-on-css-eldoc)
+  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+
+;;; JavaScript
 (use-package init-js
   :load-path "config/"
   :defer t
@@ -3435,39 +3329,6 @@ Disable the highlighting of overlong lines."
                  (setq js2-global-externs '("angular"))
 
                  (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
-
-;; TODO: Incorporate this into `use-package css-mode` below
-;; original `init-css`
-; (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
-; (add-to-list 'auto-mode-alist '("\\.scss$" . css-mode))
-;
-; (after "css-mode"
-;
-;   (setq css-indent-offset 2)
-;
-;   (defun my-css-mode-defaults ()
-;     (run-hooks 'my-prog-mode-hook))
-;
-;   (setq my-css-mode-hook 'my-css-mode-defaults)
-;
-;   (add-hook 'css-mode-hook (lambda ()
-;                            (run-hooks 'my-css-mode-hook))))
-;; end origianl `init-css`
-(use-package css-mode
-  :defer t
-  :config
-  (progn
-    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
-    ;; `fundamental-mode'.
-    (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
-
-    ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
-    (put 'css-indent-offset 'safe-local-variable #'integerp)))
-
-(use-package css-eldoc                  ; Basic Eldoc for CSS
-  :ensure t
-  :commands (turn-on-css-eldoc)
-  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
 
 (use-package php-mode                   ; Because sometimes you have to
   :ensure t)
@@ -4583,29 +4444,13 @@ Disable the highlighting of overlong lines."
                 ;; Don't keep message buffers around
                 message-kill-buffer-on-exit t))
 
-;; TODO: Incorporate this into `use-package erc` below
-;; original `init-erc`
-; (after "erc"
-;   (setq erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs"))
-;   (setq erc-hide-list '("JOIN" "PART" "QUIT"))
-;
-;   (setq erc-timestamp-only-if-changed-flag nil)
-;   (setq erc-timestamp-format "[%H:%M] ")
-;   (setq erc-insert-timestamp-function 'erc-insert-timestamp-left)
-;
-;   (setq erc-truncate-mode t)
-;
-;   (add-hook 'window-configuration-change-hook
-;             (lambda ()
-;               (setq erc-fill-column (- (window-width) 2)))))
-;; end origianl `init-erc`
-
 (use-package erc                        ; Powerful IRC client
   :defer t
   :config
   (progn
     ;; Default server and nick
     (setq erc-server "chat.freenode.net"
+          erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs")
           erc-port 7000
           erc-nick 'dotemacs-erc-nick
           erc-nick-uniquifier "_"
@@ -4762,7 +4607,7 @@ Disable the highlighting of overlong lines."
          "o" nil "mC" 'evil-org-recompute-clocks
          "l" nil "ml" 'evil-org-open-links
          "t" nil "mt" 'org-show-todo-tree)
-    (diminish evil-org-mode " ⓔ" " e")))
+    (diminish evil-org-mode . " ⓔ")))
 
 
 ;;; Online Help
@@ -4875,7 +4720,7 @@ Disable the highlighting of overlong lines."
   :config
   (add-hook 'evil-leader-mode-hook
             #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader)))
-  :diminish (guide-key-mode " Ⓖ" " G"))
+  :diminish (guide-key-mode . " Ⓖ"))
 
 
 ;;; Evil
@@ -5043,20 +4888,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
             (call-interactively 'sp-backward-delete-char)
           ad-do-it)))))
 
-(use-package evil-anzu
-  :ensure t
-  :defer t
-  :init
-  (global-anzu-mode t)
-  :config
-  (progn
-    (dotemacs-hide-lighter anzu-mode)
-    (setq anzu-search-threshold 1000
-          anzu-cons-mode-line-p nil)))
-
 (use-package evil-args
   :ensure t
-  :defer t
   :init
   (progn
     ;; bind evil-args text objects
@@ -5065,20 +4898,15 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-escape
   :ensure t
-  :defer t
-  :init
-  (evil-escape-mode)
-  :config
-  (dotemacs-hide-lighter evil-escape-mode))
+  :init (evil-escape-mode)
+  :diminish evil-escape-mode)
 
 (use-package evil-exchange
   :ensure t
-  :defer t
   :init (evil-exchange-install))
 
 (use-package evil-iedit-state
   :ensure t
-  :defer t
   :init
   (progn
     (require 'evil-iedit-state)
@@ -5094,7 +4922,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-jumper
   :ensure t
-  :defer t
   :init
   (progn
     (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps")
@@ -5137,7 +4964,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-lisp-state
   :ensure t
-  :defer t
   :init
   (progn
     (setq evil-lisp-state-global t)
@@ -5151,7 +4977,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 (use-package evil-nerd-commenter
   :disabled t
   :ensure t
-  :defer t
   :commands (evilnc-comment-operator
              evilnc-comment-or-uncomment-lines
              evilnc-toggle-invert-comment-line-by-line
@@ -5279,11 +5104,73 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (define-key evil-visual-state-map (kbd "#")
       'evil-visualstar/begin-search-backward)))
 
+
+;;; Documents
+(use-package doc-view
+  :defer t
+  :init
+  (after "evil-evilified-state"
+         (evilify doc-view-mode doc-view-mode-map
+           "/"  'dotemacs-doc-view-search-new-query
+           "?"  'dotemacs-doc-view-search-new-query-backward
+           "gg" 'doc-view-first-page
+           "G"  'doc-view-last-page
+           "gt" 'doc-view-goto-page
+           "h"  'doc-view-previous-page
+           "j"  'doc-view-next-line-or-next-page
+           "k"  'doc-view-previous-line-or-previous-page
+           "K"  'doc-view-kill-proc-and-buffer
+           "l"  'doc-view-next-page
+           "n"  'doc-view-search
+           "N"  'doc-view-search-backward
+           (kbd "C-d") 'doc-view-scroll-up-or-next-page
+           (kbd "C-k") 'doc-view-kill-proc
+           (kbd "C-u") 'doc-view-scroll-down-or-previous-page))
+  :config
+  (progn
+    (defun dotemacs-doc-view-search-new-query ()
+      "Initiate a new query."
+      (interactive)
+      (doc-view-search 'newquery))
 
-; (add-hook 'c-mode-common-hook
-;           (lambda ()
-;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-;               (ggtags-mode 1))))
+    (defun dotemacs-doc-view-search-new-query-backward ()
+      "Initiate a new query."
+      (interactive)
+      (doc-view-search 'newquery t))
+
+    ;; fixed a weird issue where toggling display does not
+    ;; swtich to text mode
+    (defadvice doc-view-toggle-display
+        (around dotemacs-doc-view-toggle-display activate)
+      (if (eq major-mode 'doc-view-mode)
+          (progn
+            ad-do-it
+            (text-mode)
+            (doc-view-minor-mode))
+        ad-do-it))))
+
+
+;;; Misc
+(use-package google-translate
+  :ensure t
+  :commands (google-translate-query-translate
+             google-translate-at-point
+             google-translate-query-translate-reverse
+             google-translate-at-point-reverse)
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key
+      "xgQ" 'google-translate-query-translate-reverse
+      "xgq" 'google-translate-query-translate
+      "xgT" 'google-translate-at-point-reverse
+      "xgt" 'google-translate-at-point))
+  :config
+  (progn
+    (require 'google-translate-default-ui)
+    (setq google-translate-enable-ido-completion t)
+    (setq google-translate-show-phonetic t)
+    (setq google-translate-default-source-language "En")
+    (setq google-translate-default-target-language "Fr")))
 
 ;; Local Variables:
 ;; coding: utf-8
