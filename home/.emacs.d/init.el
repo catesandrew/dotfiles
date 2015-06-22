@@ -255,6 +255,16 @@ selection."
 to complet without blocking common line endings."
   :group 'dotemacs-ac)
 
+;; spelling/syntax settings
+(defgroup dotemacs-s nil
+  "Configuration options for spelling/syntax."
+  :group 'dotemacs
+  :prefix 'dotemacs-s)
+
+(defcustom dotemacs-s-syntax-checking-enable-tooltips nil
+  "If non nil some feedback are displayed in tooltips."
+  :group 'dotemacs-s)
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -1420,7 +1430,7 @@ mouse-3: go to end"))))
 (setq indicate-empty-lines t
       require-final-newline t)
 
-;; Globally on't break lines for me, please
+;; Globally do not break lines for me, please
 ; (setq-default truncate-lines t)
 
 (setq kill-ring-max 200                 ; More killed items
@@ -2015,6 +2025,10 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Spelling and syntax checking
+
+;; Command Prefixes
+(dotemacs-declare-prefix "S" "spelling")
+
 (use-package ispell                     ; Spell checking
   :defer t
   :config
@@ -2034,18 +2048,30 @@ Disable the highlighting of overlong lines."
 
 (use-package flyspell                   ; On-the-fly spell checking
   :bind (("C-c t s" . flyspell-mode))
-  :init (progn (dolist (hook '(text-mode-hook message-mode-hook org-mode-hook))
-                 (add-hook hook 'turn-on-flyspell))
-               (add-hook 'prog-mode-hook 'flyspell-prog-mode))
-  :config
+  :defer t
+  :init
   (progn
+    (dolist (hook '(markdown-mode-hook text-mode-hook message-mode-hook org-mode-hook))
+      (add-hook hook '(lambda () (flyspell-mode 1))))
+    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
     (setq flyspell-use-meta-tab nil
-          ;; Make Flyspell less chatty
-          flyspell-issue-welcome-flag nil
+          flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
 
+    (dotemacs-add-toggle spelling-checking
+                         :status flyspell-mode
+                         :on (flyspell-mode)
+                         :off (flyspell-mode -1)
+                         :documentation
+                         "Enable flyspell for automatic spelling checking."
+                         :evil-leader "tS"))
+  :config
+  (progn
     ;; Free C-M-i for completion
-    (define-key flyspell-mode-map "\M-\t" nil))
+    (define-key flyspell-mode-map "\M-\t" nil)
+    (flyspell-prog-mode)
+    )
   :diminish (flyspell-mode . "✓"))
 
 ;; TODO: Incorporate this into `use-package flycheck` below
@@ -2061,14 +2087,6 @@ Disable the highlighting of overlong lines."
 ;   (setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
 ;   (setq flycheck-checkers (delq 'html-tidy flycheck-checkers))
 ;   (setq flycheck-standard-error-navigation nil))
-;
-; (global-flycheck-mode t)
-;
-; ;; flycheck errors on a tooltip (doesnt work on console)
-; (when (display-graphic-p (selected-frame))
-;   (eval-after-load 'flycheck
-;     '(custom-set-variables
-;       '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))))
 ;
 ; (defun my/adjust-flycheck-automatic-syntax-eagerness ()
 ;   "Adjust how often we check for errors based on if there are any.
@@ -2098,46 +2116,107 @@ Disable the highlighting of overlong lines."
 ;; end origianl `init-auto-flycheck`
 
 
-(use-package flycheck                   ; On-the-fly syntax checking
-  :ensure t
-  :bind (("C-c l e" . list-flycheck-errors)
-         ("C-c t f" . flycheck-mode))
-  :init
-  (global-flycheck-mode)
-  ; (add-hook 'prog-mode-hook #'flycheck-mode)
-  :config (progn
-            (setq flycheck-display-errors-function
-                  #'flycheck-display-error-messages-unless-error-list)
-
-            ;; Use italic face for checker name
-            (set-face-attribute 'flycheck-error-list-checker-name nil
-                                :inherit 'italic)
-
-            (add-to-list 'display-buffer-alist
-                         `(,(rx bos "*Flycheck errors*" eos)
-                           (display-buffer-reuse-window
-                            display-buffer-in-side-window)
-                           (side            . bottom)
-                           (reusable-frames . visible)
-                           (window-height   . 0.4))))
-  :diminish flycheck-mode)
-
-(use-package helm-flycheck
-  :ensure t
-  :bind (("C-c ! L" . helm-flycheck)))
-
 (use-package init-flycheck         ; Personal Flycheck helpers
   :load-path "config/"
   :defer t
   :commands (dotemacs-discard-undesired-html-tidy-error
-             dotemacs-flycheck-mode-line-status)
-  :init (after "flycheck"
-          ;; Don't highlight undesired errors from html tidy
-          (add-hook 'flycheck-process-error-functions
-                    #'dotemacs-discard-undesired-html-tidy-error)
+             dotemacs-flycheck-mode-line-status
+             dotemacs-defface-flycheck-mode-line-color
+             dotemacs-set-flycheck-mode-line-faces
+             dotemacs-mode-line-flycheck-info-toggle))
 
-          (setq flycheck-mode-line
-                '(:eval (dotemacs-flycheck-mode-line-status)))))
+(use-package flycheck                   ; On-the-fly syntax checking
+  :ensure t
+  :bind (("C-c l e" . list-flycheck-errors)
+         ("C-c t f" . flycheck-mode))
+  :defer t
+  :init
+  (progn
+    (setq flycheck-check-syntax-automatically '(save mode-enabled)
+          flycheck-standard-error-navigation nil)
+
+    (dotemacs-add-toggle syntax-checking
+                         :status flycheck-mode
+                         :on (flycheck-mode)
+                         :off (flycheck-mode -1)
+                         :documentation "Enable error and syntax checking."
+                         :evil-leader "ts"))
+  :config
+  (progn
+    (after "evil-leader"
+      (evil-leader/set-key
+        "ec" 'flycheck-clear
+        "el" 'flycheck-list-errors
+        "tmf" 'dotemacs-mode-line-flycheck-info-toggle))
+
+    (dotemacs-set-flycheck-mode-line-faces)
+    (setq flycheck-display-errors-function
+          #'flycheck-display-error-messages-unless-error-list
+          flycheck-mode-line
+          '(:eval (dotemacs-flycheck-mode-line-status)))
+
+    ;; Don't highlight undesired errors from html tidy
+    (add-hook 'flycheck-process-error-functions
+              #'dotemacs-discard-undesired-html-tidy-error)
+
+    ;; Use italic face for checker name
+    (set-face-attribute 'flycheck-error-list-checker-name nil
+                        :inherit 'italic)
+
+    (add-to-list 'display-buffer-alist
+                 `(,(rx bos "*Flycheck errors*" eos)
+                    (display-buffer-reuse-window
+                      display-buffer-in-side-window)
+                    (side            . bottom)
+                    (reusable-frames . visible)
+                    (window-height   . 0.4)))
+
+    ;; Custom fringe indicator
+    (when (fboundp 'define-fringe-bitmap)
+      (define-fringe-bitmap 'my-flycheck-fringe-indicator
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00011100
+                #b00111110
+                #b00111110
+                #b00111110
+                #b00011100
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b01111111)))
+
+    (flycheck-define-error-level 'error
+      :overlay-category 'flycheck-error-overlay
+      :fringe-bitmap 'my-flycheck-fringe-indicator
+      :fringe-face 'flycheck-fringe-error)
+    (flycheck-define-error-level 'warning
+      :overlay-category 'flycheck-warning-overlay
+      :fringe-bitmap 'my-flycheck-fringe-indicator
+      :fringe-face 'flycheck-fringe-warning)
+    (flycheck-define-error-level 'info
+      :overlay-category 'flycheck-info-overlay
+      :fringe-bitmap 'my-flycheck-fringe-indicator
+      :fringe-face 'flycheck-fringe-info))
+  :diminish (flycheck-mode " ⓢ" " s"))
+
+(use-package flycheck-pos-tip
+  :ensure t
+; ;; flycheck errors on a tooltip (doesnt work on console)
+  :if (and dotemacs-s-syntax-checking-enable-tooltips (display-graphic-p))
+  :defer t
+  :init
+  (setq flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
+
+(use-package helm-flycheck
+  :ensure t
+  :bind (("C-c ! L" . helm-flycheck)))
 
 
 ;; Text editing
