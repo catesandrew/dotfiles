@@ -5,13 +5,16 @@
           (let ((private-yas-dir (concat dotemacs-private-dir "snippets/"))
                 (yas-dir (concat user-emacs-directory "snippets/")))
             (setq yas-snippet-dirs
-                  (append (list private-yas-dir)
-                          (when (boundp 'yas-snippet-dirs)
+                  (append (when (boundp 'yas-snippet-dirs)
                             yas-snippet-dirs)
-                          yas-dir))
+                          (list private-yas-dir yas-dir)))
 
-            (yas-load-directory yas-dir t)
-            (yas-load-directory private-yas-dir t)
+            (if (file-exists-p yas-dir)
+              (yas-load-directory yas-dir t))
+
+            (if (file-exists-p private-yas-dir)
+              (yas-load-directory private-yas-dir t))
+
             (setq yas-wrap-around-region t))))
       (yas-minor-mode 1))
 

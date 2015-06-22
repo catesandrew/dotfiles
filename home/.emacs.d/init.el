@@ -1116,6 +1116,8 @@ mouse-3: go to end"))))
     (push '("*grep*"                 :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
     (push '("*nosetests*"            :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
     (push '("^\*WoMan.+\*$" :regexp t             :position bottom                                   ) popwin:special-display-config)
+    (push '("^\*Flycheck.+\*$" :regexp t
+                                     :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
 
     (defun dotemacs-remove-popwin-display-config (str)
       "Removes the popwin display configurations that matches the passed STR"
@@ -1686,7 +1688,8 @@ Disable the highlighting of overlong lines."
   (setq whitespace-style '(face indentation space-after-tab space-before-tab
                                 tab-mark empty trailing lines-tail)
         whitespace-line-column nil)     ; Use `fill-column' for overlong lines
-  :diminish (whitespace-mode . "▢"))
+  :diminish ((whitespace-mode . " ⓦ")
+             (global-whitespace-mode . " Ⓦ")))
 
 (use-package hl-line                    ; Highlight the current line
   :init (global-hl-line-mode 1))
@@ -1956,21 +1959,20 @@ Disable the highlighting of overlong lines."
   :init
   (progn
     ;; disable yas minor mode map, use hippie-expand instead
-    (setq yas-minor-mode-map (make-sparse-keymap))
-
-    ;; allow nested expansions
-    (setq yas-triggers-in-field t)
+    (setq yas-minor-mode-map (make-sparse-keymap)
+          ;; allow nested expansions
+          yas-triggers-in-field t
+          ;; add key into candidate list
+          helm-yas-display-key-on-candidate t)
 
     ;; this makes it easy to get out of a nested expansion
     (define-key yas-minor-mode-map
       (kbd "M-s-/") 'yas-next-field)
 
-    ;; add key into candidate list
-    (setq helm-yas-display-key-on-candidate t)
-
     (add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
                                              markdown-mode-hook
                                              org-mode-hook))
+
     (dotemacs-add-toggle yasnippet
                          :status yas-minor-mode
                          :on (yas-minor-mode)
@@ -1995,7 +1997,7 @@ Disable the highlighting of overlong lines."
     (add-hook 'yas-after-exit-snippet-hook (lambda ()
                                              (when smartparens-enabled-initially
                                                (smartparens-mode 1)))))
-  :diminish (yas-minor-mode " ⓨ" " y"))
+  :diminish (yas-minor-mode . " ⓨ" ))
 
 (use-package auto-yasnippet
   :ensure t
@@ -2003,11 +2005,11 @@ Disable the highlighting of overlong lines."
   :init
   (progn
     (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
-
-    (evil-leader/set-key
-      "iSc" 'aya-create
-      "iSe" 'dotemacs-auto-yasnippet-expand
-      "iSw" 'aya-persist-snippet)))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "iSc" 'aya-create
+        "iSe" 'dotemacs-auto-yasnippet-expand
+        "iSw" 'aya-persist-snippet))))
 
 (use-package helm-c-yasnippet
   :ensure t
@@ -2070,9 +2072,8 @@ Disable the highlighting of overlong lines."
   (progn
     ;; Free C-M-i for completion
     (define-key flyspell-mode-map "\M-\t" nil)
-    (flyspell-prog-mode)
-    )
-  :diminish (flyspell-mode . "✓"))
+    (flyspell-prog-mode))
+  :diminish (flyspell-mode . " Ⓢ"))
 
 ;; TODO: Incorporate this into `use-package flycheck` below
 ;; original `init-flycheck`
