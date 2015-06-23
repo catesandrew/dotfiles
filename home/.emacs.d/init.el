@@ -2469,6 +2469,9 @@ Disable the highlighting of overlong lines."
     (setq ispell-program-name (if (eq system-type 'darwin)
                                   (executable-find "aspell")
                                 (executable-find "hunspell"))
+          ispell-program-name (if (eq system-type 'gnu/linux)
+                                  (executable-find "aspell"))
+
           ; ispell-extra-args '("--sug-mode=ultra")
           ispell-dictionary "en_US"     ; Default dictionnary
           ispell-silently-savep t       ; Don't ask when saving the private dict
