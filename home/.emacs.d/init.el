@@ -997,27 +997,28 @@ mouse-3: go to end"))))
 
     (dotemacs-helm-hjkl-navigation t)
 
-    (dotemacs-define-micro-state helm-navigation
-      :persistent t
-      :disable-evil-leader t
-      :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
-      :on-enter (dotemacs-helm-navigation-ms-on-enter)
-      :on-exit  (dotemacs-helm-navigation-ms-on-exit)
-      :bindings
-      ("<tab>" helm-select-action :exit t)
-      ("C-i" helm-select-action :exit t)
-      ("<RET>" helm-maybe-exit-minibuffer :exit t)
-      ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
-      ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
-      ("e" dotemacs-helm-edit)
-      ("h" helm-previous-source)
-      ("j" helm-next-line)
-      ("k" helm-previous-line)
-      ("l" helm-next-source)
-      ("q" nil :exit t)
-      ("t" helm-toggle-visible-mark)
-      ("T" helm-toggle-all-marks)
-      ("v" helm-execute-persistent-action))
+    (after "evil-leader"
+      (dotemacs-define-micro-state helm-navigation
+        :persistent t
+        :disable-evil-leader t
+        :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
+        :on-enter (dotemacs-helm-navigation-ms-on-enter)
+        :on-exit  (dotemacs-helm-navigation-ms-on-exit)
+        :bindings
+        ("<tab>" helm-select-action :exit t)
+        ("C-i" helm-select-action :exit t)
+        ("<RET>" helm-maybe-exit-minibuffer :exit t)
+        ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
+        ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
+        ("e" dotemacs-helm-edit)
+        ("h" helm-previous-source)
+        ("j" helm-next-line)
+        ("k" helm-previous-line)
+        ("l" helm-next-source)
+        ("q" nil :exit t)
+        ("t" helm-toggle-visible-mark)
+        ("T" helm-toggle-all-marks)
+        ("v" helm-execute-persistent-action)))
 
     ;; Swap default TAB and C-z commands.
     ;; For GUI.
@@ -1933,19 +1934,19 @@ mouse-3: go to end"))))
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
-    (dotemacs-add-toggle smartparens
-                         :status smartparens-mode
-                         :on (smartparens-mode)
-                         :off (smartparens-mode -1)
-                         :documentation "Enable smartparens."
-                         :evil-leader "tp")
-
-    (dotemacs-add-toggle smartparens-globally
-                         :status smartparens-mode
-                         :on (smartparens-global-mode)
-                         :off (smartparens-global-mode -1)
-                         :documentation "Enable smartparens globally."
-                         :evil-leader "t C-p")
+    (after "evil-leader"
+      (dotemacs-add-toggle smartparens
+                           :status smartparens-mode
+                           :on (smartparens-mode)
+                           :off (smartparens-mode -1)
+                           :documentation "Enable smartparens."
+                           :evil-leader "tp")
+      (dotemacs-add-toggle smartparens-globally
+                           :status smartparens-mode
+                           :on (smartparens-global-mode)
+                           :off (smartparens-global-mode -1)
+                           :documentation "Enable smartparens globally."
+                           :evil-leader "t C-p"))
 
     (setq sp-show-pair-delay 0
           sp-show-pair-from-inside t ; fix paren highlighting in normal mode
@@ -2030,18 +2031,19 @@ Disable the highlighting of overlong lines."
   :bind (("C-c t w" . whitespace-mode))
   :init
   (progn
-    (dotemacs-add-toggle whitespace
-                         :status whitespace-mode
-                         :on (whitespace-mode)
-                         :off (whitespace-mode -1)
-                         :documentation "Display whitespace."
-                         :evil-leader "tw")
-    (dotemacs-add-toggle whitespace-globally
-                         :status global-whitespace-mode
-                         :on (global-whitespace-mode)
-                         :off (global-whitespace-mode -1)
-                         :documentation "Globally display whitespace."
-                         :evil-leader "t C-w")
+    (after "evil-leader"
+      (dotemacs-add-toggle whitespace
+                           :status whitespace-mode
+                           :on (whitespace-mode)
+                           :off (whitespace-mode -1)
+                           :documentation "Display whitespace."
+                           :evil-leader "tw")
+      (dotemacs-add-toggle whitespace-globally
+                           :status global-whitespace-mode
+                           :on (global-whitespace-mode)
+                           :off (global-whitespace-mode -1)
+                           :documentation "Globally display whitespace."
+                           :evil-leader "t C-w"))
 
     (defun dotemacs-set-whitespace-style-for-diff ()
       "Whitespace configuration for `diff-mode'"
@@ -2400,12 +2402,13 @@ Disable the highlighting of overlong lines."
                                              markdown-mode-hook
                                              org-mode-hook))
 
-    (dotemacs-add-toggle yasnippet
-                         :status yas-minor-mode
-                         :on (yas-minor-mode)
-                         :off (yas-minor-mode -1)
-                         :documentation "Enable yasnippet."
-                         :evil-leader "ty")
+    (after "evil-leader"
+      (dotemacs-add-toggle yasnippet
+                           :status yas-minor-mode
+                           :on (yas-minor-mode)
+                           :off (yas-minor-mode -1)
+                           :documentation "Enable yasnippet."
+                           :evil-leader "ty"))
 
     (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
                                                   shell-mode-hook
@@ -2489,13 +2492,14 @@ Disable the highlighting of overlong lines."
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
 
-    (dotemacs-add-toggle spelling-checking
-                         :status flyspell-mode
-                         :on (flyspell-mode)
-                         :off (flyspell-mode -1)
-                         :documentation
-                         "Enable flyspell for automatic spelling checking."
-                         :evil-leader "tS"))
+    (after "evil-leader"
+      (dotemacs-add-toggle spelling-checking
+                           :status flyspell-mode
+                           :on (flyspell-mode)
+                           :off (flyspell-mode -1)
+                           :documentation
+                           "Enable flyspell for automatic spelling checking."
+                           :evil-leader "tS")))
   :config
   (progn
     ;; Free C-M-i for completion
@@ -2529,12 +2533,13 @@ Disable the highlighting of overlong lines."
     (add-hook 'flycheck-after-syntax-check-hook
               #'dotemacs-adjust-flycheck-automatic-syntax-eagerness)
 
-    (dotemacs-add-toggle syntax-checking
-                         :status flycheck-mode
-                         :on (flycheck-mode)
-                         :off (flycheck-mode -1)
-                         :documentation "Enable error and syntax checking."
-                         :evil-leader "ts"))
+    (after "evil-leader"
+      (dotemacs-add-toggle syntax-checking
+                           :status flycheck-mode
+                           :on (flycheck-mode)
+                           :off (flycheck-mode -1)
+                           :documentation "Enable error and syntax checking."
+                           :evil-leader "ts")))
   :config
   (progn
     (after "evil-leader"
@@ -5132,13 +5137,14 @@ Disable the highlighting of overlong lines."
                   bzg-big-fringe-mode)
         ad-do-it))
 
-    (dotemacs-add-toggle guide-key
-                    :status guide-key-mode
-                    :on (guide-key-mode)
-                    :off (guide-key-mode -1)
-                    :documentation
-                    "Display a buffer with available key bindings."
-                    :evil-leader "tG")
+    (after "evil-leader"
+      (dotemacs-add-toggle guide-key
+                      :status guide-key-mode
+                      :on (guide-key-mode)
+                      :off (guide-key-mode -1)
+                      :documentation
+                      "Display a buffer with available key bindings."
+                      :evil-leader "tG"))
 
     (setq guide-key/guide-key-sequence `("C-x"
                                          "C-c"
