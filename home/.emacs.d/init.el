@@ -1370,8 +1370,9 @@ mouse-3: go to end"))))
   :config
   (progn
     (popwin-mode 1)
-    (evil-leader/set-key "wpm" 'popwin:messages)
-    (evil-leader/set-key "wpp" 'popwin:close-popup-window)))
+    (after "evil-leader"
+      (evil-leader/set-key "wpm" 'popwin:messages)
+      (evil-leader/set-key "wpp" 'popwin:close-popup-window))))
 
 
 ;;; File handling
@@ -2448,7 +2449,8 @@ Disable the highlighting of overlong lines."
       (dotemacs-load-yasnippet)
       (require 'helm-c-yasnippet)
       (call-interactively 'helm-yas-complete))
-    (evil-leader/set-key "is" 'dotemacs-helm-yas)
+    (after "evil-leader"
+      (evil-leader/set-key "is" 'dotemacs-helm-yas))
     (setq helm-c-yas-space-match-any-greedy t)))
 
 
@@ -3787,12 +3789,13 @@ Disable the highlighting of overlong lines."
       (interactive)
       (magit-diff "HEAD"))
 
-    (evil-leader/set-key
-      "gb" 'magit-blame-mode
-      "gl" 'magit-log
-      "gs" 'magit-status
-      "gd" 'dotemacs-magit-diff-head
-      "gC" 'magit-commit)
+    (after "evil-leader"
+      (evil-leader/set-key
+        "gb" 'magit-blame-mode
+        "gl" 'magit-log
+        "gs" 'magit-status
+        "gd" 'dotemacs-magit-diff-head
+        "gC" 'magit-commit))
 
     (after "evil-evilified-state"
       (evilify magit-commit-mode magit-commit-mode-map
@@ -3917,16 +3920,18 @@ Disable the highlighting of overlong lines."
   :ensure t
   :defer t
   :config
-  (evil-leader/set-key-for-mode 'git-commit-mode
-    "mcc" 'git-commit-commit
-    "mk" 'git-commit-abort))
+  (after "evil-leader"
+    (evil-leader/set-key-for-mode 'git-commit-mode
+      "mcc" 'git-commit-commit
+      "mk" 'git-commit-abort)))
 
 (use-package git-messenger
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key
-    "gm" 'git-messenger:popup-message))
+  (after "evil-leader"
+    (evil-leader/set-key
+      "gm" 'git-messenger:popup-message)))
 
 (use-package gitconfig-mode             ; Git configuration mode
   :ensure t
@@ -3951,9 +3956,11 @@ Disable the highlighting of overlong lines."
               "K" 'git-rebase-move-line-up
               "u" 'git-rebase-undo
               "y" 'git-rebase-insert))
-    (evil-leader/set-key-for-mode 'git-rebase-mode
-      "mcc" 'git-rebase-server-edit
-      "mk" 'git-rebase-abort)))
+
+    (after "evil-leader"
+      (evil-leader/set-key-for-mode 'git-rebase-mode
+        "mcc" 'git-rebase-server-edit
+        "mk" 'git-rebase-abort))))
 
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
@@ -3961,8 +3968,9 @@ Disable the highlighting of overlong lines."
   :bind (("C-c v t" . git-timemachine))
   :commands dotemacs-time-machine-micro-state
   :init
-  (evil-leader/set-key
-    "gt" 'dotemacs-time-machine-micro-state)
+  (after "evil-leader"
+    (evil-leader/set-key
+      "gt" 'dotemacs-time-machine-micro-state))
 
   :config
   (progn
@@ -4684,9 +4692,10 @@ Disable the highlighting of overlong lines."
       (define-key evil-motion-state-local-map (kbd "R")   'neotree-change-root)
       (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
 
-    (evil-leader/set-key
-      "ft" 'neotree-toggle
-      "pt" 'neotree-find-project-root))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "ft" 'neotree-toggle
+        "pt" 'neotree-find-project-root)))
 
   :config
     (add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
@@ -4747,9 +4756,10 @@ Disable the highlighting of overlong lines."
   :config
   (progn
     (projectile-persp-bridge helm-projectile-switch-project)
-    (evil-leader/set-key
-      "pp" 'dotemacs-persp-switch-project)
-    ))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "pp" 'dotemacs-persp-switch-project)
+    )))
 
 
 ;;; Processes and commands
@@ -4955,18 +4965,19 @@ Disable the highlighting of overlong lines."
 
                 ))
 
-    (evil-leader/set-key-for-mode 'org-mode
-      "mc" 'org-capture
-      "md" 'org-deadline
-      "me" 'org-export-dispatch
-      "mf" 'org-set-effort
-      "mi" 'org-clock-in
-      "mj" 'helm-org-in-buffer-headings
-      "mo" 'org-clock-out
-      "mm" 'org-ctrl-c-ctrl-c
-      "mq" 'org-clock-cancel
-      "mr" 'org-refile
-      "ms" 'org-schedule)
+    (after "evil-leader"
+      (evil-leader/set-key-for-mode 'org-mode
+        "mc" 'org-capture
+        "md" 'org-deadline
+        "me" 'org-export-dispatch
+        "mf" 'org-set-effort
+        "mi" 'org-clock-in
+        "mj" 'helm-org-in-buffer-headings
+        "mo" 'org-clock-out
+        "mm" 'org-ctrl-c-ctrl-c
+        "mq" 'org-clock-cancel
+        "mr" 'org-refile
+        "ms" 'org-schedule))
 
     (require 'ox-md)
     (require 'ox-ascii)
@@ -5009,12 +5020,12 @@ Disable the highlighting of overlong lines."
              ort/goto-todos)
   :init
   (progn
-    (evil-leader/set-key
-      "Ct"  'ort/capture-todo
-      "CT"  'ort/capture-todo-check)
-    (evil-leader/set-key-for-mode 'org-mode
-      "mgt" 'ort/goto-todos)
-    ))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "Ct"  'ort/capture-todo
+        "CT"  'ort/capture-todo-check)
+      (evil-leader/set-key-for-mode 'org-mode
+        "mgt" 'ort/goto-todos))))
 
 (use-package evil-org
   :disabled t
@@ -5023,13 +5034,14 @@ Disable the highlighting of overlong lines."
   (add-hook 'org-mode-hook 'evil-org-mode)
   :config
   (progn
-    (evil-leader/set-key-for-mode 'org-mode
-         "a" nil "ma" 'org-agenda
-         "c" nil "mA" 'org-archive-subtree
-         "o" nil "mC" 'evil-org-recompute-clocks
-         "l" nil "ml" 'evil-org-open-links
-         "t" nil "mt" 'org-show-todo-tree)
-    (diminish evil-org-mode . " ⓔ")))
+    (after "evil-leader"
+      (evil-leader/set-key-for-mode 'org-mode
+        "a" nil "ma" 'org-agenda
+        "c" nil "mA" 'org-archive-subtree
+        "o" nil "mC" 'evil-org-recompute-clocks
+        "l" nil "ml" 'evil-org-open-links
+        "t" nil "mt" 'org-show-todo-tree)))
+  :diminish (evil-org-mode . " ⓔ"))
 
 
 ;;; Online Help
@@ -5247,7 +5259,8 @@ Disable the highlighting of overlong lines."
     (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
     (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
 
-    (evil-leader/set-key "re" 'evil-show-registers)
+    (after "evil-leader"
+      (evil-leader/set-key "re" 'evil-show-registers))
 
     (unless dotemacs-enable-paste-micro-state
       (ad-disable-advice 'evil-paste-before 'after
@@ -5352,8 +5365,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
     (after "evil-leader"
       (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
-      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading)
-      )))
+      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading))))
 
 (use-package evil-jumper
   :ensure t
@@ -5420,13 +5432,14 @@ Example: (evil-map visual \"<\" \"<gv\")"
              evilnc-copy-and-comment-lines)
   :init
   (progn
-    (evil-leader/set-key
-      ";"  'evilnc-comment-operator
-      "cl" 'evilnc-comment-or-uncomment-lines
-      "ci" 'evilnc-toggle-invert-comment-line-by-line
-      "cp" 'evilnc-comment-or-uncomment-paragraphs
-      "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
-      "cy" 'evilnc-copy-and-comment-lines)))
+    (after "evil-leader"
+      (evil-leader/set-key
+        ";"  'evilnc-comment-operator
+        "cl" 'evilnc-comment-or-uncomment-lines
+        "ci" 'evilnc-toggle-invert-comment-line-by-line
+        "cp" 'evilnc-comment-or-uncomment-paragraphs
+        "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
+        "cy" 'evilnc-copy-and-comment-lines))))
 
 (use-package evil-matchit
   :ensure t
@@ -5471,9 +5484,11 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (interactive "p*")
       (evil-numbers/dec-at-pt amount)
       (dotemacs-evil-numbers-micro-state-overlay-map))
-    (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
-    (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
-    (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease)))
+
+    (after "evil-leader"
+      (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
+      (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
+      (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease))))
 
 (use-package evil-search-highlight-persist
   :ensure t
@@ -5481,7 +5496,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
   (progn
     (global-evil-search-highlight-persist)
     ;; (set-face-attribute )
-    (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all)
+    (after "evil-leader"
+      (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all))
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
     (evil-ex-define-cmd "nohlsearch"
                         'evil-search-highlight-persist-remove-all)
