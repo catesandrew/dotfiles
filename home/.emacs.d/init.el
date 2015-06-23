@@ -1726,14 +1726,15 @@ mouse-3: go to end"))))
   :ensure t
   :defer t
   :init
-  (dotemacs-define-micro-state move-text
-    :doc "[J] move down [K] move up"
+  (after "evil-leader"
+    (dotemacs-define-micro-state move-text
+      :doc "[J] move down [K] move up"
       :use-minibuffer t
-    :execute-binding-on-enter t
-    :evil-leader "xJ" "xK"
-    :bindings
-    ("J" move-text-down)
-    ("K" move-text-up)))
+      :execute-binding-on-enter t
+      :evil-leader "xJ" "xK"
+      :bindings
+      ("J" move-text-down)
+      ("K" move-text-up))))
 
 (use-package helm-ring                  ; Helm commands for rings
   :ensure helm
