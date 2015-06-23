@@ -100,6 +100,11 @@ several times cycle between the kill ring content.'"
   "Guide-key delay in seconds."
   :group 'dotemacs)
 
+(defcustom dotemacs-search-tools '("ag" "pt" "ack" "grep")
+  "List of search tool executable names. Dotemacs uses the first installed
+tool of the list. Supported tools are `ag', `pt', `ack' and `grep'."
+  :group 'dotemacs)
+
 ;; Regexp for useful and useless buffers for smarter buffer switching
 (defcustom dotemacs-useless-buffers-regexp '("*\.\+")
   "Regexp used to determine if a buffer is not useful."
@@ -140,6 +145,11 @@ can be toggled through `toggle-transparency'."
 (defcustom dotemacs-fullscreen-use-non-native nil
   "If non nil `dotemacs-toggle-fullscreen' will not use native fullscreen. Use
 to disable fullscreen animations in OSX."
+  :group 'dotemacs)
+
+(defcustom dotemacs-highlight-delimiters 'all
+  "Select a scope to highlight delimiters. Possible value is `all', `current'
+or `nil'. Default is `all'"
   :group 'dotemacs)
 
 (defcustom dotemacs-private-dir (locate-user-emacs-file "private")
@@ -406,10 +416,6 @@ FEATURE may be a named feature or a file name, see
 
 
 ;;; Initialization
-(when (version< emacs-version "25")
-  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
-  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
-
 ;; And disable the site default settings
 (setq inhibit-default-init t)
 
@@ -455,6 +461,10 @@ FEATURE may be a named feature or a file name, see
 
 (use-package init-funcs
   :load-path "config/")
+
+(when (and (system-is-mac) (version< emacs-version "25"))
+  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
+  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
 
 (use-package core-funcs
   :load-path "core/")
@@ -521,10 +531,39 @@ FEATURE may be a named feature or a file name, see
   :ensure t
   :bind (("C-c l p" . paradox-list-packages)
          ("C-c l P" . package-list-packages-no-fetch))
-  :config
-  ;; Don't ask for a token, please, and don't bug me about asynchronous updates
-  (setq paradox-github-token t
-        paradox-execute-asynchronously nil))
+  :commands paradox-list-packages
+  :init
+  (progn
+    (setq paradox-execute-asynchronously nil)
+    (defun dotemacs-paradox-list-packages ()
+      "Load depdendencies for auth and open the package list."
+      (interactive)
+      (require 'epa-file)
+      (require 'auth-source)
+      (when (and (not (boundp 'paradox-github-token))
+                 (file-exists-p "~/.authinfo.gpg"))
+        (let ((authinfo-result (car (auth-source-search
+                                     :max 1
+                                     :host "github.com"
+                                     :port "paradox"
+                                     :user "paradox"
+                                     :require '(:secret)))))
+          (let ((paradox-token (plist-get authinfo-result :secret)))
+            (setq paradox-github-token (if (functionp paradox-token)
+                                           (funcall paradox-token)
+                                         paradox-token)))))
+      (paradox-list-packages nil))
+
+    (after "evil-evilified-state"
+      (evilify paradox-menu-mode paradox-menu-mode-map
+               "H" 'paradox-menu-quick-help
+               "J" 'paradox-next-describe
+               "K" 'paradox-previous-describe
+               "L" 'paradox-menu-view-commit-list
+               "o" 'paradox-menu-visit-homepage))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "aP" 'dotemacs-paradox-list-packages))))
 
 (use-package bug-hunter                 ; Search init file for bugs
   :ensure t)
@@ -699,7 +738,7 @@ FEATURE may be a named feature or a file name, see
   :disabled t
   :ensure solarized-theme
   :defer t
-  :init (load-theme 'solarized-light 'no-confirm)
+  :init (load-theme 'solarized-dark 'no-confirm)
   :config
   ;; Disable variable pitch fonts in Solarized theme
   (setq solarized-use-variable-pitch nil
@@ -715,7 +754,9 @@ FEATURE may be a named feature or a file name, see
 (use-package zenburn
   :ensure zenburn-theme
   :defer t
-  :init (load-theme 'zenburn 'no-confirm))
+  :init
+  (progn
+    (load-theme 'zenburn 'no-confirm)))
 
 (use-package linum-relative
   :ensure t
@@ -1025,6 +1066,14 @@ mouse-3: go to end"))))
   :ensure helm
   :bind (([remap switch-to-buffer] . helm-mini)))
 
+(use-package helm-themes
+  :ensure helm
+  :defer t
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key
+      "Th" 'helm-themes)))
+
 (use-package helm-command               ; M-x in Helm
   :ensure helm
   :bind (([remap execute-extended-command] . helm-M-x)))
@@ -1041,6 +1090,16 @@ mouse-3: go to end"))))
 (use-package helm-unicode               ; Unicode input with Helm
   :ensure t
   :bind ("C-c b 8" . helm-unicode))
+
+(use-package helm-mode-manager
+  :ensure t
+  :defer t
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key
+      "hM"    'helm-switch-major-mode
+      ;; "hm"    'helm-disable-minor-mode
+      "h C-m" 'helm-enable-minor-mode)))
 
 
 ;;; Buffer, Windows and Frames
@@ -1176,7 +1235,72 @@ mouse-3: go to end"))))
 
 ; activate winner mode use to undo and redo windows layout
 (use-package winner                     ; Undo and redo window configurations
-  :init (winner-mode))
+  :ensure t
+  :init
+  (progn
+    (winner-mode t))
+  :config
+  (progn
+    (setq dotemacs-winner-boring-buffers '("*Completions*"
+                                           "*Compile-Log*"
+                                           "*inferior-lisp*"
+                                           "*Fuzzy Completions*"
+                                           "*Apropos*"
+                                           "*Help*"
+                                           "*cvs*"
+                                           "*Buffer List*"
+                                           "*Ibuffer*"
+                                           "*esh command on file*"
+                                            ))
+    (setq winner-boring-buffers
+          (append winner-boring-buffers dotemacs-winner-boring-buffers))))
+
+(use-package window-numbering
+  :ensure t
+  ;; not deferred on puprose
+  :init (require 'window-numbering)
+  :config
+  (progn
+    (setq window-numbering-auto-assign-0-to-minibuffer nil)
+    (after "evil-leader"
+      (evil-leader/set-key
+        "0" 'select-window-0
+        "1" 'select-window-1
+        "2" 'select-window-2
+        "3" 'select-window-3
+        "4" 'select-window-4
+        "5" 'select-window-5
+        "6" 'select-window-6
+        "7" 'select-window-7
+        "8" 'select-window-8
+        "9" 'select-window-9) )
+    (window-numbering-mode 1))
+
+  (defun dotemacs-window-number ()
+    "Return the number of the window."
+    (let* ((num (window-numbering-get-number))
+           (str (if num (int-to-string num))))
+      (cond
+       ((not dotemacs-mode-line-unicode-symbols) str)
+       ((equal str "1")  "➊")
+       ((equal str "2")  "➋")
+       ((equal str "3")  "➌")
+       ((equal str "4")  "➍")
+       ((equal str "5")  "➎")
+       ((equal str "6")  "❻")
+       ((equal str "7")  "➐")
+       ((equal str "8")  "➑")
+       ((equal str "9")  "➒")
+       ((equal str "0")  "➓"))))
+
+  (defun dotemacs-window-numbering-assign (windows)
+    "Custom number assignment for special buffers."
+    (mapc (lambda (w)
+            (when (and (boundp 'neo-global--window)
+                       (eq w neo-global--window))
+              (window-numbering-assign w 0)))
+          windows))
+  (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign))
 
 (use-package ediff-wind
   :defer t
@@ -1277,10 +1401,20 @@ mouse-3: go to end"))))
     (setq insert-directory-program gnu-ls)))
 
 (use-package tramp                      ; Access remote files
+  :ensure t
   :defer t
   :config
   ;; Store auto-save files locally
   (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
+
+(use-package open-junk-file
+  :ensure t
+  :defer t
+  :commands (open-junk-file)
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key "fJ" 'open-junk-file))
+    (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/")))
 
 (use-package dired                      ; Edit directories
   :defer t
@@ -1371,13 +1505,17 @@ mouse-3: go to end"))))
 ;; original
 
 (use-package recentf                    ; Save recently visited files
+  :defer t
   :init
-  (setq recentf-save-file (concat dotemacs-cache-directory "recentf"))
-  (recentf-mode)
-
+  ;; lazy load recentf
+  (add-hook 'find-file-hook (lambda () (unless recentf-mode
+                                         (recentf-mode)
+                                         (recentf-track-opened-file))))
   :config
-  (setq recentf-max-saved-items 200
+  (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
+        recentf-max-saved-items 200
         recentf-max-menu-items 50
+        recentf-auto-save-timer (run-with-idle-timer 600 t 'recentf-save-list)
         ;; Cleanup recent files only when Emacs is idle, but not when the mode
         ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
         ;; idles often enough to have the recent files list clean up regularly
@@ -1579,9 +1717,23 @@ mouse-3: go to end"))))
   :init (add-hook 'prog-mode-hook #'dotemacs-auto-fill-comments-mode))
 
 (use-package clean-aindent-mode ; Keeps track of the last auto-indent operation and trims down white space
+  :ensure t
   :defer t
   :init
   (add-hook 'prog-mode-hook 'clean-aindent-mode))
+
+(use-package move-text
+  :ensure t
+  :defer t
+  :init
+  (dotemacs-define-micro-state move-text
+    :doc "[J] move down [K] move up"
+      :use-minibuffer t
+    :execute-binding-on-enter t
+    :evil-leader "xJ" "xK"
+    :bindings
+    ("J" move-text-down)
+    ("K" move-text-up)))
 
 (use-package helm-ring                  ; Helm commands for rings
   :ensure helm
@@ -1823,11 +1975,6 @@ mouse-3: go to end"))))
 Disable the highlighting of overlong lines."
   (setq-local whitespace-style (-difference whitespace-style
                                             '(lines lines-tail))))
-
-(defun dotemacs-whitespace-mode-local ()
-  "Enable `whitespace-mode' after local variables where set up."
-  (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
-
 ;; Trailing whitespace
 ;; I don’t want to leave trailing whitespace in files I touch, so set
 ;; up a hook that automatically deletes trailing whitespace after
@@ -1835,26 +1982,102 @@ Disable the highlighting of overlong lines."
 ; (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
 (use-package whitespace                 ; Highlight bad whitespace
+  :ensure t
   :bind (("C-c t w" . whitespace-mode))
-  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-          (add-hook hook #'dotemacs-whitespace-mode-local))
-  :config
-  ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
-  ;; portions of lines via faces.  Also indicate tabs via characters
-  (setq whitespace-style '(face indentation space-after-tab space-before-tab
-                                tab-mark empty trailing lines-tail)
-        whitespace-line-column nil)     ; Use `fill-column' for overlong lines
+  :init
+  (progn
+    (dotemacs-add-toggle whitespace
+                         :status whitespace-mode
+                         :on (whitespace-mode)
+                         :off (whitespace-mode -1)
+                         :documentation "Display whitespace."
+                         :evil-leader "tw")
+    (dotemacs-add-toggle whitespace-globally
+                         :status global-whitespace-mode
+                         :on (global-whitespace-mode)
+                         :off (global-whitespace-mode -1)
+                         :documentation "Globally display whitespace."
+                         :evil-leader "t C-w")
+
+    (defun dotemacs-set-whitespace-style-for-diff ()
+      "Whitespace configuration for `diff-mode'"
+      (setq-local whitespace-style '(face
+                                     tabs
+                                     tab-mark
+                                     spaces
+                                     space-mark
+                                     trailing
+                                     indentation::space
+                                     indentation::tab
+                                     newline
+                                     newline-mark)))
+
+    (defun dotemacs-set-whitespace-style-for-others ()
+      "Whitespace configuration for `prog-mode, `text-mode, `conf-mode'"
+      ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
+      ;; portions of lines via faces.  Also indicate tabs via characters
+      (setq-local whitespace-style '(face
+                                     indentation
+                                     space-after-tab
+                                     space-before-tab
+                                     tab-mark
+                                     empty
+                                     trailing
+                                     lines-tail))
+
+      ; Use `fill-column' for overlong lines
+      (setq-local whitespace-line-column nil))
+
+    (defun dotemacs-whitespace-mode-local ()
+      "Enable `whitespace-mode' after local variables where set up."
+      (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
+
+    (add-hook 'diff-mode-hook #'whitespace-mode)
+    (add-hook 'diff-mode-hook #'dotemacs-set-whitespace-style-for-diff)
+
+    (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+      (progn
+        (add-hook hook #'dotemacs-whitespace-mode-local)
+        (add-hook hook #'dotemacs-set-whitespace-style-for-others))))
   :diminish ((whitespace-mode . " ⓦ")
              (global-whitespace-mode . " Ⓦ")))
 
 (use-package hl-line                    ; Highlight the current line
   :init (global-hl-line-mode 1))
 
+(use-package hl-anything ;; Highlight things at point, selections, enclosing parentheses
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq-default hl-highlight-save-file (concat dotemacs-cache-directory ".hl-save"))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "hc"  'hl-unhighlight-all-local
+        "hgc" 'hl-unhighlight-all-global
+        "hgh" 'hl-highlight-thingatpt-global
+        "hh"  'hl-highlight-thingatpt-local
+        "hn"  'hl-find-next-thing
+        "hN"  'hl-find-prev-thing
+        "hp"  'hl-paren-mode
+        "hr"  'hl-restore-highlights
+        "hs"  'hl-save-highlights)))
+  :config
+  (progn
+    (dotemacs-hide-lighter hl-highlight-mode))
+  :diminish (hl-paren-mode . " (Ⓗ)"))
+
 (use-package rainbow-delimiters         ; Highlight delimiters by depth
   :ensure t
   :defer t
-  :init (dolist (hook '(text-mode-hook prog-mode-hook))
-          (add-hook hook #'rainbow-delimiters-mode)))
+  :init
+  (progn
+    (after "evil-leader"
+      (evil-leader/set-key "tCd" 'rainbow-delimiters-mode))
+
+    (when (eq dotemacs-highlight-delimiters 'all)
+      (dolist (hook '(text-mode-hook prog-mode-hook))
+        (add-hook hook #'rainbow-delimiters-mode)))))
 
 (use-package hi-lock                    ; Custom regexp highlights
   :init (global-hi-lock-mode)
@@ -1863,7 +2086,10 @@ Disable the highlighting of overlong lines."
 (use-package highlight-numbers          ; Fontify number literals
   :ensure t
   :defer t
-  :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+  :init
+  (progn
+    (add-hook 'prog-mode-hook #'highlight-numbers-mode)
+    (add-hook 'asm-mode-hook (lambda () (highlight-numbers-mode -1)))))
 
 (use-package highlight-quoted
   :ensure t
@@ -2806,9 +3032,32 @@ Disable the highlighting of overlong lines."
   :init (after "flycheck" (flycheck-package-setup)))
 
 (use-package pcre2el                    ; Convert regexps to RX and back
-  :disabled t
   :ensure t
-  :init (rxt-global-mode))
+  :defer t
+  :commands rxt-fontify-regexp-at-point
+  :init
+  (progn
+    (dotemacs-declare-prefix "R" "pcre2el")
+    (after "evil-leader"
+      (evil-leader/set-key
+        "R/"  'rxt-explain
+        "Rc"  'rxt-convert-syntax
+        "Rx"  'rxt-convert-to-rx
+        "R'"  'rxt-convert-to-strings
+        "Rpe" 'rxt-pcre-to-elisp
+        "R%"  'pcre-query-replace-regexp
+        "Rpx" 'rxt-pcre-to-rx
+        "Rps" 'rxt-pcre-to-sre
+        "Rp'" 'rxt-pcre-to-strings
+        "Rp/" 'rxt-explain-pcre
+        "Re/" 'rxt-explain-elisp
+        "Rep" 'rxt-elisp-to-pcre
+        "Rex" 'rxt-elisp-to-rx
+        "Res" 'rxt-elisp-to-sre
+        "Re'" 'rxt-elisp-to-strings
+        "Ret" 'rxt-toggle-elisp-rx
+        "Rt"  'rxt-toggle-elisp-rx
+        "Rh"  'rxt-fontify-regexp-at-point))))
 
 (use-package macrostep                  ; Interactively expand macros in code
   :ensure t
@@ -3844,12 +4093,67 @@ Disable the highlighting of overlong lines."
   :ensure t
   :bind (("C-c a a" . helm-do-ag)
          ("C-c a A" . helm-ag))
-  :config (setq helm-ag-fuzzy-match t
-                helm-ag-use-grep-ignore-list t ;; Use `grep-find-ignored-files'
-                                               ;; and `grep-find-ignored-directories'
-                                               ;; as ignore pattern
-                helm-ag-insert-at-point 'symbol
-                helm-ag-source-type 'file-line))
+  :defer t
+  :init
+  (progn
+    (after "evil-evilified-state"
+      ;; evilify the helm-grep buffer
+      (evilify helm-grep-mode helm-grep-mode-map
+               (kbd "RET") 'helm-grep-mode-jump-other-window
+               (kbd "q") 'quit-window))
+
+    (after "evil-leader"
+      (evil-leader/set-key
+        ;; opened buffers scope
+        "sb"  'dotemacs-helm-buffers-smart-do-search
+        "sB"  'dotemacs-helm-buffers-smart-do-search-region-or-symbol
+        "sab" 'helm-do-ag-buffers
+        "saB" 'dotemacs-helm-buffers-do-ag-region-or-symbol
+        "skb" 'dotemacs-helm-buffers-do-ack
+        "skB" 'dotemacs-helm-buffers-do-ack-region-or-symbol
+        "stb" 'dotemacs-helm-buffers-do-pt
+        "stB" 'dotemacs-helm-buffers-do-pt-region-or-symbol
+        ;; current file scope
+        "ss"  'dotemacs-helm-file-smart-do-search
+        "sS"  'dotemacs-helm-file-smart-do-search-region-or-symbol
+        "saa" 'helm-ag-this-file
+        "saA" 'dotemacs-helm-file-do-ag-region-or-symbol
+        ;; files scope
+        "sf"  'dotemacs-helm-files-smart-do-search
+        "sF"  'dotemacs-helm-files-smart-do-search-region-or-symbol
+        "saf" 'helm-do-ag
+        "saF" 'dotemacs-helm-files-do-ag-region-or-symbol
+        "skf" 'dotemacs-helm-files-do-ack
+        "skF" 'dotemacs-helm-files-do-ack-region-or-symbol
+        "stf" 'dotemacs-helm-files-do-pt
+        "stF" 'dotemacs-helm-files-do-pt-region-or-symbol
+        ;; current project scope
+        "/"   'dotemacs-helm-project-smart-do-search
+        "?"   'dotemacs-helm-project-smart-do-search-region-or-symbol
+        "sp"  'dotemacs-helm-project-smart-do-search
+        "sP"  'dotemacs-helm-project-smart-do-search-region-or-symbol
+        "sap" 'dotemacs-helm-project-do-ag
+        "saP" 'dotemacs-helm-project-do-ag-region-or-symbol
+        "skp" 'dotemacs-helm-project-do-ack
+        "skP" 'dotemacs-helm-project-do-ack-region-or-symbol
+        "stp" 'dotemacs-helm-project-do-pt
+        "stP" 'dotemacs-helm-project-do-pt-region-or-symbol)))
+  :config
+  (progn
+    (setq helm-ag-fuzzy-match t
+          helm-ag-use-grep-ignore-list t ;; Use `grep-find-ignored-files'
+                                         ;; and `grep-find-ignored-directories'
+                                         ;; as ignore pattern
+          helm-ag-insert-at-point 'symbol
+          helm-ag-source-type 'file-line))
+
+    (after "evil-leader"
+      (evil-define-key 'normal helm-ag-map "SPC" evil-leader--default-map))
+
+    (after "evil-evilified-state"
+      (evilify helm-ag-mode helm-ag-mode-map
+               (kbd "RET") 'helm-ag-mode-jump-other-window
+               (kbd "q") 'quit-window)))
 
 
 ;;; Project management for Interactively Do Things (IDO)
@@ -3986,11 +4290,42 @@ Disable the highlighting of overlong lines."
 ;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
-  :init (projectile-global-mode)
-  :config
+  :commands (projectile-ack
+             projectile-ag
+             projectile-compile-project
+             projectile-dired
+             projectile-grep
+             projectile-find-dir
+             projectile-find-file
+             projectile-find-tag
+             projectile-find-test-file
+             projectile-invalidate-cache
+             projectile-kill-buffers
+             projectile-multi-occur
+             projectile-project-root
+             projectile-recentf
+             projectile-regenerate-tags
+             projectile-replace
+             projectile-run-async-shell-command-in-root
+             projectile-run-shell-command-in-root
+             projectile-switch-project
+             projectile-switch-to-buffer
+             projectile-vc)
+  :init
   (progn
-    ;; Remove dead projects when Emacs is idle
-    (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+    (setq-default projectile-enable-caching t)
+    (setq projectile-sort-order 'recentf
+          projectile-cache-file (concat dotemacs-cache-directory
+                                        "projectile.cache")
+          projectile-known-projects-file (concat dotemacs-cache-directory
+                                                   "projectile-bookmarks.eld")
+          projectile-completion-system 'helm
+          projectile-indexing-method 'alien ; force alien for Windwos
+          projectile-find-dir-includes-top-level t
+          projectile-mode-line '(:propertize
+                                 (:eval (concat " " (projectile-project-name)))
+                                 face font-lock-constant-face))
+
     (setq projectile-project-root-files '(
             ; "rebar.config"       ; Rebar project file
             "project.clj"        ; Leiningen project file
@@ -4106,25 +4441,69 @@ Disable the highlighting of overlong lines."
             "/.idea"
             "/.sass-cache"))
 
-    (setq projectile-completion-system 'helm
-          projectile-cache-file (concat dotemacs-cache-directory "projectile.cache")
-          projectile-known-projects-file (concat dotemacs-cache-directory "projectile-bookmarks.eld")
-          projectile-indexing-method 'alien ; force alien for Windwos
-          projectile-enable-caching t       ; To enable caching unconditionally
-          projectile-find-dir-includes-top-level t
-          projectile-mode-line '(:propertize
-                                 (:eval (concat " " (projectile-project-name)))
-                                 face font-lock-constant-face)))
+    (after "evil-leader"
+      (unless (boundp 'dotemacs-use-helm-projectile)
+        (evil-leader/set-key
+          "pb" 'projectile-switch-to-buffer
+          "pd" 'projectile-find-dir
+          "pe" 'projectile-recentf
+          "pf" 'projectile-find-file
+          "pg" 'projectile-grep
+          "ph" 'helm-projectile
+          "ps" 'projectile-switch-project))
+      (evil-leader/set-key
+        "p!" 'projectile-run-shell-command-in-root
+        "p&" 'projectile-run-async-shell-command-in-root
+        "pc" 'projectile-compile-project
+        "pD" 'projectile-dired
+        "pI" 'projectile-invalidate-cache
+        "pk" 'projectile-kill-buffers
+        "po" 'projectile-multi-occur
+        "pr" 'projectile-replace
+        "pR" 'projectile-regenerate-tags
+        "py" 'projectile-find-tag
+        "pT" 'projectile-find-test-file)))
+  :config
+  (progn
+    ;; Remove dead projects when Emacs is idle
+    ; (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+    (projectile-global-mode))
   :diminish projectile-mode)
 
 (use-package helm-projectile
   :ensure t
   :defer t
-  :init (after "projectile" (helm-projectile-on))
-  :config
+  :commands (helm-projectile-switch-to-buffer
+             helm-projectile-find-dir
+             helm-projectile-dired-find-dir
+             helm-projectile-recentf
+             helm-projectile-find-file
+             helm-projectile-grep
+             helm-projectile
+             helm-projectile-switch-project)
+  :init
   (progn
+    ; (after "projectile" (helm-projectile-on)
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
-    (setq projectile-switch-project-action #'helm-projectile)))
+    (setq projectile-switch-project-action #'helm-projectile)
+
+    (defconst dotemacs-use-helm-projectile t
+      "This variable is only defined if helm-projectile is used.")
+
+    ;; needed for smart search if user's default tool is grep
+    (defalias 'dotemacs-helm-project-do-grep 'helm-projectile-grep)
+    (defalias 'dotemacs-helm-project-do-grep-region-or-symbol 'helm-projectile-grep)
+
+    (after "evil-leader"
+      (evil-leader/set-key
+        "pb"  'helm-projectile-switch-to-buffer
+        "pd"  'helm-projectile-find-dir
+        "pe"  'helm-projectile-recentf
+        "pf"  'helm-projectile-find-file
+        "ph"  'helm-projectile
+        "pp"  'helm-projectile-switch-project
+        "pv"  'projectile-vc
+        "sgp" 'helm-projectile-grep))))
 
 
 ;;; Project management with Project Explorer
@@ -4637,7 +5016,20 @@ Disable the highlighting of overlong lines."
 
 (use-package helm-descbinds
   :ensure t
-  :init (helm-descbinds-mode))
+  :defer t
+  :init
+  (progn
+    (setq helm-descbinds-window-style 'split)
+    (add-hook 'helm-mode-hook 'helm-descbinds-mode)
+    (after "evil-leader"
+      (evil-leader/set-key "hk" 'helm-descbinds))))
+
+(use-package helm-make
+  :ensure t
+  :defer t
+  :init
+  (after "evil-leader"
+    (evil-leader/set-key "hk" 'helm-make)))
 
 (use-package ansible-doc                ; Documentation lookup for Ansible
   :ensure t
