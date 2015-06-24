@@ -4645,7 +4645,7 @@ Disable the highlighting of overlong lines."
     (add-to-list 'evil-motion-state-modes 'neotree-mode)
     (setq neo-window-width 32
           neo-theme 'nerd
-          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
+          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\|git\\|hg\\|svn\\|idea\\|sass-cache\\)\\|\\(Thumbs\\.db\\)\\|\\(assets\\|node_modules\\|build\\|tmp\\|log\\|vendor\\|bower_components\\|components\\)\\)$")
           neo-create-file-auto-open t
           neo-banner-message nil
           neo-show-updir-line nil
