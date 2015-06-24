@@ -2171,6 +2171,32 @@ Disable the highlighting of overlong lines."
 (use-package init-auto-completions
   :load-path "config/")
 
+(after "evil-leader"
+  (dotemacs-add-toggle auto-completion
+                       :status
+                        (if (boundp 'auto-completion-front-end)
+                            (if (eq 'company auto-completion-front-end)
+                                company-mode
+                              auto-complete-mode)
+                          ;; default completion hardcoded to be company for now
+                          (setq auto-completion-front-end 'company)
+                          nil)
+                        :on
+                        (progn
+                          (if (eq 'company auto-completion-front-end)
+                              (company-mode)
+                            (auto-complete-mode))
+                          (message "Enabled auto-completion (using %S)."
+                                   auto-completion-front-end))
+                        :off
+                        (progn
+                          (if (eq 'company auto-completion-front-end)
+                              (company-mode -1)
+                            (auto-complete-mode -1))
+                          (message "Disabled auto-completion."))
+                        :documentation "Activate auto-completion."
+                        :evil-leader "ta"))
+
 ;; In `completion-at-point', do not pop up silly completion buffers for less
 ;; than five candidates.  Cycle instead.
 (setq completion-cycle-threshold 5)
@@ -2460,35 +2486,18 @@ Disable the highlighting of overlong lines."
 ;;; Spelling and syntax checking
 
 ;; Command Prefixes
-(dotemacs-declare-prefix "S" "spelling")
-
-(use-package ispell                     ; Spell checking
-  :if (eq system-type 'darwin)
-  :config
-  (progn
-    (setq ispell-program-name (if (eq system-type 'darwin)
-                                  (executable-find "aspell")
-                                (executable-find "hunspell")))
-
-    (unless ispell-program-name
-      (warn "No spell checker available. Install Hunspell or ASpell for OS X.")))
-)
-
-(use-package ispell                     ; Spell checking
-  :if (eq system-type 'gnu/linux)
-  :config
-  (progn
-    (setq ispell-program-name (if (eq system-type 'darwin)
-                                  (executable-find "aspell")))
-    (unless ispell-program-name
-      (warn "No spell checker available. Install ASpell for Linux.")))
-)
+(after "evil-leader"
+  (dotemacs-declare-prefix "S" "spelling"))
 
 (use-package ispell                     ; Spell checking
   :defer t
   :config
   (progn
-    (setq ; ispell-extra-args '("--sug-mode=ultra")
+    (setq ispell-program-name
+          (or (executable-find "aspell")
+              (executable-find "hunspell"))
+
+          ; ispell-extra-args '("--sug-mode=ultra")
           ispell-dictionary "en_US"     ; Default dictionnary
           ispell-silently-savep t       ; Don't ask when saving the private dict
           ;; Increase the height of the choices window to take our header line
@@ -2496,7 +2505,7 @@ Disable the highlighting of overlong lines."
           ispell-choices-win-default-height 5)
 
     (unless ispell-program-name
-      (warn "No spell checker available. Install Hunspell or ASpell for OS X."))))
+      (warn "No spell checker available. Install Hunspell or ASpell."))))
 
 (use-package flyspell                   ; On-the-fly spell checking
   :bind (("C-c t s" . flyspell-mode))
@@ -3106,8 +3115,8 @@ Disable the highlighting of overlong lines."
   :commands rxt-fontify-regexp-at-point
   :init
   (progn
-    (dotemacs-declare-prefix "R" "pcre2el")
     (after "evil-leader"
+      (dotemacs-declare-prefix "R" "pcre2el")
       (evil-leader/set-key
         "R/"  'rxt-explain
         "Rc"  'rxt-convert-syntax
