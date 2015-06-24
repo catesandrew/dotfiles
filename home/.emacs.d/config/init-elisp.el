@@ -1,6 +1,6 @@
 (require 'rx)
 
-(defun dotemacs-find-cask-file (other-window)
+(defun dotemacs-elisp-find-cask-file (other-window)
     "Find the Cask file for this buffer.
 
 When OTHER-WINDOW is non-nil, find the Cask file in another
@@ -14,7 +14,7 @@ window."
       (funcall (if other-window #'find-file-other-window #'find-file)
                (expand-file-name "Cask" directory))))
 
-(defun dotemacs-emacs-lisp-current-feature ()
+(defun dotemacs-emacs-elisp-current-feature ()
   "Return the feature provided by the current buffer."
   (save-excursion
     (goto-char (point-min))

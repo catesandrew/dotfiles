@@ -2211,11 +2211,11 @@ Disable the highlighting of overlong lines."
     ;; Try to expand yasnippet snippets based on prefix
     (push 'yas-hippie-try-expand hippie-expand-try-functions-list))
   :config
-  ;; replace dabbrev-expand
-  (global-set-key (kbd "M-/") 'hippie-expand)
-  (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
-  (setq hippie-expand-try-functions-list
-        '(
+  (progn
+    ;; replace dabbrev-expand
+    (global-set-key (kbd "M-/") 'hippie-expand)
+    (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
+    (setq hippie-expand-try-functions-list '(
           ;; Try to expand word "dynamically", searching the current buffer.
           try-expand-dabbrev
           ;; Try to expand word "dynamically", searching all other buffers.
@@ -2237,7 +2237,7 @@ Disable the highlighting of overlong lines."
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
           try-complete-lisp-symbol
-          dotemacs-try-complete-lisp-symbol-without-namespace)))
+          dotemacs-try-complete-lisp-symbol-without-namespace))))
 
 (use-package company                    ; Graphical (auto-)completion
   :ensure t
@@ -3143,21 +3143,21 @@ Disable the highlighting of overlong lines."
 (use-package ielm                       ; Emacs Lisp REPL
   :bind (("C-c z" . ielm)))
 
-(use-package lisp-mode                  ; Emacs Lisp editing
+(use-package elisp-mode                  ; Emacs Lisp editing
   :defer t
   :interpreter ("emacs" . emacs-lisp-mode)
   :mode ("/Cask\\'" . emacs-lisp-mode)
   :config (require 'ert))
 
-(use-package init-lisp             ; Personal tools for Emacs Lisp
+(use-package init-elisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
-  :commands (dotemacs-find-cask-file
+  :commands (dotemacs-elisp-find-cask-file
              dotemacs-add-use-package-to-imenu)
   :init (progn
           (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
 
           (after "lisp-mode"
-            (bind-key "C-c f c" #'dotemacs-find-cask-file
+            (bind-key "C-c f c" #'dotemacs-elisp-find-cask-file
                       emacs-lisp-mode-map))))
 
 
