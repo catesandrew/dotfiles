@@ -5294,6 +5294,18 @@ Disable the highlighting of overlong lines."
     (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
 
     (after "evil-leader"
+      (dotemacs-define-micro-state scroll
+        :doc "[k] page up [j] page down [K] half page up [J] half page down"
+        :execute-binding-on-enter t
+        :evil-leader "nn" "np" "nP" "nN"
+        :bindings
+        ;; page
+        ("k" evil-scroll-page-up)
+        ("j" evil-scroll-page-down)
+        ;; half page
+        ("K" dotemacs-scroll-half-page-up)
+        ("J" dotemacs-scroll-half-page-down))
+
       (evil-leader/set-key "re" 'evil-show-registers))
 
     (unless dotemacs-enable-paste-micro-state

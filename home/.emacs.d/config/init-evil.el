@@ -128,18 +128,6 @@
   (let ((recenter-redisplay nil))
     (recenter nil)))
 
-(dotemacs-define-micro-state scroll
-  :doc "[k] page up [j] page down [K] half page up [J] half page down"
-  :execute-binding-on-enter t
-  :evil-leader "nn" "np" "nP" "nN"
-  :bindings
-  ;; page
-  ("k" evil-scroll-page-up)
-  ("j" evil-scroll-page-down)
-  ;; half page
-  ("K" dotemacs-scroll-half-page-up)
-  ("J" dotemacs-scroll-half-page-down))
-
 ; support for auto-indentation inhibition on universal argument
 (dotemacs-advise-commands
  "handle-indent" (evil-paste-before evil-paste-after) around
