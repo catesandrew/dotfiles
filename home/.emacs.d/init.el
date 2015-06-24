@@ -5253,8 +5253,9 @@ Disable the highlighting of overlong lines."
 
     (evil-mode 1)
 
+    (after "evil-leader"
     (use-package evil-evilified-state
-      :load-path "extensions/"))
+      :load-path "extensions/")))
   :config
   (progn
     ; c-k/c-j for page down/up
