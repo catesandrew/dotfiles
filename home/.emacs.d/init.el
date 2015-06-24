@@ -884,10 +884,6 @@ mouse-3: go to end"))))
 ;; have no use for these default bindings
 (global-unset-key (kbd "C-x m"))
 
-;; replace with [r]eally [q]uit
-(global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-(global-set-key (kbd "C-x C-c") (dotemacs-bind (message "Thou shall not quit!")))
-
 ;; When changing focus to the minibuffer, stop allowing point to move
 ;; over the prompt. Code taken from ergoemacs.
 ; (setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
