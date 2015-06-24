@@ -175,6 +175,16 @@
   (when (apply 'derived-mode-p dotemacs-evil-emacs-state-modes)
     (turn-off-evil-mode)))
 
+(defun dotemacs-turn-on-search-highlight-persist ()
+  "Enable search-highlight-persist in the current buffer."
+  (interactive)
+  (evil-search-highlight-persist 1))
+
+(defun dotemacs-turn-off-search-highlight-persist ()
+  "Disable evil-search-highlight-persist in the current buffer."
+  (interactive)
+  (evil-search-highlight-persist -1))
+
 ; (when (>= emacs-major-version 25)
 ;   (defadvice elisp--preceding-sexp (around evil activate)
 ;     "In normal-state or motion-state, last sexp ends at point."

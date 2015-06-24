@@ -5254,8 +5254,8 @@ Disable the highlighting of overlong lines."
     (evil-mode 1)
 
     (after "evil-leader"
-    (use-package evil-evilified-state
-      :load-path "extensions/")))
+      (use-package evil-evilified-state
+        :load-path "extensions/")))
   :config
   (progn
     ; c-k/c-j for page down/up
@@ -5542,12 +5542,15 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :init
   (progn
     (global-evil-search-highlight-persist)
-    ;; (set-face-attribute )
     (after "evil-leader"
-      (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all))
+      (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)) ;; sc
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
-    (evil-ex-define-cmd "nohlsearch"
-                        'evil-search-highlight-persist-remove-all)
+
+    (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
+    (evil-ex-define-cmd "hl[search]" 'dotemacs-turn-on-search-highlight-persist)
+    (define-key evil-ex-map "nohl" 'dotemacs-turn-off-search-highlight-persist)
+    (define-key evil-ex-map "hl" 'dotemacs-turn-on-search-highlight-persist)
+
     (defun dotemacs-adaptive-evil-highlight-persist-face ()
       (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
                           :inherit 'region
