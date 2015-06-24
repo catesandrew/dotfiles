@@ -2528,6 +2528,9 @@ Disable the highlighting of overlong lines."
   (progn
     ;; Free C-M-i for completion
     (define-key flyspell-mode-map "\M-\t" nil)
+    ;; Undefine mouse buttons which get in the way
+    (define-key flyspell-mouse-map [down-mouse-2] nil)
+    (define-key flyspell-mouse-map [mouse-2] nil)
     (flyspell-prog-mode))
   :diminish (flyspell-mode . " Ⓢ"))
 
