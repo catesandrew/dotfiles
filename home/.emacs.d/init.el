@@ -4642,6 +4642,7 @@ Disable the highlighting of overlong lines."
   :commands neo-global--window-exists-p
   :init
   (progn
+    (add-to-list 'evil-motion-state-modes 'neotree-mode)
     (setq neo-window-width 32
           neo-theme 'nerd
           neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\)\\|\\(Thumbs\\.db\\)\\)$")
@@ -5315,11 +5316,6 @@ Disable the highlighting of overlong lines."
       (ad-disable-advice 'evil-visual-paste 'after
                          'evil-visual-paste-paste-micro-state)
       (ad-activate 'evil-visual-paste))
-
-    (defadvice evil-quit (around advice-for-evil-quit activate)
-      (message "Thou shall not quit!"))
-    (defadvice evil-quit-all (around advice-for-evil-quit-all activate)
-      (message "Thou shall not quit!"))
 
     ;; butter fingers
     (evil-ex-define-cmd "Q" 'evil-quit)
