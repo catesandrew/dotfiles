@@ -2655,7 +2655,6 @@ Disable the highlighting of overlong lines."
 
 (use-package typo
   :ensure t
-  :bind (("C-c t t" . typo-mode))
   :init (progn
           (typo-global-mode)
 
