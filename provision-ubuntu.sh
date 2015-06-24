@@ -222,6 +222,10 @@ case $response in
       exec_sudo_cmd 'apt-get -yqq update'
       exec_sudo_cmd 'apt-get -y build-dep emacs24'
 
+      # sudo add-apt-repository -y ppa:ubuntu-elisp
+      # sudo apt-get update
+      # sudo apt-get install emacs-snapshot
+
       print_status "Downloading ..."
       TMP_DIR=`mktemp -d`
       exec_cmd 'cd "${TMP_DIR}"'
@@ -288,11 +292,6 @@ sudo apt-get install libtiff5-dev libpng12-dev libjpeg-dev libgif-dev libgnutls-
 
 /usr/bin/setxkbmap -option "ctrl:swapcaps"
 
-brew install editorconfig
-brew install cask
-cd .emacs.d
-cask install
-
 brew install fasd
 brew install fzf
 /usr/local/linuxbrew/Cellar/fzf/0.9.11/install
@@ -302,7 +301,6 @@ git co home/.fzf.bash
 
 cd .emacs.d/
 sudo apt-get install editorconfig
-cask install
 
 # Test for known flags
 for opt in $@
@@ -477,9 +475,10 @@ PermitRootLogin no
 sudo service ssh restart
 
 # install iptables
--P INPUT ACCEPT
+-P INPUT DROP
 -P FORWARD ACCEPT
 -P OUTPUT ACCEPT
+-N LOGGING
 -A INPUT -i lo -j ACCEPT
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
@@ -496,6 +495,9 @@ On Ubuntu, we can use the iptables-persistent package to do this:
 3
 4 # Start the service
 5 sudo service iptables-persistent start
+
+# save the rules
+sudo bash -c "iptables-save > /etc/iptables/rules.v4"
 
 
 #install Fail2Ban
