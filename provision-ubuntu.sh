@@ -226,6 +226,8 @@ case $response in
       # sudo apt-get update
       # sudo apt-get install emacs-snapshot
 
+      # sudo update-alternatives --config emacs
+
       print_status "Downloading ..."
       TMP_DIR=`mktemp -d`
       exec_cmd 'cd "${TMP_DIR}"'
