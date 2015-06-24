@@ -15,8 +15,8 @@
 ;; - C-c l: List things
 ;; - C-c m: Multiple cursors
 ;; - C-c s: Symbol commands
-;; - C-c t: Toggle things and skeletons
-;; - C-c u: Miscellaneous utilities
+;; - C-c t: Skeletons and templates
+;; - C-c u: Miscellaneous utilities, including minor modes
 ;; - C-c v: Version control
 ;; - C-c w: Web stuff
 ;; - C-x x: Perspective
@@ -770,7 +770,7 @@ FEATURE may be a named feature or a file name, see
     (setq linum-relative-current-symbol "")
     (linum-relative-toggle)))
 
-(bind-key "C-c t v" #'variable-pitch-mode)
+(bind-key "C-c u v" #'variable-pitch-mode)
 
 
 ;;; The mode line
@@ -1120,7 +1120,7 @@ mouse-3: go to end"))))
       "bml" 'buf-move-right)))
 
 (use-package frame
-  :bind (("C-c t F" . toggle-frame-fullscreen))
+  :bind (("C-c u F" . toggle-frame-fullscreen))
   :init
   (progn
     ;; Kill `suspend-frame'
@@ -1329,7 +1329,7 @@ mouse-3: go to end"))))
 
 (use-package writeroom-mode             ; Distraction-free editing
   :ensure t
-  :bind (("C-c t R" . writeroom-mode)))
+  :bind (("C-c u r" . writeroom-mode)))
 
 (setq editorconfig-packages '(editorconfig))
 (use-package editorconfig
@@ -1642,7 +1642,7 @@ mouse-3: go to end"))))
 
 (use-package nlinum                     ; Line numbers in display margin
   :ensure t
-  :bind (("C-c t l" . nlinum-mode)))
+  :bind (("C-c u l" . nlinum-mode)))
 
 (use-package helm-imenu
   :ensure helm
@@ -1745,7 +1745,7 @@ mouse-3: go to end"))))
 
 (use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
   :ensure t
-  :bind (("C-c t c" . whitespace-cleanup-mode)
+  :bind (("C-c u w c" . whitespace-cleanup-mode)
          ("C-c e w" . whitespace-cleanup))
   :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
           (add-hook hook #'whitespace-cleanup-mode))
@@ -2024,7 +2024,7 @@ Disable the highlighting of overlong lines."
 
 (use-package whitespace                 ; Highlight bad whitespace
   :ensure t
-  :bind (("C-c t w" . whitespace-mode))
+  :bind (("C-c u w w" . whitespace-mode))
   :init
   (progn
     (after "evil-leader"
@@ -2504,7 +2504,7 @@ Disable the highlighting of overlong lines."
       (warn "No spell checker available. Install Hunspell or ASpell."))))
 
 (use-package flyspell                   ; On-the-fly spell checking
-  :bind (("C-c t s" . flyspell-mode))
+  :bind (("C-c u f s" . flyspell-mode))
   :defer t
   :init
   (progn
@@ -2543,7 +2543,7 @@ Disable the highlighting of overlong lines."
 (use-package flycheck                   ; On-the-fly syntax checking
   :ensure t
   :bind (("C-c l e" . list-flycheck-errors)
-         ("C-c t f" . flycheck-mode))
+         ("C-c u f c" . flycheck-mode))
   :defer t
   :init
   (progn
@@ -2989,7 +2989,7 @@ Disable the highlighting of overlong lines."
     ))
 
 (use-package prog-mode                  ; Prog Mode
-  :bind (("C-c t p" . prettify-symbols-mode))
+  :bind (("C-c u p" . prettify-symbols-mode))
   :init
   (add-hook 'js2-mode-hook
             (lambda ()
@@ -3468,7 +3468,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 
 ;;; Emacs Lisp
-(bind-key "C-c t d" #'toggle-debug-on-error)
+(bind-key "C-c u d" #'toggle-debug-on-error)
 
 (use-package helm-elisp                 ; Helm commands for Emacs Lisp
   :ensure helm
