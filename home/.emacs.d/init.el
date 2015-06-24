@@ -2463,16 +2463,32 @@ Disable the highlighting of overlong lines."
 (dotemacs-declare-prefix "S" "spelling")
 
 (use-package ispell                     ; Spell checking
-  :defer t
+  :if (eq system-type 'darwin)
   :config
   (progn
     (setq ispell-program-name (if (eq system-type 'darwin)
                                   (executable-find "aspell")
-                                (executable-find "hunspell"))
-          ispell-program-name (if (eq system-type 'gnu/linux)
-                                  (executable-find "aspell"))
+                                (executable-find "hunspell")))
 
-          ; ispell-extra-args '("--sug-mode=ultra")
+    (unless ispell-program-name
+      (warn "No spell checker available. Install Hunspell or ASpell for OS X.")))
+)
+
+(use-package ispell                     ; Spell checking
+  :if (eq system-type 'gnu/linux)
+  :config
+  (progn
+    (setq ispell-program-name (if (eq system-type 'darwin)
+                                  (executable-find "aspell")))
+    (unless ispell-program-name
+      (warn "No spell checker available. Install ASpell for Linux.")))
+)
+
+(use-package ispell                     ; Spell checking
+  :defer t
+  :config
+  (progn
+    (setq ; ispell-extra-args '("--sug-mode=ultra")
           ispell-dictionary "en_US"     ; Default dictionnary
           ispell-silently-savep t       ; Don't ask when saving the private dict
           ;; Increase the height of the choices window to take our header line
