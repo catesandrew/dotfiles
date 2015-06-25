@@ -43,14 +43,6 @@
   "The storage location for various persistent files."
   :group 'dotemacs)
 
-(defcustom dotemacs-completion-engine
-  'company
-  "The completion engine the use."
-  :type '(radio
-          (const :tag "company-mode" company)
-          (const :tag "auto-complete-mode" auto-complete))
-  :group 'dotemacs)
-
 (defcustom dotemacs-erc-nick
   'catesandrew
   "The erc nickname to use"
@@ -177,6 +169,10 @@ NOERROR and NOMESSAGE are passed to `load'."
   "File used to store settings from Customization UI."
   :group 'dotemacs)
 
+(defcustom dotemacs-clojure-enable-fancify-symbols nil
+  "If non nil the `fancify-symbols' function is enabled."
+  :group 'dotemacs)
+
 ;; git settings
 (defgroup dotemacs-git nil
   "Configuration options for git."
@@ -238,6 +234,14 @@ NOERROR and NOMESSAGE are passed to `load'."
   "Configuration options for auto completion."
   :group 'dotemacs
   :prefix 'dotemacs-ac)
+
+(defcustom dotemacs-completion-engine
+  'company
+  "The completion engine the use."
+  :type '(radio
+          (const :tag "company-mode" company)
+          (const :tag "auto-complete-mode" auto-complete))
+  :group 'dotemacs-ac)
 
 (defcustom auto-completion-return-key-behavior 'complete
   "What the RET key should do when auto-completion menu is active.
@@ -532,6 +536,9 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 (use-package core-toggle
+  :load-path "core/")
+
+(use-package core-auto-completion
   :load-path "core/")
 
 
@@ -3332,12 +3339,11 @@ Example: (evil-map visual \"<\" \"<gv\")"
              (evil-select-paren ,start-regex ,end-regex beg end type count t))
            (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
            (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
-           (when (configuration-layer/package-usedp 'evil-surround)
-             (push (cons (string-to-char ,key)
-                         (if ,end
-                             (cons ,start ,end)
-                           ,start))
-                   evil-surround-pairs-alist)))))
+           (push (cons (string-to-char ,key)
+                       (if ,end
+                           (cons ,start ,end)
+                         ,start))
+                 evil-surround-pairs-alist))))
 
     (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
 
@@ -3921,7 +3927,157 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 
 ;;; Clojure
+(dotemacs-defvar-company-backends cider-mode)
+(dotemacs-defvar-company-backends cider-repl-mode)
 
+(use-package init-clojure
+  :load-path "config/")
+
+(use-package align-cljlet
+  :defer t
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook (lambda () (require 'align-cljlet)))
+  :config
+  (evil-leader/set-key-for-mode 'clojure-mode
+    "mfl" 'align-cljlet))
+
+(use-package cider
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq cider-stacktrace-default-filters '(tooling dup)
+          cider-repl-pop-to-buffer-on-connect nil
+          cider-prompt-save-file-on-load nil
+          cider-repl-use-clojure-font-lock t)
+    (push "\\*cider-repl\.\+\\*" dotemacs-useful-buffers-regexp)
+    (add-hook 'clojure-mode-hook 'cider-mode)
+    (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+    (if dotemacs-smartparens-strict-mode
+        (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)))
+  :config
+  (progn
+    ;; add support for evil
+    (push 'cider-stacktrace-mode evil-motion-state-modes)
+    (push 'cider-popup-buffer-mode evil-motion-state-modes)
+
+    (evilify cider-stacktrace-mode cider-stacktrace-mode-map)
+
+    ;; open cider-doc directly and close it with q
+    (setq cider-prompt-for-symbol nil)
+    (evilify cider-docview-mode cider-docview-mode-map
+             (kbd "q") 'cider-popup-buffer-quit)
+
+    (evil-leader/set-key-for-mode 'clojure-mode
+      "mhh" 'cider-doc
+      "mhg" 'cider-grimoire
+      "mhj" 'cider-javadoc
+
+      "meb" 'cider-eval-buffer
+      "mee" 'cider-eval-last-sexp
+      "mef" 'cider-eval-defun-at-point
+      "mer" 'cider-eval-region
+      "mew" 'cider-eval-last-sexp-and-replace
+
+      "mgb" 'cider-jump-back
+      "mge" 'cider-jump-to-compilation-error
+      "mgg" 'cider-jump-to-var
+      "mgr" 'cider-jump-to-resource
+
+      "msb" 'cider-load-buffer
+      "msB" 'dotemacs-cider-send-buffer-in-repl-and-focus
+      "msc" 'cider-connect
+      "mse" 'dotemacs-cider-send-last-sexp-to-repl
+      "msE" 'dotemacs-cider-send-last-sexp-to-repl-focus
+      "msf" 'dotemacs-cider-send-function-to-repl
+      "msF" 'dotemacs-cider-send-function-to-repl-focus
+      "msi" 'cider-jack-in
+      "msn" 'dotemacs-cider-send-ns-form-to-repl
+      "msN" 'dotemacs-cider-send-ns-form-to-repl-focus
+      "msq" 'cider-quit
+      "msr" 'dotemacs-cider-send-region-to-repl
+      "msR" 'dotemacs-cider-send-region-to-repl-focus
+      "mss" 'cider-switch-to-repl-buffer
+
+      "mta" 'dotemacs-cider-test-run-all-tests
+      "mtr" 'dotemacs-cider-test-rerun-tests
+      "mtt" 'dotemacs-cider-test-run-focused-test)
+    (when dotemacs-clojure-enable-fancify-symbols
+      (dotemacs-clojure-fancify-symbols 'cider-repl-mode)))
+
+  (defadvice cider-jump-to-var (before add-evil-jump activate)
+    (evil-set-jump)))
+
+(eval-after-load 'eval-sexp-fu
+  '(require 'cider-eval-sexp-fu))
+
+(use-package clj-refactor
+  :defer t
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook 'clj-refactor-mode)
+  :config
+  (progn
+    (cljr-add-keybindings-with-prefix "C-c C-f")
+    ;; not supported for now
+    ;; (dotemacs-declare-prefix "mr" "clj-refactor")
+    (evil-leader/set-key-for-mode 'clojure-mode
+      "mrad" 'cljr-add-declaration
+      "mrai" 'cljr-add-import-to-ns
+      "mram" 'cljr-add-missing-libspec
+      "mrap" 'cljr-add-project-dependency
+      "mrar" 'cljr-add-require-to-ns
+      "mrau" 'cljr-add-use-to-ns
+      "mrcc" 'cljr-cycle-coll
+      "mrci" 'cljr-cycle-if
+      "mrcn" 'cljr-clean-ns
+      "mrcp" 'cljr-cycle-privacy
+      "mrdk" 'cljr-destructure-keys
+      "mref" 'cljr-extract-function
+      "mrel" 'cljr-expand-let
+      "mrfu" 'cljr-find-usages
+      "mrhd" 'cljr-hotload-dependency
+      "mril" 'cljr-introduce-let
+      "mrmf" 'cljr-move-form
+      "mrml" 'cljr-move-to-let
+      "mrpc" 'cljr-project-clean
+      "mrpf" 'cljr-promote-function
+      "mrrd" 'cljr-remove-debug-fns
+      "mrrf" 'cljr-rename-file
+      "mrrl" 'cljr-remove-let
+      "mrrr" 'cljr-remove-unused-requires
+      "mrrs" 'cljr-rename-symbol
+      "mrru" 'cljr-replace-use
+      "mrsn" 'cljr-sort-ns
+      "mrsp" 'cljr-sort-project-dependencies
+      "mrsr" 'cljr-stop-referring
+      "mrtf" 'cljr-thread-first-all
+      "mrth" 'cljr-thread
+      "mrtl" 'cljr-thread-last-all
+      "mrua" 'cljr-unwind-all
+      "mruw" 'cljr-unwind)))
+
+(use-package clojure-mode
+  :defer t
+  :ensure t
+  :config
+  (progn
+    (when dotemacs-clojure-enable-fancify-symbols
+      (dotemacs-clojure-fancify-symbols 'clojure-mode))))
+
+(add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
+
+(unless (version< emacs-version "24.4")
+  (add-hook 'cider-mode-hook 'subword-mode))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (push 'company-capf company-backends-cider-mode)
+    (dotemacs-add-company-hook cider-mode)
+
+    (push 'company-capf company-backends-cider-repl-mode)
+    (dotemacs-add-company-hook cider-repl-mode)))
 
 
 ;;; OCaml
@@ -3958,6 +4114,18 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 
 ;;; Web languages
+
+;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
+;; can see the effect of your HTML as you type it.
+(use-package impatient-mode
+  :ensure t
+  :if window-system
+  :defer t
+  :init
+  (progn
+    ; (add-hook 'web-mode-hook 'impatient-mode)
+    ))
+
 (use-package emmet-mode
   :ensure t
   :defer t
@@ -5770,6 +5938,9 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (setq google-translate-show-phonetic t)
     (setq google-translate-default-source-language "En")
     (setq google-translate-default-target-language "Fr")))
+
+; (use-package init-bindings
+;   :load-path "config/")
 
 ;; Local Variables:
 ;; coding: utf-8
