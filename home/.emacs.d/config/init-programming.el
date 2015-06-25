@@ -34,6 +34,13 @@ This functions should be added to the hooks of major modes for programming."
     ;; add buffer-local indicator for whether prog-mode-hook has run.
     (set (make-local-variable 'my-pmh-ran) t)
 
+
+    (when dotemacs-show-trailing-whitespace
+      (set-face-attribute 'trailing-whitespace nil
+                          :background (face-attribute 'font-lock-comment-face
+                                                      :foreground))
+      (setq show-trailing-whitespace 1))
+
     ;; disable line wrap
     (unless (bound-and-true-p truncate-lines)
       ; (set (make-local-variable 'truncate-lines) t)

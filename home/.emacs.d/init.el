@@ -147,6 +147,12 @@ can be toggled through `toggle-transparency'."
 to disable fullscreen animations in OSX."
   :group 'dotemacs)
 
+;; whitespace-mode
+(defcustom dotemacs-show-trailing-whitespace t
+  "If t, show trailing whitespace."
+  :type 'boolean
+  :group 'dotemacs)
+
 (defcustom dotemacs-highlight-delimiters 'all
   "Select a scope to highlight delimiters. Possible value is `all', `current'
 or `nil'. Default is `all'"
@@ -415,6 +421,56 @@ FEATURE may be a named feature or a file name, see
 (require 'time-date)
 
 
+;;; Key Binding Init
+
+(after "evil-leader"
+  ;; We define prefix commands only for the sake of guide-key
+  (setq dotemacs-key-binding-prefixes
+        '(("a" .  "applications")
+          ("ai" . "applications-irc")
+          ("as" . "applications-shells")
+          ("b" .  "buffers")
+          ("bm" . "buffers-move")
+          ("c" .  "compile/comments")
+          ("C" .  "capture/colors")
+          ("e" .  "errors")
+          ("f" .  "files")
+          ("fe" . "files-emacs/spacemacs")
+          ("g" .  "git/versions-control")
+          ("h" .  "helm/help/highlight")
+          ("hd" . "help-describe")
+          ("i" .  "insertion")
+          ("j" .  "join/split")
+          ("k" .  "lisp")
+          ("kd" .  "lisp-delete")
+          ("kD" .  "lisp-delete-backward")
+          ("n" .  "narrow/numbers")
+          ("p" .  "projects")
+          ("p$" .  "projects/shell")
+          ("q" .  "quit")
+          ("r" .  "registers/rings")
+          ("s" .  "search/symbol")
+          ("sw" .  "search-web")
+          ("t" .  "toggles")
+          ("tC" . "toggles-colors")
+          ("th" . "toggles-highlight")
+          ("tm" . "toggles-modeline")
+          ("T" .  "toggles/themes")
+          ("w" .  "windows")
+          ("wp" . "windows-popup")
+          ("wS" . "windows-size")
+          ("x" .  "text")
+          ("xa" . "text-align")
+          ("xd" . "text-delete")
+          ("xg" . "text-google-translate")
+          ("xm" . "text-move")
+          ("xt" . "text-transpose")
+          ("xw" . "text-words")
+          ("z" .  "zoom")))
+  (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+        dotemacs-key-binding-prefixes))
+
+
 ;;; Initialization
 ;; And disable the site default settings
 (setq inhibit-default-init t)
@@ -647,16 +703,33 @@ FEATURE may be a named feature or a file name, see
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
+;; fringes
+(setq-default fringe-indicator-alist
+              '((truncation . nil) (continuation . nil)))
+
 ;; Just don’t show them. Use native Emacs controls:
 (setq use-dialog-box nil)
 
+;; Show line number in mode line
+(setq line-number-mode t)
+;; Show column number in mode line
+(setq column-number-mode t)
+;; line number
+(setq linum-format "%4d")
+
 ;; No blinking and beeping, no startup screen, no scratch message and short
 ;; Yes/No questions.
-(blink-cursor-mode -1)
-(tooltip-mode -1)
+(blink-cursor-mode 0)
+(tooltip-mode 0)
+
+;; draw underline lower
+(setq x-underline-at-descent-line t)
+
+;; no beep pleeeeeease ! (and no visual blinking too please)
 (setq ring-bell-function #'ignore
       inhibit-startup-screen t
-      initial-scratch-message "Hello there!\n")
+      visible-bell nil
+      initial-scratch-message nil)
 
 (toggle-transparency)
 
@@ -666,11 +739,15 @@ FEATURE may be a named feature or a file name, see
 ;; ridiculously bizarre thing entirely.
 (fset 'display-startup-echo-area-message #'ignore)
 
+;; don't let the cursor go into minibuffer prompt
+;; Tip taken from Xah Lee: http://ergoemacs.org/emacs/emacs_stop_cursor_enter_prompt.html
+(setq minibuffer-prompt-properties
+      '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
+
 (use-package init-scratch          ; My logo in the scratch buffer
   :commands (dotemacs-insert-logo
              dotemacs-insert-logo-into-scratch)
   :init (add-hook 'after-init-hook #'dotemacs-insert-logo-into-scratch))
-
 
 (defvar pcache-directory
   (let ((dir (concat dotemacs-cache-directory "pcache")))
@@ -831,11 +908,6 @@ FEATURE may be a named feature or a file name, see
     (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
     (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t)))
 
-
-;; Standard stuff
-(line-number-mode)
-(column-number-mode)
-
 (use-package fancy-battery              ; Fancy battery info for mode line
   :ensure t
   :defer t
@@ -865,11 +937,6 @@ mouse-3: go to end"))))
 
 
 ;;; Minibuffer and Helm
-(setq history-length 1000)              ; Store more history
-
-;; Allow recursive minibuffers
-(setq enable-recursive-minibuffers t)
-
 ;; Display current keystrokes almost immediately in mini buffer
 (setq echo-keystrokes 0.2)
 
@@ -884,14 +951,11 @@ mouse-3: go to end"))))
 ;; have no use for these default bindings
 (global-unset-key (kbd "C-x m"))
 
-;; When changing focus to the minibuffer, stop allowing point to move
-;; over the prompt. Code taken from ergoemacs.
-; (setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'minibuffer-avoid-prompt))
-; (setq minibuffer-prompt-properties (add-to-list 'minibuffer-prompt-properties 'point-entered))
-
 (use-package savehist                   ; Save minibuffer history
   :init (savehist-mode t)
   :config (setq savehist-save-minibuffer-history t
+                enable-recursive-minibuffers t ; Allow commands in minibuffers
+                history-length 1000
                 savehist-file (concat dotemacs-cache-directory "savehist")
                 savehist-additional-variables '(search ring regexp-search-ring)
                 savehist-autosave-interval 180))
@@ -1145,7 +1209,9 @@ mouse-3: go to end"))))
           (add-hook 'focus-out-hook #'dotemacs-force-save-some-buffers)))
 
 (use-package uniquify                   ; Make buffer names unique
-  :config (setq uniquify-buffer-name-style 'forward
+  ;; When having windows with repeated filenames, uniquify them
+  ;; by the folder they are in rather those annoying <2>,<3>,.. etc
+  :config (setq uniquify-buffer-name-style 'post-forward-angle-brackets
                 uniquify-separator "/"
                 uniquify-ignore-buffers-re "^\\*" ; leave special buffers alone
                 uniquify-after-kill-buffer-p t))
@@ -1230,11 +1296,11 @@ mouse-3: go to end"))))
          ("S-<up>"    . windmove-up)
          ("S-<down>"  . windmove-down)))
 
-; activate winner mode use to undo and redo windows layout
 (use-package winner                     ; Undo and redo window configurations
   :ensure t
   :init
   (progn
+    ;; activate winner mode use to undo and redo windows layout
     (winner-mode t))
   :config
   (progn
@@ -1373,8 +1439,12 @@ mouse-3: go to end"))))
 
 
 ;;; File handling
-; (setq make-backup-files nil) ; Stop creating backup~ files
-; (setq auto-save-default nil) ; Stop creating #autosave# files
+
+;; don't create backup~ or #auto-save# files
+(setq backup-by-copying t
+      make-backup-files nil
+      auto-save-default nil
+      create-lockfiles nil)
 
 ;; Keep backup and auto save files out of the way
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
@@ -1386,6 +1456,19 @@ mouse-3: go to end"))))
 
 ;; Delete files to trash
 (setq delete-by-moving-to-trash t)
+
+;; auto-save
+(let
+    ((autosave-dir (expand-file-name (concat dotemacs-cache-directory "autosave"))))
+  (unless (file-exists-p autosave-dir)
+    (make-directory autosave-dir))
+  (setq auto-save-list-file-prefix (concat autosave-dir "/")
+        auto-save-file-name-transforms `((".*" ,autosave-dir t))))
+
+;; Remove prompt if the file is opened in other clients
+(defun server-remove-kill-buffer-hook ()
+  (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function))
+(add-hook 'server-visit-hook 'server-remove-kill-buffer-hook)
 
 (use-package files
   ;; Revert the current buffer (re-read the contents from disk). Burying
@@ -1483,7 +1566,6 @@ mouse-3: go to end"))))
   (setq hardhat-buffer-protected-functions '(hardhat-protected-by-ignoramus))
   :config (setq hardhat-mode-lighter "🔒"))
 
-
 (use-package tramp                      ; Access remote files
   :defer t
   :config
@@ -1492,11 +1574,14 @@ mouse-3: go to end"))))
 
 (use-package bookmark                   ; Bookmarks for Emacs buffers
   :bind (("C-c l b" . list-bookmarks))
-  ;; Save bookmarks immediately after a bookmark was added
-  :config
-  (setq bookmark-save-flag 1)
-  ;; Store auto-save files locally
-  (setq bookmark-default-file (concat dotemacs-cache-directory "bookmarks")))
+  :init
+  (progn
+    (setq bookmark-save-flag 1
+          ;; Store auto-save files locally
+          bookmark-default-file (concat dotemacs-cache-directory "bookmarks")
+          url-configuration-directory (concat dotemacs-cache-directory "url")
+          eshell-directory-name (concat dotemacs-cache-directory "eshell" )
+          tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))))
 
 ;; original
 (run-with-timer 1800 1800 'recentf-save-list)
@@ -1528,7 +1613,7 @@ mouse-3: go to end"))))
 ;; move cursor to the last position upon open
 (use-package saveplace                  ; Save point position in files
   :config (setq-default save-place t)
-  (setq save-place-file (expand-file-name ".places" user-emacs-directory)))
+  (setq save-place-file (concat dotemacs-cache-directory "places")))
 
 (setq view-read-only t)                 ; View read-only files
 
@@ -1591,6 +1676,9 @@ mouse-3: go to end"))))
       ;; and smooth
       mouse-wheel-progressive-speed nil
       mouse-wheel-scroll-amount '(1))
+
+;; Mouse cursor in terminal mode
+(xterm-mouse-mode 1)
 
 ;; When popping the mark, continue popping until the cursor actually moves
 ;; Also, if the last command was a copy - skip past all the expand-region cruft.
@@ -1657,9 +1745,13 @@ mouse-3: go to end"))))
 (put 'transient-mark-mode 'permanent-local t)
 (setq-default transient-mark-mode t)
 
+
+
 ;; Nic says eval-expression-print-level needs to be set to nil (turned off) so
-;; that you can always see what's happening.
-(setq eval-expression-print-level nil)
+;; that you can always see what's happening. Also remove annoying ellipsis when
+;; printing sexp in message buffer
+(setq eval-expression-print-length nil
+      eval-expression-print-level nil)
 
 ;; Don't highlight matches with jump-char - it's distracting
 (setq jump-char-lazy-highlight-face nil)
@@ -1673,10 +1765,17 @@ mouse-3: go to end"))))
 ;; enable electric indent
 (setq electric-indent-mode t)
 
+;; Text
+(setq longlines-show-hard-newlines t)
+
 ;; Disable tabs, but given them proper width
 (setq-default indent-tabs-mode nil
               highlight-tabs t
               tab-width 8)
+
+;; Turn on electric-indent-mode
+(electric-indent-mode)
+
 ;; Make Tab complete if the line is indented
 (setq tab-always-indent 'complete)
 
@@ -1861,8 +1960,11 @@ mouse-3: go to end"))))
 
 ;; Give us narrowing back!
 (put 'narrow-to-region 'disabled nil)
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-defun 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+(put 'scroll-left 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
 
 ;; Same for region casing
 (put 'upcase-region 'disabled nil)
@@ -3002,6 +3104,7 @@ Disable the highlighting of overlong lines."
 (use-package hs-minor-mode
   :defer t
   :init (progn
+    ;; required for evil folding
     (setq hs-set-up-overlay 'dotemacs-fold-overlay)
     (add-hook 'prog-mode-hook #'hs-minor-mode)))
 
@@ -4700,7 +4803,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (defvar ido-context-switch-command nil))
   :init
   (progn
-    (setq ido-enable-flex-matching t
+    (setq ido-enable-flex-matching t ;; enable fuzzy matching
           ido-use-faces nil       ;; disable ido faces to see flx highlights.
           ido-enable-prefix nil
           ido-create-new-buffer 'always
