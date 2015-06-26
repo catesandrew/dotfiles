@@ -3581,6 +3581,24 @@ Example: (evil-map visual \"<\" \"<gv\")"
 ;;; Emacs Lisp
 (bind-key "C-c u d" #'toggle-debug-on-error)
 
+(use-package init-elisp             ; Personal tools for Emacs Lisp
+  :load-path "config/"
+  :commands (dotemacs-elisp-find-cask-file
+             dotemacs-add-use-package-to-imenu)
+  :init (progn
+          (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
+
+          (add-to-hook 'emacs-lisp-mode
+                       '(lambda ()
+                          (dotemacs-define-text-object ";"
+                                                       "elisp-comment"
+                                                       ";; "
+                                                       "")))
+
+          (after "lisp-mode"
+            (bind-key "C-c f c" #'dotemacs-elisp-find-cask-file
+                      emacs-lisp-mode-map))))
+
 (use-package helm-elisp                 ; Helm commands for Emacs Lisp
   :ensure helm
   :bind (("C-c f l" . helm-locate-library)
@@ -3644,29 +3662,74 @@ Example: (evil-map visual \"<\" \"<gv\")"
 (use-package macrostep                  ; Interactively expand macros in code
   :ensure t
   :defer t
-  :init (after "lisp-mode"
-          (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
-          (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map)))
+  :mode ("\\*.el\\'" . emacs-lisp-mode)
+  :init
+  (progn
+    (after "lisp-mode"
+           (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
+           (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map))
+
+    (dotemacs-define-micro-state macrostep
+      :doc "[e] expand [c] collapse [n/N] next/previous [q] quit"
+      :disable-evil-leader t
+      :persistent t
+      :evil-leader-for-mode (emacs-lisp-mode . "mdm")
+      :bindings
+      ("e" macrostep-expand)
+      ("c" macrostep-collapse)
+      ("n" macrostep-next-macro)
+      ("N" macrostep-prev-macro)
+      ("q" macrostep-collapse-all :exit t))))
 
 (use-package ielm                       ; Emacs Lisp REPL
-  :bind (("C-c z" . ielm)))
+  :bind (("C-c z" . ielm))
+  :config
+  (defun ielm-indent-line ()
+    (interactive)
+    (let ((current-point (point)))
+      (save-restriction
+        (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
+        (lisp-indent-line)))))
 
 (use-package elisp-mode                  ; Emacs Lisp editing
   :defer t
   :interpreter ("emacs" . emacs-lisp-mode)
   :mode ("/Cask\\'" . emacs-lisp-mode)
-  :config (require 'ert))
+  :config
+  (progn
+    (require 'ert)
+    (evil-leader/set-key-for-mode 'emacs-lisp-mode
+      "me$" 'lisp-state-eval-sexp-end-of-line
+      "meb" 'eval-buffer
+      "mec" 'dotemacs-eval-current-form
+      "mee" 'eval-last-sexp
+      "mer" 'dotemacs-eval-region
+      "mef" 'eval-defun
+      "mel" 'lisp-state-eval-sexp-end-of-line
+      "m,"  'lisp-state-toggle-lisp-state
+      "mtb" 'dotemacs-ert-run-tests-buffer
+      "mtq" 'ert)
 
-(use-package init-elisp             ; Personal tools for Emacs Lisp
-  :load-path "config/"
-  :commands (dotemacs-elisp-find-cask-file
-             dotemacs-add-use-package-to-imenu)
-  :init (progn
-          (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
+    ;; company support
+    (after "company"
+      (push 'company-capf company-backends-emacs-lisp-mode)
+      (dotemacs-add-company-hook emacs-lisp-mode))))
 
-          (after "lisp-mode"
-            (bind-key "C-c f c" #'dotemacs-elisp-find-cask-file
-                      emacs-lisp-mode-map))))
+(after "srefactor"
+  (add-hook 'emacs-lisp-mode-hook 'dotemacs-lazy-load-srefactor)
+  (use-package srefactor-lisp
+    :ensure t
+    :commands (srefactor-lisp-format-buffer
+               srefactor-lisp-format-defun
+               srefactor-lisp-format-sexp
+               srefactor-lisp-one-line)
+    :init
+    (after "evil-leader"
+      (evil-leader/set-key-for-mode 'emacs-lisp-mode
+        "m=b" 'srefactor-lisp-format-buffer
+        "m=d" 'srefactor-lisp-format-defun
+        "m=o" 'srefactor-lisp-one-line
+        "m=s" 'srefactor-lisp-format-sexp))))
 
 
 ;;; Scala

@@ -1,5 +1,10 @@
 (require 'rx)
 
+(dotemacs-defvar-company-backends emacs-lisp-mode)
+
+(setq emacs-lisp-post-extensions
+      '(emacs-builtin-emacs-lisp))
+
 (defun dotemacs-elisp-find-cask-file (other-window)
     "Find the Cask file for this buffer.
 
@@ -32,5 +37,10 @@ window."
   "Add `use-package' declarations to `imenu'."
   (add-to-list 'imenu-generic-expression
                dotemacs-use-package-imenu-expression))
+
+; (defun emacs-lisp/post-init-semantic ()
+;   (semantic/enable-semantic-mode 'emacs-lisp-mode)
+;   (eval-after-load 'semantic
+;     '(semantic-default-elisp-setup)))
 
 (provide 'init-lisp)
