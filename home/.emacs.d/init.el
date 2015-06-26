@@ -4369,13 +4369,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
         sh-basic-offset 2               ; The offset for nested indentation
         ))
 
-(use-package puppet-mode                ; Puppet manifests
-  :ensure t
-  :defer t
-  :config
-  ;; Fontify variables in Puppet comments
-  (setq puppet-fontify-variables-in-comments t))
-
 (use-package nxml-mode                  ; XML editing
   :defer t
   ;; Complete closing tags, and insert XML declarations into empty files
@@ -5955,9 +5948,12 @@ Example: (evil-map visual \"<\" \"<gv\")"
      )))
 
 ;; Puppet
-(use-package puppet-mode
+(use-package puppet-mode                ; Puppet manifests
   :defer t
   :ensure t
+  :config
+  ;; Fontify variables in Puppet comments
+  (setq puppet-fontify-variables-in-comments t)
   :init
   (progn
     (evil-leader/set-key-for-mode 'puppet-mode
