@@ -5944,6 +5944,43 @@ Example: (evil-map visual \"<\" \"<gv\")"
           '(add-hook 'yaml-mode-hook 'ansible/ansible-doc-maybe-enable))
   :diminish (ansible-doc-mode . "❓"))
 
+;; Docker
+(use-package dockerfile-mode
+  :defer t
+  :ensure t
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'dockerfile-mode
+       "mcb" 'dockerfile-build-buffer
+     )))
+
+;; Puppet
+(use-package puppet-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'puppet-mode
+      "m{" 'beginning-of-defun
+      "m}" 'end-of-defun
+      "m$" 'puppet-interpolate
+      "ma" 'puppet-align-block
+      "m'" 'puppet-toggle-string-quotes
+      "m;" 'puppet-clear-string
+      "mj" 'imenu
+      "mc" 'puppet-apply
+      "mv" 'puppet-validate
+      "ml" 'puppet-lint
+    )))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook puppet-mode)))
+
+(use-package puppetfile-mode
+  :ensure t
+  :defer t)
+
 
 ;;; Misc
 (use-package google-translate
