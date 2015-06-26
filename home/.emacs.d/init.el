@@ -439,7 +439,7 @@ FEATURE may be a named feature or a file name, see
           ("C" .  "capture/colors")
           ("e" .  "errors")
           ("f" .  "files")
-          ("fe" . "files-emacs/spacemacs")
+          ("fe" . "files-emacs/dotemacs")
           ("g" .  "git/versions-control")
           ("h" .  "helm/help/highlight")
           ("hd" . "help-describe")
@@ -4477,18 +4477,72 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 
 ;; Databases
+(use-package init-sql
+  :load-path "config/")
+
 (use-package sql
+  :defer t
+  :ensure t
   :bind (("C-c d c" . sql-connect)
          ("C-c d m" . sql-mysql))
-  :config (progn (dotemacs-load-private-file "sql-connections" 'noerror)
+  :config
+  (progn
+    (dotemacs-load-private-file "sql-connections" 'noerror)
 
-                 (add-to-list 'display-buffer-alist
-                              `(,(rx bos "*SQL")
-                                (display-buffer-reuse-window
-                                 display-buffer-in-side-window
-                                 (side            . bottom)
-                                 (reusable-frames . visible)
-                                 (window-height   . 0.4))))))
+    (add-to-list 'display-buffer-alist
+               `(,(rx bos "*SQL")
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window
+                  (side            . bottom)
+                  (reusable-frames . visible)
+                  (window-height   . 0.4))))
+
+    (setq dotemacs-sql-highlightable sql-product-alist
+          dotemacs-sql-startable (remove-if-not
+                              (lambda (product) (sql-get-product-feature (car product) :sqli-program))
+                              sql-product-alist)
+
+          ;; should not set this to anything else than nil
+          ;; the focus of SQLi is handled by dotemacs conventions
+          sql-pop-to-buffer-after-send-region nil)
+
+    (evil-leader/set-key-for-mode 'sql-mode
+      ;; sqli buffer
+      "mbb" 'sql-show-sqli-buffer
+      "mbs" 'sql-set-sqli-buffer
+
+      ;; dialects
+      "mhk" 'dotemacs-sql-highlight
+
+      ;; interactivity
+      "msb" 'sql-send-buffer
+      "msB" 'dotemacs-sql-send-buffer-and-focus
+      "msi" 'dotemacs-sql-start
+      ;; paragraph gets "f" here because they can be assimilated to functions.
+      ;; If you separate your commands in a SQL file, this key will send the
+      ;; command under the point, which is what you probably want.
+      "msf" 'sql-send-paragraph
+      "msF" 'dotemacs-sql-send-paragraph-and-focus
+      "msq" 'sql-send-string
+      "msQ" 'dotemacs-sql-send-string-and-focus
+      "msr" 'sql-send-region
+      "msR" 'dotemacs-sql-send-region-and-focus
+
+      ;; listing
+      "mla" 'sql-list-all
+      "mlt" 'sql-list-table)
+
+    (evil-leader/set-key-for-mode 'sql-interactive-mode
+      ;; sqli buffer
+      "mbr" 'sql-rename-buffer
+      "mbS" 'sql-save-connection)
+
+    (add-hook 'sql-interactive-mode-hook
+              (lambda () (toggle-truncate-lines t)))))
+
+(use-package sql-indent
+  :ensure t
+  :defer t)
 
 
 ;;; Version control
