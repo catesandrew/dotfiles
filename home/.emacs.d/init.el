@@ -3924,6 +3924,81 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 ;;; Go
 
+
+;;; C/C++
+(use-package init-c-c++
+  :load-path "config/")
+
+(use-package cc-mode
+  :ensure t
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist `("\\.h$" . ,c-c++-default-mode-for-headers))
+  :config
+  (progn
+    (require 'compile)
+    (c-toggle-auto-newline 1)
+    (evil-leader/set-key-for-mode 'c-mode
+      "mga" 'projectile-find-other-file
+      "mgA" 'projectile-find-other-file-other-window)
+    (evil-leader/set-key-for-mode 'c++-mode
+      "mga" 'projectile-find-other-file
+      "mgA" 'projectile-find-other-file-other-window)))
+
+(use-package clang-format
+  :ensure t
+  :if c-c++-enable-clang-support)
+
+(use-package cmake-mode
+  :ensure t
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
+  :init (push 'company-cmake company-backends-cmake-mode))
+
+  (dotemacs-add-company-hook c-mode-common)
+  (dotemacs-add-company-hook cmake-mode)
+
+  (when c-c++-enable-clang-support
+    (push 'company-clang company-backends-c-mode-common)
+    ;; .clang_complete file loading
+    ;; Sets the arguments for company-clang based on a project-specific text file.
+    (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser))
+
+(use-package company-c-headers
+ :if (eq dotemacs-completion-engine 'company)
+ :defer t
+ :init (push 'company-c-headers company-backends-c-mode-common))
+
+(after "flycheck"
+ (add-to-hooks 'flycheck-mode '(c-mode-hook c++-mode-hook)))
+
+(use-package gdb-mi
+  :ensure t
+  :defer t
+  :init
+  (setq
+   ;; use gdb-many-windows by default when `M-x gdb'
+   gdb-many-windows t
+   ;; Non-nil means display source file containing the main routine at startup
+   gdb-show-main t))
+
+(after "srefactor"
+  (evil-leader/set-key-for-mode 'c-mode "mr" 'srefactor-refactor-at-point)
+  (evil-leader/set-key-for-mode 'c++-mode "mr" 'srefactor-refactor-at-point)
+  (add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)))
+
+(after "stickyfunc-enhance"
+ (add-to-hooks 'dotemacs-lazy-load-stickyfunc-enhance '(c-mode-hook c++-mode-hook)))
+
+(after "ycmd"
+  (add-hook 'c++-mode-hook 'ycmd-mode)
+  (evil-leader/set-key-for-mode 'c++-mode
+    "mgg" 'ycmd-goto
+    "mgG" 'ycmd-goto-imprecise))
+
+(after "company-ycmd"
+ (push 'company-ycmd company-backends-c-mode-common))
+
+;;; SQL
 
 
 ;;; Clojure
