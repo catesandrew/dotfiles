@@ -5786,12 +5786,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
   (after "evil-leader"
     (evil-leader/set-key "hk" 'helm-make)))
 
-(use-package ansible-doc                ; Documentation lookup for Ansible
-  :ensure t
-  :defer t
-  :init (add-hook 'yaml-mode-hook #'ansible-doc-mode)
-  :diminish (ansible-doc-mode . "❓"))
-
 (use-package help-mode
   :config
   (progn
@@ -5917,6 +5911,40 @@ Example: (evil-map visual \"<\" \"<gv\")"
         ad-do-it))))
 
 
+;;; Config
+
+;; Ansible
+(use-package init-ansible
+  :load-path "config/")
+
+(use-package yaml-mode
+  :ensure t
+  :defer t)
+
+(use-package ansible
+  :ensure t
+  :defer t
+  :init (progn
+          (eval-after-load 'yaml-mode
+            '(add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))
+
+          ;; ansible-mode requires ac-user-dictionary-files. If the
+          ;; config is using company-mode this variable will not be
+          ;; set, so we set it to a dummy value.
+          ;;
+          ;; Tracking here:
+          ;; https://github.com/k1LoW/emacs-ansible/issues/2
+          (after "company"
+            (setq ac-user-dictionary-files '()))))
+
+(use-package ansible-doc                ; Documentation lookup for Ansible
+  :ensure t
+  :defer t
+  :init (eval-after-load 'yaml-mode
+          '(add-hook 'yaml-mode-hook 'ansible/ansible-doc-maybe-enable))
+  :diminish (ansible-doc-mode . "❓"))
+
+
 ;;; Misc
 (use-package google-translate
   :ensure t
@@ -5937,7 +5965,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (setq google-translate-enable-ido-completion t)
     (setq google-translate-show-phonetic t)
     (setq google-translate-default-source-language "En")
-    (setq google-translate-default-target-language "Fr")))
+    (setq google-translate-default-target-language "Sp")))
 
 ; (use-package init-bindings
 ;   :load-path "config/")
