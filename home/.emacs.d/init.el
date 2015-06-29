@@ -3948,19 +3948,39 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;
 ;; - https://github.com/chrisdone/ghci-ng
 
+(dotemacs-defvar-company-backends haskell-mode)
+(dotemacs-defvar-company-backends haskell-cabal-mode)
+
+(use-package init-haskell
+  :load-path "config/")
+
 (use-package haskell-mode
   :ensure t
   :defer t
   :config
   (progn
+    (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
+    (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
+    (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)
+
+    ;; Haskell main editing mode key bindings.
     (add-hook 'haskell-mode-hook #'subword-mode)           ; Subword navigation
-    (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate
-                                        ; declarations
+    (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate declarations
     ;; Insert module templates into new buffers
     (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
+    (add-hook 'haskell-mode-hook #'flycheck-mode)
+    (add-hook 'haskell-mode-hook #'dotemacs-init-haskell-mode)
+    (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-hook)
 
-    ;; Automatically run hasktags
-    (setq haskell-tags-on-save t
+    ;; settings
+    (setq haskell-process-type 'auto
+          ;; Use notify.el (if you have it installed) at the end of running
+          ;; Cabal commands or generally things worth notifying.
+          haskell-notify-p t
+          ;; To enable tags generation on save.
+          haskell-tags-on-save t
+          ;; Remove annoying error popups
+          haskell-interactive-popup-error nil
           ;; Suggest adding/removing imports as by GHC warnings and Hoggle/GHCI
           ;; loaded modules respectively
           haskell-process-suggest-remove-import-lines t
@@ -3972,17 +3992,90 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ;; it's networked, but it covers all of hackage, which is really an
           ;; advantage.
           haskell-process-suggest-hoogle-imports nil
-          haskell-process-suggest-hayoo-imports t)
+          haskell-process-suggest-hayoo-imports t
+          ;; Disable haskell-stylish on save, it breaks flycheck highlighting
+          haskell-stylish-on-save nil)
 
-    (when-let (ghci-ng (executable-find "ghci-ng"))
-      ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
-      (setq haskell-process-path-ghci ghci-ng)
-      (add-to-list 'haskell-process-args-cabal-repl
-                   (concat "--with-ghc=" ghci-ng)))
+    ;; key bindings
+    (evil-leader/set-key-for-mode 'haskell-mode
+      "mgg"  'haskell-mode-jump-to-def-or-tag
+      "mf"   'haskell-mode-stylish-buffer
 
-    (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
-    (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
-    (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)))
+      "msb"  'haskell-process-load-or-reload
+      "msc"  'haskell-interactive-mode-clear
+      "mss"  'haskell-interactive-bring
+      "msS"  'haskell-interactive-switch
+
+      "mca"  'haskell-process-cabal
+      "mcb"  'haskell-process-cabal-build
+      "mcc"  'haskell-compile
+      "mcv"  'haskell-cabal-visit-file
+
+      "mhd"  'inferior-haskell-find-haddock
+      "mhh"  'hoogle
+      "mhi"  'haskell-process-do-info
+      "mht"  'haskell-process-do-type
+      "mhT"  'dotemacs-haskell-process-do-type-on-prev-line
+      "mhy"  'hayoo
+
+      "mdd"  'haskell-debug
+      "mdb"  'haskell-debug/break-on-function
+      "mdn"  'haskell-debug/next
+      "mdN"  'haskell-debug/previous
+      "mdB"  'haskell-debug/delete
+      "mdc"  'haskell-debug/continue
+      "mda"  'haskell-debug/abandon
+      "mdr"  'haskell-debug/refresh)
+
+    ;; Switch back to editor from REPL
+    (evil-leader/set-key-for-mode 'haskell-interactive-mode
+      "msS"  'haskell-interactive-switch)
+
+    ;; Compile
+    (evil-leader/set-key-for-mode 'haskell-cabal
+      "mC"  'haskell-compile)
+
+    ;; Cabal-file bindings
+    (evil-leader/set-key-for-mode 'haskell-cabal-mode
+      ;; "m="  'haskell-cabal-subsection-arrange-lines ;; Does a bad job, 'gg=G' works better
+      "md" 'haskell-cabal-add-dependency
+      "mb" 'haskell-cabal-goto-benchmark-section
+      "me" 'haskell-cabal-goto-executable-section
+      "mt" 'haskell-cabal-goto-test-suite-section
+      "mm" 'haskell-cabal-goto-exposed-modules
+      "ml" 'haskell-cabal-goto-library-section
+      "mn" 'haskell-cabal-next-subsection
+      "mp" 'haskell-cabal-previous-subsection
+      "mN" 'haskell-cabal-next-section
+      "mP" 'haskell-cabal-previous-section
+      "mf" 'haskell-cabal-find-or-create-source-file)
+
+    ;; Make "RET" behaviour in REPL saner
+    (evil-define-key 'insert haskell-interactive-mode-map
+      (kbd "RET") 'haskell-interactive-mode-return)
+    (evil-define-key 'normal haskell-interactive-mode-map
+      (kbd "RET") 'haskell-interactive-mode-return)
+
+    ;;GHCi-ng
+    (when dotemacs-haskell-enable-ghci-ng-support
+
+      (when-let (ghci-ng (executable-find "ghci-ng"))
+        ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
+        (setq haskell-process-path-ghci ghci-ng)
+        ;; haskell-process-type is set to auto, so setup ghci-ng for either case
+        ;; if haskell-process-type == cabal-repl
+        (add-to-list 'haskell-process-args-cabal-repl
+                     '("--ghc-option=-ferror-spans" (concat "--with-ghc=" ghci-ng))))
+
+      (evil-leader/set-key-for-mode 'haskell-mode
+        "mu"   'haskell-mode-find-uses
+        "mht"  'haskell-mode-show-type-at
+        "mgg"  'haskell-mode-goto-loc))
+
+    ;; Useful to have these keybindings for .cabal files, too.
+    (after "haskell-cabal-mode-map"
+      '(define-key haskell-cabal-mode-map
+         [?\C-c ?\C-z] 'haskell-interactive-switch))))
 
 (use-package haskell
   :ensure haskell-mode
