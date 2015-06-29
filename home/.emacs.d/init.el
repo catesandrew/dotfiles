@@ -3188,6 +3188,8 @@ Disable the highlighting of overlong lines."
     (add-hook 'ielm-mode-hook #'eldoc-mode))
   :diminish eldoc-mode)
 
+
+;;; REST Client
 (use-package restclient                ; ReST REPL for Emacs
   :ensure t
   :defer t)
@@ -3455,7 +3457,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
 (use-package evil-commentary
   :ensure t
   :defer t
-  :init (evil-commentary-mode))
+  :init (evil-commentary-mode)
+  :diminish evil-commentary-mode)
 
 (use-package evil-nerd-commenter
   :disabled t
@@ -4285,14 +4288,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (when (eq dotemacs-completion-engine 'company)
   (after "company"
-    (dotemacs-add-company-hook go-mode)
+    (dotemacs-add-company-hook go-mode)))
 
-    (use-package company-go
-      :if (eq dotemacs-completion-engine 'company)
-      :disabled t
-      :defer t
-      :init
-      (push 'company-go company-backends-go-mode))))
+(use-package company-go
+  :if (eq dotemacs-completion-engine 'company)
+  :disabled t
+  :defer t
+  :init
+  (push 'company-go company-backends-go-mode))
 
 
 ;;; C/C++
