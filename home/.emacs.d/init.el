@@ -4231,14 +4231,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
   :init (push 'company-cmake company-backends-cmake-mode))
 
-  (dotemacs-add-company-hook c-mode-common)
-  (dotemacs-add-company-hook cmake-mode)
+(dotemacs-add-company-hook c-mode-common)
+(dotemacs-add-company-hook cmake-mode)
 
-  (when c-c++-enable-clang-support
-    (push 'company-clang company-backends-c-mode-common)
-    ;; .clang_complete file loading
-    ;; Sets the arguments for company-clang based on a project-specific text file.
-    (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser))
+(when c-c++-enable-clang-support
+  (push 'company-clang company-backends-c-mode-common)
+  ;; .clang_complete file loading
+  ;; Sets the arguments for company-clang based on a project-specific text file.
+  (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser))
 
 (use-package company-c-headers
  :if (eq dotemacs-completion-engine 'company)
