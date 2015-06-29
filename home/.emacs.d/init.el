@@ -3608,6 +3608,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key evil-visual-state-map (kbd "#")
       'evil-visualstar/begin-search-backward)))
 
+(use-package init-bindings
+  :load-path "config/")
+
 
 ;;; Emacs Lisp
 (bind-key "C-c u d" #'toggle-debug-on-error)
@@ -6219,9 +6222,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setq google-translate-show-phonetic t)
     (setq google-translate-default-source-language "En")
     (setq google-translate-default-target-language "Sp")))
-
-; (use-package init-bindings
-;   :load-path "config/")
 
 ;; Local Variables:
 ;; coding: utf-8
