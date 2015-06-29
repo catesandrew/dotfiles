@@ -5093,8 +5093,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "stf" 'dotemacs-helm-files-do-pt
         "stF" 'dotemacs-helm-files-do-pt-region-or-symbol
         ;; current project scope
-        "/"   'dotemacs-helm-project-smart-do-search
-        "?"   'dotemacs-helm-project-smart-do-search-region-or-symbol
         "sp"  'dotemacs-helm-project-smart-do-search
         "sP"  'dotemacs-helm-project-smart-do-search-region-or-symbol
         "sap" 'dotemacs-helm-project-do-ag
