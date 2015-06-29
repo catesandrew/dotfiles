@@ -128,12 +128,10 @@ Removes the automatic guessing of the initial value based on thing at point. "
   ;; and could slow down Emacs as the list grows
   (setq display-buffer-alist dotemacs-display-buffer-alist))
 
-
 (defun dotemacs-helm-cleanup ()
   "Cleanup some helm related states when quitting."
   ;; deactivate any running transient map (micro-state)
   (setq overriding-terminal-local-map nil))
-
 
 (defun dotemacs-set-dotted-directory ()
   "Set the face of diretories for `.' and `..'"

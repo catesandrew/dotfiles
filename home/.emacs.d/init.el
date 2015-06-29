@@ -2974,6 +2974,10 @@ Disable the highlighting of overlong lines."
 ;
 ;; end origianl `init-hbs`
 
+(use-package init-markdown
+  :load-path "config/"
+  :defer t)
+
 (use-package markdown-mode              ; Markdown
   :ensure t
   :mode (("\\.md$" . markdown-mode)
@@ -3023,12 +3027,6 @@ Disable the highlighting of overlong lines."
 
     ;; Fight my habit of constantly pressing M-q.  We should not fill in GFM Mode.
     (bind-key "M-q" #'ignore gfm-mode-map)))
-
-(use-package init-markdown
-  :if (and (eq system-type 'darwin) (display-graphic-p))
-  :defer t
-  :commands(dotemacs-preview-md-file)
-  :bind (("C-c m" . dotemacs-preview-md-file)))
 
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
