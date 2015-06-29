@@ -3749,7 +3749,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (after "srefactor"
   (add-hook 'emacs-lisp-mode-hook 'dotemacs-lazy-load-srefactor)
   (use-package srefactor-lisp
-    :ensure t
     :commands (srefactor-lisp-format-buffer
                srefactor-lisp-format-defun
                srefactor-lisp-format-sexp
