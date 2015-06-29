@@ -143,4 +143,18 @@ Supported properties:
 
   (setq-local org-hide-emphasis-markers t))
 
+(defun dotemacs-get-package-directory (pkg)
+  "Return the directory of PKG. Return nil if not found."
+  (let ((elpa-dir (concat user-emacs-directory "elpa/")))
+    (when (file-exists-p elpa-dir)
+      (let ((dir (reduce (lambda (x y) (if x x y))
+                         (mapcar (lambda (x)
+                                   (if (string-match
+                                        (concat "/"
+                                                (symbol-name pkg)
+                                                "-[0-9]+") x) x))
+                                 (directory-files elpa-dir 'full))
+                         :initial-value nil)))
+        (if dir (file-name-as-directory dir))))))
+
 (provide 'core-funcs)

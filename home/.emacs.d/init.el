@@ -173,6 +173,25 @@ NOERROR and NOMESSAGE are passed to `load'."
   "If non nil the `fancify-symbols' function is enabled."
   :group 'dotemacs)
 
+;; haskell settings
+(defgroup dotemacs-haskell nil
+  "Configuration options for haskell."
+  :group 'dotemacs
+  :prefix 'dotemacs-haskell)
+
+;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
+(defcustom dotemacs-haskell-enable-ghci-ng-support nil
+  "If non-nil ghci-ng support is enabled"
+  :group 'dotemacs-haskell)
+
+(defcustom dotemacs-haskell-enable-shm-support nil
+  "If non-nil structured-haskell-mode support is enabled"
+  :group 'dotemacs-haskell)
+
+(defcustom dotemacs-haskell-enable-hindent-style 'fundamental
+  "If non-nil structured-haskell-mode support is enabled"
+  :group 'dotemacs-haskell)
+
 ;; git settings
 (defgroup dotemacs-git nil
   "Configuration options for git."
@@ -3993,16 +4012,44 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package haskell-indentation
   :ensure haskell-mode
   :defer t
-  :init (add-hook 'haskell-mode-hook #'haskell-indentation-mode))
+  :init (unless dotemacs-haskell-enable-shm-support
+          (add-hook 'haskell-mode-hook #'haskell-indentation-mode))
+  :config
+  (progn
+     ;; Show indentation guides in insert or emacs state only.
+     (defun dotemacs-haskell-indentation-show-guides ()
+       "Show visual indentation guides."
+       (when (and (boundp 'haskell-indentation-mode) haskell-indentation-mode)
+         (haskell-indentation-enable-show-indentations)))
+
+     (defun dotemacs-haskell-indentation-hide-guides ()
+       "Hide visual indentation guides."
+       (when (and (boundp 'haskell-indentation-mode) haskell-indentation-mode)
+         (haskell-indentation-disable-show-indentations)))
+
+     ;; first entry in normal state
+     (add-hook 'evil-normal-state-entry-hook 'dotemacs-haskell-indentation-hide-guides)
+
+     (add-hook 'evil-insert-state-entry-hook 'dotemacs-haskell-indentation-show-guides)
+     (add-hook 'evil-emacs-state-entry-hook 'dotemacs-haskell-indentation-show-guides)
+     (add-hook 'evil-insert-state-exit-hook 'dotemacs-haskell-indentation-hide-guides)
+     (add-hook 'evil-emacs-state-exit-hook 'dotemacs-haskell-indentation-hide-guides)))
 
 (use-package hindent                    ; Automated Haskell indentation
-  :ensure t
   :defer t
-  :init (add-hook 'haskell-mode-hook #'hindent-mode))
+  :ensure t
+  :if (stringp dotemacs-haskell-enable-hindent-style)
+  :init
+  (add-hook 'haskell-mode-hook #'hindent-mode)
+  :config
+  (progn
+    (setq hindent-style dotemacs-haskell-enable-hindent-style)
+    (evil-leader/set-key-for-mode 'haskell-mode
+      "mF" 'hindent/reformat-decl)))
 
 (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
   :ensure t
-  :defer t
+  :commands flycheck-haskell-configure
   :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
 
 (use-package helm-hayoo
@@ -4016,6 +4063,93 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init (after "haskell-mode"
           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
+
+(use-package haskell-snippets
+  :ensure t
+  :init
+  (progn
+    ;; manually load the package since the current implementation is not lazy
+    ;; loading friendly (funny coming from the haskell mode :-))
+    (setq haskell-snippets-dir (dotemacs-get-package-directory
+                                'haskell-snippets))
+
+    (defun haskell-snippets-initialize ()
+      (let ((snip-dir (expand-file-name "snippets" haskell-snippets-dir)))
+        (add-to-list 'yas-snippet-dirs snip-dir t)
+        (yas-load-directory snip-dir)))
+
+    (after "yasnippet" '(haskell-snippets-initialize))))
+
+(use-package cmm-mode
+  :ensure t
+  :defer t)
+
+(use-package ghc
+  :ensure t
+  :defer t
+  :init (add-hook 'haskell-mode-hook 'ghc-init)
+  :config
+  (after "flycheck"
+    ;; remove overlays from ghc-check.el if flycheck is enabled
+    (set-face-attribute 'ghc-face-error nil :underline nil)
+    (set-face-attribute 'ghc-face-warn nil :underline nil)))
+
+(use-package shm
+  :defer t
+  :ensure t
+  :if dotemacs-haskell-enable-shm-support
+  :init
+  (add-hook 'haskell-mode-hook 'structured-haskell-mode)
+  :config
+  (progn
+    (when (require 'shm-case-split nil 'noerror)
+      ;;TODO: Find some better bindings for case-splits
+      (define-key shm-map (kbd "C-c S") 'shm/case-split)
+      (define-key shm-map (kbd "C-c C-s") 'shm/do-case-split))
+
+    (evil-define-key 'normal shm-map
+      (kbd "RET") nil
+      (kbd "C-k") nil
+      (kbd "C-j") nil
+      (kbd "D") 'shm/kill-line
+      (kbd "R") 'shm/raise
+      (kbd "P") 'shm/yank
+      (kbd "RET") 'shm/newline-indent
+      (kbd "RET") 'shm/newline-indent
+      (kbd "M-RET") 'evil-ret
+      )
+
+    (evil-define-key 'operator shm-map
+      (kbd ")") 'shm/forward-node
+      (kbd "(") 'shm/backward-node)
+
+    (evil-define-key 'motion shm-map
+      (kbd ")") 'shm/forward-node
+      (kbd "(") 'shm/backward-node)
+
+    (define-key shm-map (kbd "C-j") nil)
+    (define-key shm-map (kbd "C-k") nil)))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook haskell-mode)
+    (dotemacs-add-company-hook haskell-cabal-mode)))
+
+(use-package company-ghc
+ :if (eq dotemacs-completion-engine 'company)
+ :ensure t
+ :defer t
+ :init
+ (push '(company-ghc company-dabbrev-code company-yasnippet)
+       company-backends-haskell-mode))
+
+(use-package company-cabal
+ :if (eq dotemacs-completion-engine 'company)
+ :ensure t
+ :defer t
+ :init
+ (push '(company-cabal)
+       company-backends-haskell-cabal-mode))
 
 
 ;;; Go
