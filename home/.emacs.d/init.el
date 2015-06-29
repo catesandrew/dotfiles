@@ -4019,6 +4019,53 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Go
+(use-package init-go
+  :commands (load-gopath-file
+             go/init-go-oracle
+             dotemacs-go-run-package-tests)
+  :load-path "config/")
+
+(use-package go-rename
+  :disabled t
+  :init
+  (evil-leader/set-key-for-mode 'go-mode "mr" 'go-rename))
+
+(use-package go-mode
+  :ensure t
+  :defer t
+  :init (after "flycheck"
+          (add-hook 'go-mode-hook 'flycheck-mode))
+  :config
+  (progn
+    (add-hook 'before-save-hook 'gofmt-before-save)
+
+    (evil-leader/set-key-for-mode 'go-mode
+      "mdp" 'godoc-at-point
+      "mig" 'go-goto-imports
+      "mia" 'go-import-add
+      "mir" 'go-remove-unused-imports
+      "mpb" 'go-play-buffer
+      "mpr" 'go-play-region
+      "mpd" 'go-download-play
+      "mga" 'ff-find-other-file
+      "mgg" 'godef-jump
+      "mtp" 'dotemacs-go-run-package-tests)))
+
+(use-package go-eldoc
+  :disabled t
+  :init
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook go-mode)
+
+    (use-package company-go
+      :if (eq dotemacs-completion-engine 'company)
+      :disabled t
+      :defer t
+      :init
+      (push 'company-go company-backends-go-mode))))
 
 
 ;;; C/C++
