@@ -3534,6 +3534,39 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :init
   (progn
     (global-evil-surround-mode 1)
+    (defun dotemacs-surround-add-pair (trigger begin-or-fun &optional end)
+      "Add a surround pair.
+If `end' is nil `begin-or-fun' will be treated as a fun."
+      (push (cons (if (stringp trigger)
+                    (string-to-char trigger)
+                    trigger)
+                  (if end
+                    (cons begin-or-fun end)
+                    begin-or-fun))
+            evil-surround-pairs-alist))
+
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "`" "`"  "'"))
+                  '(emacs-lisp-mode-hook lisp-mode-hook))
+
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "~" "```"  "```"))
+                  '(markdown-mode-hook))
+
+    (add-hook 'LaTeX-mode-hook (lambda ()
+                                 (dotemacs-surround-add-pair "~" "\\texttt{" "}")
+                                 (dotemacs-surround-add-pair "=" "\\verb=" "=")
+                                 (dotemacs-surround-add-pair "/" "\\emph{" "}")
+                                 (dotemacs-surround-add-pair "*" "\\textbf{" "}")
+                                 (dotemacs-surround-add-pair "P" "\\(" "\\)")))
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "c" ":class:`" "`")
+                    (dotemacs-surround-add-pair "f" ":func:`" "`")
+                    (dotemacs-surround-add-pair "m" ":meth:`" "`")
+                    (dotemacs-surround-add-pair "a" ":attr:`" "`")
+                    (dotemacs-surround-add-pair "e" ":exc:`" "`"))
+                  '(rst-mode-hook python-mode-hook))
+
     ;; `s' for surround instead of `substitute'
     ;; see motivation for this change in the documentation
     (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
