@@ -2435,7 +2435,7 @@ Disable the highlighting of overlong lines."
         candidates))
     (setq company-transformers '(dotemacs-company-transformer-cancel
                                    company-sort-by-occurrence)))
-  :diminish (company-mode " ⓐ" " a"))
+  :diminish (company-mode . " ⓐ"))
 
 (use-package company-statistics
   :ensure t
