@@ -4562,6 +4562,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Web languages
+(dotemacs-defvar-company-backends css-mode)
+(dotemacs-defvar-company-backends web-mode)
+
+(use-package init-web
+  :load-path "config/")
 
 ;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
 ;; can see the effect of your HTML as you type it.
@@ -4571,12 +4576,117 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    ; (add-hook 'web-mode-hook 'impatient-mode)
-    ))
+    (add-hook 'web-mode-hook 'impatient-mode)))
+
+(use-package css-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (push 'company-css company-backends-css-mode)
+    (after "yasnippet"
+      (add-hook 'css-mode-hook 'dotemacs-load-yasnippet)))
+  :config
+  (progn
+    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+    ;; `fundamental-mode'.
+    (add-hook 'css-mode-hook (lambda () (run-hooks #'dotemacs-prog-mode-hook)))
+
+    ;; Mark css-indent-offset as safe local variable.
+    (put 'css-indent-offset 'safe-local-variable #'integerp)))
+
+(use-package css-eldoc                  ; Basic Eldoc for CSS
+  :ensure t
+  :commands (turn-on-css-eldoc)
+  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+
+(use-package helm-css-scss
+  :defer t
+  :ensure t
+  :init
+  (after "scss-mode"
+    '(evil-leader/set-key-for-mode 'scss-mode "mgh" 'helm-css-scss)))
+
+(use-package web-mode                   ; Template editing
+  :defer t
+  :ensure t
+  :init
+  (push 'company-web-html company-backends-web-mode)
+  :config
+  (progn
+    ;; Only use smartparens in web-mode
+    (setq web-mode-enable-auto-pairing nil)
+    (setq web-mode-markup-indent-offset 2)
+
+    (sp-local-pair 'web-mode "<% " " %>")
+    (sp-local-pair 'web-mode "{ " " }")
+    (sp-local-pair 'web-mode "<%= "  "  %>")
+    (sp-local-pair 'web-mode "<%# "  " %>")
+    (sp-local-pair 'web-mode "<%$ "  " %>")
+    (sp-local-pair 'web-mode "<%@ "  " %>")
+    (sp-local-pair 'web-mode "<%: "  " %>")
+    (sp-local-pair 'web-mode "{{ "  " }}")
+    (sp-local-pair 'web-mode "{% "  " %}")
+    (sp-local-pair 'web-mode "{%- "  " %}")
+    (sp-local-pair 'web-mode "{# "  " #}")
+
+    (evil-leader/set-key-for-mode 'web-mode
+      "meh" 'web-mode-dom-errors-show
+      "mgb" 'web-mode-element-beginning
+      "mgc" 'web-mode-element-child
+      "mgp" 'web-mode-element-parent
+      "mgs" 'web-mode-element-sibling-next
+      "mhp" 'web-mode-dom-xpath
+      "mrc" 'web-mode-element-clone
+      "mrd" 'web-mode-element-vanish
+      "mrk" 'web-mode-element-kill
+      "mrr" 'web-mode-element-rename
+      "mrw" 'web-mode-element-wrap
+      "mz" 'web-mode-fold-or-unfold
+      ;; TODO element close would be nice but broken with evil.
+      )
+
+    (defvar dotemacs--web-mode-ms-doc-toggle 0
+      "Display a short doc when nil, full doc otherwise.")
+
+    (dotemacs-define-micro-state web-mode
+      :doc (dotemacs-web-mode-ms-doc)
+      :persistent t
+      :evil-leader-for-mode (web-mode . "m.")
+      :bindings
+      ("<escape>" nil :exit t)
+      ("?" dotemacs-web-mode-ms-toggle-doc)
+      ("c" web-mode-element-clone)
+      ("d" web-mode-element-vanish)
+      ("D" web-mode-element-kill)
+      ("j" web-mode-element-next)
+      ("J" web-mode-element-sibling-next)
+      ("k" web-mode-element-previous)
+      ("K" web-mode-element-sibling-previous)
+      ("h" web-mode-element-parent)
+      ("l" web-mode-element-child)
+      ("p" web-mode-dom-xpath)
+      ("r" web-mode-element-rename)
+      ("q" nil :exit t)
+      ("w" web-mode-element-wrap)))
+
+  :mode
+  (("\\.phtml\\'"      . web-mode)
+   ("\\.tpl\\.php\\'"  . web-mode)
+   ("\\.html\\'"       . web-mode)
+   ("\\.htm\\'"        . web-mode)
+   ("\\.[gj]sp\\'"     . web-mode)
+   ("\\.as[cp]x\\'"    . web-mode)
+   ("\\.erb\\'"        . web-mode)
+   ("\\.mustache\\'"   . web-mode)
+   ("\\.handlebars\\'" . web-mode)
+   ("\\.hbs\\'"        . web-mode)
+   ("\\.eco\\'"        . web-mode)
+   ("\\.djhtml\\'"     . web-mode)))
 
 (use-package emmet-mode
-  :ensure t
   :defer t
+  :ensure t
   :init
   (progn
     (add-hook 'web-mode-hook 'emmet-mode)
@@ -4589,47 +4699,65 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    ))
+  :diminish emmet-mode))
 
-(use-package web-mode                   ; Template editing
+; (defun html/post-init-evil-matchit ()
+;   (add-hook 'web-mode-hook 'evil-matchit-mode))
+
+(use-package scss-mode
+  :defer t
+  :ensure t
+  :mode ("\\.scss\\'" . scss-mode)
+  :init
+  (progn
+    (after "rainbow-delimiters"
+      (add-hook 'scss-mode-hook 'rainbow-delimiters-mode))))
+
+(use-package sass-mode
   :ensure t
   :defer t
-  :mode "/templates?/.*\\.\\(php\\|html\\)\\'"
-  :config
-  (setq web-mode-markup-indent-offset 2))
+  :mode ("\\.sass\\'" . sass-mode))
 
-;; TODO: Incorporate this into `use-package css-mode` below
-;; original `init-css`
-; (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
-; (add-to-list 'auto-mode-alist '("\\.scss$" . css-mode))
-;
-; (after "css-mode"
-;
-;   (setq css-indent-offset 2)
-;
-;   (defun my-css-mode-defaults ()
-;     (run-hooks 'my-prog-mode-hook))
-;
-;   (setq my-css-mode-hook 'my-css-mode-defaults)
-;
-;   (add-hook 'css-mode-hook (lambda ()
-;                            (run-hooks 'my-css-mode-hook))))
-;; end origianl `init-css`
-(use-package css-mode
+(use-package less-css-mode
   :defer t
+  :ensure t
+  :init
+  (progn
+    (after "rainbow-delimiters"
+      (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode)))
+  :mode ("\\.less\\'" . less-css-mode))
+
+; (defun html/post-init-flycheck ()
+;   (add-hook 'web-mode-hook 'flycheck-mode)
+;   (add-hook 'scss-mode-hook 'flycheck-mode)
+;   (add-hook 'sass-mode-hook 'flycheck-mode))
+
+(use-package tagedit
+  :defer t
+  :ensure t
   :config
   (progn
-    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
-    ;; `fundamental-mode'.
-    (add-hook 'css-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+    (tagedit-add-experimental-features)
+    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1))))
+  :diminish (tagedit-mode . " Ⓣ"))
 
-    ;; Mark css-indent-offset as safe local variable.  TODO: Report upstream
-    (put 'css-indent-offset 'safe-local-variable #'integerp)))
-
-(use-package css-eldoc                  ; Basic Eldoc for CSS
+(use-package haml-mode
   :ensure t
-  :commands (turn-on-css-eldoc)
-  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+  :defer t)
+
+(use-package slim-mode
+  :ensure t
+  :defer t)
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook css-mode)
+    (dotemacs-add-company-hook web-mode)))
+
+(use-package company-web
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t)
 
 ;;; JavaScript
 (use-package init-js
