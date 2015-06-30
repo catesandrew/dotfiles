@@ -44,11 +44,15 @@
   (dotemacs-stylus-async (point-min) (point-max) nil))
 
 (defun dotemacs-stylus-mode-defaults ()
-  ;; disable electric re-indenting...
-  ; (electric-indent-local-mode -1)
-  (unless (process-status "httpd")
-    (httpd-start))
-  ; (run-hooks 'my-prog-mode-hook)
-  )
+  "Default stylus-mode coding hook."
+
+  (unless (bound-and-true-p my-stylus-mh-ran)
+    ;; add buffer-local indicator for whether prog-mode-hook has run.
+    (set (make-local-variable 'my-stylus-mh-ran) t)
+
+    ;; disable electric re-indenting...
+    ; (electric-indent-local-mode -1)
+    (unless (process-status "httpd")
+      (httpd-start))))
 
 (provide 'init-stylus)

@@ -4909,13 +4909,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package init-stylus
   :load-path "config/"
   :defer t
-  :commands(dotemacs-stylus-mode-defaults))
+  :commands dotemacs-stylus-mode-defaults)
 
 (use-package stylus-mode
   :ensure t
   :defer t
   :mode ("\\.styl$" . stylus-mode)
-  :init (add-hook 'stylus-mode-hook #'dotemacs-stylus-mode-defaults))
+  :init
+  (progn
+    (setq dotemacs-stylus-mode-hook #'dotemacs-stylus-mode-defaults)
+    (add-hook 'stylus-mode-hook
+              (lambda ()
+                (run-hooks #'dotemacs-stylus-mode-hook)))))
 
 
 ;;; Skewer
