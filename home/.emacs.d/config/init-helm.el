@@ -456,4 +456,17 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   (interactive)
   (dotemacs-helm-project-smart-do-search t))
 
+;;; Debugging
+;;
+;;
+(defun helm-debug-toggle ()
+  (interactive)
+  (setq helm-debug (not helm-debug))
+  (message "Helm Debug is now %s"
+           (if helm-debug "Enabled" "Disabled")))
+
+(defun helm-ff-candidates-lisp-p (candidate)
+  (cl-loop for cand in (helm-marked-candidates)
+           always (string-match "\.el$" cand)))
+
 (provide 'init-helm)

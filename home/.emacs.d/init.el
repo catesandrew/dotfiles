@@ -6,11 +6,10 @@
 ;;
 ;; - C-c A: Align
 ;; - C-c a: Ag
-;; - C-c b: Helm commands (b for "browse")
 ;; - C-c d: Data stuff
 ;; - C-c e: Edit commands, general and mode specific
 ;; - C-c f: Files
-;; - C-c h: Help and documentation
+;; - C-c h: Helm/Help and documentation
 ;; - C-c j: Jumping and navigation
 ;; - C-c l: List things
 ;; - C-c m: Multiple cursors
@@ -996,7 +995,7 @@ mouse-3: go to end"))))
 
 (use-package helm
   :ensure t
-  :bind (("C-c b b" . helm-resume))
+  :bind (("C-c h h" . helm-resume))
   :commands dotemacs-helm-find-files
   :init
   (progn
@@ -1076,7 +1075,7 @@ mouse-3: go to end"))))
     (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
   :config
   (progn
-    (helm-mode +1)
+    (helm-mode 1)
     (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
 
     (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
@@ -1167,16 +1166,16 @@ mouse-3: go to end"))))
 
 (use-package helm-eval                  ; Evaluate expressions with Helm
   :ensure helm
-  :bind (("C-c b M-:" . helm-eval-expression-with-eldoc)
-         ("C-c b *"   . helm-calcul-expression)))
+  :bind (("C-c h M-:" . helm-eval-expression-with-eldoc)
+         ("C-c h *"   . helm-calcul-expression)))
 
 (use-package helm-color                 ; Input colors with Helm
   :ensure helm
-  :bind (("C-c b c" . helm-colors)))
+  :bind (("C-c h c" . helm-colors)))
 
 (use-package helm-unicode               ; Unicode input with Helm
   :ensure t
-  :bind ("C-c b 8" . helm-unicode))
+  :bind ("C-c h 8" . helm-unicode))
 
 (use-package helm-mode-manager
   :ensure t
