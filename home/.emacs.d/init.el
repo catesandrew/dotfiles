@@ -3637,6 +3637,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Emacs Lisp
 (bind-key "C-c u d" #'toggle-debug-on-error)
 
+(dotemacs-defvar-company-backends emacs-lisp-mode)
+
 (use-package init-elisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
   :commands (dotemacs-elisp-find-cask-file

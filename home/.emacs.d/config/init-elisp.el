@@ -1,7 +1,5 @@
 (require 'rx)
 
-(dotemacs-defvar-company-backends emacs-lisp-mode)
-
 (setq emacs-lisp-post-extensions
       '(emacs-builtin-emacs-lisp))
 
