@@ -4762,9 +4762,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t)
 
 ;;; JavaScript
+(dotemacs-defvar-company-backends js2-mode)
+
 (use-package init-js
   :load-path "config/"
-  :defer t
   :commands(dotemacs-js-ctrl-c-ctrl-c
             dotemacs-hide-test-functions
             dotemacs-tab-properly
@@ -4772,40 +4773,52 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             dotemacs-js-jump-to
             dotemacs-js-format-impl-name
             dotemacs-js-format-test-name
-            dotemacs-js-jump-to-implementation-or-test))
+            dotemacs-js-jump-to-implementation-or-test
+            dotemacs-js2-mode-defaults)
+  :init
+  (progn
+    (setq dotemacs-js2-mode-hook #'dotemacs-js2-mode-defaults)
+    (add-hook 'js2-mode-hook
+              (lambda ()
+                (run-hooks #'dotemacs-js2-mode-hook)))))
 
-;; TODO: Incorporate this into `use-package js2-mode` below
-;; original `init-js`
-; (require 'init-programming)
-;
-; (add-to-list 'auto-mode-alist '("\\.js\\'"    . js2-mode))
-; (add-to-list 'auto-mode-alist '("\\.pac\\'"   . js2-mode))
-; (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-; (add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
-; (add-to-list 'auto-mode-alist '("\\.jshintrc$" . javascript-mode))
-; (add-to-list 'magic-mode-alist '("#!/usr/bin/env node" . js2-mode))
-;
-; (with-eval-after-load 'javascript-mode
-;   (setq javascript-indent-level 2)) ; javascript-mode
-;
-; (with-eval-after-load 'js-mode
-;   (setq js-indent-level 2)) ; js-mode
-;
-; (with-eval-after-load 'js2-mode
-;   (defun my-js2-mode-defaults ()
-;     (js2-imenu-extras-mode +1)
-;     (setq mode-name "JS2")
-;     ; '(define-key js-mode-map "," 'self-insert-command)
-;     ; '(define-key js-mode-map ";" 'self-insert-command)
-;     ;; electric-layout-mode doesn't play nice with smartparens
-;     (setq-local electric-layout-rules '((?\; . after)))
-;     (run-hooks 'my-prog-mode-hook)
-;     (message "My JS2 hook"))
-;
-;   (setq my-js2-mode-hook 'my-js2-mode-defaults)
-;   (add-hook 'js2-mode-hook (lambda ()
-;                              (run-hooks 'my-js2-mode-hook)))
-;
+(use-package coffee-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (defun javascript/coffee-indent ()
+      (if (coffee-line-wants-indent)
+          ;; We need to insert an additional tab because the last line was special.
+          (coffee-insert-spaces (+ (coffee-previous-indent) coffee-tab-width))
+        ;; otherwise keep at the same indentation level
+        (coffee-insert-spaces (coffee-previous-indent)))
+      )
+    ;; indent to right position after `evil-open-below' and `evil-open-above'
+    (add-hook 'coffee-mode-hook '(lambda ()
+                                   (setq indent-line-function 'javascript/coffee-indent
+                                         evil-shift-width coffee-tab-width)))))
+
+; (defun javascript/post-init-flycheck ()
+;   (add-hook 'coffee-mode-hook 'flycheck-mode)
+;   (add-hook 'js2-mode-hook    'flycheck-mode)
+;   (add-hook 'json-mode-hook   'flycheck-mode))
+
+(use-package js2-mode                   ; Javascript editing
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)
+    ;; required to make `<SPC> s l' to work correctly
+    (add-hook 'js2-mode-hook 'js2-imenu-extras-mode))
+  :config
+  (progn
+    (setq-default js2-basic-offset 2)
+    (setq js2-global-externs '("angular" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
+
 ;   (add-hook 'js2-mode-hook (lambda ()
 ;     (local-set-key (kbd "C-c C-c") #'dotemacs-js-ctrl-c-ctrl-c)))
 ;
@@ -4813,7 +4826,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;         tab-width 2
 ;         js-indent-level 2)
 ;   (setq js2-highlight-level 3)
-;   (setq js2-basic-offset 2)
 ;   (setq js2-concat-multiline-strings (quote eol))
 ;   (setq js2-include-node-externs t)
 ;   (setq js2-indent-switch-body t)
@@ -4821,7 +4833,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;   (setq js2-allow-rhino-new-expr-initializer nil)
 ;   (setq js2-auto-indent-p nil)
 ;   (setq js2-enter-indents-newline nil)
-;   (setq js2-global-externs '("setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
 ;   (setq js2-idle-timer-delay 0.8)
 ;   (setq js2-indent-on-enter-key nil)
 ;   (setq js2-mirror-mode nil)
@@ -4834,73 +4845,128 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;   (setq js2-show-parse-errors nil)
 ;   (setq js2-strict-missing-semi-warning nil)
 ;   (setq js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
-;
-;   (define-key js2-mode-map (kbd "C-c RET jt") 'jump-to-test-file)
-;   (define-key js2-mode-map (kbd "C-c RET ot") 'jump-to-test-file-other-window)
-;   (define-key js2-mode-map (kbd "C-c RET js") 'jump-to-source-file)
-;   (define-key js2-mode-map (kbd "C-c RET os") 'jump-to-source-file-other-window)
-;   (define-key js2-mode-map (kbd "C-c RET jo") 'jump-between-source-and-test-files)
-;   (define-key js2-mode-map (kbd "C-c RET oo") 'jump-between-source-and-test-files-other-window)
-;
-;   (define-key js2-mode-map (kbd "C-c RET dp") 'js2r-duplicate-object-property-node)
-;
-;   (define-key js2-mode-map (kbd "C-c RET ta") 'toggle-assert-refute)
-;
-;   (defadvice js2r-inline-var (after reindent-buffer activate)
-;     (cleanup-buffer))
-;
-;   (define-key js2-mode-map (kbd "C-c t") 'dotemacs-hide-test-functions)
-;
-;   (define-key js2-mode-map (kbd "TAB") 'dotemacs-tab-properly)
-;
-;   ;; When renaming/deleting js-files, check for corresponding testfile
-;   (define-key js2-mode-map (kbd "C-x C-r") 'js2r-rename-current-buffer-file)
-;   (define-key js2-mode-map (kbd "C-x C-k") 'js2r-delete-current-buffer-file)
-;
-;   (define-key js2-mode-map (kbd "C-k") 'js2r-kill)
-;
-;   ;; After js2 has parsed a js file, we look for jslint globals decl comment ("/* global Fred, _, Harry */") and
-;   ;; add any symbols to a buffer-local var of acceptable global vars
-;   ;; Note that we also support the "symbol: true" way of specifying names via a hack (remove any ":true"
-;   ;; to make it look like a plain decl, and any ':false' are left behind so they'll effectively be ignored as
-;   ;; you can;t have a symbol called "someName:false"
-;   (add-hook 'js2-post-parse-callbacks
-;             (lambda ()
-;               (when (> (buffer-size) 0)
-;                 (let ((btext (replace-regexp-in-string
-;                               ": *true" " "
-;                               (replace-regexp-in-string "[\n\t ]+" " " (buffer-substring-no-properties 1 (buffer-size)) t t))))
-;                   (mapc (apply-partially 'add-to-list 'js2-additional-externs)
-;                         (split-string
-;                          (if (string-match "/\\* *global *\\(.*?\\) *\\*/" btext) (match-string-no-properties 1 btext) "")
-;                          " *, *" t))
-;                   ))))
-;
-;   (require 'js2-refactor)
-;   (js2r-add-keybindings-with-prefix "C-c C-m")
-;
-;   (require 'js2-imenu-extras)
-;   (js2-imenu-extras-setup)
-;
-;   ;; jshintrc
-;   (when (executable-find "tern")
-;     (require 'tern)
-;     (add-hook 'js2-mode-hook 'tern-mode)
-;     (with-eval-after-load 'tern
-;       (with-eval-after-load 'auto-complete
-;         (require 'tern-auto-complete)
-;         (tern-ac-setup))
-;       (with-eval-after-load 'company-mode
-;         (require 'company-tern)))))
-;; end origianl `init-js`
-(use-package js2-mode                   ; Javascript editing
+
+    (evil-leader/set-key-for-mode 'js2-mode "mw" 'js2-mode-toggle-warnings-and-errors)
+    (evil-leader/set-key-for-mode 'js2-mode "mzc" 'js2-mode-hide-element)
+    (evil-leader/set-key-for-mode 'js2-mode "mzo" 'js2-mode-show-element)
+    (evil-leader/set-key-for-mode 'js2-mode "mzr" 'js2-mode-show-all)
+    (evil-leader/set-key-for-mode 'js2-mode "mze" 'js2-mode-toggle-element)
+    (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
+    (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)
+
+    ))
+
+(use-package js2-refactor
+  :defer t
   :ensure t
-  :mode "\\.js\\'"
-  :config (progn (setq-default js2-basic-offset 2)
-                 (setq js2-global-externs '("angular"))
+  :init
+  (progn
+    (defun javascript/load-js2-refactor ()
+      "Lazy load js2-refactor"
+      (require 'js2-refactor))
+    (add-hook 'js2-mode-hook 'javascript/load-js2-refactor))
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'js2-mode "mr3i" 'js2r-ternary-to-if)
 
-                 (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)))
+    (evil-leader/set-key-for-mode 'js2-mode "mrag" 'js2r-add-to-globals-annotation)
+    (evil-leader/set-key-for-mode 'js2-mode "mrao" 'js2r-arguments-to-object)
 
+    (evil-leader/set-key-for-mode 'js2-mode "mrba" 'js2r-forward-barf)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrca" 'js2r-contract-array)
+    (evil-leader/set-key-for-mode 'js2-mode "mrco" 'js2r-contract-object)
+    (evil-leader/set-key-for-mode 'js2-mode "mrcu" 'js2r-contract-function)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrea" 'js2r-expand-array)
+    (evil-leader/set-key-for-mode 'js2-mode "mref" 'js2r-extract-function)
+    (evil-leader/set-key-for-mode 'js2-mode "mrem" 'js2r-extract-method)
+    (evil-leader/set-key-for-mode 'js2-mode "mreo" 'js2r-expand-object)
+    (evil-leader/set-key-for-mode 'js2-mode "mreu" 'js2r-expand-function)
+    (evil-leader/set-key-for-mode 'js2-mode "mrev" 'js2r-extract-var)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrig" 'js2r-inject-global-in-iife)
+    (evil-leader/set-key-for-mode 'js2-mode "mrip" 'js2r-introduce-parameter)
+    (evil-leader/set-key-for-mode 'js2-mode "mriv" 'js2r-inline-var)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrlp" 'js2r-localize-parameter)
+    (evil-leader/set-key-for-mode 'js2-mode "mrlt" 'js2r-log-this)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrrv" 'js2r-rename-var)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrsl" 'js2r-forward-slurp)
+    (evil-leader/set-key-for-mode 'js2-mode "mrss" 'js2r-split-string)
+    (evil-leader/set-key-for-mode 'js2-mode "mrsv" 'js2r-split-var-declaration)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrtf" 'js2r-toggle-function-expression-and-declaration)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mruw" 'js2r-unwrap)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrvt" 'js2r-var-to-this)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mrwi" 'js2r-wrap-buffer-in-iife)
+    (evil-leader/set-key-for-mode 'js2-mode "mrwl" 'js2r-wrap-in-for-loop)
+
+    (evil-leader/set-key-for-mode 'js2-mode "mk" 'js2r-kill)
+    (evil-leader/set-key-for-mode 'js2-mode "xmj" 'js2r-move-line-down)
+    (evil-leader/set-key-for-mode 'js2-mode "xmk" 'js2r-move-line-up)))
+
+(use-package json-mode
+  :defer t
+  :ensure t)
+
+(use-package tern
+  :defer t
+  :ensure t
+  :init (add-hook 'js2-mode-hook 'tern-mode)
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'js2-mode "mrrV" 'tern-rename-variable)
+    (evil-leader/set-key-for-mode 'js2-mode "mhd" 'tern-get-docs)
+    (evil-leader/set-key-for-mode 'js2-mode "mgg" 'tern-find-definition)
+    (evil-leader/set-key-for-mode 'js2-mode "mgG" 'tern-find-definition-by-name)
+    (evil-leader/set-key-for-mode 'js2-mode (kbd "m C-g") 'tern-pop-find-definition)
+    (evil-leader/set-key-for-mode 'js2-mode "mht" 'tern-get-type)))
+
+(use-package js-doc
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (defun javascript/load-js-doc ()
+        "Lazy load js-doc"
+      (require 'js-doc))
+    (add-hook 'js2-mode-hook 'javascript/load-js-doc))
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'js2-mode "mrdb" 'js-doc-insert-file-doc)
+    (evil-leader/set-key-for-mode 'js2-mode "mrdf" 'js-doc-insert-function-doc)
+    (evil-leader/set-key-for-mode 'js2-mode "mrdt" 'js-doc-insert-tag)
+    (evil-leader/set-key-for-mode 'js2-mode "mrdh" 'js-doc-describe-tag)))
+
+(use-package web-beautify
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'js2-mode  "m=" 'web-beautify-js)
+    (evil-leader/set-key-for-mode 'json-mode "m=" 'web-beautify-js)
+    (evil-leader/set-key-for-mode 'web-mode  "m=" 'web-beautify-html)
+    (evil-leader/set-key-for-mode 'css-mode  "m=" 'web-beautify-css)))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook js2-mode)))
+
+(use-package company-tern
+ :if (eq dotemacs-completion-engine 'company)
+ :ensure t
+ :defer t
+ :init
+ (push 'company-tern company-backends-js2-mode))
+
+
+;;; PHP
 (use-package php-mode                   ; Because sometimes you have to
   :ensure t)
 

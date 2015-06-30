@@ -87,7 +87,17 @@ an array and adds a string for the first argument in the parameter list."
     (cond
      ((member "test" current) (dotemacs-js-jump-to current "test" "lib" 'dotemacs-js-format-impl-name))
      ((member "lib" current)  (dotemacs-js-jump-to current "lib" "test" 'dotemacs-js-format-test-name))
-     (t (error "not within a test or lib directory"))
-     )))
+     (t (error "not within a test or lib directory")))))
+
+(defun dotemacs-js2-mode-defaults ()
+  "Default js2-mode coding hook."
+
+  (unless (bound-and-true-p my-js2mh-ran)
+    ;; add buffer-local indicator for whether prog-mode-hook has run.
+    (set (make-local-variable 'my-js2mh-ran) t)
+
+    ;; electric-layout-mode doesn't play nice with smartparens
+    ; (setq-local electric-layout-rules '((?\; . after)))
+    ))
 
 (provide 'init-js)
