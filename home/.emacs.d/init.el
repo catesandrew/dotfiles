@@ -5927,7 +5927,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              helm-projectile-switch-project)
   :init
   (progn
-    ; (after "projectile" (helm-projectile-on)
+    (helm-projectile-on)
+
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
     (setq projectile-switch-project-action #'helm-projectile)
 
