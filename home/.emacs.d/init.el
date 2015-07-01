@@ -5215,8 +5215,45 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; PHP
-(use-package php-mode                   ; Because sometimes you have to
+(dotemacs-defvar-company-backends php-mode)
+
+(use-package drupal-mode
+  :defer t)
+
+; (defun php/post-init-eldoc ()
+;   (add-hook 'php-mode-hook 'eldoc-mode)
+;   (when (configuration-layer/package-usedp 'ggtags)
+;     (spacemacs/ggtags-enable-eldoc 'php-mode)))
+;
+; (defun php/post-init-ggtags ()
+;   (add-hook 'php-mode-hook 'ggtags-mode))
+;
+; (defun php/post-init-helm-gtags ()
+;   (spacemacs/helm-gtags-define-keys-for-mode 'php-mode))
+
+(use-package php-auto-yasnippets
+  :defer t
   :ensure t)
+
+(use-package php-extras
+  :defer t
+  :ensure t)
+
+(use-package php-mode                   ; Because sometimes you have to
+  :defer t
+  :mode ("\\.php\\'" . php-mode))
+
+(use-package phpcbf
+  :defer t
+  :ensure t)
+
+(use-package phpunit
+  :defer t
+  :ensure t)
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook php-mode)))
 
 
 ;;; Stylus
