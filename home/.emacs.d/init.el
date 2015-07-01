@@ -5294,6 +5294,63 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :diminish skewer-mode)
 
 
+;;; Racket
+
+;; this is the only thing to do to enable company in racket-mode
+;; because racket-mode handle everything for us when company
+;; is loaded.
+; (add-hook 'racket-mode-hook 'company-mode)
+
+;; Bug exists in Racket company backend that opens docs in new window when
+;; company-quickhelp calls it. Note hook is appendended for proper ordering.
+; (add-hook 'company-mode-hook
+;           '(lambda ()
+;              (when (equal major-mode 'racket-mode)
+;                (company-quickhelp-mode -1))) t)
+
+(use-package init-racket
+  :load-path "config/")
+
+(use-package racket-mode
+  :defer t
+  :ensure t
+  :config
+  (progn
+    ;; smartparens configuration
+    (after "smartparens"
+      '(progn (add-to-list 'sp--lisp-modes 'racket-mode)
+              (when (fboundp 'sp-local-pair)
+                (sp-local-pair 'racket-mode "'" nil :actions nil)
+                (sp-local-pair 'racket-mode "`" nil :actions nil))))
+
+    (evil-leader/set-key-for-mode 'racket-mode
+      ;; navigation
+      "mg`" 'racket-unvisit
+      "mgg" 'racket-visit-definition
+      "mgm" 'racket-visit-module
+      "mgr" 'racket-open-require-path
+      ;; doc
+      "mhd" 'racket-describe
+      "mhh" 'racket-doc
+      ;; insert
+      "mil" 'racket-insert-lambda
+      ;; REPL
+      "msb" 'racket-run
+      "msB" 'racket-run-and-switch-to-repl
+      "mse" 'racket-send-last-sexp
+      "msE" 'dotemacs-racket-send-last-sexp-focus
+      "msf" 'racket-send-definition
+      "msF" 'dotemacs-racket-send-definition-focus
+      "msi" 'racket-repl
+      "msr" 'racket-send-region
+      "msR" 'dotemacs-racket-send-region-focus
+      "mss" 'racket-repl
+      ;; Tests
+      "mtb" 'racket-test
+      "mtB" 'dotemacs-racket-test-with-coverage)
+    (define-key racket-mode-map (kbd "H-r") 'racket-run)))
+
+
 ;;; Misc programming languages
 (use-package sh-script                  ; Shell scripts
   :mode ("\\.zsh\\'" . sh-mode)
