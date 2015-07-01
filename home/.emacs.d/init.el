@@ -3080,59 +3080,39 @@ Disable the highlighting of overlong lines."
   :defer t
   :mode (("\\.mustache$" . mustache-mode)))
 
-;; TODO: Incorporate this into new `use-package handlebars-mode` below
-;; original `init-hbs`
-; (defun my-handlebars-load ()
-;   (require 'handlebars-mode)
-;   (handlebars-mode))
-;
-; (setq my-handlebars-load-hook 'my-handlebars-load)
-;
-; (add-to-list 'auto-mode-alist
-;              '("\\.hbs$" . (lambda ()
-;                               (require 'handlebars-mode)
-;                               (handlebars-mode))))
-;
-; (add-to-list 'auto-mode-alist
-;              '("\\.handlebars$" . (lambda ()
-;                               (require 'handlebars-mode)
-;                               (handlebars-mode))))
-;
-; (with-eval-after-load 'handlebars-mode
-;   (defun my-handlebars-mode-defaults ()
-;     ; (toggle-truncate-lines 1)
-;     ; (setq truncate-lines 0)
-;     (run-hooks 'my-prog-mode-hook))
-;
-;   (setq my-handlebars-mode-hook 'my-handlebars-mode-defaults)
-;
-;   (add-hook 'handlebars-mode-hook (lambda ()
-;                                     (run-hooks 'my-handlebars-mode-hook))))
-;
-;; end origianl `init-hbs`
+(use-package handlebars-mode
+  :ensure t
+  :mode (("\\.hbs$" . handlebars-mode)
+         ("\\.handlebars$" . handlebars-mode)))
 
 (use-package init-markdown
   :load-path "config/"
   :defer t)
 
 (use-package markdown-mode              ; Markdown
-  :ensure t
-  :mode (("\\.md$" . markdown-mode)
+  :mode (("\\.m[k]d" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
          ("\\.apib$" . markdown-mode))
-
-  ;; http://www.tychoish.com/posts/imenu-for-markdown-and-writing/
-  :init (setq markdown-imenu-generic-expression
-               '(("title"  "^\\(.*\\)[\n]=+$" 1)
-                 ("h2-"    "^\\(.*\\)[\n]-+$" 1)
-                 ("h1"   "^# \\(.*\\)$" 1)
-                 ("h2"   "^## \\(.*\\)$" 1)
-                 ("h3"   "^### \\(.*\\)$" 1)
-                 ("h4"   "^#### \\(.*\\)$" 1)
-                 ("h5"   "^##### \\(.*\\)$" 1)
-                 ("h6"   "^###### \\(.*\\)$" 1)
-                 ("fn"   "^\\[\\^\\(.*\\)\\]" 1)))
+  :ensure t
+  :init
+  (progn
+    (add-hook 'markdown-mode-hook 'smartparens-mode)
+    ;; http://www.tychoish.com/posts/imenu-for-markdown-and-writing/
+    (setq markdown-imenu-generic-expression
+          '(("title"  "^\\(.*\\)[\n]=+$" 1)
+            ("h2-"    "^\\(.*\\)[\n]-+$" 1)
+            ("h1"   "^# \\(.*\\)$" 1)
+            ("h2"   "^## \\(.*\\)$" 1)
+            ("h3"   "^### \\(.*\\)$" 1)
+            ("h4"   "^#### \\(.*\\)$" 1)
+            ("h5"   "^##### \\(.*\\)$" 1)
+            ("h6"   "^###### \\(.*\\)$" 1)
+            ("fn"   "^\\[\\^\\(.*\\)\\]" 1))))
   :config
+  ;; Don't do terrible things with Github code blocks (```)
+  (when (fboundp 'sp-local-pair)
+    (sp-local-pair 'markdown-mode "`" nil :actions '(:rem autoskip))
+    (sp-local-pair 'markdown-mode "'" nil :actions nil))
   (progn
     ;; Process Markdown with Pandoc, using a custom stylesheet for nice output
     (let ((stylesheet (expand-file-name
@@ -3162,8 +3142,135 @@ Disable the highlighting of overlong lines."
     (bind-key "C-c C-s C" #'markdown-insert-gfm-code-block markdown-mode-map)
     (bind-key "C-c C-s P" #'markdown-insert-gfm-code-block markdown-mode-map)
 
-    ;; Fight my habit of constantly pressing M-q.  We should not fill in GFM Mode.
-    (bind-key "M-q" #'ignore gfm-mode-map)))
+    (evil-leader/set-key-for-mode 'markdown-mode
+      ;; Movement
+      "m{"   'markdown-backward-paragraph
+      "m}"   'markdown-forward-paragraph
+      ;; Completion, and Cycling
+      "m]"   'markdown-complete
+      ;; Indentation
+      "m>"   'markdown-indent-region
+      "m<"   'markdown-exdent-region
+      ;; Buffer-wide commands
+      "mc]"  'markdown-complete-buffer
+      "mcm"  'markdown-other-window
+      "mcp"  'markdown-preview
+      "mce"  'markdown-export
+      "mcv"  'markdown-export-and-preview
+      "mco"  'markdown-open
+      "mcw"  'markdown-kill-ring-save
+      "mcc"  'markdown-check-refs
+      "mcn"  'markdown-cleanup-list-numbers
+      "mcr"  'gh-md-render-buffer
+      ;; headings
+      "mhi"  'markdown-insert-header-dwim
+      "mhI"  'markdown-insert-header-setext-dwim
+      "mh1"  'markdown-insert-header-atx-1
+      "mh2"  'markdown-insert-header-atx-2
+      "mh3"  'markdown-insert-header-atx-3
+      "mh4"  'markdown-insert-header-atx-4
+      "mh5"  'markdown-insert-header-atx-5
+      "mh6"  'markdown-insert-header-atx-6
+      "mh!"  'markdown-insert-header-setext-1
+      "mh@"  'markdown-insert-header-setext-2
+      ;; Insertion of common elements
+      "m-"   'markdown-insert-hr
+      "mif"  'markdown-insert-footnote
+      "mii"  'markdown-insert-image
+      "mik"  'dotemacs-insert-keybinding-markdown
+      "miI"  'markdown-insert-reference-image
+      "mil"  'markdown-insert-link
+      "miL"  'markdown-insert-reference-link-dwim
+      "miw"  'markdown-insert-wiki-link
+      "miu"  'markdown-insert-uri
+      ;; Element removal
+      "mk"   'markdown-kill-thing-at-point
+      ;; List editing
+      "mli"  'markdown-insert-list-item
+      ;; region manipulation
+      "mxb"  'markdown-insert-bold
+      "mxi"  'markdown-insert-italic
+      "mxc"  'markdown-insert-code
+      "mxq"  'markdown-insert-blockquote
+      "mxQ"  'markdown-blockquote-region
+      "mxp"  'markdown-insert-pre
+      "mxP"  'markdown-pre-region
+      ;; Following and Jumping
+      "mN"   'markdown-next-link
+      "mo"   'markdown-follow-thing-at-point
+      "mP"   'markdown-previous-link
+      "m <RET>" 'markdown-jump)
+
+    ;; Header navigation in normal state movements
+    (evil-define-key 'normal markdown-mode-map
+      "gj" 'outline-forward-same-level
+      "gk" 'outline-backward-same-level
+      "gh" 'outline-up-heading
+      ;; next visible heading is not exactly what we want but close enough
+      "gl" 'outline-next-visible-heading)
+
+    ;; Promotion, Demotion
+    (define-key markdown-mode-map (kbd "M-h") 'markdown-promote)
+    (define-key markdown-mode-map (kbd "M-j") 'markdown-move-down)
+    (define-key markdown-mode-map (kbd "M-k") 'markdown-move-up)
+    (define-key markdown-mode-map (kbd "M-l") 'markdown-demote)))
+
+(use-package markdown-toc
+  :ensure t
+  :defer t)
+
+(use-package mmm-mode
+  :commands mmm-parse-buffer
+  :ensure t
+  :init
+  (evil-leader/set-key-for-mode 'markdown-mode
+    ;; Highlight code blocks
+    "mcs"   'mmm-parse-buffer)
+  :config
+  (progn
+    (mmm-add-classes '((markdown-python
+                        :submode python-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```python[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-html
+                        :submode web-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```html[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-java
+                        :submode java-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```java[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-ruby
+                        :submode ruby-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```ruby[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-c
+                        :submode c-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```c[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-c++
+                        :submode c++-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```c\+\+[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-elisp
+                        :submode emacs-lisp-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```elisp[\n\r]+"
+                        :back "^```$")))
+    (setq mmm-global-mode t)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-python)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-java)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-ruby)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-c)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-c++)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-elisp)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)))
 
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
