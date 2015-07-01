@@ -6798,7 +6798,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           guide-key/popup-window-position 'bottom
           guide-key/idle-delay dotemacs-guide-key-delay
           guide-key/text-scale-amount 0
-          guide-key-tip/enabled nil)
+          guide-key-tip/enabled (if window-system t))
     (setq guide-key/highlight-command-regexp
                  (cons dotemacs-prefix-command-string font-lock-warning-face))
     (guide-key-mode 1))
