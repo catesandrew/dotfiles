@@ -172,6 +172,29 @@ NOERROR and NOMESSAGE are passed to `load'."
   "If non nil the `fancify-symbols' function is enabled."
   :group 'dotemacs)
 
+;; latex settings
+(defgroup dotemacs-latex nil
+  "Configuration options for latex."
+  :group 'dotemacs
+  :prefix 'dotemacs-latex)
+
+(defcustom dotemacs-latex-build-command "LaTeX"
+  "The default command to use with `SPC m b'"
+  :group 'dotemacs-latex)
+
+(defcustom dotemacs-latex-enable-auto-fill t
+  "Whether to use auto-fill-mode or not in tex files."
+  :group 'dotemacs-latex)
+
+(defcustom dotemacs-latex-nofill-env '("equation"
+                           "equation*"
+                           "align"
+                           "align*"
+                           "tabular"
+                           "tikzpicture")
+  "List of environment names in which `auto-fill-mode' will be inhibited."
+  :group 'dotemacs-latex)
+
 ;; haskell settings
 (defgroup dotemacs-haskell nil
   "Configuration options for haskell."
@@ -2795,17 +2818,23 @@ Disable the highlighting of overlong lines."
 
 
 ;;; LaTeX with AUCTeX
+(dotemacs-defvar-company-backends LaTeX-mode)
+
+(use-package init-latex
+  :load-path "config/")
+
 (use-package tex-site                   ; AUCTeX initialization
   :ensure auctex)
 
 (use-package tex                        ; TeX editing/processing
   :ensure auctex
   :defer t
-  :config
+  :init
   (progn
-    (setq TeX-parse-self t              ; Parse documents to provide completion
-                                        ; for packages, etc.
+    (setq TeX-command-default dotemacs-latex-build-command
           TeX-auto-save t               ; Automatically save style information
+          TeX-parse-self t              ; Parse documents to provide completion
+                                        ; for packages, etc.
           TeX-electric-sub-and-superscript t ; Automatically insert braces after
                                         ; sub- and superscripts in math mode
           TeX-electric-math '("\\(" "\\)")
@@ -2813,16 +2842,73 @@ Disable the highlighting of overlong lines."
           TeX-quote-after-quote t
           ;; Don't ask for confirmation when cleaning
           TeX-clean-confirm nil
+          TeX-syntactic-comment t
           ;; Provide forward and inverse search with SyncTeX
           TeX-source-correlate-mode t
-          TeX-source-correlate-method 'synctex)
+          TeX-source-correlate-start-server nil
+          ;; Setup reftex style (RefTeX is supported through extension)
+          reftex-use-fonts t
+          TeX-source-correlate-method 'synctex
+          ;; Don't insert line-break at inline math
+          LaTeX-fill-break-at-separators nil)
+
     (setq-default TeX-master nil        ; Ask for the master file
                   TeX-engine 'luatex    ; Use a modern engine
                   ;; Redundant in 11.88, but keep for older AUCTeX
                   TeX-PDF-mode t)
 
+    (when dotemacs-latex-enable-auto-fill
+      (add-hook 'LaTeX-mode-hook 'latex/auto-fill-mode))
+    (add-hook 'LaTeX-mode-hook 'latex-math-mode))
+  :config
+  (progn
     ;; Move to chktex
-    (setcar (cdr (assoc "Check" TeX-command-list)) "chktex -v6 %s")))
+    (setcar (cdr (assoc "Check" TeX-command-list)) "chktex -v6 %s")
+
+    ;; Key bindings for plain TeX
+    (evil-leader/set-key-for-mode 'tex-mode
+      "m\\" 'TeX-insert-macro
+      "mb" 'latex/build
+      "mC" 'TeX-command-master
+      ;; Find a way to rebind tex-fonts
+      "mf" 'TeX-font
+      "mv" 'TeX-view)
+
+    ;; Key bindings for LaTeX
+    (evil-leader/set-key-for-mode 'latex-mode
+      "m\\" 'TeX-insert-macro
+      "mb" 'latex/build
+      "mc" 'LaTeX-close-environment
+      "mC" 'TeX-command-master
+      "me" 'LaTeX-environment
+      ;; Find a way to rebind tex-fonts
+      "mf" 'TeX-font
+      "mhd" 'TeX-doc
+      "mi" 'LaTeX-insert-item
+      ;; TeX-doc is a very slow function
+      "mpb" 'preview-buffer
+      "mpc" 'preview-clearout
+      "mpd" 'preview-document
+      "mpe" 'preview-environment
+      "mpf" 'preview-cache-preamble
+      "mpp" 'preview-at-point
+      "mpr" 'preview-region
+      "mps" 'preview-section
+      "mv" 'TeX-view)))
+
+(when (eq dotemacs-completion-engine 'company)
+  (after "company"
+    (dotemacs-add-company-hook LaTeX-mode)))
+
+(use-package company-auctex
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init
+  (progn
+    (push 'company-auctex-labels company-backends-LaTeX-mode)
+    (push 'company-auctex-bibs company-backends-LaTeX-mode)
+    (push '(company-auctex-macros company-auctex-symbols company-auctex-environments)
+          company-backends-LaTeX-mode)))
 
 (use-package tex-buf                    ; TeX buffer management
   :ensure auctex
@@ -2906,6 +2992,23 @@ Disable the highlighting of overlong lines."
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
   (progn
+    (setq reftex-plug-into-AUCTeX '(nil nil t t t))
+
+    (evil-leader/set-key-for-mode 'latex-mode
+      "mrc"    'reftex-citation
+      "mrg"    'reftex-grep-document
+      "mri"    'reftex-index-selection-or-word
+      "mrI"    'reftex-display-index
+      "mr C-i" 'reftex-index
+      "mrl"    'reftex-label
+      "mrp"    'reftex-index-phrase-selection-or-word
+      "mrP"    'reftex-index-visit-phrases-buffer
+      "mrr"    'reftex-reference
+      "mrs"    'reftex-search-document
+      "mrt"    'reftex-toc
+      "mrT"    'reftex-toc-recenter
+      "mrv"    'reftex-view-crossref)
+
     ;; Plug into AUCTeX
     (setq reftex-plug-into-AUCTeX t
           ;; Automatically derive labels, and prompt for confirmation
@@ -2940,6 +3043,22 @@ Disable the highlighting of overlong lines."
                                (?X . "{%l}"))))
       (setq reftex-cite-format 'biblatex)))
   :diminish reftex-mode)
+
+; (defun latex/post-init-evil-matchit ()
+;   (add-hook 'LaTeX-mode-hook 'evil-matchit-mode))
+;
+; (defun latex/post-init-flycheck ()
+;   (add-hook 'LaTeX-mode-hook 'flycheck-mode))
+;
+; (defun latex/post-init-flyspell ()
+;   (add-hook 'LaTeX-mode-hook 'flyspell-mode))
+;
+; (defun latex/post-init-smartparens ()
+;   (add-hook 'LaTeX-mode-hook 'smartparens-mode))
+;
+; (defun latex/post-init-yasnippet ()
+;   (add-hook 'LaTeX-mode-hook 'dotemacs-load-yasnippet))
+
 
 
 ;; Other markup languages
