@@ -172,6 +172,20 @@ NOERROR and NOMESSAGE are passed to `load'."
   "If non nil the `fancify-symbols' function is enabled."
   :group 'dotemacs)
 
+;; ruby settings
+(defgroup dotemacs-ruby nil
+  "Configuration options for ruby."
+  :group 'dotemacs
+  :prefix 'dotemacs-ruby)
+
+(defcustom dotemacs-ruby-version-manager 'rbenv
+  "If non nil defines the Ruby version manager (i.e. rbenv, rvm)"
+  :group 'dotemacs-ruby)
+
+(defcustom dotemacs-ruby-enable-ruby-on-rails-support nil
+  "If non nil we'll load support for Rails (haml, features, navigation)"
+  :group 'dotemacs-ruby)
+
 ;; latex settings
 (defgroup dotemacs-latex nil
   "Configuration options for latex."
@@ -4330,6 +4344,183 @@ fix this issue."
 
 
 ;;; Ruby
+(dotemacs-defvar-company-backends enh-ruby-mode)
+
+(use-package rbenv
+  :ensure t
+  :disabled t
+  :if (eq dotemacs-ruby-version-manager 'rbenv)
+  :defer t
+  :init (global-rbenv-mode)
+  :config (add-hook 'enh-ruby-mode-hook
+                    (lambda () (rbenv-use-corresponding))))
+
+(use-package rvm
+  :ensure t
+  :disabled t
+  :defer t
+  :if (eq dotemacs-ruby-version-manager 'rvm)
+  :init (rvm-use-default)
+  :config (add-hook 'enh-ruby-mode-hook
+                    (lambda () (rvm-activate-corresponding-ruby))))
+
+(use-package enh-ruby-mode
+  :ensure t
+  :mode (("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
+         ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
+  :config
+  (progn
+    (after "flycheck"
+      (add-hook 'enh-ruby-mode-hook #'flycheck-mode))
+
+    (after "company"
+      (dotemacs-add-company-hook enh-ruby-mode))
+
+    (after "company-dabbrev-code"
+      '(push 'enh-ruby-mode company-dabbrev-code-modes))
+
+    (setq enh-ruby-deep-indent-paren nil
+          enh-ruby-hanging-paren-deep-indent-level 2)
+    (sp-with-modes '(ruby-mode enh-ruby-mode)
+      (sp-local-pair "{" "}"
+                     :pre-handlers '(sp-ruby-pre-handler)
+                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
+                     :suffix ""))))
+
+(use-package ruby-tools
+  :defer t
+  :ensure t
+  :init
+  (add-hook 'enh-ruby-mode-hook 'ruby-tools-mode)
+  :diminish ruby-tools-mode)
+
+(use-package bundler
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbc" 'bundle-check)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbi" 'bundle-install)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbs" 'bundle-console)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbu" 'bundle-update)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbx" 'bundle-exec)))
+
+(use-package projectile-rails
+  :if (when dotemacs-ruby-enable-ruby-on-rails-support)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'enh-ruby-mode-hook 'projectile-rails-on))
+  :diminish (projectile-rails-mode . " ⇋")
+  :config
+  (progn
+    ;; Find files
+    (evil-leader/set-key-for-mode 'enh-ruby-mode
+      "mrfa" 'projectile-rails-find-locale
+      "mrfc" 'projectile-rails-find-controller
+      "mrfe" 'projectile-rails-find-environment
+      "mrff" 'projectile-rails-find-feature
+      "mrfh" 'projectile-rails-find-helper
+      "mrfi" 'projectile-rails-find-initializer
+      "mrfj" 'projectile-rails-find-javascript
+      "mrfl" 'projectile-rails-find-lib
+      "mrfm" 'projectile-rails-find-model
+      "mrfn" 'projectile-rails-find-migration
+      "mrfo" 'projectile-rails-find-log
+      "mrfp" 'projectile-rails-find-spec
+      "mrfr" 'projectile-rails-find-rake-task
+      "mrfs" 'projectile-rails-find-stylesheet
+      "mrft" 'projectile-rails-find-test
+      "mrfu" 'projectile-rails-find-fixture
+      "mrfv" 'projectile-rails-find-view
+      "mrfy" 'projectile-rails-find-layout
+      "mrf@" 'projectile-rails-find-mailer
+      ;; Goto file
+      "mrgc" 'projectile-rails-find-current-controller
+      "mrgd" 'projectile-rails-goto-schema
+      "mrge" 'projectile-rails-goto-seeds
+      "mrgh" 'projectile-rails-find-current-helper
+      "mrgj" 'projectile-rails-find-current-javascript
+      "mrgg" 'projectile-rails-goto-gemfile
+      "mrgm" 'projectile-rails-find-current-model
+      "mrgn" 'projectile-rails-find-current-migration
+      "mrgp" 'projectile-rails-find-current-spec
+      "mrgr" 'projectile-rails-goto-routes
+      "mrgs" 'projectile-rails-find-current-stylesheet
+      "mrgt" 'projectile-rails-find-current-test
+      "mrgu" 'projectile-rails-find-current-fixture
+      "mrgv" 'projectile-rails-find-current-view
+      "mrgz" 'projectile-rails-goto-spec-helper
+      "mrg." 'projectile-rails-goto-file-at-point
+      ;; Rails external commands
+      "mrcc" 'projectile-rails-generate
+      "mri" 'projectile-rails-console
+      "mrr:" 'projectile-rails-rake
+      "mrxs" 'projectile-rails-server
+      ;; Refactoring 'projectile-rails-mode
+      "mrRx" 'projectile-rails-extract-region)
+    ;; Ex-commands
+    (evil-ex-define-cmd "A" 'projectile-toggle-between-implementation-and-test)))
+
+(use-package robe                       ; Ruby backend for Emacs
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'enh-ruby-mode-hook 'robe-mode)
+    (after "company"
+      ;; (add-to-list 'company-backends 'company-robe) old
+      (push 'company-robe company-backends-enh-ruby-mode)))
+  :diminish robe-mode
+  :config
+  (progn
+    ;; robe mode specific
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mgg" 'robe-jump)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mhd" 'robe-doc)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mrsr" 'robe-rails-refresh)
+    ;; inf-enh-ruby-mode
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "msf" 'ruby-send-definition)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "msF" 'ruby-send-definition-and-go)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "msi" 'robe-start)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "msr" 'ruby-send-region)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "msR" 'ruby-send-region-and-go)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mss" 'ruby-switch-to-inf)))
+
+(use-package yaml-mode
+  :ensure t
+  :mode (("\\.\\(yml\\|yaml\\)\\'" . yaml-mode)
+         ("Procfile\\'" . yaml-mode))
+  :config (add-hook 'yaml-mode-hook
+                    '(lambda ()
+                       (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+
+(use-package feature-mode               ; Feature files for ecukes/cucumber
+  :ensure t
+  :if (when dotemacs-ruby-enable-ruby-on-rails-support)
+  :mode ("\\.feature\\'" . feature-mode)
+  :config
+  (progn
+    ;; Add standard hooks for Feature Mode, since it is no derived mode
+    (add-hook 'feature-mode-hook #'whitespace-mode)
+    (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
+    (add-hook 'feature-mode-hook #'flyspell-mode)))
+
+(use-package haml-mode
+  :ensure t
+  :if (when dotemacs-ruby-enable-ruby-on-rails-support)
+  :defer t)
+
+(use-package ruby-test-mode
+  :defer t
+  :ensure t
+  :init (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
+  :diminish ruby-test-mode
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mtb" 'ruby-test-run)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mtt" 'ruby-test-run-at-point)))
+
 (use-package inf-ruby                   ; Ruby REPL
   :ensure t
   :defer t
@@ -4337,12 +4528,6 @@ fix this issue."
   :config
   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
   (inf-ruby-switch-setup))
-
-(use-package robe                       ; Ruby backend for Emacs
-  :ensure t
-  :defer t
-  :init (after "company"
-          (add-to-list 'company-backends 'company-robe)))
 
 
 ;;; Rust
@@ -5166,10 +5351,6 @@ fix this issue."
     (add-hook 'html-mode-hook (lambda () (tagedit-mode 1))))
   :diminish (tagedit-mode . " Ⓣ"))
 
-(use-package haml-mode
-  :ensure t
-  :defer t)
-
 (use-package slim-mode
   :ensure t
   :defer t)
@@ -5592,16 +5773,6 @@ fix this issue."
   ;; Complete closing tags, and insert XML declarations into empty files
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t))
-
-(use-package feature-mode               ; Feature files for ecukes/cucumber
-  :ensure t
-  :defer t
-  :config
-  (progn
-    ;; Add standard hooks for Feature Mode, since it is no derived mode
-    (add-hook 'feature-mode-hook #'whitespace-mode)
-    (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
-    (add-hook 'feature-mode-hook #'flyspell-mode)))
 
 (use-package cmake-mode                 ; CMake files
   :ensure t
@@ -7180,10 +7351,6 @@ fix this issue."
 ;; Ansible
 (use-package init-ansible
   :load-path "config/")
-
-(use-package yaml-mode
-  :ensure t
-  :defer t)
 
 (use-package ansible
   :ensure t
