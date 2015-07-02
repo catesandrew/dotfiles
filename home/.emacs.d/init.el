@@ -313,7 +313,7 @@ Possible values are `complete', `cycle' or `nil'."
 selection."
   :group 'dotemacs-ac)
 
-(defcustom auto-completion-enable-sort-by-usage nil
+(defcustom auto-completion-enable-sort-by-usage t
   "If non nil suggestions are sorted by how often they are used."
   :group 'dotemacs-ac)
 
@@ -2510,7 +2510,8 @@ Disable the highlighting of overlong lines."
 
 (use-package company-statistics
   :ensure t
-  :if (eq dotemacs-completion-engine 'company)
+  :if (and auto-completion-enable-sort-by-usage
+           (eq dotemacs-completion-engine 'company))
   :defer t
   :init
   (progn
@@ -7550,6 +7551,40 @@ fix this issue."
 (use-package puppetfile-mode
   :ensure t
   :defer t)
+
+
+;;; Finance
+(dotemacs-defvar-company-backends ledger-mode)
+
+(use-package ledger-mode
+  :mode ("\\.\\(ledger\\|ldg\\)\\'" . ledger-mode)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (after "flycheck"
+      '(require 'flycheck-ledger))
+
+    (after "company"
+      (dotemacs-add-company-hook ledger-mode))
+
+    (setq ledger-post-amount-alignment-column 62)
+    (push 'company-capf company-backends-ledger-mode)
+    (evil-leader/set-key-for-mode 'ledger-mode
+      "mhd"   'ledger-delete-current-transaction
+      "ma"    'ledger-add-transaction
+      "mb"    'ledger-post-edit-amount
+      "mc"    'ledger-toggle-current
+      "mC"    'ledger-mode-clean-buffer
+      "ml"    'ledger-display-ledger-stats
+      "mp"    'ledger-display-balance-at-point
+      "mq"    'ledger-post-align-xact
+      "mr"    'ledger-reconcile
+      "mR"    'ledger-report
+      "mt"    'ledger-insert-effective-date
+      "my"    'ledger-set-year
+      "m RET" 'ledger-set-month)
+    (evilify ledger-report-mode ledger-report-mode-map)))
 
 
 ;;; Misc
