@@ -5867,18 +5867,35 @@ fix this issue."
   ;; Always follow symlinks to files in VCS repos
   (setq vc-follow-symlinks t))
 
+(use-package diff-mode
+  :defer t
+  :ensure t
+  :config
+  (evilify diff-mode diff-mode-map
+           "j" 'diff-hunk-next
+           "k" 'diff-hunk-prev))
+
 (use-package diff-hl                    ; Highlight hunks in fringe
   :ensure t
   :defer t
-  :init (progn
-          ;; Highlight changes to the current file in the fringe
-          (global-diff-hl-mode)
-          ;; Highlight changed files in the fringe of Dired
-          (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  :init
+  (progn
+    (setq diff-hl-side 'right)
+    ;; Highlight changes to the current file in the fringe
+    (global-diff-hl-mode)
+    ;; Highlight changed files in the fringe of Dired
+    (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
 
-          ;; Fall back to the display margin, if the fringe is unavailable
-          (unless (display-graphic-p)
-            (diff-hl-margin-mode))))
+    ;; Fall back to the display margin, if the fringe is unavailable
+    (unless (display-graphic-p)
+      (setq diff-hl-side 'left)
+      (diff-hl-margin-mode))
+
+    (evil-leader/set-key
+        "ghr" 'diff-hl-revert-hunk
+        "ghN" 'diff-hl-previous-hunk
+        "ghn" 'diff-hl-next-hunk
+        "ghg" 'diff-hl-diff-goto-hunk)))
 
 ;; magit
 (use-package init-magit
