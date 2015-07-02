@@ -640,7 +640,6 @@ FEATURE may be a named feature or a file name, see
 
 (use-package init-eshell
   :load-path "config/"
-  :defer t
   :commands (dotemacs-new-eshell-split
              dotemacs-eshell-prompt
              dotemacs-current-git-branch))
@@ -1276,7 +1275,7 @@ mouse-3: go to end"))))
   :config
   (progn
     ; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-    (add-to-list 'initial-frame-alist '(width . 120))
+    (add-to-list 'initial-frame-alist '(width . 90))
     (add-to-list 'initial-frame-alist '(height . 72))))
 
 (use-package init-buffers          ; Personal buffer tools
