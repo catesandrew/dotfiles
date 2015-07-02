@@ -571,13 +571,6 @@ FEATURE may be a named feature or a file name, see
             my-buffer-to-unix-format
             my-buffer-to-dos-format))
 
-(use-package init-eshell
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-new-eshell-split
-             dotemacs-eshell-prompt
-             dotemacs-current-git-branch))
-
 (use-package init-funcs
   :load-path "config/")
 
