@@ -4100,39 +4100,233 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Python
-(use-package python
-  :defer t
-  :config
-  (progn
-    ;; PEP 8 compliant filling rules, 79 chars maximum
-    (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
-    (add-hook 'python-mode-hook #'subword-mode)
+(dotemacs-defvar-company-backends python-mode)
+(dotemacs-defvar-company-backends inferior-python-mode)
+(dotemacs-defvar-company-backends pip-requirements-mode)
 
-    (let ((ipython (executable-find "ipython")))
-
-      (if ipython
-          (setq python-shell-interpreter ipython)
-        (warn "IPython is missing, falling back to default python")))))
+(use-package init-python
+  :load-path "config/")
 
 (use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
   :load-path "config/"
   :commands (flycheck-virtualenv-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
 
-(use-package anaconda-mode              ; Powerful Python backend for Emacs
-  :ensure t
+(use-package cython-mode
   :defer t
-  :init (add-hook 'python-mode-hook #'anaconda-mode))
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'cython-mode
+      "mhh" 'anaconda-mode-view-doc
+      "mgg"  'anaconda-mode-goto)))
+
+(use-package anaconda-mode              ; Powerful Python backend for Emacs
+  :defer t
+  :init (add-hook 'python-mode-hook #'anaconda-mode)
+  :config
+  (progn
+    (after "evil-jumper"
+      (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)
+        (evil-jumper--push)))
+    (evil-leader/set-key-for-mode 'python-mode
+      "mhh" 'anaconda-mode-view-doc
+      "mgg"  'anaconda-mode-goto))
+  :diminish anaconda-mode)
 
 (use-package company-anaconda           ; Python backend for Company
   :ensure t
+  :if (eq dotemacs-completion-engine 'company)
   :defer t
-  :init (after "company"
-          (add-to-list 'company-backends 'company-anaconda)))
+  :init
+  (progn
+    (after "company"
+      ; (add-to-list 'company-backends 'company-anaconda) old-way
+      (add-to-list 'company-backends company-backends-python-mode))))
 
 (use-package pip-requirements           ; requirements.txt files
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (after "company"
+      ;; company support
+      (push 'company-capf company-backends-pip-requirements-mode)
+      (dotemacs-add-company-hook pip-requirements-mode))))
+
+(use-package pony-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'python-mode
+      ; d*j*ango f*a*bric
+      "mjaf" 'pony-fabric
+      "mjad" 'pony-fabric-deploy
+      ; d*j*ango *f*iles
+      "mjfs" 'pony-goto-settings
+      "mjfc" 'pony-setting
+      "mjft" 'pony-goto-template
+      "mjfr" 'pony-resolve
+      ; d*j*ango *i*nteractive
+      "mjid" 'pony-db-shell
+      "mjis" 'pony-shell
+      ; d*j*ango *m*anage
+      ; not including one-off management commands like "flush" and
+      ; "startapp" even though they're implemented in pony-mode,
+      ; because this is much handier
+      "mjm" 'pony-manage
+      ; d*j*ango *r*unserver
+      "mjrd" 'pony-stopserver
+      "mjro" 'pony-browser
+      "mjrr" 'pony-restart-server
+      "mjru" 'pony-runserver
+      "mjrt" 'pony-temp-server
+      ; d*j*ango *s*outh/*s*yncdb
+      "mjsc" 'pony-south-convert
+      "mjsh" 'pony-south-schemamigration
+      "mjsi" 'pony-south-initial
+      "mjsm" 'pony-south-migrate
+      "mjss" 'pony-syncdb
+      ; d*j*ango *t*est
+      "mjtd" 'pony-test-down
+      "mjte" 'pony-test-goto-err
+      "mjto" 'pony-test-open
+      "mjtt" 'pony-test
+      "mjtu" 'pony-test-up)))
+
+(use-package pyenv-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'python-mode
+      "mvs" 'pyenv-mode-set
+      "mvu" 'pyenv-mode-unset)))
+
+(use-package pyvenv
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key-for-mode 'python-mode
+    "mV" 'pyvenv-workon))
+
+(use-package pytest
+  :defer t
+  :ensure t
+  :commands (pytest-one
+             pytest-pdb-one
+             pytest-all
+             pytest-pdb-all
+             pytest-module
+             pytest-pdb-module)
+  :init
+  (progn
+    (evil-leader/set-key-for-mode 'python-mode
+      "mTa" 'pytest-pdb-all
+      "mta" 'pytest-all
+      "mTb" 'pytest-pdb-module
+      "mtb" 'pytest-module
+      "mTt" 'pytest-pdb-one
+      "mtt" 'pytest-one
+      "mTm" 'pytest-pdb-module
+      "mtm" 'pytest-module))
+  :config (add-to-list 'pytest-project-root-files "setup.cfg"))
+
+(use-package python
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (after "stickyfunc-enhance"
+      (add-to-hooks 'python-mode-hook 'dotemacs-lazy-load-stickyfunc-enhance))
+
+    (after "eldoc"
+      (add-hook 'python-mode-hook #'eldoc-mode))
+
+    (after "company"
+      (dotemacs-add-company-hook python-mode)
+      (dotemacs-add-company-hook inferior-python-mode)
+      (push 'company-capf company-backends-inferior-python-mode)
+      (add-hook 'inferior-python-mode-hook (lambda ()
+                                             (setq-local company-minimum-prefix-length 0)
+                                             (setq-local company-idle-delay 0.5))))
+
+    (add-hook 'inferior-python-mode-hook #'inferior-python-setup-hook)
+    (add-all-to-hook 'python-mode-hook
+                     'python-default
+                     'python-setup-shell))
+  :config
+  (progn
+    ;; PEP 8 compliant filling rules, 79 chars maximum
+    (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
+    (add-hook 'python-mode-hook #'subword-mode)
+    (after "flycheck"
+      (add-hook 'python-mode-hook #'flycheck-mode))
+
+    (add-hook 'inferior-python-mode-hook 'smartparens-mode)
+    ;; add support for `ahs-range-beginning-of-defun' for python-mode
+    (after "auto-highlight-symbol"
+      '(add-to-list 'ahs-plugin-bod-modes 'python-mode))
+
+    (evil-leader/set-key-for-mode 'python-mode
+      "mcc" 'dotemacs-python-execute-file
+      "mcC" 'dotemacs-python-execute-file-focus
+      "mdb" 'python-toggle-breakpoint
+      "mri" 'python-remove-unused-imports
+      "msB" 'python-shell-send-buffer-switch
+      "msb" 'python-shell-send-buffer
+      "msF" 'python-shell-send-defun-switch
+      "msf" 'python-shell-send-defun
+      "msi" 'python-start-or-switch-repl
+      "msR" 'python-shell-send-region-switch
+      "msr" 'python-shell-send-region)
+
+    ;; the default in Emacs is M-n
+    (define-key inferior-python-mode-map (kbd "C-j") 'comint-next-input)
+    ;; the default in Emacs is M-p and this key binding overrides default C-k
+    ;; which prevents Emacs users to kill line
+    (define-key inferior-python-mode-map (kbd "C-k") 'comint-previous-input)
+    ;; the default in Emacs is M-r; C-r to search backward old output
+    ;; and should not be changed
+    (define-key inferior-python-mode-map (kbd "C-r") 'comint-history-isearch-backward)
+    ;; this key binding is for recentering buffer in Emacs
+    ;; it would be troublesome if Emacs user
+    ;; Vim users can use this key since they have other key
+    (define-key inferior-python-mode-map (kbd "C-l") 'comint-clear-buffer)
+
+    ;; add this optional key binding for Emacs user, since it is unbound
+    (define-key inferior-python-mode-map (kbd "C-c M-l") 'comint-clear-buffer)
+
+    (after "semantic"
+      (semantic/enable-semantic-mode 'python-mode)
+      (defadvice semantic-python-get-system-include-path (around semantic-python-skip-error-advice activate)
+        "Don't cause error when Semantic cannot retrieve include
+paths for Python then prevent the buffer to be switched. This
+issue might be fixed in Emacs 25. Until then, we need it here to
+fix this issue."
+        (condition-case nil
+            ad-do-it
+          (error nil))))
+
+    (after "smartparens"
+      (defadvice python-indent-dedent-line-backspace
+          (around python/sp-backward-delete-char activate)
+        (let ((pythonp (or (not smartparens-strict-mode)
+                           (char-equal (char-before) ?\s))))
+          (if pythonp
+              ad-do-it
+            (call-interactively 'sp-backward-delete-char)))))))
+
+(use-package hy-mode
   :ensure t
   :defer t)
+
+(use-package helm-pydoc
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key-for-mode 'python-mode "mhd" 'helm-pydoc))
 
 
 ;;; Ruby
