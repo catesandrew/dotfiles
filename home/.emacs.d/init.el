@@ -3438,18 +3438,6 @@ Disable the highlighting of overlong lines."
   :diminish eldoc-mode)
 
 
-;;; REST Client
-(use-package restclient                ; ReST REPL for Emacs
-  :ensure t
-  :defer t)
-
-(use-package company-restclient
-  :ensure t
-  :defer t
-  :init (after "company"
-          (add-to-list 'company-backends 'company-restclient)))
-
-
 ;;; Evil
 (use-package init-evil
   :load-path "config/")
@@ -3881,6 +3869,37 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package init-bindings
   :load-path "config/")
+
+
+;;; REST Client
+(dotemacs-defvar-company-backends restclient-mode)
+
+;; (Emacs Rocks!)[http://emacsrocks.com/e15.html]
+(use-package restclient                ; ReST REPL for Emacs
+  :mode ("\\.http\\'" . restclient-mode)
+  :ensure t
+  :defer t
+  :init
+  (progn
+
+    (defun restclient-http-send-current-raw-stay-in-window ()
+      (interactive)
+      (restclient-http-send-current t t))
+
+    (evil-leader/set-key-for-mode 'restclient-mode
+      "ms" 'restclient-http-send-current-stay-in-window
+      "mS" 'restclient-http-send-current
+      "mr" 'restclient-http-send-current-raw-stay-in-window
+      "mR" 'restclient-http-send-current-raw
+      )))
+
+(use-package company-restclient    ; restclient backend for Company
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init (after "company"
+          ; (add-to-list 'company-backends 'company-restclient) ;; old
+          (add-to-list 'company-backends company-backends-restclient-mode)))
 
 
 ;;; Emacs Lisp
