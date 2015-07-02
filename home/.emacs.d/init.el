@@ -1270,7 +1270,9 @@ mouse-3: go to end"))))
 (use-package init-buffers          ; Personal buffer tools
   :load-path "config/"
   :commands (dotemacs-force-save-some-buffers
-             dotemacs-do-not-kill-important-buffers)
+             dotemacs-do-not-kill-important-buffers
+             dotemacs-ibuffer-group-by-modes
+             dotemacs-ibuffer-group-by-projects)
   :init (progn
           (add-hook 'kill-buffer-query-functions
                     #'dotemacs-do-not-kill-important-buffers)
@@ -1292,56 +1294,20 @@ mouse-3: go to end"))))
   :defer t
   :config (setq helm-buffers-fuzzy-matching t))
 
-;; http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
 (use-package ibuffer                    ; Better buffer list
   :bind (([remap list-buffers] . ibuffer))
   ;; Show VC Status in ibuffer
   :init
   (progn
-    (add-hook 'ibuffer-hook
-              (lambda ()
-                ; (ibuffer-switch-to-saved-filter-groups "home")
-                (ibuffer-auto-mode 1)))
+    (after "evil-evilified-state"
+      (evil-leader/set-key "bB" 'ibuffer)
+      (evilify ibuffer-mode ibuffer-mode-map))
+
+    (global-set-key (kbd "C-x C-b") 'ibuffer)
+    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
+
     (setq ibuffer-expert t
-          ibuffer-show-empty-filter-groups nil))
-  :config
-  (progn
-    (setq ibuffer-formats
-          '((mark modified read-only vc-status-mini " "
-                  (name 18 18 :left :elide)
-                  " "
-                  (size 9 -1 :right)
-                  " "
-                  (mode 16 16 :left :elide)
-                  " "
-                  (vc-status 16 16 :left)
-                  " "
-                  filename-and-process)
-            (mark modified read-only " "
-                  (name 18 18 :left :elide)
-                  " "
-                  (size 9 -1 :right)
-                  " "
-                  (mode 16 16 :left :elide)
-                  " " filename-and-process)
-            (mark " "
-                  (name 16 -1)
-                  " " filename)))
-    (setq ibuffer-saved-filter-groups
-          '(("home"
-             ("emacs-config" (or (filename . ".emacs.d")
-                                 (filename . "emacs-config")))
-             ("Org" (or (mode . org-mode)
-                        (filename . "OrgMode")))
-             ("code" (filename . "code"))
-             ("Dev" (or (mode . html-mode)
-                        (mode . css-mode)))
-             ("Subversion" (name . "\*svn"))
-             ("Magit" (name . "\*magit"))
-             ("ERC" (mode . erc-mode))
-             ("Help" (or (name . "\*Help\*")
-                         (name . "\*Apropos\*")
-                         (name . "\*info\*"))))))))
+          ibuffer-show-empty-filter-groups nil)))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
@@ -1354,7 +1320,10 @@ mouse-3: go to end"))))
 
 (use-package ibuffer-projectile         ; Group buffers by Projectile project
   :ensure t
-  :defer t)
+  :defer t
+  :init
+  (progn
+    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-projects)))
 
 (use-package init-window
   :load-path "config/"
