@@ -7316,11 +7316,37 @@ fix this issue."
     (define-key help-mode-map (kbd "j") 'next-line)
     (define-key help-mode-map (kbd "k") 'previous-line)))
 
+(defvar dash-helm-dash-docset-path ""
+  "Path containing dash docsets.")
+
+(use-package helm-dash
+  :defer t
+  :ensure t
+  :if (eq system-type 'gnu/linux)
+  :init
+  (progn
+    (evil-leader/set-key "dd" 'helm-dash-at-point)
+    (evil-leader/set-key "dD" 'helm-dash))
+  :config
+  (progn
+    (defun dash//activate-package-docsets (path)
+      "Add dash docsets from specified PATH."
+      (setq helm-dash-docsets-path path
+            helm-dash-common-docsets (helm-dash-installed-docsets))
+      (message (format "activated %d docsets from: %s"
+                       (length helm-dash-common-docsets) path)))
+    (dash//activate-package-docsets dash-helm-dash-docset-path)))
+
 (use-package dash-at-point
   :ensure t
+  :if (eq system-type 'darwin)
   :defer t
   :bind (("C-c h d" . dash-at-point)
          ("C-c h D" . dash-at-point-with-docset))
+  :init
+  (progn
+    (evil-leader/set-key "dd" 'dash-at-point)
+    (evil-leader/set-key "dD" 'dash-at-point-with-docset))
   :config (add-to-list 'dash-at-point-mode-alist
                        '(swift-mode . "ios,swift")))
 
