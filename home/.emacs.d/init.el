@@ -487,15 +487,15 @@ FEATURE may be a named feature or a file name, see
           ("i" .  "insertion")
           ("j" .  "join/split")
           ("k" .  "lisp")
-          ("kd" .  "lisp-delete")
-          ("kD" .  "lisp-delete-backward")
+          ("kd" . "lisp-delete")
+          ("kD" . "lisp-delete-backward")
           ("n" .  "narrow/numbers")
           ("p" .  "projects")
-          ("p$" .  "projects/shell")
+          ("p$" . "projects/shell")
           ("q" .  "quit")
           ("r" .  "registers/rings")
           ("s" .  "search/symbol")
-          ("sw" .  "search-web")
+          ("sw" . "search-web")
           ("t" .  "toggles")
           ("tC" . "toggles-colors")
           ("th" . "toggles-highlight")
@@ -3061,30 +3061,7 @@ Disable the highlighting of overlong lines."
 
 
 
-;; Other markup languages
-(use-package rst                        ; ReStructuredText
-  :defer t
-  :config
-  ;; Indent with 3 spaces after all kinds of literal blocks
-  (setq rst-indent-literal-minimized 3
-        rst-indent-literal-normal 3)
-
-  (bind-key "C-=" nil rst-mode-map)
-  ;; For similarity with AUCTeX
-  (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
-  ;; …and with Markdown Mode
-  (bind-key "M-RET" #'rst-insert-list rst-mode-map))
-
-(use-package mustache-mode              ; Mustache mode
-  :ensure t
-  :defer t
-  :mode (("\\.mustache$" . mustache-mode)))
-
-(use-package handlebars-mode
-  :ensure t
-  :mode (("\\.hbs$" . handlebars-mode)
-         ("\\.handlebars$" . handlebars-mode)))
-
+;;; Markdown
 (use-package init-markdown
   :load-path "config/"
   :defer t)
@@ -3272,6 +3249,31 @@ Disable the highlighting of overlong lines."
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-elisp)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)))
 
+
+;; Other markup languages
+(use-package rst                        ; ReStructuredText
+  :defer t
+  :config
+  ;; Indent with 3 spaces after all kinds of literal blocks
+  (setq rst-indent-literal-minimized 3
+        rst-indent-literal-normal 3)
+
+  (bind-key "C-=" nil rst-mode-map)
+  ;; For similarity with AUCTeX
+  (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
+  ;; …and with Markdown Mode
+  (bind-key "M-RET" #'rst-insert-list rst-mode-map))
+
+(use-package mustache-mode              ; Mustache mode
+  :ensure t
+  :defer t
+  :mode (("\\.mustache$" . mustache-mode)))
+
+(use-package handlebars-mode
+  :ensure t
+  :mode (("\\.hbs$" . handlebars-mode)
+         ("\\.handlebars$" . handlebars-mode)))
+
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
   :defer t)
@@ -3286,15 +3288,6 @@ Disable the highlighting of overlong lines."
               (lambda ()
                 (electric-indent-local-mode -1)
                 (run-hooks 'prog-mode-hook))))
-
-(use-package json-mode                  ; JSON files
-  :ensure t
-  :defer t)
-
-(use-package json-reformat              ; Reformat JSON
-  :ensure t
-  :defer t
-  :bind (("C-c e j" . json-reformat-region)))
 
 (use-package graphviz-dot-mode          ; Graphviz
   :ensure t
@@ -5136,9 +5129,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'js2-mode "xmj" 'js2r-move-line-down)
     (evil-leader/set-key-for-mode 'js2-mode "xmk" 'js2r-move-line-up)))
 
-(use-package json-mode
+(use-package json-mode                  ; JSON files
+  :ensure t
+  :defer t)
+
+(use-package json-reformat              ; Reformat JSON
+  :ensure t
   :defer t
-  :ensure t)
+  :bind (("C-c e j" . json-reformat-region)))
 
 (use-package tern
   :defer t
@@ -5236,8 +5234,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t)
 
 (use-package php-extras
-  :defer t
-  :ensure t)
+  :defer t)
 
 (use-package php-mode                   ; Because sometimes you have to
   :defer t
