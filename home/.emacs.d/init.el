@@ -7289,12 +7289,6 @@ fix this issue."
     (define-key global-map "\C-cl" 'org-store-link)
     (define-key global-map "\C-ca" 'org-agenda)
 
-    ;; We add this key mapping because an Emacs user can change
-    ;; `dotemacs-major-mode-emacs-leader-key' to `C-c' and the key binding
-    ;; C-c ' is shadowed by `dotemacs-default-pop-shell', effectively making
-    ;; the Emacs user unable to exit src block editing.
-    (define-key org-src-mode-map (kbd (concat dotemacs-major-mode-emacs-leader-key " '")) 'org-edit-src-exit)
-
     (evil-leader/set-key
       "Cc" 'org-capture)))
 
@@ -7690,6 +7684,73 @@ fix this issue."
     (setq google-translate-show-phonetic t)
     (setq google-translate-default-source-language "En")
     (setq google-translate-default-target-language "Sp")))
+
+;; search engine
+(use-package engine-mode
+  :commands (defengine dotemacs-search-engine-select)
+  :ensure t
+  :defines search-engine-alist
+  :init
+  (evil-leader/set-key
+    "a/" 'dotemacs-search-engine-select)
+  (setq search-engine-alist
+        '((amazon
+           :name "Amazon"
+           :url "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%%3Daps&field-keywords=%s")
+          (duck-duck-go
+           :name "Duck Duck Go"
+           :url "https://duckduckgo.com/?q=%s")
+          (google
+           :name "Google"
+           :url "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
+          (google-images
+           :name "Google Images"
+           :url "http://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
+          (github
+           :name "Github"
+           :url "https://github.com/search?ref=simplesearch&q=%s")
+          (google-maps
+           :name "Google Maps"
+           :url "http://maps.google.com/maps?q=%s")
+          (twitter
+           :name "Twitter"
+           :url "https://twitter.com/search?q=%s")
+          (project-gutenberg
+           :name "Project Gutenberg"
+           :url "http://www.gutenberg.org/ebooks/search.html/?format=html&default_prefix=all&sort_order=&query=%s")
+          (youtube
+           :name "YouTube"
+           :url "http://www.youtube.com/results?aq=f&oq=&search_query=%s")
+          (stack-overflow
+           :name "Stack Overflow"
+           :url "https://stackoverflow.com/search?q=%s")
+          (wikipedia
+           :name "Wikipedia"
+           :url "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s")
+          (wolfram-alpha
+           :name "Wolfram Alpha"
+           :url "http://www.wolframalpha.com/input/?i=%s")))
+  :config
+  (engine-mode t)
+  (mapcar (lambda (engine)
+            (let* ((cur-engine (car engine))
+                   (engine-url (plist-get (cdr engine) :url)))
+              (eval `(defengine ,cur-engine ,engine-url))))
+          search-engine-alist)
+  (defun dotemacs-search-engine-source (engines)
+    "return a source for helm selection"
+    `((name . "Search Engines")
+      (candidates . ,(mapcar (lambda (engine)
+                               (cons (plist-get (cdr engine) :name)
+                                     (intern (format "engine/search-%S"
+                                                     (car engine)))))
+                             engines))
+      (action . (lambda (candidate) (call-interactively candidate)))))
+  (defun dotemacs-search-engine-select ()
+    "set search engine to use"
+    (interactive)
+    (helm :sources (list (dotemacs-search-engine-source
+                          search-engine-alist)))))
 
 ;; vagrant
 (use-package vagrant
