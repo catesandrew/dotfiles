@@ -340,6 +340,18 @@ to complet without blocking common line endings."
   "If non nil some feedback are displayed in tooltips."
   :group 'dotemacs-s)
 
+;; buffer settings
+(defgroup dotemacs-ibuffer nil
+  "Configuration options for ibuffer"
+  :group 'dotemacs
+  :prefix 'dotemacs-ibuffer)
+
+(defcustom dotemacs-ibuffer-group-buffers-by 'modes
+  "If non nil ibuffer will group the buffers according to the passed symbol.
+The supported values are `modes' to group by major-modes and `projects' to
+group by projectile projects."
+  :group 'dotemacs-ibuffer)
+
 ;;helm
 (defface dotemacs-helm-navigation-ms-face
       `((t :background ,(face-attribute 'error :foreground) :foreground "black"))

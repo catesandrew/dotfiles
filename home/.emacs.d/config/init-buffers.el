@@ -16,11 +16,6 @@ Add this to `kill-buffer-query-functions'."
   "Save all modified buffers, without prompts."
   (save-some-buffers 'dont-ask))
 
-(defvar ibuffer-group-buffers-by 'modes
-  "If non nil ibuffer will group the buffers according to the passed symbol.
-The supported values are `modes' to group by major-modes and `projects' to
-group by projectile projects.")
-
 (defun dotemacs-ibuffer-get-major-modes-ibuff-rules-list (mm-list result-list)
   (if mm-list
       (let* ((cur-mm (car mm-list))
@@ -59,14 +54,14 @@ group by projectile projects.")
 
 (defun dotemacs-ibuffer-group-by-projects ()
   "Group buffers by projects."
-  (when (eq 'projects ibuffer-group-buffers-by)
+  (when (eq 'projects dotemacs-ibuffer-group-buffers-by)
     (ibuffer-projectile-set-filter-groups)
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
 (defun dotemacs-ibuffer-group-by-modes ()
   "Group buffers by modes."
-  (when (eq 'modes ibuffer-group-buffers-by)
+  (when (eq 'modes dotemacs-ibuffer-group-buffers-by)
     (dotemacs-ibuffer-create-buffs-group)))
 
 (provide 'init-buffers)
