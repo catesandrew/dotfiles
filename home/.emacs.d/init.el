@@ -5184,6 +5184,31 @@ fix this issue."
   :ensure t
   :defer t)
 
+;;; PureScript
+(use-package purescript-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
+    (evil-leader/set-key-for-mode 'purescript-mode
+      "mi="  'purescript-mode-format-imports
+      "mi`"  'purescript-navigate-imports-return
+      "mia"  'purescript-align-imports
+      "min"  'purescript-navigate-imports)))
+
+(use-package psci
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'purescript-mode-hook 'inferior-psci-mode)
+    (evil-leader/set-key-for-mode 'purescript-mode
+      "msb" 'psci/load-current-file!
+      "msi" 'psci
+      "msm" 'psci/load-module!
+      "msp" 'psci/load-project-modules!)))
+
 ;;; JavaScript
 (dotemacs-defvar-company-backends js2-mode)
 
