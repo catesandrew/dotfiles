@@ -685,21 +685,33 @@ FEATURE may be a named feature or a file name, see
   :if (eq system-type 'darwin)
   :init
   (progn
-    (global-set-key (kbd "M-V") 'yank)
-    (global-set-key (kbd "M-C") 'kill-ring-save)
-    (global-set-key (kbd "M-X") 'kill-region)
-    (global-set-key (kbd "M-W") 'kill-this-buffer)
-    (global-set-key (kbd "M-Z") 'undo-tree-undo)
-    (global-set-key (kbd "M-S") 'save-buffer))
+    (after "evil-leader"
+      (evil-leader/set-key "bf" 'reveal-in-finder))
+
+    ;; this is only applicable to GUI mode
+    (when (display-graphic-p)
+      (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
+      (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
+      (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
+      (global-set-key (kbd "M-n") 'new-frame)
+      (global-set-key (kbd "M-v") 'yank)
+      (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
+      (global-set-key (kbd "M-X") 'kill-region)
+      (global-set-key (kbd "M-z") 'undo-tree-undo)
+      (global-set-key (kbd "M-Z") 'undo-tree-redo)
+      (global-set-key (kbd "M-s") 'save-buffer)))
   :config
-  (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
-                                        ; workspace
-        mac-option-modifier 'meta       ; Option is simply the natural Meta
-        mac-command-modifier 'meta      ; But command is a lot easier to hit
-        mac-right-command-modifier 'left
-        mac-right-option-modifier 'none ; Keep right option for accented input
-        ;; Just in case we ever need these keys
-        mac-function-modifier 'hyper))
+  (when (display-graphic-p)
+    (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
+                                          ; workspace
+          mac-option-key-is-meta t
+          mac-option-modifier 'meta       ; Option is simply the natural Meta
+          mac-command-key-is-meta t
+          mac-command-modifier 'meta      ; But command is a lot easier to hit
+          mac-right-command-modifier 'left
+          mac-right-option-modifier 'none ; Keep right option for accented input
+          ;; Just in case we ever need these keys
+          mac-function-modifier 'hyper)))
 
 (use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
@@ -710,23 +722,9 @@ FEATURE may be a named feature or a file name, see
              dotemacs-homebrew-prefix
              dotemacs-homebrew-installed-p
              dotemacs-open-current-file
-             dotemacs-copy-from-osx
-             dotemacs-paste-to-osx
              dotemacs-chomp
              dotemacs-get-keychain-password)
   :init
-  (progn
-    ;; Using this configuration, Emacs runs best in iTerm2.
-
-    ;; On the desktop, Emacs integrates with the OS X clipboard, so kill
-    ;; etc. copy to the clipboard, and yank copies from the clipboard.
-
-    ;; Obviously this doesn’t work in the terminal, so we need to use the
-    ;; interprogram-(cut|paste)-function variables to copy/paste. Most of
-    ;; this code gotten from this blog comment.
-    (unless (display-graphic-p)
-      (setq interprogram-cut-function 'dotemacs-paste-to-osx)
-      (setq interprogram-paste-function 'dotemacs-copy-from-osx)))
   :config
   (progn
     ;; Ignore .DS_Store files with ido mode
@@ -737,6 +735,16 @@ FEATURE may be a named feature or a file name, see
   :if (eq system-type 'darwin)
   :ensure t
   :init (osx-trash-setup))
+
+(use-package pbcopy
+  :if (and (eq system-type 'darwin) (not (display-graphic-p)))
+  :ensure t
+  :init (turn-on-pbcopy))
+
+(use-package reveal-in-finder
+  :if (eq system-type 'darwin)
+  :ensure t
+  :commands reveal-in-finder)
 
 
 ;;; User interface
@@ -1527,6 +1535,9 @@ mouse-3: go to end"))))
   :config
   ;; Use GNU ls for Emacs
   (when-let (gnu-ls (and (eq system-type 'darwin) (executable-find "gls")))
+    ;; maybe absolute or relative name of the `ls' program used by
+    ;; `insert-directory'.
+    ;; brew info coreutils
     (setq insert-directory-program gnu-ls)))
 
 (use-package tramp                      ; Access remote files
