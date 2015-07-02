@@ -1734,6 +1734,28 @@ mouse-3: go to end"))))
     (add-hook 'find-file-hook #'visual-line-mode)
     (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file))))
 
+(use-package fasd
+  :ensure t
+  :init
+  (progn
+    (global-fasd-mode 1)
+    (dotemacs-declare-prefix "fa" "fasd-find")
+
+    (defun fasd-find-file-only ()
+      (interactive)
+      (fasd-find-file -1))
+
+    (defun fasd-find-directory-only ()
+      (interactive)
+      (fasd-find-file 1))
+
+    (evil-leader/set-key "fad" 'fasd-find-directory-only)
+    (evil-leader/set-key "faf" 'fasd-find-file-only)
+    (evil-leader/set-key "fas" 'fasd-find-file)
+
+    ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
+    (setq fasd-completing-read-function 'nil)))
+
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
 (bind-key "C-c f v l" #'add-file-local-variable)
