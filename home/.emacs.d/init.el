@@ -1739,7 +1739,6 @@ mouse-3: go to end"))))
   :init
   (progn
     (global-fasd-mode 1)
-    (dotemacs-declare-prefix "fa" "fasd-find")
 
     (defun fasd-find-file-only ()
       (interactive)
@@ -1749,9 +1748,11 @@ mouse-3: go to end"))))
       (interactive)
       (fasd-find-file 1))
 
-    (evil-leader/set-key "fad" 'fasd-find-directory-only)
-    (evil-leader/set-key "faf" 'fasd-find-file-only)
-    (evil-leader/set-key "fas" 'fasd-find-file)
+    (after "evil-leader"
+      (dotemacs-declare-prefix "fa" "fasd-find")
+      (evil-leader/set-key "fad" 'fasd-find-directory-only)
+      (evil-leader/set-key "faf" 'fasd-find-file-only)
+      (evil-leader/set-key "fas" 'fasd-find-file))
 
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
@@ -7572,6 +7573,37 @@ fix this issue."
     (setq google-translate-show-phonetic t)
     (setq google-translate-default-source-language "En")
     (setq google-translate-default-target-language "Sp")))
+
+;; vagrant
+(use-package vagrant
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (dotemacs-declare-prefix "V" "vagrant")
+    (evil-leader/set-key
+      "VD" 'vagrant-destroy
+      "Ve" 'vagrant-edit
+      "VH" 'vagrant-halt
+      "Vp" 'vagrant-provision
+      "Vr" 'vagrant-resume
+      "Vs" 'vagrant-status
+      "VS" 'vagrant-suspend
+      "VV" 'vagrant-up)))
+
+(use-package vagrant-tramp
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (defvar dotemacs--vagrant-tramp-loaded nil)
+    (defadvice vagrant-tramp-term (before dotemacs-load-vagrant activate)
+      "Lazy load vagrant-tramp."
+      (unless dotemacs--vagrant-tramp-loaded
+        (vagrant-tramp-enable)
+        (setq dotemacs--vagrant-tramp-loaded t)))
+    (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
+
 
 ;; Local Variables:
 ;; coding: utf-8
