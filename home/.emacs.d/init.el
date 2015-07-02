@@ -481,7 +481,6 @@ FEATURE may be a named feature or a file name, see
 
 
 ;;; Key Binding Init
-
 (after "evil-leader"
   ;; We define prefix commands only for the sake of guide-key
   (setq dotemacs-key-binding-prefixes
@@ -496,6 +495,8 @@ FEATURE may be a named feature or a file name, see
           ("f" .  "files")
           ("fe" . "files-emacs/dotemacs")
           ("g" .  "git/versions-control")
+          ("gf" . "file")
+          ("gg" . "gist")
           ("h" .  "helm/help/highlight")
           ("hd" . "help-describe")
           ("i" .  "insertion")
@@ -5860,7 +5861,6 @@ fix this issue."
 
 
 ;;; Version control
-
 (use-package vc-hooks                   ; Simple version control
   :defer t
   :config
@@ -6031,9 +6031,16 @@ fix this issue."
   :diminish magit-auto-revert-mode)
 
 (use-package magit-gh-pulls
-  :ensure t
   :defer t
-  :init (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls))
+  :defer t
+  :init
+  (progn
+    (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls)
+    (after "magit"
+      '(progn
+         (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode)
+         (define-key magit-mode-map "#gf" 'dotemacs-fetch-gh-pulls-mode))))
+  :diminish (magit-gh-pulls-mode . "Github-PR"))
 
 (use-package magit-gitflow
   :ensure t
@@ -6051,6 +6058,7 @@ fix this issue."
     (evil-define-key 'emacs magit-status-mode-map
       "N" 'magit-key-mode-popup-svn)))
 
+;; git
 (use-package git-commit-mode            ; Git commit message mode
   :ensure t
   :defer t
@@ -6125,6 +6133,68 @@ fix this issue."
       ("N" git-timemachine-show-previous-revision)
       ("Y" git-timemachine-kill-revision)
       ("q" nil :exit t))))
+
+;; github
+(use-package gist
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evilify gist-list-menu-mode gist-list-menu-mode-map
+             "f" 'gist-fetch-current
+             "K" 'gist-kill-current
+             "o" 'gist-browse-current-url)
+
+    (evil-leader/set-key
+      "ggb" 'gist-buffer
+      "ggB" 'gist-buffer-private
+      "ggl" 'gist-list
+      "ggr" 'gist-region
+      "ggR" 'gist-region-private)))
+
+(use-package github-browse-file
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key
+    "gfb" 'github-browse-file))
+
+(use-package git-link
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key
+      "gfl" 'git-link
+      "gfL" 'dotemacs-git-link-copy-url-only
+      "gfc" 'git-link-commit
+      "gfC" 'dotemacs-git-link-commit-copy-url-only)
+
+    ;; default is to open the generated link
+    (setq git-link-open-in-browser t))
+  :config
+  (progn
+
+    (defun git-link-ibaset (hostname dirname filename branch commit start end)
+      (format "https://git.ibaset.com/%s/blob/%s/%s#%s"
+        dirname
+        (or branch commit)
+        filename
+        (if (and start end)
+            (format "L%s-L%s" start end)
+          (format "L%s" start))))
+
+    (defun git-link-commit-ibaset (hostname dirname commit)
+      (format "https://git.ibaset.com/%s/commit/%s" dirname commit))
+
+    (add-to-list 'git-link-remote-alist
+      '("git.ibaset.com" git-link-github))
+    (add-to-list 'git-link-commit-remote-alist
+      '("git.ibaset.com" git-link-commit-github))
+    (add-to-list 'git-link-remote-alist
+      '("andrew.git.ibaset.com" git-link-ibaset))
+    (add-to-list 'git-link-commit-remote-alist
+      '("andrew.git.ibaset.com" git-link-commit-ibaset))))
 
 
 ;;; Search
