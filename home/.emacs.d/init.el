@@ -7135,84 +7135,117 @@ fix this issue."
 
 
 ;;; Org Mode
+(use-package init-org
+  :load-path "config/")
+
 (use-package org-plus-contrib
+  :mode ("\\.org$" . org-mode)
   :ensure t
   :defer t
-  :mode ("\\.org$" . org-mode)
   :init
   (progn
     (setq org-replace-disputed-keys t ;; Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
           org-src-fontify-natively t ;; Fontify org-mode code blocks
           org-log-done t
+          org-startup-with-inline-images t
           org-startup-indented t)
 
+    (after "org-indent"
+      '(diminish org-indent-mode))
+
     (add-hook 'org-load-hook
-              (lambda ()
-                (unless (file-exists-p org-directory)
-                  (make-directory org-directory))
+      (lambda ()
+        (unless (file-exists-p org-directory)
+          (make-directory org-directory))
 
-                (setq my-inbox-org-file (concat org-directory "/inbox.org")
-                      org-indent-indentation-per-level 2
-                      org-use-fast-todo-selection t
-                      org-completion-use-ido t
-                      org-treat-S-cursor-todo-selection-as-state-change nil
-                      org-agenda-files `(,org-directory))
+        (setq my-inbox-org-file (concat org-directory "/inbox.org")
+              org-indent-indentation-per-level 2
+              org-use-fast-todo-selection t
+              org-completion-use-ido t
+              org-treat-S-cursor-todo-selection-as-state-change nil
+              org-agenda-files `(,org-directory))
 
-                (setq org-capture-templates
-                      '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
-                         "* TODO %?\n%U\n%a\n")
-                        ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
-                         "* %? :NOTE:\n%U\n%a\n")
-                        ("m" "Meeting" entry (file my-inbox-org-file)
-                         "* MEETING %? :MEETING:\n%U")
-                        ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
-                         "* %?\n%U\n")))
+        (setq org-capture-templates
+              '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
+                 "* TODO %?\n%U\n%a\n")
+                ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
+                 "* %? :NOTE:\n%U\n%a\n")
+                ("m" "Meeting" entry (file my-inbox-org-file)
+                 "* MEETING %? :MEETING:\n%U")
+                ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
+                 "* %?\n%U\n")))
 
-                ;; org-mode colors
-                (setq org-todo-keyword-faces
-                      '(
-                        ("INPR" . (:foreground "yellow" :weight bold))
-                        ("DONE" . (:foreground "green" :weight bold))
-                        ("IMPEDED" . (:foreground "red" :weight bold))
-                        ))
-
-                (setq org-refile-targets '((nil :maxlevel . 9)
-                              (org-agenda-files :maxlevel . 9)))
-
-                (setq org-todo-keywords
-                      '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
-                        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
-
-                (setq org-todo-state-tags-triggers
-                      ' (("CANCELLED" ("CANCELLED" . t))
-                         ("WAITING" ("WAITING" . t))
-                         ("TODO" ("WAITING") ("CANCELLED"))
-                         ("NEXT" ("WAITING") ("CANCELLED"))
-                         ("DONE" ("WAITING") ("CANCELLED"))))
-
+        ;; org-mode colors
+        (setq org-todo-keyword-faces
+              '(
+                ("INPR" . (:foreground "yellow" :weight bold))
+                ("DONE" . (:foreground "green" :weight bold))
+                ("IMPEDED" . (:foreground "red" :weight bold))
                 ))
+
+        (setq org-refile-targets '((nil :maxlevel . 9)
+                      (org-agenda-files :maxlevel . 9)))
+
+        (setq org-todo-keywords
+              '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
+                (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
+
+        (setq org-todo-state-tags-triggers
+              ' (("CANCELLED" ("CANCELLED" . t))
+                 ("WAITING" ("WAITING" . t))
+                 ("TODO" ("WAITING") ("CANCELLED"))
+                 ("NEXT" ("WAITING") ("CANCELLED"))
+                 ("DONE" ("WAITING") ("CANCELLED"))))))
+
+    (defmacro dotemacs-org-emphasize (fname char)
+      "Make function for setting the emphasis in org mode"
+      `(defun ,fname () (interactive)
+              (org-emphasize ,char)))
 
     (after "evil-leader"
       (evil-leader/set-key-for-mode 'org-mode
+        "m'" 'org-edit-special
         "mc" 'org-capture
         "md" 'org-deadline
         "me" 'org-export-dispatch
         "mf" 'org-set-effort
-        "mi" 'org-clock-in
-        "mj" 'helm-org-in-buffer-headings
-        "mo" 'org-clock-out
-        "mm" 'org-ctrl-c-ctrl-c
-        "mq" 'org-clock-cancel
-        "mr" 'org-refile
-        "ms" 'org-schedule))
+
+        ;; headings
+        "mhi" 'org-insert-heading-after-current
+        "mhI" 'org-insert-heading
+
+        "mI" 'org-clock-in
+        (if dotemacs-major-mode-leader-key
+            (concat "m" dotemacs-major-mode-leader-key)
+          "m,") 'org-ctrl-c-ctrl-c
+          "mn" 'org-narrow-to-subtree
+          "mN" 'widen
+          "mO" 'org-clock-out
+          "mq" 'org-clock-cancel
+          "mR" 'org-refile
+          "ms" 'org-schedule
+
+          ;; insertion of common elements
+          "mil" 'org-insert-link
+          "mif" 'org-footnote-new
+          "mik" 'dotemacs-insert-keybinding-org
+
+          ;; images and other link types have no commands in org mode-line
+          ;; could be inserted using yasnippet?
+          ;; region manipulation
+          "mxb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
+          "mxc" (dotemacs-org-emphasize dotemacs-org-code ?~)
+          "mxi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
+          "mxr" (dotemacs-org-emphasize dotemacs-org-clear ? )
+          "mxs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
+          "mxu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
+          "mxv" (dotemacs-org-emphasize dotemacs-org-verbose ?=)))
 
     (require 'ox-md)
     (require 'ox-ascii)
     (require 'ox-confluence)
     (require 'ox-html)
     (require 'org-bullets)
-
-    (after "evil" (add-hook 'org-capture-mode-hook #'evil-emacs-state))
 
     (after "org-agenda"
       '(progn
@@ -7227,9 +7260,24 @@ fix this issue."
          )))
   :config
   (progn
+    (font-lock-add-keywords
+     'org-mode '(("\\(@@html:<kbd>@@\\) \\(.*\\) \\(@@html:</kbd>@@\\)"
+                  (1 font-lock-comment-face prepend)
+                  (2 font-lock-function-name-face)
+                  (3 font-lock-comment-face prepend))))
+
     (require 'org-indent)
     (define-key global-map "\C-cl" 'org-store-link)
-    (define-key global-map "\C-ca" 'org-agenda)))
+    (define-key global-map "\C-ca" 'org-agenda)
+
+    ;; We add this key mapping because an Emacs user can change
+    ;; `dotemacs-major-mode-emacs-leader-key' to `C-c' and the key binding
+    ;; C-c ' is shadowed by `dotemacs-default-pop-shell', effectively making
+    ;; the Emacs user unable to exit src block editing.
+    (define-key org-src-mode-map (kbd (concat dotemacs-major-mode-emacs-leader-key " '")) 'org-edit-src-exit)
+
+    (evil-leader/set-key
+      "Cc" 'org-capture)))
 
 (use-package org-bullets
   :ensure t
@@ -7255,8 +7303,8 @@ fix this issue."
         "mgt" 'ort/goto-todos))))
 
 (use-package evil-org
-  :disabled t
   :commands evil-org-mode
+  :ensure t
   :init
   (add-hook 'org-mode-hook 'evil-org-mode)
   :config
@@ -7264,12 +7312,46 @@ fix this issue."
     (after "evil-leader"
       (evil-leader/set-key-for-mode 'org-mode
         "a" nil "ma" 'org-agenda
+        "b" nil "mb" 'org-tree-to-indirect-buffer
         "c" nil "mA" 'org-archive-subtree
         "o" nil "mC" 'evil-org-recompute-clocks
         "l" nil "ml" 'evil-org-open-links
-        "t" nil "mt" 'org-show-todo-tree)))
+        "t" nil "mt" 'org-show-todo-tree))
+      (evil-define-key 'normal evil-org-mode-map
+        "O" 'evil-open-above))
   :diminish (evil-org-mode . " ⓔ"))
 
+(use-package org-pomodoro
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (when (system-is-mac)
+      (setq org-pomodoro-audio-player "/usr/bin/afplay"))
+    (evil-leader/set-key-for-mode 'org-mode
+      "mp" 'org-pomodoro)))
+
+(use-package org-present
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (after "evil-evilified-state"
+      (evilify nil org-present-mode-keymap
+        "h" 'org-present-prev
+        "l" 'org-present-next
+        "q" 'org-present-quit))
+    (add-hook 'org-present-mode-hook 'dotemacs-org-present-start)
+    (add-hook 'org-present-mode-quit-hook 'dotemacs-org-present-end)))
+
+(use-package toc-org
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook 'toc-org-enable))
+
+(use-package htmlize
+  :ensure t
+  :defer t)
 
 ;;; Online Help
 (use-package find-func                  ; Find function/variable definitions
