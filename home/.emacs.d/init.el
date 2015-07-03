@@ -537,6 +537,7 @@ FEATURE may be a named feature or a file name, see
           ("r" .  "registers/rings")
           ("s" .  "search/symbol")
           ("sw" . "search-web")
+          ("S" .  "spelling")
           ("t" .  "toggles")
           ("tC" . "toggles-colors")
           ("th" . "toggles-highlight")
@@ -2351,66 +2352,8 @@ Disable the highlighting of overlong lines."
                                         ; navigation
   :diminish highlight-symbol-mode)
 
-(use-package init-yasnippet
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-load-yasnippet
-             dotemacs-auto-yasnippet-expand
-             dotemacs-force-yasnippet-off))
-
-;; Command Prefixes
-(after "evil-leader"
-  (dotemacs-declare-prefix "S" "spelling"))
-
-(use-package ispell                     ; Spell checking
-  :defer t
-  :config
-  (progn
-    (setq ispell-program-name
-          (or (executable-find "aspell")
-              (executable-find "hunspell"))
-
-          ; ispell-extra-args '("--sug-mode=ultra")
-          ispell-dictionary "en_US"     ; Default dictionnary
-          ispell-silently-savep t       ; Don't ask when saving the private dict
-          ;; Increase the height of the choices window to take our header line
-          ;; into account.
-          ispell-choices-win-default-height 5)
-
-    (unless ispell-program-name
-      (warn "No spell checker available. Install Hunspell or ASpell."))))
-
-(use-package flyspell                   ; On-the-fly spell checking
-  :bind (("C-c u f s" . flyspell-mode))
-  :defer t
-  :init
-  (progn
-    (dolist (hook '(markdown-mode-hook text-mode-hook message-mode-hook org-mode-hook))
-      (add-hook hook '(lambda () (flyspell-mode 1))))
-    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
-    (setq flyspell-use-meta-tab nil
-          flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
-          flyspell-issue-message-flag nil)
-
-    (after "evil-leader"
-      (dotemacs-add-toggle spelling-checking
-                           :status flyspell-mode
-                           :on (flyspell-mode)
-                           :off (flyspell-mode -1)
-                           :documentation
-                           "Enable flyspell for automatic spelling checking."
-                           :evil-leader "tS")))
-  :config
-  (progn
-    ;; Free C-M-i for completion
-    (define-key flyspell-mode-map "\M-\t" nil)
-    ;; Undefine mouse buttons which get in the way
-    (define-key flyspell-mouse-map [down-mouse-2] nil)
-    (define-key flyspell-mouse-map [mouse-2] nil)
-    (flyspell-prog-mode))
-  :diminish (flyspell-mode . " Ⓢ"))
-
+
+;;; Syntax Checking
 (use-package init-flycheck         ; Personal Flycheck helpers
   :load-path "config/"
   :defer t
@@ -2511,18 +2454,71 @@ Disable the highlighting of overlong lines."
 
 (use-package flycheck-pos-tip
   :ensure t
-; ;; flycheck errors on a tooltip (doesnt work on console)
+  ;; flycheck errors on a tooltip (doesnt work on console)
   :if (and dotemacs-s-syntax-checking-enable-tooltips (display-graphic-p))
   :defer t
   :init
   (setq flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
 
+(use-package ispell                     ; Spell checking
+  :defer t
+  :config
+  (progn
+    (setq ispell-program-name
+          (or (executable-find "aspell")
+              (executable-find "hunspell"))
+
+          ; ispell-extra-args '("--sug-mode=ultra")
+          ispell-dictionary "en_US"     ; Default dictionnary
+          ispell-silently-savep t       ; Don't ask when saving the private dict
+          ;; Increase the height of the choices window to take our header line
+          ;; into account.
+          ispell-choices-win-default-height 5)
+
+    (unless ispell-program-name
+      (warn "No spell checker available. Install Hunspell or ASpell."))))
+
+(use-package flyspell                   ; On-the-fly spell checking
+  :bind (("C-c u f s" . flyspell-mode))
+  :defer t
+  :init
+  (progn
+    (dolist (hook '(markdown-mode-hook text-mode-hook message-mode-hook org-mode-hook))
+      (add-hook hook '(lambda () (flyspell-mode 1))))
+    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
+    (setq flyspell-use-meta-tab nil
+          flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
+          flyspell-issue-message-flag nil)
+
+    (after "evil-leader"
+      (dotemacs-add-toggle spelling-checking
+                           :status flyspell-mode
+                           :on (flyspell-mode)
+                           :off (flyspell-mode -1)
+                           :documentation
+                           "Enable flyspell for automatic spelling checking."
+                           :evil-leader "tS")))
+  :config
+  (progn
+    ;; Undefine mouse buttons which get in the way
+    (define-key flyspell-mouse-map [down-mouse-2] nil)
+    (define-key flyspell-mouse-map [mouse-2] nil)
+    (flyspell-prog-mode))
+  :diminish (flyspell-mode . " Ⓢ"))
+
 (use-package helm-flycheck
   :ensure t
-  :bind (("C-c ! L" . helm-flycheck)))
+  :commands helm-flycheck
+  :init (evil-leader/set-key "Sf" 'helm-flycheck))
+
+(use-package helm-flyspell
+  :ensure t
+  :commands helm-flyspell-correct
+  :init (evil-leader/set-key "Sc" 'helm-flyspell-correct))
 
 
-;; Text editing
+;;; Text editing
 (use-package tildify
   :bind (("C-c e t" . tildify-region))
   :init (dolist (hook '(markdown-mode-hook
@@ -7707,6 +7703,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (eval-after-load 'auto-complete
       '(ac-ispell-setup))
     ))
+
+(use-package init-yasnippet
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs-load-yasnippet
+             dotemacs-auto-yasnippet-expand
+             dotemacs-force-yasnippet-off))
 
 (use-package yasnippet
   :ensure t
