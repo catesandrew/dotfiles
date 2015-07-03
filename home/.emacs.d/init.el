@@ -2588,17 +2588,20 @@ Disable the highlighting of overlong lines."
       (setq reftex-cite-format 'biblatex)))
   :diminish reftex-mode)
 
-; (defun latex/post-init-flycheck ()
-;   (add-hook 'LaTeX-mode-hook 'flycheck-mode))
-;
-; (defun latex/post-init-flyspell ()
-;   (add-hook 'LaTeX-mode-hook 'flyspell-mode))
-;
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'LaTeX-mode-hook 'flycheck-mode))
+
+(dotemacs-use-package-add-hook flyspell
+  :post-init
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode))
+
 ; (defun latex/post-init-smartparens ()
 ;   (add-hook 'LaTeX-mode-hook 'smartparens-mode))
-;
-; (defun latex/post-init-yasnippet ()
-;   (add-hook 'LaTeX-mode-hook 'dotemacs-load-yasnippet))
+
+(dotemacs-use-package-add-hook yasnippet
+  :post-init
+  (add-hook 'LaTeX-mode-hook 'dotemacs-load-yasnippet))
 
 
 ;;; Markdown
@@ -4892,10 +4895,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode)))
   :mode ("\\.less\\'" . less-css-mode))
 
-; (defun html/post-init-flycheck ()
-;   (add-hook 'web-mode-hook 'flycheck-mode)
-;   (add-hook 'scss-mode-hook 'flycheck-mode)
-;   (add-hook 'sass-mode-hook 'flycheck-mode))
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'web-mode-hook 'flycheck-mode)
+    (add-hook 'scss-mode-hook 'flycheck-mode)
+    (add-hook 'sass-mode-hook 'flycheck-mode)))
 
 (use-package tagedit
   :defer t
@@ -4989,10 +4994,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                    (setq indent-line-function 'javascript/coffee-indent
                                          evil-shift-width coffee-tab-width)))))
 
-; (defun javascript/post-init-flycheck ()
-;   (add-hook 'coffee-mode-hook 'flycheck-mode)
-;   (add-hook 'js2-mode-hook    'flycheck-mode)
-;   (add-hook 'json-mode-hook   'flycheck-mode))
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'coffee-mode-hook 'flycheck-mode)
+    (add-hook 'js2-mode-hook    'flycheck-mode)
+    (add-hook 'json-mode-hook   'flycheck-mode)))
 
 (use-package js2-mode                   ; Javascript editing
   :defer t
@@ -5139,8 +5146,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Lua
 (dotemacs-defvar-company-backends lua-mode)
 
-; (defun lua/post-init-flycheck ()
-;   (add-hook 'lua-mode-hook 'flycheck-mode))
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'lua-mode-hook 'flycheck-mode))
 
 (use-package lua-mode
   :defer t
