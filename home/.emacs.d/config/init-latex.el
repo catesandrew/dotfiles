@@ -34,4 +34,20 @@ the automatic filling of the current paragraph."
   (auto-fill-mode)
   (setq auto-fill-function 'latex//autofill))
 
+(defun dotemacs-reftex-find-ams-environment-caption (environment)
+  "Find the caption of an AMS ENVIRONMENT."
+  (let ((re (rx-to-string `(and "\\begin{" ,environment "}"))))
+    ;; Go to the beginning of the label first
+    (re-search-backward re)
+    (goto-char (match-end 0)))
+  (if (not (looking-at (rx (zero-or-more space) "[")))
+      (error "Environment %s has no title" environment)
+    (let ((beg (match-end 0)))
+      ;; Move point onto the title start bracket and move over to the end,
+      ;; skipping any other brackets in between, and eventually extract the text
+      ;; between the brackets
+      (goto-char (1- beg))
+      (forward-list)
+      (buffer-substring-no-properties beg (1- (point))))))
+
 (provide 'init-latex)

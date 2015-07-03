@@ -172,6 +172,20 @@ NOERROR and NOMESSAGE are passed to `load'."
   "If non nil the `fancify-symbols' function is enabled."
   :group 'dotemacs)
 
+;; c-c++ settings
+(defgroup dotemacs-c-c++ nil
+  "Configuration options for c/c++."
+  :group 'dotemacs
+  :prefix 'dotemacs-c-c++)
+
+(defcustom dotemacs-c-c++-enable-clang-support t
+  "If non nil Clang related packages and configuration are enabled."
+  :group 'dotemacs-c-c++)
+
+(defcustom dotemacs-c-c++-default-mode-for-headers 'c-mode
+  "Default mode to open header files. Can be `c-mode' or `c++-mode'."
+  :group 'dotemacs-c-c++)
+
 ;; ruby settings
 (defgroup dotemacs-ruby nil
   "Configuration options for ruby."
@@ -600,6 +614,9 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 (use-package core-auto-completion
+  :load-path "core/")
+
+(use-package core-use-package-ext
   :load-path "core/")
 
 
@@ -2334,325 +2351,12 @@ Disable the highlighting of overlong lines."
                                         ; navigation
   :diminish highlight-symbol-mode)
 
-
-;;; Skeletons, completion and expansion
-(use-package init-auto-completions
-  :load-path "config/")
-
-(after "evil-leader"
-  (dotemacs-add-toggle auto-completion
-                       :status
-                        (if (boundp 'auto-completion-front-end)
-                            (if (eq 'company auto-completion-front-end)
-                                company-mode
-                              auto-complete-mode)
-                          ;; default completion hardcoded to be company for now
-                          (setq auto-completion-front-end 'company)
-                          nil)
-                        :on
-                        (progn
-                          (if (eq 'company auto-completion-front-end)
-                              (company-mode)
-                            (auto-complete-mode))
-                          (message "Enabled auto-completion (using %S)."
-                                   auto-completion-front-end))
-                        :off
-                        (progn
-                          (if (eq 'company auto-completion-front-end)
-                              (company-mode -1)
-                            (auto-complete-mode -1))
-                          (message "Disabled auto-completion."))
-                        :documentation "Activate auto-completion."
-                        :evil-leader "ta"))
-
-;; In `completion-at-point', do not pop up silly completion buffers for less
-;; than five candidates.  Cycle instead.
-(setq completion-cycle-threshold 5)
-
-;; tell emacs where to read abbrev
-(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
-
-(use-package init-hippie-exp       ; Custom expansion functions
-  :load-path "config/"
-  :commands (dotemacs-try-complete-lisp-symbol-without-namespace))
-
-(use-package hippie-exp                 ; Powerful expansion and completion
-  :bind (([remap dabbrev-expand] . hippie-expand))
-  :init
-  (after "yasnippet"
-    ;; Try to expand yasnippet snippets based on prefix
-    (push 'yas-hippie-try-expand hippie-expand-try-functions-list))
-  :config
-  (progn
-    ;; replace dabbrev-expand
-    (global-set-key (kbd "M-/") 'hippie-expand)
-    (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
-    (setq hippie-expand-try-functions-list '(
-          ;; Try to expand word "dynamically", searching the current buffer.
-          try-expand-dabbrev
-          ;; Try to expand word "dynamically", searching all other buffers.
-          try-expand-dabbrev-all-buffers
-          ;; Try to expand word "dynamically", searching the kill ring.
-          try-expand-dabbrev-from-kill
-          ;; Try to complete text as a file name, as many characters as unique.
-          try-complete-file-name-partially
-          ;; Try to complete text as a file name.
-          try-complete-file-name
-          ;; Try to expand word before point according to all abbrev tables.
-          try-expand-all-abbrevs
-          ;; Try to complete the current line to an entire line in the buffer.
-          try-expand-list
-          ;; Try to complete the current line to an entire line in the buffer.
-          try-expand-line
-          ;; Try to complete as an Emacs Lisp symbol, as many characters as
-          ;; unique.
-          try-complete-lisp-symbol-partially
-          ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol
-          dotemacs-try-complete-lisp-symbol-without-namespace))))
-
-(use-package company                    ; Graphical (auto-)completion
-  :ensure t
-  :defer t
-  :if (eq dotemacs-completion-engine 'company)
-  :init
-  (progn
-    (setq company-idle-delay 0.2
-          company-tooltip-align-annotations t
-          ; company-tooltip-limit 10
-          company-minimum-prefix-length 2
-          ;; invert the navigation direction if the the completion popup-isearch-match
-          ;; is displayed on top (happens near the bottom of windows)
-          ; company-tooltip-flip-when-above t
-          company-require-match nil
-          ; company-dabbrev-code-ignore-case t
-          ; company-dabbrev-code-everywhere t
-          company-show-numbers t ;; Easy navigation to candidates with M-<n>
-          company-dabbrev-ignore-case nil
-          company-dabbrev-downcase nil
-          company-frontends '(company-pseudo-tooltip-frontend)
-          company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
-          (defvar-local company-fci-mode-on-p nil)
-
-    (defun company-turn-off-fci (&rest ignore)
-      (when (boundp 'fci-mode)
-        (setq company-fci-mode-on-p fci-mode)
-        (when fci-mode (fci-mode -1))))
-
-    (defun company-maybe-turn-on-fci (&rest ignore)
-      (when company-fci-mode-on-p (fci-mode 1)))
-
-    (add-hook 'company-completion-started-hook 'company-turn-off-fci)
-    (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
-  :config
-  (progn
-    ;; key bindings
-    (defun dotemacs-company-complete-common-or-cycle-backward ()
-      "Complete common prefix or cycle backward."
-      (interactive)
-      (company-complete-common-or-cycle -1))
-
-    (dotemacs-auto-completion-set-RET-key-behavior 'company)
-    (dotemacs-auto-completion-set-TAB-key-behavior 'company)
-    (dotemacs-auto-completion-setup-key-sequence 'company)
-    (let ((map company-active-map))
-      (define-key map (kbd "C-/") 'company-search-candidates)
-      (define-key map (kbd "C-M-/") 'company-filter-candidates)
-      (define-key map (kbd "C-d") 'company-show-doc-buffer)
-      (define-key map (kbd "C-j") 'company-select-next)
-      (define-key map (kbd "C-k") 'company-select-previous)
-      (define-key map (kbd "C-l") 'company-complete-selection))
-
-    ;; Nicer looking faces
-    (custom-set-faces
-     '(company-tooltip-common
-       ((t (:inherit company-tooltip :weight bold :underline nil))))
-     '(company-tooltip-common-selection
-       ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
-
-    ;; Transformers
-    (defun dotemacs-company-transformer-cancel (candidates)
-      "Cancel completion if prefix is in the list
-`company-mode-completion-cancel-keywords'"
-      (unless (member company-prefix company-mode-completion-cancel-keywords)
-        candidates))
-    (setq company-transformers '(dotemacs-company-transformer-cancel
-                                   company-sort-by-occurrence)))
-  :diminish (company-mode . " ⓐ"))
-
-(use-package company-statistics
-  :ensure t
-  :if (and auto-completion-enable-sort-by-usage
-           (eq dotemacs-completion-engine 'company))
-  :defer t
-  :init
-  (progn
-    (setq company-statistics-file (concat dotemacs-cache-directory
-                                          "company-statistics-cache.el"))
-    (add-hook 'company-mode-hook 'company-statistics-mode)))
-
-(use-package company-quickhelp
-  :defer t
-  :disabled t
-  :if (and auto-completion-enable-help-tooltip
-           (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
-                                                  ;; is not compatible with 24.3 anymore
-           (eq dotemacs-completion-engine 'company)
-           (display-graphic-p))
-  :init (add-hook 'company-mode-hook 'company-quickhelp-mode))
-
-(use-package company-math               ; Completion for Math symbols
-  :ensure t
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init (after "company"
-          ;; Add backends for math characters
-          (add-to-list 'company-backends 'company-math-symbols-unicode)
-          (add-to-list 'company-backends 'company-math-symbols-latex)))
-
-(use-package helm-company
-  :ensure t
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init (after "company"
-          ;; Use Company for completion
-          (bind-key [remap completion-at-point] #'helm-company company-mode-map)
-          (bind-key "C-:" #'helm-company company-mode-map)
-          (bind-key "C-:" #'helm-company company-active-map)))
-
-(use-package auto-complete
-  :ensure t
-  :if (eq dotemacs-completion-engine 'auto-complete)
-  :diminish auto-complete-mode)
-
-(use-package auto-complete
-  :ensure t
-  :if (eq dotemacs-completion-engine 'auto-complete)
-  :defer t
-  :init
-  (setq ac-auto-start 0
-        ac-delay 0.2
-        ac-quick-help-delay 1.
-        ac-use-fuzzy t
-        ; ac-auto-show-menu t
-        ; ac-quick-help-height 30
-        ; ac-show-menu-immediately-on-auto-complete t
-        ; completion-ignored-extensions '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".aux" ".elf" )
-        ac-fuzzy-enable t
-        ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat")
-        ;; use 'complete when auto-complete is disabled
-        tab-always-indent 'complete
-        ac-dwim t)
-  :config
-  (progn
-    (require 'auto-complete-config)
-    (setq-default ac-sources '(ac-source-abbrev
-                               ac-source-dictionary
-                               ac-source-words-in-same-mode-buffers))
-    (after "yasnippet"
-      (push 'ac-source-yasnippet ac-sources))
-
-    (add-to-list 'completion-styles 'initials t)
-    (define-key ac-completing-map (kbd "C-j") 'ac-next)
-    (define-key ac-completing-map (kbd "C-k") 'ac-previous)
-    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous))
-  :diminish (auto-complete-mode " ⓐ" " a"))
-
-(use-package ac-ispell
-  :ensure t
-  :defer t
-  :if (eq dotemacs-completion-engine 'auto-complete)
-  :init
-  (progn
-    (setq ac-ispell-requires 4)
-    (eval-after-load 'auto-complete
-      '(ac-ispell-setup))
-    ))
-
 (use-package init-yasnippet
   :load-path "config/"
   :defer t
   :commands (dotemacs-load-yasnippet
              dotemacs-auto-yasnippet-expand
              dotemacs-force-yasnippet-off))
-
-(use-package yasnippet
-  :ensure t
-  :commands yas-global-mode
-  :init
-  (progn
-    ;; disable yas minor mode map, use hippie-expand instead
-    (setq yas-minor-mode-map (make-sparse-keymap)
-          ;; allow nested expansions
-          yas-triggers-in-field t
-          ;; add key into candidate list
-          helm-yas-display-key-on-candidate t)
-
-    ;; this makes it easy to get out of a nested expansion
-    (define-key yas-minor-mode-map
-      (kbd "M-s-/") 'yas-next-field)
-
-    (add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
-                                             markdown-mode-hook
-                                             org-mode-hook))
-
-    (after "evil-leader"
-      (dotemacs-add-toggle yasnippet
-                           :status yas-minor-mode
-                           :on (yas-minor-mode)
-                           :off (yas-minor-mode -1)
-                           :documentation "Enable yasnippet."
-                           :evil-leader "ty"))
-
-    (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
-                                                  shell-mode-hook
-                                                  eshell-mode-hook)))
-  :config
-  (progn
-    ;;  We need to know whether the smartparens was enabled, see
-    ;; `yas-before-expand-snippet-hook' below.
-    (defvar smartparens-enabled-initially t
-      "Stored whether smartparens is originally enabled or not.")
-
-    (add-hook 'yas-before-expand-snippet-hook (lambda ()
-                                                ;; If enabled, smartparens will mess snippets expanded by `hippie-expand`
-                                                (setq smartparens-enabled-initially smartparens-mode)
-                                                (smartparens-mode -1)))
-    (add-hook 'yas-after-exit-snippet-hook (lambda ()
-                                             (when smartparens-enabled-initially
-                                               (smartparens-mode 1)))))
-  :diminish (yas-minor-mode . " ⓨ" ))
-
-(use-package auto-yasnippet
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
-    (after "evil-leader"
-      (evil-leader/set-key
-        "iSc" 'aya-create
-        "iSe" 'dotemacs-auto-yasnippet-expand
-        "iSw" 'aya-persist-snippet))))
-
-(use-package helm-c-yasnippet
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-helm-yas ()
-      "Properly lazy load helm-c-yasnipper."
-      (interactive)
-      (dotemacs-load-yasnippet)
-      (require 'helm-c-yasnippet)
-      (call-interactively 'helm-yas-complete))
-    (after "evil-leader"
-      (evil-leader/set-key "is" 'dotemacs-helm-yas))
-    (setq helm-c-yas-space-match-any-greedy t)))
-
-
-;;; Spelling and syntax checking
 
 ;; Command Prefixes
 (after "evil-leader"
@@ -2920,8 +2624,10 @@ Disable the highlighting of overlong lines."
       "mv" 'TeX-view)))
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook LaTeX-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook LaTeX-mode))))
 
 (use-package company-auctex
   :if (eq dotemacs-completion-engine 'company)
@@ -2994,22 +2700,6 @@ Disable the highlighting of overlong lines."
     ;; Use a modern BibTeX dialect
     (bibtex-set-dialect 'biblatex)))
 
-(defun dotemacs-reftex-find-ams-environment-caption (environment)
-  "Find the caption of an AMS ENVIRONMENT."
-  (let ((re (rx-to-string `(and "\\begin{" ,environment "}"))))
-    ;; Go to the beginning of the label first
-    (re-search-backward re)
-    (goto-char (match-end 0)))
-  (if (not (looking-at (rx (zero-or-more space) "[")))
-      (error "Environment %s has no title" environment)
-    (let ((beg (match-end 0)))
-      ;; Move point onto the title start bracket and move over to the end,
-      ;; skipping any other brackets in between, and eventually extract the text
-      ;; between the brackets
-      (goto-char (1- beg))
-      (forward-list)
-      (buffer-substring-no-properties beg (1- (point))))))
-
 (use-package reftex                     ; TeX/BibTeX cross-reference management
   :defer t
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
@@ -3067,9 +2757,6 @@ Disable the highlighting of overlong lines."
       (setq reftex-cite-format 'biblatex)))
   :diminish reftex-mode)
 
-; (defun latex/post-init-evil-matchit ()
-;   (add-hook 'LaTeX-mode-hook 'evil-matchit-mode))
-;
 ; (defun latex/post-init-flycheck ()
 ;   (add-hook 'LaTeX-mode-hook 'flycheck-mode))
 ;
@@ -3081,7 +2768,6 @@ Disable the highlighting of overlong lines."
 ;
 ; (defun latex/post-init-yasnippet ()
 ;   (add-hook 'LaTeX-mode-hook 'dotemacs-load-yasnippet))
-
 
 
 ;;; Markdown
@@ -3712,7 +3398,11 @@ Example: (evil-map visual \"<\" \"<gv\")"
 (use-package evil-matchit
   :ensure t
   :defer t
-  :init (global-evil-matchit-mode))
+  :init
+  (progn
+    ; (global-evil-matchit-mode)
+    (dolist (hook '(LaTeX-mode-hook web-mode-hook))
+      (add-hook hook '(lambda () (evil-matchit-mode))))))
 
 (use-package evil-indent-textobject
   :ensure t
@@ -3885,19 +3575,25 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mR" 'restclient-http-send-current-raw
       )))
 
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook restclient-mode))))
+
 (use-package company-restclient    ; restclient backend for Company
-  :ensure t
   :if (eq dotemacs-completion-engine 'company)
+  :ensure t
   :defer t
-  :init (after "company"
-          ; (add-to-list 'company-backends 'company-restclient) ;; old
-          (add-to-list 'company-backends company-backends-restclient-mode)))
+  :init
+  (progn
+    (push 'company-restclient company-backends-restclient-mode)))
 
 
 ;;; Emacs Lisp
-(bind-key "C-c u d" #'toggle-debug-on-error)
-
 (dotemacs-defvar-company-backends emacs-lisp-mode)
+
+(bind-key "C-c u d" #'toggle-debug-on-error)
 
 (use-package init-elisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
@@ -4026,27 +3722,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mel" 'lisp-state-eval-sexp-end-of-line
       "m,"  'lisp-state-toggle-lisp-state
       "mtb" 'dotemacs-ert-run-tests-buffer
-      "mtq" 'ert)
+      "mtq" 'ert)))
 
-    ;; company support
-    (after "company"
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
       (push 'company-capf company-backends-emacs-lisp-mode)
       (dotemacs-add-company-hook emacs-lisp-mode))))
-
-(after "srefactor"
-  (add-hook 'emacs-lisp-mode-hook 'dotemacs-lazy-load-srefactor)
-  (use-package srefactor-lisp
-    :commands (srefactor-lisp-format-buffer
-               srefactor-lisp-format-defun
-               srefactor-lisp-format-sexp
-               srefactor-lisp-one-line)
-    :init
-    (after "evil-leader"
-      (evil-leader/set-key-for-mode 'emacs-lisp-mode
-        "m=b" 'srefactor-lisp-format-buffer
-        "m=d" 'srefactor-lisp-format-defun
-        "m=o" 'srefactor-lisp-one-line
-        "m=s" 'srefactor-lisp-format-sexp))))
 
 
 ;;; Scala
@@ -4165,25 +3848,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mgg"  'anaconda-mode-goto))
   :diminish anaconda-mode)
 
-(use-package company-anaconda           ; Python backend for Company
-  :ensure t
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (progn
-    (after "company"
-      ; (add-to-list 'company-backends 'company-anaconda) old-way
-      (add-to-list 'company-backends company-backends-python-mode))))
-
 (use-package pip-requirements           ; requirements.txt files
   :defer t
-  :ensure t
-  :init
-  (progn
-    (after "company"
-      ;; company support
-      (push 'company-capf company-backends-pip-requirements-mode)
-      (dotemacs-add-company-hook pip-requirements-mode))))
+  :ensure t)
 
 (use-package pony-mode
   :defer t
@@ -4275,14 +3942,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "eldoc"
       (add-hook 'python-mode-hook #'eldoc-mode))
 
-    (after "company"
-      (dotemacs-add-company-hook python-mode)
-      (dotemacs-add-company-hook inferior-python-mode)
-      (push 'company-capf company-backends-inferior-python-mode)
-      (add-hook 'inferior-python-mode-hook (lambda ()
-                                             (setq-local company-minimum-prefix-length 0)
-                                             (setq-local company-idle-delay 0.5))))
-
     (add-hook 'inferior-python-mode-hook #'inferior-python-setup-hook)
     (add-all-to-hook 'python-mode-hook
                      'python-default
@@ -4329,17 +3988,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; add this optional key binding for Emacs user, since it is unbound
     (define-key inferior-python-mode-map (kbd "C-c M-l") 'comint-clear-buffer)
 
-    (after "semantic"
-      (semantic/enable-semantic-mode 'python-mode)
-      (defadvice semantic-python-get-system-include-path (around semantic-python-skip-error-advice activate)
-        "Don't cause error when Semantic cannot retrieve include
-paths for Python then prevent the buffer to be switched. This
-issue might be fixed in Emacs 25. Until then, we need it here to
-fix this issue."
-        (condition-case nil
-            ad-do-it
-          (error nil))))
-
     (after "smartparens"
       (defadvice python-indent-dedent-line-backspace
           (around python/sp-backward-delete-char activate)
@@ -4358,6 +4006,28 @@ fix this issue."
   :ensure t
   :init
   (evil-leader/set-key-for-mode 'python-mode "mhd" 'helm-pydoc))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook python-mode)
+      (push 'company-capf company-backends-pip-requirements-mode)
+      (dotemacs-add-company-hook pip-requirements-mode)
+
+      (push 'company-capf company-backends-inferior-python-mode)
+      (dotemacs-add-company-hook inferior-python-mode)
+      (add-hook 'inferior-python-mode-hook (lambda ()
+                                             (setq-local company-minimum-prefix-length 0)
+                                             (setq-local company-idle-delay 0.5))))))
+
+(use-package company-anaconda           ; Python backend for Company
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init
+  (progn
+    (push 'company-anaconda company-backends-python-mode)))
 
 
 ;;; Ruby
@@ -4389,12 +4059,6 @@ fix this issue."
   (progn
     (after "flycheck"
       (add-hook 'enh-ruby-mode-hook #'flycheck-mode))
-
-    (after "company"
-      (dotemacs-add-company-hook enh-ruby-mode))
-
-    (after "company-dabbrev-code"
-      '(push 'enh-ruby-mode company-dabbrev-code-modes))
 
     (setq enh-ruby-deep-indent-paren nil
           enh-ruby-hanging-paren-deep-indent-level 2)
@@ -4486,8 +4150,7 @@ fix this issue."
   :init
   (progn
     (add-hook 'enh-ruby-mode-hook 'robe-mode)
-    (after "company"
-      ;; (add-to-list 'company-backends 'company-robe) old
+    (when (eq dotemacs-completion-engine 'company)
       (push 'company-robe company-backends-enh-ruby-mode)))
   :diminish robe-mode
   :config
@@ -4545,6 +4208,14 @@ fix this issue."
   :config
   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
   (inf-ruby-switch-setup))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook enh-ruby-mode)
+      (after "company-dabbrev-code"
+        '(push 'enh-ruby-mode company-dabbrev-code-modes)))))
 
 
 ;;; Rust
@@ -4854,28 +4525,33 @@ fix this issue."
     (define-key shm-map (kbd "C-k") nil)))
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook haskell-mode)
-    (dotemacs-add-company-hook haskell-cabal-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook haskell-mode)
+      (dotemacs-add-company-hook haskell-cabal-mode))))
 
 (use-package company-ghc
- :if (eq dotemacs-completion-engine 'company)
- :ensure t
- :defer t
- :init
- (push '(company-ghc company-dabbrev-code company-yasnippet)
-       company-backends-haskell-mode))
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push '(company-ghc company-dabbrev-code company-yasnippet)
+          company-backends-haskell-mode)))
 
 (use-package company-cabal
- :if (eq dotemacs-completion-engine 'company)
- :ensure t
- :defer t
- :init
- (push '(company-cabal)
-       company-backends-haskell-cabal-mode))
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push '(company-cabal) company-backends-haskell-cabal-mode)))
 
 
 ;;; Go
+(dotemacs-defvar-company-backends go-mode)
+
 (use-package init-go
   :commands (load-gopath-file
              go/init-go-oracle
@@ -4890,8 +4566,10 @@ fix this issue."
 (use-package go-mode
   :ensure t
   :defer t
-  :init (after "flycheck"
-          (add-hook 'go-mode-hook 'flycheck-mode))
+  :init
+  (progn
+    (after "flycheck"
+      (add-hook 'go-mode-hook 'flycheck-mode)))
   :config
   (progn
     (add-hook 'before-save-hook 'gofmt-before-save)
@@ -4914,18 +4592,24 @@ fix this issue."
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook go-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook go-mode))))
 
 (use-package company-go
   :if (eq dotemacs-completion-engine 'company)
-  :disabled t
+  :ensure t
   :defer t
   :init
-  (push 'company-go company-backends-go-mode))
+  (progn
+    (push 'company-go company-backends-go-mode)))
 
 
 ;;; C/C++
+(dotemacs-defvar-company-backends c-mode-common)
+(dotemacs-defvar-company-backends cmake-mode)
+
 (use-package init-c-c++
   :load-path "config/")
 
@@ -4933,7 +4617,7 @@ fix this issue."
   :ensure t
   :defer t
   :init
-  (add-to-list 'auto-mode-alist `("\\.h$" . ,c-c++-default-mode-for-headers))
+  (add-to-list 'auto-mode-alist `("\\.h$" . ,dotemacs-c-c++-default-mode-for-headers))
   :config
   (progn
     (require 'compile)
@@ -4947,29 +4631,38 @@ fix this issue."
 
 (use-package clang-format
   :ensure t
-  :if c-c++-enable-clang-support)
+  :if dotemacs-c-c++-enable-clang-support)
 
 (use-package cmake-mode
   :ensure t
   :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
   :init (push 'company-cmake company-backends-cmake-mode))
 
-(dotemacs-add-company-hook c-mode-common)
-(dotemacs-add-company-hook cmake-mode)
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook c-mode-common)
+      (dotemacs-add-company-hook cmake-mode)
 
-(when c-c++-enable-clang-support
-  (push 'company-clang company-backends-c-mode-common)
-  ;; .clang_complete file loading
-  ;; Sets the arguments for company-clang based on a project-specific text file.
-  (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser))
+      (when dotemacs-c-c++-enable-clang-support
+        (push 'company-clang company-backends-c-mode-common)
+        ;; .clang_complete file loading
+        ;; Sets the arguments for company-clang based on a project-specific text file.
+        (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)))))
 
 (use-package company-c-headers
- :if (eq dotemacs-completion-engine 'company)
- :defer t
- :init (push 'company-c-headers company-backends-c-mode-common))
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-c-headers company-backends-c-mode-common)))
 
-(after "flycheck"
- (add-to-hooks 'flycheck-mode '(c-mode-hook c++-mode-hook)))
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-to-hooks 'flycheck-mode '(c-mode-hook c++-mode-hook))))
 
 (use-package gdb-mi
   :ensure t
@@ -4981,22 +4674,42 @@ fix this issue."
    ;; Non-nil means display source file containing the main routine at startup
    gdb-show-main t))
 
-(after "srefactor"
-  (evil-leader/set-key-for-mode 'c-mode "mr" 'srefactor-refactor-at-point)
-  (evil-leader/set-key-for-mode 'c++-mode "mr" 'srefactor-refactor-at-point)
-  (add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)))
+(dotemacs-use-package-add-hook helm-gtags
+  :post-init
+  (progn
+    (dotemacs-helm-gtags-define-keys-for-mode 'c-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'c++-mode)))
 
-(after "stickyfunc-enhance"
- (add-to-hooks 'dotemacs-lazy-load-stickyfunc-enhance '(c-mode-hook c++-mode-hook)))
+(dotemacs-use-package-add-hook semantic
+  :post-init
+  (progn
+    (semantic/enable-semantic-mode 'c-mode)
+    (semantic/enable-semantic-mode 'c++-mode)))
 
-(after "ycmd"
-  (add-hook 'c++-mode-hook 'ycmd-mode)
-  (evil-leader/set-key-for-mode 'c++-mode
-    "mgg" 'ycmd-goto
-    "mgG" 'ycmd-goto-imprecise))
+(dotemacs-use-package-add-hook srefactor
+  :post-init
+  (progn
+    (evil-leader/set-key-for-mode 'c-mode "mr" 'srefactor-refactor-at-point)
+    (evil-leader/set-key-for-mode 'c++-mode "mr" 'srefactor-refactor-at-point)
+    (add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)) ))
 
-(after "company-ycmd"
- (push 'company-ycmd company-backends-c-mode-common))
+(dotemacs-use-package-add-hook stickyfunc-enhance
+  :post-init
+  (progn
+    (add-to-hooks 'dotemacs-lazy-load-stickyfunc-enhance '(c-mode-hook c++-mode-hook) )))
+
+(dotemacs-use-package-add-hook ycmd
+  :post-init
+  (progn
+    (add-hook 'c++-mode-hook 'ycmd-mode)
+    (evil-leader/set-key-for-mode 'c++-mode
+      "mgg" 'ycmd-goto
+      "mgG" 'ycmd-goto-imprecise)))
+
+(dotemacs-use-package-add-hook company-ycmd
+  :post-init
+  (progn
+    (push 'company-ycmd company-backends-c-mode-common)))
 
 ;;; SQL
 
@@ -5029,6 +4742,9 @@ fix this issue."
     (push "\\*cider-repl\.\+\\*" dotemacs-useful-buffers-regexp)
     (add-hook 'clojure-mode-hook 'cider-mode)
     (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+    (add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
+    (unless (version< emacs-version "24.4")
+      (add-hook 'cider-mode-hook 'subword-mode))
     (if dotemacs-smartparens-strict-mode
         (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)))
   :config
@@ -5141,18 +4857,15 @@ fix this issue."
     (when dotemacs-clojure-enable-fancify-symbols
       (dotemacs-clojure-fancify-symbols 'clojure-mode))))
 
-(add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
-
-(unless (version< emacs-version "24.4")
-  (add-hook 'cider-mode-hook 'subword-mode))
-
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (push 'company-capf company-backends-cider-mode)
-    (dotemacs-add-company-hook cider-mode)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (push 'company-capf company-backends-cider-mode)
+      (dotemacs-add-company-hook cider-mode)
 
-    (push 'company-capf company-backends-cider-repl-mode)
-    (dotemacs-add-company-hook cider-repl-mode)))
+      (push 'company-capf company-backends-cider-repl-mode)
+      (dotemacs-add-company-hook cider-repl-mode))))
 
 
 ;;; OCaml
@@ -5208,11 +4921,6 @@ fix this issue."
 (use-package css-mode
   :defer t
   :ensure t
-  :init
-  (progn
-    (push 'company-css company-backends-css-mode)
-    (after "yasnippet"
-      (add-hook 'css-mode-hook 'dotemacs-load-yasnippet)))
   :config
   (progn
     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
@@ -5221,6 +4929,11 @@ fix this issue."
 
     ;; Mark css-indent-offset as safe local variable.
     (put 'css-indent-offset 'safe-local-variable #'integerp)))
+
+(dotemacs-use-package-add-hook yasnippet
+  :post-init
+  (progn
+    (add-hook 'css-mode-hook 'dotemacs-load-yasnippet)))
 
 (use-package css-eldoc                  ; Basic Eldoc for CSS
   :ensure t
@@ -5237,8 +4950,6 @@ fix this issue."
 (use-package web-mode                   ; Template editing
   :defer t
   :ensure t
-  :init
-  (push 'company-web-html company-backends-web-mode)
   :config
   (progn
     ;; Only use smartparens in web-mode
@@ -5318,7 +5029,6 @@ fix this issue."
   (progn
     (add-hook 'web-mode-hook 'emmet-mode)
     (add-hook 'html-mode-hook 'emmet-mode)
-    ; (add-hook 'sgml-mode-hook 'emmet-mode)
     (add-hook 'css-mode-hook 'emmet-mode))
   :config
   (progn
@@ -5327,9 +5037,6 @@ fix this issue."
     (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
   :diminish emmet-mode))
-
-; (defun html/post-init-evil-matchit ()
-;   (add-hook 'web-mode-hook 'evil-matchit-mode))
 
 (use-package scss-mode
   :defer t
@@ -5373,14 +5080,20 @@ fix this issue."
   :defer t)
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook css-mode)
-    (dotemacs-add-company-hook web-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook css-mode)
+      (dotemacs-add-company-hook web-mode))))
 
 (use-package company-web
   :if (eq dotemacs-completion-engine 'company)
   :ensure t
-  :defer t)
+  :defer t
+  :init
+  (progn
+    (push 'company-css company-backends-css-mode)
+    (push 'company-web-html company-backends-web-mode)))
 
 ;;; PureScript
 (use-package purescript-mode
@@ -5412,15 +5125,15 @@ fix this issue."
 
 (use-package init-js
   :load-path "config/"
-  :commands(dotemacs-js-ctrl-c-ctrl-c
-            dotemacs-hide-test-functions
-            dotemacs-tab-properly
-            dotemacs-fetch-autolint-externs
-            dotemacs-js-jump-to
-            dotemacs-js-format-impl-name
-            dotemacs-js-format-test-name
-            dotemacs-js-jump-to-implementation-or-test
-            dotemacs-js2-mode-defaults)
+  :commands (dotemacs-js-ctrl-c-ctrl-c
+             dotemacs-hide-test-functions
+             dotemacs-tab-properly
+             dotemacs-fetch-autolint-externs
+             dotemacs-js-jump-to
+             dotemacs-js-format-impl-name
+             dotemacs-js-format-test-name
+             dotemacs-js-jump-to-implementation-or-test
+             dotemacs-js2-mode-defaults)
   :init
   (progn
     (setq dotemacs-js2-mode-hook #'dotemacs-js2-mode-defaults)
@@ -5465,42 +5178,13 @@ fix this issue."
     (setq-default js2-basic-offset 2)
     (setq js2-global-externs '("angular" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
 
-;   (add-hook 'js2-mode-hook (lambda ()
-;     (local-set-key (kbd "C-c C-c") #'dotemacs-js-ctrl-c-ctrl-c)))
-;
-;   (setq indent-tabs-mode nil
-;         tab-width 2
-;         js-indent-level 2)
-;   (setq js2-highlight-level 3)
-;   (setq js2-concat-multiline-strings (quote eol))
-;   (setq js2-include-node-externs t)
-;   (setq js2-indent-switch-body t)
-;
-;   (setq js2-allow-rhino-new-expr-initializer nil)
-;   (setq js2-auto-indent-p nil)
-;   (setq js2-enter-indents-newline nil)
-;   (setq js2-idle-timer-delay 0.8)
-;   (setq js2-indent-on-enter-key nil)
-;   (setq js2-mirror-mode nil)
-;   (setq js2-strict-inconsistent-return-warning nil)
-;   (setq js2-include-rhino-externs nil)
-;   (setq js2-include-gears-externs nil)
-;   (setq js2-rebind-eol-bol-keys nil)
-;
-;   ;; Let flycheck handle parse errors
-;   (setq js2-show-parse-errors nil)
-;   (setq js2-strict-missing-semi-warning nil)
-;   (setq js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
-
     (evil-leader/set-key-for-mode 'js2-mode "mw" 'js2-mode-toggle-warnings-and-errors)
     (evil-leader/set-key-for-mode 'js2-mode "mzc" 'js2-mode-hide-element)
     (evil-leader/set-key-for-mode 'js2-mode "mzo" 'js2-mode-show-element)
     (evil-leader/set-key-for-mode 'js2-mode "mzr" 'js2-mode-show-all)
     (evil-leader/set-key-for-mode 'js2-mode "mze" 'js2-mode-toggle-element)
     (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
-    (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)
-
-    ))
+    (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)))
 
 (use-package js2-refactor
   :defer t
@@ -5606,18 +5290,24 @@ fix this issue."
     (evil-leader/set-key-for-mode 'css-mode  "m=" 'web-beautify-css)))
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook js2-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (push 'company-capf company-backends-js2-mode)
+      (dotemacs-add-company-hook js2-mode))))
 
-(use-package company-tern
- :if (eq dotemacs-completion-engine 'company)
- :ensure t
- :defer t
- :init
- (push 'company-tern company-backends-js2-mode))
+(use-package company-tern       ; JavaScript backend for Company
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-tern company-backends-js2-mode)))
 
 
 ;;; Lua
+(dotemacs-defvar-company-backends lua-mode)
+
 ; (defun lua/post-init-flycheck ()
 ;   (add-hook 'lua-mode-hook 'flycheck-mode))
 
@@ -5636,8 +5326,11 @@ fix this issue."
     (evil-leader/set-key-for-mode 'lua-mode "msl" 'lua-send-current-line)
     (evil-leader/set-key-for-mode 'lua-mode "msr" 'lua-send-region)))
 
-; (defun lua/post-init-company ()
-;   (add-hook 'lua-mode-hook 'company-mode))
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook lua-mode))))
 
 
 ;;; PHP
@@ -5648,14 +5341,13 @@ fix this issue."
 
 ; (defun php/post-init-eldoc ()
 ;   (add-hook 'php-mode-hook 'eldoc-mode)
-;   (when (configuration-layer/package-usedp 'ggtags)
-;     (spacemacs/ggtags-enable-eldoc 'php-mode)))
+;     (dotemacs-ggtags-enable-eldoc 'php-mode))
 ;
 ; (defun php/post-init-ggtags ()
 ;   (add-hook 'php-mode-hook 'ggtags-mode))
 ;
 ; (defun php/post-init-helm-gtags ()
-;   (spacemacs/helm-gtags-define-keys-for-mode 'php-mode))
+;   (dotemacs-helm-gtags-define-keys-for-mode 'php-mode))
 
 (use-package php-auto-yasnippets
   :defer t
@@ -5677,8 +5369,10 @@ fix this issue."
   :ensure t)
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook php-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook php-mode))))
 
 
 ;;; Stylus
@@ -5721,17 +5415,24 @@ fix this issue."
 
 ;;; Racket
 
-;; this is the only thing to do to enable company in racket-mode
-;; because racket-mode handle everything for us when company
-;; is loaded.
-; (add-hook 'racket-mode-hook 'company-mode)
+(when (eq dotemacs-completion-engine 'company)
+  ;; this is the only thing to do to enable company in racket-mode
+  ;; because racket-mode handle everything for us when company
+  ;; is loaded.
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (add-hook 'racket-mode-hook 'company-mode)))
 
-;; Bug exists in Racket company backend that opens docs in new window when
-;; company-quickhelp calls it. Note hook is appendended for proper ordering.
-; (add-hook 'company-mode-hook
-;           '(lambda ()
-;              (when (equal major-mode 'racket-mode)
-;                (company-quickhelp-mode -1))) t)
+  ;; Bug exists in Racket company backend that opens docs in new window when
+  ;; company-quickhelp calls it. Note hook is appendended for proper ordering.
+  (dotemacs-use-package-add-hook company-quickhelp
+    :post-init
+    (progn
+      (add-hook 'company-mode-hook
+          '(lambda ()
+             (when (equal major-mode 'racket-mode)
+               (company-quickhelp-mode -1))) t))))
 
 (use-package init-racket
   :load-path "config/")
@@ -7570,7 +7271,7 @@ fix this issue."
           ;;
           ;; Tracking here:
           ;; https://github.com/k1LoW/emacs-ansible/issues/2
-          (after "company"
+          (when (eq dotemacs-completion-engine 'company)
             (setq ac-user-dictionary-files '()))))
 
 (use-package ansible-doc                ; Documentation lookup for Ansible
@@ -7591,6 +7292,8 @@ fix this issue."
      )))
 
 ;; Puppet
+(dotemacs-defvar-company-backends puppet-mode)
+
 (use-package puppet-mode                ; Puppet manifests
   :defer t
   :ensure t
@@ -7613,8 +7316,10 @@ fix this issue."
     )))
 
 (when (eq dotemacs-completion-engine 'company)
-  (after "company"
-    (dotemacs-add-company-hook puppet-mode)))
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook puppet-mode))))
 
 (use-package puppetfile-mode
   :ensure t
@@ -7633,11 +7338,7 @@ fix this issue."
     (after "flycheck"
       '(require 'flycheck-ledger))
 
-    (after "company"
-      (dotemacs-add-company-hook ledger-mode))
-
     (setq ledger-post-amount-alignment-column 62)
-    (push 'company-capf company-backends-ledger-mode)
     (evil-leader/set-key-for-mode 'ledger-mode
       "mhd"   'ledger-delete-current-transaction
       "ma"    'ledger-add-transaction
@@ -7654,6 +7355,12 @@ fix this issue."
       "m RET" 'ledger-set-month)
     (evilify ledger-report-mode ledger-report-mode-map)))
 
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (push 'company-capf company-backends-ledger-mode)
+      (dotemacs-add-company-hook ledger-mode))))
 
 ;;; Misc
 (use-package google-translate
@@ -7774,6 +7481,306 @@ fix this issue."
         (setq dotemacs--vagrant-tramp-loaded t)))
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
+
+;;; Skeletons, completion and expansion
+(use-package init-auto-completions
+  :load-path "config/")
+
+(after "evil-leader"
+  (dotemacs-add-toggle auto-completion
+                       :status
+                        (if (boundp 'auto-completion-front-end)
+                            (if (eq 'company auto-completion-front-end)
+                                company-mode
+                              auto-complete-mode)
+                          ;; default completion hardcoded to be company for now
+                          (setq auto-completion-front-end 'company)
+                          nil)
+                        :on
+                        (progn
+                          (if (eq 'company auto-completion-front-end)
+                              (company-mode)
+                            (auto-complete-mode))
+                          (message "Enabled auto-completion (using %S)."
+                                   auto-completion-front-end))
+                        :off
+                        (progn
+                          (if (eq 'company auto-completion-front-end)
+                              (company-mode -1)
+                            (auto-complete-mode -1))
+                          (message "Disabled auto-completion."))
+                        :documentation "Activate auto-completion."
+                        :evil-leader "ta"))
+
+;; In `completion-at-point', do not pop up silly completion buffers for less
+;; than five candidates.  Cycle instead.
+(setq completion-cycle-threshold 5)
+
+;; tell emacs where to read abbrev
+(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
+
+(use-package init-hippie-exp       ; Custom expansion functions
+  :load-path "config/"
+  :commands (dotemacs-try-complete-lisp-symbol-without-namespace))
+
+(use-package hippie-exp                 ; Powerful expansion and completion
+  :bind (([remap dabbrev-expand] . hippie-expand))
+  :init
+  (after "yasnippet"
+    ;; Try to expand yasnippet snippets based on prefix
+    (push 'yas-hippie-try-expand hippie-expand-try-functions-list))
+  :config
+  (progn
+    ;; replace dabbrev-expand
+    (global-set-key (kbd "M-/") 'hippie-expand)
+    (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
+    (setq hippie-expand-try-functions-list '(
+          ;; Try to expand word "dynamically", searching the current buffer.
+          try-expand-dabbrev
+          ;; Try to expand word "dynamically", searching all other buffers.
+          try-expand-dabbrev-all-buffers
+          ;; Try to expand word "dynamically", searching the kill ring.
+          try-expand-dabbrev-from-kill
+          ;; Try to complete text as a file name, as many characters as unique.
+          try-complete-file-name-partially
+          ;; Try to complete text as a file name.
+          try-complete-file-name
+          ;; Try to expand word before point according to all abbrev tables.
+          try-expand-all-abbrevs
+          ;; Try to complete the current line to an entire line in the buffer.
+          try-expand-list
+          ;; Try to complete the current line to an entire line in the buffer.
+          try-expand-line
+          ;; Try to complete as an Emacs Lisp symbol, as many characters as
+          ;; unique.
+          try-complete-lisp-symbol-partially
+          ;; Try to complete word as an Emacs Lisp symbol.
+          try-complete-lisp-symbol
+          dotemacs-try-complete-lisp-symbol-without-namespace))))
+
+(use-package company                    ; Graphical (auto-)completion
+  :ensure t
+  :defer t
+  :if (eq dotemacs-completion-engine 'company)
+  :init
+  (progn
+    (setq company-idle-delay 0.2
+          company-tooltip-align-annotations t
+          ; company-tooltip-limit 10
+          company-minimum-prefix-length 2
+          ;; invert the navigation direction if the the completion popup-isearch-match
+          ;; is displayed on top (happens near the bottom of windows)
+          ; company-tooltip-flip-when-above t
+          company-require-match nil
+          ; company-dabbrev-code-ignore-case t
+          ; company-dabbrev-code-everywhere t
+          company-show-numbers t ;; Easy navigation to candidates with M-<n>
+          company-dabbrev-ignore-case nil
+          company-dabbrev-downcase nil
+          company-frontends '(company-pseudo-tooltip-frontend)
+          company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+          (defvar-local company-fci-mode-on-p nil)
+
+    (defun company-turn-off-fci (&rest ignore)
+      (when (boundp 'fci-mode)
+        (setq company-fci-mode-on-p fci-mode)
+        (when fci-mode (fci-mode -1))))
+
+    (defun company-maybe-turn-on-fci (&rest ignore)
+      (when company-fci-mode-on-p (fci-mode 1)))
+
+    (add-hook 'company-completion-started-hook 'company-turn-off-fci)
+    (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
+  :config
+  (progn
+    ;; key bindings
+    (defun dotemacs-company-complete-common-or-cycle-backward ()
+      "Complete common prefix or cycle backward."
+      (interactive)
+      (company-complete-common-or-cycle -1))
+
+    (dotemacs-auto-completion-set-RET-key-behavior 'company)
+    (dotemacs-auto-completion-set-TAB-key-behavior 'company)
+    (dotemacs-auto-completion-setup-key-sequence 'company)
+    (let ((map company-active-map))
+      (define-key map (kbd "C-/") 'company-search-candidates)
+      (define-key map (kbd "C-M-/") 'company-filter-candidates)
+      (define-key map (kbd "C-d") 'company-show-doc-buffer)
+      (define-key map (kbd "C-j") 'company-select-next)
+      (define-key map (kbd "C-k") 'company-select-previous)
+      (define-key map (kbd "C-l") 'company-complete-selection))
+
+    ;; Nicer looking faces
+    (custom-set-faces
+     '(company-tooltip-common
+       ((t (:inherit company-tooltip :weight bold :underline nil))))
+     '(company-tooltip-common-selection
+       ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+
+    ;; Transformers
+    (defun dotemacs-company-transformer-cancel (candidates)
+      "Cancel completion if prefix is in the list
+`company-mode-completion-cancel-keywords'"
+      (unless (member company-prefix company-mode-completion-cancel-keywords)
+        candidates))
+    (setq company-transformers '(dotemacs-company-transformer-cancel
+                                   company-sort-by-occurrence)))
+  :diminish (company-mode . " ⓐ"))
+
+(use-package company-statistics
+  :ensure t
+  :if (and auto-completion-enable-sort-by-usage
+           (eq dotemacs-completion-engine 'company))
+  :defer t
+  :init
+  (progn
+    (setq company-statistics-file (concat dotemacs-cache-directory
+                                          "company-statistics-cache.el"))
+    (add-hook 'company-mode-hook 'company-statistics-mode)))
+
+(use-package company-quickhelp
+  :defer t
+  :disabled t
+  :if (and auto-completion-enable-help-tooltip
+           (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
+                                                  ;; is not compatible with 24.3 anymore
+           (eq dotemacs-completion-engine 'company)
+           (display-graphic-p))
+  :init (add-hook 'company-mode-hook 'company-quickhelp-mode))
+
+(use-package helm-company
+  :ensure t
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init (after "company"
+          ;; Use Company for completion
+          (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+          (bind-key "C-:" #'helm-company company-mode-map)
+          (bind-key "C-:" #'helm-company company-active-map)))
+
+(use-package auto-complete
+  :ensure t
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :diminish auto-complete-mode)
+
+(use-package auto-complete
+  :ensure t
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :defer t
+  :init
+  (setq ac-auto-start 0
+        ac-delay 0.2
+        ac-quick-help-delay 1.
+        ac-use-fuzzy t
+        ; ac-auto-show-menu t
+        ; ac-quick-help-height 30
+        ; ac-show-menu-immediately-on-auto-complete t
+        ; completion-ignored-extensions '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".aux" ".elf" )
+        ac-fuzzy-enable t
+        ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat")
+        ;; use 'complete when auto-complete is disabled
+        tab-always-indent 'complete
+        ac-dwim t)
+  :config
+  (progn
+    (require 'auto-complete-config)
+    (setq-default ac-sources '(ac-source-abbrev
+                               ac-source-dictionary
+                               ac-source-words-in-same-mode-buffers))
+    (after "yasnippet"
+      (push 'ac-source-yasnippet ac-sources))
+
+    (add-to-list 'completion-styles 'initials t)
+    (define-key ac-completing-map (kbd "C-j") 'ac-next)
+    (define-key ac-completing-map (kbd "C-k") 'ac-previous)
+    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous))
+  :diminish (auto-complete-mode " ⓐ" " a"))
+
+(use-package ac-ispell
+  :ensure t
+  :defer t
+  :if (eq dotemacs-completion-engine 'auto-complete)
+  :init
+  (progn
+    (setq ac-ispell-requires 4)
+    (eval-after-load 'auto-complete
+      '(ac-ispell-setup))
+    ))
+
+(use-package yasnippet
+  :ensure t
+  :commands yas-global-mode
+  :init
+  (progn
+    ;; disable yas minor mode map, use hippie-expand instead
+    (setq yas-minor-mode-map (make-sparse-keymap)
+          ;; allow nested expansions
+          yas-triggers-in-field t
+          ;; add key into candidate list
+          helm-yas-display-key-on-candidate t)
+
+    ;; this makes it easy to get out of a nested expansion
+    (define-key yas-minor-mode-map
+      (kbd "M-s-/") 'yas-next-field)
+
+    (add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
+                                             markdown-mode-hook
+                                             org-mode-hook))
+
+    (after "evil-leader"
+      (dotemacs-add-toggle yasnippet
+                           :status yas-minor-mode
+                           :on (yas-minor-mode)
+                           :off (yas-minor-mode -1)
+                           :documentation "Enable yasnippet."
+                           :evil-leader "ty"))
+
+    (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
+                                                  shell-mode-hook
+                                                  eshell-mode-hook)))
+  :config
+  (progn
+    ;;  We need to know whether the smartparens was enabled, see
+    ;; `yas-before-expand-snippet-hook' below.
+    (defvar smartparens-enabled-initially t
+      "Stored whether smartparens is originally enabled or not.")
+
+    (add-hook 'yas-before-expand-snippet-hook (lambda ()
+                                                ;; If enabled, smartparens will mess snippets expanded by `hippie-expand`
+                                                (setq smartparens-enabled-initially smartparens-mode)
+                                                (smartparens-mode -1)))
+    (add-hook 'yas-after-exit-snippet-hook (lambda ()
+                                             (when smartparens-enabled-initially
+                                               (smartparens-mode 1)))))
+  :diminish (yas-minor-mode . " ⓨ" ))
+
+(use-package auto-yasnippet
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
+    (after "evil-leader"
+      (evil-leader/set-key
+        "iSc" 'aya-create
+        "iSe" 'dotemacs-auto-yasnippet-expand
+        "iSw" 'aya-persist-snippet))))
+
+(use-package helm-c-yasnippet
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (defun dotemacs-helm-yas ()
+      "Properly lazy load helm-c-yasnipper."
+      (interactive)
+      (dotemacs-load-yasnippet)
+      (require 'helm-c-yasnippet)
+      (call-interactively 'helm-yas-complete))
+    (after "evil-leader"
+      (evil-leader/set-key "is" 'dotemacs-helm-yas))
+    (setq helm-c-yas-space-match-any-greedy t)))
 
 ;; Local Variables:
 ;; coding: utf-8

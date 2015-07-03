@@ -1,5 +1,3 @@
-(dotemacs-defvar-company-backends go-mode)
-
 (defun load-gopath-file(gopath name)
   "Search for NAME file in all paths referenced in GOPATH."
   (let ((paths (split-string gopath ":"))
