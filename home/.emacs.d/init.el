@@ -350,7 +350,7 @@ to complet without blocking common line endings."
   :group 'dotemacs
   :prefix 'dotemacs-s)
 
-(defcustom dotemacs-s-syntax-checking-enable-tooltips nil
+(defcustom dotemacs-s-syntax-checking-enable-tooltips t
   "If non nil some feedback are displayed in tooltips."
   :group 'dotemacs-s)
 
@@ -1833,8 +1833,6 @@ mouse-3: go to end"))))
 (put 'transient-mark-mode 'permanent-local t)
 (setq-default transient-mark-mode t)
 
-
-
 ;; Nic says eval-expression-print-level needs to be set to nil (turned off) so
 ;; that you can always see what's happening. Also remove annoying ellipsis when
 ;; printing sexp in message buffer
@@ -1976,6 +1974,7 @@ mouse-3: go to end"))))
          ("C-c e r" . align-regexp)))
 
 (use-package multiple-cursors           ; Edit text with multiple cursors
+  :disabled t
   :ensure t
   :bind (("C-c m <SPC>" . mc/vertical-align-with-space)
          ("C-c m a"     . mc/vertical-align)
@@ -2353,6 +2352,446 @@ Disable the highlighting of overlong lines."
   :diminish highlight-symbol-mode)
 
 
+;;; Evil
+(use-package init-evil
+  :load-path "config/")
+
+(use-package evil
+  :ensure t
+  :defer t
+  :init
+  (progn
+    ;; put back refresh of the cursor on post-command-hook see status of:
+    ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
+    (add-hook 'post-command-hook 'evil-refresh-cursor)
+
+    ; (add-hook 'after-change-major-mode-hook #'dotemacs-major-mode-evil-state-adjust)
+
+    ; (after "paren"
+    ;   ;; the default behavior only highlights with the point one-after the closing paren
+    ;   ;; this changes it such it will match with the point on the closing paren
+    ;   (defadvice show-paren-function (around show-paren-closing-before activate)
+    ;     (if (and (or
+    ;               (evil-normal-state-p)
+    ;               (evil-visual-state-p))
+    ;              (eq (syntax-class (syntax-after (point))) 5))
+    ;         (save-excursion
+    ;           (forward-char)
+    ;           ad-do-it)
+    ;       ad-do-it)))
+
+    (dotemacs-set-state-faces)
+
+    (set-default-evil-emacs-state-cursor)
+    (set-default-evil-evilified-state-cursor)
+    (set-default-evil-normal-state-cursor)
+    (set-default-evil-insert-state-cursor)
+    (set-default-evil-visual-state-cursor)
+    (set-default-evil-motion-state-cursor)
+    (set-default-evil-lisp-state-cursor)
+    (set-default-evil-iedit-state-cursor)
+    (set-default-evil-iedit-insert-state-cursor)
+    (set-default-evil-replace-state-cursor)
+    (set-default-evil-operator-state-cursor)
+
+    ; Don't move back the cursor one position when exiting insert mode
+    (setq evil-move-cursor-back nil)
+    ; (setq evil-search-module 'evil-search)
+    ; (setq evil-magic 'very-magic)
+
+    (evil-mode 1)
+
+    (after "evil-leader"
+      (use-package evil-evilified-state
+        :load-path "extensions/")))
+  :config
+  (progn
+    ; c-k/c-j for page down/up
+    ;
+    ; One thing that surprised me considering how complete Evil is, is the lack
+    ; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
+    ; pretty important in Emacs (it's the shortcut to give a numeric parameter to
+    ; other commands). I've in fact these mapped on my .vimrc to c-k/c-j
+    ; (because I think they're more consistent with Vim's j/k movement keys) so
+    ; that's how I mapped them in Emacs:
+    (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
+    (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
+
+    (global-set-key (kbd "C-w") 'evil-window-map)
+    (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
+    (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
+    (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
+    (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
+    (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
+
+    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
+
+    (define-key evil-normal-state-map (kbd "Q") 'my-window-killer)
+    (define-key evil-normal-state-map (kbd "Y") (kbd "y$"))
+
+    (define-key evil-visual-state-map (kbd ", e") 'eval-region)
+
+    ;; evil ex-command key
+    (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
+    (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
+    (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; Make the current definition and/or comment visible.
+    (define-key evil-normal-state-map "zf" 'reposition-window)
+    ;; toggle maximize buffer
+    (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
+    (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
+
+    (after "evil-leader"
+      (dotemacs-define-micro-state scroll
+        :doc "[k] page up [j] page down [K] half page up [J] half page down"
+        :execute-binding-on-enter t
+        :evil-leader "nn" "np" "nP" "nN"
+        :bindings
+        ;; page
+        ("k" evil-scroll-page-up)
+        ("j" evil-scroll-page-down)
+        ;; half page
+        ("K" dotemacs-scroll-half-page-up)
+        ("J" dotemacs-scroll-half-page-down))
+
+      (evil-leader/set-key "re" 'evil-show-registers))
+
+    (unless dotemacs-enable-paste-micro-state
+      (ad-disable-advice 'evil-paste-before 'after
+                         'evil-paste-before-paste-micro-state)
+      (ad-activate 'evil-paste-before)
+      (ad-disable-advice 'evil-paste-after 'after
+                         'evil-paste-after-paste-micro-state)
+      (ad-activate 'evil-paste-after)
+      (ad-disable-advice 'evil-visual-paste 'after
+                         'evil-visual-paste-paste-micro-state)
+      (ad-activate 'evil-visual-paste))
+
+    ;; butter fingers
+    (evil-ex-define-cmd "Q" 'evil-quit)
+    (evil-ex-define-cmd "Qa" 'evil-quit-all)
+    (evil-ex-define-cmd "QA" 'evil-quit-all)
+
+    (defmacro evil-map (state key seq)
+      "Map for a given STATE a KEY to a sequence SEQ of keys.
+
+Can handle recursive definition only if KEY is the first key of SEQ.
+Example: (evil-map visual \"<\" \"<gv\")"
+      (let ((map (intern (format "evil-%S-state-map" state))))
+        `(define-key ,map ,key
+           (lambda ()
+             (interactive)
+             ,(if (string-equal key (substring seq 0 1))
+                  `(progn
+                     (call-interactively ',(lookup-key evil-normal-state-map key))
+                     (execute-kbd-macro ,(substring seq 1)))
+                (execute-kbd-macro ,seq))))))
+    ;; Keep the region active when shifting
+    (evil-map visual "<" "<gv")
+    (evil-map visual ">" ">gv")
+
+    (define-key evil-normal-state-map (kbd "K") 'dotemacs-evil-smart-doc-lookup)
+
+    (define-key evil-normal-state-map
+      (kbd "gd") 'dotemacs-evil-smart-goto-definition)
+
+    ;; define text objects
+    (defmacro dotemacs-define-text-object (key name start end)
+      (let ((inner-name (make-symbol (concat "evil-inner-" name)))
+            (outer-name (make-symbol (concat "evil-outer-" name)))
+            (start-regex (regexp-opt (list start)))
+            (end-regex (regexp-opt (list end))))
+        `(progn
+           (evil-define-text-object ,inner-name (count &optional beg end type)
+             (evil-select-paren ,start-regex ,end-regex beg end type count nil))
+           (evil-define-text-object ,outer-name (count &optional beg end type)
+             (evil-select-paren ,start-regex ,end-regex beg end type count t))
+           (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
+           (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
+           (push (cons (string-to-char ,key)
+                       (if ,end
+                           (cons ,start ,end)
+                         ,start))
+                 evil-surround-pairs-alist))))
+
+    (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
+
+    ;; support smart-parens-strict-mode
+    (after "smartparens"
+      (defadvice evil-delete-backward-char-and-join
+          (around dotemacs-evil-delete-backward-char-and-join activate)
+        (if smartparens-strict-mode
+            (call-interactively 'sp-backward-delete-char)
+          ad-do-it)))))
+
+(use-package evil-args
+  :ensure t
+  :init
+  (progn
+    ;; bind evil-args text objects
+    (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
+    (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)))
+
+(use-package evil-escape
+  :ensure t
+  :init (evil-escape-mode)
+  :diminish evil-escape-mode)
+
+(use-package evil-exchange
+  :ensure t
+  :init (evil-exchange-install))
+
+(use-package evil-iedit-state
+  :ensure t
+  :init
+  (progn
+    (require 'evil-iedit-state)
+    (defun dotemacs-evil-state-lazy-loading ()
+      ;; activate leader in iedit and iedit-insert states
+      (define-key evil-iedit-state-map
+        (kbd evil-leader/leader) evil-leader--default-map))
+
+    (after "evil-leader"
+      (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
+      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading))))
+
+(use-package evil-jumper
+  :ensure t
+  :init
+  (progn
+    (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps")
+          evil-jumper-auto-center t
+          evil-jumper-auto-save-interval 3600)
+    (evil-jumper-mode t)))
+
+(use-package evil-leader
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (setq evil-leader/leader dotemacs-leader-key)
+    (global-evil-leader-mode))
+  :config
+  (progn
+    ;; Unset shortcuts which shadow evil leader
+    (eval-after-load "compile"
+      '(progn
+         (define-key compilation-mode-map (kbd "h") nil)))
+    ;; make leader available in visual and motion states
+    (mapc (lambda (s)
+            (eval `(define-key
+                     ,(intern (format "evil-%S-state-map" s))
+                     ,(kbd dotemacs-leader-key)
+                     evil-leader--default-map)))
+          '(motion visual))
+    ;; emacs and insert states (make it also available in other states
+    ;; for consistency and POLA.)
+    (mapc (lambda (s)
+            (eval `(define-key
+                     ,(intern (format "evil-%S-state-map" s))
+                     ,(kbd dotemacs-emacs-leader-key)
+                     evil-leader--default-map)))
+          '(emacs insert normal visual motion))
+    ;; experimental: map `<leader> m` to `dotemacs-major-mode-leader-key`
+    (when dotemacs-major-mode-leader-key
+      (add-hook 'after-change-major-mode-hook
+                'dotemacs-activate-major-mode-leader))))
+
+(use-package evil-lisp-state
+  :ensure t
+  :init
+  (progn
+    (setq evil-lisp-state-global t)
+    (setq evil-lisp-state-leader-prefix "k")))
+
+(use-package evil-commentary
+  :ensure t
+  :defer t
+  :init (evil-commentary-mode)
+  :diminish evil-commentary-mode)
+
+(use-package evil-nerd-commenter
+  :disabled t
+  :ensure t
+  :commands (evilnc-comment-operator
+             evilnc-comment-or-uncomment-lines
+             evilnc-toggle-invert-comment-line-by-line
+             evilnc-comment-or-uncomment-paragraphs
+             evilnc-quick-comment-or-uncomment-to-the-line
+             evilnc-copy-and-comment-lines)
+  :init
+  (progn
+    (after "evil-leader"
+      (evil-leader/set-key
+        ";"  'evilnc-comment-operator
+        "cl" 'evilnc-comment-or-uncomment-lines
+        "ci" 'evilnc-toggle-invert-comment-line-by-line
+        "cp" 'evilnc-comment-or-uncomment-paragraphs
+        "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
+        "cy" 'evilnc-copy-and-comment-lines))))
+
+(use-package evil-matchit
+  :ensure t
+  :defer t
+  :init
+  (progn
+    ; (global-evil-matchit-mode)
+    (dolist (hook '(LaTeX-mode-hook
+                    web-mode-hook
+                    mustache-mode-hook
+                    handlebars-mode-hook))
+      (add-hook hook '(lambda () (evil-matchit-mode))))))
+
+(use-package evil-indent-textobject
+  :ensure t
+  :defer t)
+
+(use-package evil-easymotion
+  :ensure t
+  :defer t
+  :init (after "evil"))
+
+(use-package evil-numbers
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (defun dotemacs-evil-numbers-micro-state-doc ()
+      "Display a short documentation in the mini buffer."
+      (echo "+/= to increase the value or - to decrease it"))
+
+    (defun dotemacs-evil-numbers-micro-state-overlay-map ()
+      "Set a temporary overlay map to easily increase or decrease a number"
+      (set-temporary-overlay-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map (kbd "+") 'dotemacs-evil-numbers-increase)
+         (define-key map (kbd "=") 'dotemacs-evil-numbers-increase)
+         (define-key map (kbd "-") 'dotemacs-evil-numbers-decrease)
+         map) t)
+      (dotemacs-evil-numbers-micro-state-doc))
+
+    (defun dotemacs-evil-numbers-increase (amount &optional no-region)
+      "Increase number at point."
+      (interactive "p*")
+      (evil-numbers/inc-at-pt amount no-region)
+      (dotemacs-evil-numbers-micro-state-overlay-map))
+    (defun dotemacs-evil-numbers-decrease (amount)
+      "Decrease number at point."
+      (interactive "p*")
+      (evil-numbers/dec-at-pt amount)
+      (dotemacs-evil-numbers-micro-state-overlay-map))
+
+    (after "evil-leader"
+      (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
+      (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
+      (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease))))
+
+(use-package evil-search-highlight-persist
+  :ensure t
+  :init
+  (progn
+    (global-evil-search-highlight-persist)
+    (after "evil-leader"
+      (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)) ;; sc
+    (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
+
+    (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
+    (evil-ex-define-cmd "hl[search]" 'dotemacs-turn-on-search-highlight-persist)
+    (define-key evil-ex-map "nohl" 'dotemacs-turn-off-search-highlight-persist)
+    (define-key evil-ex-map "hl" 'dotemacs-turn-on-search-highlight-persist)
+
+    (defun dotemacs-adaptive-evil-highlight-persist-face ()
+      (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
+                          :inherit 'region
+                          :background nil
+                          :foreground nil))
+    (dotemacs-adaptive-evil-highlight-persist-face)))
+
+(use-package evil-surround
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (global-evil-surround-mode 1)
+    (defun dotemacs-surround-add-pair (trigger begin-or-fun &optional end)
+      "Add a surround pair.
+If `end' is nil `begin-or-fun' will be treated as a fun."
+      (push (cons (if (stringp trigger)
+                    (string-to-char trigger)
+                    trigger)
+                  (if end
+                    (cons begin-or-fun end)
+                    begin-or-fun))
+            evil-surround-pairs-alist))
+
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "`" "`"  "'"))
+                  '(emacs-lisp-mode-hook lisp-mode-hook))
+
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "~" "```"  "```"))
+                  '(markdown-mode-hook))
+
+    (add-hook 'LaTeX-mode-hook (lambda ()
+                                 (dotemacs-surround-add-pair "~" "\\texttt{" "}")
+                                 (dotemacs-surround-add-pair "=" "\\verb=" "=")
+                                 (dotemacs-surround-add-pair "/" "\\emph{" "}")
+                                 (dotemacs-surround-add-pair "*" "\\textbf{" "}")
+                                 (dotemacs-surround-add-pair "P" "\\(" "\\)")))
+    (add-to-hooks (lambda ()
+                    (dotemacs-surround-add-pair "c" ":class:`" "`")
+                    (dotemacs-surround-add-pair "f" ":func:`" "`")
+                    (dotemacs-surround-add-pair "m" ":meth:`" "`")
+                    (dotemacs-surround-add-pair "a" ":attr:`" "`")
+                    (dotemacs-surround-add-pair "e" ":exc:`" "`"))
+                  '(rst-mode-hook python-mode-hook))
+
+    ;; `s' for surround instead of `substitute'
+    ;; see motivation for this change in the documentation
+    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
+    (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute)))
+
+(use-package evil-terminal-cursor-changer
+  :if (not (display-graphic-p))
+  :ensure t
+  :init
+  (progn
+    (require 'evil-terminal-cursor-changer)
+    (setq evil-visual-state-cursor 'box ; █
+          evil-insert-state-cursor 'bar ; ⎸
+          evil-emacs-state-cursor 'hbar)) ; _
+  :defer t)
+
+(use-package evil-tutor
+  :disabled t
+  :ensure t
+  :defer t
+  :commands (evil-tutor-start
+             evil-tutor-resume)
+  :init
+  (progn
+    (setq evil-tutor-working-directory
+          (concat dotemacs-cache-directory ".tutor/"))
+    (evil-leader/set-key "hT" 'evil-tutor-start)))
+
+(use-package evil-visualstar
+  :ensure t
+  :defer t
+  :commands (evil-visualstar/begin-search-forward
+             evil-visualstar/begin-search-backward)
+  :init
+  (progn
+    ; (global-evil-visualstar-mode)
+    (define-key evil-visual-state-map (kbd "*")
+      'evil-visualstar/begin-search-forward)
+    (define-key evil-visual-state-map (kbd "#")
+      'evil-visualstar/begin-search-backward)))
+
+(use-package init-bindings
+  :load-path "config/")
+
+
 ;;; Text editing
 (use-package tildify
   :bind (("C-c e t" . tildify-region))
@@ -2361,16 +2800,14 @@ Disable the highlighting of overlong lines."
                         rst-mode-hook))
           (add-hook hook #'tildify-mode))
   ;; Use the right space for LaTeX
-  :config (add-hook 'latex-mode-hook
+  :config (add-hook 'LaTeX-mode-hook
                     (lambda () (setq-local tildify-space-string "~"))))
 
 (use-package typo
   :ensure t
   :init (progn
           (typo-global-mode)
-
-          (dolist (hook '(markdown-mode-hook
-                          rst-mode-hook))
+          (dolist (hook '(markdown-mode-hook rst-mode-hook))
             (add-hook hook 'typo-mode)))
   :diminish (typo-mode . "𝕿"))
 
@@ -2792,8 +3229,12 @@ Disable the highlighting of overlong lines."
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-elisp)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)))
 
+(dotemacs-use-package-add-hook flyspell
+  :post-init
+  (add-hook 'markdown-mode-hook 'flyspell-mode))
+
 
-;; Other markup languages
+;;; Other markup languages
 (use-package rst                        ; ReStructuredText
   :defer t
   :config
@@ -2806,6 +3247,10 @@ Disable the highlighting of overlong lines."
   (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
   ;; …and with Markdown Mode
   (bind-key "M-RET" #'rst-insert-list rst-mode-map))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'rst-mode-hook 'flycheck-mode))
 
 (use-package mustache-mode              ; Mustache mode
   :ensure t
@@ -2820,17 +3265,6 @@ Disable the highlighting of overlong lines."
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
   :defer t)
-
-(use-package yaml-mode                  ; YAML
-  :ensure t
-  :defer t
-  :mode (("\\.yaml$" . yaml-mode)
-         ("\\.yml$" . yaml-mode))
-  :config
-    (add-hook 'yaml-mode-hook
-              (lambda ()
-                (electric-indent-local-mode -1)
-                (run-hooks 'prog-mode-hook))))
 
 (use-package graphviz-dot-mode          ; Graphviz
   :ensure t
@@ -2950,480 +3384,6 @@ Disable the highlighting of overlong lines."
   :diminish eldoc-mode)
 
 
-;;; Evil
-(use-package init-evil
-  :load-path "config/")
-
-(use-package evil
-  :ensure t
-  :defer t
-  :init
-  (progn
-    ;; put back refresh of the cursor on post-command-hook see status of:
-    ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
-    (add-hook 'post-command-hook 'evil-refresh-cursor)
-
-    ; (add-hook 'after-change-major-mode-hook #'dotemacs-major-mode-evil-state-adjust)
-
-    ; (after "paren"
-    ;   ;; the default behavior only highlights with the point one-after the closing paren
-    ;   ;; this changes it such it will match with the point on the closing paren
-    ;   (defadvice show-paren-function (around show-paren-closing-before activate)
-    ;     (if (and (or
-    ;               (evil-normal-state-p)
-    ;               (evil-visual-state-p))
-    ;              (eq (syntax-class (syntax-after (point))) 5))
-    ;         (save-excursion
-    ;           (forward-char)
-    ;           ad-do-it)
-    ;       ad-do-it)))
-
-    (dotemacs-set-state-faces)
-
-    (set-default-evil-emacs-state-cursor)
-    (set-default-evil-evilified-state-cursor)
-    (set-default-evil-normal-state-cursor)
-    (set-default-evil-insert-state-cursor)
-    (set-default-evil-visual-state-cursor)
-    (set-default-evil-motion-state-cursor)
-    (set-default-evil-lisp-state-cursor)
-    (set-default-evil-iedit-state-cursor)
-    (set-default-evil-iedit-insert-state-cursor)
-    (set-default-evil-replace-state-cursor)
-    (set-default-evil-operator-state-cursor)
-
-    ; Don't move back the cursor one position when exiting insert mode
-    (setq evil-move-cursor-back nil)
-    ; (setq evil-search-module 'evil-search)
-    ; (setq evil-magic 'very-magic)
-
-    (evil-mode 1)
-
-    (after "evil-leader"
-      (use-package evil-evilified-state
-        :load-path "extensions/")))
-  :config
-  (progn
-    ; c-k/c-j for page down/up
-    ;
-    ; One thing that surprised me considering how complete Evil is, is the lack
-    ; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
-    ; pretty important in Emacs (it's the shortcut to give a numeric parameter to
-    ; other commands). I've in fact these mapped on my .vimrc to c-k/c-j
-    ; (because I think they're more consistent with Vim's j/k movement keys) so
-    ; that's how I mapped them in Emacs:
-    (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
-    (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
-
-    (global-set-key (kbd "C-w") 'evil-window-map)
-    (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
-    (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
-    (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
-    (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
-    (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
-
-    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
-    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
-
-    (define-key evil-normal-state-map (kbd "Q") 'my-window-killer)
-    (define-key evil-normal-state-map (kbd "Y") (kbd "y$"))
-
-    (define-key evil-visual-state-map (kbd ", e") 'eval-region)
-
-    ;; evil ex-command key
-    (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
-    (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
-    (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
-    ;; Make the current definition and/or comment visible.
-    (define-key evil-normal-state-map "zf" 'reposition-window)
-    ;; toggle maximize buffer
-    (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
-    (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
-
-    (after "evil-leader"
-      (dotemacs-define-micro-state scroll
-        :doc "[k] page up [j] page down [K] half page up [J] half page down"
-        :execute-binding-on-enter t
-        :evil-leader "nn" "np" "nP" "nN"
-        :bindings
-        ;; page
-        ("k" evil-scroll-page-up)
-        ("j" evil-scroll-page-down)
-        ;; half page
-        ("K" dotemacs-scroll-half-page-up)
-        ("J" dotemacs-scroll-half-page-down))
-
-      (evil-leader/set-key "re" 'evil-show-registers))
-
-    (unless dotemacs-enable-paste-micro-state
-      (ad-disable-advice 'evil-paste-before 'after
-                         'evil-paste-before-paste-micro-state)
-      (ad-activate 'evil-paste-before)
-      (ad-disable-advice 'evil-paste-after 'after
-                         'evil-paste-after-paste-micro-state)
-      (ad-activate 'evil-paste-after)
-      (ad-disable-advice 'evil-visual-paste 'after
-                         'evil-visual-paste-paste-micro-state)
-      (ad-activate 'evil-visual-paste))
-
-    ;; butter fingers
-    (evil-ex-define-cmd "Q" 'evil-quit)
-    (evil-ex-define-cmd "Qa" 'evil-quit-all)
-    (evil-ex-define-cmd "QA" 'evil-quit-all)
-
-    (defmacro evil-map (state key seq)
-      "Map for a given STATE a KEY to a sequence SEQ of keys.
-
-Can handle recursive definition only if KEY is the first key of SEQ.
-Example: (evil-map visual \"<\" \"<gv\")"
-      (let ((map (intern (format "evil-%S-state-map" state))))
-        `(define-key ,map ,key
-           (lambda ()
-             (interactive)
-             ,(if (string-equal key (substring seq 0 1))
-                  `(progn
-                     (call-interactively ',(lookup-key evil-normal-state-map key))
-                     (execute-kbd-macro ,(substring seq 1)))
-                (execute-kbd-macro ,seq))))))
-    ;; Keep the region active when shifting
-    (evil-map visual "<" "<gv")
-    (evil-map visual ">" ">gv")
-
-    (define-key evil-normal-state-map (kbd "K") 'dotemacs-evil-smart-doc-lookup)
-
-    (define-key evil-normal-state-map
-      (kbd "gd") 'dotemacs-evil-smart-goto-definition)
-
-    ;; define text objects
-    (defmacro dotemacs-define-text-object (key name start end)
-      (let ((inner-name (make-symbol (concat "evil-inner-" name)))
-            (outer-name (make-symbol (concat "evil-outer-" name)))
-            (start-regex (regexp-opt (list start)))
-            (end-regex (regexp-opt (list end))))
-        `(progn
-           (evil-define-text-object ,inner-name (count &optional beg end type)
-             (evil-select-paren ,start-regex ,end-regex beg end type count nil))
-           (evil-define-text-object ,outer-name (count &optional beg end type)
-             (evil-select-paren ,start-regex ,end-regex beg end type count t))
-           (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
-           (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
-           (push (cons (string-to-char ,key)
-                       (if ,end
-                           (cons ,start ,end)
-                         ,start))
-                 evil-surround-pairs-alist))))
-
-    (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
-
-    ;; support smart-parens-strict-mode
-    (after "smartparens"
-      (defadvice evil-delete-backward-char-and-join
-          (around dotemacs-evil-delete-backward-char-and-join activate)
-        (if smartparens-strict-mode
-            (call-interactively 'sp-backward-delete-char)
-          ad-do-it)))))
-
-(use-package evil-args
-  :ensure t
-  :init
-  (progn
-    ;; bind evil-args text objects
-    (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
-    (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)))
-
-(use-package evil-escape
-  :ensure t
-  :init (evil-escape-mode)
-  :diminish evil-escape-mode)
-
-(use-package evil-exchange
-  :ensure t
-  :init (evil-exchange-install))
-
-(use-package evil-iedit-state
-  :ensure t
-  :init
-  (progn
-    (require 'evil-iedit-state)
-    (defun dotemacs-evil-state-lazy-loading ()
-      ;; activate leader in iedit and iedit-insert states
-      (define-key evil-iedit-state-map
-        (kbd evil-leader/leader) evil-leader--default-map))
-
-    (after "evil-leader"
-      (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
-      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading))))
-
-(use-package evil-jumper
-  :ensure t
-  :init
-  (progn
-    (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps")
-          evil-jumper-auto-center t
-          evil-jumper-auto-save-interval 3600)
-    (evil-jumper-mode t)))
-
-(use-package evil-leader
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq evil-leader/leader dotemacs-leader-key)
-    (global-evil-leader-mode))
-  :config
-  (progn
-    ;; Unset shortcuts which shadow evil leader
-    (eval-after-load "compile"
-      '(progn
-         (define-key compilation-mode-map (kbd "h") nil)))
-    ;; make leader available in visual and motion states
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-map" s))
-                     ,(kbd dotemacs-leader-key)
-                     evil-leader--default-map)))
-          '(motion visual))
-    ;; emacs and insert states (make it also available in other states
-    ;; for consistency and POLA.)
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-map" s))
-                     ,(kbd dotemacs-emacs-leader-key)
-                     evil-leader--default-map)))
-          '(emacs insert normal visual motion))
-    ;; experimental: map `<leader> m` to `dotemacs-major-mode-leader-key`
-    (when dotemacs-major-mode-leader-key
-      (add-hook 'after-change-major-mode-hook
-                'dotemacs-activate-major-mode-leader))))
-
-(use-package evil-lisp-state
-  :ensure t
-  :init
-  (progn
-    (setq evil-lisp-state-global t)
-    (setq evil-lisp-state-leader-prefix "k")))
-
-(use-package evil-commentary
-  :ensure t
-  :defer t
-  :init (evil-commentary-mode)
-  :diminish evil-commentary-mode)
-
-(use-package evil-nerd-commenter
-  :disabled t
-  :ensure t
-  :commands (evilnc-comment-operator
-             evilnc-comment-or-uncomment-lines
-             evilnc-toggle-invert-comment-line-by-line
-             evilnc-comment-or-uncomment-paragraphs
-             evilnc-quick-comment-or-uncomment-to-the-line
-             evilnc-copy-and-comment-lines)
-  :init
-  (progn
-    (after "evil-leader"
-      (evil-leader/set-key
-        ";"  'evilnc-comment-operator
-        "cl" 'evilnc-comment-or-uncomment-lines
-        "ci" 'evilnc-toggle-invert-comment-line-by-line
-        "cp" 'evilnc-comment-or-uncomment-paragraphs
-        "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
-        "cy" 'evilnc-copy-and-comment-lines))))
-
-(use-package evil-matchit
-  :ensure t
-  :defer t
-  :init
-  (progn
-    ; (global-evil-matchit-mode)
-    (dolist (hook '(LaTeX-mode-hook web-mode-hook))
-      (add-hook hook '(lambda () (evil-matchit-mode))))))
-
-(use-package evil-indent-textobject
-  :ensure t
-  :defer t)
-
-(use-package evil-easymotion
-  :ensure t
-  :defer t
-  :init (after "evil"))
-
-(use-package evil-numbers
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (defun dotemacs-evil-numbers-micro-state-doc ()
-      "Display a short documentation in the mini buffer."
-      (echo "+/= to increase the value or - to decrease it"))
-
-    (defun dotemacs-evil-numbers-micro-state-overlay-map ()
-      "Set a temporary overlay map to easily increase or decrease a number"
-      (set-temporary-overlay-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map (kbd "+") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "=") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "-") 'dotemacs-evil-numbers-decrease)
-         map) t)
-      (dotemacs-evil-numbers-micro-state-doc))
-
-    (defun dotemacs-evil-numbers-increase (amount &optional no-region)
-      "Increase number at point."
-      (interactive "p*")
-      (evil-numbers/inc-at-pt amount no-region)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-    (defun dotemacs-evil-numbers-decrease (amount)
-      "Decrease number at point."
-      (interactive "p*")
-      (evil-numbers/dec-at-pt amount)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-
-    (after "evil-leader"
-      (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
-      (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
-      (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease))))
-
-(use-package evil-search-highlight-persist
-  :ensure t
-  :init
-  (progn
-    (global-evil-search-highlight-persist)
-    (after "evil-leader"
-      (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)) ;; sc
-    (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
-
-    (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
-    (evil-ex-define-cmd "hl[search]" 'dotemacs-turn-on-search-highlight-persist)
-    (define-key evil-ex-map "nohl" 'dotemacs-turn-off-search-highlight-persist)
-    (define-key evil-ex-map "hl" 'dotemacs-turn-on-search-highlight-persist)
-
-    (defun dotemacs-adaptive-evil-highlight-persist-face ()
-      (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
-                          :inherit 'region
-                          :background nil
-                          :foreground nil))
-    (dotemacs-adaptive-evil-highlight-persist-face)))
-
-(use-package evil-surround
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (global-evil-surround-mode 1)
-    (defun dotemacs-surround-add-pair (trigger begin-or-fun &optional end)
-      "Add a surround pair.
-If `end' is nil `begin-or-fun' will be treated as a fun."
-      (push (cons (if (stringp trigger)
-                    (string-to-char trigger)
-                    trigger)
-                  (if end
-                    (cons begin-or-fun end)
-                    begin-or-fun))
-            evil-surround-pairs-alist))
-
-    (add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "`" "`"  "'"))
-                  '(emacs-lisp-mode-hook lisp-mode-hook))
-
-    (add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "~" "```"  "```"))
-                  '(markdown-mode-hook))
-
-    (add-hook 'LaTeX-mode-hook (lambda ()
-                                 (dotemacs-surround-add-pair "~" "\\texttt{" "}")
-                                 (dotemacs-surround-add-pair "=" "\\verb=" "=")
-                                 (dotemacs-surround-add-pair "/" "\\emph{" "}")
-                                 (dotemacs-surround-add-pair "*" "\\textbf{" "}")
-                                 (dotemacs-surround-add-pair "P" "\\(" "\\)")))
-    (add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "c" ":class:`" "`")
-                    (dotemacs-surround-add-pair "f" ":func:`" "`")
-                    (dotemacs-surround-add-pair "m" ":meth:`" "`")
-                    (dotemacs-surround-add-pair "a" ":attr:`" "`")
-                    (dotemacs-surround-add-pair "e" ":exc:`" "`"))
-                  '(rst-mode-hook python-mode-hook))
-
-    ;; `s' for surround instead of `substitute'
-    ;; see motivation for this change in the documentation
-    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
-    (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute)))
-
-(use-package evil-terminal-cursor-changer
-  :if (not (display-graphic-p))
-  :ensure t
-  :init
-  (progn
-    (require 'evil-terminal-cursor-changer)
-    (setq evil-visual-state-cursor 'box ; █
-          evil-insert-state-cursor 'bar ; ⎸
-          evil-emacs-state-cursor 'hbar)) ; _
-  :defer t)
-
-(use-package evil-tutor
-  :disabled t
-  :ensure t
-  :defer t
-  :commands (evil-tutor-start
-             evil-tutor-resume)
-  :init
-  (progn
-    (setq evil-tutor-working-directory
-          (concat dotemacs-cache-directory ".tutor/"))
-    (evil-leader/set-key "hT" 'evil-tutor-start)))
-
-(use-package evil-visualstar
-  :ensure t
-  :defer t
-  :commands (evil-visualstar/begin-search-forward
-             evil-visualstar/begin-search-backward)
-  :init
-  (progn
-    ; (global-evil-visualstar-mode)
-    (define-key evil-visual-state-map (kbd "*")
-      'evil-visualstar/begin-search-forward)
-    (define-key evil-visual-state-map (kbd "#")
-      'evil-visualstar/begin-search-backward)))
-
-(use-package init-bindings
-  :load-path "config/")
-
-
-;;; REST Client
-(dotemacs-defvar-company-backends restclient-mode)
-
-;; (Emacs Rocks!)[http://emacsrocks.com/e15.html]
-(use-package restclient                ; ReST REPL for Emacs
-  :mode ("\\.http\\'" . restclient-mode)
-  :ensure t
-  :defer t
-  :init
-  (progn
-
-    (defun restclient-http-send-current-raw-stay-in-window ()
-      (interactive)
-      (restclient-http-send-current t t))
-
-    (evil-leader/set-key-for-mode 'restclient-mode
-      "ms" 'restclient-http-send-current-stay-in-window
-      "mS" 'restclient-http-send-current
-      "mr" 'restclient-http-send-current-raw-stay-in-window
-      "mR" 'restclient-http-send-current-raw
-      )))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook restclient-mode))))
-
-(use-package company-restclient    ; restclient backend for Company
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push 'company-restclient company-backends-restclient-mode)))
-
-
 ;;; Emacs Lisp
 (dotemacs-defvar-company-backends emacs-lisp-mode)
 
@@ -3471,7 +3431,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package flycheck-cask              ; Setup Flycheck by Cask projects
   :ensure t
-  :defer t
+  :commands (flycheck-cask-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
 
 (use-package flycheck-package           ; Check package conventions with Flycheck
@@ -3565,23 +3525,55 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (push 'company-capf company-backends-emacs-lisp-mode)
       (dotemacs-add-company-hook emacs-lisp-mode))))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+    (add-hook 'lisp-mode-hook 'flycheck-mode)))
+
 
 ;;; Scala
-(use-package scala-mode2                ; Scala editing
-  :ensure t
-  :defer t
-  :config (progn (setq scala-indent:default-run-on-strategy
-                       scala-indent:operator-strategy)
-
-                 (bind-key "C-c z" #'ensime scala-mode-map)))
+(use-package init-scala
+  :load-path "config/")
 
 (use-package flycheck-auto-scalastyle   ; Scalastyle setup
   :load-path "config/"
+  :commands (flycheck-auto-scalastyle-setup)
+  :init
+  (after "scala-mode2"
+    (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
+
+(use-package noflet
+  :ensure t
+  :defer t)
+
+(use-package scala-mode2                ; Scala editing
+  :ensure t
   :defer t
-  :commands (flycheck-auto-scalastyle-configure
-             flycheck-auto-scalastyle-setup)
-  :init (after "scala-mode2"
-          (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
+  :init
+  (dolist (ext '(".cfe" ".cfs" ".si" ".gen" ".lock"))
+    (add-to-list 'completion-ignored-extensions ext))
+  :config
+  (progn
+    (evil-define-key 'normal scala-mode-map "J" 'dotemacs-scala-join-line)
+
+    ;; Compatibility with `aggressive-indent'
+    (custom-set-variables
+     '(scala-indent:align-forms t)
+     '(scala-indent:align-parameters t)
+     '(scala-indent:default-run-on-strategy scala-indent:operator-strategy))
+
+    (require 'noflet)
+
+    (defadvice scala-indent:indent-code-line (around retain-trailing-ws activate)
+      "Keep trailing-whitespace when indenting."
+      (noflet ((scala-lib:delete-trailing-whitespace ()))
+        ad-do-it))))
+
+(use-package flycheck-ensime
+  :load-path "config/"
+  :defer t
+  :commands (flycheck-ensime-setup))
 
 (use-package sbt-mode                   ; Scala build tool
   :ensure t
@@ -3614,37 +3606,141 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package ensime                     ; Scala interaction mode
   :ensure t
-  :defer t
-  :config (progn
-            ;; Automatically open new Ensime sessions if needed
-            (setq ensime-auto-connect 'always)
+  :commands (ensime-mode)
+  :init
+  (progn
+    (add-hook 'ensime-mode-hook 'scala/enable-eldoc)
+    (add-hook 'scala-mode-hook 'scala/configure-flyspell)
+    (add-hook 'scala-mode-hook 'scala/configure-ensime)
+    (add-hook 'scala-mode-hook 'scala/maybe-start-ensime))
+  :config
+  (progn
+    ;; Automatically open new Ensime sessions if needed
+    (setq ensime-auto-connect 'always)
 
-            ;; Enable Ensime for all Scala buffers.  We don't do this in :init,
-            ;; because `ensime-mode' isn't autoloaded, and ensime-mode makes no
-            ;; sense before the first session was started anyway
-            (add-hook 'scala-mode-hook #'ensime-mode)
+    (setq user-emacs-ensime-directory ".cache/ensime")
 
-            ;; Disable Flycheck in Ensime, since Ensime features its own error
-            ;; checking.  TODO: Maybe write a Flycheck checker for Ensime
-            (after "flycheck"
-              (add-hook 'ensime-mode-hook (lambda () (flycheck-mode -1))))
+    ;; Enable Ensime for all Scala buffers.  We don't do this in :init,
+    ;; because `ensime-mode' isn't autoloaded, and ensime-mode makes no
+    ;; sense before the first session was started anyway
+    (add-hook 'scala-mode-hook #'ensime-mode)
 
-            ;; Free M-n and M-p again
-            (bind-key "M-n" nil ensime-mode-map)
-            (bind-key "M-p" nil ensime-mode-map)
-            (bind-key "C-c M-n" #'ensime-forward-note ensime-mode-map)
-            (bind-key "C-c M-p" #'ensime-backward-note ensime-mode-map)))
+    (evil-define-key 'insert ensime-mode-map
+      (kbd ".") 'scala/completing-dot
+      (kbd "M-.") 'ensime-edit-definition
+      (kbd "M-,") 'ensime-pop-find-definition-stack)
+
+    (evil-define-key 'normal ensime-mode-map
+      (kbd "M-.") 'ensime-edit-definition
+      (kbd "M-,") 'ensime-pop-find-definition-stack)
+
+    (evil-define-key 'normal ensime-popup-buffer-map
+      (kbd "q") 'ensime-popup-buffer-quit-function)
+
+    (evil-define-key 'normal ensime-inspector-mode-map
+      (kbd "q") 'ensime-popup-buffer-quit-function)
+
+    (evil-define-key 'normal ensime-refactor-info-map
+      (kbd "q") 'spacemacs/ensime-refactor-cancel
+      (kbd "c") 'spacemacs/ensime-refactor-accept
+      (kbd "RET") 'spacemacs/ensime-refactor-accept)
+
+    (evil-define-key 'normal ensime-compile-result-map
+      (kbd "g") 'ensime-show-all-errors-and-warnings
+      (kbd "TAB") 'forward-button
+      (kbd "<backtab>") 'backward-button
+      (kbd "M-n") 'forward-button
+      (kbd "M-p") 'backward-button
+      (kbd "n") 'forward-button
+      (kbd "N") 'backward-button)
+
+    (evil-leader/set-key-for-mode 'scala-mode
+      "m/"     'ensime-search
+      "m?"     'ensime-scalex
+
+      "mbc"     'ensime-sbt-do-compile
+      "mbC"     'ensime-sbt-do-clean
+      "mbi"     'ensime-sbt-switch
+      "mbp"     'ensime-sbt-do-package
+      "mbr"     'ensime-sbt-do-run
+
+      "mct"     'ensime-typecheck-current-file
+      "mcT"     'ensime-typecheck-all
+
+      "mdA"     'ensime-db-attach
+      "mdb"     'ensime-db-set-break
+      "mdB"     'ensime-db-clear-break
+      "mdC"     'ensime-db-clear-all-breaks
+      "mdc"     'ensime-db-continue
+      "mdd"     'ensime-db-start
+      "mdi"     'ensime-db-inspect-value-at-point
+      "mdl"     'ensime-db-list-locals
+      "mdn"     'ensime-db-next
+      "mdo"     'ensime-db-step-out
+      "mdq"     'ensime-db-quit
+      "mdr"     'ensime-db-run
+      "mds"     'ensime-db-step
+      "mdt"     'ensime-db-backtrace
+
+      "mee"     'ensime-print-errors-at-point
+      "mel"     'ensime-show-all-errors-and-warnings
+      "mes"     'ensime-stacktrace-switch
+
+      "mgg"     'ensime-edit-definition
+      "mgi"     'ensime-goto-impl
+      "mgt"     'ensime-goto-test
+
+      "mhh"     'ensime-show-doc-for-symbol-at-point
+      "mhu"     'ensime-show-uses-of-symbol-at-point
+      "mht"     'ensime-print-type-at-point
+
+      "mii"     'ensime-inspect-type-at-point
+      "miI"     'ensime-inspect-type-at-point-other-frame
+      "mip"     'ensime-inspect-project-package
+
+      "mnF"     'ensime-reload-open-files
+      "mns"     'ensime
+      "mnS"     'ensime-gen-and-restart
+
+      "mrd"     'ensime-refactor-inline-local
+      "mrD"     'ensime-undo-peek
+      "mrf"     'ensime-format-source
+      "mri"     'ensime-refactor-organize-imports
+      "mrm"     'ensime-refactor-extract-method
+      "mrr"     'ensime-refactor-rename
+      "mrt"     'ensime-import-type-at-point
+      "mrv"     'ensime-refactor-extract-local
+
+      "mta"     'ensime-sbt-do-test
+      "mtr"     'ensime-sbt-do-test-quick
+      "mtt"     'ensime-sbt-do-test-only
+
+      "msa"     'ensime-inf-load-file
+      "msb"     'ensime-inf-eval-buffer
+      "msB"     'ensime-inf-eval-buffer-switch
+      "msi"     'ensime-inf-switch
+      "msr"     'ensime-inf-eval-region
+      "msR"     'ensime-inf-eval-region-switch
+
+      "mz"      'ensime-expand-selection-command
+      )
+
+    ;; Don't use scala checker if ensime mode is active, since it provides
+    ;; better error checking.
+    (after "flycheck"
+      '(progn
+         (defun scala/disable-flycheck () (flycheck-mode -1))
+         (add-hook 'ensime-mode-hook 'scala/disable-flycheck)))))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'scala-mode-hook 'flycheck-mode))
 
 (use-package ensime-sbt
   :ensure ensime
   :defer t
   ;; Compile on save.
   :config (setq ensime-sbt-perform-on-save "test:compile"))
-
-(use-package flycheck-ensime
-  :disabled t
-  :load-path "config/"
-  :defer t)
 
 
 ;;; Python
@@ -3654,11 +3750,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package init-python
   :load-path "config/")
-
-(use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
-  :load-path "config/"
-  :commands (flycheck-virtualenv-setup)
-  :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
 
 (use-package cython-mode
   :defer t
@@ -3785,8 +3876,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; PEP 8 compliant filling rules, 79 chars maximum
     (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
     (add-hook 'python-mode-hook #'subword-mode)
-    (after "flycheck"
-      (add-hook 'python-mode-hook #'flycheck-mode))
 
     (add-hook 'inferior-python-mode-hook 'smartparens-mode)
     ;; add support for `ahs-range-beginning-of-defun' for python-mode
@@ -3841,6 +3930,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (evil-leader/set-key-for-mode 'python-mode "mhd" 'helm-pydoc))
 
+(use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
+  :load-path "config/"
+  :commands (flycheck-virtualenv-setup)
+  :init (add-hook 'flycheck-mode-hook #'flycheck-virtualenv-setup))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'python-mode-hook 'flycheck-mode))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -3891,9 +3989,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
   :config
   (progn
-    (after "flycheck"
-      (add-hook 'enh-ruby-mode-hook #'flycheck-mode))
-
     (setq enh-ruby-deep-indent-paren nil
           enh-ruby-hanging-paren-deep-indent-level 2)
     (sp-with-modes '(ruby-mode enh-ruby-mode)
@@ -4001,12 +4096,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'enh-ruby-mode "msR" 'ruby-send-region-and-go)
     (evil-leader/set-key-for-mode 'enh-ruby-mode "mss" 'ruby-switch-to-inf)))
 
-(use-package yaml-mode
+(use-package yaml-mode                  ; YAML
   :ensure t
   :mode (("\\.\\(yml\\|yaml\\)\\'" . yaml-mode)
          ("Procfile\\'" . yaml-mode))
   :config (add-hook 'yaml-mode-hook
                     '(lambda ()
+                       ; (electric-indent-local-mode -1)
+                       (run-hooks 'prog-mode-hook)
                        (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
 
 (use-package feature-mode               ; Feature files for ecukes/cucumber
@@ -4043,6 +4140,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
   (inf-ruby-switch-setup))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'enh-ruby-mode-hook 'flycheck-mode)
+    (add-hook 'haml-mode-hook 'flycheck-mode)
+    (add-hook 'yaml-mode-hook 'flycheck-mode)
+    (add-hook 'ruby-mode-hook 'flycheck-mode)))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -4059,8 +4164,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package flycheck-rust              ; Flycheck setup for Rust
   :ensure t
-  :defer t
+  :commands (flycheck-rust-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'rust-mode-hook 'flycheck-mode))
 
 (use-package toml-mode                  ; Toml for Cargo files
   :ensure t
@@ -4103,7 +4212,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate declarations
     ;; Insert module templates into new buffers
     (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
-    (add-hook 'haskell-mode-hook #'flycheck-mode)
     (add-hook 'haskell-mode-hook #'dotemacs-init-haskell-mode)
     (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-hook)
 
@@ -4277,7 +4385,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
   :ensure t
-  :commands flycheck-haskell-configure
+  :commands (flycheck-haskell-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
 
 (use-package helm-hayoo
@@ -4294,6 +4402,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package haskell-snippets
   :ensure t
+  :defer t
   :init
   (progn
     ;; manually load the package since the current implementation is not lazy
@@ -4302,11 +4411,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                 'haskell-snippets))
 
     (defun haskell-snippets-initialize ()
-      (let ((snip-dir (expand-file-name "snippets" haskell-snippets-dir)))
-        (add-to-list 'yas-snippet-dirs snip-dir t)
-        (yas-load-directory snip-dir)))
+      (when (derived-mode-p 'haskell-mode)
+        (let ((snip-dir (expand-file-name "snippets" haskell-snippets-dir)))
+          (add-to-list 'yas-snippet-dirs snip-dir t)
+          (yas-load-directory snip-dir))))
 
-    (after "yasnippet" '(haskell-snippets-initialize))))
+    ;; TODO only load once
+    (add-hook 'haskell-mode-hook #'haskell-snippets-initialize)))
 
 (use-package cmm-mode
   :ensure t
@@ -4358,6 +4469,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key shm-map (kbd "C-j") nil)
     (define-key shm-map (kbd "C-k") nil)))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'haskell-mode-hook 'flycheck-mode))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -4400,10 +4515,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package go-mode
   :ensure t
   :defer t
-  :init
-  (progn
-    (after "flycheck"
-      (add-hook 'go-mode-hook 'flycheck-mode)))
   :config
   (progn
     (add-hook 'before-save-hook 'gofmt-before-save)
@@ -4424,6 +4535,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :disabled t
   :init
   (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'go-mode-hook 'flycheck-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -4545,8 +4660,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (push 'company-ycmd company-backends-c-mode-common)))
 
-;;; SQL
-
 
 ;;; Clojure
 (dotemacs-defvar-company-backends cider-mode)
@@ -4569,6 +4682,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
+    (after "eval-sexp-fu"
+      '(require 'cider-eval-sexp-fu))
     (setq cider-stacktrace-default-filters '(tooling dup)
           cider-repl-pop-to-buffer-on-connect nil
           cider-prompt-save-file-on-load nil
@@ -4634,8 +4749,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (defadvice cider-jump-to-var (before add-evil-jump activate)
     (evil-set-jump)))
 
-(eval-after-load 'eval-sexp-fu
-  '(require 'cider-eval-sexp-fu))
 
 (use-package clj-refactor
   :defer t
@@ -4728,11 +4841,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         ;; Disable Merlin's own error checking in favour of Flycheck
         merlin-error-after-save nil))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'tuareg-mode-hook 'flycheck-mode))
+
 (use-package flycheck-ocaml             ; Check OCaml code with Merlin
   :ensure t
-  :defer t
-  :init (after "merlin"
-          (flycheck-ocaml-setup)))
+  :commands (flycheck-ocaml-setup)
+  :init (add-hook 'flycheck-mode-hook #'flycheck-ocaml-setup))
 
 
 ;;; Web languages
@@ -4895,13 +5011,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode)))
   :mode ("\\.less\\'" . less-css-mode))
 
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (progn
-    (add-hook 'web-mode-hook 'flycheck-mode)
-    (add-hook 'scss-mode-hook 'flycheck-mode)
-    (add-hook 'sass-mode-hook 'flycheck-mode)))
-
 (use-package tagedit
   :defer t
   :ensure t
@@ -4914,6 +5023,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package slim-mode
   :ensure t
   :defer t)
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'web-mode-hook 'flycheck-mode)
+    (add-hook 'scss-mode-hook 'flycheck-mode)
+    (add-hook 'slim-mode-hook 'flycheck-mode)
+    (add-hook 'sass-mode-hook 'flycheck-mode)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -4943,6 +5060,30 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mi`"  'purescript-navigate-imports-return
       "mia"  'purescript-align-imports
       "min"  'purescript-navigate-imports)))
+
+(after "flycheck"
+  (flycheck-define-checker purs-check
+    "Use purscheck to flycheck PureScript code."
+    :command ("purscheck" source source-original temporary-file-name)
+    :error-patterns
+    ((error line-start
+            (or (and "Error at " (file-name)    " line " line ", column " column ":" (zero-or-more " "))
+                (and "\""        (file-name) "\" (line " line ", column " column "):"))
+            (or (message (one-or-more not-newline))
+                (and "\n"
+                     (message
+                      (zero-or-more " ") (one-or-more not-newline)
+                      (zero-or-more "\n"
+                                    (zero-or-more " ")
+                                    (one-or-more not-newline)))))
+            line-end))
+    :modes purescript-mode)
+  (add-to-list 'flycheck-checkers 'purs-check))
+
+; Waiting on purscheck to make it to melpa
+; (dotemacs-use-package-add-hook flycheck
+;   :post-init
+;   (add-hook 'purescript-mode-hook 'flycheck-mode))
 
 (use-package psci
   :defer t
@@ -5207,6 +5348,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t)
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'php-mode-hook 'flycheck-mode))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -5253,6 +5398,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Racket
+(use-package init-racket
+  :load-path "config/")
 
 (when (eq dotemacs-completion-engine 'company)
   ;; this is the only thing to do to enable company in racket-mode
@@ -5272,9 +5419,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           '(lambda ()
              (when (equal major-mode 'racket-mode)
                (company-quickhelp-mode -1))) t))))
-
-(use-package init-racket
-  :load-path "config/")
 
 (use-package racket-mode
   :defer t
@@ -5315,6 +5459,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mtB" 'dotemacs-racket-test-with-coverage)
     (define-key racket-mode-map (kbd "H-r") 'racket-run)))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'racket-mode-hook 'flycheck-mode))
+
 
 ;;; Misc programming languages
 (use-package sh-script                  ; Shell scripts
@@ -5345,6 +5493,49 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :config (after "flycheck"
             (add-to-list 'flycheck-checkers 'swift)))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-hook 'swift-mode-hook 'flycheck-mode)
+    (add-hook 'sh-mode-hook 'flycheck-mode)))
+
+
+;; REST Client
+(dotemacs-defvar-company-backends restclient-mode)
+
+; (Emacs Rocks!)[http://emacsrocks.com/e15.html]
+(use-package restclient                ; ReST REPL for Emacs
+  :mode ("\\.http\\'" . restclient-mode)
+  :ensure t
+  :defer t
+  :init
+  (progn
+
+    (defun restclient-http-send-current-raw-stay-in-window ()
+      (interactive)
+      (restclient-http-send-current t t))
+
+    (evil-leader/set-key-for-mode 'restclient-mode
+      "ms" 'restclient-http-send-current-stay-in-window
+      "mS" 'restclient-http-send-current
+      "mr" 'restclient-http-send-current-raw-stay-in-window
+      "mR" 'restclient-http-send-current-raw
+      )))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook restclient-mode))))
+
+(use-package company-restclient    ; restclient backend for Company
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-restclient company-backends-restclient-mode)))
 
 
 ;; Databases
@@ -6473,6 +6664,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "evil-leader"
       (evil-leader/set-key
         "ft" 'neotree-toggle
+        "fT" 'neotree-hide
         "pt" 'neotree-find-project-root)))
 
   :config
@@ -6686,6 +6878,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Org Mode
+; todo add flyspell
 (use-package init-org
   :load-path "config/")
 
@@ -7098,25 +7291,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :load-path "config/")
 
 (use-package ansible
-  :ensure t
+  ;; Tracking here:
+  ;; https://github.com/k1LoW/emacs-ansible/issues/4
+  ;; Ansible wants to hook into yasnippet and load its snippets always
+  :disabled t
   :defer t
-  :init (progn
-          (eval-after-load 'yaml-mode
-            '(add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))
-
-          ;; ansible-mode requires ac-user-dictionary-files. If the
-          ;; config is using company-mode this variable will not be
-          ;; set, so we set it to a dummy value.
-          ;;
-          ;; Tracking here:
-          ;; https://github.com/k1LoW/emacs-ansible/issues/2
-          (when (eq dotemacs-completion-engine 'company)
-            (setq ac-user-dictionary-files '()))))
+  :init
+  (progn
+    (after "yaml-mode"
+      '(add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))))
 
 (use-package ansible-doc                ; Documentation lookup for Ansible
   :ensure t
   :defer t
-  :init (eval-after-load 'yaml-mode
+  :init (after "yaml-mode"
           '(add-hook 'yaml-mode-hook 'ansible/ansible-doc-maybe-enable))
   :diminish (ansible-doc-mode . "❓"))
 
@@ -7160,6 +7348,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (progn
       (dotemacs-add-company-hook puppet-mode))))
 
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'puppet-mode-hook 'flycheck-mode))
+
 (use-package puppetfile-mode
   :ensure t
   :defer t)
@@ -7174,9 +7366,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (after "flycheck"
-      '(require 'flycheck-ledger))
-
     (setq ledger-post-amount-alignment-column 62)
     (evil-leader/set-key-for-mode 'ledger-mode
       "mhd"   'ledger-delete-current-transaction
@@ -7193,6 +7382,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "my"    'ledger-set-year
       "m RET" 'ledger-set-month)
     (evilify ledger-report-mode ledger-report-mode-map)))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'ledger-mode-hook 'flycheck-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -7361,6 +7554,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (evil-leader/set-key
         "ec" 'flycheck-clear
         "el" 'flycheck-list-errors
+        "eL" 'dotemacs-flycheck-hide-list-errors
         "tmf" 'dotemacs-mode-line-flycheck-info-toggle))
 
     (dotemacs-set-flycheck-mode-line-faces)
@@ -7384,6 +7578,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                     (side            . bottom)
                     (reusable-frames . visible)
                     (window-height   . 0.4)))
+
+    (defun dotemacs-flycheck-hide-list-errors ()
+      "Hide the error list for the current buffer."
+      (interactive)
+      (unless flycheck-mode
+        (user-error "Flycheck mode not enabled"))
+      (when (get-buffer flycheck-error-list-buffer)
+        (kill-buffer flycheck-error-list-buffer)))
+
+    (after "evil-evilified-state"
+      (evilify flycheck-error-list-mode flycheck-error-list-mode-map
+        "j" #'flycheck-error-list-next-error
+        "k" #'flycheck-error-list-previous-error
+        "RET" #'flycheck-error-list-goto-error))
 
     ;; Custom fringe indicator
     (when (fboundp 'define-fringe-bitmap)
@@ -7451,14 +7659,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (dolist (hook '(markdown-mode-hook text-mode-hook message-mode-hook org-mode-hook))
-      (add-hook hook '(lambda () (flyspell-mode 1))))
-    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
     (setq flyspell-use-meta-tab nil
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
-
+    (dolist (hook '(text-mode-hook message-mode-hook))
+      (add-hook hook '(lambda () (flyspell-mode 1))))
     (after "evil-leader"
       (dotemacs-add-toggle spelling-checking
                            :status flyspell-mode
@@ -7714,7 +7919,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package init-yasnippet
   :load-path "config/"
-  :defer t
   :commands (dotemacs-load-yasnippet
              dotemacs-auto-yasnippet-expand
              dotemacs-force-yasnippet-off))
