@@ -89,4 +89,4 @@ up before you execute another command."
   (flycheck-clear-idle-change-timer)
   (flycheck-buffer-automatically 'idle-change))
 
-(provide 'init-flycheck)
+(provide 'init-syntax-checking)
