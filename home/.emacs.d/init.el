@@ -4906,6 +4906,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setq web-mode-enable-auto-pairing nil)
     (setq web-mode-markup-indent-offset 2)
 
+    (after "flycheck"
+      (when-let (tidy5 (and (eq system-type 'darwin)
+                               (executable-find "tidy5")))
+        (setq flycheck-html-tidy-executable tidy5)
+        (flycheck-add-mode 'html-tidy 'web-mode)))
+
     (sp-local-pair 'web-mode "<% " " %>")
     (sp-local-pair 'web-mode "{ " " }")
     (sp-local-pair 'web-mode "<%= "  "  %>")
