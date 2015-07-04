@@ -7564,10 +7564,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "tmf" 'dotemacs-mode-line-flycheck-info-toggle))
 
     (dotemacs-set-flycheck-mode-line-faces)
-    (setq flycheck-display-errors-function
-          #'flycheck-display-error-messages-unless-error-list
-          flycheck-mode-line
-          '(:eval (dotemacs-flycheck-mode-line-status)))
 
     ;; Don't highlight undesired errors from html tidy
     (add-hook 'flycheck-process-error-functions
@@ -7640,7 +7636,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :if (and dotemacs-s-syntax-checking-enable-tooltips (display-graphic-p))
   :defer t
   :init
-  (setq flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
+  (after "flycheck"
+    (setq flycheck-display-errors-function
+          #'flycheck-pos-tip-error-messages
+          flycheck-mode-line
+          '(:eval (dotemacs-flycheck-mode-line-status)))))
 
 (use-package ispell                     ; Spell checking
   :defer t
