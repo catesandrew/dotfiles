@@ -24,7 +24,6 @@ if [ $(uname) = "Darwin" ]; then
 
     if hash brew 2>/dev/null; then
         export BREW_HOME="`brew --prefix`"
-        export BREW_EMACS_MAC_HOME="`brew --prefix emacs-mac`"
 
         # Cask installation
         if [ ! -h "${HOME}/.cask" ]; then
