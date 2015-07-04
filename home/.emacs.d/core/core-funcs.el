@@ -157,4 +157,28 @@ Supported properties:
                          :initial-value nil)))
         (if dir (file-name-as-directory dir))))))
 
+(defun dotemacs-load-or-install-package (pkg &optional log file-to-load)
+  "Load PKG package. PKG will be installed if it is not already installed.
+Whenever the initial require fails the absolute path to the package
+directory is returned.
+If LOG is non-nil a message is displayed in spacemacs-mode buffer.
+FILE-TO-LOAD is an explicit file to load after the installation."
+  (condition-case nil
+      (require pkg)
+    (error
+     ;; not installed, we try to initialize package.el only if required to
+     ;; precious seconds during boot time
+     (require 'cl)
+     (let ((pkg-elpa-dir (dotemacs-get-package-directory pkg)))
+       (if pkg-elpa-dir
+           (add-to-list 'load-path pkg-elpa-dir)
+         ;; install the package
+         (package-refresh-contents)
+         (package-install pkg)
+         (setq pkg-elpa-dir (dotemacs-get-package-directory pkg)))
+       (require pkg nil 'noerror)
+       (when file-to-load
+         (load-file (concat pkg-elpa-dir file-to-load)))
+       pkg-elpa-dir))))
+
 (provide 'core-funcs)

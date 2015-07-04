@@ -59,6 +59,19 @@
   "The currently logged in user's storage location for settings."
   :group 'dotemacs)
 
+(defcustom dotemacs-themes '(zenburn
+                             solarized-dark
+                             solarized-light
+                             leuven
+                             monokai)
+  "List of themes, the first of the list is loaded when emacs starts.
+Press <Leader> T n to cycle to the next theme in the list (works great
+with 2 themes variants, one dark and one light")
+
+(defcustom dotemacs--cur-theme nil
+  "The current theme"
+  :group 'dotemacs)
+
 (defcustom dotemacs-leader-key ","
   "The leader key."
   :group 'dotemacs)
@@ -648,6 +661,9 @@ FEATURE may be a named feature or a file name, see
 (use-package core-use-package-ext
   :load-path "core/")
 
+(use-package core-themes-support
+  :load-path "core/")
+
 
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
@@ -852,6 +868,16 @@ FEATURE may be a named feature or a file name, see
       visible-bell nil
       initial-scratch-message nil)
 
+;; default theme
+(let ((default-theme (car dotemacs-themes)))
+  (dotemacs-load-theme default-theme)
+  ;; used to prevent automatic deletion of used packages
+  (setq dotemacs-used-theme-packages
+        (delq nil (mapcar 'dotemacs-get-theme-package
+                          dotemacs-themes)))
+  (setq dotemacs--cur-theme default-theme)
+  (setq-default dotemacs--cycle-themes (cdr dotemacs-themes)))
+
 (toggle-transparency)
 
 ;; Answering just 'y' or 'n' will do
@@ -931,30 +957,6 @@ FEATURE may be a named feature or a file name, see
   :config (progn (setq unicode-fonts-skip-font-groups '(low-quality-glyphs)
                        unicode-fonts-use-prepend t)
                  (unicode-fonts-setup)))
-
-(use-package solarized                  ; My colour theme
-  :disabled t
-  :ensure solarized-theme
-  :defer t
-  :init (load-theme 'solarized-dark 'no-confirm)
-  :config
-  ;; Disable variable pitch fonts in Solarized theme
-  (setq solarized-use-variable-pitch nil
-        ;; Don't add too much colours to the fringe
-        solarized-emphasize-indicators nil
-        ;; I find different font sizes irritating.
-        solarized-height-minus-1 1.0
-        solarized-height-plus-1 1.0
-        solarized-height-plus-2 1.0
-        solarized-height-plus-3 1.0
-        solarized-height-plus-4 1.0))
-
-(use-package zenburn
-  :ensure zenburn-theme
-  :defer t
-  :init
-  (progn
-    (load-theme 'zenburn 'no-confirm)))
 
 (use-package linum-relative
   :ensure t

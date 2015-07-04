@@ -54,6 +54,8 @@
   "bR"  'dotemacs-safe-revert-buffer
   "bY"  'copy-whole-buffer-to-clipboard
   "bw"  'read-only-mode)
+;; Cycling settings -----------------------------------------------------------
+(evil-leader/set-key "Tn" 'dotemacs-cycle-dotemacs-theme)
 ;; describe functions ---------------------------------------------------------
 (defmacro dotemacs-set-helm-key (keys func)
   "Define a key bindings for FUNC using KEYS.
