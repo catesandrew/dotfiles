@@ -199,6 +199,31 @@ NOERROR and NOMESSAGE are passed to `load'."
   "Default mode to open header files. Can be `c-mode' or `c++-mode'."
   :group 'dotemacs-c-c++)
 
+;; shell settings
+(defgroup dotemacs-shell nil
+  "Configuration options for shell."
+  :group 'dotemacs
+  :prefix 'dotemacs-shell)
+
+(defcustom dotemacs-shell-default-shell (if (eq window-system 'w32)
+                                'eshell
+                              'ansi-term)
+  "Default shell to use in emacs. Possible values are `eshell', `shell',
+`term', `multi-term`,  and `ansi-term'."
+  :group 'dotemacs-shell)
+
+(defcustom dotemacs-shell-default-position 'bottom
+  "Position of the shell. Possible values are `top', `bottom' and `full'."
+  :group 'dotemacs-shell)
+
+(defcustom dotemacs-shell-default-height 30
+  "Height in percents for the shell window."
+  :group 'dotemacs-shell)
+
+(defcustom dotemacs-shell-default-term-shell "/bin/bash"
+  "Default shell to use in `term' and `ansi-term' shells."
+  :group 'dotemacs-shell)
+
 ;; ruby settings
 (defgroup dotemacs-ruby nil
   "Configuration options for ruby."
@@ -669,6 +694,10 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 
+;; Shell
+(use-package init-eshell
+  :load-path "config/")
+
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
   :ensure t
@@ -697,11 +726,94 @@ FEATURE may be a named feature or a file name, see
         (when dir
           (add-to-list 'Info-directory-list dir))))))
 
-(use-package init-eshell
-  :load-path "config/"
-  :commands (dotemacs-new-eshell-split
-             dotemacs-eshell-prompt
-             dotemacs-current-git-branch))
+(use-package multi-term
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (after "evil-leader"
+      (evil-leader/set-key "ast" 'shell-pop-multi-term)))
+  :config
+  (progn
+    (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
+    (after "evil-leader"
+      (evil-leader/set-key "p$t" 'projectile-multi-term-in-root))))
+
+(use-package shell-pop
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq shell-pop-window-position dotemacs-shell-default-position
+          shell-pop-window-height   dotemacs-shell-default-height
+          shell-pop-term-shell      dotemacs-shell-default-term-shell
+          shell-pop-full-span t)
+    (defmacro make-shell-pop-command (type &optional shell)
+      (let* ((name (symbol-name type)))
+        `(defun ,(intern (concat "shell-pop-" name)) (index)
+           (interactive "P")
+           (require 'shell-pop)
+           (shell-pop--set-shell-type
+            'shell-pop-shell-type
+            (backquote (,name
+                        ,(concat "*" name "*")
+                        (lambda nil (funcall ',type ,shell)))))
+           (shell-pop index))))
+    (make-shell-pop-command eshell)
+    (make-shell-pop-command shell)
+    (make-shell-pop-command term shell-pop-term-shell)
+    (make-shell-pop-command multiterm)
+    (make-shell-pop-command ansi-term shell-pop-term-shell)
+
+    (add-hook 'kill-buffer-hook 'dotemacs-term-kill-buffer-hook)
+    (add-hook 'term-mode-hook 'ansi-term-handle-close)
+
+    (after "evil-leader"
+      (evil-leader/set-key
+        "'"   'dotemacs-default-pop-shell
+        "ase" 'shell-pop-eshell
+        "asi" 'shell-pop-shell
+        "asm" 'shell-pop-multiterm
+        "ast" 'shell-pop-ansi-term
+        "asT" 'shell-pop-term))))
+
+;; shell
+(add-hook 'shell-mode-hook 'shell-comint-input-sender-hook)
+(add-hook 'eshell-mode-hook (lambda ()
+                              (setq pcomplete-cycle-completions nil)))
+
+;; term
+(after "evil-leader"
+  ;; hack to fix pasting issue, the paste micro-state won't
+  ;; work in term
+  (evil-define-key 'normal term-raw-map "p" 'term-paste)
+  (evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
+  (evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab))
+
+(dotemacs-use-package-add-hook helm
+  :post-config
+  (progn
+    ;; eshell
+    (defun dotemacs-helm-eshell-history ()
+      "Correctly revert to insert state after selection."
+      (interactive)
+      (helm-eshell-history)
+      (evil-insert-state))
+    (defun dotemacs-helm-shell-history ()
+      "Correctly revert to insert state after selection."
+      (interactive)
+      (helm-comint-input-ring)
+      (evil-insert-state))
+    (defun dotemacs-init-helm-eshell ()
+      "Initialize helm-eshell."
+      ;; this is buggy for now
+      ;; (define-key eshell-mode-map (kbd "<tab>") 'helm-esh-pcomplete)
+      (evil-leader/set-key-for-mode 'eshell-mode
+        "mH" 'dotemacs-helm-eshell-history))
+    (add-hook 'eshell-mode-hook 'dotemacs-init-helm-eshell)
+    ;;shell
+    (evil-leader/set-key-for-mode 'shell-mode
+      "mH" 'dotemacs-helm-shell-history)))
 
 
 ;;; Customization, init file and package management
