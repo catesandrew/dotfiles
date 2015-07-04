@@ -1760,7 +1760,7 @@ mouse-3: go to end"))))
   (when-let (gnu-ls (and (eq system-type 'darwin) (executable-find "gls")))
     ;; maybe absolute or relative name of the `ls' program used by
     ;; `insert-directory'.
-    ;; brew info coreutils
+    ;; brew install coreutils
     (setq insert-directory-program gnu-ls)))
 
 (use-package tramp                      ; Access remote files
@@ -1996,6 +1996,7 @@ mouse-3: go to end"))))
     (dotimes (i 10)
       (when (= p (point)) ad-do-it))))
 
+;; todo: add choice between avy-jump and ace-jump
 (use-package avy-jump                   ; Jump to characters in buffers
   :ensure avy
   :bind (("C-c j s" . avy-isearch)
@@ -2007,20 +2008,67 @@ mouse-3: go to end"))))
     ; (define-key evil-motion-state-map (kbd "S-SPC") 'avy-goto-line)
     ))
 
-(use-package ace-link                   ; Fast link jumping
-  :ensure t
+(use-package ace-jump-mode
   :defer t
-  :init (progn (after "info"
-                 (bind-key "C-c j l" #'ace-link-info Info-mode-map))
+  :disabled t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key "SPC" 'evil-ace-jump-word-mode)
+    (evil-leader/set-key "l" 'evil-ace-jump-line-mode))
+  :config
+  (progn
+    (setq ace-jump-mode-scope 'global)
+    (evil-leader/set-key "`" 'ace-jump-mode-pop-mark)))
 
-               (after "help-mode"
-                 (defvar help-mode-map)  ; Silence the byte compiler
-                 (bind-key "C-c j l" #'ace-link-help help-mode-map))))
+(use-package ace-link                   ; Fast link jumping
+  :commands dotemacs-ace-buffer-links
+  :init
+  (progn
+    (after "info"
+      (bind-key "C-c j l" #'ace-link-info Info-mode-map)
+      '(define-key Info-mode-map "o" 'ace-link-info))
+    (after "help-mode"
+      (defvar help-mode-map)  ; Silence the byte compiler
+      (bind-key "C-c j l" #'ace-link-help help-mode-map)
+      '(define-key help-mode-map "o" 'ace-link-help))
+    (after "eww"
+      '(progn
+         (define-key eww-link-keymap "o" 'ace-link-eww)
+         (define-key eww-mode-map "o" 'ace-link-eww))))
+  :config
+  (progn
+    (defvar dotemacs--link-pattern "~?/.+\\|\s\\[")
+    (defun dotemacs-collect-buffer-links ()
+      (let ((end (window-end))
+            points)
+        (save-excursion
+          (goto-char (window-start))
+          (while (re-search-forward dotemacs--link-pattern end t)
+            (push (+ (match-beginning 0) 1) points))
+          (nreverse points))))
+    (defun dotemacs-ace-buffer-links ()
+      "Ace jump to links in `spacemacs' buffer."
+      (interactive)
+      (ali-generic
+       (dotemacs-collect-buffer-links)
+       (forward-char 1)
+       (widget-button-press (point))))))
 
 (use-package ace-window                 ; Fast window switching
   :ensure t
+  :defer t
   :bind (("C-x o" . ace-window)
-         ("C-c o" . ace-window)))
+         ("C-c o" . ace-window))
+  :init
+  (progn
+    (after "evil-leader"
+    (evil-leader/set-key
+      "bM"  'ace-swap-window
+      "wC"  'ace-delete-window
+      "w <SPC>"  'ace-window))
+    ;; set ace-window keys to home-row
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
 
 (use-package page-break-lines           ; Turn page breaks into lines
   :ensure t
