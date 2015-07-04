@@ -299,14 +299,14 @@ NOERROR and NOMESSAGE are passed to `load'."
   :group 'dotemacs-evil)
 
 (defcustom dotemacs-evil-cursor-colors '((normal . "DarkGoldenrod2")
-                                       (insert . "chartreuse3")
-                                       (emacs  . "SkyBlue2")
-                                       (evilified . "LightGoldenrod3")
-                                       (visual . "gray")
-                                       (motion . "plum3")
-                                       (lisp   . "HotPink1")
-                                       (iedit  . "firebrick1")
-                                       (iedit-insert  . "firebrick1"))
+                                         (insert . "chartreuse3")
+                                         (emacs  . "SkyBlue2")
+                                         (evilified . "LightGoldenrod3")
+                                         (visual . "gray")
+                                         (motion . "plum3")
+                                         (lisp   . "HotPink1")
+                                         (iedit  . "firebrick1")
+                                         (iedit-insert  . "firebrick1"))
   "Colors assigned to evil states."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
@@ -317,7 +317,11 @@ NOERROR and NOMESSAGE are passed to `load'."
   :group 'dotemacs
   :prefix 'dotemacs-colors)
 
-(defcustom dotemacs-colors-enable-rainbow-identifiers nil
+(defcustom dotemacs-colors-enable-color-identifiers nil
+  "If non nil the `color-identifers' package is enabled."
+  :group 'dotemacs-colors)
+
+(defcustom dotemacs-colors-enable-rainbow-identifiers t
   "If non nil the `rainbow-identifers' package is enabled."
   :group 'dotemacs-colors)
 
@@ -2365,6 +2369,9 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Colors
+(use-package init-colors
+  :load-path "config/")
+
 (use-package rainbow-delimiters         ; Highlight delimiters by depth
   :ensure t
   :defer t
@@ -2376,6 +2383,55 @@ Disable the highlighting of overlong lines."
     (when (eq dotemacs-highlight-delimiters 'all)
       (dolist (hook '(text-mode-hook prog-mode-hook))
         (add-hook hook #'rainbow-delimiters-mode)))))
+
+;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
+;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
+(use-package color-identifiers-mode
+  :ensure t
+  :if dotemacs-colors-enable-color-identifiers
+  :commands color-identifiers-mode
+  :init
+  (progn
+    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (color-identifiers-mode)))))
+  :diminish color-identifiers-mode)
+
+(use-package rainbow-identifiers
+  :ensure t
+  :if dotemacs-colors-enable-rainbow-identifiers
+  :commands rainbow-identifiers-mode
+  :init
+  (progn
+    (setq rainbow-identifiers-choose-face-function 'rainbow-identifiers-cie-l*a*b*-choose-face
+          rainbow-identifiers-cie-l*a*b*-saturation 100
+          rainbow-identifiers-cie-l*a*b*-lightness 40
+          ;; override theme faces
+          rainbow-identifiers-faces-to-override '(highlight-quoted-symbol
+                                                  font-lock-keyword-face
+                                                  font-lock-function-name-face
+                                                  font-lock-variable-name-face))
+
+    (dotemacs-add-toggle rainbow-identifier-globally
+                         :status rainbow-identifiers-mode
+                         :on (rainbow-identifiers-mode)
+                         :off (rainbow-identifiers-mode -1)
+                         :documentation "Colorize identifiers globally."
+                         :evil-leader "tCi")
+
+    (add-hook 'prog-mode-hook 'rainbow-identifiers-mode))
+  (colors//tweak-theme-colors dotemacs--cur-theme)
+
+  (defadvice dotemacs-post-theme-init (after colors/post-theme-init activate)
+    "Adjust lightness and brightness of rainbow-identifiers on post theme init."
+    (colors//tweak-theme-colors dotemacs--cur-theme))
+
+  :config
+  (progn
+    ;; key bindings
+    (evil-leader/set-key "Cis" 'colors/start-change-color-saturation)
+    (evil-leader/set-key "Cil" 'colors/start-change-color-lightness)))
 
 (use-package rainbow-mode               ; Fontify color values in code
   :commands rainbow-mode
@@ -3325,20 +3381,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Programming utilities
-
-;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
-;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
-(use-package color-identifiers-mode
-  :ensure t
-  :defer t
-  :diminish color-identifiers-mode
-  :init
-  (progn
-    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (global-color-identifiers-mode))))))
-
 (use-package init-programming
   :load-path "config/"
   :defer t
