@@ -298,6 +298,28 @@ NOERROR and NOMESSAGE are passed to `load'."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 
+;; colors settings
+(defgroup dotemacs-colors nil
+  "Configuration options for colors."
+  :group 'dotemacs
+  :prefix 'dotemacs-colors)
+
+(defcustom dotemacs-colors-enable-rainbow-identifiers nil
+  "If non nil the `rainbow-identifers' package is enabled."
+  :group 'dotemacs-colors)
+
+(defcustom dotemacs-colors-theme-identifiers-sat&light
+  '((jazz . (50 55))
+    (gotham . (45 60))
+    (leuven . (100 40))
+    (material . (95 105))
+    (monokai . (55 60))
+    (solarized-dark . (65 55))
+    (solarized-light . (60 55))
+    (zenburn . (40 65)))
+  "alist of theme symbols and pair of saturation and lightness values."
+  :group 'dotemacs-colors)
+
 ;; auto-completion settings
 (defgroup dotemacs-ac nil
   "Configuration options for auto completion."
@@ -556,7 +578,12 @@ FEATURE may be a named feature or a file name, see
           ("xw" . "text-words")
           ("z" .  "zoom")))
   (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
-        dotemacs-key-binding-prefixes))
+        dotemacs-key-binding-prefixes)
+
+  (when dotemacs-colors-enable-rainbow-identifiers
+    (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
+    (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+          colors/key-binding-prefixes)))
 
 
 ;;; Initialization
@@ -1032,7 +1059,7 @@ mouse-3: go to end"))))
 
 ;;; Minibuffer and Helm
 ;; Display current keystrokes almost immediately in mini buffer
-(setq echo-keystrokes 0.2)
+(setq echo-keystrokes 0.02)
 
 ;; escape minibuffer
 (define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
@@ -2299,18 +2326,6 @@ Disable the highlighting of overlong lines."
     (dotemacs-hide-lighter hl-highlight-mode))
   :diminish (hl-paren-mode . " (Ⓗ)"))
 
-(use-package rainbow-delimiters         ; Highlight delimiters by depth
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (after "evil-leader"
-      (evil-leader/set-key "tCd" 'rainbow-delimiters-mode))
-
-    (when (eq dotemacs-highlight-delimiters 'all)
-      (dolist (hook '(text-mode-hook prog-mode-hook))
-        (add-hook hook #'rainbow-delimiters-mode)))))
-
 (use-package hi-lock                    ; Custom regexp highlights
   :init (global-hi-lock-mode)
   :diminish hi-lock-mode)
@@ -2327,12 +2342,6 @@ Disable the highlighting of overlong lines."
   :ensure t
   :defer t
   :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
-
-(use-package rainbow-mode               ; Fontify color values in code
-  :ensure t
-  :bind (("C-c t r" . rainbow-mode))
-  :init (dolist (hook '(js-mode-hook js2-mode-hook html-mode-hook web-mode-hook css-mode-hook stylus-mode-hook stylus-mode-hook handlebars-mode-hook))
-          (add-hook hook #'rainbow-mode)))
 
 (use-package highlight-symbol           ; Highlighting and commands for symbols
   :ensure t
@@ -2351,6 +2360,32 @@ Disable the highlighting of overlong lines."
         highlight-symbol-on-navigation-p t) ; Highlight immediately after
                                         ; navigation
   :diminish highlight-symbol-mode)
+
+
+;;; Colors
+(use-package rainbow-delimiters         ; Highlight delimiters by depth
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (after "evil-leader"
+      (evil-leader/set-key "tCd" 'rainbow-delimiters-mode))
+
+    (when (eq dotemacs-highlight-delimiters 'all)
+      (dolist (hook '(text-mode-hook prog-mode-hook))
+        (add-hook hook #'rainbow-delimiters-mode)))))
+
+(use-package rainbow-mode               ; Fontify color values in code
+  :commands rainbow-mode
+  :ensure t
+  :bind (("C-c t r" . rainbow-mode))
+  :init
+  (progn
+    (evil-leader/set-key "tCc" 'rainbow-mode)
+    (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
+      (add-hook hook #'rainbow-mode)))
+  :diminish rainbow-mode)
+
 
 
 ;;; Evil
@@ -3651,9 +3686,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (kbd "q") 'ensime-popup-buffer-quit-function)
 
     (evil-define-key 'normal ensime-refactor-info-map
-      (kbd "q") 'spacemacs/ensime-refactor-cancel
-      (kbd "c") 'spacemacs/ensime-refactor-accept
-      (kbd "RET") 'spacemacs/ensime-refactor-accept)
+      (kbd "q") 'dotemacs-ensime-refactor-cancel
+      (kbd "c") 'dotemacs-ensime-refactor-accept
+      (kbd "RET") 'dotemacs-ensime-refactor-accept)
 
     (evil-define-key 'normal ensime-compile-result-map
       (kbd "g") 'ensime-show-all-errors-and-warnings
@@ -5007,8 +5042,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode ("\\.scss\\'" . scss-mode)
   :init
   (progn
-    (after "rainbow-delimiters"
-      (add-hook 'scss-mode-hook 'rainbow-delimiters-mode))))
+    (add-hook 'scss-mode-hook 'rainbow-delimiters-mode)))
 
 (use-package sass-mode
   :ensure t
@@ -5020,8 +5054,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (after "rainbow-delimiters"
-      (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode)))
+    (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode))
   :mode ("\\.less\\'" . less-css-mode))
 
 (use-package tagedit
