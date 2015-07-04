@@ -412,12 +412,13 @@ NOERROR and NOMESSAGE are passed to `load'."
   :group 'dotemacs
   :prefix 'dotemacs-colors)
 
-(defcustom dotemacs-colors-enable-color-identifiers nil
-  "If non nil the `color-identifers' package is enabled."
-  :group 'dotemacs-colors)
-
-(defcustom dotemacs-colors-enable-rainbow-identifiers t
-  "If non nil the `rainbow-identifers' package is enabled."
+(defcustom dotemacs-colors-engine
+  'rainbow
+  "The color identifier engine to use."
+  :type '(radio
+          (const :tag "none" none)
+          (const :tag "rainbow-identifiers" rainbow)
+          (const :tag "color-identifiers" color))
   :group 'dotemacs-colors)
 
 (defcustom dotemacs-colors-theme-identifiers-sat&light
@@ -692,7 +693,7 @@ FEATURE may be a named feature or a file name, see
   (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
         dotemacs-key-binding-prefixes)
 
-  (when dotemacs-colors-enable-rainbow-identifiers
+  (when (eq dotemacs-colors-engine 'rainbow)
     (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
     (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
           colors/key-binding-prefixes)))
@@ -2570,7 +2571,7 @@ Disable the highlighting of overlong lines."
 ;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
 (use-package color-identifiers-mode
   :ensure t
-  :if dotemacs-colors-enable-color-identifiers
+  :if (eq dotemacs-colors-engine 'color)
   :commands color-identifiers-mode
   :init
   (progn
@@ -2582,7 +2583,7 @@ Disable the highlighting of overlong lines."
 
 (use-package rainbow-identifiers
   :ensure t
-  :if dotemacs-colors-enable-rainbow-identifiers
+  :if (eq dotemacs-colors-engine 'rainbow)
   :commands rainbow-identifiers-mode
   :init
   (progn
