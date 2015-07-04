@@ -541,6 +541,7 @@ FEATURE may be a named feature or a file name, see
           ("t" .  "toggles")
           ("tC" . "toggles-colors")
           ("th" . "toggles-highlight")
+          ("te" . "toggles-errors")
           ("tm" . "toggles-modeline")
           ("T" .  "toggles/themes")
           ("w" .  "windows")
@@ -3260,7 +3261,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package handlebars-mode
   :ensure t
   :mode (("\\.hbs$" . handlebars-mode)
-         ("\\.handlebars$" . handlebars-mode)))
+         ("\\.handlebars$" . handlebars-mode))
+  :init
+  (progn
+    (after "flycheck"
+      (when-let (handlebars (executable-find "handlebars"))
+                (setq flycheck-handlebars-executable handlebars)))))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'handlebars-mode-hook 'flycheck-mode))
 
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
@@ -4972,9 +4982,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
    ("\\.[gj]sp\\'"     . web-mode)
    ("\\.as[cp]x\\'"    . web-mode)
    ("\\.erb\\'"        . web-mode)
-   ("\\.mustache\\'"   . web-mode)
-   ("\\.handlebars\\'" . web-mode)
-   ("\\.hbs\\'"        . web-mode)
    ("\\.eco\\'"        . web-mode)
    ("\\.djhtml\\'"     . web-mode)))
 
@@ -5034,6 +5041,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (progn
     (add-hook 'web-mode-hook 'flycheck-mode)
+    (add-hook 'css-mode-hook 'flycheck-mode)
     (add-hook 'scss-mode-hook 'flycheck-mode)
     (add-hook 'slim-mode-hook 'flycheck-mode)
     (add-hook 'sass-mode-hook 'flycheck-mode)))
@@ -5129,6 +5137,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
+    (after "flycheck"
+      (when-let (coffeelint (executable-find "coffeelint"))
+        (setq flycheck-coffee-coffeelint-executable coffeelint)))
+
     (defun javascript/coffee-indent ()
       (if (coffee-line-wants-indent)
           ;; We need to insert an additional tab because the last line was special.
@@ -5145,15 +5157,59 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (progn
     (add-hook 'coffee-mode-hook 'flycheck-mode)
-    (add-hook 'js2-mode-hook    'flycheck-mode)
-    (add-hook 'json-mode-hook   'flycheck-mode)))
+    (add-hook 'js2-mode-hook 'flycheck-mode)
+    (add-hook 'json-mode-hook 'flycheck-mode)))
 
 (use-package js2-mode                   ; Javascript editing
   :defer t
   :ensure t
   :init
   (progn
+    (after "flycheck"
+
+      (when-let (jshint (executable-find "jshint"))
+                (setq flycheck-javascript-jshint-executable jshint)
+                (defun flycheck-jshint-disable ()
+                  (interactive)
+                  (add-to-list 'flycheck-disabled-checkers 'javascript-jshint))
+                (defun flycheck-jshint-enable ()
+                  (interactive)
+                  (setq flycheck-disabled-checkers (remove 'javascript-jshint flycheck-disabled-checkers)))
+                (evil-leader/set-key
+                  "teh" 'flycheck-jshint-enable
+                  "teH" 'flycheck-jshint-disable))
+
+      (when-let (jscs (executable-find "jscs"))
+                (setq flycheck-javascript-jscs-executable jscs)
+                (defun flycheck-jscs-disable ()
+                  (interactive)
+                  (add-to-list 'flycheck-disabled-checkers 'javascript-jscs))
+                (defun flycheck-jscs-enable ()
+                  (interactive)
+                  (setq flycheck-disabled-checkers (remove 'javascript-jscs flycheck-disabled-checkers)))
+                (evil-leader/set-key
+                  "tec" 'flycheck-jscs-enable
+                  "teC" 'flycheck-jscs-disable))
+
+      (when-let (eslint (executable-find "eslint"))
+                (setq flycheck-javascript-eslint-executable eslint)
+                (defun flycheck-eslint-disable ()
+                  (interactive)
+                  (add-to-list 'flycheck-disabled-checkers 'javascript-eslint))
+                (defun flycheck-eslint-enable ()
+                  (interactive)
+                  (setq flycheck-disabled-checkers (remove 'javascript-eslint flycheck-disabled-checkers)))
+                (evil-leader/set-key
+                  "tee" 'flycheck-eslint-enable
+                  "teE" 'flycheck-eslint-disable)))
+
+    ;; Let flycheck handle parse errors
+    (setq js2-show-parse-errors nil
+          js2-strict-missing-semi-warning nil
+          js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
+
     (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.eslintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
     (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)
     ;; required to make `<SPC> s l' to work correctly
@@ -7559,11 +7615,21 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "evil-leader"
       (evil-leader/set-key
         "ec" 'flycheck-clear
-        "el" 'flycheck-list-errors
+        "eC" 'flycheck-compile
+        ; https://github.com/flycheck/flycheck/pull/494
+        "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
         "eL" 'dotemacs-flycheck-hide-list-errors
+        "es" 'flycheck-select-checker
+        "ex" 'flycheck-disable-checker
+        "e?" 'flycheck-describe-checker
         "tmf" 'dotemacs-mode-line-flycheck-info-toggle))
 
     (dotemacs-set-flycheck-mode-line-faces)
+    (unless (display-graphic-p)
+      (setq flycheck-display-errors-function
+            #'flycheck-display-error-messages-unless-error-list
+            flycheck-mode-line
+            '(:eval (dotemacs-flycheck-mode-line-status))))
 
     ;; Don't highlight undesired errors from html tidy
     (add-hook 'flycheck-process-error-functions
@@ -7581,13 +7647,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                     (reusable-frames . visible)
                     (window-height   . 0.4)))
 
+    (defun dotemacs-flycheck-pop-to-error-list ()
+      (interactive)
+      (flycheck-list-errors)
+      (pop-to-buffer flycheck-error-list-buffer))
+
     (defun dotemacs-flycheck-hide-list-errors ()
       "Hide the error list for the current buffer."
       (interactive)
-      (unless flycheck-mode
-        (user-error "Flycheck mode not enabled"))
-      (when (get-buffer flycheck-error-list-buffer)
-        (kill-buffer flycheck-error-list-buffer)))
+      (let ((buffer (get-buffer flycheck-error-list-buffer)))
+        (when buffer
+          (let ((window (get-buffer-window buffer)))
+            (when window
+              (unless (flycheck-overlays-at (point))
+                (quit-window nil window)))))))
 
     (after "evil-evilified-state"
       (evilify flycheck-error-list-mode flycheck-error-list-mode-map
@@ -7689,7 +7762,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package helm-flycheck
   :ensure t
   :commands helm-flycheck
-  :init (evil-leader/set-key "Sf" 'helm-flycheck))
+  :init (evil-leader/set-key "ef" 'helm-flycheck))
 
 (use-package helm-flyspell
   :ensure t

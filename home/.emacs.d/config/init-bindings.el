@@ -81,9 +81,10 @@ Ensure that helm is required before calling FUNC."
 (dotemacs-set-helm-key "swg" helm-google-suggest)
 ;; errors ---------------------------------------------------------------------
 (evil-leader/set-key
+  "ej" 'dotemacs-next-error
+  "ek" 'dotemacs-previous-error
   "en" 'dotemacs-next-error
-  "ep" 'dotemacs-previous-error
-  "eN" 'dotemacs-previous-error)
+  "ep" 'dotemacs-previous-error)
 ;; file -----------------------------------------------------------------------
 (evil-leader/set-key
   "fD"  'delete-current-buffer-file
