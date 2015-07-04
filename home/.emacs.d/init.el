@@ -2384,6 +2384,10 @@ mouse-3: go to end"))))
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
+    (add-hook 'LaTeX-mode-hook 'smartparens-mode)
+    (add-hook 'markdown-mode-hook 'smartparens-mode)
+    (add-hook 'inferior-python-mode-hook 'smartparens-mode)
+
     (after "evil-leader"
       (dotemacs-add-toggle smartparens
                            :status smartparens-mode
@@ -2460,7 +2464,7 @@ mouse-3: go to end"))))
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
     (sp-pair "[" nil :post-handlers
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET"))))
-  :diminish (smartparens-mode " ⓟ" " p"))
+  :diminish (smartparens-mode . " ⓟ"))
 
 
 ;;; Highlights and fontification
@@ -2674,7 +2678,6 @@ Disable the highlighting of overlong lines."
     (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
       (add-hook hook #'rainbow-mode)))
   :diminish rainbow-mode)
-
 
 
 ;;; Evil
@@ -3107,7 +3110,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              evil-visualstar/begin-search-backward)
   :init
   (progn
-    ; (global-evil-visualstar-mode)
     (define-key evil-visual-state-map (kbd "*")
       'evil-visualstar/begin-search-forward)
     (define-key evil-visual-state-map (kbd "#")
@@ -3358,9 +3360,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (add-hook 'LaTeX-mode-hook 'flyspell-mode))
 
-; (defun latex/post-init-smartparens ()
-;   (add-hook 'LaTeX-mode-hook 'smartparens-mode))
-
 (dotemacs-use-package-add-hook yasnippet
   :post-init
   (add-hook 'LaTeX-mode-hook 'dotemacs-load-yasnippet))
@@ -3378,7 +3377,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (add-hook 'markdown-mode-hook 'smartparens-mode)
     ;; http://www.tychoish.com/posts/imenu-for-markdown-and-writing/
     (setq markdown-imenu-generic-expression
           '(("title"  "^\\(.*\\)[\n]=+$" 1)
@@ -4228,7 +4226,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'python-mode-hook (lambda () (setq fill-column 79)))
     (add-hook 'python-mode-hook #'subword-mode)
 
-    (add-hook 'inferior-python-mode-hook 'smartparens-mode)
     ;; add support for `ahs-range-beginning-of-defun' for python-mode
     (after "auto-highlight-symbol"
       '(add-to-list 'ahs-plugin-bod-modes 'python-mode))
