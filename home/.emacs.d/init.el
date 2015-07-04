@@ -63,7 +63,77 @@
                              solarized-dark
                              solarized-light
                              leuven
-                             monokai)
+                             monokai
+                             ;; monster theme support
+                             afternoon
+                             ample
+                             ample-zen
+                             anti-zenburn
+                             birds-of-paradise-plus
+                             bubbleberry
+                             busybee
+                             cherry-blossom
+                             clues
+                             cyberpunk
+                             dakrone
+                             darkburn
+                             darkmine
+                             darktooth
+                             django
+                             espresso
+                             firebelly
+                             flatland
+                             flatui
+                             gandalf
+                             gotham
+                             grandshell
+                             gruber-darker
+                             gruvbox
+                             hc-zenburn
+                             heroku
+                             inkpot
+                             ir-black
+                             jazz
+                             light-soap
+                             lush
+                             material
+                             minimal
+                             molokai
+                             monochrome
+                             mustang
+                             naquadah
+                             niflheim
+                             noctilux
+                             obsidian
+                             occidental
+                             oldlace
+                             organic-green
+                             pastels-on-dark
+                             phoenix-dark-mono
+                             phoenix-dark-pink
+                             planet
+                             professional
+                             purple-haze
+                             seti
+                             smyx
+                             soft-charcoal
+                             soft-morning
+                             soft-stone
+                             soothe
+                             spacegray
+                             subatomic
+                             subatomic256
+                             sunny-day
+                             tango-2
+                             tango-plus
+                             tangotango
+                             tronesque
+                             twilight-anti-bright
+                             twilight-bright
+                             twilight
+                             ujelly
+                             underwater
+                             zen-and-art)
   "List of themes, the first of the list is loaded when emacs starts.
 Press <Leader> T n to cycle to the next theme in the list (works great
 with 2 themes variants, one dark and one light")
