@@ -5717,6 +5717,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package drupal-mode
   :defer t)
 
+; todo
 ; (defun php/post-init-eldoc ()
 ;   (add-hook 'php-mode-hook 'eldoc-mode)
 ;     (dotemacs-ggtags-enable-eldoc 'php-mode))
@@ -6057,11 +6058,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          ("C-c v l" . magit-file-log))
   :init
   (progn
-    ; (after "evil-leader" (progn
-    ;   ;; Set the initial evil state that certain major modes will be in.
-    ;   (evil-set-initial-state 'magit-log-edit-mode 'emacs)
-    ; ))
-
     ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
     ;; most stupid warning ever
     (setq magit-last-seen-setup-instructions "1.4.0"
@@ -6574,6 +6570,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;;; Project management for Interactively Do Things (IDO)
 
+; todo
 ;; original `init-ido`
 ; (require 'ido)
 ; (setq ido-case-fold nil
@@ -6924,6 +6921,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Project management with Project Explorer
+; todo: make choice between project explorer and neo-tree
 (use-package project-explorer
   :disabled t
   :defer t
