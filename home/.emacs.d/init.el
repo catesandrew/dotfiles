@@ -2572,6 +2572,11 @@ Disable the highlighting of overlong lines."
   :init (global-hi-lock-mode)
   :diminish hi-lock-mode)
 
+
+;;; Colors
+(use-package init-colors
+  :load-path "config/")
+
 (use-package highlight-numbers          ; Fontify number literals
   :ensure t
   :defer t
@@ -2635,11 +2640,6 @@ Disable the highlighting of overlong lines."
         highlight-symbol-on-navigation-p t) ; Highlight immediately after
                                         ; navigation
   :diminish highlight-symbol-mode)
-
-
-;;; Colors
-(use-package init-colors
-  :load-path "config/")
 
 (use-package rainbow-delimiters         ; Highlight delimiters by depth,  is a "rainbow parentheses"-like
   :ensure t
