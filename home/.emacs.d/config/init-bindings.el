@@ -149,19 +149,19 @@ Ensure that helm is required before calling FUNC."
                       :status nil
                       :on (toggle-truncate-lines)
                       :documentation "Truncate the long lines (no wrap)."
-                      :evil-leader "tl")
+                      :evil-leader "tt")
 (dotemacs-add-toggle visual-line-navigation
                       :status visual-line-mode
                       :on (visual-line-mode)
                       :off (visual-line-mode -1)
                       :documentation "Move point according to visual lines."
-                      :evil-leader "tL")
+                      :evil-leader "tv")
 (dotemacs-add-toggle line-numbers
                       :status linum-mode
                       :on (global-linum-mode)
                       :off (global-linum-mode -1)
                       :documentation "Show the line numbers."
-                      :evil-leader "tn")
+                      :evil-leader "tl")
 (dotemacs-add-toggle auto-fill-mode
                       :status auto-fill-function
                       :on (auto-fill-mode)

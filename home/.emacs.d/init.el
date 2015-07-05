@@ -639,6 +639,7 @@ FEATURE may be a named feature or a file name, see
 (require 'subr-x)
 (require 'rx)
 (require 'time-date)
+(require 'eval-sexp-fu)
 
 
 ;;; Key Binding Init
@@ -2579,6 +2580,39 @@ Disable the highlighting of overlong lines."
     (add-hook 'prog-mode-hook #'highlight-numbers-mode)
     (add-hook 'asm-mode-hook (lambda () (highlight-numbers-mode -1)))))
 
+(use-package highlight-indentation
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (dotemacs-add-toggle highlight-indentation
+                          :status highlight-indentation-mode
+                          :on (highlight-indentation-mode)
+                          :off (highlight-indentation-mode -1)
+                          :documentation "Highlight indentation levels."
+                          :evil-leader "thi")
+    (dotemacs-add-toggle highlight-indentation-current-column
+                          :status highlight-indentation-current-column-mode
+                          :on (highlight-indentation-current-column-mode)
+                          :off (highlight-indentation-current-column-mode -1)
+                          :documentation "Highlight indentation level at point."
+                          :evil-leader "thc")))
+
+(use-package highlight-parentheses
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (when (eq dotemacs-highlight-delimiters 'current)
+      (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
+    (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
+    (setq hl-paren-colors '("Springgreen3"
+                            "IndianRed1"
+                            "IndianRed3"
+                            "IndianRed4")))
+  :config
+  (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold))
+
 (use-package highlight-quoted
   :ensure t
   :defer t
@@ -2607,7 +2641,7 @@ Disable the highlighting of overlong lines."
 (use-package init-colors
   :load-path "config/")
 
-(use-package rainbow-delimiters         ; Highlight delimiters by depth
+(use-package rainbow-delimiters         ; Highlight delimiters by depth,  is a "rainbow parentheses"-like
   :ensure t
   :defer t
   :init
@@ -6570,56 +6604,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;;; Project management for Interactively Do Things (IDO)
 
-; todo
-;; original `init-ido`
-; (require 'ido)
-; (setq ido-case-fold nil
-;       ido-auto-merge-work-directories-length -1
-;       ido-max-prospects 10)
-; (setq ido-enable-prefix nil)
-; (setq ido-use-virtual-buffers t)
-; ;; disable ido faces to see flx highlights.
-; (setq ido-use-faces nil)
-; (setq ido-create-new-buffer 'always)
-; (setq ido-use-filename-at-point 'guess)
-; (setq ido-save-directory-list-file (concat dotemacs-cache-directory "ido.last"))
-;
-; (ido-mode t)
-; (ido-everywhere t)
-;
-; (require 'ido-ubiquitous)
-; (ido-ubiquitous-mode t)
-;
-; ;; Try out flx-ido for better flex matching between words
-; (require 'flx-ido)
-; (flx-ido-mode t)
-;
-; ;; flx-ido looks better with ido-vertical-mode
-; (require 'ido-vertical-mode)
-; (ido-vertical-mode)
-;
-; ;; C-n/p is more intuitive in vertical layout
-; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-;
-; (require 'dash)
-;
-; ;; Always rescan buffer for imenu
-; (set-default 'imenu-auto-rescan t)
-;
-; (add-to-list 'ido-ignore-directories "target")
-; (add-to-list 'ido-ignore-directories "node_modules")
-; (add-to-list 'ido-ignore-directories "bower_components")
-;
-; ;; Ido at point (C-,)
-; (require 'ido-at-point)
-; (ido-at-point-mode)
-;
-; ;; Use ido everywhere
-; (require 'ido-ubiquitous)
-; (ido-ubiquitous-mode 1)
-;
-; (provide 'init-ido)
-;; end origianl `init-ido`
 (use-package ido
   :preface
   :disabled t
@@ -6932,8 +6916,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (after "evil-leader"
       (evil-leader/set-key
-        "ft" 'project-explorer-open
-        "fT" 'project-explorer-toggle))
+        "tn" 'project-explorer-open
+        "tN" 'project-explorer-toggle))
     (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer")))
   :config
   (progn
@@ -6979,6 +6963,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (add-to-list 'evil-motion-state-modes 'neotree-mode)
     (setq neo-window-width 32
+          neo-modern-sidebar t
           neo-theme 'nerd
           neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\|git\\|hg\\|svn\\|idea\\|sass-cache\\)\\|\\(Thumbs\\.db\\)\\|\\(assets\\|node_modules\\|build\\|tmp\\|log\\|vendor\\|bower_components\\|components\\)\\)$")
           neo-create-file-auto-open t
@@ -7059,8 +7044,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (after "evil-leader"
       (evil-leader/set-key
-        "ft" 'neotree-toggle
-        "fT" 'neotree-hide
+        "tn" 'neotree-show
+        "tN" 'neotree-hide
         "pt" 'neotree-find-project-root)))
 
   :config
