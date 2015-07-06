@@ -6253,13 +6253,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t)
 
 (use-package magit                      ; The one and only Git frontend
-  :defer t
   :ensure t
   :bind (("C-c g"   . magit-status)
          ("C-c v g" . magit-status)
          ("C-c v v" . magit-status)
          ("C-c v g" . magit-blame-mode)
          ("C-c v l" . magit-file-log))
+  :commands (magit-status
+             magit-blame-mode
+             magit-log
+             magit-commit)
   :init
   (progn
     ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
@@ -6274,8 +6277,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           magit-set-upstream-on-push t)
 
     (add-hook 'git-commit-mode-hook 'fci-mode)
-    ;; must enable auto-fill-mode again because somehow fci-mode disable it
-    (add-hook 'git-commit-mode-hook 'auto-fill-mode)
     ;; On Windows, we must use Git GUI to enter username and password
     ;; See: https://github.com/magit/magit/wiki/FAQ#windows-cannot-push-via-https
     (when (eq window-system 'w32)
