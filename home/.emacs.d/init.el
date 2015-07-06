@@ -4583,7 +4583,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Rust
 (use-package rust-mode                  ; Rust
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (progn
+    (when (fboundp 'sp-local-pair)
+      ;; Don't pair lifetime specifiers
+      (sp-local-pair 'rust-mode "'" nil :actions nil))
+
+    (evil-leader/set-key-for-mode 'rust-mode
+      "mcc" 'spacemacs/rust-cargo-build
+      "mct" 'spacemacs/rust-cargo-test
+      "mcd" 'spacemacs/rust-cargo-doc
+      "mcx" 'spacemacs/rust-cargo-run)))
 
 (use-package flycheck-rust              ; Flycheck setup for Rust
   :ensure t
@@ -5940,6 +5951,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key racket-mode-map ")" 'self-insert-command)
     (define-key racket-mode-map "]" 'self-insert-command)
     (define-key racket-mode-map "}" 'self-insert-command)))
+
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (add-hook 'racket-mode-hook 'flycheck-mode))
