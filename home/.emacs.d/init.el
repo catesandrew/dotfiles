@@ -222,6 +222,13 @@ can be toggled through `toggle-transparency'."
 to disable fullscreen animations in OSX."
   :group 'dotemacs)
 
+(defcustom dotemacs-auto-save-file-location 'cache
+  "Location where to auto-save files. Possible values are `original' to
+auto-save the file in-place, `cache' to auto-save the file to another
+file stored in the cache directory and `nil' to disable auto-saving.
+Default value is `cache'."
+  :group 'dotemacs)
+
 ;; whitespace-mode
 (defcustom dotemacs-show-trailing-whitespace t
   "If t, show trailing whitespace."
@@ -1741,22 +1748,39 @@ mouse-3: go to end"))))
 
 ;; Keep backup and auto save files out of the way
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
-      auto-save-file-name-transforms `((".*" ,(concat dotemacs-cache-directory "backups") t))
       auto-save-list-file-prefix (concat dotemacs-cache-directory "auto-save-list/saves-"))
+
+(defconst dotemacs-auto-save-directory
+  (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
+  "dotemacs auto-save directory")
+
+;; Auto-save file
+(setq auto-save-default (not (null dotemacs-auto-save-file-location)))
+(setq auto-save-list-file-prefix (concat dotemacs-auto-save-directory))
+;; always save TRAMP URLs to cache directory no matter what is the value
+;; of `dotemacs-auto-save-file-location'
+(let ((autosave-dir (concat dotemacs-auto-save-directory "dist/")))
+  (setq auto-save-file-name-transforms
+        `(("\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'" ,autosave-dir  t)))
+  (unless (or (file-exists-p autosave-dir)
+              (null dotemacs-auto-save-file-location))
+    (make-directory autosave-dir t)))
+;; Choose auto-save location
+(case dotemacs-auto-save-file-location
+  (cache (let ((autosave-dir (concat dotemacs-auto-save-directory "site/")))
+           (add-to-list 'auto-save-file-name-transforms
+                        `(".*" ,autosave-dir t) 'append)
+           (unless (file-exists-p autosave-dir)
+             (make-directory autosave-dir t))))
+  (original (setq auto-save-visited-file-name t))
+  (_ (setq auto-save-default nil
+           auto-save-list-file-prefix nil)))
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
 
 ;; Delete files to trash
 (setq delete-by-moving-to-trash t)
-
-;; auto-save
-(let
-    ((autosave-dir (expand-file-name (concat dotemacs-cache-directory "autosave"))))
-  (unless (file-exists-p autosave-dir)
-    (make-directory autosave-dir))
-  (setq auto-save-list-file-prefix (concat autosave-dir "/")
-        auto-save-file-name-transforms `((".*" ,autosave-dir t))))
 
 ;; Remove prompt if the file is opened in other clients
 (defun server-remove-kill-buffer-hook ()
