@@ -64,6 +64,7 @@
                              solarized-light
                              leuven
                              monokai
+                             tao
                              ;; monster theme support
                              afternoon
                              ample
