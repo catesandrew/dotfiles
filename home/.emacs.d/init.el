@@ -6983,6 +6983,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
+  :defer 1
   :commands (projectile-ack
              projectile-ag
              projectile-compile-project
