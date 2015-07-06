@@ -859,11 +859,13 @@ The body of the advice is in BODY."
   (let ((file-path (if (eq major-mode 'dired-mode)
                        (dired-get-file-for-visit)
                      (buffer-file-name))))
-    (cond
-     ((system-is-mswindows) (w32-shell-execute "open" (replace-regexp-in-string "/" "\\\\" file-path)))
-     ((system-is-mac) (shell-command (format "open \"%s\"" file-path)))
-     ((system-is-linux) (let ((process-connection-type nil))
-                          (start-process "" nil "xdg-open" file-path))))))
+    (if file-path
+        (cond
+         ((system-is-mswindows) (w32-shell-execute "open" (replace-regexp-in-string "/" "\\\\" file-path)))
+         ((system-is-mac) (shell-command (format "open \"%s\"" file-path)))
+         ((system-is-linux) (let ((process-connection-type nil))
+                              (start-process "" nil "xdg-open" file-path))))
+      (message "No file associated to this buffer."))))
 
 (defun dotemacs-next-error (&optional n reset)
   "Dispatch to flycheck or standard emacs error."
