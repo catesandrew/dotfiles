@@ -5934,8 +5934,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ;; Tests
       "mtb" 'racket-test
       "mtB" 'dotemacs-racket-test-with-coverage)
-    (define-key racket-mode-map (kbd "H-r") 'racket-run)))
-
+    (define-key racket-mode-map (kbd "H-r") 'racket-run)
+    ;; remove racket auto-insert of closing delimiter
+    ;; see https://github.com/greghendershott/racket-mode/issues/140
+    (define-key racket-mode-map ")" 'self-insert-command)
+    (define-key racket-mode-map "]" 'self-insert-command)
+    (define-key racket-mode-map "}" 'self-insert-command)))
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (add-hook 'racket-mode-hook 'flycheck-mode))
