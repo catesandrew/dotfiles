@@ -6296,35 +6296,52 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ; (dotemacs-hide-lighter magit-auto-revert-mode)
 
     ;; mode maps
-    (dotemacs-evilify-map 'magit-mode-map)
-    ;; (dotemacs-evilify-map 'magit-popup-mode-map  'magit-popup-mode)
-    (dotemacs-evilify-map 'magit-status-mode-map 'magit-status-mode)
-    (dotemacs-evilify-map 'magit-refs-mode-map 'magit-refs-mode)
-    (dotemacs-evilify-map 'magit-blame-mode-map 'magit-blame-mode)
-    (dotemacs-evilify-map 'magit-diff-mode-map 'magit-diff-mode)
-    (dotemacs-evilify-map 'magit-log-read-revs-map 'magit-log-read-revs)
-    (dotemacs-evilify-map 'magit-log-mode-map 'magit-log-mode)
-    (dotemacs-evilify-map 'magit-log-select-mode-map 'magit-log-select-mode)
-    (dotemacs-evilify-map 'magit-cherry-mode-map 'magit-cherry-mode)
-    (dotemacs-evilify-map 'magit-reflog-mode-map 'magit-reflog-mode)
-    (dotemacs-evilify-map 'magit-process-mode-map 'magit-process-mode)
+    (dotemacs-evilify-map magit-mode-map)
+    (dotemacs-evilify-map magit-status-mode-map
+                           :mode magit-status-mode)
+    (dotemacs-evilify-map magit-refs-mode-map
+                           :mode magit-refs-mode)
+    (dotemacs-evilify-map magit-blame-mode-map
+                           :mode magit-blame-mode)
+    (dotemacs-evilify-map magit-diff-mode-map
+                           :mode magit-diff-mode)
+    (dotemacs-evilify-map magit-log-read-revs-map
+                           :mode magit-log-read-revs)
+    (dotemacs-evilify-map magit-log-mode-map
+                           :mode magit-log-mode)
+    (dotemacs-evilify-map magit-log-select-mode-map
+                           :mode magit-log-select-mode)
+    (dotemacs-evilify-map magit-cherry-mode-map
+                           :mode magit-cherry-mode)
+    (dotemacs-evilify-map magit-reflog-mode-map
+                           :mode magit-reflog-mode)
+    (dotemacs-evilify-map magit-process-mode-map
+                           :mode magit-process-mode)
+    (dotemacs-evilify-map git-rebase-mode-map
+                           :mode git-rebase-mode
+                           :bindings
+                           "J" 'git-rebase-move-line-down
+                           "K" 'git-rebase-move-line-up
+                           "u" 'git-rebase-undo
+                           "y" 'git-rebase-insert)
     ;; section maps
-    (dotemacs-evilify-map 'magit-tag-section-map)
-    (dotemacs-evilify-map 'magit-untracked-section-map)
-    (dotemacs-evilify-map 'magit-branch-section-map)
-    (dotemacs-evilify-map 'magit-remote-section-map)
-    (dotemacs-evilify-map 'magit-file-section-map)
-    (dotemacs-evilify-map 'magit-hunk-section-map)
-    (dotemacs-evilify-map 'magit-unstaged-section-map)
-    (dotemacs-evilify-map 'magit-staged-section-map)
-    (dotemacs-evilify-map 'magit-commit-section-map)
-    (dotemacs-evilify-map 'magit-module-commit-section-map)
-    (dotemacs-evilify-map 'magit-unpulled-section-map)
-    (dotemacs-evilify-map 'magit-unpushed-section-map)
-    (dotemacs-evilify-map 'magit-stashes-section-map)
+    (dotemacs-evilify-map magit-tag-section-map)
+    (dotemacs-evilify-map magit-untracked-section-map)
+    (dotemacs-evilify-map magit-branch-section-map)
+    (dotemacs-evilify-map magit-remote-section-map)
+    (dotemacs-evilify-map magit-file-section-map)
+    (dotemacs-evilify-map magit-hunk-section-map)
+    (dotemacs-evilify-map magit-unstaged-section-map)
+    (dotemacs-evilify-map magit-staged-section-map)
+    (dotemacs-evilify-map magit-commit-section-map)
+    (dotemacs-evilify-map magit-module-commit-section-map)
+    (dotemacs-evilify-map magit-unpulled-section-map)
+    (dotemacs-evilify-map magit-unpushed-section-map)
+    (dotemacs-evilify-map magit-stashes-section-map)
+    (dotemacs-evilify-map magit-stash-section-map)
 
     (add-hook 'projectile-switch-project-hook
-      #'dotemacs-magit-set-repo-dirs-from-projectile)  (dotemacs-evilify-map 'magit-stash-section-map)
+      #'dotemacs-magit-set-repo-dirs-from-projectile)
 
     ;; full screen magit-status
     (when dotemacs-git-magit-status-fullscreen
@@ -6339,12 +6356,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (kill-buffer)
         (jump-to-register :magit-fullscreen))
 
-      (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)))
-    (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace)
-
-
-
-    )
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
+    (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace))
   :diminish magit-auto-revert-mode)
 
 (use-package magit-gh-pulls
