@@ -1291,7 +1291,7 @@ mouse-3: go to end"))))
   :load-path "config/")
 
 (use-package helm
-  :ensure t
+  :ensure 1
   :bind (("C-c h h" . helm-resume))
   :commands dotemacs-helm-find-files
   :init
