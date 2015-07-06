@@ -1303,7 +1303,10 @@ mouse-3: go to end"))))
           helm-bookmark-show-location t
           helm-display-header-line nil
           helm-split-window-in-side-p t
-          helm-always-two-windows t)
+          helm-always-two-windows t
+          helm-echo-input-in-header-line t)
+
+    (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
 
     ;; fuzzy matching setting
     (setq helm-M-x-fuzzy-match t

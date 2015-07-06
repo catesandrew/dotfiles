@@ -112,14 +112,14 @@ Removes the automatic guessing of the initial value based on thing at point. "
     (popwin-mode -1)))
 
 (defun dotemacs-display-helm-at-bottom (buffer)
-  (let ((display-buffer-alist (list spacemacs-helm-display-help-buffer-regexp
+  (let ((display-buffer-alist (list dotemacs-helm-display-help-buffer-regexp
                                     ;; this or any specialized case of Helm buffer must be added AFTER
                                     ;; `spacemacs-helm-display-buffer-regexp'. Otherwise,
                                     ;; `spacemacs-helm-display-buffer-regexp' will be used before
                                     ;; `spacemacs-helm-display-help-buffer-regexp' and display
                                     ;; configuration for normal Helm buffer is applied for helm help
                                     ;; buffer, making the help buffer unable to be displayed.
-                                    spacemacs-helm-display-buffer-regexp)))
+                                    dotemacs-helm-display-buffer-regexp)))
     (helm-default-display-buffer buffer)))
 
 (defun dotemacs-restore-previous-display-config ()
@@ -184,7 +184,7 @@ ARG non nil means that the editing style is `vim'."
   "Initialization of helm micro-state."
   ;; faces
   (dotemacs-helm-navigation-ms-set-face)
-  (setq spacemacs--helm-navigation-ms-face-cookie-minibuffer
+  (setq dotemacs--helm-navigation-ms-face-cookie-minibuffer
         (face-remap-add-relative
          'minibuffer-prompt
          'dotemacs-helm-navigation-ms-face))
@@ -197,7 +197,7 @@ ARG non nil means that the editing style is `vim'."
 (defun dotemacs-helm-navigation-ms-set-face ()
   "Set the face for helm header in helm navigation micro-state"
   (with-helm-window
-    (setq spacemacs--helm-navigation-ms-face-cookie-header
+    (setq dotemacs--helm-navigation-ms-face-cookie-header
           (face-remap-add-relative
            'helm-header
            'dotemacs-helm-navigation-ms-face))))
@@ -209,9 +209,9 @@ ARG non nil means that the editing style is `vim'."
   ;; restore faces
   (with-helm-window
     (face-remap-remove-relative
-     spacemacs--helm-navigation-ms-face-cookie-header))
+     dotemacs--helm-navigation-ms-face-cookie-header))
   (face-remap-remove-relative
-   spacemacs--helm-navigation-ms-face-cookie-minibuffer))
+   dotemacs--helm-navigation-ms-face-cookie-minibuffer))
 
 (defun dotemacs-helm-navigation-ms-full-doc ()
   "Full documentation for helm navigation micro-state."
@@ -476,5 +476,14 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
 (defun helm-ff-candidates-lisp-p (candidate)
   (cl-loop for cand in (helm-marked-candidates)
            always (string-match "\.el$" cand)))
+
+;; hide minibuffer in Helm session, since we use the header line already
+(defun helm-hide-minibuffer-maybe ()
+  (when (with-helm-buffer helm-echo-input-in-header-line)
+    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+      (overlay-put ov 'window (selected-window))
+      (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
+                              `(:background ,bg-color :foreground ,bg-color)))
+      (setq-local cursor-type nil))))
 
 (provide 'init-helm)
