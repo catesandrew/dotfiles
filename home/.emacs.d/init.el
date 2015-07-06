@@ -4581,6 +4581,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Rust
+(dotemacs-defvar-company-backends rust-mode)
+
+(use-package init-rust
+  :load-path "config/")
+
 (use-package rust-mode                  ; Rust
   :ensure t
   :defer t
@@ -4591,10 +4596,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (sp-local-pair 'rust-mode "'" nil :actions nil))
 
     (evil-leader/set-key-for-mode 'rust-mode
-      "mcc" 'spacemacs/rust-cargo-build
-      "mct" 'spacemacs/rust-cargo-test
-      "mcd" 'spacemacs/rust-cargo-doc
-      "mcx" 'spacemacs/rust-cargo-run)))
+      "mcc" 'dotemacs-rust-cargo-build
+      "mct" 'dotemacs-rust-cargo-test
+      "mcd" 'dotemacs-rust-cargo-doc
+      "mcx" 'dotemacs-rust-cargo-run)))
 
 (use-package flycheck-rust              ; Flycheck setup for Rust
   :ensure t
@@ -4604,6 +4609,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (add-hook 'rust-mode-hook 'flycheck-mode))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook rust-mode))))
+
+(use-package company-racer
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-tern company-backends-rust-mode)))
 
 (use-package toml-mode                  ; Toml for Cargo files
   :ensure t
