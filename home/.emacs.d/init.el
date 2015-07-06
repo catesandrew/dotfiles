@@ -5692,6 +5692,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :defer t)
 
+(use-package json-snatcher
+  :defer t
+  :ensure t
+  :config
+  (evil-leader/set-key-for-mode 'json-mode
+    "mhp" 'jsons-print-path)
+  )
+
 (use-package json-reformat              ; Reformat JSON
   :ensure t
   :defer t
