@@ -6336,42 +6336,102 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (evil-leader/set-key
         "gb" 'magit-blame
         "gl" 'magit-log-all
+        "gL" 'magit-log-buffer-file
         "gs" 'magit-status
         "gd" 'dotemacs-magit-diff-head
         "gC" 'magit-commit)))
   :config
   (progn
-    ; (dotemacs-hide-lighter magit-auto-revert-mode)
-
+    ;; seems to be necessary at the time of release
+    (require 'git-rebase)
     ;; mode maps
     (dotemacs-evilify-map magit-mode-map)
     (dotemacs-evilify-map magit-status-mode-map
-                           :mode magit-status-mode)
+      :mode magit-status-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-refs-mode-map
-                           :mode magit-refs-mode)
+      :mode magit-refs-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-blame-mode-map
-                           :mode magit-blame-mode)
+      :mode magit-blame-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-diff-mode-map
-                           :mode magit-diff-mode)
+      :mode magit-diff-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-log-read-revs-map
-                           :mode magit-log-read-revs)
+      :mode magit-log-read-revs
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-log-mode-map
-                           :mode magit-log-mode)
+      :mode magit-log-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-log-select-mode-map
-                           :mode magit-log-select-mode)
+      :mode magit-log-select-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-cherry-mode-map
-                           :mode magit-cherry-mode)
+      :mode magit-cherry-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-reflog-mode-map
-                           :mode magit-reflog-mode)
+      :mode magit-reflog-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-process-mode-map
-                           :mode magit-process-mode)
+      :mode magit-process-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map git-rebase-mode-map
-                           :mode git-rebase-mode
-                           :bindings
-                           "J" 'git-rebase-move-line-down
-                           "K" 'git-rebase-move-line-up
-                           "u" 'git-rebase-undo
-                           "y" 'git-rebase-insert)
+      :mode git-rebase-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward
+      "J" 'git-rebase-move-line-down
+      "K" 'git-rebase-move-line-up
+      "u" 'git-rebase-undo
+      "y" 'git-rebase-insert)
+    ;; default state for additional modes
+    (dolist (mode '(magit-popup-mode
+                    magit-popup-sequence-mode))
+      (add-to-list 'evil-emacs-state-modes mode))
+    (dotemacs-evilify-configure-default-state 'magit-revision-mode)
     ;; section maps
     (dotemacs-evilify-map magit-tag-section-map)
     (dotemacs-evilify-map magit-untracked-section-map)
@@ -6392,20 +6452,24 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       #'dotemacs-magit-set-repo-dirs-from-projectile)
 
     ;; full screen magit-status
-    (when dotemacs-git-magit-status-fullscreen
-      (defadvice magit-status (around magit-fullscreen activate)
-        (window-configuration-to-register :magit-fullscreen)
-        ad-do-it
-        (delete-other-windows))
+    (when git-magit-status-fullscreen
+      (setq magit-restore-window-configuration t)
+      (setq magit-status-buffer-switch-function
+            (lambda (buffer)
+              (pop-to-buffer buffer)
+              (delete-other-windows))))
 
-      (defun magit-quit-session ()
-        "Restores the previous window configuration and kills the magit buffer"
-        (interactive)
-        (kill-buffer)
-        (jump-to-register :magit-fullscreen))
+    ;; rebase mode
+    (evil-leader/set-key-for-mode 'git-rebase-mode
+      "mcc" 'git-rebase-server-edit
+      "mk" 'git-rebase-abort)
+    ;; commit mode
+    (evil-leader/set-key-for-mode 'git-commit-mode
+      "mcc" 'git-commit-commit
+      "mk" 'git-commit-abort)
 
-    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
-    (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace))
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
+    (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace))
   :diminish magit-auto-revert-mode)
 
 (use-package magit-gh-pulls

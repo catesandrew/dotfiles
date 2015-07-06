@@ -59,16 +59,6 @@
   (interactive)
   (magit-diff "HEAD"))
 
-;; rebase mode
-(evil-leader/set-key-for-mode 'git-rebase-mode
-  "mcc" 'git-rebase-server-edit
-  "mk" 'git-rebase-abort)
-
-;; commit mode
-(evil-leader/set-key-for-mode 'git-commit-mode
-  "mcc" 'git-commit-commit
-  "mk" 'git-commit-abort)
-
 ;; whitespace
 (defun magit-toggle-whitespace ()
   (interactive)
@@ -77,16 +67,6 @@
   	   magit-diff-section-arguments))
       (magit-dont-ignore-whitespace)
     (magit-ignore-whitespace)))
-
-(defun magit-ignore-whitespace ()
-  (interactive)
-  (add-to-list 'magit-diff-options "-w")
-  (magit-refresh))
-
-(defun magit-dont-ignore-whitespace ()
-  (interactive)
-  (setq magit-diff-options (remove "-w" magit-diff-options))
-  (magit-refresh))
 
 (defun magit-ignore-whitespace ()
   (interactive)
