@@ -3773,9 +3773,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (bind-key "C-c u d" #'toggle-debug-on-error)
 
-(use-package eval-sexp-fu
-  :config (require 'eval-sexp-fu))
-
 (use-package init-elisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
   :commands (dotemacs-elisp-find-cask-file
