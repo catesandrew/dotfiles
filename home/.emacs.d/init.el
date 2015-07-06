@@ -7780,7 +7780,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setq helm-descbinds-window-style 'split)
     (add-hook 'helm-mode-hook 'helm-descbinds-mode)
     (after "evil-leader"
-      (evil-leader/set-key "hk" 'helm-descbinds))))
+      (evil-leader/set-key "?" 'helm-descbinds))))
 
 (use-package helm-make
   :ensure t
