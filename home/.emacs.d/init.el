@@ -2134,7 +2134,7 @@ mouse-3: go to end"))))
   '(define-key comint-mode-map (kbd "C-d") nil))
 
 ;; enable electric indent
-(setq electric-indent-mode t)
+(setq electric-indent-mode 1)
 
 ;; Text
 (setq longlines-show-hard-newlines t)
@@ -2143,9 +2143,6 @@ mouse-3: go to end"))))
 (setq-default indent-tabs-mode nil
               highlight-tabs t
               tab-width 8)
-
-;; Turn on electric-indent-mode
-(electric-indent-mode)
 
 ;; Make Tab complete if the line is indented
 (setq tab-always-indent 'complete)

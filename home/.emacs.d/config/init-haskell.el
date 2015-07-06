@@ -1,6 +1,7 @@
 (defun dotemacs-init-haskell-mode ()
   ;; use only internal indentation system from haskell
-  (electric-indent-local-mode -1))
+  (if (fboundp 'electric-indent-local-mode)
+      (electric-indent-local-mode -1)))
 
 (defun dotemacs-haskell-process-do-type-on-prev-line ()
   (interactive)
