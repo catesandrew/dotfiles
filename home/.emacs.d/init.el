@@ -8161,6 +8161,28 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (helm :sources (list (dotemacs-search-engine-source
                           search-engine-alist)))))
 
+;; emoji
+(use-package emoji-cheat-sheet-plus
+  :commands (emoji-cheat-sheet-plus-insert
+             emoji-cheat-sheet-plus-buffer
+             emoji-cheat-sheet-plus-display-mode)
+  :init
+  (progn
+    (evil-leader/set-key "aE" 'emoji-cheat-sheet-plus-buffer)
+    (evil-leader/set-key "ie" 'emoji-cheat-sheet-plus-insert)
+    (evilify emoji-cheat-sheet-plus-buffer-mode
+             emoji-cheat-sheet-plus-buffer-mode-map
+             "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
+    (defun dotemacs-delay-emoji-cheat-sheet-hook ()
+      "Work-around for org buffers."
+      ;; we need to wait for org buffer to be fully loaded before
+      ;; calling the emoji mode.
+      ;; If we directly call the emoji mode at hook runtime then some
+      ;; text properties are not applied correctly.
+      (run-at-time 0.1 nil 'emoji-cheat-sheet-plus-display-mode))
+    (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook)
+    (add-to-hooks 'emoji-cheat-sheet-plus-display-mode '(markdown-mode))))
+
 ;; vagrant
 (use-package vagrant
   :defer t
