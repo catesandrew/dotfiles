@@ -1,10 +1,3 @@
-;; hack for speeding up the use of ace-jump-line as a motion
-;; https://bitbucket.org/lyro/evil/issue/472/evil-half-cursor-makes-evil-ace-jump-mode
-(defun evil-half-cursor ()
-  "Change cursor to a half-height box. (This is really just a thick horizontal bar.)"
-    (let ((height (/ (window-pixel-height) (* (window-height) 2))))
-      (setq cursor-type (cons 'hbar height))))
-
 (defun dotemacs-state-color-face (state)
   "Return the symbol of the face for the given STATE."
   (intern (format "dotemacs-%s-face" (symbol-name state))))
