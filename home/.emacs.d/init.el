@@ -7094,23 +7094,22 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (evil-leader/set-key
           "pb" 'projectile-switch-to-buffer
           "pd" 'projectile-find-dir
-          "pe" 'projectile-recentf
           "pf" 'projectile-find-file
-          "pg" 'projectile-grep
           "ph" 'helm-projectile
+          "pr" 'projectile-recentf
           "ps" 'projectile-switch-project))
       (evil-leader/set-key
         "p!" 'projectile-run-shell-command-in-root
         "p&" 'projectile-run-async-shell-command-in-root
         "pc" 'projectile-compile-project
         "pD" 'projectile-dired
+        "pG" 'projectile-regenerate-tags
         "pI" 'projectile-invalidate-cache
         "pk" 'projectile-kill-buffers
         "po" 'projectile-multi-occur
-        "pr" 'projectile-replace
-        "pR" 'projectile-regenerate-tags
-        "py" 'projectile-find-tag
-        "pT" 'projectile-find-test-file)))
+        "pR" 'projectile-replace
+        "pT" 'projectile-find-test-file
+        "py" 'projectile-find-tag)))
   :config
   (progn
     ;; Remove dead projects when Emacs is idle
@@ -7147,10 +7146,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (evil-leader/set-key
         "pb"  'helm-projectile-switch-to-buffer
         "pd"  'helm-projectile-find-dir
-        "pe"  'helm-projectile-recentf
         "pf"  'helm-projectile-find-file
         "ph"  'helm-projectile
         "pp"  'helm-projectile-switch-project
+        "pr"  'helm-projectile-recentf
         "pv"  'projectile-vc
         "sgp" 'helm-projectile-grep))))
 
