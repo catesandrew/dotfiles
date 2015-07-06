@@ -1740,15 +1740,13 @@ mouse-3: go to end"))))
 
 ;;; File handling
 
-;; don't create backup~ or #auto-save# files
+;; don't create backup~ files
 (setq backup-by-copying t
       make-backup-files nil
-      auto-save-default nil
       create-lockfiles nil)
 
-;; Keep backup and auto save files out of the way
-(setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups")))
-      auto-save-list-file-prefix (concat dotemacs-cache-directory "auto-save-list/saves-"))
+;; Keep backup files out of the way
+(setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups"))))
 
 (defconst dotemacs-auto-save-directory
   (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
