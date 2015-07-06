@@ -1689,8 +1689,12 @@ mouse-3: go to end"))))
 (use-package popwin
   :ensure t
   :bind ("C-c P" . popwin:popup-last-buffer)
-  :init
+  :config
   (progn
+    (popwin-mode 1)
+    (after "evil-leader"
+      (evil-leader/set-key "wpm" 'popwin:messages)
+      (evil-leader/set-key "wpp" 'popwin:close-popup-window))
     ;; don't use default value but manage it ourselves
     (setq popwin:special-display-config nil)
 
@@ -1712,14 +1716,7 @@ mouse-3: go to end"))))
       (setq popwin:special-display-config
             (-remove (lambda (x) (if (and (listp x) (stringp (car x)))
                                      (string-match str (car x))))
-                     popwin:special-display-config))))
-  :config
-  (progn
-    (popwin-mode 1)
-    (after "evil-leader"
-      (evil-leader/set-key "wpm" 'popwin:messages)
-      (evil-leader/set-key "wpp" 'popwin:close-popup-window))))
-
+                     popwin:special-display-config)))))
 
 ;;; File handling
 
