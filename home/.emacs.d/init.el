@@ -2121,6 +2121,12 @@ mouse-3: go to end"))))
 ;; Sentences do not need double spaces to end. Period.
 (set-default 'sentence-end-double-space nil)
 
+;; The C-d rebinding that most shell-like buffers inherit from
+;; comint-mode assumes non-evil configuration with its
+;; `comint-delchar-or-maybe-eof' function, so we disable it
+(eval-after-load 'comint
+  '(define-key comint-mode-map (kbd "C-d") nil))
+
 ;; enable electric indent
 (setq electric-indent-mode t)
 
