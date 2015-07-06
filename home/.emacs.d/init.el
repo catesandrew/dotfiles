@@ -8214,6 +8214,56 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
 
+;;; Auto highlight symbol
+(use-package init-auto-highlight-symbol
+  :load-path "config/")
+
+(use-package auto-highlight-symbol
+  :defer t
+  :ensure t
+  :init
+  (add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
+                                              markdown-mode-hook))
+  :config
+  (progn
+    (custom-set-variables
+     '(ahs-case-fold-search nil)
+     '(ahs-default-range (quote ahs-range-whole-buffer))
+     ;; disable auto-highlight of symbol
+     ;; current symbol should be highlight on demand with <SPC> s h
+     '(ahs-idle-timer 0)
+     '(ahs-idle-interval 0.25)
+     '(ahs-inhibit-face-list nil))
+
+    (defvar dotemacs-last-ahs-highlight-p nil
+      "Info on the last searched highlighted symbol.")
+    (make-variable-buffer-local 'dotemacs-last-ahs-highlight-p)
+
+    (after "evil"
+      '(progn
+         (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)
+         (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward)))
+
+    (evil-leader/set-key
+      "sh"  'dotemacs-symbol-highlight
+      "sH"  'dotemacs-goto-last-searched-ahs-symbol
+      "sR"  'dotemacs-symbol-highlight-reset-range)
+
+    (dotemacs-hide-lighter auto-highlight-symbol-mode)
+    ;; micro-state to easily jump from a highlighted symbol to the others
+    (dolist (sym '(ahs-forward
+                   ahs-forward-definition
+                   ahs-backward
+                   ahs-backward-definition
+                   ahs-back-to-start
+                   ahs-change-range))
+      (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
+        (eval `(defadvice ,sym (after ,advice activate)
+                 (dotemacs-ahs-highlight-now-wrapper)
+                 (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
+                 (dotemacs-auto-highlight-symbol-overlay-map)))))))
+
+
 ;;; Syntax Checking
 (use-package init-syntax-checking
   :load-path "config/"
