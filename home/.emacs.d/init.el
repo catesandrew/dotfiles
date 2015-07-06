@@ -1361,7 +1361,9 @@ mouse-3: go to end"))))
       (evil-leader/set-key
         dotemacs-command-key 'helm-M-x))
 
-    (add-hook 'helm-after-initialize-hook 'dotemacs-display-helm-at-bottom)
+    (setq helm-display-function 'dotemacs-display-helm-at-bottom)
+
+    (add-hook 'helm-after-initialize-hook 'dotemacs-helm-prepare-display)
     ;;  Restore popwin-mode after a Helm session finishes.
     (add-hook 'helm-cleanup-hook 'dotemacs-restore-previous-display-config)
 

@@ -98,28 +98,36 @@ Removes the automatic guessing of the initial value based on thing at point. "
                                                (inhibit-same-window . t)
                                                (window-height . 0.4)))
 (defvar dotemacs-display-buffer-alist nil)
-
-(defun dotemacs-display-helm-at-bottom ()
-  "Display the helm buffer at the bottom of the frame."
+(defun dotemacs-helm-prepare-display ()
+  "Prepare necessary settings to make Helm display properly."
   ;; avoid Helm buffer being diplaye twice when user
   ;; sets this variable to some function that pop buffer to
   ;; a window. See https://github.com/syl20bnr/spacemacs/issues/1396
   (let ((display-buffer-base-action '(nil)))
-    ;; backup old display-buffer-base-action
     (setq dotemacs-display-buffer-alist display-buffer-alist)
     ;; the only buffer to display is Helm, nothing else we must set this
     ;; otherwise Helm cannot reuse its own windows for copyinng/deleting
     ;; etc... because of existing popwin buffers in the alist
     (setq display-buffer-alist nil)
-    (add-to-list 'display-buffer-alist dotemacs-helm-display-buffer-regexp)
-    ;; this or any specialized case of Helm buffer must be added AFTER
-    ;; `dotemacs-helm-display-buffer-regexp'. Otherwise,
-    ;; `dotemacs-helm-display-buffer-regexp' will be used before
-    ;; `dotemacs-helm-display-help-buffer-regexp' and display
-    ;; configuration for normal Helm buffer is applied for helm help
-    ;; buffer, making the help buffer unable to be displayed.
-    (add-to-list 'display-buffer-alist dotemacs-helm-display-help-buffer-regexp)
     (popwin-mode -1)))
+
+(defun dotemacs-display-helm-at-bottom (buffer)
+  (let ((display-buffer-alist (list spacemacs-helm-display-help-buffer-regexp
+                                    ;; this or any specialized case of Helm buffer must be added AFTER
+                                    ;; `spacemacs-helm-display-buffer-regexp'. Otherwise,
+                                    ;; `spacemacs-helm-display-buffer-regexp' will be used before
+                                    ;; `spacemacs-helm-display-help-buffer-regexp' and display
+                                    ;; configuration for normal Helm buffer is applied for helm help
+                                    ;; buffer, making the help buffer unable to be displayed.
+                                    spacemacs-helm-display-buffer-regexp)))
+    (helm-default-display-buffer buffer)))
+
+(defun dotemacs-restore-previous-display-config ()
+  (popwin-mode 1)
+  ;; we must enable popwin-mode first then restore `display-buffer-alist'
+  ;; Otherwise, popwin keeps adding up its own buffers to `display-buffer-alist'
+  ;; and could slow down Emacs as the list grows
+  (setq display-buffer-alist dotemacs-display-buffer-alist))
 
 (defun dotemacs-restore-previous-display-config ()
   (popwin-mode 1)
