@@ -4539,6 +4539,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
   :defer t)
 
+(use-package slim-mode
+  :ensure t
+  :if (when dotemacs-ruby-enable-ruby-on-rails-support)
+  :defer t)
+
 (use-package ruby-test-mode
   :defer t
   :ensure t
@@ -4561,6 +4566,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (progn
     (add-hook 'enh-ruby-mode-hook 'flycheck-mode)
+    (add-hook 'slim-mode-hook 'flycheck-mode)
     (add-hook 'haml-mode-hook 'flycheck-mode)
     (add-hook 'yaml-mode-hook 'flycheck-mode)
     (add-hook 'ruby-mode-hook 'flycheck-mode)))
@@ -5438,17 +5444,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'html-mode-hook (lambda () (tagedit-mode 1))))
   :diminish (tagedit-mode . " Ⓣ"))
 
-(use-package slim-mode
-  :ensure t
-  :defer t)
-
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
     (add-hook 'web-mode-hook 'flycheck-mode)
     (add-hook 'css-mode-hook 'flycheck-mode)
     (add-hook 'scss-mode-hook 'flycheck-mode)
-    (add-hook 'slim-mode-hook 'flycheck-mode)
     (add-hook 'sass-mode-hook 'flycheck-mode)))
 
 (when (eq dotemacs-completion-engine 'company)
