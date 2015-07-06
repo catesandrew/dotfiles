@@ -7445,6 +7445,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq org-replace-disputed-keys t ;; Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
           org-src-fontify-natively t ;; Fontify org-mode code blocks
+          org-clock-persist-file (concat dotemacs-cache-directory "org-clock-save.el")
           org-log-done t
           org-startup-with-inline-images t
           org-startup-indented t)
