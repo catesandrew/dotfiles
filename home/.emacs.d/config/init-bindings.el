@@ -89,6 +89,7 @@ Ensure that helm is required before calling FUNC."
   "ep" 'dotemacs-previous-error)
 ;; file -----------------------------------------------------------------------
 (evil-leader/set-key
+  "fc" 'dotemacs-copy-file
   "fD"  'delete-current-buffer-file
   "fei" 'find-user-init-file
   "fes" 'find-dotemacs-file
