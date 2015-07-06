@@ -6154,7 +6154,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "evil-leader"
       (evil-leader/set-key
         "gb" 'magit-blame-mode
-        "gl" 'magit-log
+        "gl" 'magit-log-all
         "gs" 'magit-status
         "gd" 'dotemacs-magit-diff-head
         "gC" 'magit-commit))
