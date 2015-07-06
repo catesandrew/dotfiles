@@ -18,3 +18,5 @@
 (defun dotemacs-java-maven-install ()
   (interactive)
   (eclim-maven-run "install"))
+
+(provide 'init-java)

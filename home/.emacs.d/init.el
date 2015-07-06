@@ -1298,8 +1298,9 @@ mouse-3: go to end"))))
   :load-path "config/")
 
 (use-package helm
-  :ensure 1
+  :ensure t
   :bind (("C-c h h" . helm-resume))
+  :defer 1
   :commands dotemacs-helm-find-files
   :init
   (progn
@@ -1384,7 +1385,7 @@ mouse-3: go to end"))))
     (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
   :config
   (progn
-    (helm-mode 1)
+    (helm-mode +1)
     (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
 
     (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
@@ -1894,7 +1895,7 @@ mouse-3: go to end"))))
   :bind (("C-c l b" . list-bookmarks))
   :init
   (progn
-    (setq bookmark-save-flag 1
+    (setq bookmark-save-flag 1 ;; autosave each change
           ;; Store auto-save files locally
           bookmark-default-file (concat dotemacs-cache-directory "bookmarks")
           url-configuration-directory (concat dotemacs-cache-directory "url")
@@ -6043,7 +6044,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package eclim
   :defer t
-  :ensure t
+  :ensure emacs-eclim
   :init (add-hook 'java-mode-hook 'eclim-mode)
   :config
   (progn
@@ -6155,7 +6156,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package company-emacs-eclim
   :if (eq dotemacs-completion-engine 'company)
-  :ensure t
   :defer t
   :init
   (push 'company-emacs-eclim company-backends-java-mode))
@@ -6343,8 +6343,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;; magit
 (use-package init-magit
-  :load-path "config/"
-  :defer t)
+  :load-path "config/")
 
 (use-package magit                      ; The one and only Git frontend
   :ensure t
@@ -8163,6 +8162,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;; emoji
 (use-package emoji-cheat-sheet-plus
+  :ensure t
   :commands (emoji-cheat-sheet-plus-insert
              emoji-cheat-sheet-plus-buffer
              emoji-cheat-sheet-plus-display-mode)
