@@ -42,4 +42,37 @@
   (let (git-link-open-in-browser)
     (call-interactively 'git-link-commit)))
 
+;; Set Magit's repo dirs for `magit-status' from Projectile's known
+;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
+;; was loaded, and update it every time we switched projects, because the
+;; new project might have been unknown before
+(defun dotemacs-magit-set-repo-dirs-from-projectile ()
+  "Set `magit-repo-dirs' from known Projectile projects."
+  (let ((project-dirs (bound-and-true-p projectile-known-projects)))
+    ;; Remove trailing slashes from project directories, because Magit adds
+    ;; trailing slashes again, which breaks the presentation in the Magit
+    ;; prompt.
+    (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
+
+(defun dotemacs-magit-diff-head ()
+  "Execute `magit-diff' against current HEAD."
+  (interactive)
+  (magit-diff "HEAD"))
+
+(defun magit-toggle-whitespace ()
+  (interactive)
+  (if (member "-w" magit-diff-options)
+      (magit-dont-ignore-whitespace)
+    (magit-ignore-whitespace)))
+
+(defun magit-ignore-whitespace ()
+  (interactive)
+  (add-to-list 'magit-diff-options "-w")
+  (magit-refresh))
+
+(defun magit-dont-ignore-whitespace ()
+  (interactive)
+  (setq magit-diff-options (remove "-w" magit-diff-options))
+  (magit-refresh))
+
 (provide 'init-magit)

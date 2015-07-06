@@ -749,6 +749,9 @@ FEATURE may be a named feature or a file name, see
 (use-package core-micro-state
   :load-path "core/")
 
+(use-package core-evilify-keymap
+  :load-path "core/")
+
 (use-package core-use-package
   :load-path "core/")
 
@@ -6278,10 +6281,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (when (eq window-system 'w32)
       (setenv "GIT_ASKPASS" "git-gui--askpass"))
 
-    (defun dotemacs-magit-diff-head ()
-      "Execute `magit-diff' against current HEAD."
-      (interactive)
-      (magit-diff "HEAD"))
+    (after "projectile"
+      (dotemacs-magit-set-repo-dirs-from-projectile))
 
     (after "evil-leader"
       (evil-leader/set-key
@@ -6289,56 +6290,42 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "gl" 'magit-log-all
         "gs" 'magit-status
         "gd" 'dotemacs-magit-diff-head
-        "gC" 'magit-commit))
-
-    (after "evil-evilified-state"
-      (evilify magit-commit-mode magit-commit-mode-map
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)
-      (evilify magit-log-mode magit-log-mode-map
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)
-      (evilify magit-process-mode magit-process-mode-map
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)
-      (evilify magit-branch-manager-mode magit-branch-manager-mode-map
-             "K" 'magit-discard-item
-             "L" 'magit-key-mode-popup-logging
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)
-      (evilify magit-status-mode magit-status-mode-map
-             "K" 'magit-discard-item
-             "L" 'magit-key-mode-popup-logging
-             "H" 'magit-key-mode-popup-diff-options
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)
-      (evilify magit-diff-mode magit-diff-mode-map
-             "K" 'magit-discard-item
-             "L" 'magit-key-mode-popup-logging
-             "H" 'magit-key-mode-popup-diff-options
-             (kbd "C-j") 'magit-goto-next-section
-             (kbd "C-k") 'magit-goto-previous-section
-             (kbd "C-n") 'magit-goto-next-section
-             (kbd "C-p") 'magit-goto-previous-section
-             (kbd "C-v") 'magit-revert-item)))
+        "gC" 'magit-commit)))
   :config
   (progn
-    (dotemacs-hide-lighter magit-auto-revert-mode)
+    ; (dotemacs-hide-lighter magit-auto-revert-mode)
+
+    ;; mode maps
+    (dotemacs-evilify-map 'magit-mode-map)
+    ;; (dotemacs-evilify-map 'magit-popup-mode-map  'magit-popup-mode)
+    (dotemacs-evilify-map 'magit-status-mode-map 'magit-status-mode)
+    (dotemacs-evilify-map 'magit-refs-mode-map 'magit-refs-mode)
+    (dotemacs-evilify-map 'magit-blame-mode-map 'magit-blame-mode)
+    (dotemacs-evilify-map 'magit-diff-mode-map 'magit-diff-mode)
+    (dotemacs-evilify-map 'magit-log-read-revs-map 'magit-log-read-revs)
+    (dotemacs-evilify-map 'magit-log-mode-map 'magit-log-mode)
+    (dotemacs-evilify-map 'magit-log-select-mode-map 'magit-log-select-mode)
+    (dotemacs-evilify-map 'magit-cherry-mode-map 'magit-cherry-mode)
+    (dotemacs-evilify-map 'magit-reflog-mode-map 'magit-reflog-mode)
+    (dotemacs-evilify-map 'magit-process-mode-map 'magit-process-mode)
+    ;; section maps
+    (dotemacs-evilify-map 'magit-tag-section-map)
+    (dotemacs-evilify-map 'magit-untracked-section-map)
+    (dotemacs-evilify-map 'magit-branch-section-map)
+    (dotemacs-evilify-map 'magit-remote-section-map)
+    (dotemacs-evilify-map 'magit-file-section-map)
+    (dotemacs-evilify-map 'magit-hunk-section-map)
+    (dotemacs-evilify-map 'magit-unstaged-section-map)
+    (dotemacs-evilify-map 'magit-staged-section-map)
+    (dotemacs-evilify-map 'magit-commit-section-map)
+    (dotemacs-evilify-map 'magit-module-commit-section-map)
+    (dotemacs-evilify-map 'magit-unpulled-section-map)
+    (dotemacs-evilify-map 'magit-unpushed-section-map)
+    (dotemacs-evilify-map 'magit-stashes-section-map)
+
+    (add-hook 'projectile-switch-project-hook
+      #'dotemacs-magit-set-repo-dirs-from-projectile)  (dotemacs-evilify-map 'magit-stash-section-map)
+
     ;; full screen magit-status
     (when dotemacs-git-magit-status-fullscreen
       (defadvice magit-status (around magit-fullscreen activate)
@@ -6351,42 +6338,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (interactive)
         (kill-buffer)
         (jump-to-register :magit-fullscreen))
-      (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
 
-    (defun magit-toggle-whitespace ()
-      (interactive)
-      (if (member "-w" magit-diff-options)
-          (magit-dont-ignore-whitespace)
-        (magit-ignore-whitespace)))
-
-    (defun magit-ignore-whitespace ()
-      (interactive)
-      (add-to-list 'magit-diff-options "-w")
-      (magit-refresh))
-
-    (defun magit-dont-ignore-whitespace ()
-      (interactive)
-      (setq magit-diff-options (remove "-w" magit-diff-options))
-      (magit-refresh))
+      (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)))
     (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace)
 
-    ;; Set Magit's repo dirs for `magit-status' from Projectile's known
-    ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
-    ;; was loaded, and update it every time we switched projects, because the
-    ;; new project might have been unknown before
-    (defun dotemacs-magit-set-repo-dirs-from-projectile ()
-      "Set `magit-repo-dirs' from known Projectile projects."
-      (let ((project-dirs (bound-and-true-p projectile-known-projects)))
-        ;; Remove trailing slashes from project directories, because Magit adds
-        ;; trailing slashes again, which breaks the presentation in the Magit
-        ;; prompt.
-        (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
 
-    (after "projectile"
-      (dotemacs-magit-set-repo-dirs-from-projectile))
 
-    (add-hook 'projectile-switch-project-hook
-              #'dotemacs-magit-set-repo-dirs-from-projectile))
+    )
   :diminish magit-auto-revert-mode)
 
 (use-package magit-gh-pulls
