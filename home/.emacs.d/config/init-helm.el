@@ -452,10 +452,11 @@ Search for a search tool in the order provided by `dotemacs-search-tools'
 If DEFAULT-INPUTP is non nil then the current region or symbol at point
 are used as default input."
   (interactive)
-  (call-interactively
-   (dotemacs-helm-do-search-find-tool "helm-project-do"
-                                      dotemacs-search-tools
-                                      default-inputp)))
+  (let ((projectile-require-project-root nil))
+   (call-interactively
+    (dotemacs-helm-do-search-find-tool "helm-project-do"
+                                       dotemacs-search-tools
+                                       default-inputp))))
 
 (defun dotemacs-helm-project-smart-do-search-region-or-symbol ()
   "Search in current project using `dotemacs-search-tools' with
