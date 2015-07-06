@@ -639,7 +639,6 @@ FEATURE may be a named feature or a file name, see
 (require 'subr-x)
 (require 'rx)
 (require 'time-date)
-(require 'eval-sexp-fu)
 
 
 ;;; Key Binding Init
@@ -1245,6 +1244,10 @@ FEATURE may be a named feature or a file name, see
                        help-echo "mouse-1: go to beginning\n\
 mouse-2: toggle rest visibility\n\
 mouse-3: go to end"))))
+
+(use-package rfringe
+  :ensure t
+  :defer t)
 
 
 ;;; Minibuffer and Helm
@@ -2203,8 +2206,37 @@ mouse-3: go to end"))))
   :diminish (whitespace-cleanup-mode . "⌫"))
 
 (use-package subword                    ; Subword/superword editing
+  :ensure t
+  :if (unless (version< emacs-version "24.4"))
   :defer t
-  :diminish subword-mode)
+  :init
+  (progn
+    (unless (category-docstring ?U)
+      (define-category ?U "Uppercase")
+      (define-category ?u "Lowercase"))
+    (modify-category-entry (cons ?A ?Z) ?U)
+    (modify-category-entry (cons ?a ?z) ?u)
+    (make-variable-buffer-local 'evil-cjk-word-separating-categories)
+    (defun spacemacs//subword-enable-camel-case ()
+      "Add support for camel case to subword."
+      (if subword-mode
+          (push '(?u . ?U) evil-cjk-word-separating-categories)
+        (setq evil-cjk-word-separating-categories
+              (default-value 'evil-cjk-word-separating-categories))))
+    (add-hook 'subword-mode-hook 'spacemacs//subword-enable-camel-case)
+    (spacemacs|add-toggle camel-case-motion
+                          :status subword-mode
+                          :on (subword-mode +1)
+                          :off (subword-mode -1)
+                          :documentation "Toggle CamelCase motion."
+                          :evil-leader "tc")
+    (spacemacs|add-toggle camel-case-motion-globally
+                          :status subword-mode
+                          :on (global-subword-mode +1)
+                          :off (global-subword-mode -1)
+                          :documentation "Globally toggle CamelCase motion."
+                          :evil-leader "t C-c"))
+  :diminish (subword-mode . " ⓒ"))
 
 (use-package adaptive-wrap              ; Choose wrap prefix automatically
   :ensure t
@@ -3741,6 +3773,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (bind-key "C-c u d" #'toggle-debug-on-error)
 
+(use-package eval-sexp-fu
+  :config (require 'eval-sexp-fu))
+
 (use-package init-elisp             ; Personal tools for Emacs Lisp
   :load-path "config/"
   :commands (dotemacs-elisp-find-cask-file
@@ -3849,6 +3884,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "Ret" 'rxt-toggle-elisp-rx
         "Rt"  'rxt-toggle-elisp-rx
         "Rh"  'rxt-fontify-regexp-at-point))))
+
+(use-package visual-regexp-steroids
+  :defer t)
 
 (use-package macrostep                  ; Interactively expand macros in code
   :ensure t
