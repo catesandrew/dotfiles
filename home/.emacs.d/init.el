@@ -452,6 +452,10 @@ NOERROR and NOMESSAGE are passed to `load'."
 Possible values are `complete' or `nil'."
   :group 'dotemacs-ac)
 
+(defcustom auto-completion-enable-snippets-in-popup t
+  "If non nil show snippets in the auto-completion popup."
+  :group 'dotemacs-ac)
+
 (defcustom auto-completion-tab-key-behavior 'cycle
   "What the TAB key should do when auto-completion menu is active.
 Possible values are `complete', `cycle' or `nil'."
