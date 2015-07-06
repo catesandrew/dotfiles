@@ -987,4 +987,17 @@ the right."
 (create-align-repeat-x "left-paren" "(")
 (create-align-repeat-x "right-paren" ")" t)
 
+(defun dotemacs-write-file ()
+  "Write the file if visiting a file.
+   Otherwise ask for new filename."
+  (interactive)
+  (if (buffer-file-name)
+      (call-interactively 'evil-write)
+    (call-interactively 'write-file)))
+
+(defun dotemacs-copy-file ()
+  "Write the file under new name."
+  (interactive)
+  (call-interactively 'write-file))
+
 (provide 'init-funcs)

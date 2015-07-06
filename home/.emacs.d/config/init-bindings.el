@@ -102,7 +102,7 @@ Ensure that helm is required before calling FUNC."
   "fo" 'dotemacs-open-in-external-app
   "fR"  'rename-current-buffer-file
   "fS" 'evil-write-all
-  "fs" 'evil-write
+  "fs" 'dotemacs-write-file
   "fy" 'show-and-copy-buffer-filename)
 ;; insert stuff ---------------------------------------------------------------
 (evil-leader/set-key
