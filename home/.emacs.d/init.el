@@ -8091,8 +8091,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (setq flycheck-check-syntax-automatically '(save mode-enabled)
-          flycheck-standard-error-navigation nil)
+    (setq flycheck-standard-error-navigation nil)
 
     ;; Each buffer gets its own idle-change-delay because of the
     ;; buffer-sensitive adjustment above.
