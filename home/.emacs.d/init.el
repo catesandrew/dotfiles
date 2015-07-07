@@ -1172,6 +1172,24 @@ FEATURE may be a named feature or a file name, see
     (setq linum-relative-current-symbol "")
     (linum-relative-toggle)))
 
+(use-package fill-column-indicator
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq fci-rule-width 1)
+    (setq fci-rule-color "#D0BF8F")
+    ;; manually register the minor mode since it does not define any
+    ;; lighter
+    (push '(fci-mode "") minor-mode-alist)
+    (dotemacs-add-toggle fill-column-indicator
+                          :status fci-mode
+                          :on (turn-on-fci-mode)
+                          :off (turn-off-fci-mode)
+                          :documentation "Display the fill column indicator."
+                          :evil-leader "tf"))
+  :diminish fci-mode)
+
 (bind-key "C-c u v" #'variable-pitch-mode)
 
 
@@ -6365,7 +6383,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ;; Except when you ask something useful…
           magit-set-upstream-on-push t)
 
-    (add-hook 'git-commit-mode-hook 'fci-mode)
+    (when (boundp 'fci-mode)
+      (add-hook 'git-commit-mode-hook #'fci-mode))
+
     ;; On Windows, we must use Git GUI to enter username and password
     ;; See: https://github.com/magit/magit/wiki/FAQ#windows-cannot-push-via-https
     (when (eq window-system 'w32)
