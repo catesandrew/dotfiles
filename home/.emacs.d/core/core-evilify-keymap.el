@@ -38,9 +38,8 @@
 (defun dotemacs-evilify-configure-default-state (mode)
   "Configure default state for the passed mode."
   (add-to-list 'evil-evilified-state--modes mode)
-  (unless (bound-and-true-p holy-mode)
-    (delq mode evil-emacs-state-modes)
-    (add-to-list 'evil-evilified-state-modes mode)))
+  (delq mode evil-emacs-state-modes)
+  (add-to-list 'evil-evilified-state-modes mode))
 
 (defun dotemacs-evilify-event (map map-symbol event evil-value
                                      &optional processed pending-funcs)
@@ -68,7 +67,7 @@
                            (dotemacs-evilify-find-new-event event) nil
                            processed pending-funcs))))
     (when pending-funcs
-      (warn
+      (dotemacs-buffer/warning
        (concat (format (concat "Auto-evilication could not remap these "
                                "functions in map `%s':\n")
                        map-symbol)

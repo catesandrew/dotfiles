@@ -761,10 +761,10 @@ FEATURE may be a named feature or a file name, see
 (use-package core-micro-state
   :load-path "core/")
 
-(use-package core-evilify-keymap
+(use-package core-buffers
   :load-path "core/")
 
-(use-package core-use-package
+(use-package core-evilify-keymap
   :load-path "core/")
 
 (use-package core-toggle
@@ -2964,7 +2964,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)))
 
 (use-package evil-escape
-  :ensure t
+  :disabled t
   :init (evil-escape-mode)
   :diminish evil-escape-mode)
 
@@ -6347,25 +6347,21 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package magit                      ; The one and only Git frontend
   :ensure t
-  :bind (("C-c g"   . magit-status)
-         ("C-c v g" . magit-status)
+  :bind (("C-c v g" . magit-status)
          ("C-c v v" . magit-status)
-         ("C-c v g" . magit-blame-mode)
-         ("C-c v l" . magit-file-log))
+         ("C-c v b" . magit-blame-mode)
+         ("C-c v l" . magit-log-all))
   :commands (magit-status
              magit-blame-mode
              magit-log
              magit-commit)
   :init
   (progn
-    ;; Seriously, Magit?! Set this variable before Magit is loaded to silence the
-    ;; most stupid warning ever
-    (setq magit-last-seen-setup-instructions "1.4.0"
-          magit-completing-read-function 'magit-ido-completing-read
-          magit-save-some-buffers 'dontask
+    (setq magit-save-some-buffers 'dontask
           magit-stage-all-confirm nil
           magit-unstage-all-confirm nil
           magit-show-child-count t
+          magit-completing-read-function 'magit-builtin-completing-read
           ;; Except when you ask something useful…
           magit-set-upstream-on-push t)
 
@@ -6378,19 +6374,19 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "projectile"
       (dotemacs-magit-set-repo-dirs-from-projectile))
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        "gb" 'magit-blame
-        "gl" 'magit-log-all
-        "gL" 'magit-log-buffer-file
-        "gs" 'magit-status
-        "gd" 'dotemacs-magit-diff-head
-        "gC" 'magit-commit)))
+    (evil-leader/set-key
+      "gb" 'magit-blame
+      "gl" 'magit-log-all
+      "gL" 'magit-log-buffer-file
+      "gs" 'magit-status
+      "gd" 'dotemacs-magit-diff-head
+      "gC" 'magit-commit))
   :config
   (progn
     ;; seems to be necessary at the time of release
     (require 'git-rebase)
     ;; mode maps
+
     (dotemacs-evilify-map magit-mode-map)
     (dotemacs-evilify-map magit-status-mode-map
       :mode magit-status-mode
@@ -6473,6 +6469,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "K" 'git-rebase-move-line-up
       "u" 'git-rebase-undo
       "y" 'git-rebase-insert)
+
     ;; default state for additional modes
     (dolist (mode '(magit-popup-mode
                     magit-popup-sequence-mode))
@@ -6498,7 +6495,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       #'dotemacs-magit-set-repo-dirs-from-projectile)
 
     ;; full screen magit-status
-    (when git-magit-status-fullscreen
+    (when dotemacs-git-magit-status-fullscreen
       (setq magit-restore-window-configuration t)
       (setq magit-status-buffer-switch-function
             (lambda (buffer)
@@ -6515,15 +6512,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mk" 'git-commit-abort)
 
     (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
-    (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace))
-  :diminish magit-auto-revert-mode)
+    (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
 
+(setq github-post-extensions '(magit-gh-pulls))
 (use-package magit-gh-pulls
-  :defer t
-  :defer t
+  :disabled t ; not compatible with magit 2.1
+  :commands magit-gh-pulls-mode
   :init
   (progn
-    (add-hook 'magit-mode-hook #'turn-on-magit-gh-pulls)
     (after "magit"
       '(progn
          (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode)
@@ -6532,12 +6528,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package magit-gitflow
   :ensure t
+  :disabled t ; not compatible with magit 2.1
   :commands turn-on-magit-gitflow
   :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
   :diminish (magit-gitflow-mode . "Flow"))
 
 (use-package magit-svn
   :if dotemacs-git-enable-magit-svn-plugin
+  :disabled t ; not compatible with magit 2.1
   :ensure t
   :commands turn-on-magit-svn
   :init (add-hook 'magit-mode-hook 'turn-on-magit-svn)
@@ -6548,7 +6546,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;; git
 (use-package git-commit-mode            ; Git commit message mode
-  :ensure t
+  :disabled t ; not compatible with magit 2.1
   :defer t
   :config
   (after "evil-leader"
@@ -6577,7 +6575,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t)
 
 (use-package git-rebase-mode            ; Mode for git rebase -i
-  :ensure t
+  :disabled t ; not compatible with magit 2.1
   :defer t
   :config
   (progn
