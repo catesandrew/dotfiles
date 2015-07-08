@@ -1190,6 +1190,56 @@ FEATURE may be a named feature or a file name, see
                           :evil-leader "tf"))
   :diminish fci-mode)
 
+(use-package zoom-frm
+  :commands (zoom-frm-unzoom
+             zoom-frm-out
+             zoom-frm-in)
+  :ensure t
+  :init
+  (progn
+    (dotemacs-define-micro-state zoom-frm
+      :doc "[+] zoom frame in [-] zoom frame out [=] reset zoom"
+      :evil-leader "zf"
+      :use-minibuffer t
+      :bindings
+      ("+" dotemacs-zoom-frm-in)
+      ("-" dotemacs-zoom-frm-out)
+      ("=" dotemacs-zoom-frm-unzoom))
+
+    (defun dotemacs-zoom-frm-do (arg)
+      "Perform a zoom action depending on ARG value."
+      (let ((zoom-action (cond ((eq arg 0) 'zoom-frm-unzoom)
+                               ((< arg 0) 'zoom-frm-out)
+                               ((> arg 0) 'zoom-frm-in)))
+            (fm (cdr (assoc 'fullscreen (frame-parameters))))
+            (fwp (* (frame-char-width) (frame-width)))
+            (fhp (* (frame-char-height) (frame-height))))
+        (when (equal fm 'maximized)
+          (toggle-frame-maximized))
+        (funcall zoom-action)
+        (set-frame-size nil fwp fhp t)
+        (when (equal fm 'maximized)
+          (toggle-frame-maximized))))
+
+    (defun dotemacs-zoom-frm-in ()
+      "zoom in frame, but keep the same pixel size"
+      (interactive)
+      (dotemacs-zoom-frm-do 1))
+
+    (defun dotemacs-zoom-frm-out ()
+      "zoom out frame, but keep the same pixel size"
+      (interactive)
+      (dotemacs-zoom-frm-do -1))
+
+    (defun dotemacs-zoom-frm-unzoom ()
+      "Unzoom current frame, keeping the same pixel size"
+      (interactive)
+      (dotemacs-zoom-frm-do 0))
+
+    ;; Font size, either with ctrl + mouse wheel
+    (global-set-key (kbd "<C-wheel-up>") 'dotemacs-zoom-frm-in)
+    (global-set-key (kbd "<C-wheel-down>") 'dotemacs-zoom-frm-out)))
+
 (bind-key "C-c u v" #'variable-pitch-mode)
 
 
