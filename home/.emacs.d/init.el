@@ -171,7 +171,7 @@ with `:' and Emacs commands are executed with `<leader> :'."
 several times cycle between the kill ring content.'"
   :group 'dotemacs)
 
-(defcustom dotemacs-guide-key-delay 0.4
+(defcustom dotemacs-guide-key-delay 1.0
   "Guide-key delay in seconds."
   :group 'dotemacs)
 
@@ -1734,6 +1734,7 @@ mouse-3: go to end"))))
     (after "evil-leader"
       (evil-leader/set-key "wpm" 'popwin:messages)
       (evil-leader/set-key "wpp" 'popwin:close-popup-window))
+
     ;; don't use default value but manage it ourselves
     (setq popwin:special-display-config nil)
 
@@ -7928,9 +7929,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setq guide-key/highlight-command-regexp
                  (cons dotemacs-prefix-command-string font-lock-warning-face))
     (guide-key-mode 1))
-  :config
-  (add-hook 'evil-leader-mode-hook
-            #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader)))
+  ; :config
+  ; (add-hook 'evil-leader-mode-hook
+  ;           #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader)))
   :diminish (guide-key-mode . " Ⓖ"))
 
 
