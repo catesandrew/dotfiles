@@ -7180,21 +7180,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (ido-everywhere 1)))
 
 (use-package flx-ido
-  :disabled t
+  :ensure t
   :defer t
   :init
   (progn
-    (setq flx-ido-use-faces 1)
     (flx-ido-mode 1)))
 
 (use-package ido-ubiquitous
-  :disabled t
+  :ensure t
   :defer t
-  :preface
+  :init
   (progn
-    (defvar ido-ubiquitous-debug-mode nil))
-  :init (after "flx-ido"
-          (ido-ubiquitous-mode 1)))
+    (defvar ido-ubiquitous-debug-mode nil)
+    (after "flx-ido"
+      (ido-ubiquitous-mode 1))))
 
 
 ;;; Project management with Projectile
@@ -7263,7 +7262,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                         "projectile.cache")
           projectile-known-projects-file (concat dotemacs-cache-directory
                                                    "projectile-bookmarks.eld")
-          projectile-completion-system 'helm
+          ; testing with ido vs helm completion
+          projectile-completion-system 'ido ; helm
           projectile-indexing-method 'alien ; force alien for Windwos
           projectile-find-dir-includes-top-level t
           projectile-mode-line '(:propertize
