@@ -1584,7 +1584,7 @@ mouse-3: go to end"))))
     (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-z") 'helm-select-action)
 
-    (eval-after-load "helm-mode" ; required
+    (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
 
 (use-package helm-swoop
@@ -2172,6 +2172,11 @@ mouse-3: go to end"))))
 
 
 ;;; Navigation and scrolling
+
+;; Handy way of getting back to previous places.
+(bind-key "C-x p" 'pop-to-mark-command)
+(setq set-mark-command-repeat-pop t)
+
 (setq scroll-margin 3                   ; 0 to drag the point along while scrolling
       scroll-conservatively 1000        ; Never recenter the screen while scrolling
       scroll-error-top-bottom t         ; Move to beg/end of buffer before
@@ -2329,7 +2334,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; The C-d rebinding that most shell-like buffers inherit from
 ;; comint-mode assumes non-evil configuration with its
 ;; `comint-delchar-or-maybe-eof' function, so we disable it
-(eval-after-load 'comint
+(after "comint"
   '(define-key comint-mode-map (kbd "C-d") nil))
 
 ;; enable electric indent
@@ -3181,7 +3186,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :config
   (progn
     ;; Unset shortcuts which shadow evil leader
-    (eval-after-load "compile"
+    (after "compile"
       '(progn
          (define-key compilation-mode-map (kbd "h") nil)))
     ;; make leader available in visual and motion states
@@ -7352,7 +7357,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              helm-projectile-switch-project)
   :init
   (progn
-    (helm-projectile-on)
+    ; disable till fixed https://github.com/emacs-helm/helm/issues/1088
+    ; disable till fixed https://github.com/bbatsov/projectile/issues/794
+    ; (helm-projectile-on)
 
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
     (setq projectile-switch-project-action #'helm-projectile)
@@ -8856,7 +8863,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (setq ac-ispell-requires 4)
-    (eval-after-load 'auto-complete
+    (after "auto-complete"
       '(ac-ispell-setup))
     ))
 
