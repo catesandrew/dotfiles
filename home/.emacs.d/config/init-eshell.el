@@ -81,4 +81,24 @@
   (interactive)
   (multi-term))
 
+(defun dotemacs-eshell-auto-end ()
+  "Move point to end of current prompt when switching to insert state."
+  (when (and (eq major-mode 'eshell-mode)
+             ;; Not on last line, we might want to edit within it.
+             (not (eq (line-end-position) (point-max))))
+    (end-of-buffer)))
+
+(defun dotemacs-init-eshell ()
+  "Stuff to do when enabling eshell."
+  (setq pcomplete-cycle-completions nil)
+  (unless shell-enable-smart-eshell
+    ;; we don't want auto-jump to prompt when smart eshell is enabled.
+    ;; Idea: maybe we could make auto-jump smarter and jump only if the
+    ;; point is not on a prompt line
+    (add-hook 'evil-insert-state-entry-hook
+              'dotemacs-eshell-auto-end nil t))
+  ; (after "semantic"
+  ;   (semantic-mode -1))
+  )
+
 (provide 'init-eshell)

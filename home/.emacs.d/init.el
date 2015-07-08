@@ -302,6 +302,11 @@ NOERROR and NOMESSAGE are passed to `load'."
   "Default shell to use in `term' and `ansi-term' shells."
   :group 'dotemacs-shell)
 
+(defcustom dotemacs-shell-enable-smart-eshell nil
+  "If non-nil then `em-smart' is enabled. `em-smart' allows to quickly review
+commands, modify old commands or enter a new one."
+  :group 'dotemacs-shell)
+
 ;; ruby settings
 (defgroup dotemacs-ruby nil
   "Configuration options for ruby."
@@ -781,6 +786,8 @@ FEATURE may be a named feature or a file name, see
 
 
 ;; Shell
+(dotemacs-defvar-company-backends eshell-mode)
+
 (use-package init-eshell
   :load-path "config/")
 
@@ -811,6 +818,74 @@ FEATURE may be a named feature or a file name, see
       (dolist (dir (parse-colon-path (getenv "INFOPATH")))
         (when dir
           (add-to-list 'Info-directory-list dir))))))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (setq-local company-idle-delay 0.2)
+      ;; The default frontend screws everything up in short windows like
+      ;; terminal often are
+      (setq-local company-frontends '(company-preview-frontend))
+      (push 'company-capf company-backends-eshell-mode)
+      (dotemacs-add-company-hook eshell-mode))))
+
+(use-package eshell
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq eshell-cmpl-cycle-completions nil
+          ;; auto truncate after 20k lines
+          eshell-buffer-maximum-lines 20000
+          ;; history size
+          eshell-history-size 350
+          ;; buffer shorthand -> echo foo > #'buffer
+          eshell-buffer-shorthand t
+          ;; my prompt is easy enough to see
+          eshell-highlight-prompt nil
+          ;; treat 'echo' like shell echo
+          eshell-plain-echo-behavior t)
+
+    (add-hook 'eshell-mode-hook 'dotemacs-init-eshell))
+  :config
+  (progn
+    (require 'esh-opt)
+
+    ;; quick commands
+    (defalias 'e 'find-file-other-window)
+    (defalias 'd 'dired)
+    (setenv "PAGER" "cat")
+
+    ;; support `em-smart'
+    (when dotemacs-shell-enable-smart-eshell
+      (require 'em-smart)
+      (setq eshell-where-to-jump 'begin
+            eshell-review-quick-commands nil
+            eshell-smart-space-goes-to-end t)
+      (add-hook 'eshell-mode-hook 'eshell-smart-initialize))
+
+    ;; Visual commands
+    (require 'em-term)
+    (mapc (lambda (x) (push x eshell-visual-commands))
+          '("el" "elinks" "htop" "less" "ssh" "tmux" "top"))
+
+    ;; automatically truncate buffer after output
+    (when (boundp 'eshell-output-filter-functions)
+      (push 'eshell-truncate-buffer eshell-output-filter-functions))))
+
+(use-package esh-help
+  :defer t
+  :ensure t
+  :init (add-hook 'eshell-mode-hook 'eldoc-mode)
+  :config (setup-esh-help-eldoc))
+
+(use-package eshell-prompt-extras
+  :commands epe-theme-lambda
+  :ensure t
+  :init
+  (setq eshell-highlight-prompt nil
+        eshell-prompt-function 'epe-theme-lambda))
 
 (use-package multi-term
   :defer t
@@ -865,8 +940,6 @@ FEATURE may be a named feature or a file name, see
 
 ;; shell
 (add-hook 'shell-mode-hook 'shell-comint-input-sender-hook)
-(add-hook 'eshell-mode-hook (lambda ()
-                              (setq pcomplete-cycle-completions nil)))
 
 ;; term
 (after "evil-leader"
@@ -877,7 +950,7 @@ FEATURE may be a named feature or a file name, see
   (evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab))
 
 (dotemacs-use-package-add-hook helm
-  :post-config
+  :post-init
   (progn
     ;; eshell
     (defun dotemacs-helm-eshell-history ()
@@ -900,6 +973,16 @@ FEATURE may be a named feature or a file name, see
     ;;shell
     (evil-leader/set-key-for-mode 'shell-mode
       "mH" 'dotemacs-helm-shell-history)))
+
+(dotemacs-use-package-add-hook magit
+  :post-init
+  (progn
+    ;; add a quick alias to open magit-status in current directory
+    (defun dotemacs-eshell-magit-status ()
+      "Function to open magit-status for the current directory"
+      (interactive)
+      (magit-status default-directory))
+    (defalias 's 'dotemacs-eshell-magit-status)))
 
 
 ;;; Customization, init file and package management
