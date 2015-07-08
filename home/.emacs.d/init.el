@@ -1484,10 +1484,12 @@ mouse-3: go to end"))))
           helm-file-cache-fuzzy-match t
           helm-imenu-fuzzy-match t
           helm-lisp-fuzzy-completion t
-          helm-locate-fuzzy-match t
           helm-recentf-fuzzy-match t
           helm-semantic-fuzzy-match t
           helm-buffers-fuzzy-matching t)
+
+    (when (not (eq system-type 'darwin))
+      (setq helm-locate-fuzzy-match t))
 
     ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
     ;; brew tap homebrew/dupes
