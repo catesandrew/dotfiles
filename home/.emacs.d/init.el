@@ -2370,8 +2370,18 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; Configure a reasonable fill column, indicate it in the buffer and enable
 ;; automatic filling
 (setq-default fill-column 80)
-(add-hook 'text-mode-hook #'auto-fill-mode)
+
+; Also, =visual-line-mode= is so much better than =auto-fill-mode=. It doesn't
+; actually break the text into multiple lines - it only looks that way.
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 (diminish 'auto-fill-function "↵")
+
+; Exclude very large buffers from dabbrev
+; From https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
+(defun sanityinc/dabbrev-friend-buffer (other-buffer)
+  (< (buffer-size other-buffer) (* 1 1024 1024)))
+(setq dabbrev-friend-buffer-function 'sanityinc/dabbrev-friend-buffer)
 
 (use-package init-simple           ; Personal editing helpers
   :load-path "config/"
@@ -6132,6 +6142,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :commands(dotemacs-skewer-start
             dotemacs-skewer-demo))
 
+; This lets you send HTML, CSS, and Javascript fragments to Google Chrome. You
+; may need to start Chrome with `--allow-running-insecure-content`, if
+; you're using the user script with HTTPS sites.
 (use-package skewer-mode
   :ensure t
   :defer t
