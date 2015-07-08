@@ -1035,12 +1035,23 @@ FEATURE may be a named feature or a file name, see
 ;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
 ;; bar, since the top menu bar is always visible anyway, and we'd just empty it
 ;; which is rather pointless.
-(when (fboundp 'tool-bar-mode)
+(when (and (fboundp 'tool-bar-mode) (not (eq tool-bar-mode -1)))
   (tool-bar-mode -1))
-(when (and (not (eq system-type 'darwin)) (fboundp 'menu-bar-mode))
-  (menu-bar-mode -1))
-(when (fboundp 'scroll-bar-mode)
+(when (and (fboundp 'scroll-bar-mode) (not (eq scroll-bar-mode -1)))
   (scroll-bar-mode -1))
+;; tooltips in echo-aera
+(when (and (fboundp 'tooltip-mode) (not (eq tooltip-mode -1)))
+  (tooltip-mode -1))
+(setq tooltip-use-echo-area t)
+(unless (eq system-type 'darwin)
+  (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
+    (menu-bar-mode -1)))
+;; for convenience and user support
+(unless (fboundp 'tool-bar-mode)
+  (dotemacs-message (concat "No graphical support detected, you won't be"
+                             "able to launch a graphical instance of Emacs"
+                             "with this build.")))
+
 
 ;; fringes
 (setq-default fringe-indicator-alist
@@ -1596,7 +1607,7 @@ mouse-3: go to end"))))
   :config
   (progn
     ; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-    (add-to-list 'initial-frame-alist '(width . 90))
+    (add-to-list 'initial-frame-alist '(width . 120))
     (add-to-list 'initial-frame-alist '(height . 72))))
 
 (use-package init-buffers          ; Personal buffer tools
@@ -2087,6 +2098,19 @@ mouse-3: go to end"))))
       ;; and smooth
       mouse-wheel-progressive-speed nil
       mouse-wheel-scroll-amount '(1))
+
+;; Hack to fix a bug with tabulated-list.el
+;; see: http://redd.it/2dgy52
+(defun tabulated-list-revert (&rest ignored)
+  "The `revert-buffer-function' for `tabulated-list-mode'.
+It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
+  (interactive)
+  (unless (derived-mode-p 'tabulated-list-mode)
+    (error "The current buffer is not in Tabulated List mode"))
+  (run-hooks 'tabulated-list-revert-hook)
+  ;; hack is here
+  ;; (tabulated-list-print t)
+  (tabulated-list-print))
 
 ;; Mouse cursor in terminal mode
 (xterm-mouse-mode 1)
