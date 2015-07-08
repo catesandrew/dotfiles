@@ -42,8 +42,7 @@ Removes the automatic guessing of the initial value based on thing at point. "
                                     (if helm-ff-transformer-show-only-basename
                                         (helm-basename preselection)
                                       preselection))))))
-    (helm-do-grep-1 targets nil nil nil nil use-region-or-symbol-p)))
-
+    (helm-do-grep-1 targets t nil nil nil use-region-or-symbol-p)))
 
 (defun dotemacs-helm-file-do-grep ()
   "Search in current file with `grep' using a default input."

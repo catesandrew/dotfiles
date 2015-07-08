@@ -1494,7 +1494,9 @@ mouse-3: go to end"))))
     ;; brew install homebrew/dupes/grep
     (when-let (gnu-grep (and (eq system-type 'darwin)
                            (executable-find "ggrep")))
-    (setq helm-grep-default gnu-grep))
+        (setq helm-grep-default gnu-grep)
+        (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
+        (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
 
     (defadvice helm-ff-delete-char-backward
         (around dotemacs-helm-find-files-navigate-back activate)
@@ -1577,12 +1579,13 @@ mouse-3: go to end"))))
         ("T" helm-toggle-all-marks)
         ("v" helm-execute-persistent-action)))
 
+
     ;; Swap default TAB and C-z commands.
-    ;; For GUI.
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    ;; For terminal.
-    (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-z") 'helm-select-action)
+    (if (not (display-graphic-p)) ;; For GUI.
+      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+      (progn ;; For terminal.
+        (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+        (define-key helm-map (kbd "C-z") 'helm-select-action))) ; list actions using C-z
 
     (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
