@@ -1469,6 +1469,39 @@ mouse-3: go to end"))))
     (after "helm-config"
            (warn "`helm-config' loaded! Get rid of it ASAP!"))
 
+    (defun dotemacs-helm-multi-files ()
+      "Runs `helm-multi-files`, but first primes the `helm-ls-git` file lists."
+      (interactive)
+      (dotemacs-helm-ls-git-ls)
+      (helm-multi-files))
+
+    (defun dotemacs-helm-ls-git-ls ()
+      (interactive)
+      (when (not (helm-ls-git-not-inside-git-repo))
+        (unless (and helm-source-ls-git
+                     helm-source-ls-git-buffers)
+          (setq helm-source-ls-git (helm-make-source "Git files" 'helm-ls-git-source
+                                                     :fuzzy-match helm-ls-git-fuzzy-match)
+                helm-source-ls-git-buffers (helm-make-source "Buffers in project" 'helm-source-buffers
+                                                             :header-name #'helm-ls-git-header-name
+                                                             :buffer-list (lambda () (helm-browse-project-get-buffers
+                                                                                       (helm-ls-git-root-dir))))))))
+
+    ;; https://github.com/syl20bnr/spacemacs/issues/1544
+    ;; Vim users are used to CtrlP plugin.
+    (setq helm-for-files-preferred-list '(helm-source-buffers-list
+                                          helm-source-buffer-not-found
+                                          helm-source-ls-git
+                                          helm-source-ls-git-buffers
+                                          ; helm-source-projectile-projects
+                                          ; helm-source-projectile-files-list
+                                          helm-source-recentf
+                                          helm-source-bookmarks
+                                          helm-source-file-cache
+                                          helm-source-files-in-current-dir
+                                          ))
+    (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
+
     (setq helm-prevent-escaping-from-minibuffer t
           helm-bookmark-show-location t
           helm-display-header-line nil
@@ -1508,6 +1541,7 @@ mouse-3: go to end"))))
 
     ;; use helm by default for M-x
     (global-set-key (kbd "M-x") 'helm-M-x)
+    (global-set-key (kbd "C-x C-d") 'helm-browse-project)
 
     (after "evil-leader"
       (evil-leader/set-key
@@ -1591,6 +1625,16 @@ mouse-3: go to end"))))
 
     (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
+
+(use-package helm-ls-git
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (require 'helm-ls-git))
+  :config
+  (progn
+    (setq helm-ls-git-show-abs-or-relative 'relative) ))
 
 (use-package helm-swoop
   :ensure t
@@ -5575,7 +5619,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (add-hook 'web-mode-hook 'impatient-mode)))
+
+    (defun dotemacs-impatient-mode-hook()
+      "my web mode hook for HTML REPL"
+      (interactive)
+      (impatient-mode)
+      (httpd-start))
+
+    (add-hook 'web-mode-hook #'dotemacs-impatient-mode-hook)))
 
 (use-package css-mode
   :defer t
