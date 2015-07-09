@@ -6554,6 +6554,80 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t)
 
 
+;;; gtags
+
+(defun helm-gtags-dwim-other-window ()
+  "helm-gtags-dwim in the other window"
+  (interactive)
+  (let ((helm-gtags--use-otherwin t)
+        (split-height-threshold nil)
+        (split-width-threshold 140))
+    (helm-gtags-dwim)))
+
+(defun dotemacs-helm-gtags-define-keys-for-mode (mode)
+  "Define key bindings for the specific MODE."
+  (when (fboundp mode)
+    (let ((hook (intern (concat (symbol-name mode) "-hook"))))
+      (add-hook hook 'helm-gtags-mode))
+    (evil-leader/set-key-for-mode mode
+      "mgc" 'helm-gtags-create-tags
+      "mgd" 'helm-gtags-find-tag
+      "mgf" 'helm-gtags-select-path
+      "mgg" 'helm-gtags-dwim
+      "mgG" 'helm-gtags-dwim-other-window
+      "mgi" 'helm-gtags-tags-in-this-function
+      "mgl" 'helm-gtags-parse-file
+      "mgn" 'helm-gtags-next-history
+      "mgp" 'helm-gtags-previous-history
+      "mgr" 'helm-gtags-find-rtag
+      "mgR" 'helm-gtags-resume
+      "mgs" 'helm-gtags-select
+      "mgS" 'helm-gtags-show-stack
+      "mgu" 'helm-gtags-update-tags)))
+
+(defun dotemacs-ggtags-enable-eldoc (mode)
+  (add-hook (intern (concat (symbol-name mode) "-hook"))
+            (lambda ()
+              (ggtags-mode 1)
+              (setq-local eldoc-documentation-function
+                          #'ggtags-eldoc-function))))
+
+(use-package ggtags
+  :ensure t
+  :defer t)
+
+(use-package helm-gtags
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq helm-gtags-ignore-case t
+          helm-gtags-auto-update t
+          helm-gtags-use-input-at-cursor t
+          helm-gtags-pulse-at-cursor t)
+    ;; modes that do not have a layer, define here
+    (dotemacs-helm-gtags-define-keys-for-mode 'tcl-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'java-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'vhdl-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'shell-script-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'awk-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'asm-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'dired-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'compilation-mode)
+    (dotemacs-helm-gtags-define-keys-for-mode 'shell-mode)
+
+    (dotemacs-ggtags-enable-eldoc 'tcl-mode)
+    (dotemacs-ggtags-enable-eldoc 'java-mode)
+    (dotemacs-ggtags-enable-eldoc 'vhdl-mode))
+  :config
+  (progn
+    ;; if anyone uses helm-gtags, they would want to use these key bindings
+    (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+    (define-key helm-gtags-mode-map (kbd "C-x 4 .") 'helm-gtags-find-tag-other-window)
+    (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+    (define-key helm-gtags-mode-map (kbd "M-*") 'helm-gtags-pop-stack)))
+
+
 ;;; Version control
 (use-package vc-hooks                   ; Simple version control
   :defer t
