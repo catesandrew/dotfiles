@@ -2609,6 +2609,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :ensure t
   :init
   (global-undo-tree-mode)
+  ;; https://bitbucket.org/lyro/evil/issues/522/when-saving-the-buffer-change-list-got
+  ;; https://github.com/syl20bnr/spacemacs/issues/774
   ;; (setq undo-tree-auto-save-history t
   ;;       undo-tree-history-directory-alist
   ;;       `(("." . ,(concat dotemacs-cache-directory "undo"))))
