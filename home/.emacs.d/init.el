@@ -4231,7 +4231,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "meb" 'eval-buffer
       "mec" 'dotemacs-eval-current-form
       "mee" 'eval-last-sexp
-      "mer" 'dotemacs-eval-region
+      "mer" 'eval-region
       "mef" 'eval-defun
       "mel" 'lisp-state-eval-sexp-end-of-line
       "m,"  'lisp-state-toggle-lisp-state
