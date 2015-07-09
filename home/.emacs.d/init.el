@@ -3981,10 +3981,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
               (push '("function" . 955) prettify-symbols-alist)
               (push '("return" . 8592) prettify-symbols-alist))))
 
-; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
+;; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
 (use-package hs-minor-mode
   :defer t
-  :init (progn
+  :init
+  (progn
+    ;; Space to toggle folds.
+    (define-key evil-motion-state-map " " 'evil-toggle-fold)
+    ;; TODO: Figure out how to only map " " when in hs-minor-mode
+    ;; (evil-define-key 'motion hs-minor-mode-map " " 'evil-toggle-fold)
+
     ;; required for evil folding
     (setq hs-set-up-overlay 'dotemacs-fold-overlay)
     (add-hook 'prog-mode-hook #'hs-minor-mode)))
