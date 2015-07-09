@@ -1493,8 +1493,8 @@ mouse-3: go to end"))))
                                           helm-source-buffer-not-found
                                           helm-source-ls-git
                                           helm-source-ls-git-buffers
-                                          ; helm-source-projectile-projects
-                                          ; helm-source-projectile-files-list
+                                          helm-source-projectile-projects
+                                          helm-source-projectile-files-list
                                           helm-source-recentf
                                           helm-source-bookmarks
                                           helm-source-file-cache
@@ -7500,9 +7500,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              helm-projectile-switch-project)
   :init
   (progn
-    ; disable till fixed https://github.com/emacs-helm/helm/issues/1088
-    ; disable till fixed https://github.com/bbatsov/projectile/issues/794
-    ; (helm-projectile-on)
+    (helm-projectile-on)
 
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
     (setq projectile-switch-project-action #'helm-projectile)
