@@ -2694,9 +2694,9 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :init
   (progn
     (add-to-hooks (if dotemacs-smartparens-strict-mode
-                      'smartparens-strict-mode
-                    'smartparens-mode)
-                  '(prog-mode-hook))
+                      #'smartparens-strict-mode
+                    #'smartparens-mode)
+                  '(text-mode-hook prog-mode-hook))
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
@@ -2725,14 +2725,87 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (progn
     (require 'smartparens-config)
 
+
+    (setq sp-pairs '((t
+                      .
+                      ((:open "\"" :close "\"" :actions (insert wrap))
+                       (:open "'"  :close "'"  :actions (insert wrap) :unless (sp-point-after-word-p))
+                       (:open "("  :close ")"  :actions (insert wrap))
+                       (:open "["  :close "]"  :actions (insert wrap))
+                       (:open "{"  :close "}"  :actions (insert wrap))
+                       (:open "`"  :close "`"  :actions (insert wrap))))))
+
+    (defun dotemacs-sp-kill-surrounding-sexp ()
+      "Kill from beginning to end of sexp."
+      (interactive)
+      (kill-region (progn (sp-beginning-of-sexp)
+                     (1- (point)))
+        (progn (sp-end-of-sexp)
+          (1+  (point)))))
+
     ;;; Additional pairs for various modes
+    (sp-with-modes '(scala-mode)
+      (sp-local-pair "'" nil :actions nil))
+
+    (sp-with-modes '(text-mode)
+      (sp-local-pair "`" "'" :actions '(insert wrap)))
+
+    '(progn (add-to-list 'sp--lisp-modes 'racket-mode))
+    (sp-with-modes '(racket-mode)
+      (sp-local-pair "'" nil :actions nil)
+      (sp-local-pair "`" nil :actions nil))
+
+    (sp-with-modes '(tex-mode
+                     plain-tex-mode
+                     latex-mode
+                     org-mode)
+      (sp-local-pair "$" " $")
+      (sp-local-pair "\\[" " \\]")
+      (sp-local-pair "\\(" " \\)")
+      (sp-local-pair "\\{" " \\}")
+      (sp-local-pair "\\left(" " \\right)")
+      (sp-local-pair "\\left\\{" " \\right\\}"))
+
+    (sp-with-modes '(markdown-mode
+                     rst-mode)
+      ;; (sp-local-pair "`" "`")
+      ;; Don't do terrible things with Github code blocks (```)
+      (sp-local-pair "`" nil :actions '(:rem autoskip))
+      (sp-local-pair "'" nil :actions nil))
+
+    (sp-with-modes '(rust-mode)
+      ;; Don't pair lifetime specifiers
+      (sp-local-pair "'" nil :actions nil))
+
+    (sp-with-modes '(ruby-mode enh-ruby-mode)
+      (sp-local-pair "{" "}"
+                     :pre-handlers '(sp-ruby-pre-handler)
+                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
+                     :suffix ""))
+
+    (sp-with-modes '(web-mode)
+      (sp-local-pair "<% " " %>")
+      (sp-local-pair "{ " " }")
+      (sp-local-pair "<%= "  "  %>")
+      (sp-local-pair "<%# "  " %>")
+      (sp-local-pair "<%$ "  " %>")
+      (sp-local-pair "<%@ "  " %>")
+      (sp-local-pair "<%: "  " %>")
+      (sp-local-pair "{{ "  " }}")
+      (sp-local-pair "{% "  " %}")
+      (sp-local-pair "{%- "  " %}")
+      (sp-local-pair "{# "  " #}"))
 
     ;; Emacs Lisp
-    (sp-local-pair '(emacs-lisp-mode lisp-interaction-mode inferior-emacs-lisp-mode)
-                   "(" nil :bind "M-(")
+    (sp-with-modes '(emacs-lisp-mode
+                     inferior-emacs-lisp-mode
+                     lisp-interaction-mode
+                     lisp-mode)
+      (sp-local-pair "'" nil :actions nil)
+      (sp-local-pair "(" nil :bind "M-(")
+      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
 
     ;;; Key bindings
-
     (let ((map smartparens-mode-map))
       ;; Movement and navigation
       (define-key map (kbd "C-M-f") #'sp-forward-sexp)
@@ -2743,6 +2816,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (define-key map (kbd "C-M-n") #'sp-up-sexp)
       ;; Deleting and killing
       (define-key map (kbd "C-M-k") #'sp-kill-sexp)
+      (define-key map (kbd "M-k") #'dotemacs-sp-kill-surrounding-sexp)
       (define-key map (kbd "C-M-w") #'sp-copy-sexp)
       ;; Depth changing
       (define-key map (kbd "M-S-<up>") #'sp-splice-sexp)
@@ -3738,10 +3812,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             ("h6"   "^###### \\(.*\\)$" 1)
             ("fn"   "^\\[\\^\\(.*\\)\\]" 1))))
   :config
-  ;; Don't do terrible things with Github code blocks (```)
-  (when (fboundp 'sp-local-pair)
-    (sp-local-pair 'markdown-mode "`" nil :actions '(:rem autoskip))
-    (sp-local-pair 'markdown-mode "'" nil :actions nil))
   (progn
     ;; Process Markdown with Pandoc, using a custom stylesheet for nice output
     (let ((stylesheet (expand-file-name
@@ -4720,12 +4790,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (setq enh-ruby-deep-indent-paren nil
-          enh-ruby-hanging-paren-deep-indent-level 2)
-    (sp-with-modes '(ruby-mode enh-ruby-mode)
-      (sp-local-pair "{" "}"
-                     :pre-handlers '(sp-ruby-pre-handler)
-                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
-                     :suffix ""))))
+          enh-ruby-hanging-paren-deep-indent-level 2)))
 
 (use-package ruby-tools
   :defer t
@@ -4904,10 +4969,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :config
   (progn
-    (when (fboundp 'sp-local-pair)
-      ;; Don't pair lifetime specifiers
-      (sp-local-pair 'rust-mode "'" nil :actions nil))
-
     (evil-leader/set-key-for-mode 'rust-mode
       "mcc" 'dotemacs-rust-cargo-build
       "mct" 'dotemacs-rust-cargo-test
@@ -5685,18 +5746,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (setq flycheck-html-tidy-executable tidy5)
         (flycheck-add-mode 'html-tidy 'web-mode)))
 
-    (sp-local-pair 'web-mode "<% " " %>")
-    (sp-local-pair 'web-mode "{ " " }")
-    (sp-local-pair 'web-mode "<%= "  "  %>")
-    (sp-local-pair 'web-mode "<%# "  " %>")
-    (sp-local-pair 'web-mode "<%$ "  " %>")
-    (sp-local-pair 'web-mode "<%@ "  " %>")
-    (sp-local-pair 'web-mode "<%: "  " %>")
-    (sp-local-pair 'web-mode "{{ "  " }}")
-    (sp-local-pair 'web-mode "{% "  " %}")
-    (sp-local-pair 'web-mode "{%- "  " %}")
-    (sp-local-pair 'web-mode "{# "  " #}")
-
     (evil-leader/set-key-for-mode 'web-mode
       "meh" 'web-mode-dom-errors-show
       "mgb" 'web-mode-element-beginning
@@ -6255,13 +6304,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :config
   (progn
-    ;; smartparens configuration
-    (after "smartparens"
-      '(progn (add-to-list 'sp--lisp-modes 'racket-mode)
-              (when (fboundp 'sp-local-pair)
-                (sp-local-pair 'racket-mode "'" nil :actions nil)
-                (sp-local-pair 'racket-mode "`" nil :actions nil))))
-
     (evil-leader/set-key-for-mode 'racket-mode
       ;; navigation
       "mg`" 'racket-unvisit
