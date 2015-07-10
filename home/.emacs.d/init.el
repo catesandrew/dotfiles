@@ -1883,10 +1883,15 @@ mouse-3: go to end"))))
 (use-package ediff-wind
   :defer t
   :config
-  ;; Prevent Ediff from spamming the frame
-  (setq ediff-diff-options "-w"
-        ediff-window-setup-function #'ediff-setup-windows-plain
-        ediff-split-window-function #'split-window-horizontally))
+  (progn
+    ;;revert windows on exit - needs winner mode
+    (when (fboundp 'winner-undo)
+      (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
+
+    ;; Prevent Ediff from spamming the frame
+    (setq ediff-diff-options "-w"
+            ediff-window-setup-function #'ediff-setup-windows-plain
+            ediff-split-window-function #'split-window-horizontally)))
 
 ;; http://stackoverflow.com/a/4485083/740527
 (use-package init-desktop
