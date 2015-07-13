@@ -2754,7 +2754,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (sp-with-modes '(text-mode)
       (sp-local-pair "`" "'" :actions '(insert wrap)))
 
-    '(progn (add-to-list 'sp--lisp-modes 'racket-mode))
     (sp-with-modes '(racket-mode)
       (sp-local-pair "'" nil :actions nil)
       (sp-local-pair "`" nil :actions nil))
