@@ -4206,15 +4206,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package slime
   :ensure t
-  :disabled t
   :commands slime-mode
   :init
   (progn
     (setq slime-contribs '(slime-fancy
                            slime-indentation
                            slime-sbcl-exts
-                           slime-scratch)
-          inferior-lisp-program "sbcl")
+                           slime-scratch))
+
+    (when-let (clisp (executable-find "clisp"))
+      (setq inferior-lisp-program clisp))
+
     ;; enable fuzzy matching in code buffer and SLIME REPL
     (setq slime-complete-symbol*-fancy t)
     (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
@@ -4224,14 +4226,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (smartparens-strict-mode -1)
       (turn-off-smartparens-mode))
     (add-hook 'slime-repl-mode-hook #'slime/disable-smartparens)
-    (add-to-hooks 'slime-mode '(lisp-mode-hook scheme-mode-hook)))
+    (add-to-hooks 'slime-mode '(lisp-mode-hook)))
   :config
   (progn
     (slime-setup)
     (dolist (m `(,slime-mode-map ,slime-repl-mode-map))
       (define-key m [(tab)] 'slime-fuzzy-complete-symbol))
-    (dolist (m '(lisp-mode
-                 scheme-mode))
+    (dolist (m '(lisp-mode))
       (evil-leader/set-key-for-mode m
         "mcc" 'slime-compile-file
         "mcC" 'slime-compile-and-load-file
@@ -4258,6 +4259,22 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "msq" 'slime-quit-lisp
 
         "mtf" 'slime-toggle-fancy-trace))))
+
+(dotemacs-defvar-company-backends geiser-mode)
+
+(use-package geiser
+  :ensure t
+  :defer t
+  :commands run-geiser
+  :config
+  (progn
+    ))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook geiser-mode))))
 
 (use-package pcre2el                    ; Convert regexps to RX and back
   :ensure t
