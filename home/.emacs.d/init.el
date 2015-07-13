@@ -1351,9 +1351,7 @@ FEATURE may be a named feature or a file name, see
                 mode-line-frame-identification
                 mode-line-buffer-identification " " mode-line-position
                 ;; Some specific information about the current buffer:
-                ;; - Paredit
                 ;; - Dired Omit Mode
-                (paredit-mode (:propertize " ()" face bold))
                 (smartparens-strict-mode (:propertize " ()" face bold))
                 (dired-omit-mode " 👻")
                 (server-buffer-clients " 💻")
@@ -2689,22 +2687,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (setq show-paren-delay 0)
   :config (setq show-paren-when-point-inside-paren t
                 show-paren-when-point-in-periphery t))
-
-(use-package paredit                    ; Balanced sexp editing
-  :disabled t
-  :ensure t
-  :defer t
-  :init (dolist (hook '(eval-expression-minibuffer-setup-hook
-                        emacs-lisp-mode-hook
-                        inferior-emacs-lisp-mode-hook
-                        clojure-mode-hook))
-          (add-hook hook #'paredit-mode))
-  :config
-  (progn
-    ;; Free M-s.  There are some useful bindings in that prefix map.
-    (define-key paredit-mode-map (kbd "M-s") nil)
-    (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-splice-sexp))
-  :diminish paredit-mode)
 
 (use-package init-smartparens      ; Personal Smartparens extensions
   :load-path "config/")
