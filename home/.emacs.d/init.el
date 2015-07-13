@@ -11,7 +11,7 @@
 ;; - C-c f: Files
 ;; - C-c h: Helm/Help and documentation
 ;; - C-c j: Jumping and navigation
-;; - C-c l: List things
+;; - c-c l: List things
 ;; - C-c m: Multiple cursors
 ;; - C-c s: Symbol commands
 ;; - C-c t: Skeletons and templates
@@ -1386,10 +1386,10 @@ FEATURE may be a named feature or a file name, see
   (progn
     (setq sml/no-confirm-load-theme t
           sml/theme 'dark
-           sml/shorten-directory t
-           sml/shorten-modes t
-           sml/name-width 20
-           sml/mode-width 'full)
+          sml/shorten-directory t
+          sml/shorten-modes t
+          sml/name-width 20
+          sml/mode-width 'full)
     ; (powerline-default-theme)
     (sml/setup)
     (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
