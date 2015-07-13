@@ -1364,7 +1364,7 @@ FEATURE may be a named feature or a file name, see
                 (anzu-mode (:eval                  ; isearch pos/matches
                             (when (> anzu--total-matched 0)
                               (anzu--update-mode-line))))
-                (multiple-cursors-mode mc/mode-line) ; Number of cursors
+                ; (multiple-cursors-mode mc/mode-line) ; Number of cursors
                 ;; And the modes, which we don't really care for anyway
                 " " mode-line-misc-info mode-line-modes mode-line-end-spaces)
               mode-line-remote
