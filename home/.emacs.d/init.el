@@ -202,7 +202,7 @@ transparency level of a frame when it's inactive or deselected. Transparency
 can be toggled through `toggle-transparency'."
   :group 'dotemacs)
 
-(defcustom dotemacs-smartparens-strict-mode t
+(defcustom dotemacs-smartparens-strict-mode nil
   "If non-nil smartparens-strict-mode will be enabled in programming modes."
   :group 'dotemacs)
 
@@ -2707,7 +2707,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (add-to-hooks (if dotemacs-smartparens-strict-mode
                       #'smartparens-strict-mode
                     #'smartparens-mode)
-                  '(text-mode-hook prog-mode-hook))
+                  '(prog-mode-hook))
+
+    ;; but alwayws enable for lisp mode
+    (add-to-hooks #'smartparens-strict-mode '(lisp-mode))
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
@@ -2722,6 +2725,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                            :off (smartparens-mode -1)
                            :documentation "Enable smartparens."
                            :evil-leader "tp")
+
       (dotemacs-add-toggle smartparens-globally
                            :status smartparens-mode
                            :on (smartparens-global-mode)
@@ -2730,21 +2734,14 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                            :evil-leader "t C-p"))
 
     (setq sp-show-pair-delay 0
+          sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
           sp-show-pair-from-inside t ; fix paren highlighting in normal mode
           sp-cancel-autoskip-on-backward-movement nil))
   :config
   (progn
     (require 'smartparens-config)
 
-
-    (setq sp-pairs '((t
-                      .
-                      ((:open "\"" :close "\"" :actions (insert wrap))
-                       (:open "'"  :close "'"  :actions (insert wrap) :unless (sp-point-after-word-p))
-                       (:open "("  :close ")"  :actions (insert wrap))
-                       (:open "["  :close "]"  :actions (insert wrap))
-                       (:open "{"  :close "}"  :actions (insert wrap))
-                       (:open "`"  :close "`"  :actions (insert wrap))))))
+    (show-smartparens-global-mode +1)
 
     (defun dotemacs-sp-kill-surrounding-sexp ()
       "Kill from beginning to end of sexp."
@@ -2754,7 +2751,50 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
         (progn (sp-end-of-sexp)
           (1+  (point)))))
 
+    (defun dotemacs-gfm-skip-asterisk (ms mb me)
+      (save-excursion
+        (goto-char mb)
+        (save-match-data (looking-at "^\\* "))))
+
+    (defun dotemacs-org-skip-asterisk (ms mb me)
+      (or (and (= (line-beginning-position) mb)
+               (eq 32 (char-after (1+ mb))))
+          (and (= (1+ (line-beginning-position)) me)
+               (eq 32 (char-after me)))))
+
+    (defun dotemacs-after-symbol-p (_id action _context)
+      (when (eq action 'insert)
+        (save-excursion
+          (backward-char 1)
+          (looking-back "\\sw\\|\\s_\\|\\s'"))))
+
+    (defun dotemacs-php-handle-docstring (&rest _ignored)
+      (-when-let (line (save-excursion
+                         (forward-line)
+                         (thing-at-point 'line)))
+        (cond
+         ((string-match-p "function" line)
+          (save-excursion
+            (insert "\n")
+            (let ((args (save-excursion
+                          (forward-line)
+                          (my-php-get-function-args))))
+              (--each args
+                (insert (format "* @param %s\n" it)))))
+          (insert "* "))
+         ((string-match-p ".*class\\|interface" line)
+          (save-excursion (insert "\n*\n* @author\n"))
+          (insert "* ")))
+        (let ((o (sp--get-active-overlay)))
+          (indent-region (overlay-start o) (overlay-end o)))))
+
     ;;; Additional pairs for various modes
+    (sp-with-modes '(php-mode)
+      (sp-local-pair "/**" "*/" :post-handlers '(("| " "SPC")
+                                                 (dotemacs-php-handle-docstring "RET")))
+      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
+      (sp-local-pair "(" nil :prefix "\\(\\sw\\|\\s_\\)*"))
+
     (sp-with-modes '(scala-mode)
       (sp-local-pair "'" nil :actions nil))
 
@@ -2765,10 +2805,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (sp-local-pair "'" nil :actions nil)
       (sp-local-pair "`" nil :actions nil))
 
+    ;; TODO research sp-local-tag or evil-surround with modes
     (sp-with-modes '(tex-mode
                      plain-tex-mode
-                     latex-mode
-                     org-mode)
+                     latex-mode)
+      ; (sp-local-tag "i" "\"<" "\">")
       (sp-local-pair "$" " $")
       (sp-local-pair "\\[" " \\]")
       (sp-local-pair "\\(" " \\)")
@@ -2776,9 +2817,22 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (sp-local-pair "\\left(" " \\right)")
       (sp-local-pair "\\left\\{" " \\right\\}"))
 
+    (sp-with-modes 'org-mode
+      (sp-local-pair "*" "*" :actions '(insert wrap) :unless '(sp-point-after-word-p sp-point-at-bol-p) :wrap "C-*" :skip-match 'dotemacs-org-skip-asterisk)
+      (sp-local-pair "_" "_" :unless '(sp-point-after-word-p) :wrap "C-_")
+      (sp-local-pair "/" "/" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "~" "~" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "=" "=" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "«" "»"))
+
     (sp-with-modes '(markdown-mode
+                     gfm-mode
                      rst-mode)
-      ;; (sp-local-pair "`" "`")
+      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
+      (sp-local-pair "_" "_" :wrap "C-_")
+      ; (sp-local-tag "2" "**" "**")
+      ; (sp-local-tag "s" "```scheme" "```")
+      ; (sp-local-tag "<"  "<_>" "</_>" :transform 'sp-match-sgml-tags)
       ;; Don't do terrible things with Github code blocks (```)
       (sp-local-pair "`" nil :actions '(:rem autoskip))
       (sp-local-pair "'" nil :actions nil))
@@ -2806,6 +2860,15 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (sp-local-pair "{%- "  " %}")
       (sp-local-pair "{# "  " #}"))
 
+    (sp-with-modes '(malabar-mode c++-mode)
+      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
+
+    (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
+                                                        ("* ||\n[i]" "RET")))
+    (sp-with-modes '(haskell-mode)
+      (sp-local-pair "'" nil :unless '(dotemacs-after-symbol-p))
+      (sp-local-pair "\\(" nil :actions nil))
+
     ;; Emacs Lisp
     (sp-with-modes '(emacs-lisp-mode
                      inferior-emacs-lisp-mode
@@ -2814,48 +2877,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (sp-local-pair "'" nil :actions nil)
       (sp-local-pair "(" nil :bind "M-(")
       (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
-
-    ;;; Key bindings
-    (let ((map smartparens-mode-map))
-      ;; Movement and navigation
-      (define-key map (kbd "C-M-f") #'sp-forward-sexp)
-      (define-key map (kbd "C-M-b") #'sp-backward-sexp)
-      (define-key map (kbd "C-M-u") #'sp-backward-up-sexp)
-      (define-key map (kbd "C-M-d") #'sp-down-sexp)
-      (define-key map (kbd "C-M-p") #'sp-backward-down-sexp)
-      (define-key map (kbd "C-M-n") #'sp-up-sexp)
-      ;; Deleting and killing
-      (define-key map (kbd "C-M-k") #'sp-kill-sexp)
-      (define-key map (kbd "M-k") #'dotemacs-sp-kill-surrounding-sexp)
-      (define-key map (kbd "C-M-w") #'sp-copy-sexp)
-      ;; Depth changing
-      (define-key map (kbd "M-S-<up>") #'sp-splice-sexp)
-      (define-key map (kbd "M-<up>") #'sp-splice-sexp-killing-backward)
-      (define-key map (kbd "M-<down>") #'sp-splice-sexp-killing-forward)
-      (define-key map (kbd "M-C-<up>") #'sp-splice-sexp-killing-around)
-      (define-key map (kbd "M-?") #'sp-convolute-sexp)
-      ;; Barfage & Slurpage
-      (define-key map (kbd "C-)") #'sp-forward-slurp-sexp)
-      (define-key map (kbd "C-<right>") #'sp-forward-slurp-sexp)
-      (define-key map (kbd "C-}") #'sp-forward-barf-sexp)
-      (define-key map (kbd "C-<left>") #'sp-forward-barf-sexp)
-      (define-key map (kbd "C-(") #'sp-backward-slurp-sexp)
-      (define-key map (kbd "C-M-<left>") #'sp-backward-slurp-sexp)
-      (define-key map (kbd "C-{") #'sp-backward-barf-sexp)
-      (define-key map (kbd "C-M-<right>") #'sp-backward-barf-sexp)
-      ;; Miscellaneous commands
-      (define-key map (kbd "M-S") #'sp-split-sexp)
-      (define-key map (kbd "M-J") #'sp-join-sexp)
-      (define-key map (kbd "C-M-t") #'sp-transpose-sexp))
-
-    (let ((map smartparens-strict-mode-map))
-      (define-key map (kbd "M-q") #'sp-indent-defun))
-
-    (setq sp-autoskip-closing-pair 'always
-          ;; Don't kill entire symbol on C-k
-          sp-hybrid-kill-entire-symbol nil)
-
-    (show-smartparens-global-mode +1)
 
     ;; don't create a pair with single quote in minibuffer
     (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
