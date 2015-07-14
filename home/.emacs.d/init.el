@@ -1041,7 +1041,6 @@ FEATURE may be a named feature or a file name, see
 (use-package server                     ; The server of `emacsclient'
   :defer t
   :init (server-mode)
-  ; :config (setenv "EDITOR" "emacsclient")
   :diminish server-buffer-clients)
 
 
@@ -3127,21 +3126,6 @@ Disable the highlighting of overlong lines."
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     (add-hook 'post-command-hook 'evil-refresh-cursor)
 
-    ; (add-hook 'after-change-major-mode-hook #'dotemacs-major-mode-evil-state-adjust)
-
-    ; (after "paren"
-    ;   ;; the default behavior only highlights with the point one-after the closing paren
-    ;   ;; this changes it such it will match with the point on the closing paren
-    ;   (defadvice show-paren-function (around show-paren-closing-before activate)
-    ;     (if (and (or
-    ;               (evil-normal-state-p)
-    ;               (evil-visual-state-p))
-    ;              (eq (syntax-class (syntax-after (point))) 5))
-    ;         (save-excursion
-    ;           (forward-char)
-    ;           ad-do-it)
-    ;       ad-do-it)))
-
     (dotemacs-set-state-faces)
 
     (set-default-evil-emacs-state-cursor)
@@ -4209,8 +4193,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; enable fuzzy matching in code buffer and SLIME REPL
     (setq slime-complete-symbol*-fancy t)
     (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
-    ;; enabel smartparen in code buffer and SLIME REPL
-    ;; (add-hook 'slime-repl-mode-hook #'smartparens-strict-mode)
     (defun slime/disable-smartparens ()
       (smartparens-strict-mode -1)
       (turn-off-smartparens-mode))

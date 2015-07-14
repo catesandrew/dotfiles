@@ -164,12 +164,6 @@
   ;; between percent signs:
   (dotemacs-define-text-object "%" "percent" "%" "%"))
 
-(defun dotemacs-major-mode-evil-state-adjust ()
-  (if (apply 'derived-mode-p dotemacs-evil-evil-state-modes)
-      (turn-on-evil-mode))
-  (when (apply 'derived-mode-p dotemacs-evil-emacs-state-modes)
-    (turn-off-evil-mode)))
-
 (defun dotemacs-turn-on-search-highlight-persist ()
   "Enable search-highlight-persist in the current buffer."
   (interactive)
