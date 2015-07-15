@@ -3383,6 +3383,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (setq evil-lisp-state-global t)
     (setq evil-lisp-state-leader-prefix "k")))
 
+; TODO: Add switch between evil-commentary and evil-nerd-commenter
 (use-package evil-commentary
   :ensure t
   :defer t
@@ -3414,22 +3415,25 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :defer t
   :init
   (progn
+    (add-hook 'evil-matchit-mode-hook
+      (lambda ()
+        (unless (bound-and-true-p evil-matchit-mode-hook-ran)
+          ; (set (make-local-variable 'evil-matchit-mode-hook-ran) t)
+          (defvar evil-matchit-mode-hook-ran t)
+          (plist-put evilmi-plugins 'js2-mode
+            ((evilmi-simple-get-tag evilmi-simple-jump)
+             (evilmi--javascript-find-open-brace
+              evilmi-javascript-jump
+              evilmi-javascript-get-tag))))))
+
     ; (global-evil-matchit-mode)
     (dolist (hook '(LaTeX-mode-hook
                     web-mode-hook
+                    js2-mode-hook
                     mustache-mode-hook
                     handlebars-mode-hook))
-      (add-hook hook '(lambda () (evil-matchit-mode))))))
-
-(use-package evil-matchit-javascript
-  :defer t
-  :ensure evil-matchit
-  :init
-  (progn
-    ; (global-evil-matchit-mode 1)
-    (plist-put evilmi-plugins 'js2-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
-                                          (evilmi--javascript-find-open-brace evilmi-javascript-jump evilmi-javascript-get-tag)))
-    (add-hook `js2-mode `evil-matchit-mode)))
+      (add-hook hook '(lambda ()
+        (turn-on-evil-matchit-mode))))))
 
 (use-package evil-indent-textobject
   :ensure t
