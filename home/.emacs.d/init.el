@@ -2241,7 +2241,8 @@ mouse-3: go to end"))))
   :ensure t
   :init
   (progn
-    (setq evil-ranger-ignored-extensions '("mkv" "iso" "mp4")
+    (setq evil-ranger-show-literal nil
+          evil-ranger-preview-file t
           evil-ranger-width-parents 0.15
           evil-ranger-width-preview 0.65
           evil-ranger-show-preview t
