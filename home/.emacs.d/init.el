@@ -785,26 +785,31 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 
-;; Shell
+;;; Terminal emulation and shells
 (dotemacs-defvar-company-backends eshell-mode)
 
 (use-package init-eshell
   :load-path "config/")
 
+(use-package shell                      ; Dump shell in Emacs
+  :config (add-to-list 'display-buffer-alist
+                       `(,(rx bos "*shell")
+                         (display-buffer-reuse-window
+                          display-buffer-in-side-window
+                          (side            . bottom)
+                          (reusable-frames . visible)
+                          (window-height   . 0.4)))))
+
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
   :ensure t
-  :if (and (eq system-type 'darwin) (display-graphic-p))
-  :config
+  :init
   (progn
     (when (string-match-p "/zsh$" (getenv "SHELL"))
       ;; Use a non-interactive shell. We use a login shell, even though we have
       ;; our paths setup in .zshenv. However, OS X adds global settings to the
       ;; login profile. Notably, this affects /usr/texbin from MacTeX
       (setq exec-path-from-shell-arguments '("-l")))
-
-    (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
-      (add-to-list 'exec-path-from-shell-variables var))
 
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize))
@@ -817,7 +822,13 @@ FEATURE may be a named feature or a file name, see
     (after "info"
       (dolist (dir (parse-colon-path (getenv "INFOPATH")))
         (when dir
-          (add-to-list 'Info-directory-list dir))))))
+          (add-to-list 'Info-directory-list dir)))))
+  :config
+  (progn
+    (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
+      (add-to-list 'exec-path-from-shell-variables var))
+
+    ))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -7861,21 +7872,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                   ("America/Winnipeg" "Winnipeg (CA)")
                                   ("America/New_York" "New York (USA)")
                                   ("Asia/Tokyo"       "Tokyo (JP)"))))
-
-
-;;; Terminal emulation and shells
-(use-package shell                      ; Dump shell in Emacs
-  :bind ("C-c u s" . shell)
-  :config (add-to-list 'display-buffer-alist
-                       `(,(rx bos "*shell")
-                         (display-buffer-reuse-window
-                          display-buffer-in-side-window
-                          (side            . bottom)
-                          (reusable-frames . visible)
-                          (window-height   . 0.4)))))
-
-(use-package term                       ; Terminal emulator in Emacs
-  :bind ("C-c u S" . ansi-term))
 
 
 ;;; Net & Web
