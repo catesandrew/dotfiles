@@ -5779,8 +5779,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     ;; Only use smartparens in web-mode
-    (setq web-mode-enable-auto-pairing nil)
-    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-enable-auto-pairing nil
+          web-mode-markup-indent-offset 2
+          web-mode-code-indent-offset 2
+          web-mode-sql-indent-offset 2
+          web-mode-css-indent-offset 2
+          web-mode-attr-indent-offset 2)
 
     (after "flycheck"
       (when-let (tidy5 (and (eq system-type 'darwin)
