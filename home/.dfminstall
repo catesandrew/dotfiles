@@ -7,5 +7,6 @@ indent.pro skip
 .gitconfig-local.template skip
 .gitconfig-private.template skip
 .ssh recurse
+.config recurse
 .mjolnir recurse
 .lein recurse
