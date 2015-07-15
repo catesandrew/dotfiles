@@ -2047,6 +2047,15 @@ mouse-3: go to end"))))
   (progn
     (require 'dired-x)
 
+    (defun dotemacs-dired-mode-defaults ()
+      (unless (bound-and-true-p my-dmh-ran)
+        ;; add buffer-local indicator for whether dired-mode-hook has run.
+        (set (make-local-variable 'my-dmh-ran) t)
+        ;; disable line wrap
+        (unless (bound-and-true-p truncate-lines)
+          (setq truncate-lines t))))
+    (add-hook 'dired-mode-hook #'dotemacs-dired-mode-defaults)
+
     (setq dired-auto-revert-buffer t    ; Revert on re-visiting
           ;; Move files between split panes
           dired-dwim-target t
@@ -2226,6 +2235,19 @@ mouse-3: go to end"))))
 
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
+
+(use-package evil-ranger
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq evil-ranger-ignored-extensions '("mkv" "iso" "mp4")
+          evil-ranger-width-parents 0.15
+          evil-ranger-width-preview 0.65
+          evil-ranger-show-preview t
+          evil-ranger-parent-depth 1
+          evil-ranger-max-preview-size 10)
+    (evil-leader/set-key "ar" 'evil-ranger)))
 
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
@@ -3418,7 +3440,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (add-hook 'evil-matchit-mode-hook
       (lambda ()
         (unless (bound-and-true-p evil-matchit-mode-hook-ran)
-          ; (set (make-local-variable 'evil-matchit-mode-hook-ran) t)
           (defvar evil-matchit-mode-hook-ran t)
           (plist-put evilmi-plugins 'js2-mode
             ((evilmi-simple-get-tag evilmi-simple-jump)
@@ -3426,7 +3447,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
               evilmi-javascript-jump
               evilmi-javascript-get-tag))))))
 
-    ; (global-evil-matchit-mode)
     (dolist (hook '(LaTeX-mode-hook
                     web-mode-hook
                     js2-mode-hook
