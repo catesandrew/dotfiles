@@ -3421,6 +3421,16 @@ Example: (evil-map visual \"<\" \"<gv\")"
                     handlebars-mode-hook))
       (add-hook hook '(lambda () (evil-matchit-mode))))))
 
+(use-package evil-matchit-javascript
+  :defer t
+  :ensure evil-matchit
+  :init
+  (progn
+    ; (global-evil-matchit-mode 1)
+    (plist-put evilmi-plugins 'js2-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
+                                          (evilmi--javascript-find-open-brace evilmi-javascript-jump evilmi-javascript-get-tag)))
+    (add-hook `js2-mode `evil-matchit-mode)))
+
 (use-package evil-indent-textobject
   :ensure t
   :defer t)
@@ -5798,12 +5808,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (add-hook 'web-mode-hook
       (lambda ()
-        (message "web-mode-content-type %s" web-mode-content-type)
         (when (equal web-mode-content-type "jsx")
           (setq-local cursor-type nil)
           (after "flycheck"
             (add-to-list 'flycheck-disabled-checkers 'html-tidy)
-            (message "flycheck-disabled-checkers %s" flycheck-disabled-checkers)
             (flycheck-select-checker 'javascript-eslint)))))
 
     (evil-leader/set-key-for-mode 'web-mode
