@@ -5838,6 +5838,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             (add-to-list 'flycheck-disabled-checkers 'html-tidy)
             (flycheck-select-checker 'javascript-eslint)))))
 
+    (add-hook 'web-mode-hook
+      (lambda ()
+        (after "yasnippet"
+          (set (make-local-variable 'yas--extra-modes) 'html-mode))))
+
     (evil-leader/set-key-for-mode 'web-mode
       "meh" 'web-mode-dom-errors-show
       "mgb" 'web-mode-element-beginning
@@ -8959,22 +8964,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;; tell emacs where to read abbrev
 (setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
 
-(use-package init-hippie-exp       ; Custom expansion functions
-  :load-path "config/"
-  :commands (dotemacs-try-complete-lisp-symbol-without-namespace))
-
 (use-package hippie-exp                 ; Powerful expansion and completion
   :bind (([remap dabbrev-expand] . hippie-expand))
   :init
-  (after "yasnippet"
-    ;; Try to expand yasnippet snippets based on prefix
-    (push 'yas-hippie-try-expand hippie-expand-try-functions-list))
   :config
   (progn
     ;; replace dabbrev-expand
     (global-set-key (kbd "M-/") 'hippie-expand)
     (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
     (setq hippie-expand-try-functions-list '(
+          ;; Try to expand yasnippet snippets based on prefix
+          yas-hippie-try-expand
           ;; Try to expand word "dynamically", searching the current buffer.
           try-expand-dabbrev
           ;; Try to expand word "dynamically", searching all other buffers.
@@ -8995,8 +8995,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ;; unique.
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol
-          dotemacs-try-complete-lisp-symbol-without-namespace))))
+          try-complete-lisp-symbol))))
 
 (use-package company                    ; Graphical (auto-)completion
   :ensure t
