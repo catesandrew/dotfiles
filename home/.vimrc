@@ -304,7 +304,10 @@ set wildmenu                     " make tab completion for files/buffers act lik
 set wildmode=list:longest,full   " show a list when pressing tab and complete
                                  " first full match
 set wildignore=.svn,CVS,.git,.hg,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,.DS_Store,*.aux,*.out,*.toc,tmp,*.scssc
-set wildignorecase
+" http://stackoverflow.com/questions/3686841/vim-case-insensitive-filename-completion/4780444#4780444
+if exists("&wildignorecase")
+    set wildignorecase
+endif
 
 set splitbelow
 set splitright
