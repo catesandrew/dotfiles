@@ -5900,7 +5900,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (setq emmet-indentation 2)
+    (setq emmet-indentation 2
+          emmet-move-cursor-between-quotes t)
     (add-hook 'web-mode-hook 'emmet-mode)
     (add-hook 'html-mode-hook 'emmet-mode)
     (add-hook 'css-mode-hook 'emmet-mode))
