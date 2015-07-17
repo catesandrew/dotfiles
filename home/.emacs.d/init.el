@@ -5838,11 +5838,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             (add-to-list 'flycheck-disabled-checkers 'html-tidy)
             (flycheck-select-checker 'javascript-eslint)))))
 
-    (add-hook 'web-mode-hook
-      (lambda ()
-        (after "yasnippet"
-          (set (make-local-variable 'yas--extra-modes) 'html-mode))))
-
     (evil-leader/set-key-for-mode 'web-mode
       "meh" 'web-mode-dom-errors-show
       "mgb" 'web-mode-element-beginning
