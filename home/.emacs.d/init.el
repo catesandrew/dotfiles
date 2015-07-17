@@ -1268,12 +1268,19 @@ FEATURE may be a named feature or a file name, see
   :ensure t
   :commands linum-relative-toggle
   :init
-  (after "evil-leader"
-    (evil-leader/set-key "tr" 'linum-relative-toggle))
+  (progn
+    (defun dotemacs-linum-relative-mode-setup ()
+      (unless (bound-and-true-p my-lrm-ran)
+        (set (make-local-variable 'my-lrm-ran) t)
+        (linum-relative-toggle)))
+    (add-hook 'linum-mode-hook #'dotemacs-linum-relative-mode-setup)
+
+    (after "evil-leader"
+      (evil-leader/set-key "tr" 'linum-relative-toggle)))
   :config
   (progn
     (setq linum-format 'linum-relative)
-    (setq linum-relative-current-symbol "")
+    (setq linum-relative-current-symbol "→")
     (linum-relative-toggle)))
 
 (use-package fill-column-indicator
@@ -5831,6 +5838,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (add-hook 'web-mode-hook
       (lambda ()
+        (run-hooks #'dotemacs-prog-mode-hook)
         (when (equal web-mode-content-type "jsx")
           (setq-local cursor-type nil)
           (after "flycheck"

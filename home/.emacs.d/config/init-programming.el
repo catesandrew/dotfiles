@@ -34,7 +34,6 @@ This functions should be added to the hooks of major modes for programming."
     ;; add buffer-local indicator for whether prog-mode-hook has run.
     (set (make-local-variable 'my-pmh-ran) t)
 
-
     (when dotemacs-show-trailing-whitespace
       (set-face-attribute 'trailing-whitespace nil
                           :background (face-attribute 'font-lock-comment-face
@@ -45,6 +44,10 @@ This functions should be added to the hooks of major modes for programming."
     (unless (bound-and-true-p truncate-lines)
       ; (set (make-local-variable 'truncate-lines) t)
       (setq truncate-lines t))
+
+    ;; enable line number-mode
+    (unless (bound-and-true-p linum-mode)
+      (linum-mode))
 
     (when (bound-and-true-p visual-line-mode)
       (setq visual-line-mode nil))
