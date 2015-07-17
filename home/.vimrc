@@ -74,8 +74,9 @@ function! StripTrailingWhitespace() "{{{
 endfunction "}}}
 
 function! EnsureExists(path) "{{{
-  if !isdirectory(expand(a:path))
-      call mkdir(expand(a:path))
+  let s:dir = expand(a:path)
+  if !isdirectory(s:dir)
+      silent !mkdir s:dir > /dev/null 2>&1
   endif
 endfunction "}}}
 
