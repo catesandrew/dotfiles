@@ -2747,9 +2747,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
-    (add-hook 'LaTeX-mode-hook 'smartparens-mode)
-    (add-hook 'markdown-mode-hook 'smartparens-mode)
-    (add-hook 'inferior-python-mode-hook 'smartparens-mode)
+    (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
+      (add-hook hook #'smartparens-mode))
 
     (after "evil-leader"
       (dotemacs-add-toggle smartparens
