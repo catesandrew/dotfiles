@@ -2475,6 +2475,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; automatic filling
 (setq-default fill-column 80)
 
+(setq standard-indent 2)
+
 ; Also, =visual-line-mode= is so much better than =auto-fill-mode=. It doesn't
 ; actually break the text into multiple lines - it only looks that way.
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
@@ -5898,6 +5900,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
+    (setq emmet-indentation 2)
     (add-hook 'web-mode-hook 'emmet-mode)
     (add-hook 'html-mode-hook 'emmet-mode)
     (add-hook 'css-mode-hook 'emmet-mode))
