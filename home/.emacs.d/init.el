@@ -2463,9 +2463,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (setq indicate-empty-lines t
       require-final-newline t)
 
-;; Globally do not break lines for me, please
-; (setq-default truncate-lines t)
-
 (setq kill-ring-max 200                 ; More killed items
       ;; Save the contents of the clipboard to kill ring before killing
       save-interprogram-paste-before-kill t)
@@ -2579,7 +2576,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 (use-package visual-fill-column
   :ensure t
-  :defer t
+  :disabled t
   :init (add-hook 'visual-line-mode-hook #'visual-fill-column-mode))
 
 ;;https://www.masteringemacs.org/article/re-builder-interactive-regexp-builder

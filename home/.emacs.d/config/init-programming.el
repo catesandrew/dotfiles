@@ -46,6 +46,13 @@ This functions should be added to the hooks of major modes for programming."
       ; (set (make-local-variable 'truncate-lines) t)
       (setq truncate-lines t))
 
+    (when (bound-and-true-p visual-line-mode)
+      (setq visual-line-mode nil))
+
+    ; TODO: Check and disable visual-fill-column-mode
+    ; (when (bound-and-true-p visual-fill-column-mode)
+    ;   (visual-fill-column-mode--disable))
+
     ; (smartparens-mode +1)
 
     ; how-to-check-whether-a-minor-mode-e-g-flymake-mode-is-on
