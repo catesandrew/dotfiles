@@ -5824,7 +5824,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           web-mode-code-indent-offset 2
           web-mode-sql-indent-offset 2
           web-mode-css-indent-offset 2
-          web-mode-attr-indent-offset 2)
+          web-mode-attr-indent-offset 2
+          web-mode-style-padding 2
+          web-mode-script-padding 2)
 
     (after "flycheck"
       (when-let (eslint (executable-find "eslint"))
