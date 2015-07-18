@@ -1,6 +1,9 @@
 cite about-plugin
 about-plugin 'manage your nginx service'
 
+export NGINX_PATH='/opt/nginx'
+pathmunge $NGINX_PATH/sbin after
+
 function nginx_reload() {
   about 'reload your nginx config'
   group 'nginx'
