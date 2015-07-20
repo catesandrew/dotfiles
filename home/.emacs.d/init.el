@@ -8702,6 +8702,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (evil-leader/set-key "P/" 'dotemacs-run-pandoc)))
 
+; As there’s not, yet, an EPUB reader for Emacs, you can still set up Emacs to
+; be able to open .epub files to see what’s inside them, since they are, after
+; all, just ZIP files
+(setq auto-mode-alist
+ (append (list '("\\.epub$" . archive-mode)) auto-mode-alist))
+
+(setq auto-coding-alist
+ (append (list '("\\.epub$" . no-conversion)) auto-coding-alist))
+
 
 ;;; Auto highlight symbol
 (use-package init-auto-highlight-symbol
