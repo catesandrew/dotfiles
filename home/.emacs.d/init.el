@@ -8850,7 +8850,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                 (quit-window nil window)))))))
 
     (after "evil-evilified-state"
-      (evilify flycheck-error-list-mode flycheck-error-list-mode-map
+      (add-to-list 'evil-motion-state-modes 'flycheck-error-list-mode)
+      (evil-define-key 'motion flycheck-error-list-mode-map
         "j" #'flycheck-error-list-next-error
         "k" #'flycheck-error-list-previous-error
         "RET" #'flycheck-error-list-goto-error))
