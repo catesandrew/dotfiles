@@ -8687,6 +8687,21 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (setq dotemacs--vagrant-tramp-loaded t)))
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
+(use-package pandoc-mode
+  :defer t
+  :commands dotemacs-run-pandoc
+  :config
+  (progn
+    (defun dotemacs-run-pandoc ()
+      "Start pandoc for the buffer and open the menu"
+      (interactive)
+      (pandoc-mode)
+      (pandoc-main-hydra/body))
+    (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings))
+  :init
+  (progn
+    (evil-leader/set-key "P/" 'dotemacs-run-pandoc)))
+
 
 ;;; Auto highlight symbol
 (use-package init-auto-highlight-symbol
