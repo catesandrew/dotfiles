@@ -8687,7 +8687,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (setq dotemacs--vagrant-tramp-loaded t)))
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
-(use-package pandoc-mode
+(use-package pandoc-mode ; http://joostkremers.github.io/pandoc-mode/
   :defer t
   :commands dotemacs-run-pandoc
   :config
