@@ -2336,11 +2336,12 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :bind (("C-c j s" . avy-isearch)
          ("C-c j j" . avy-goto-char-2)
          ("C-c j w" . avy-goto-word-1))
-  :init (after "evil"
-    ; (define-key evil-operator-state-map (kbd "z") 'avy-goto-char-2)
-    ; (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)
-    ; (define-key evil-motion-state-map (kbd "S-SPC") 'avy-goto-line)
-    ))
+  :init
+  (progn
+    (setq avy-keys (number-sequence ?a ?z))
+    (after "evil-leader"
+      (evil-leader/set-key "SPC" 'avy-goto-word-1)
+      (evil-leader/set-key "l" 'avy-goto-char-2))))
 
 (use-package ace-jump-mode
   :defer t
