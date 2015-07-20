@@ -1080,14 +1080,16 @@ FEATURE may be a named feature or a file name, see
   (when (display-graphic-p)
     (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
                                           ; workspace
-          mac-option-key-is-meta t
-          mac-option-modifier 'meta       ; Option is simply the natural Meta
-          mac-command-key-is-meta t
-          mac-command-modifier 'meta      ; But command is a lot easier to hit
+          mac-control-modifier 'control   ; Make control to Control
+          mac-option-modifier 'super      ; Make option do Super (`s` is for super)
+          mac-command-modifier 'meta      ; Option is simply the natural Meta
+                                          ; But command is a lot easier to hit.
+                                          ; (`M` is for meta)
           mac-right-command-modifier 'left
           mac-right-option-modifier 'none ; Keep right option for accented input
-          ;; Just in case we ever need these keys
-          mac-function-modifier 'hyper)))
+          mac-function-modifier 'hyper    ; Just in case we ever need these
+                                          ; keys. (`H` is for hyper)
+          )))
 
 (use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
