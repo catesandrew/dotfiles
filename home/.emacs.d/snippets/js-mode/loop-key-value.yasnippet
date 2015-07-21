@@ -2,9 +2,9 @@
 # name: loop key/value object
 # key: for
 # --
-for (var k in ${1:obj}) {
-  if ($1.hasOwnProperty(k)) {
-    var ${2:val} = $1[k];
-    $0 
+for (var ${1:key} in ${2:source}) {
+  if ($2.hasOwnProperty($1)) {
+    var ${3:val} = $2[$1];
+    ${0}
   }
 }
