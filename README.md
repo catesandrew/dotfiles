@@ -1,26 +1,27 @@
-.dotfiles
-=========
+# .dotfiles #
 
-Installation
-=
-First, clone this repo:
-```
+## Installation ##
+
+First, clone this repository:
+
+```sh
 $ cd $HOME
-$ git clone git@github.com:catesandrew/dotfiles.git .dotfiles
+$ git clone --recursive git@github.com:catesandrew/dotfiles.git ~/.dotfiles
 ```
 
-Second, set up the `.bash/` sub-modules.
+Then, run the `dfm` installer. The `DFM_REPO` environment variable is required for the first install due to a technical quirk I have yet to address.
 
-```
-$ cd .dotfiles
-$ git submodule init
-$ git submodule update
+```sh
+$ DFM_REPO=~/.dotfiles ~/.dotfiles/home/.bin/dfm install
 ```
 
-Third, run the dfm installer
+On Mac OS/X create a `~/.bashrc` file.
 
-```
-$ bin/dfm install
+```sh
+touch ~/.bashrc
+
+cat <<< '. $HOME/.bashrc.load
+'> ~/.bashrc
 ```
 
 ## My background
@@ -36,7 +37,7 @@ On my machines I usually keep a set of personalized dotfiles which I don't want 
 
 I need these files on all machines which I regularly work on.
 
-## Some interesting solutions for dotfile management
+## Some interesting solutions for dotfile management ##
 
 Many people have looked at this problem before – and solved it in their own ways. Most often the basic principle is that the files are stored and tracked via git in a hidden directory, and the tool of your choise manages symlinks between the files in the store and in `$HOME`.
 
@@ -48,7 +49,7 @@ Other people had the same Ruby problem and created [Homeshick](https://github.co
 
 But Homeshick is only almost my favorite – meet [dfm – a Utility to Manage Dotfiles](https://github.com/justone/dfm)! It is written in Perl and mainly does the same as mentioned above, minus the support for more than one repository. But on the plus side it has the capability of ensuring file rights via chmod. I haven't seen that in any other solution. Additionally it supports arbitrary scripts executed during the update process for example for host specific commands.
 
-## Starting with dfm
+## Starting with dfm ##
 
 The `.bashrc` is hardly modified:
 
@@ -63,7 +64,7 @@ As a side node, I am not sure if I really want to drop all my customizations on 
 >
 > For instance, if a system sources bash completion files for you, and your dotfiles overwrites the system-provided .bashrc, then you would have to replicate that functionality on your own.
 
-### Adding files with dfm
+### Adding files with dfm ###
 
 The next step is to add further files to your dfm repository, which is quite easy because dfm comes along with an import function:
 
@@ -73,7 +74,7 @@ The usage is pretty straightforward, and supports directories as well:
 
     $ dfm import .emacs.d
 
-### Using dfm on a new system
+### Using dfm on a new system ###
 
 Using dfm on a new system is straightforward as well: clone the repo, invocate dfm, and you are done:
 
@@ -93,7 +94,7 @@ Using dfm on a new system is straightforward as well: clone the repo, invocate d
 
 As you see quite some files are backed up, that just means they are moved to `.backup`, so in worst case you know where to look.
 
-### Adding soft links with dfm
+### Adding soft links with dfm ###
 
 Now lets see what happens when you change something.
 
@@ -115,7 +116,7 @@ Now lets see what happens when you change something.
 
 As you see, dfm supports git pass through: git commands are directly handed over to git. The changes where added to the git repository, and the repository was pushed to the remote URL.
 
-### Updates with dfm
+### Updates with dfm ###
 
 So, to get the changes onto the other system you just have to ask dfm to update the files via `dfm umi`. In this case I called it after I made changes to .screenrc:
 
@@ -125,25 +126,25 @@ So, to get the changes onto the other system you just have to ask dfm to update 
     INFO: Installing dotfiles...
     INFO:   Symlinking .screenrc (.dotfiles/.screenrc).
 
-### Special features of dfm
+### Special features of dfm ###
 
 As mentioned above, the strongest feature of dfm is to be able to ensure file system rights and to start scripts after an update. The first option comes in handy when you are sharing files in your ssh config directory. The second is useful whenever you have to alter files or do anything based for example on host names. Imagine that you have various build machines to build rpm files, but you have to use different packages names on each build environment.
 
-### Summary
+### Summary ###
 
 So, summarizing I can say dfm offers a quite neat and easily understandable solution for managing dotfiles while not relying on languages or tools you probably cannot install on the systems you are working on. However, Homeshick comes in as a close second, and I might give that one a try at some other point in the future. In the end, both solutions are much better than self written solutions – or no solution at all.
 
-# Heroku Accounts
+## Heroku Accounts ##
 
 Helps use multiple accounts on Heroku.
 
-Installation
-=
+### Installation ###
+
 ```
 $ heroku plugins:install git://github.com/ddollar/heroku-accounts.git
 ```
 
-## Usage
+### Usage ###
 
 To add accounts:
 
@@ -201,3 +202,9 @@ If you want to switch the account for an app:
     $ heroku accounts:set work
 
 This also changes the URL of the git origin `heroku` to make sure you're using the correct SSH host.
+
+## SSH ##
+
+### Introduction ###
+
+This started off from [github-keygen](https://github.com/dolmen/github-keygen), which is also checked in at `home\.bin\github-keygen`. Since the `~/.ssh/config` file was created for me and my accounts, you will probably want to remove the soft link in your own `~/.ssh` folder. I would strongly suggest following the pattern. On Mac OS/X it requires a newer `openssh` you can install from `homebrew/dupes`.
