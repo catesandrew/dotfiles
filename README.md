@@ -20,7 +20,7 @@ On Mac OS/X create a `~/.bashrc` file.
 ```sh
 touch ~/.bashrc
 
-cat <<< '. $HOME/.bashrc.load
+cat <<< '. $HOME/.bashrc
 '> ~/.bashrc
 ```
 
