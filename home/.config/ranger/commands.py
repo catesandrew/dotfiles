@@ -139,3 +139,46 @@ class trash(Command):
             names = []
             names.extend(f.basename for f in self.fm.thistab.get_selection())
             self.fm.notify("Files moved to the trash: " + ', '.join(map(str, names)))
+
+
+class fasd(Command):
+    """
+    :fasd
+
+    Jump to directory using fasd
+    """
+    def execute(self):
+        arg = self.rest(1)
+        if arg:
+            directory = subprocess.check_output(["fasd", "-d"]+arg.split(), universal_newlines=True).strip()
+            self.fm.cd(directory)
+
+
+class fzf_select(Command):
+    """
+    :fzf_select
+
+    Find a file using fzf.
+
+    With a prefix argument select only directories.
+
+    See: https://github.com/junegunn/fzf
+    """
+    def execute(self):
+        import subprocess
+        if self.quantifier:
+            # match only directories
+            command = "find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
+            -o -type d -print 2> /dev/null | sed 1d | cut -b3- | fzf +m"
+        else:
+            # match files and directories
+            command = "find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
+            -o -print 2> /dev/null | sed 1d | cut -b3- | fzf +m"
+        fzf = self.fm.execute_command(command, stdout=subprocess.PIPE)
+        stdout, stderr = fzf.communicate()
+        if fzf.returncode == 0:
+            fzf_file = os.path.abspath(stdout.decode('utf-8').rstrip('\n'))
+            if os.path.isdir(fzf_file):
+                self.fm.cd(fzf_file)
+            else:
+                self.fm.select_file(fzf_file)
