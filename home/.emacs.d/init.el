@@ -2936,11 +2936,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 Disable the highlighting of overlong lines."
   (setq-local whitespace-style (-difference whitespace-style
+                                            '(lines lines-tail))))
 
 (defun dotemacs-whitespace-mode-local ()
   "Enable `whitespace-mode' after local variables where set up."
   (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
-                                            '(lines lines-tail))))
 ;; Trailing whitespace
 ;; I don’t want to leave trailing whitespace in files I touch, so set
 ;; up a hook that automatically deletes trailing whitespace after
