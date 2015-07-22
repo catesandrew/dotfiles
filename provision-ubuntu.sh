@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-LIB=home/.bash/lib
+LIB="${HOME}/.bash/lib"
 source "${LIB}/utils.sh"
 source "${LIB}/brew.sh"
 source "${LIB}/npm.sh"
@@ -23,8 +23,7 @@ alias Reset="tput sgr0"
 # arg $1 = message
 # arg $2 = Color
 cecho() {
-  echo "${2}${1}"
-  Reset # Reset to normal.
+  echo -e "${2}${1}\033[m"
   return
 }
 
@@ -47,8 +46,8 @@ cecho "understood that it will make changes to your computer? (y/n)" $red
 read -r response
 case $response in
   [yY]) CONTINUE=true
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 if ! $CONTINUE; then
@@ -63,7 +62,7 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 echo ""
-echo "Would you like to set your computer name?  (y/n)"
+echo "Would you like to set your computer name? (y/n)"
 read -r response
 case $response in
   [yY])
@@ -71,8 +70,8 @@ case $response in
       read COMPUTER_NAME
       sudo hostname $COMPUTER_NAME
       sudo hostnamectl set-hostname $COMPUTER_NAME
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 PRE_INSTALL_PKGS=""
@@ -94,7 +93,7 @@ fi
 
 # Populating Cache
 print_status "Populating apt-get cache..."
-exec_sudo_cmd 'apt-get update'
+# exec_sudo_cmd 'apt-get update'
 
 if [ "X${PRE_INSTALL_PKGS}" != "X" ]; then
     print_status "Installing packages required for setup:${PRE_INSTALL_PKGS}..."
@@ -110,365 +109,456 @@ DISTRO=$(lsb_release -c -s)
 ###############################################################################
 
 echo ""
-echo "Would you like to install git?  (y/n)"
+echo "Would you like to install git? (y/n)"
 read -r response
 case $response in
   [yY])
-      sudo apt-get update
-      sudo apt-get install git
-      break;;
-  *) break;;
+
+    exec_sudo_cmd 'add-apt-repository -y ppa:git-core/ppa'
+    exec_sudo_cmd 'apt-get update'
+    exec_sudo_cmd 'apt-get -y install git'
+    ;;
+  *)
+    ;;
+esac
+
+# User should belong to adm group
+# sudo usermod -aG adm andrew
+
+PREFIX=/usr/local
+echo ""
+echo "Would you like to setup /usr/local? (y/n)"
+read -r response
+case $response in
+  [yY])
+    print_status "Preparing the /usr/local directory"
+    exec_sudo_cmd "chgrp adm ${PREFIX}"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}"
+
+    exec_sudo_cmd "chgrp adm ${PREFIX}/*"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}/*"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install the basics? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get -y install curl wget unzip git ack-grep htop vim tmux software-properties-common"
+    ;;
+  *)
+    ;;
 esac
 
 ###############################################################################
 # Linuxbrew
 ###############################################################################
 
-PREFIX=/usr/local
 HOMEBREW_PREFIX="${PREFIX}/linuxbrew"
 HOMEBREW_CACHE="${HOMEBREW_PREFIX}/.cache"
 
 echo ""
-echo "Install linuxbrew?  (y/n)"
+echo "Install linuxbrew? (y/n)"
 read -r response
 case $response in
   [yY])
     # dependencies
-    sudo apt-get install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev
+    exec_sudo_cmd 'apt-get -y install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev'
 
-    sudo chmod g+rwx ${PREFIX}
-    sudo chgrp adm ${PREFIX}
-
-    sudo mkdir -p ${HOMEBREW_PREFIX}
-    sudo chmod g+rwx ${HOMEBREW_PREFIX}
+    exec_cmd "git clone https://github.com/Homebrew/linuxbrew.git ${HOMEBREW_PREFIX}"
+    exec_sudo_cmd "chmod g+rwx ${HOMEBREW_PREFIX}"
     # the group is set to wheel by default for some reason
-    sudo chgrp adm ${HOMEBREW_PREFIX}
+    exec_sudo_cmd "chgrp adm ${HOMEBREW_PREFIX}"
 
-    sudo mkdir -p ${HOMEBREW_CACHE}
-    sudo chmod g+rwx ${HOMEBREW_CACHE}
+    exec_cmd "mkdir -p ${HOMEBREW_CACHE}"
+    exec_sudo_cmd "chmod g+rwx ${HOMEBREW_CACHE}"
 
-    git clone https://github.com/Homebrew/linuxbrew.git ${HOMEBREW_PREFIX}
-
-    break;;
-  *) break;;
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install your dotfiles?  (y/n)"
+echo "Would you like to install your dotfiles? (y/n)"
 read -r response
 case $response in
   [yY])
-      DFM_REPO="${HOME}/.dotfiles"
-      git clone --recursive https://github.com/catesandrew/dotfiles.git .dotfiles
-      DFM_REPO=.dotfiles .dotfiles/home/.bin/dfm install
-      cd "${HOME}/.vim/bundle/vimproc"
-      exec_cmd 'make'
-      exec_cmd 'cd -'
-      exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-local.template ${HOME}/.gitconfig-local"'
-      exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-private.template ${HOME}/.gitconfig-private"'
+    DFM_REPO="${HOME}/.dotfiles"
+    exec_cmd 'git clone --recursive https://github.com/catesandrew/dotfiles.git ~/.dotfiles'
+    exec_cmd 'DFM_REPO=~/.dotfiles ~/.dotfiles/home/.bin/dfm install'
+    exec_cmd "cd ${HOME}/.vim/bundle/vimproc"
+    exec_cmd 'make'
+    exec_cmd 'cd -'
+    exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-local.template ${HOME}/.gitconfig-local"'
+    exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-private.template ${HOME}/.gitconfig-private"'
 
-      print_status 'Edit the .gitconfig-local and .gitconfig-private files'
-
-      break;;
-  *) break;;
+    print_status 'Edit the .gitconfig-local and .gitconfig-private files'
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install powerline fonts?  (y/n)"
+echo "Would you like to install powerline fonts? (y/n)"
 read -r response
 case $response in
   [yY])
-      TMP_DIR=`mktemp -d`
-      exec_cmd 'git clone https://github.com/powerline/fonts.git "${TMP_DIR}"'
-      exec_cmd 'cd "${TMP_DIR}"'
-      exec_cmd './install.sh'
-      exec_cmd 'cd -'
-      break;;
-  *) break;;
+    TMP_DIR=`mktemp -d`
+    exec_cmd "git clone https://github.com/powerline/fonts.git ${TMP_DIR}"
+    exec_cmd "${TMP_DIR}/install.sh"
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install node via ppa?  (y/n)"
+echo "Would you like to install node via ppa? (y/n)"
 read -r response
 case $response in
   [yY])
-      dpkg -s npm &>/dev/null || {
-        # curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+    # curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 
-        print_status "Updating NodeJS PPA..."
+    print_status "Updating NodeJS PPA..."
 
-        ## NodeSource's Node.js PPA
-        sudo bash -c 'echo "deb https://deb.nodesource.com/node_0.12 ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
-        sudo bash -c 'echo "deb-src https://deb.nodesource.com/node_0.12 ${DISTRO} main" > /etc/apt/sources.list.d/nodesource.list'
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68576280
+    ## NodeSource's Node.js PPA
+    exec_sudo_cmd "echo 'deb https://deb.nodesource.com/node_0.12 ${DISTRO} main' > /etc/apt/sources.list.d/nodesource.list"
+    exec_sudo_cmd "echo 'deb-src https://deb.nodesource.com/node_0.12 ${DISTRO} main' >> /etc/apt/sources.list.d/nodesource.list"
+    exec_sudo_cmd "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68576280"
 
-        exec_sudo_cmd 'apt-get -yqq update'
-        exec_sudo_cmd 'apt-get -y install nodejs'
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y install nodejs"
 
-        print_status "Installing native build tools..."
-        apt-get install -y build-essential
-      }
-
-      break;;
-  *) break;;
+    print_status "Installing native build tools..."
+    exec_sudo_cmd "apt-get -y install build-essential"
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install emacs...?  (y/n)"
+echo "Would you like to install emacs snapshot? (y/n)"
 read -r response
 case $response in
   [yY])
-      print_status "Installing build-dep emacs24..."
-      exec_sudo_cmd 'apt-get -yqq update'
-      exec_sudo_cmd 'apt-get -y build-dep emacs24'
+    print_status "Installing emacs snapshot"
+    exec_sudo_cmd "add-apt-repository -y ppa:ubuntu-elisp"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y install emacs-snapshot emacs-snapshot-el"
 
-      # sudo add-apt-repository -y ppa:ubuntu-elisp
-      # sudo apt-get update
-      # sudo apt-get install emacs-snapshot
-
-      # sudo update-alternatives --config emacs
-
-      print_status "Downloading ..."
-      TMP_DIR=`mktemp -d`
-      exec_cmd 'cd "${TMP_DIR}"'
-      exec_cmd 'wget http://mirror.team-cymru.org/gnu/emacs/emacs-24.5.tar.gz'
-      exec_cmd 'tar xvf emacs-24.5.tar.gz'
-      exec_cmd 'cd emacs-24.5'
-      exec_cmd './configure'
-      print_status "Making ..."
-      exec_cmd 'make'
-      print_status "Installing ..."
-      exec_sudo_cmd 'make install'
-      exec_cmd 'cd --'
-
-      break;;
-  *) break;;
+    # sudo update-alternatives --config emacs
+    exec_sudo_cmd "update-alternatives --set emacs /usr/bin/emacs-snapshot"
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install nvm?  (y/n)"
+echo "Would you like to install nvm? (y/n)"
 read -r response
 case $response in
   [yY])
-      print_status "Installing native build tools..."
-      apt-get install -y build-essential libssl-dev
-      exec_cmd 'brew install nvm'
+    print_status "Installing native build tools..."
+    # exec_sudo_cmd "apt-get install -y build-essential libssl-dev"
+    exec_cmd "brew install nvm"
 
-      # Load NVM into a shell session *as a function*
-      NVM_TARGET="$(brew --prefix nvm)"
-      [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh"
+    exec_sudo_cmd "mkdir -p ${PREFIX}/nvm"
+    exec_sudo_cmd "chgrp adm ${PREFIX}/nvm"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}/nvm"
 
-      exec_sudo_cmd 'mkdir -p ${PREFIX}/nvm'
-      exec_sudo_cmd 'chmod g+rwx ${PREFIX}/nvm'
-      exec_sudo_cmd 'chgrp adm ${PREFIX}/nvm'
+    export NVM_DIR="${PREFIX}/nvm"
 
-      exec_cmd 'nvm install -s v0.12.3'
-      exec_cmd 'nvm alias default 0.12.3'
-      exec_cmd 'nvm use default'
+    # Load NVM into a shell session *as a function*
+    exec_cmd "source $(brew --prefix nvm)/nvm.sh"
 
-      break;;
-  *) break;;
+    exec_cmd "nvm install -s v0.12.4"
+    exec_cmd "nvm alias default 0.12.4"
+    exec_cmd "nvm install iojs-v2.4.0"
+    exec_cmd "nvm use default"
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to disable smb password synchronization?  (y/n)"
+echo "Would you like to disable smb password synchronization? (y/n)"
 read -r response
 case $response in
   [yY])
-
-      print_status "Launching pam-auth-update ..."
-      print_status "Please uncheck SMB password synchronization ..."
-      exec_sudo_cmd 'pam-auth-update'
-
-      break;;
-  *) break;;
-esac
-
-# sudo apt-get -yqq update
-# sudo apt-get -yqq upgrade
-# sudo apt-get dist-upgrade
-# dpkg -l | grep <package-name>
-sudo apt-get install lua
-
-sudo apt-get install libtiff5-dev libpng12-dev libjpeg-dev libgif-dev libgnutls-dev libxml2-dev
-
-/usr/bin/setxkbmap -option "ctrl:swapcaps"
-
-brew install fasd
-brew install fzf
-/usr/local/linuxbrew/Cellar/fzf/0.9.11/install
-git co home/.fzf.bash
-
-# sudo update-rc.d vncserver defaults 99
-
-cd .emacs.d/
-sudo apt-get install editorconfig
-
-# Test for known flags
-for opt in $@
-do
-    case $opt in
-        --no-packages) no_packages=true ;;
-        --no-sync) no_sync=true ;;
-        -*|--*) e_warning "Warning: invalid option $opt" ;;
-    esac
-done
-
-# Before relying on Homebrew, check that packages can be compiled
-if ! type_exists 'gcc'; then
-    e_error "The XCode Command Line Tools must be installed first."
-    printf "  Download them from: https://developer.apple.com/downloads\n"
-    printf "  Then run: bash ~/.dotfiles/bin/dotfiles\n"
-    exit 1
-fi
-
-# Check for Homebrew
-if ! type_exists 'brew'; then
-    e_header "Installing Homebrew..."
-    ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
-fi
-
-# Check for git
-if ! type_exists 'git'; then
-    e_header "Updating Homebrew..."
-    brew update
-    e_header "Installing Git..."
-    brew install git
-fi
-
-# Initialize the git repository if it's missing
-if ! is_git_repo; then
-    e_header "Initializing git repository..."
-    git init
-    git remote add origin ${DOTFILES_GIT_REMOTE}
-    git fetch origin master
-    # Reset the index and working tree to the fetched HEAD
-    # (submodules are cloned in the subsequent sync step)
-    git reset --hard FETCH_HEAD
-    # Remove any untracked files
-    git clean -fd
-fi
-
-# Conditionally sync with the remote repository
-if [[ $no_sync ]]; then
-    printf "Skipped dotfiles sync.\n"
-else
-    e_header "Syncing dotfiles..."
-    # Pull down the latest changes
-    git pull --rebase origin master
-    # Update submodules
-    git submodule update --recursive --init --quiet
-fi
-
-# Install and update packages
-if [[ $no_packages ]]; then
-    printf "Skipped package installations.\n"
-else
-    printf "Updating packages...\n"
-    # Install Homebrew formulae
-    run_brew
-    # Install Node packages
-    run_npm
-fi
-# Ask before potentially overwriting OS X defaults
-seek_confirmation "Warning: This step may modify your OS X system defaults."
-
-if is_confirmed; then
-    bash ./bin/osxdefaults
-    e_success "OS X settings updated! You may need to restart."
-else
-    printf "Skipped OS X settings update.\n"
-fi
-
-sudo apt-get install apparix
-
-#ruby
-sudo apt-get install rbenv
-sudo gem update system
-
-# nokogiri requirements
-# mkmf is part of the ruby-dev package
-sudo apt-get install ruby-dev
-sudo gem install nokogiri
-sudo gem install chef
-
-
-# sudo apt-get install vagrant
-
-# If you are running Vagrant on Ubuntu (14.04) and installed through apt-get,
-# the latest version of Vagrant in the Ubuntu repository is 1.4. Downloading the
-# latest (1.7.2 at this time) from the vagrant downloads page resolves the
-# issue. As discussed
-# [here](https://github.com/Varying-Vagrant-Vagrants/VVV/issues/354)
-
-sudo bash -c 'echo deb http://vagrant-deb.linestarve.com/ any main > /etc/apt/sources.list.d/wolfgang42-vagrant.list'
-sudo apt-key adv --keyserver pgp.mit.edu --recv-key 2099F7A4
-sudo apt-get update
-sudo apt-get install vagrant
-
-# vagrant plugins
-vagrant-aws (0.6.0)
-vagrant-hostmanager (1.5.0)
-vagrant-librarian-chef (0.2.1)
-vagrant-list (0.0.6)
-vagrant-share (1.1.3, system)
-
-
-
-
-echo ""
-echo "Would you like to install latest virtualbox via ppa?  (y/n)"
-read -r response
-case $response in
-  [yY])
-      print_status "Updating VirtualBox PPA..."
-
-      VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
-      VBOX_MAJOR_MINOR=$(echo "${VBOX_LATEST_VERSION%.*}")
-      exec_sudo_cmd 'echo "deb http://download.virtualbox.org/virtualbox/debian ${DISTRO} contrib" > /etc/apt/sources.list.d/virtualbox.list'
-      wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
-      exec_sudo_cmd 'apt-get -yqq update'
-      exec_sudo_cmd 'apt-get -y install dkms virtualbox-${VBOX_MAJOR_MINOR}'
-
-      wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack -O /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack
-      exec_sudo_cmd 'VBoxManage extpack uninstall "Oracle VM VirtualBox Extension Pack"'
-      exec_sudo_cmd 'VBoxManage extpack cleanup'
-      exec_sudo_cmd 'VBoxManage extpack install /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack'
-      exec_sudo_cmd 'usermod -a -G vboxusers nodemanager'
-
-
-  *) break;;
+    print_status "Launching pam-auth-update ..."
+    print_status "Please uncheck SMB password synchronization ..."
+    exec_sudo_cmd "pam-auth-update"
+    ;;
+  *)
+    ;;
 esac
 
 echo ""
-echo "Would you like to install latest virtualbox guest additions?  (y/n)"
+echo "Would you like to install editorconfig? (y/n)"
 read -r response
 case $response in
   [yY])
-      print_status "Updating vbox guest additions"
-
-      VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
-      wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso -O /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso
-
-      exec_sudo_cmd 'mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions'
-      exec_sudo_cmd '/media/guestadditions/VBoxLinuxAdditions.run'
-      exec_sudo_cmd 'umount /media/guestadditions'
-      exec_sudo_cmd 'rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions'
-
-      print_status 'You may safely ignore the message that reads: "Could not find the X.Org or XFree86 Window System."'
-
-      break;;
-  *) break;;
+    exec_sudo_cmd "apt-get -y install editorconfig"
+    ;;
+  *)
+    ;;
 esac
 
-As of Ubuntu 14.04, the
-`add-apt-repository` command is now included in the `software-properties-common` package rather than the `python-software-properties` package.
+echo ""
+echo "Would you like to install apparix? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get -y install apparix"
+    ;;
+  *)
+    ;;
+esac
 
-Install the Basics
-The first thing we’ll use is the apt-get command to install our packages:
+echo ""
+echo "Would you like to install lua? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get -y install lua5.2"
+    ;;
+  *)
+    ;;
+esac
 
-sudo apt-get install curl wget unzip git ack-grep htop vim tmux software-properties-common
+echo ""
+echo "Would you like to install image libs? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get -y install libtiff5-dev libpng12-dev libjpeg-dev libgif-dev libgnutls-dev libxml2-dev"
+    ;;
+  *)
+    ;;
+esac
 
+echo ""
+echo "Would you like to install fasd? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_cmd "brew install fasd"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install golang? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y golang"
+
+    exec_sudo_cmd "mkdir -p ${PREFIX}/go"
+    exec_sudo_cmd "chgrp adm ${PREFIX}/go"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}/go"
+    export GOPATH="${PREFIX}/go"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install ruby2.2? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y software-properties-common"
+    exec_sudo_cmd "apt-add-repository -y ppa:brightbox/ruby-ng"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get install -y ruby2.2 ruby2.2-dev"
+    exec_sudo_cmd "sudo gem2.2 install bundler"
+    exec_sudo_cmd "apt-get install -y ruby-switch"
+    # exec_sudo_cmd "apt-get purge -y ruby1.9"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to update gem? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "gem update system"
+    exec_sudo_cmd "gem install nokogiri"
+    # exec_sudo_cmd "gem install chef"
+    # nokogiri requirements
+    # mkmf is part of the ruby-dev package
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install rbenv? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y rbenv"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install fzf? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_cmd "git clone https://github.com/junegunn/fzf.git ${PREFIX}/fzf"
+    exec_sudo_cmd "chgrp adm ${PREFIX}/nvm"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}/nvm"
+    exec_cmd "${PREFIX}/fzf/install"
+
+    # exec_sudo_cmd "curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/install | sudo bash -"
+    # exec_cmd "brew install fzf"
+    # exec_cmd "$(brew --prefix fzf)/install"
+    # exec_cmd "git co $HOME/.fzf.bash"
+    # exec_cmd "source $(brew --prefix nvm)/nvm.sh"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install automatic security updates? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y unattended-upgrades"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install ack? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y ack-grep"
+    # Renaming ack-grep on Debian-derived distros. On Debian-derived distros, ack is
+    # packaged as "ack-grep" because "ack" already existed. Your ack will be called
+    # "ack-grep", which is 167% more characters to type per invocation. This is
+    # tragic for your poor fingers.
+
+    # To create a local diversion, renaming ack-grep to ack, first install the
+    # ack-grep package as shown above. Then, run:
+    exec_sudo_cmd "dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install ag? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y silversearcher-ag"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install sslmate? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list"
+    exec_sudo_cmd "wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y install sslmate"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install vagrant? (y/n)"
+read -r response
+case $response in
+  [yY])
+    # If you are running Vagrant on Ubuntu (14.04) and installed through apt-get,
+    # the latest version of Vagrant in the Ubuntu repository is 1.4. Downloading the
+    # latest (1.7.2 at this time) from the vagrant downloads page resolves the
+    # issue. As discussed
+    # [here](https://github.com/Varying-Vagrant-Vagrants/VVV/issues/354)
+
+    exec_sudo_cmd "echo deb http://vagrant-deb.linestarve.com/ any main > /etc/apt/sources.list.d/wolfgang42-vagrant.list"
+    exec_sudo_cmd "apt-key adv --keyserver pgp.mit.edu --recv-key 2099F7A4"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y install vagrant"
+
+    # vagrant plugins
+    # vagrant-aws (0.6.0)
+    # vagrant-hostmanager (1.5.0)
+    # vagrant-librarian-chef (0.2.1)
+    # vagrant-list (0.0.6)
+    # vagrant-share (1.1.3, system)
+
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install latest virtualbox via ppa? (y/n)"
+read -r response
+case $response in
+  [yY])
+    print_status "Insalling VirtualBox via PPA"
+
+    VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
+    VBOX_MAJOR_MINOR=$(echo ${VBOX_LATEST_VERSION%.*})
+    print_status "Found version ${VBOX_MAJOR_MINOR}"
+    exec_sudo_cmd "echo 'deb http://download.virtualbox.org/virtualbox/debian ${DISTRO} contrib' > /etc/apt/sources.list.d/virtualbox.list"
+    wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y install dkms virtualbox-${VBOX_MAJOR_MINOR}"
+
+    wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack -O /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack
+    exec_sudo_cmd "VBoxManage extpack uninstall 'Oracle VM VirtualBox Extension Pack'"
+    exec_sudo_cmd "VBoxManage extpack cleanup"
+    exec_sudo_cmd "VBoxManage extpack install /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack"
+    # exec_sudo_cmd "usermod -aG vboxusers nodemanager"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install latest virtualbox guest additions? (y/n)"
+read -r response
+case $response in
+  [yY])
+    print_status "Updating vbox guest additions"
+
+    VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
+    wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso -O /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso
+
+    exec_sudo_cmd "mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
+    exec_sudo_cmd "/media/guestadditions/VBoxLinuxAdditions.run"
+    sudo umount /media/guestadditions
+    sudo rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions
+
+    print_status "You may safely ignore the message that reads: 'Could not find the X.Org or XFree86 Window System.'"
+    ;;
+  *)
+    ;;
+esac
+
+exit
 
 # disallow remote log in directly as root user with ssh
 # /etc/ssh/sshd_config change the following property to no
@@ -508,29 +598,6 @@ sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 sudo service fail2ban reload
 
 
-# automatic security updates
-sudo apt-get install -y unattended-upgrades
-
-# ack
-sudo apt-get install -y ack-grep
-# Renaming ack-grep on Debian-derived distros. On Debian-derived distros, ack is
-# packaged as "ack-grep" because "ack" already existed. Your ack will be called
-# "ack-grep", which is 167% more characters to type per invocation. This is
-# tragic for your poor fingers.
-
-# To create a local diversion, renaming ack-grep to ack, first install the
-# ack-grep package as shown above. Then, run:
-sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
-
-# ssmlate
-sudo wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list
-sudo wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg
-sudo apt-get update
-sudo apt-get install sslmate
-
-# silver surfer
-sudo apt-get install silversearcher-ag
-
 # ansible
 sudo apt-add-repository ppa:ansible/ansible
 sudo apt-get update
@@ -538,7 +605,12 @@ sudo apt-get install -y ansible
 
 
 
-sudo apt-get install software-properties-common
-sudo apt-add-repository ppa:brightbox/ruby-ng
-sudo apt-get update
-udo apt-get install ruby2.2 ruby2.2-dev
+# /usr/bin/setxkbmap -option "ctrl:swapcaps"
+# sudo update-rc.d vncserver defaults 99
+
+
+
+# sudo apt-get -yqq update
+# sudo apt-get -yqq upgrade
+# sudo apt-get dist-upgrade
+# dpkg -l | grep <package-name>
