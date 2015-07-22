@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# Script to quickly pull and push github pull requests to keep commit history
+# cleaner, merging directly to master and closing the previous pull request
+
+readonly program="$(basename "$0")"
+remote='upstream' # use 'upstream' as default remote
+
+depends_on() {
+  if [[ ! $(which "${1}") ]]; then
+    echo -e >&2 "\n$(tput setaf 1)This script requires ${1}. Please install it first.$(tput sgr0)\n"
+    exit 1
+  fi
+}
+
+depends_on ghi
+
+syntax_error() {
+  echo "$program: $1" >&2
+  echo "Try \`$program --help\` for more information." >&2
+  exit 1
+}
+
+usage() {
+  echo "
+    usage: $program [options] <github_pull_request_url>
+
+    options:
+      -r <remote>, --remote <remote>   Use to specify a remote to pull from and push to (defaults to 'upstream').
+      -h, --help                       Show this help.
+  " | sed -E 's/^ {4}//'
+}
+
+# available flags
+while [[ "$1" ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -r | --remote)
+      remote="$2"
+      shift
+      ;;
+    -*)
+      syntax_error "unrecognized option: $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+abort_patch() {
+  if [[ "$1" == 'revert' ]]; then
+    git reset --hard "${last_commit_remote}"
+    git am --abort
+    shift
+  fi
+
+  echo -e "\n$(tput setaf 1)$1$(tput sgr0)\n"
+  exit 1
+}
+
+check_repo() {
+  local_repo=$(git remote show origin -n | grep "Fetch URL:" | sed -E 's|^.*/(.*).git|\1|')
+  remote_repo=$(sed -E 's|.*/(.*)/pull.*|\1|' <<< "${url}")
+  [[ "${local_repo}" != "${remote_repo}" ]] && abort_patch "You're trying to pull from '${remote_repo}', but you're on '${local_repo}'."
+}
+
+pull_remote() { # pull changes if local branch is behind
+  last_commit_local=$(git rev-parse refs/heads/master)
+  last_commit_remote=$(git ls-remote "${remote}" --heads refs/heads/master | perl -pe 's/\s.*//')
+  [[ "${last_commit_local}" != "${last_commit_remote}" ]] && git pull --rebase "${remote}" master
+}
+
+apply_patch() {
+  url=$(perl -pe 's/(.*\d).*/\1/' <<< "$1") # clean url of extraneous information
+  issue_number=$(sed 's|.*/||' <<< "${url}")
+  patch_url="${url}.patch" # github pull request url, ending in '.patch'
+  check_repo
+
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  [[ "${current_branch}" != 'master' ]] && git checkout master
+  pull_remote
+
+  curl --location --silent "${patch_url}" | git am # get and apply patch
+  [[ "$?" != 0 ]] && abort_patch 'revert' "There was an error applying the patch from ${issue_number}. Reverted to last successful state." # if applying the patch was unsuccessful, warn and revert state
+}
+
+push_and_close() {
+  pull_remote
+  git push "${remote}" master
+
+  ghi close --message "Thank you for the contribution. It was merged directly as ${last_commit_local} to keep commit history cleaner. Your contribution is still credited to you." "${issue_number}"
+}
+
+while [[ "$1" ]]; do # allow for multiple github PR urls to be passed at once
+  if [[ "$1" =~ https://github.com/* ]]; then
+    apply_patch "$1"
+    push_and_close
+  else
+    usage
+    exit 1
+  fi
+  shift
+done

@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# Script to quickly pull, fix, and push github pull requests, merging directly
+# to master and closing the previous pull request
+
+readonly program="$(basename "$0")"
+readonly issue_number_file='/tmp/prfixmaster_issue_number_save'
+remote='upstream' # use 'upstream' as default remote
+
+depends_on() {
+  if [[ ! $(which "${1}") ]]; then
+    echo -e >&2 "\n$(tput setaf 1)This script requires ${1}. Please install it first.$(tput sgr0)\n"
+    exit 1
+  fi
+}
+
+depends_on ghi
+
+syntax_error() {
+  echo "$program: $1" >&2
+  echo "Try \`$program --help\` for more information." >&2
+  exit 1
+}
+
+usage() {
+  echo "
+    usage: $program [options] <github_pull_request_url>
+
+    options:
+      -r <remote>, --remote <remote>   Use to specify a remote to pull from and push to (defaults to 'upstream').
+      -c, --continue                   Use after making your fixes, to push your changes and close the issue with a message. If you use it with uncommitted changes, they'll all be squashed (fixup) into the original patch; else your commits will be preserved.
+      -h, --help                       Show this help.
+  " | sed -E 's/^ {4}//'
+}
+
+# available flags
+while [[ "$1" ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -r | --remote)
+      remote="$2"
+      shift
+      ;;
+    -c | --continue)
+      push_changes='yes'
+      ;;
+    -*)
+      syntax_error "unrecognized option: $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+check_repo() {
+  local_repo=$(git remote show origin -n | grep "Fetch URL:" | sed -E 's|^.*/(.*).git|\1|')
+  remote_repo=$(sed -E 's|.*/(.*)/pull.*|\1|' <<< "${url}")
+
+  if [[ "${local_repo}" != "${remote_repo}" ]]; then
+    echo -e "\n$(tput setaf 1)You're trying to pull from '${remote_repo}' but you're on '${local_repo}'.$(tput sgr0)\n"
+    exit 1
+  fi
+}
+
+pull_remote() { # pull changes if local branch is behind
+  last_commit_local=$(git rev-parse refs/heads/master)
+  last_commit_remote=$(git ls-remote "${remote}" --heads refs/heads/master | perl -pe 's/\s.*//')
+  [[ "${last_commit_local}" != "${last_commit_remote}" ]] && git pull --rebase "${remote}" master
+}
+
+apply_patch() {
+  url=$(perl -pe 's/(.*\d).*/\1/' <<< "$1") # clean url of extraneous information
+  issue_number=$(sed 's|.*/||' <<< "${url}")
+  patch_url="${url}.patch" # github pull request url, ending in '.patch'
+  check_repo
+
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  [[ "${current_branch}" != 'master' ]] && git checkout master
+  pull_remote
+
+  curl --location --silent "${patch_url}" | git am # get and apply patch
+
+  echo "${issue_number}" > "${issue_number_file}" # save issue number
+
+  echo "
+    Make your changes and run
+      $program -c
+  " | sed -E 's/^ {2}//'
+}
+
+push_and_close() {
+  original_issue="$(cat ${issue_number_file})"
+  uncommitted_changes="$(git status --porcelain)"
+
+  # squash your fixes into the last commit, if there are uncommitted changes
+  if [[ "${uncommitted_changes}" ]]; then
+    git commit --all --allow-empty-message --message ''
+    git reset --soft @~
+    git commit --amend -C HEAD
+  fi
+
+  # push and close issue
+  pull_remote
+  git push "${remote}" master
+
+  ghi close --message "Thank you for the contribution. It needed some fixes, so they were made in ${last_commit_local}. Your contribution is still included (and still credited to you), with the appropriate modifications. Please feel free to ask about any of the changes." "${original_issue}"
+}
+
+if [[ "$1" =~ https://github.com/* ]]; then
+  apply_patch "$1"
+elif [[ "${push_changes}" == 'yes' ]]; then
+  push_and_close
+else
+  usage
+  exit 1
+fi
