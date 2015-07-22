@@ -2936,6 +2936,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 Disable the highlighting of overlong lines."
   (setq-local whitespace-style (-difference whitespace-style
+
+(defun dotemacs-whitespace-mode-local ()
+  "Enable `whitespace-mode' after local variables where set up."
+  (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
                                             '(lines lines-tail))))
 ;; Trailing whitespace
 ;; I don’t want to leave trailing whitespace in files I touch, so set
@@ -2990,10 +2994,6 @@ Disable the highlighting of overlong lines."
 
       ; Use `fill-column' for overlong lines
       (setq-local whitespace-line-column nil))
-
-    (defun dotemacs-whitespace-mode-local ()
-      "Enable `whitespace-mode' after local variables where set up."
-      (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
 
     (add-hook 'diff-mode-hook #'whitespace-mode)
     (add-hook 'diff-mode-hook #'dotemacs-set-whitespace-style-for-diff)
@@ -3906,7 +3906,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'gfm-mode-hook #'turn-off-auto-fill)
     ;; Use visual lines instead
     (add-hook 'gfm-mode-hook #'visual-line-mode)
-    (add-hook 'gfm-mode-hook #'init-whitespace-style-no-long-lines)
+    (add-hook 'gfm-mode-hook #'dotemacs-whitespace-style-no-long-lines)
 
     (bind-key "C-c C-s C" #'markdown-insert-gfm-code-block markdown-mode-map)
     (bind-key "C-c C-s P" #'markdown-insert-gfm-code-block markdown-mode-map)
