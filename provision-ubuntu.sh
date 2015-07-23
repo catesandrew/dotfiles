@@ -480,12 +480,12 @@ case $response in
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get -y install sslmate"
 
-    print_status "Be sure to turn `sslmate link` to link your account."
-    print_status "Download your certs with `sss download *.domain.com`"
-    print_status "Copy your private key `sudo mv private-pem.key /etc/sslmate/*.domain.com.key`"
-    print_status "Then `sudo chmod 644 /etc/sslmate/*.domain.com.key`"
-    print_status "`sudo chown root /etc/sslmate/*.domain.com.key`"
-    print_status "`sudo chgrp root /etc/sslmate/*.domain.com.key`"
+    print_status "Be sure to turn 'sslmate link' to link your account."
+    print_status "Download your certs with 'sss download *.domain.com'"
+    print_status "Copy your private key 'sudo mv private-pem.key /etc/sslmate/*.domain.com.key'"
+    print_status "Then 'sudo chmod 644 /etc/sslmate/*.domain.com.key'"
+    print_status "'sudo chown root /etc/sslmate/*.domain.com.key'"
+    print_status "'sudo chgrp root /etc/sslmate/*.domain.com.key'"
     ;;
   *)
     ;;
@@ -498,8 +498,6 @@ case $response in
   [yY])
     exec_sudo_cmd "apt-get -yqq update"
     exec_sudo_cmd "apt-get install -y ranger caca-utils highlight atool w3m poppler-utils mediainfo"
-
-    print_status "Register the runner with `sudo gitlab-ci-multi-runner register`"
     ;;
   *)
     ;;
@@ -722,8 +720,8 @@ case $response in
     exec_sudo_cmd "apt-get install -y gitlab-ee"
 
     print_status "Edit the /etc/gitlab/gitlab.rb file to make changes to gitlab"
-    print_status "Afterwards run `sudo gitlab-ctl reconfigure`"
-    print_status "Then run `sudo gitlab-ctl restart`"
+    print_status "Afterwards run 'sudo gitlab-ctl reconfigure'"
+    print_status "Then run 'sudo gitlab-ctl restart'"
     ;;
   *)
     ;;
@@ -738,7 +736,7 @@ case $response in
     exec_sudo_cmd "apt-get -yqq update"
     exec_sudo_cmd "apt-get install -y gitlab-ci-multi-runner"
 
-    print_status "Register the runner with `sudo gitlab-ci-multi-runner register`"
+    print_status "Register the runner with 'sudo gitlab-ci-multi-runner register'"
     ;;
   *)
     ;;
@@ -750,9 +748,9 @@ cecho "###############################################" $red
 cecho "# Disable remote root login with ssh          #" $red
 cecho "###############################################" $red
 print_status "Consider disallowing remote login as root with ssh"
-print_status "Edit `/etc/ssh/sshd_config` and change the following property to no"
+print_status "Edit '/etc/ssh/sshd_config' and change the following property to no"
 print_status "PermintRootLogin no"
-print_status "And restart ssh `sudo service ssh restart`"
+print_status "And restart ssh 'sudo service ssh restart'"
 
 echo ""
 cecho "###############################################" $green
