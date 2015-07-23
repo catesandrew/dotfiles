@@ -7551,7 +7551,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           projectile-completion-system 'ido ; helm
           projectile-indexing-method 'alien ; force alien for Windwos
           projectile-find-dir-includes-top-level t
-          projectile-enable-caching t
+          projectile-enable-caching nil
+          projectile-require-project-root t
+          projectile-switch-project-action 'projectile-dired
+          projectile-verbose nil
+          projectile-file-exists-local-cache-expire nil
+          projectile-file-exists-remote-cache-expire (* 15 60)
+          projectile-project-root-files-functions '(projectile-root-bottom-up
+                                                    projectile-root-top-down
+                                                    projectile-root-top-down-recurring)
           projectile-mode-line '(:propertize
                                  (:eval (concat " " (projectile-project-name)))
                                  face font-lock-constant-face))
