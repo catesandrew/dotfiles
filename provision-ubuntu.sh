@@ -479,6 +479,43 @@ case $response in
     exec_sudo_cmd "wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg"
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get -y install sslmate"
+
+    print_status "Be sure to turn `sslmate link` to link your account."
+    print_status "Download your certs with `sss download *.domain.com`"
+    print_status "Copy your private key `sudo mv private-pem.key /etc/sslmate/*.domain.com.key`"
+    print_status "Then `sudo chmod 644 /etc/sslmate/*.domain.com.key`"
+    print_status "`sudo chown root /etc/sslmate/*.domain.com.key`"
+    print_status "`sudo chgrp root /etc/sslmate/*.domain.com.key`"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install Ranger file manager? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get -yqq update"
+    exec_sudo_cmd "apt-get install -y ranger caca-utils highlight atool w3m poppler-utils mediainfo"
+
+    print_status "Register the runner with `sudo gitlab-ci-multi-runner register`"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to uninstall unity desktop? (y/n)"
+read -r response
+case $response in
+  [yY])
+    # To remove unity in 14.04
+    # http://askubuntu.com/questions/6302/how-can-you-remove-unity
+    exec_sudo_cmd "apt-get remove --purge unity"
+    exec_sudo_cmd "apt-get remove --purge gnome-shell"
+    exec_sudo_cmd "apt-get remove --purge lightdm"
+    exec_sudo_cmd "apt-get autoremove"
     ;;
   *)
     ;;
@@ -500,13 +537,12 @@ case $response in
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get -y install vagrant"
 
-    # vagrant plugins
-    # vagrant-aws (0.6.0)
-    # vagrant-hostmanager (1.5.0)
-    # vagrant-librarian-chef (0.2.1)
-    # vagrant-list (0.0.6)
-    # vagrant-share (1.1.3, system)
-
+    print_status "List of vagrant plugins to consider installing"
+    print_status "- vagrant-aws"
+    print_status "- vagrant-hostmanager"
+    print_status "- vagrant-librarian-chef"
+    print_status "- vagrant-list"
+    print_status "- vagrant-share"
     ;;
   *)
     ;;
@@ -527,7 +563,7 @@ case $response in
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get -y install dkms virtualbox-${VBOX_MAJOR_MINOR}"
 
-    wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack -O /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack
+    wget -c "http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack" -O "/tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack"
     exec_sudo_cmd "VBoxManage extpack uninstall 'Oracle VM VirtualBox Extension Pack'"
     exec_sudo_cmd "VBoxManage extpack cleanup"
     exec_sudo_cmd "VBoxManage extpack install /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack"
@@ -545,7 +581,7 @@ case $response in
     print_status "Updating vbox guest additions"
 
     VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
-    wget -c http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso -O /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso
+    wget -c "http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso" -O "/tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso"
 
     exec_sudo_cmd "mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
     exec_sudo_cmd "/media/guestadditions/VBoxLinuxAdditions.run"
@@ -557,13 +593,6 @@ case $response in
   *)
     ;;
 esac
-
-
-# disallow remote log in directly as root user with ssh
-# /etc/ssh/sshd_config change the following property to no
-# PermitRootLogin no
-# then restart ssh
-# sudo service ssh restart
 
 echo ""
 echo "Would you like to install firewall rules? (y/n)"
@@ -583,7 +612,6 @@ case $response in
     exec_sudo_cmd "iptables -A INPUT -p tcp --dport 22 -j ACCEPT"
     exec_sudo_cmd "iptables -A INPUT -p tcp --dport 80 -j ACCEPT"
     exec_sudo_cmd "iptables -A INPUT -p tcp --dport 443 -j ACCEPT"
-
 
     # Create new chain
     exec_sudo_cmd "iptables -N LOGGING"
@@ -664,12 +692,14 @@ case $response in
     exec_sudo_cmd "sed -i 's/^GRUB_CMDLINE_LINUX=\"\"$/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapaccount=1\"/' /etc/default/grub"
     exec_sudo_cmd "update-grub"
 
-    # add docker group and add vagrant to it
+    # add docker group
     exec_sudo_cmd "groupadd docker"
-    exec_sudo_cmd "usermod -aG docker vagrant"
+    exec_sudo_cmd "usermod -aG docker $USER"
+    # Add vagrant to docker group
+    # exec_sudo_cmd "usermod -aG docker vagrant"
 
     # official Ubuntu AMIs create a default user with the username ubuntu
-    # sudo usermod -a -G docker ubuntu
+    # sudo usermod -aG docker ubuntu
 
     # add the docker gpg key
     exec_sudo_cmd "curl https://get.docker.io/gpg | apt-key add -"
@@ -688,59 +718,50 @@ echo "Would you like to install GitLab EE? (y/n)"
 read -r response
 case $response in
   [yY])
-    # sudo apt-get install openssh-server ca-certificates
     exec_sudo_cmd "curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | bash"
     exec_sudo_cmd "apt-get install -y gitlab-ee"
 
-    # sudo gitlab-ctl start
-    # sudo gitlab-ctl stop unicorn
-    # sudo gitlab-ctl stop sidekiq
-    # sudo gitlab-ctl start
-    # sudo gitlab-rake gitlab:satellites:create
-    # sudo gitlab-rake gitlab:check SANITIZE=true
-    # sudo service stop nginx
-    # sudo service nginx stop
-    # sudo vim /etc/gitlab/gitlab.rb
-    # sudo gitlab-ctl start
-    # sudo gitlab-ctl reconfigure
-
+    print_status "Edit the /etc/gitlab/gitlab.rb file to make changes to gitlab"
+    print_status "Afterwards run `sudo gitlab-ctl reconfigure`"
+    print_status "Then run `sudo gitlab-ctl restart`"
     ;;
   *)
     ;;
 esac
 
+echo ""
+echo "Would you like to install GitLab CI runner? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-ci-multi-runner/script.deb.sh | bash"
+    exec_sudo_cmd "apt-get -yqq update"
+    exec_sudo_cmd "apt-get install -y gitlab-ci-multi-runner"
 
+    print_status "Register the runner with `sudo gitlab-ci-multi-runner register`"
+    ;;
+  *)
+    ;;
+esac
 
+# disallow remote log in directly as root user with ssh
+echo ""
+cecho "###############################################" $red
+cecho "# Disable remote root login with ssh          #" $red
+cecho "###############################################" $red
+print_status "Consider disallowing remote login as root with ssh"
+print_status "Edit `/etc/ssh/sshd_config` and change the following property to no"
+print_status "PermintRootLogin no"
+print_status "And restart ssh `sudo service ssh restart`"
 
-
-
-# sudo vim /etc/apt/apt.conf.d/10periodic
-# sslmate link
-# sudo sslmate download *.ibaset.com
-# sudo mv star-ibaset_rsa_pri.key /etc/sslmate/*.ibaset.com.key
-# sudo chmod 644 /etc/sslmate/\*.ibaset.com.key
-# sudo chown root /etc/sslmate/\*.ibaset.com.key
-# sudo chgrp root /etc/sslmate/\*.ibaset.com.key
-
-
-
-# /usr/bin/setxkbmap -option "ctrl:swapcaps"
-
-# To remove unity in 14.04
-# http://askubuntu.com/questions/6302/how-can-you-remove-unity
-# sudo apt-get remove --purge unity
-# sudo apt-get remove --purge gnome-shell
-# sudo apt-get remove --purge lightdm
-# sudo apt-get autoremove
-
-
-# sudo apt-get -yqq update
-# sudo apt-get -yqq upgrade
-# sudo apt-get dist-upgrade
-# dpkg -l | grep <package-name>
-
-
-
+echo ""
+cecho "###############################################" $green
+cecho "# Cleanup                                     #" $green
+cecho "###############################################" $green
 exec_sudo_cmd "apt-get -y autoremove"
 exec_sudo_cmd "apt-get clean"
 exec_sudo_cmd "rm -rf /tmp/*"
+
+# sudo vim /etc/apt/apt.conf.d/10periodic
+
+# /usr/bin/setxkbmap -option "ctrl:swapcaps"
