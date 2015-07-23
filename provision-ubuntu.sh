@@ -531,7 +531,7 @@ case $response in
     exec_sudo_cmd "VBoxManage extpack uninstall 'Oracle VM VirtualBox Extension Pack'"
     exec_sudo_cmd "VBoxManage extpack cleanup"
     exec_sudo_cmd "VBoxManage extpack install /tmp/Oracle_VM_VirtualBox_Extension_Pack-${VBOX_LATEST_VERSION}.vbox-extpack"
-    # exec_sudo_cmd "usermod -aG vboxusers nodemanager"
+    exec_sudo_cmd "usermod -aG vboxusers $USER"
     ;;
   *)
     ;;
@@ -549,8 +549,8 @@ case $response in
 
     exec_sudo_cmd "mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
     exec_sudo_cmd "/media/guestadditions/VBoxLinuxAdditions.run"
-    sudo umount /media/guestadditions
-    sudo rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions
+    exec_sudo_cmd "umount -l /media/guestadditions"
+    exec_sudo_cmd "rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
 
     print_status "You may safely ignore the message that reads: 'Could not find the X.Org or XFree86 Window System.'"
     ;;
@@ -558,8 +558,8 @@ case $response in
     ;;
 esac
 
-exit
 
+exit
 # disallow remote log in directly as root user with ssh
 # /etc/ssh/sshd_config change the following property to no
 PermitRootLogin no
