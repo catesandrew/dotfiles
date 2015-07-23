@@ -2034,9 +2034,27 @@ mouse-3: go to end"))))
     ;; brew install coreutils
     (setq insert-directory-program gnu-ls)))
 
+(defun current-buffer-remote-p ()
+  (--any? (and it (file-remote-p it))
+          (list
+           (buffer-file-name)
+           list-buffers-directory
+           default-directory))
+;; (and (fboundp 'tramp-tramp-file-p) (-any? 'tramp-tramp-file-p
+;;             (list
+;;              (buffer-file-name)
+;;              list-buffers-directory
+;;              default-directory)))
+  )
+
 (use-package tramp                      ; Access remote files
-  :ensure t
   :defer t
+  :init
+  (progn
+    (setq vc-ignore-dir-regexp
+          (format "\\(%s\\)\\|\\(%s\\)"
+                  vc-ignore-dir-regexp
+                  tramp-file-name-regexp)))
   :config
   ;; Store auto-save files locally
   (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
@@ -2180,7 +2198,21 @@ mouse-3: go to end"))))
 (setq view-read-only t)                 ; View read-only files
 
 (use-package autorevert                 ; Auto-revert buffers of changed files
-  :init (global-auto-revert-mode)
+  :if (not noninteractive)
+  :defer
+  init
+  (progn
+    (setq auto-revert-check-vc-info nil
+          auto-revert-verbose nil)
+    (if (not (not window-system))
+        (setq auto-revert-mode-text " ♻"
+              auto-revert-tail-mode-text " ♻~")
+      (setq auto-revert-mode-text " ar"
+            auto-revert-tail-mode-text " ar~"))
+    (defun auto-revert-turn-on-maybe ()
+      (unless (current-buffer-remote-p)
+        (auto-revert-mode)))
+    (add-hook 'find-file-hook 'auto-revert-turn-on-maybe))
   :config (setq auto-revert-verbose nil ; Shut up, please!
                 ;; Revert Dired buffers, too
                 global-auto-revert-non-file-buffers t))
@@ -3847,7 +3879,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'LaTeX-mode-hook 'flycheck-mode))
+  (add-hook 'LaTeX-mode-hook 'flycheck-turn-on-maybe))
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
@@ -4062,7 +4094,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'rst-mode-hook 'flycheck-mode))
+  (add-hook 'rst-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package mustache-mode              ; Mustache mode
   :ensure t
@@ -4081,7 +4113,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'handlebars-mode-hook 'flycheck-mode))
+  (add-hook 'handlebars-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
@@ -4414,8 +4446,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
-    (add-hook 'lisp-mode-hook 'flycheck-mode)))
+    (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)))
 
 
 ;;; Scala
@@ -4620,7 +4652,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'scala-mode-hook 'flycheck-mode))
+  (add-hook 'scala-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package ensime-sbt
   :ensure ensime
@@ -4822,7 +4854,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'python-mode-hook 'flycheck-mode))
+  (add-hook 'python-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5028,11 +5060,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'enh-ruby-mode-hook 'flycheck-mode)
-    (add-hook 'slim-mode-hook 'flycheck-mode)
-    (add-hook 'haml-mode-hook 'flycheck-mode)
-    (add-hook 'yaml-mode-hook 'flycheck-mode)
-    (add-hook 'ruby-mode-hook 'flycheck-mode)))
+    (add-hook 'enh-ruby-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'slim-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'haml-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'yaml-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'ruby-mode-hook 'flycheck-turn-on-maybe)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5067,7 +5099,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'rust-mode-hook 'flycheck-mode))
+  (add-hook 'rust-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5383,7 +5415,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'haskell-mode-hook 'flycheck-mode))
+  (add-hook 'haskell-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5450,7 +5482,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'go-mode-hook 'flycheck-mode))
+  (add-hook 'go-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5523,7 +5555,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-to-hooks 'flycheck-mode '(c-mode-hook c++-mode-hook))))
+    (add-to-hooks 'flycheck-turn-on-maybe '(c-mode-hook c++-mode-hook))))
 
 (use-package gdb-mi
   :ensure t
@@ -5755,7 +5787,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'tuareg-mode-hook 'flycheck-mode))
+  (add-hook 'tuareg-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package flycheck-ocaml             ; Check OCaml code with Merlin
   :ensure t
@@ -5958,10 +5990,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'web-mode-hook 'flycheck-mode)
-    (add-hook 'css-mode-hook 'flycheck-mode)
-    (add-hook 'scss-mode-hook 'flycheck-mode)
-    (add-hook 'sass-mode-hook 'flycheck-mode)))
+    (add-hook 'web-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'css-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'scss-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'sass-mode-hook 'flycheck-turn-on-maybe)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -6014,7 +6046,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ; Waiting on purscheck to make it to melpa
 ; (dotemacs-use-package-add-hook flycheck
 ;   :post-init
-;   (add-hook 'purescript-mode-hook 'flycheck-mode))
+;   (add-hook 'purescript-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package psci
   :defer t
@@ -6073,9 +6105,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'coffee-mode-hook 'flycheck-mode)
-    (add-hook 'js2-mode-hook 'flycheck-mode)
-    (add-hook 'json-mode-hook 'flycheck-mode)))
+    (add-hook 'coffee-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'js2-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'json-mode-hook 'flycheck-turn-on-maybe)))
 
 (use-package js2-mode                   ; Javascript editing
   :defer t
@@ -6276,7 +6308,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'lua-mode-hook 'flycheck-mode))
+  (add-hook 'lua-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package lua-mode
   :defer t
@@ -6338,7 +6370,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'php-mode-hook 'flycheck-mode))
+  (add-hook 'php-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -6450,7 +6482,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'racket-mode-hook 'flycheck-mode))
+  (add-hook 'racket-mode-hook 'flycheck-turn-on-maybe))
 
 
 ;;; Java
@@ -6611,8 +6643,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'swift-mode-hook 'flycheck-mode)
-    (add-hook 'sh-mode-hook 'flycheck-mode)))
+    (add-hook 'swift-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'sh-mode-hook 'flycheck-turn-on-maybe)))
 
 
 ;; REST Client
@@ -7473,7 +7505,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
-  :defer 1
+  :defer 1.4
   :commands (projectile-ack
              projectile-ag
              projectile-compile-project
@@ -7497,8 +7529,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              projectile-vc)
   :init
   (progn
-    (setq-default projectile-enable-caching t)
-    (setq projectile-sort-order 'recentf
+    (defun projectile-find-file-ignored ()
+      "Projectile find file without ignore."
+      (interactive)
+      (let ((projectile-git-command "git ls-files -zco"))
+        (call-interactively 'projectile-find-file)))
+
+    (defun projectile-add-magit-repo-dirs-to-known-projects ()
+      "Add `magit-repo-dirs' to `projectile-known-projects'."
+      (interactive)
+      (--each (mapcar 'cdr (magit-list-repos magit-repo-dirs))
+        (projectile-add-known-project (file-name-as-directory
+                                       (file-truename it)))))
+
+    (setq projectile-sort-order 'recently-active  ; recentf
           projectile-cache-file (concat dotemacs-cache-directory
                                         "projectile.cache")
           projectile-known-projects-file (concat dotemacs-cache-directory
@@ -7507,9 +7551,19 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           projectile-completion-system 'ido ; helm
           projectile-indexing-method 'alien ; force alien for Windwos
           projectile-find-dir-includes-top-level t
+          projectile-enable-caching t
           projectile-mode-line '(:propertize
                                  (:eval (concat " " (projectile-project-name)))
                                  face font-lock-constant-face))
+
+    (defadvice projectile-mode (before maybe-use-cache activate)
+      (when
+        (--any? (and it (file-remote-p it))
+                (list
+                  (buffer-file-name)
+                  list-buffers-directory
+                  default-directory))
+        (setq-local projectile-enable-caching t)))
 
     (setq projectile-project-root-files '(
             ; "rebar.config"       ; Rebar project file
@@ -8504,7 +8558,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'puppet-mode-hook 'flycheck-mode))
+  (add-hook 'puppet-mode-hook 'flycheck-turn-on-maybe))
 
 (use-package puppetfile-mode
   :ensure t
@@ -8539,7 +8593,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'ledger-mode-hook 'flycheck-mode))
+  (add-hook 'ledger-mode-hook 'flycheck-turn-on-maybe))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -8777,12 +8831,23 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package flycheck                   ; On-the-fly syntax checking
   :ensure t
+  :if (not noninteractive)
+  :commands (flycheck-mode
+             global-flycheck-mode)
   :bind (("C-c l e" . list-flycheck-errors)
          ("C-c u f c" . flycheck-mode))
-  :defer t
   :init
   (progn
-    (setq flycheck-standard-error-navigation nil)
+    (setq flycheck-standard-error-navigation nil
+          flycheck-completion-system 'ido)
+
+    (defun flycheck-turn-on-maybe ()
+      (unless
+          (or
+           buffer-read-only
+           (hardhat-buffer-included-p (current-buffer))
+           (current-buffer-remote-p))
+        (flycheck-mode)))
 
     ;; Each buffer gets its own idle-change-delay because of the
     ;; buffer-sensitive adjustment above.
