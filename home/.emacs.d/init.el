@@ -2200,7 +2200,7 @@ mouse-3: go to end"))))
 (use-package autorevert                 ; Auto-revert buffers of changed files
   :if (not noninteractive)
   :defer
-  init
+  :init
   (progn
     (setq auto-revert-check-vc-info nil
           auto-revert-verbose nil)

@@ -93,7 +93,7 @@ fi
 
 # Populating Cache
 print_status "Populating apt-get cache..."
-# exec_sudo_cmd 'apt-get update'
+exec_sudo_cmd 'apt-get update'
 
 if [ "X${PRE_INSTALL_PKGS}" != "X" ]; then
     print_status "Installing packages required for setup:${PRE_INSTALL_PKGS}..."
