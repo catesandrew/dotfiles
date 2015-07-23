@@ -559,55 +559,110 @@ case $response in
 esac
 
 
-exit
 # disallow remote log in directly as root user with ssh
 # /etc/ssh/sshd_config change the following property to no
-PermitRootLogin no
-# restart ssh
-sudo service ssh restart
+# PermitRootLogin no
+# then restart ssh
+# sudo service ssh restart
 
-# install iptables
--P INPUT DROP
--P FORWARD ACCEPT
--P OUTPUT ACCEPT
--N LOGGING
--A INPUT -i lo -j ACCEPT
--A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
--A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
--A INPUT -j LOGGING
--A LOGGING -m limit --limit 2/min -j LOG --log-prefix "IPTables Packet Dropped: " --log-level 7
--A LOGGING -j DROP
+echo ""
+echo "Would you like to install firewall rules? (y/n)"
+read -r response
+case $response in
+  [yY])
+    print_status "Here are your current list of rules"
+    exec_sudo_cmd "iptables -L -v"
 
-On Ubuntu, we can use the iptables-persistent package to do this:
+    # First, we’ll add the rule to allow all loopback traffic:
+    exec_sudo_cmd "iptables -A INPUT -i lo -j ACCEPT"
 
-1 # Install the package
-2 sudo apt-get install -y iptables-persistent
-3
-4 # Start the service
-5 sudo service iptables-persistent start
+    # Now let’s add the rule to accept current/established connections:
+    exec_sudo_cmd "iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
 
-# save the rules
-sudo bash -c "iptables-save > /etc/iptables/rules.v4"
+    # Open up our SSH/HTTP/HTTPS ports for remote access:
+    exec_sudo_cmd "iptables -A INPUT -p tcp --dport 22 -j ACCEPT"
+    exec_sudo_cmd "iptables -A INPUT -p tcp --dport 80 -j ACCEPT"
+    exec_sudo_cmd "iptables -A INPUT -p tcp --dport 443 -j ACCEPT"
 
 
-#install Fail2Ban
-sudo apt-get install -y fail2ban
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sudo service fail2ban reload
+    # Create new chain
+    exec_sudo_cmd "iptables -N LOGGING"
+    # Add the “catch all” to LOG any packets which made it this far down the rule chain:
+    exec_sudo_cmd "iptables -A INPUT -j LOGGING"
 
+    # Log the packets with a prefix
+    exec_sudo_cmd "iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix 'IPTables Packet Dropped: ' --log-level 7"
+    # Drop those packets
+    # Note this is added to the LOGGING chain
+    exec_sudo_cmd "iptables -A LOGGING -j DROP"
 
-# ansible
-sudo apt-add-repository ppa:ansible/ansible
-sudo apt-get update
-sudo apt-get install -y ansible
+    # Let’s change the INPUT chain to default to DROP:
+    exec_sudo_cmd "iptables -P INPUT DROP"
 
+    print_status "Now here are your current list of rules"
+    exec_sudo_cmd "iptables -L -v"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to save your firewall rules after reboot? (y/n)"
+read -r response
+case $response in
+  [yY])
+    # On Ubuntu, we can use the iptables-persistent package to do this:
+    exec_sudo_cmd "apt-get install -y iptables-persistent"
+
+    # Start the service
+    exec_sudo_cmd "service iptables-persistent start"
+
+    # save the rules
+    exec_sudo_cmd "iptables-save > /etc/iptables/rules.v4"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install Fail2Ban? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-get install -y fail2ban"
+    exec_sudo_cmd "cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local"
+    exec_sudo_cmd "service fail2ban reload"
+    exec_sudo_cmd "iptables-save > /etc/iptables/rules.v4"
+
+    # When that’s done, restart iptables-persistent:
+    exec_sudo_cmd "service iptables-persistent restart"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install ansible? (y/n)"
+read -r response
+case $response in
+  [yY])
+    exec_sudo_cmd "apt-add-repository ppa:ansible/ansible"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get install -y ansible"
+    ;;
+  *)
+    ;;
+esac
 
 
 # /usr/bin/setxkbmap -option "ctrl:swapcaps"
-# sudo update-rc.d vncserver defaults 99
 
+# To remove unity in 14.04
+# http://askubuntu.com/questions/6302/how-can-you-remove-unity
+# sudo apt-get remove --purge unity
+# sudo apt-get remove --purge gnome-shell
+# sudo apt-get remove --purge lightdm
+# sudo apt-get autoremove
 
 
 # sudo apt-get -yqq update
