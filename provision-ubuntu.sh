@@ -646,13 +646,82 @@ echo "Would you like to install ansible? (y/n)"
 read -r response
 case $response in
   [yY])
-    exec_sudo_cmd "apt-add-repository ppa:ansible/ansible"
+    exec_sudo_cmd "apt-add-repository -y ppa:ansible/ansible"
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get install -y ansible"
     ;;
   *)
     ;;
 esac
+
+echo ""
+echo "Would you like to install Docker (y/n)"
+read -r response
+case $response in
+  [yY])
+    # Enable memory cgroup and swap accounting for Docker.
+    # http://docs.docker.io/en/latest/installation/kernel/#memory-and-swap-accounting-on-debian-ubuntu
+    exec_sudo_cmd "sed -i 's/^GRUB_CMDLINE_LINUX=\"\"$/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapaccount=1\"/' /etc/default/grub"
+    exec_sudo_cmd "update-grub"
+
+    # add docker group and add vagrant to it
+    exec_sudo_cmd "groupadd docker"
+    exec_sudo_cmd "usermod -aG docker vagrant"
+
+    # official Ubuntu AMIs create a default user with the username ubuntu
+    # sudo usermod -a -G docker ubuntu
+
+    # add the docker gpg key
+    exec_sudo_cmd "curl https://get.docker.io/gpg | apt-key add -"
+
+    # Add the Docker repository to your apt sources list.
+    exec_sudo_cmd "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get install -y lxc-docker"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
+echo "Would you like to install GitLab EE? (y/n)"
+read -r response
+case $response in
+  [yY])
+    # sudo apt-get install openssh-server ca-certificates
+    exec_sudo_cmd "curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | bash"
+    exec_sudo_cmd "apt-get install -y gitlab-ee"
+
+    # sudo gitlab-ctl start
+    # sudo gitlab-ctl stop unicorn
+    # sudo gitlab-ctl stop sidekiq
+    # sudo gitlab-ctl start
+    # sudo gitlab-rake gitlab:satellites:create
+    # sudo gitlab-rake gitlab:check SANITIZE=true
+    # sudo service stop nginx
+    # sudo service nginx stop
+    # sudo vim /etc/gitlab/gitlab.rb
+    # sudo gitlab-ctl start
+    # sudo gitlab-ctl reconfigure
+
+    ;;
+  *)
+    ;;
+esac
+
+
+
+
+
+
+# sudo vim /etc/apt/apt.conf.d/10periodic
+# sslmate link
+# sudo sslmate download *.ibaset.com
+# sudo mv star-ibaset_rsa_pri.key /etc/sslmate/*.ibaset.com.key
+# sudo chmod 644 /etc/sslmate/\*.ibaset.com.key
+# sudo chown root /etc/sslmate/\*.ibaset.com.key
+# sudo chgrp root /etc/sslmate/\*.ibaset.com.key
+
 
 
 # /usr/bin/setxkbmap -option "ctrl:swapcaps"
@@ -669,3 +738,9 @@ esac
 # sudo apt-get -yqq upgrade
 # sudo apt-get dist-upgrade
 # dpkg -l | grep <package-name>
+
+
+
+exec_sudo_cmd "apt-get -y autoremove"
+exec_sudo_cmd "apt-get clean"
+exec_sudo_cmd "rm -rf /tmp/*"
