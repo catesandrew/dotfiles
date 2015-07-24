@@ -2765,7 +2765,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                          :off (show-paren-mode -1)
                          :documentation "Highlight matching pairs of parentheses."
                          :evil-leader "tCP")
-    (if (eq dotemacs-highlight-delimiters 'all)
+    (when (member dotemacs-highlight-delimiters '(all current))
       (show-paren-mode)))
   :config (setq show-paren-when-point-inside-paren t
                 show-paren-when-point-in-periphery t))
