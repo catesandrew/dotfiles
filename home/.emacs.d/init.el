@@ -3111,6 +3111,7 @@ Disable the highlighting of overlong lines."
                             "IndianRed3"
                             "IndianRed4")))
   :config
+  (dotemacs-hide-lighter highlight-parentheses-mode)
   (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold))
 
 (use-package highlight-quoted
