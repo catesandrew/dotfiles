@@ -8090,9 +8090,26 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (setq erc-track-switch-direction 'newest
         erc-track-enable-keybindings t))
 
+(use-package jabber        ;; Jabber (XMPP) client for Emacs
+  :defer t
+  :ensure t
+  :init (evil-leader/set-key "aj" 'jabber-connect-all)
+  :config (evil-leader/set-key-for-mode 'jabber-roster-mode
+            "ma" 'jabber-send-presence
+            "mb" 'jabber-get-browse
+            "md" 'jabber-disconnect
+            "me" 'jabber-roster-edit-action-at-point
+            "mg" 'jabber-display-roster
+            "mi" 'jabber-get-disco-items
+            "mj" 'jabber-muc-join
+            "mo" 'jabber-roster-toggle-offline-display
+            "mq" 'bury-buffer
+            "ms" 'jabber-send-subscription-request
+            "mv" 'jabber-get-version
+            "m RET" 'jabber-roster-ret-action-at-point))
+
 
 ;;; Org Mode
-; todo add flyspell
 (use-package init-org
   :load-path "config/")
 
