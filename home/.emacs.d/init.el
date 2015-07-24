@@ -5955,9 +5955,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq emmet-indentation 2
           emmet-move-cursor-between-quotes t)
-    (add-hook 'web-mode-hook 'emmet-mode)
-    (add-hook 'html-mode-hook 'emmet-mode)
-    (add-hook 'css-mode-hook 'emmet-mode))
+    (add-to-hooks 'emmet-mode '(css-mode-hook
+                                html-mode-hook
+                                web-mode-hook)))
   :config
   (progn
     (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
