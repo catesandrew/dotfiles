@@ -833,7 +833,7 @@ FEATURE may be a named feature or a file name, see
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
-    :post-init
+    :pre-init
     (progn
       (setq-local company-idle-delay 0.2)
       ;; The default frontend screws everything up in short windows like
