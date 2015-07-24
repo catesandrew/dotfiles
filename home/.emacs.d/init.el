@@ -8411,11 +8411,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package helm-dash
   :defer t
   :ensure t
-  :if (eq system-type 'gnu/linux)
   :init
   (progn
-    (evil-leader/set-key "dd" 'helm-dash-at-point)
-    (evil-leader/set-key "dD" 'helm-dash))
+    (evil-leader/set-key
+      "dh" 'helm-dash-at-point
+      "dH" 'helm-dash))
   :config
   (progn
     (defun dash//activate-package-docsets (path)
@@ -8438,6 +8438,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key "dD" 'dash-at-point-with-docset))
   :config (add-to-list 'dash-at-point-mode-alist
                        '(swift-mode . "ios,swift")))
+
+(use-package zeal-at-point
+  :ensure t
+  :if (eq system-type 'gnu/linux)
+  :defer t
+  :init
+  (evil-leader/set-key
+    "dd" 'zeal-at-point
+    "dD" 'zeal-at-point-set-docset)
+  :config
+  ;; This lets users seach in multiple docsets
+  (push '(web-mode . "html,css,javascript") zeal-at-point-mode-alist))
 
 (bind-key "C-c h b" #'describe-personal-keybindings)
 
