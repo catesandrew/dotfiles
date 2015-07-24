@@ -2516,7 +2516,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; Configure a reasonable fill column, indicate it in the buffer and enable
 ;; automatic filling
 (setq-default fill-column 80)
-
 (setq standard-indent 2)
 
 ; Also, =visual-line-mode= is so much better than =auto-fill-mode=. It doesn't
@@ -8994,6 +8993,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (unless ispell-program-name
       (warn "No spell checker available. Install Hunspell or ASpell."))))
+
+(use-package define-word
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key
+    "xwd" 'define-word-at-point))
 
 (use-package flyspell                   ; On-the-fly spell checking
   :bind (("C-c u f s" . flyspell-mode))
