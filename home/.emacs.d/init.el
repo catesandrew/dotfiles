@@ -1941,7 +1941,6 @@ mouse-3: go to end"))))
 
 (use-package popwin
   :ensure t
-  :bind ("C-c P" . popwin:popup-last-buffer)
   :config
   (progn
     (popwin-mode 1)
@@ -3642,8 +3641,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package init-bindings
   :load-path "config/"
-  :config
-  (dotemacs-toggle-transparency))
+  :init
+  (progn (after "projectile"
+           (dotemacs-toggle-transparency))))
 
 
 ;;; Text editing
@@ -8455,6 +8455,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package guide-key-tip
   :ensure t
+  :disabled t
   :defer t
   :init
   (progn
@@ -8504,15 +8505,57 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           guide-key/popup-window-position 'bottom
           guide-key/idle-delay dotemacs-guide-key-delay
           guide-key/text-scale-amount 0
-          guide-key-tip/enabled (if window-system t))
-    (setq guide-key/highlight-command-regexp
-                 (cons dotemacs-prefix-command-string font-lock-warning-face))
+          guide-key-tip/enabled (if window-system t)
+          guide-key/highlight-command-regexp
+                 (cons dotemacs-prefix-command-string
+                       font-lock-warning-face))
+
     (guide-key-mode 1))
-  ; :config
-  ; (add-hook 'evil-leader-mode-hook
-  ;           #'(lambda () (guide-key/add-local-guide-key-sequence evil-leader/leader)))
   :diminish (guide-key-mode . " Ⓖ"))
 
+(use-package which-key
+  :ensure t
+  ; :disabled t
+  :init
+  (progn
+    (setq which-key-max-description-length 32)
+    (which-key-mode)
+    (after "evil-leader"
+      (dotemacs-add-toggle which-key
+                           :status which-key-mode
+                           :on (which-key-mode)
+                           :off (which-key-mode -1)
+                           :documentation
+                           "Display a buffer with available key bindings."
+                           :evil-leader "tK"))
+
+    (defadvice which-key--update
+        (around dotemacs-inhibit-which-key-buffer activate)
+      "Prevent the popup of the which-key buffer in some case."
+      ;; a micro-state is running
+      ;; or
+      ;; bzg-big-fringe-mode is on
+      (if (or overriding-terminal-local-map
+              bzg-big-fringe-mode)
+          (let ((which-key-inhibit t)) ad-do-it)
+        ad-do-it))
+    (add-to-list 'which-key-description-replacement-alist '("select-window-\\([0-9]\\)" . "Window \\1"))
+
+    (which-key-add-key-based-replacements
+      ", TAB"  "last buffer"
+      ", SPC"  "ace word"
+      ", !"    "shell cmd"
+      ", '"    "open shell"
+      ", /"    "smart search"
+      ", ?"    "show keybindings"
+      ", J"    "split sexp"
+      ", l"    "ace line"
+      ", u"    "universal arg"
+      ", v"    "expand region"
+      ", <f1>" "apropos"
+      ", m"    "maj mode cmds"
+      (concat ", " dotemacs-command-key) "M-x"))
+  :diminish (which-key-mode . " Ⓚ"))
 
 
 ;;; Documents
