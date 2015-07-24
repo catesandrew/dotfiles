@@ -236,8 +236,9 @@ Default value is `cache'."
   :group 'dotemacs)
 
 (defcustom dotemacs-highlight-delimiters 'all
-  "Select a scope to highlight delimiters. Possible value is `all', `current'
-or `nil'. Default is `all'"
+  "Select a scope to highlight delimiters. Possible values are `any',
+  `current', `all' or `nil'. Default is `all' (highlight any scope and
+  emphasis the current one."
   :group 'dotemacs)
 
 (defcustom dotemacs-private-dir (locate-user-emacs-file "private")
@@ -3143,7 +3144,7 @@ Disable the highlighting of overlong lines."
     (after "evil-leader"
       (evil-leader/set-key "tCd" 'rainbow-delimiters-mode))
 
-    (when (eq dotemacs-highlight-delimiters 'all)
+    (when (member dotemacs-highlight-delimiters '(any all))
       (dolist (hook '(text-mode-hook prog-mode-hook))
         (add-hook hook #'rainbow-delimiters-mode)))))
 
