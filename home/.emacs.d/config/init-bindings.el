@@ -90,7 +90,7 @@ Ensure that helm is required before calling FUNC."
 ;; file -----------------------------------------------------------------------
 (evil-leader/set-key
   "fc" 'dotemacs-copy-file
-  "fD"  'delete-current-buffer-file
+  "fD" 'delete-current-buffer-file
   "fei" 'find-user-init-file
   "fes" 'find-dotemacs-file
   "fec" 'find-contrib-file
@@ -99,8 +99,9 @@ Ensure that helm is required before calling FUNC."
   "fev" 'dotemacs-display-and-copy-version
   "fg" 'rgrep
   "fj" 'dired-jump
+  "fl" 'find-file-literally
   "fo" 'dotemacs-open-in-external-app
-  "fR"  'rename-current-buffer-file
+  "fR" 'rename-current-buffer-file
   "fS" 'evil-write-all
   "fs" 'dotemacs-write-file
   "fy" 'show-and-copy-buffer-filename)
