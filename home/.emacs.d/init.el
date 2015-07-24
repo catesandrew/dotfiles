@@ -2765,7 +2765,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                          :off (show-paren-mode -1)
                          :documentation "Highlight matching pairs of parentheses."
                          :evil-leader "tCP")
-    (when (member dotemacs-highlight-delimiters '(all current))
+    (if (eq dotemacs-highlight-delimiters 'all)
       (show-paren-mode)))
   :config (setq show-paren-when-point-inside-paren t
                 show-paren-when-point-in-periphery t))
@@ -3102,7 +3102,7 @@ Disable the highlighting of overlong lines."
   :ensure t
   :init
   (progn
-    (when (eq dotemacs-highlight-delimiters 'current)
+    (when (member dotemacs-highlight-delimiters '(all current))
       (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
     (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
     (setq hl-paren-colors '("Springgreen3"
