@@ -2082,6 +2082,7 @@ mouse-3: go to end"))))
         (unless (bound-and-true-p truncate-lines)
           (setq truncate-lines t))))
     (add-hook 'dired-mode-hook #'dotemacs-dired-mode-defaults)
+    (add-hook 'dired-mode-hook 'vinegar/dired-setup)
 
     (setq dired-auto-revert-buffer t    ; Revert on re-visiting
           ;; Move files between split panes
@@ -8322,6 +8323,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package htmlize
   :ensure t
   :defer t)
+
 
 ;;; Online Help
 (use-package find-func                  ; Find function/variable definitions
@@ -8514,6 +8516,71 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             (text-mode)
             (doc-view-minor-mode))
         ad-do-it))))
+
+
+;;; Tim Pope
+
+;; vinegar
+; This layer is a port contribution layer for vim-vinegar for emacs.
+;
+; A port of tpope's vinegar.vim
+; [vinegar][https://github.com/tpope/vim-vinegar], simplifying =dired=
+; with a limited number of details and exposing the ~-~ command in all
+; buffers to enter dired.
+;
+; ** Features
+;
+; -  navigation up folders with ~-~ key
+; -  simplify dired buffer to show only file names
+; -  better evil/vim bindings for navigation within dired buffer
+; -  keep only one active dired buffer
+; -  Use dired-k extension to show time / vcs related information in
+;    single bar
+; -  right mouse click moves up directory if in blank space or shows context menu
+
+(use-package init-vinegar
+  :load-path "config/"
+  :defer t
+  :commands (vinegar/dired-setup))
+
+(use-package dired+
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq diredp-hide-details-initially-flag t
+          diredp-hide-details-propagate-flag t
+          ;; use single buffer for all dired navigation
+          ;; disable font themeing from dired+
+          font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
+    (toggle-diredp-find-file-reuse-dir 1)))
+
+(after "dired-x"
+       (progn
+         (define-key evil-normal-state-map (kbd "-") 'dired-jump)))
+
+(eval-after-load "dired-mode"
+  (evilify dired-mode dired-mode-map
+           "j"         'vinegar/move-down
+           "k"         'vinegar/move-up
+           "-"         'vinegar/up-directory
+           "0"         'dired-back-to-start-of-files
+           "="         'vinegar/dired-diff
+           (kbd "C-j") 'dired-next-subdir
+           (kbd "C-k") 'dired-prev-subdir
+           "I"         'vinegar/dotfiles-toggle
+           (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
+           (kbd "RET") 'dired-find-alternate-file
+           "f"         'helm-find-files
+           (kbd "C-f") 'find-name-dired
+           "H"         'diredp-dired-recent-dirs
+           "T"         'dired-tree-down
+           "K"         'dired-do-kill-lines
+           "r"         'dired-do-redisplay
+           (kbd "C-r") 'revert-buffer
+           "gg"        'vinegar/back-to-top
+           "G"         'vinegar/jump-to-bottom
+           ))
 
 
 ;;; Config
