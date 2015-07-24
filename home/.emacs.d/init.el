@@ -8533,6 +8533,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
        "mcb" 'dockerfile-build-buffer
      )))
 
+;; Terraform
+(use-package terraform-mode
+  :defer t
+  :ensure t)
+
 ;; Puppet
 (dotemacs-defvar-company-backends puppet-mode)
 
