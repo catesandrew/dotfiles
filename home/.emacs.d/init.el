@@ -8543,18 +8543,19 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (which-key-add-key-based-replacements
       ", TAB"  "last buffer"
-      ", SPC"  "ace word"
+      ", SPC"  "avy word"
       ", !"    "shell cmd"
-      ", '"    "open shell"
+      ", '"    "pop shell"
       ", /"    "smart search"
       ", ?"    "show keybindings"
       ", J"    "split sexp"
-      ", l"    "ace line"
+      ", l"    "avy char"
       ", u"    "universal arg"
       ", v"    "expand region"
-      ", <f1>" "apropos"
+      ; ", ;"    "nerd commenter"
+      ", <f1>" "helm apropos"
       ", m"    "maj mode cmds"
-      (concat ", " dotemacs-command-key) "M-x"))
+      (concat ", " dotemacs-command-key) "helm M-x"))
   :diminish (which-key-mode . " Ⓚ"))
 
 
