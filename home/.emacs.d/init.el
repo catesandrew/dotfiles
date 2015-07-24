@@ -4883,6 +4883,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;;; Ruby
 (dotemacs-defvar-company-backends enh-ruby-mode)
+;; TODO: uncomment this when it becomes available
+;; (dotemacs-defvar-company-backends haml-mode)
+
 
 (use-package rbenv
   :ensure t
@@ -5034,12 +5037,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package haml-mode
   :ensure t
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
-  :defer t)
-
-(use-package slim-mode
-  :ensure t
-  :if (when dotemacs-ruby-enable-ruby-on-rails-support)
-  :defer t)
+  :defer t
+  :init
+  (progn
+    (add-hook 'haml-mode-hook 'rainbow-delimiters-mode)))
 
 (use-package ruby-test-mode
   :defer t
@@ -5062,11 +5063,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'enh-ruby-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'slim-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'haml-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'yaml-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'ruby-mode-hook 'flycheck-turn-on-maybe)))
+    (add-to-hooks 'flycheck-turn-on-maybe '(haml-mode-hook
+                                            yaml-mode-hook
+                                            ruby-mode-hook
+                                            enh-ruby-mode-hook))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5803,6 +5803,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Web languages
 (dotemacs-defvar-company-backends css-mode)
 (dotemacs-defvar-company-backends web-mode)
+(dotemacs-defvar-company-backends jade-mode)
+(dotemacs-defvar-company-backends slim-mode)
 
 (use-package init-web
   :load-path "config/")
@@ -5839,7 +5841,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook yasnippet
   :post-init
   (progn
-    (add-hook 'css-mode-hook 'dotemacs-load-yasnippet)))
+    (add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
+                                             jade-mode-hook
+                                             slim-mode-hook))))
 
 (use-package css-eldoc                  ; Basic Eldoc for CSS
   :ensure t
@@ -5962,6 +5966,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
   :diminish emmet-mode))
 
+(use-package jade-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'jade-mode-hook 'rainbow-delimiters-mode)))
+
+(use-package slim-mode
+  :ensure t
+  :init
+  (progn
+    (add-hook 'slim-mode-hook 'rainbow-delimiters-mode))
+  :defer t)
+
 (use-package scss-mode
   :defer t
   :ensure t
@@ -5995,17 +6013,22 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'web-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'css-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'scss-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'sass-mode-hook 'flycheck-turn-on-maybe)))
+    (add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
+                                            less-mode-hook
+                                            slim-mode-hook
+                                            sass-mode-hook
+                                            css-mode-hook
+                                            scss-mode-hook
+                                            web-mode-hook))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
       (dotemacs-add-company-hook css-mode)
-      (dotemacs-add-company-hook web-mode))))
+      (dotemacs-add-company-hook web-mode)
+      (dotemacs-add-company-hook jade-mode)
+      (dotemacs-add-company-hook slim-mode))))
 
 (use-package company-web
   :if (eq dotemacs-completion-engine 'company)
@@ -6014,6 +6037,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (push 'company-css company-backends-css-mode)
+    (push 'company-web-slim company-backends-slim-mode)
+    (push 'company-web-jade company-backends-jade-mode)
     (push 'company-web-html company-backends-web-mode)))
 
 ;;; PureScript
