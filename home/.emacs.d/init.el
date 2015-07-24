@@ -5458,6 +5458,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (evil-leader/set-key-for-mode 'go-mode "mr" 'go-rename))
 
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-copy-env "GOPATH"))
+
 (use-package go-mode
   :ensure t
   :defer t
