@@ -199,7 +199,7 @@ Ensure that helm is required before calling FUNC."
                       :evil-leader "tmt")
 (dotemacs-add-toggle transparent-frame
                       :status nil
-                      :on (toggle-transparency)
+                      :on (dotemacs-toggle-transparency)
                       :documentation "Make the current frame non-opaque."
                       :evil-leader "TT")
 (dotemacs-add-toggle tool-bar
@@ -477,5 +477,46 @@ otherwise it is scaled down."
   ("q" nil :exit t))
 
 ;; end of Text Manipulation Micro State
+
+;; Transparency micro-state
+
+(defun dotemacs-toggle-transparency ()
+  "Toggle between transparent or opaque display."
+  (interactive)
+  ;; Define alpha if it's nil
+  (if (eq (frame-parameter (selected-frame) 'alpha) nil)
+      (set-frame-parameter (selected-frame) 'alpha '(100 100)))
+  ;; Do the actual toggle
+  (if (/= (cadr (frame-parameter (selected-frame) 'alpha)) 100)
+      (set-frame-parameter (selected-frame) 'alpha '(100 100))
+    (set-frame-parameter (selected-frame) 'alpha
+                         (list dotemacs-active-transparency
+                               dotemacs-inactive-transparency)))
+  ;; Immediately enter the micro-state
+  (dotemacs-scale-transparency-micro-state))
+
+(defun dotemacs-increase-transparency ()
+  "Increase transparency of current frame."
+  (interactive)
+  (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
+         (increased-alpha (- current-alpha 5)))
+    (when (>= increased-alpha frame-alpha-lower-limit)
+      (set-frame-parameter (selected-frame) 'alpha (list increased-alpha increased-alpha)))))
+
+(defun dotemacs-decrease-transparency ()
+  "Decrease transparency of current frame."
+  (interactive)
+  (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
+         (decreased-alpha (+ current-alpha 5)))
+    (when (<= decreased-alpha 100)
+      (set-frame-parameter (selected-frame) 'alpha (list decreased-alpha decreased-alpha)))))
+
+(dotemacs-define-micro-state scale-transparency
+  :doc "[+] increase [-] decrease [T] toggle transparency [q] quit"
+  :bindings
+  ("+" dotemacs-increase-transparency)
+  ("-" dotemacs-decrease-transparency)
+  ("T" dotemacs-toggle-transparency)
+  ("q" nil :exit t))
 
 (provide 'init-bindings)

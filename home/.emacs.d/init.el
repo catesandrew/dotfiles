@@ -1187,8 +1187,6 @@ FEATURE may be a named feature or a file name, see
   (setq dotemacs--cur-theme default-theme)
   (setq-default dotemacs--cycle-themes (cdr dotemacs-themes)))
 
-(toggle-transparency)
-
 ;; Answering just 'y' or 'n' will do
 (fset 'yes-or-no-p #'y-or-n-p)
 ;; Opt out from the startup message in the echo area by simply disabling this
@@ -3643,7 +3641,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       'evil-visualstar/begin-search-backward)))
 
 (use-package init-bindings
-  :load-path "config/")
+  :load-path "config/"
+  :config
+  (dotemacs-toggle-transparency))
 
 
 ;;; Text editing
