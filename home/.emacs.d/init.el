@@ -1975,6 +1975,8 @@ mouse-3: go to end"))))
                                      :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
     ;; add cider error to popwin special buffers
     (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+    ;; add cider-doc to popwin
+    (push '("*cider-doc*"            :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
 
 
     (defun dotemacs-remove-popwin-display-config (str)
