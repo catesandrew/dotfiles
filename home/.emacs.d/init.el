@@ -8442,7 +8442,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package which-key
   :ensure t
-  ; :disabled t
   :init
   (progn
     (setq which-key-max-description-length 32)
@@ -8456,34 +8455,57 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                            "Display a buffer with available key bindings."
                            :evil-leader "tK"))
 
-    (defadvice which-key--update
-        (around dotemacs-inhibit-which-key-buffer activate)
-      "Prevent the popup of the which-key buffer in some case."
-      ;; a micro-state is running
-      ;; or
-      ;; bzg-big-fringe-mode is on
-      (if (or overriding-terminal-local-map
-              bzg-big-fringe-mode)
-          (let ((which-key-inhibit t)) ad-do-it)
-        ad-do-it))
-    (add-to-list 'which-key-description-replacement-alist '("select-window-\\([0-9]\\)" . "Window \\1"))
+    (let ((new-descriptions
+           ;; being higher in this list means the replacement is applied later
+           '(
+             ("dotemacs-\\(.+\\)" . "\\1")
+             ("dotemacs-toggle-\\(.+\\)" . "\\1")
+             ("select-window-\\([0-9]\\)" . "window \\1")
+             ("dotemacs-alternate-buffer" . "last buffer")
+             ("evil-ace-jump-word-mode" . "avy word")
+             ("shell-command" . "shell cmd")
+             ("dotemacs-default-pop-shell" . "open shell")
+             ("dotemacs-helm-project-smart-do-search-region-or-symbol" . "smart search")
+             ("helm-descbinds" . "show keybindings")
+             ("sp-split-sexp" . "split sexp")
+             ("evil-ace-jump-line-mode" . "avy line")
+             ("universal-argument" . "universal arg")
+             ("er/expand-region" . "expand region")
+             ("helm-apropos" . "apropos"))))
+        (dolist (nd new-descriptions)
+          ;; ensure the target matches the whole string
+          (push (cons (concat "\\`" (car nd) "\\'") (cdr nd))
+                which-key-description-replacement-alist)))
 
-    (which-key-add-key-based-replacements
-      ", TAB"  "last buffer"
-      ", SPC"  "avy word"
-      ", !"    "shell cmd"
-      ", '"    "pop shell"
-      ", /"    "smart search"
-      ", ?"    "show keybindings"
-      ", J"    "split sexp"
-      ", l"    "avy char"
-      ", u"    "universal arg"
-      ", v"    "expand region"
-      ; ", ;"    "nerd commenter"
-      ", <f1>" "helm apropos"
-      ", m"    "maj mode cmds"
-      (concat ", " dotemacs-command-key) "helm M-x"))
-  :diminish (which-key-mode . " Ⓚ"))
+      (dolist (leader-key `(,dotemacs-leader-key ,dotemacs-emacs-leader-key))
+        (which-key-add-key-based-replacements
+         (concat leader-key " m")    "maj mode cmds"
+         (concat leader-key " " dotemacs-command-key) "M-x"))
+
+      ;; disable special key handling for spacemacs, since it can be
+      ;; disorienting if you don't understand it
+      (setq which-key-special-keys nil)
+      (setq which-key-use-C-h-for-paging t)
+      (dotemacs-diminish which-key-mode " Ⓚ" " K")
+
+    ; (which-key-add-key-based-replacements
+    ;   ", TAB"  "last buffer"
+    ;   ", SPC"  "avy word"
+    ;   ", !"    "shell cmd"
+    ;   ", '"    "pop shell"
+    ;   ", /"    "smart search"
+    ;   ", ?"    "show keybindings"
+    ;   ", J"    "split sexp"
+    ;   ", l"    "avy char"
+    ;   ", u"    "universal arg"
+    ;   ", v"    "expand region"
+    ;   ; ", ;"    "nerd commenter"
+    ;   ", <f1>" "helm apropos"
+    ;   ", m"    "maj mode cmds"
+    ;   (concat ", " dotemacs-command-key) "helm M-x")
+    )
+  ; :diminish (which-key-mode . " Ⓚ")
+)
 
 
 ;;; Documents
