@@ -1973,6 +1973,9 @@ mouse-3: go to end"))))
     (push '("^\*WoMan.+\*$" :regexp t             :position bottom                                   ) popwin:special-display-config)
     (push '("^\*Flycheck.+\*$" :regexp t
                                      :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
+    ;; add cider error to popwin special buffers
+    (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+
 
     (defun dotemacs-remove-popwin-display-config (str)
       "Removes the popwin display configurations that matches the passed STR"
