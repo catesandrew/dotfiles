@@ -1430,7 +1430,65 @@ the user activate the completion manually."
 (use-package fancy-battery              ; Fancy battery info for mode line
   :ensure t
   :defer t
-  :init (fancy-battery-mode))
+  :init
+  (progn
+    (dotemacs-add-toggle mode-line-battery
+                         :status fancy-battery-mode
+                         :on
+                         (fancy-battery-mode)
+                         (dotemacs-mode-line-battery-remove-from-global)
+                         :off (fancy-battery-mode -1)
+                         :documentation "Display battery info in mode-line."
+                         :evil-leader "tmb")
+
+    (defun dotemacs-mode-line-battery-remove-from-global ()
+      "Remove the battery info from the `global-mode-string'."
+      (setq global-mode-string (delq 'fancy-battery-mode-line
+                                     global-mode-string)))
+
+    (defun dotemacs-mode-line-battery-percentage ()
+      "Return the load percentage or an empty string."
+      (let ((p (cdr (assq ?p fancy-battery-last-status))))
+        (if (and fancy-battery-show-percentage
+                 p (not (string= "N/A" p))) (concat " " p "%%") "")))
+
+    (defun dotemacs-mode-line-battery-time ()
+      "Return the remaining time complete load or discharge."
+      (let ((time (cdr (assq ?t fancy-battery-last-status))))
+        (cond
+         ((string= "0:00" time) "")
+         ((string= "N/A" time) "")
+         ((string-empty-p time) "")
+         (t (concat " (" time ")")))))
+
+    (setq-default fancy-battery-show-percentage t))
+  :config
+  (progn
+    ;; redefine this function for Dotemacs,
+    ;; basically remove all faces and properties.
+    (defun fancy-battery-default-mode-line ()
+      "Assemble a mode line string for Fancy Battery Mode."
+      (dotemacs-mode-line-battery-remove-from-global)
+      (when fancy-battery-last-status
+
+        (let* ((type (cdr (assq ?L fancy-battery-last-status)))
+               (percentage (dotemacs-mode-line-battery-percentage))
+               (time (dotemacs-mode-line-battery-time)))
+          (cond
+           ((string= "on-line" type) " No Battery")
+           ((string-empty-p type) " No Battery")
+           (t (concat (if (string= "AC" type) " AC" "") percentage time))))))
+
+    (defun fancy-battery-powerline-face ()
+      "Return a face appropriate for powerline"
+      (let ((type (cdr (assq ?L fancy-battery-last-status))))
+        (if (and type (string= "AC" type))
+            'fancy-battery-charging
+          (pcase (cdr (assq ?b fancy-battery-last-status))
+            ("!"  'fancy-battery-critical)
+            ("+"  'fancy-battery-charging)
+            ("-"  'fancy-battery-discharging)
+            (_ 'fancy-battery-discharging)))))))
 
 (use-package evil-anzu                  ; Position/matches count for isearch
   :ensure t
