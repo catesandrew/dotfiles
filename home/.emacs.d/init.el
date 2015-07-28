@@ -9054,6 +9054,38 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                  (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
                  (dotemacs-auto-highlight-symbol-overlay-map)))))))
 
+;; NixOS
+(dotemacs-defvar-company-backends nix-mode)
+
+(use-package nix-mode   ; This layer adds tools for
+  :ensure t             ; better integration of emacs in NixOS.
+  :defer t)
+
+(use-package nixos-options
+  :ensure t
+  :defer t)
+
+(use-package helm-nixos-options
+  :ensure t
+  :defer t
+  :config
+  (evil-leader/set-key
+    "h>" 'helm-nixos-options))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :pre-init
+    (progn
+      (push 'company-capf company-backends-nix-mode)
+      (dotemacs-add-company-hook nix-mode))))
+
+(use-package company-nixos-options
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init
+  (progn
+    (push 'company-nixos-options company-backends-nix-mode)))
+
 
 ;;; Syntax Checking
 (use-package init-syntax-checking
