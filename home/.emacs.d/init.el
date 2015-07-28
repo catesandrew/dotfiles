@@ -1661,8 +1661,6 @@ the user activate the completion manually."
       '(:eval (if (buffer-file-name)
                   (abbreviate-file-name (buffer-file-name)) "%b")))
 
-(setq-default line-spacing 0.1)         ; A bit more spacing between lines
-
 (use-package buffer-move
   :defer t
   :init
@@ -8501,8 +8499,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ;; disorienting if you don't understand it
       (setq which-key-special-keys nil)
       (setq which-key-use-C-h-for-paging t)
-      (dotemacs-diminish which-key-mode " Ⓚ" " K"))
-)
+      (dotemacs-diminish which-key-mode " Ⓚ" " K")))
 
 
 ;;; Documents
