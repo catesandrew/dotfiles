@@ -1371,152 +1371,6 @@ the user activate the completion manually."
 (bind-key "C-c u v" #'variable-pitch-mode)
 
 
-;;; The mode line
-(setq-default header-line-format
-              '(which-func-mode ("" which-func-format " "))
-              mode-line-format
-              '("%e" mode-line-front-space
-                "🐮"                   ; My branding :)
-                ;; Standard info about the current buffer
-                mode-line-mule-info
-                mode-line-client
-                mode-line-modified
-                mode-line-remote
-                mode-line-frame-identification
-                mode-line-buffer-identification " " mode-line-position
-                ;; Some specific information about the current buffer:
-                ;; - Dired Omit Mode
-                (smartparens-strict-mode (:propertize " ()" face bold))
-                (dired-omit-mode " 👻")
-                (server-buffer-clients " 💻")
-                (projectile-mode projectile-mode-line)
-                (vc-mode vc-mode)
-                " "
-                (flycheck-mode flycheck-mode-line) ; Flycheck status
-                (firestarter-mode firestarter-lighter)
-                (isearch-mode " 🔍")
-                (anzu-mode (:eval                  ; isearch pos/matches
-                            (when (> anzu--total-matched 0)
-                              (anzu--update-mode-line))))
-                ; (multiple-cursors-mode mc/mode-line) ; Number of cursors
-                ;; And the modes, which we don't really care for anyway
-                " " mode-line-misc-info mode-line-modes mode-line-end-spaces)
-              mode-line-remote
-              '(:eval
-                (when-let (host (file-remote-p default-directory 'host))
-                  (propertize (concat "@" host) 'face
-                              '(italic warning))))
-              ;; Remove which func from the mode line, since we have it in the
-              ;; header line
-              mode-line-misc-info
-              (assq-delete-all 'which-func-mode mode-line-misc-info))
-
-(use-package smart-mode-line   ; smart-mode-line-powerline-theme
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (setq sml/no-confirm-load-theme t
-          sml/theme 'dark
-          sml/shorten-directory t
-          sml/shorten-modes t
-          sml/name-width 20
-          sml/mode-width 'full)
-    ; (powerline-default-theme)
-    (sml/setup)
-    (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
-    (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t)))
-
-(use-package fancy-battery              ; Fancy battery info for mode line
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs-add-toggle mode-line-battery
-                         :status fancy-battery-mode
-                         :on
-                         (fancy-battery-mode)
-                         (dotemacs-mode-line-battery-remove-from-global)
-                         :off (fancy-battery-mode -1)
-                         :documentation "Display battery info in mode-line."
-                         :evil-leader "tmb")
-
-    (defun dotemacs-mode-line-battery-remove-from-global ()
-      "Remove the battery info from the `global-mode-string'."
-      (setq global-mode-string (delq 'fancy-battery-mode-line
-                                     global-mode-string)))
-
-    (defun dotemacs-mode-line-battery-percentage ()
-      "Return the load percentage or an empty string."
-      (let ((p (cdr (assq ?p fancy-battery-last-status))))
-        (if (and fancy-battery-show-percentage
-                 p (not (string= "N/A" p))) (concat " " p "%%") "")))
-
-    (defun dotemacs-mode-line-battery-time ()
-      "Return the remaining time complete load or discharge."
-      (let ((time (cdr (assq ?t fancy-battery-last-status))))
-        (cond
-         ((string= "0:00" time) "")
-         ((string= "N/A" time) "")
-         ((string-empty-p time) "")
-         (t (concat " (" time ")")))))
-
-    (setq-default fancy-battery-show-percentage t))
-  :config
-  (progn
-    ;; redefine this function for Dotemacs,
-    ;; basically remove all faces and properties.
-    (defun fancy-battery-default-mode-line ()
-      "Assemble a mode line string for Fancy Battery Mode."
-      (dotemacs-mode-line-battery-remove-from-global)
-      (when fancy-battery-last-status
-
-        (let* ((type (cdr (assq ?L fancy-battery-last-status)))
-               (percentage (dotemacs-mode-line-battery-percentage))
-               (time (dotemacs-mode-line-battery-time)))
-          (cond
-           ((string= "on-line" type) " No Battery")
-           ((string-empty-p type) " No Battery")
-           (t (concat (if (string= "AC" type) " AC" "") percentage time))))))
-
-    (defun fancy-battery-powerline-face ()
-      "Return a face appropriate for powerline"
-      (let ((type (cdr (assq ?L fancy-battery-last-status))))
-        (if (and type (string= "AC" type))
-            'fancy-battery-charging
-          (pcase (cdr (assq ?b fancy-battery-last-status))
-            ("!"  'fancy-battery-critical)
-            ("+"  'fancy-battery-charging)
-            ("-"  'fancy-battery-discharging)
-            (_ 'fancy-battery-discharging)))))))
-
-(use-package evil-anzu                  ; Position/matches count for isearch
-  :ensure t
-  :init (global-anzu-mode)
-  :config
-  (progn
-    (setq anzu-search-threshold 1000
-          anzu-cons-mode-line-p nil))
-  :diminish anzu-mode)
-
-(use-package which-func                 ; Current function name in header line
-  :init (which-function-mode)
-  :config
-  (setq which-func-unknown "⊥" ; The default is really boring…
-        which-func-format
-        `((:propertize (" ➤ " which-func-current)
-                       local-map ,which-func-keymap
-                       face which-func
-                       mouse-face mode-line-highlight
-                       help-echo "mouse-1: go to beginning\n\
-mouse-2: toggle rest visibility\n\
-mouse-3: go to end"))))
-
-(use-package rfringe
-  :ensure t
-  :defer t)
-
-
 ;;; Minibuffer and Helm
 ;; Display current keystrokes almost immediately in mini buffer
 (setq echo-keystrokes 0.02)
@@ -9672,6 +9526,659 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (after "evil-leader"
       (evil-leader/set-key "is" 'dotemacs-helm-yas))
     (setq helm-c-yas-space-match-any-greedy t)))
+
+
+;;; The mode line
+; (setq-default header-line-format
+;               '(which-func-mode ("" which-func-format " "))
+;               mode-line-format
+;               '("%e" mode-line-front-space
+;                 "🐮"                   ; My branding :)
+;                 ;; Standard info about the current buffer
+;                 mode-line-mule-info
+;                 mode-line-client
+;                 mode-line-modified
+;                 mode-line-remote
+;                 mode-line-frame-identification
+;                 mode-line-buffer-identification " " mode-line-position
+;                 ;; Some specific information about the current buffer:
+;                 ;; - Dired Omit Mode
+;                 (smartparens-strict-mode (:propertize " ()" face bold))
+;                 (dired-omit-mode " 👻")
+;                 (server-buffer-clients " 💻")
+;                 (projectile-mode projectile-mode-line)
+;                 (vc-mode vc-mode)
+;                 " "
+;                 (flycheck-mode flycheck-mode-line) ; Flycheck status
+;                 (firestarter-mode firestarter-lighter)
+;                 (isearch-mode " 🔍")
+;                 (anzu-mode (:eval                  ; isearch pos/matches
+;                             (when (> anzu--total-matched 0)
+;                               (anzu--update-mode-line))))
+;                 ; (multiple-cursors-mode mc/mode-line) ; Number of cursors
+;                 ;; And the modes, which we don't really care for anyway
+;                 " " mode-line-misc-info mode-line-modes mode-line-end-spaces)
+;               mode-line-remote
+;               '(:eval
+;                 (when-let (host (file-remote-p default-directory 'host))
+;                   (propertize (concat "@" host) 'face
+;                               '(italic warning))))
+;               ;; Remove which func from the mode line, since we have it in the
+;               ;; header line
+;               mode-line-misc-info
+;               (assq-delete-all 'which-func-mode mode-line-misc-info))
+
+(use-package powerline
+  :ensure t
+  :init
+  (progn
+    ;; Custom format of minor mode lighters, they are separated by a pipe.
+    (defpowerline dotemacs-powerline-minor-modes
+      (mapconcat (lambda (mm)
+                   (propertize
+                    mm
+                    'mouse-face 'mode-line-highlight
+                    'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
+                    'local-map (let ((map (make-sparse-keymap)))
+                                 (define-key map
+                                   [mode-line down-mouse-1]
+                                   (powerline-mouse 'minor 'menu mm))
+                                 (define-key map
+                                   [mode-line mouse-2]
+                                   (powerline-mouse 'minor 'help mm))
+                                 (define-key map
+                                   [mode-line down-mouse-3]
+                                   (powerline-mouse 'minor 'menu mm))
+                                 (define-key map
+                                   [header-line down-mouse-3]
+                                   (powerline-mouse 'minor 'menu mm))
+                                 map)))
+                 (split-string (format-mode-line minor-mode-alist))
+                 (concat (propertize
+                          (if dotemacs-mode-line-unicode-symbols " " "") 'face face)
+                         (unless dotemacs-mode-line-unicode-symbols "|"))))
+
+    (defvar dotemacs-mode-line-minor-modesp t
+      "If not nil, minor modes lighter are displayed in the mode-line.")
+    (dotemacs-add-toggle mode-line-minor-modes
+      :status dotemacs-mode-line-minor-modesp
+      :on (setq dotemacs-mode-line-minor-modesp t)
+      :off (setq dotemacs-mode-line-minor-modesp nil)
+      :documentation "Show minor modes in mode-line."
+      :evil-leader "tmm")
+
+    (defvar dotemacs-mode-line-major-modep t
+      "If not nil, major mode is displayed in the mode-line.")
+    (dotemacs-add-toggle mode-line-major-mode
+      :status dotemacs-mode-line-major-modep
+      :on (setq dotemacs-mode-line-major-modep t)
+      :off (setq dotemacs-mode-line-major-modep nil)
+      :documentation "Show major mode in mode-line."
+      :evil-leader "tmM")
+
+    (defvar dotemacs-mode-line-version-controlp t
+      "If not nil, version control info is displayed in the mode-line.")
+    (dotemacs-add-toggle mode-line-version-control
+      :status dotemacs-mode-line-version-controlp
+      :on (setq dotemacs-mode-line-version-controlp t)
+      :off (setq dotemacs-mode-line-version-controlp nil)
+      :documentation "Show version control info in mode-line."
+      :evil-leader "tmv")
+
+    (defvar dotemacs-mode-line-display-point-p nil
+      "If not nil, display point alongside row/column in the mode-line.")
+    (dotemacs-add-toggle mode-line-display-point
+      :status dotemacs-mode-line-display-point-p
+      :on (setq dotemacs-mode-line-display-point-p t)
+      :off (setq dotemacs-mode-line-display-point-p nil)
+      :documentation "Show point in the mode-line."
+      :evil-leader "tmp")
+
+    (defvar dotemacs-mode-line-org-clock-current-taskp nil
+      "If not nil, the currently clocked org-mode task will be
+displayed in the mode-line.")
+    (defvar spacemacs-mode-line-org-clock-format-function
+      'org-clock-get-clock-string
+      "Function used to render the currently clocked org-mode task.")
+    (dotemacs-add-toggle mode-line-org-clock-current-task
+      :status dotemacs-mode-line-org-clock-current-taskp
+      :on (setq dotemacs-mode-line-org-clock-current-taskp t)
+      :off (setq dotemacs-mode-line-org-clock-current-taskp nil)
+      :documentation "Show org clock in mode-line."
+      :evil-leader "tmc")
+
+    (defvar dotemacs-mode-line-left
+      '(((workspace-number window-number)
+         :fallback state-tag
+         :separator "|"
+         :face state-face)
+        anzu
+        (buffer-modified buffer-size buffer-id remote-host)
+        major-mode
+        ((flycheck-errors flycheck-warnings flycheck-infos)
+         :when active)
+        ((minor-modes process)
+         :when active)
+        (erc-track :when active)
+        (version-control :when active)
+        (org-pomodoro :when active)
+        (org-clock :when active)
+        nyan-cat)
+      "List of modeline segments to render on the left. Each element
+must be a valid segment specification, see documentation for
+`dotemacs-eval-mode-line-segment'.")
+
+    (defvar dotemacs-mode-line-right
+      '((battery :when active)
+        selection-info
+        ((buffer-encoding-abbrev
+          point-position
+          line-column)
+         :separator " | ")
+        buffer-position
+        hud)
+      "List of modeline segments to render on the right. Each element
+must be a valid segment specification, see documentation for
+`dotemacs-eval-mode-line-segment'.")
+
+    (defun dotemacs-mode-line-file-encoding ()
+      "Return the file encoding to be displayed in the mode-line."
+      (let ((buf-coding (format "%s" buffer-file-coding-system)))
+        (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
+            (match-string 1 buf-coding)
+          buf-coding)))
+
+    (if (display-graphic-p)
+        (setq-default powerline-default-separator 'wave)
+      (setq-default powerline-default-separator 'utf-8))
+
+    (defun dotemacs-customize-powerline-faces ()
+      "Alter powerline face to make them work with more themes."
+      (set-face-attribute 'powerline-inactive2 nil
+                          :inherit 'font-lock-comment-face))
+    (dotemacs-customize-powerline-faces)
+
+    (defmacro dotemacs-define-mode-line-segment (name value &rest props)
+      "Defines a modeline segment called `NAME' whose value is
+computed by the form `VALUE'. The optional keyword argument `WHEN'
+defines a condition required for the segment to be shown.
+
+This macro defines a function `dotemacs-mode-line-NAME' which
+returns a list of modeline objects (strings or images). If the
+form `VALUE' does not result in a list, the return value will be
+wrapped as a singleton list.
+
+All properties are stored in a plist attached to the symbol, to be
+inspected at evaluation time by `dotemacs-eval-mode-line-segment'."
+      (declare (indent 1))
+      (let* ((wrapper-func (intern (format "dotemacs-mode-line-%S" name)))
+             (wrapper-func-available (intern (format "%S-available" wrapper-func)))
+             (condition (or (plist-get props :when) t)))
+        `(progn
+           (defun ,wrapper-func ()
+             (when ,condition
+               (let ((value ,value))
+                 (cond ((dotemacs-imagep value)
+                        (list value))
+                       ((listp value) value)
+                       ((and (stringp value)
+                             (= 0 (length value)))
+                        nil)
+                       (t (list value))))))
+           (setplist ',wrapper-func ',props))))
+
+    ;; An intermediate representation of the value of a modeline segment.
+    (defstruct segment
+      objects face-left face-right tight-left tight-right)
+
+    (defun column-number-at-pos (pos)
+      "Analog to line-number-at-pos."
+      (save-excursion (goto-char pos) (current-column)))
+
+    (defun selection-info ()
+      "Info on the current selection for the mode-line.
+
+It is a string holding:
+- the number of columns in the selection if it covers only one line,
+- the number of lines in the selection if if covers several full lines
+- or rowsxcols if it's a block selection."
+    (let* ((lines (count-lines (region-beginning) (min (1+ (region-end)) (point-max))))
+           (chars (- (1+ (region-end)) (region-beginning)))
+           (cols (1+ (abs (- (column-number-at-pos (region-end))
+                             (column-number-at-pos (region-beginning)))))))
+      (if (eq evil-visual-selection 'block)
+          (format "%d×%d block" lines cols)
+        (if (> lines 1) (format "%d lines" lines)
+          (format "%d chars" chars)))))
+
+  ;; BEGIN define modeline segments
+
+  (dotemacs-define-mode-line-segment workspace-number
+    (dotemacs-workspace-number)
+    :when (and (bound-and-true-p eyebrowse-mode)
+               (dotemacs-workspace-number)))
+
+  (dotemacs-define-mode-line-segment window-number
+    (dotemacs-window-number)
+    :when (and (bound-and-true-p window-numbering-mode)
+               (dotemacs-window-number)))
+
+  (dotemacs-define-mode-line-segment state-tag
+    (s-trim (evil-state-property evil-state :tag t)))
+
+  (dotemacs-define-mode-line-segment anzu
+    (anzu--update-mode-line)
+    :when (and active (bound-and-true-p anzu--state)))
+
+  (dotemacs-define-mode-line-segment buffer-modified "%*")
+  (dotemacs-define-mode-line-segment buffer-size
+    (powerline-buffer-size))
+  (dotemacs-define-mode-line-segment buffer-id
+    (powerline-buffer-id))
+  (dotemacs-define-mode-line-segment remote-host
+    (concat "@" (file-remote-p default-directory 'host))
+    :when (file-remote-p default-directory 'host))
+
+  (dotemacs-define-mode-line-segment major-mode
+    (powerline-major-mode)
+    :when dotemacs-mode-line-major-modep)
+  (dotemacs-define-mode-line-segment minor-modes
+    (dotemacs-powerline-minor-modes)
+    :when dotemacs-mode-line-minor-modesp)
+  (dotemacs-define-mode-line-segment process
+    (powerline-raw mode-line-process)
+    :when (dotemacs-mode-line-nonempty mode-line-process))
+
+  (dotemacs-define-mode-line-segment erc-track
+    (let* ((buffers (mapcar 'car erc-modified-channels-alist))
+           (long-names (mapconcat (lambda (buf)
+                                    (or (buffer-name buf) ""))
+                                  buffers " ")))
+      long-names)
+    :when (bound-and-true-p erc-track-mode))
+
+  (dotemacs-define-mode-line-segment version-control
+    (s-trim (powerline-vc))
+    :when (and (powerline-vc)
+               dotemacs-mode-line-version-controlp))
+
+  (dotemacs-define-mode-line-segment selection-info
+    (selection-info)
+    :when (evil-visual-state-p))
+
+  (dotemacs-define-mode-line-segment buffer-encoding
+    (format "%s" buffer-file-coding-system))
+  (dotemacs-define-mode-line-segment buffer-encoding-abbrev
+    (dotemacs-mode-line-file-encoding))
+
+  (dotemacs-define-mode-line-segment point-position
+    (format "%d" (point))
+    :when dotemacs-mode-line-display-point-p)
+  (dotemacs-define-mode-line-segment line-column "%l:%2c")
+  (dotemacs-define-mode-line-segment buffer-position "%p")
+
+  (dotemacs-define-mode-line-segment hud
+    (powerline-hud state-face default-face)
+    :tight t
+    :when (string-match "\%" (format-mode-line "%p")))
+
+  (dotemacs-define-mode-line-segment nyan-cat
+    (powerline-raw (nyan-create) default-face)
+    :when (bound-and-true-p nyan-mode))
+
+  (dotemacs-define-mode-line-segment global-mode
+    (powerline-raw global-mode-string)
+    :when (dotemacs-mode-line-nonempty global-mode-string))
+
+  (dotemacs-define-mode-line-segment battery
+    (powerline-raw (s-trim (fancy-battery-default-mode-line))
+                   (fancy-battery-powerline-face))
+    :when (bound-and-true-p fancy-battery-mode))
+
+  ;; flycheck-errors, flycheck-warnings, flycheck-infos
+  (dolist (type '(error warning info))
+    (let ((segment-name (intern (format "flycheck-%ss" type)))
+          (face (intern (format "spacemacs-mode-line-flycheck-%s-face" type))))
+      (eval
+       `(dotemacs-define-mode-line-segment ,segment-name
+          (powerline-raw (s-trim (dotemacs-custom-flycheck-lighter ,type)) ',face)
+          :when (and (bound-and-true-p flycheck-mode)
+                     (or flycheck-current-errors
+                         (eq 'running flycheck-last-status-change))
+                     (dotemacs-custom-flycheck-lighter ,type))))))
+
+  (dotemacs-define-mode-line-segment org-clock
+    (funcall spacemacs-mode-line-org-clock-format-function)
+    :when (and dotemacs-mode-line-org-clock-current-taskp
+               (fboundp 'org-clocking-p)
+               (org-clocking-p)))
+
+  (dotemacs-define-mode-line-segment org-pomodoro
+    (concat "[" (nth 1 org-pomodoro-mode-line) "]")
+    :when (and (fboundp 'org-pomodoro-active-p)
+               (org-pomodoro-active-p)))
+
+  ;; END define modeline segments
+
+  (defun dotemacs-eval-mode-line-segment (segment-spec &rest outer-props)
+    "Evaluates a modeline segment given by `SEGMENT-SPEC' with
+additional properties given by `OUTER-PROPS'.
+
+`SEGMENT-SPEC' may be either:
+- A literal value (number or string, for example)
+- A symbol previously defined by `dotemacs-define-mode-line-segment'
+- A list whose car is a segment-spec and whose cdr is a plist of properties
+- A list of segment-specs
+
+The properties applied are, in order of priority:
+- Those given by `SEGMENT-SPEC', if applicable
+- The properties attached to the segment symbol, if applicable
+- `OUTER-PROPS'
+
+Valid properties are:
+- `:tight-left' => if true, the segment should be rendered with no padding
+  or separator on its left side
+- `:tight-right' => corresponding option for the right side
+- `:tight' => shorthand option to set both `:tight-left' and `:tight-right'
+- `:when' => condition that determines whether this segment is shown
+- `:fallback' => segment to evaluate if this segment produces no output
+- `:separator' => string with which to separate nested segments
+- `:face' => the face with which to render the segment
+
+When calling nested or fallback segments, the full property list is passed
+as `OUTER-PROPS', with the exception of `:fallback'. This means that more
+deeply specified properties, as a rule, override the higher level ones.
+The exception is `:when', which must be true at all levels.
+
+The return vaule is a `segment' struct. Its `OBJECTS' list may be nil."
+
+      ;; We get a property list from `SEGMENT-SPEC' if it's a list
+      ;; with more than one element whose second element is a symbol
+      ;; starting with a colon
+      (let* ((input (if (and (listp segment-spec)
+                             (cdr segment-spec)
+                             (keywordp (cadr segment-spec)))
+                        segment-spec
+                      (cons segment-spec nil)))
+             (segment (car input))
+             (segment-symbol (when (symbolp segment)
+                               (intern (format "dotemacs-mode-line-%S" segment))))
+
+             ;; Assemble the properties in the correct order
+             (props (append (cdr input)
+                            (when (symbolp segment) (symbol-plist segment-symbol))
+                            outer-props))
+
+             ;; Property list to be passed to nested or fallback segments
+             (nest-props (append '(:fallback nil) (cdr input) outer-props))
+
+             ;; Parse property list
+             (condition (if (plist-member props :when)
+                            (eval (plist-get props :when))
+                          t))
+             (face (eval (or (plist-get props :face) 'default-face)))
+             (separator (powerline-raw (or (plist-get props :separator) " ") face))
+             (tight-left (or (plist-member props :tight)
+                             (plist-member props :tight-left)))
+             (tight-right (or (plist-member props :tight)
+                              (plist-member props :tight-right)))
+
+             ;; Final output
+             (result (make-segment :objects nil
+                                   :face-left face
+                                   :face-right face
+                                   :tight-left tight-left
+                                   :tight-right tight-right)))
+
+        ;; Evaluate the segment based on its type
+        (when condition
+          (cond
+           ;; A list of segments
+           ((listp segment)
+            (let ((results (remove-if-not
+                            'segment-objects
+                            (mapcar (lambda (s)
+                                      (apply 'dotemacs-eval-mode-line-segment
+                                             s nest-props))
+                                    segment))))
+              (when results
+                (setf (segment-objects result)
+                      (apply 'append (dotemacs-intersperse
+                                      (mapcar 'segment-objects results)
+                                      (list separator))))
+                (setf (segment-face-left result)
+                      (segment-face-left (car results)))
+                (setf (segment-face-right result)
+                      (segment-face-right (car (last results))))
+                (setf (segment-tight-left result)
+                      (segment-tight-left (car results)))
+                (setf (segment-tight-right result)
+                      (segment-tight-right (car (last results)))))))
+           ;; A single symbol
+           ((symbolp segment)
+            (setf (segment-objects result)
+                  (mapcar (lambda (s)
+                            (if (dotemacs-imagep s) s (powerline-raw s face)))
+                          (funcall segment-symbol))))
+           ;; A literal value
+           (t (setf (segment-objects result)
+                    (list (powerline-raw (format "%s" segment) face))))))
+
+        (cond
+         ;; This segment produced output, so return it
+         ((segment-objects result) result)
+         ;; Return the fallback segment, if any
+         ((plist-get props :fallback)
+          (apply 'dotemacs-eval-mode-line-segment
+                 (plist-get props :fallback) nest-props))
+         ;; No output (objects = nil)
+         (t result))))
+
+    (defun dotemacs-mode-line-prepare-any (spec side)
+      "Prepares one side of the modeline. `SPEC' is a list of segment
+specifications (see `dotemacs-eval-mode-line-segment'), and `SIDE' is
+one of `l' or `r'."
+      (let* ((active (powerline-selected-window-active))
+             (line-face (if active 'powerline-active2 'powerline-inactive2))
+             (default-face (if active 'powerline-active1 'powerline-inactive1))
+             (other-face (if active 'mode-line 'mode-line-inactive))
+             (state-face (if active (dotemacs-current-state-face) line-face))
+
+             ;; Loop through the segments and collect the results
+             (segments (loop with result
+                             for s in spec
+                             do (setq result (dotemacs-eval-mode-line-segment s))
+                             if (segment-objects result)
+                               collect result
+                               and do (rotatef default-face other-face)))
+
+             (dummy (make-segment :face-left line-face :face-right line-face))
+             (separator-style (format "powerline-%S" powerline-default-separator))
+             (default-separator (intern (format "%s-%S" separator-style
+                                                (car powerline-default-separator-dir))))
+             (other-separator (intern (format "%s-%S" separator-style
+                                              (cdr powerline-default-separator-dir)))))
+
+        ;; Collect all segment values and add separators
+        (apply 'append
+               (mapcar
+                (lambda (pair)
+                  (let* ((lhs (car pair))
+                         (rhs (cdr pair))
+                         (objs (if (eq 'l side) lhs rhs))
+                         (add-sep (not (or (segment-tight-right lhs)
+                                           (segment-tight-left rhs)))))
+                    (rotatef default-separator other-separator)
+                    (append
+                     (when (and (eq 'r side) add-sep)
+                       (list (funcall default-separator
+                                      (segment-face-right lhs)
+                                      (segment-face-left rhs))))
+                     (unless (segment-tight-left objs)
+                       (list (powerline-raw " " (segment-face-left objs))))
+                     (segment-objects objs)
+                     (unless (segment-tight-right objs)
+                       (list (powerline-raw " " (segment-face-right objs))))
+                     (when (and (eq 'l side) add-sep)
+                       (list (funcall default-separator
+                                      (segment-face-right lhs)
+                                      (segment-face-left rhs)))))))
+                (-zip (if (eq 'l side) segments (cons dummy segments))
+                      (if (eq 'l side) (append (cdr segments) (list dummy)) segments))))))
+
+    (defun dotemacs-mode-line-prepare-left ()
+      (dotemacs-mode-line-prepare-any dotemacs-mode-line-left 'l))
+
+    (defun dotemacs-mode-line-prepare-right ()
+      (dotemacs-mode-line-prepare-any dotemacs-mode-line-right 'r))
+
+    (defun dotemacs-mode-line-prepare ()
+      (let* ((active (powerline-selected-window-active))
+             (lhs (dotemacs-mode-line-prepare-left))
+             (rhs (dotemacs-mode-line-prepare-right))
+             (line-face (if active 'powerline-active2 'powerline-inactive2)))
+        (concat (powerline-render lhs)
+                (powerline-fill line-face (powerline-width rhs))
+                (powerline-render rhs))))
+
+    (setq-default mode-line-format
+                  '("%e" (:eval (dotemacs-mode-line-prepare))))
+
+    (defun dotemacs-restore-powerline (buffer)
+      "Restore the powerline in buffer"
+      (with-current-buffer buffer
+            (setq-local mode-line-format
+                        '("%e" (:eval (dotemacs-mode-line-prepare))))
+            (powerline-set-selected-window)
+            (powerline-reset)))
+
+    (defun dotemacs-set-powerline-for-startup-buffers ()
+      "Set the powerline for buffers created when Emacs starts."
+      (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
+        (when (get-buffer buffer)
+          (dotemacs-restore-powerline buffer))))
+    (add-hook 'after-init-hook
+              'dotemacs-set-powerline-for-startup-buffers)))
+
+(use-package fancy-battery              ; Fancy battery info for mode line
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (dotemacs-add-toggle mode-line-battery
+                         :status fancy-battery-mode
+                         :on
+                         (fancy-battery-mode)
+                         (dotemacs-mode-line-battery-remove-from-global)
+                         :off (fancy-battery-mode -1)
+                         :documentation "Display battery info in mode-line."
+                         :evil-leader "tmb")
+
+    (defun dotemacs-mode-line-battery-remove-from-global ()
+      "Remove the battery info from the `global-mode-string'."
+      (setq global-mode-string (delq 'fancy-battery-mode-line
+                                     global-mode-string)))
+
+    (defun dotemacs-mode-line-battery-percentage ()
+      "Return the load percentage or an empty string."
+      (let ((p (cdr (assq ?p fancy-battery-last-status))))
+        (if (and fancy-battery-show-percentage
+                 p (not (string= "N/A" p))) (concat " " p "%%") "")))
+
+    (defun dotemacs-mode-line-battery-time ()
+      "Return the remaining time complete load or discharge."
+      (let ((time (cdr (assq ?t fancy-battery-last-status))))
+        (cond
+         ((string= "0:00" time) "")
+         ((string= "N/A" time) "")
+         ((string-empty-p time) "")
+         (t (concat " (" time ")")))))
+
+    (setq-default fancy-battery-show-percentage t))
+  :config
+  (progn
+    ;; redefine this function for Dotemacs,
+    ;; basically remove all faces and properties.
+    (defun fancy-battery-default-mode-line ()
+      "Assemble a mode line string for Fancy Battery Mode."
+      (dotemacs-mode-line-battery-remove-from-global)
+      (when fancy-battery-last-status
+
+        (let* ((type (cdr (assq ?L fancy-battery-last-status)))
+               (percentage (dotemacs-mode-line-battery-percentage))
+               (time (dotemacs-mode-line-battery-time)))
+          (cond
+           ((string= "on-line" type) " No Battery")
+           ((string-empty-p type) " No Battery")
+           (t (concat (if (string= "AC" type) " AC" "") percentage time))))))
+
+    (defun fancy-battery-powerline-face ()
+      "Return a face appropriate for powerline"
+      (let ((type (cdr (assq ?L fancy-battery-last-status))))
+        (if (and type (string= "AC" type))
+            'fancy-battery-charging
+          (pcase (cdr (assq ?b fancy-battery-last-status))
+            ("!"  'fancy-battery-critical)
+            ("+"  'fancy-battery-charging)
+            ("-"  'fancy-battery-discharging)
+            (_ 'fancy-battery-discharging)))))))
+
+(use-package evil-anzu                  ; Position/matches count for isearch
+  :ensure t
+  :init
+  (global-anzu-mode t)
+  :config
+  (progn
+    (dotemacs-hide-lighter anzu-mode)
+    (setq anzu-search-threshold 1000
+          anzu-cons-mode-line-p nil)
+    ;; powerline integration
+    (defun dotemacs-anzu-update-mode-line (here total)
+      "Custom update function which does not propertize the status."
+      (when anzu--state
+        (let ((status (cl-case anzu--state
+                        (search (format "(%s/%d%s)"
+                                        (anzu--format-here-position here total)
+                                        total (if anzu--overflow-p "+" "")))
+                        (replace-query (format "(%d replace)" total))
+                        (replace (format "(%d/%d)" here total)))))
+          status)))
+    (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
+
+(use-package rfringe
+  :ensure t
+  :defer t)
+
+(use-package smart-mode-line   ; smart-mode-line-powerline-theme
+  :ensure t
+  :disabled t
+  :defer t
+  :config
+  (progn
+    (setq sml/no-confirm-load-theme t
+          sml/theme 'dark
+          sml/shorten-directory t
+          sml/shorten-modes t
+          sml/name-width 20
+          sml/mode-width 'full)
+    ; (powerline-default-theme)
+    (sml/setup)
+    (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
+    (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t)))
+
+(use-package which-func                 ; Current function name in header line
+  :init (which-function-mode)
+  :disabled t
+  :config
+  (setq which-func-unknown "⊥" ; The default is really boring…
+        which-func-format
+        `((:propertize (" ➤ " which-func-current)
+                       local-map ,which-func-keymap
+                       face which-func
+                       mouse-face mode-line-highlight
+                       help-echo "mouse-1: go to beginning\n\
+mouse-2: toggle rest visibility\n\
+mouse-3: go to end"))))
 
 ;; Local Variables:
 ;; coding: utf-8

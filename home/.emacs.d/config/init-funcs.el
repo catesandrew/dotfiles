@@ -989,4 +989,28 @@ the right."
   (interactive)
   (call-interactively 'write-file))
 
+(defun dotemacs-imagep (object)
+  "Tests whether the given object is an image (a list whose
+first element is the symbol `image')."
+  (and (listp object)
+       object
+       (eq 'image (car object))))
+
+(defun dotemacs-intersperse (seq separator)
+  "Returns a list with `SEPARATOR' added between each element
+of the list `SEQ'."
+  (cond
+   ((not seq) nil)
+   ((not (cdr seq)) seq)
+   (t (append (list (car seq) separator)
+              (dotemacs-intersperse (cdr seq) separator)))))
+
+(defun dotemacs-mode-line-nonempty (seg)
+  "Checks whether a modeline segment (classical Emacs style)
+is nonempty."
+  (let ((val (format-mode-line seg)))
+    (cond ((listp val) val)
+          ((stringp val) (< 0 (length val)))
+          (t))))
+
 (provide 'init-funcs)
