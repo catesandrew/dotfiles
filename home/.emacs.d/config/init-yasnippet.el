@@ -2,7 +2,9 @@
       (unless yas-global-mode
         (progn
           (yas-global-mode 1)
-          (let ((private-yas-dir (concat dotemacs-private-dir "snippets/"))
+          (let ((private-yas-dir (if dotemacs-ac-private-snippets-directory
+                                     dotemacs-ac-private-snippets-directory
+                                   (concat dotemacs-private-dir "snippets/")))
                 (yas-dir (concat user-emacs-directory "snippets/")))
             (setq yas-snippet-dirs
                   (append (when (boundp 'yas-snippet-dirs)

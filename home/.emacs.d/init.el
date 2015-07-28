@@ -497,6 +497,10 @@ selection."
 to complet without blocking common line endings."
   :group 'dotemacs-ac)
 
+(defcustom dotemacs-ac-private-snippets-directory nil
+  "Configurable private snippets directory."
+  :group 'dotemacs-ac)
+
 ;; spelling/syntax settings
 (defgroup dotemacs-s nil
   "Configuration options for spelling/syntax."
