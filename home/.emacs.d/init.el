@@ -7016,7 +7016,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package magit-gitflow
   :ensure t
-  :disabled t ; not compatible with magit 2.1
   :commands turn-on-magit-gitflow
   :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
   :diminish (magit-gitflow-mode . "Flow"))
