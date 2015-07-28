@@ -88,6 +88,21 @@
              (not (eq (line-end-position) (point-max))))
     (end-of-buffer)))
 
+(defun dotemacs-protect-eshell-prompt ()
+  "Protect Eshell's prompt like Comint's prompts.
+
+E.g. `evil-change-whole-line' won't wipe the prompt. This
+is achieved by adding the relevant text properties."
+  (let ((inhibit-field-text-motion t))
+    (add-text-properties
+     (point-at-bol)
+     (point)
+     '(rear-nonsticky t
+       inhibit-line-move-field-capture t
+       field output
+       read-only t
+       front-sticky (field inhibit-line-move-field-capture)))))
+
 (defun dotemacs-init-eshell ()
   "Stuff to do when enabling eshell."
   (setq pcomplete-cycle-completions nil)

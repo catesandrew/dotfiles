@@ -308,6 +308,12 @@ NOERROR and NOMESSAGE are passed to `load'."
 commands, modify old commands or enter a new one."
   :group 'dotemacs-shell)
 
+(defcustom dotemacs-shell-protect-eshell-prompt t
+  "If non-nil then eshell's prompt is protected. This means that
+movement to the prompt is inhibited like for `comint-mode'
+prompts and the prompt is made read-only"
+  :group 'dotemacs-shell)
+
 ;; ruby settings
 (defgroup dotemacs-ruby nil
   "Configuration options for ruby."
@@ -873,6 +879,8 @@ the user activate the completion manually."
           ;; treat 'echo' like shell echo
           eshell-plain-echo-behavior t)
 
+    (when dotemacs-shell-protect-eshell-prompt
+      (add-hook 'eshell-after-prompt-hook 'dotemacs-protect-eshell-prompt))
     (add-hook 'eshell-mode-hook 'dotemacs-init-eshell))
   :config
   (progn
