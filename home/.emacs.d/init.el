@@ -8476,13 +8476,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              ("dotemacs-toggle-\\(.+\\)" . "\\1")
              ("select-window-\\([0-9]\\)" . "window \\1")
              ("dotemacs-alternate-buffer" . "last buffer")
-             ("evil-ace-jump-word-mode" . "avy word")
+             ("avy-goto-word-1" . "avy word")
              ("shell-command" . "shell cmd")
              ("dotemacs-default-pop-shell" . "open shell")
              ("dotemacs-helm-project-smart-do-search-region-or-symbol" . "smart search")
+             ("evil-search-highlight-persist-remove-all" . "remove srch hlght")
              ("helm-descbinds" . "show keybindings")
              ("sp-split-sexp" . "split sexp")
-             ("evil-ace-jump-line-mode" . "avy line")
+             ("avy-goto-char-2" . "avy line")
              ("universal-argument" . "universal arg")
              ("er/expand-region" . "expand region")
              ("helm-apropos" . "apropos"))))
@@ -8494,31 +8495,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (dolist (leader-key `(,dotemacs-leader-key ,dotemacs-emacs-leader-key))
         (which-key-add-key-based-replacements
          (concat leader-key " m")    "maj mode cmds"
-         (concat leader-key " " dotemacs-command-key) "M-x"))
+         (concat leader-key " " dotemacs-command-key) "helm M-x"))
 
       ;; disable special key handling for spacemacs, since it can be
       ;; disorienting if you don't understand it
       (setq which-key-special-keys nil)
       (setq which-key-use-C-h-for-paging t)
-      (dotemacs-diminish which-key-mode " Ⓚ" " K")
-
-    ; (which-key-add-key-based-replacements
-    ;   ", TAB"  "last buffer"
-    ;   ", SPC"  "avy word"
-    ;   ", !"    "shell cmd"
-    ;   ", '"    "pop shell"
-    ;   ", /"    "smart search"
-    ;   ", ?"    "show keybindings"
-    ;   ", J"    "split sexp"
-    ;   ", l"    "avy char"
-    ;   ", u"    "universal arg"
-    ;   ", v"    "expand region"
-    ;   ; ", ;"    "nerd commenter"
-    ;   ", <f1>" "helm apropos"
-    ;   ", m"    "maj mode cmds"
-    ;   (concat ", " dotemacs-command-key) "helm M-x")
-    )
-  ; :diminish (which-key-mode . " Ⓚ")
+      (dotemacs-diminish which-key-mode " Ⓚ" " K"))
 )
 
 
