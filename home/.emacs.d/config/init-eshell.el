@@ -91,7 +91,7 @@
 (defun dotemacs-init-eshell ()
   "Stuff to do when enabling eshell."
   (setq pcomplete-cycle-completions nil)
-  (unless shell-enable-smart-eshell
+  (unless dotemacs-shell-enable-smart-eshell
     ;; we don't want auto-jump to prompt when smart eshell is enabled.
     ;; Idea: maybe we could make auto-jump smarter and jump only if the
     ;; point is not on a prompt line

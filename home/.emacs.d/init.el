@@ -835,7 +835,17 @@ FEATURE may be a named feature or a file name, see
   (dotemacs-use-package-add-hook company
     :pre-init
     (progn
-      (setq-local company-idle-delay 0.2)
+      (defun dotemacs-toggle-shell-auto-completion-based-on-path ()
+        "Deactivates automatic completion on remote paths.
+Retrieving completions for Eshell blocks Emacs. Over remote
+connections the delay is often annoying, so it's better to let
+the user activate the completion manually."
+        (if (current-buffer-remote-p)
+            (setq-local company-idle-delay nil)
+          (setq-local company-idle-delay 0.2)))
+      (add-hook 'eshell-directory-change-hook
+                'dotemacs-toggle-shell-auto-completion-based-on-path)
+
       ;; The default frontend screws everything up in short windows like
       ;; terminal often are
       (setq-local company-frontends '(company-preview-frontend))
@@ -2035,9 +2045,9 @@ mouse-3: go to end"))))
 (defun current-buffer-remote-p ()
   (--any? (and it (file-remote-p it))
           (list
-           (buffer-file-name)
-           list-buffers-directory
-           default-directory))
+            (buffer-file-name)
+             list-buffers-directory
+             default-directory))
 ;; (and (fboundp 'tramp-tramp-file-p) (-any? 'tramp-tramp-file-p
 ;;             (list
 ;;              (buffer-file-name)
@@ -7594,8 +7604,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (--any? (and it (file-remote-p it))
                 (list
                   (buffer-file-name)
-                  list-buffers-directory
-                  default-directory))
+                   list-buffers-directory
+                   default-directory))
         (setq-local projectile-enable-caching t)))
 
     (setq projectile-project-root-files '(
