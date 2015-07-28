@@ -7100,14 +7100,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "N" 'magit-key-mode-popup-svn)))
 
 ;; git
-(use-package git-commit-mode            ; Git commit message mode
-  :disabled t ; not compatible with magit 2.1
-  :defer t
-  :config
-  (after "evil-leader"
-    (evil-leader/set-key-for-mode 'git-commit-mode
-      "mcc" 'git-commit-commit
-      "mk" 'git-commit-abort)))
+(use-package git-commit                 ; Git commit message mode
+  :ensure t
+  :defer t)
 
 (use-package git-messenger
   :ensure t
