@@ -1002,13 +1002,7 @@ the user activate the completion manually."
 
 (dotemacs-use-package-add-hook magit
   :post-init
-  (progn
-    ;; add a quick alias to open magit-status in current directory
-    (defun dotemacs-eshell-magit-status ()
-      "Function to open magit-status for the current directory"
-      (interactive)
-      (magit-status default-directory))
-    (defalias 's 'dotemacs-eshell-magit-status)))
+  (defalias 's 'magit-status))
 
 
 ;;; Customization, init file and package management
