@@ -1316,7 +1316,7 @@ the user activate the completion manually."
                           :off (turn-off-fci-mode)
                           :documentation "Display the fill column indicator."
                           :evil-leader "tf"))
-  :diminish fci-mode)
+  :config (dotemacs-hide-lighter fci-mode))
 
 (use-package zoom-frm
   :commands (zoom-frm-unzoom
@@ -2371,8 +2371,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 (use-package page-break-lines           ; Turn page breaks into lines
   :ensure t
-  :init (global-page-break-lines-mode)
-  :diminish page-break-lines-mode)
+  :init
+  (progn
+    (global-page-break-lines-mode)
+    (dotemacs-hide-lighter page-break-lines-mode)))
 
 (use-package outline                    ; Navigate outlines in buffers
   :defer t
@@ -2542,7 +2544,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                           :off (global-subword-mode -1)
                           :documentation "Globally toggle CamelCase motion."
                           :evil-leader "t C-c"))
-  :diminish (subword-mode . " ⓒ"))
+  :config
+  (dotemacs-diminish subword-mode " ⓒ" " c"))
 
 (use-package adaptive-wrap              ; Choose wrap prefix automatically
   :ensure t
@@ -2649,7 +2652,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-visualizer-diff t)
   :config
-  :diminish (undo-tree-mode . "↺"))
+  (dotemacs-hide-lighter undo-tree-mode))
 
 ;; Give us narrowing back!
 (put 'narrow-to-region 'disabled nil)
@@ -2745,6 +2748,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :config
   (progn
     (require 'smartparens-config)
+    (dotemacs-diminish smartparens-mode " ⓟ" " p")
 
     (show-smartparens-global-mode +1)
 
@@ -2889,8 +2893,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (sp-pair "{" nil :post-handlers
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
     (sp-pair "[" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET"))))
-  :diminish (smartparens-mode . " ⓟ"))
+             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
 
 
 ;;; Highlights and fontification
@@ -2965,8 +2968,17 @@ Disable the highlighting of overlong lines."
       (progn
         (add-hook hook #'dotemacs-whitespace-mode-local)
         (add-hook hook #'dotemacs-set-whitespace-style-for-others))))
-  :diminish ((whitespace-mode . " ⓦ")
-             (global-whitespace-mode . " Ⓦ")))
+  :config
+  (progn
+    (set-face-attribute 'whitespace-space nil
+                        :background nil
+                        :foreground (face-attribute 'font-lock-warning-face :foreground))
+    (set-face-attribute 'whitespace-tab nil
+                        :background nil)
+    (set-face-attribute 'whitespace-indentation nil
+                        :background nil)
+    (dotemacs-diminish whitespace-mode " ⓦ" " w")
+    (dotemacs-diminish global-whitespace-mode " Ⓦ" " W")))
 
 (use-package hl-line                    ; Highlight the current line
   :init (global-hl-line-mode 1))
@@ -2990,8 +3002,8 @@ Disable the highlighting of overlong lines."
         "hs"  'hl-save-highlights)))
   :config
   (progn
-    (dotemacs-hide-lighter hl-highlight-mode))
-  :diminish (hl-paren-mode . " (Ⓗ)"))
+    (dotemacs-diminish hl-paren-mode " (Ⓗ)" " (H)")
+    (dotemacs-hide-lighter hl-highlight-mode)))
 
 (use-package hi-lock                    ; Custom regexp highlights
   :init (global-hi-lock-mode)
@@ -3309,7 +3321,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
 (use-package evil-escape
   :disabled t
   :init (evil-escape-mode)
-  :diminish evil-escape-mode)
+  :config
+  (dotemacs-hide-lighter evil-escape-mode))
 
 (use-package evil-exchange
   :ensure t
@@ -4160,8 +4173,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; enable eldoc in `eval-expression'
     (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
      ;; enable eldoc in IELM
-    (add-hook 'ielm-mode-hook #'eldoc-mode))
-  :diminish eldoc-mode)
+    (add-hook 'ielm-mode-hook #'eldoc-mode)
+    ;; don't display eldoc on modeline
+    (dotemacs-hide-lighter eldoc-mode)))
 
 
 ;;; Emacs Lisp
@@ -7670,8 +7684,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     ;; Remove dead projects when Emacs is idle
     ; (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
-    (projectile-global-mode))
-  :diminish projectile-mode)
+    (projectile-global-mode)
+    (dotemacs-hide-lighter projectile-mode)))
 
 (use-package helm-projectile
   :ensure t
