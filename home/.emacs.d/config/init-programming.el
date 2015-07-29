@@ -5,12 +5,19 @@
                  (current-column)))
           (count (count-lines (overlay-start ov) (overlay-end ov))))
       (overlay-put ov 'after-string
-                   (format "%s [ %d ] ... "
+                   (format "%s [ %d ] … "
                            (make-string (- (window-width) col 32) (string-to-char "."))
                            count)))))
 
 (defun dotemacs-local-comment-auto-fill ()
   (set (make-local-variable 'comment-auto-fill-only-comments) t))
+
+;; required for evil folding
+(defun dotemacs-enable-hs-minor-mode ()
+  "Enable hs-minor-mode for code folding."
+  (ignore-errors
+    (hs-minor-mode)
+    (dotemacs-hide-lighter hs-minor-mode)))
 
 (defun dotemacs-font-lock-comment-annotations ()
   "Highlight a bunch of well known comment annotations.
@@ -63,6 +70,7 @@ This functions should be added to the hooks of major modes for programming."
     ; however, hs-minor-mode already set in `init.el`
     ; (unless (bound-and-true-p hs-minor-mode)
     ;   (hs-minor-mode t))
+    (dotemacs-enable-hs-minor-mode)
     (dotemacs-local-comment-auto-fill)
     (dotemacs-font-lock-comment-annotations)))
 

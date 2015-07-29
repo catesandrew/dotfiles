@@ -2454,7 +2454,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ; actually break the text into multiple lines - it only looks that way.
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-(diminish 'auto-fill-function "↵")
+(dotemacs-diminish auto-fill-function " Ⓕ" " F")
 
 ; Exclude very large buffers from dabbrev
 ; From https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
@@ -3147,7 +3147,8 @@ Disable the highlighting of overlong lines."
     (evil-leader/set-key "tCc" 'rainbow-mode)
     (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
       (add-hook hook #'rainbow-mode)))
-  :diminish rainbow-mode)
+  :config
+  (dotemacs-hide-lighter rainbow-mode))
 
 
 ;;; Evil
@@ -4115,8 +4116,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; (evil-define-key 'motion hs-minor-mode-map " " 'evil-toggle-fold)
 
     ;; required for evil folding
-    (setq hs-set-up-overlay 'dotemacs-fold-overlay)
-    (add-hook 'prog-mode-hook #'hs-minor-mode)))
+    (setq hs-set-up-overlay 'dotemacs-fold-overlay)))
 
 ; This works and sets the mode correctly but the symbols do not show up
 (use-package prettify-symbols-mode
@@ -4635,8 +4635,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (evil-jumper--push)))
     (evil-leader/set-key-for-mode 'python-mode
       "mhh" 'anaconda-mode-view-doc
-      "mgg"  'anaconda-mode-goto))
-  :diminish anaconda-mode)
+      "mgg"  'anaconda-mode-goto)
+    (dotemacs-hide-lighter anaconda-mode)))
 
 (use-package pip-requirements           ; requirements.txt files
   :defer t
@@ -4864,7 +4864,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (add-hook 'enh-ruby-mode-hook 'ruby-tools-mode)
-  :diminish ruby-tools-mode)
+  :config
+  (dotemacs-hide-lighter ruby-tools-mode))
 
 (use-package bundler
   :defer t
@@ -4884,9 +4885,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (add-hook 'enh-ruby-mode-hook 'projectile-rails-on))
-  :diminish (projectile-rails-mode . " ⇋")
   :config
   (progn
+    (dotemacs-diminish projectile-rails-mode " ⇋" " RoR")
     ;; Find files
     (evil-leader/set-key-for-mode 'enh-ruby-mode
       "mrfa" 'projectile-rails-find-locale
@@ -4943,9 +4944,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'enh-ruby-mode-hook 'robe-mode)
     (when (eq dotemacs-completion-engine 'company)
       (push 'company-robe company-backends-enh-ruby-mode)))
-  :diminish robe-mode
   :config
   (progn
+    (dotemacs-hide-lighter robe-mode)
     ;; robe mode specific
     (evil-leader/set-key-for-mode 'enh-ruby-mode "mgg" 'robe-jump)
     (evil-leader/set-key-for-mode 'enh-ruby-mode "mhd" 'robe-doc)
@@ -4991,9 +4992,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t
   :init (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
-  :diminish ruby-test-mode
   :config
   (progn
+    (dotemacs-hide-lighter ruby-test-mode)
     (evil-leader/set-key-for-mode 'enh-ruby-mode "mtb" 'ruby-test-run)
     (evil-leader/set-key-for-mode 'enh-ruby-mode "mtt" 'ruby-test-run-at-point)))
 
@@ -5909,7 +5910,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-  :diminish emmet-mode))
+    (dotemacs-hide-lighter emmet-mode)))
 
 (use-package jade-mode
   :defer t
@@ -5952,8 +5953,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (tagedit-add-experimental-features)
-    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1))))
-  :diminish (tagedit-mode . " Ⓣ"))
+    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
+    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
@@ -7024,13 +7025,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       '(progn
          (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode)
          (define-key magit-mode-map "#gf" 'dotemacs-fetch-gh-pulls-mode))))
-  :diminish (magit-gh-pulls-mode . "Github-PR"))
+  :config
+  (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))
 
 (use-package magit-gitflow
   :ensure t
   :commands turn-on-magit-gitflow
   :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-  :diminish (magit-gitflow-mode . "Flow"))
+  :config (dotemacs-diminish magit-gitflow-mode "Flow"))
 
 (use-package magit-svn
   :if dotemacs-git-enable-magit-svn-plugin
@@ -8097,7 +8099,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           org-startup-indented t)
 
     (after "org-indent"
-      '(diminish org-indent-mode))
+      '(dotemacs-hide-lighter org-indent-mode))
 
     (add-hook 'org-load-hook
       (lambda ()
@@ -8258,8 +8260,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "l" nil "ml" 'evil-org-open-links
         "t" nil "mt" 'org-show-todo-tree))
       (evil-define-key 'normal evil-org-mode-map
-        "O" 'evil-open-above))
-  :diminish (evil-org-mode . " ⓔ"))
+        "O" 'evil-open-above)
+      (dotemacs-diminish evil-org-mode " ⓔ" " e")))
 
 (use-package org-pomodoro
   :defer t
@@ -9076,6 +9078,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                            :evil-leader "ts")))
   :config
   (progn
+    (dotemacs-diminish flycheck-mode " ⓢ" " s")
+
     (after "evil-leader"
       (evil-leader/set-key
         "ec" 'flycheck-clear
@@ -9165,8 +9169,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (flycheck-define-error-level 'info
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-info))
-  :diminish (flycheck-mode . " ⓢ"))
+      :fringe-face 'flycheck-fringe-info)))
 
 (use-package flycheck-pos-tip
   :ensure t
@@ -9228,8 +9231,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; Undefine mouse buttons which get in the way
     (define-key flyspell-mouse-map [down-mouse-2] nil)
     (define-key flyspell-mouse-map [mouse-2] nil)
-    (flyspell-prog-mode))
-  :diminish (flyspell-mode . " Ⓢ"))
+    (flyspell-prog-mode)
+    (dotemacs-diminish flyspell-mode " Ⓢ" " S")))
 
 (use-package helm-flycheck
   :ensure t
@@ -9348,6 +9351,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
   :config
   (progn
+    (dotemacs-diminish company-mode " ⓐ" " a")
     ;; key bindings
     (defun dotemacs-company-complete-common-or-cycle-backward ()
       "Complete common prefix or cycle backward."
@@ -9379,8 +9383,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (unless (member company-prefix company-mode-completion-cancel-keywords)
         candidates))
     (setq company-transformers '(dotemacs-company-transformer-cancel
-                                   company-sort-by-occurrence)))
-  :diminish (company-mode . " ⓐ"))
+                                   company-sort-by-occurrence))))
 
 (use-package company-statistics
   :ensure t
@@ -9416,11 +9419,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package auto-complete
   :ensure t
   :if (eq dotemacs-completion-engine 'auto-complete)
-  :diminish auto-complete-mode)
-
-(use-package auto-complete
-  :ensure t
-  :if (eq dotemacs-completion-engine 'auto-complete)
   :defer t
   :init
   (setq ac-auto-start 0
@@ -9448,8 +9446,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-to-list 'completion-styles 'initials t)
     (define-key ac-completing-map (kbd "C-j") 'ac-next)
     (define-key ac-completing-map (kbd "C-k") 'ac-previous)
-    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous))
-  :diminish (auto-complete-mode " ⓐ" " a"))
+    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous)
+    (dotemacs-diminish auto-complete-mode " ⓐ" " a")))
 
 (use-package ac-ispell
   :ensure t
@@ -9512,8 +9510,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                                 (smartparens-mode -1)))
     (add-hook 'yas-after-exit-snippet-hook (lambda ()
                                              (when smartparens-enabled-initially
-                                               (smartparens-mode 1)))))
-  :diminish (yas-minor-mode . " ⓨ" ))
+                                               (smartparens-mode 1))))
+    (dotemacs-diminish yas-minor-mode " ⓨ" " y")))
 
 (use-package auto-yasnippet
   :ensure t
