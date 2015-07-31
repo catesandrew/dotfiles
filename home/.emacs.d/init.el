@@ -790,8 +790,8 @@ FEATURE may be a named feature or a file name, see
 (use-package core-funcs
   :load-path "core/")
 
-;; evil and evil-leader must be installed at the beginning of the
-;; boot sequence.
+(dotemacs-load-or-install-package 's t)
+;; evil and evil-leader must be installed at the beginning of the boot sequence.
 (dotemacs-load-or-install-package 'evil t)
 (dotemacs-load-or-install-package 'evil-leader t)
 
