@@ -696,6 +696,7 @@ FEATURE may be a named feature or a file name, see
           ("bm" . "buffers-move")
           ("c" .  "compile/comments")
           ("C" .  "capture/colors")
+          ("d" .  "dash-at-point")
           ("e" .  "errors")
           ("f" .  "files")
           ("fe" . "files-emacs/dotemacs")
@@ -709,9 +710,9 @@ FEATURE may be a named feature or a file name, see
           ("k" .  "lisp")
           ("kd" . "lisp-delete")
           ("kD" . "lisp-delete-backward")
-          ("n" .  "narrow/numbers")
           ("p" .  "projects")
           ("p$" . "projects/shell")
+          ("P" .  "pandoc")
           ("q" .  "quit")
           ("r" .  "registers/rings")
           ("s" .  "search/symbol")
@@ -733,6 +734,7 @@ FEATURE may be a named feature or a file name, see
           ("xm" . "text-move")
           ("xt" . "text-transpose")
           ("xw" . "text-words")
+          ("y" .  "narrow/numbers")
           ("z" .  "zoom")))
   (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
         dotemacs-key-binding-prefixes)
@@ -7852,10 +7854,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (define-key evil-motion-state-local-map (kbd "R")   'neotree-change-root)
       (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
 
+    ;; neo-global--select-window
     (after "evil-leader"
       (evil-leader/set-key
         "tn" 'neotree-show
         "tN" 'neotree-hide
+        "n" 'neotree-show
+        "N" 'neotree-hide
         "pt" 'neotree-find-project-root)))
 
   :config
