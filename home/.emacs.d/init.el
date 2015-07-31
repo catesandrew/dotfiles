@@ -10031,15 +10031,11 @@ one of `l' or `r'."
           (setq powerline-default-separator 'arrow)
         (setq powerline-default-separator 'utf-8))
 
-    (after "powerline"
-      (powerline-vimish-theme))
-
     (defun dotemacs-set-vimish-powerline-for-startup-buffers ()
        "Set the powerline for buffers created when Emacs starts."
        (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
          (when (get-buffer buffer)
            (with-current-buffer buffer
-
              (setq-local mode-line-format (default-value 'mode-line-format))
              (powerline-set-selected-window)
              (powerline-reset)))))
