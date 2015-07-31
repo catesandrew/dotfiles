@@ -6110,6 +6110,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
 
     (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.jscsrc$" . json-mode))
     (add-to-list 'auto-mode-alist '("\\.eslintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
     (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)
