@@ -9125,6 +9125,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "k" #'flycheck-error-list-previous-error
         "RET" #'flycheck-error-list-goto-error))
 
+    (defmacro dotemacs-custom-flycheck-lighter (error)
+      "Return a formatted string for the given ERROR (error, warning, info)."
+      `(let* ((error-counts (flycheck-count-errors
+                             flycheck-current-errors))
+              (errorp (flycheck-has-current-errors-p ',error))
+              (err (or (cdr (assq ',error error-counts)) "?"))
+              (running (eq 'running flycheck-last-status-change)))
+         (if (or errorp running) (format "•%s " err))))
+
     ;; Custom fringe indicator
     (when (fboundp 'define-fringe-bitmap)
       (define-fringe-bitmap 'my-flycheck-fringe-indicator
@@ -9599,7 +9608,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (defvar dotemacs-mode-line-org-clock-current-taskp nil
       "If not nil, the currently clocked org-mode task will be
 displayed in the mode-line.")
-    (defvar spacemacs-mode-line-org-clock-format-function
+    (defvar dotemacs-mode-line-org-clock-format-function
       'org-clock-get-clock-string
       "Function used to render the currently clocked org-mode task.")
     (dotemacs-add-toggle mode-line-org-clock-current-task
@@ -9800,7 +9809,7 @@ It is a string holding:
   ;; flycheck-errors, flycheck-warnings, flycheck-infos
   (dolist (type '(error warning info))
     (let ((segment-name (intern (format "flycheck-%ss" type)))
-          (face (intern (format "spacemacs-mode-line-flycheck-%s-face" type))))
+          (face (intern (format "dotemacs-mode-line-flycheck-%s-face" type))))
       (eval
        `(dotemacs-define-mode-line-segment ,segment-name
           (powerline-raw (s-trim (dotemacs-custom-flycheck-lighter ,type)) ',face)
@@ -9810,7 +9819,7 @@ It is a string holding:
                      (dotemacs-custom-flycheck-lighter ,type))))))
 
   (dotemacs-define-mode-line-segment org-clock
-    (funcall spacemacs-mode-line-org-clock-format-function)
+    (funcall dotemacs-mode-line-org-clock-format-function)
     :when (and dotemacs-mode-line-org-clock-current-taskp
                (fboundp 'org-clocking-p)
                (org-clocking-p)))
