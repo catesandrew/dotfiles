@@ -3401,16 +3401,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :defer t
   :init
   (progn
-    (add-hook 'evil-matchit-mode-hook
-      (lambda ()
-        (unless (bound-and-true-p evil-matchit-mode-hook-ran)
-          (defvar evil-matchit-mode-hook-ran t)
-          (plist-put evilmi-plugins 'js2-mode
-            ((evilmi-simple-get-tag evilmi-simple-jump)
-             (evilmi--javascript-find-open-brace
-              evilmi-javascript-jump
-              evilmi-javascript-get-tag))))))
-
     (dolist (hook '(LaTeX-mode-hook
                     web-mode-hook
                     js2-mode-hook
