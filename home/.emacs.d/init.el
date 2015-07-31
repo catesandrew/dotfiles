@@ -7763,7 +7763,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setq neo-window-width 32
           neo-modern-sidebar t
           neo-theme 'nerd
-          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\|git\\|hg\\|svn\\|idea\\|sass-cache\\)\\|\\(Thumbs\\.db\\)\\|\\(assets\\|node_modules\\|build\\|tmp\\|log\\|vendor\\|bower_components\\|components\\)\\)$")
+          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|tern-port\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\|git\\|hg\\|svn\\|idea\\|sass-cache\\)\\|\\(Thumbs\\.db\\)\\|\\(assets\\|node_modules\\|build\\|tmp\\|log\\|vendor\\|bower_components\\|components\\)\\)$")
           neo-create-file-auto-open t
           neo-banner-message nil
           neo-show-updir-line nil
@@ -7771,7 +7771,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           neo-smart-open t
           neo-dont-be-alone t
           neo-persist-show nil
-          neo-show-hidden-files t
+          neo-show-hidden-files nil
           neo-auto-indent-point t)
 
     (defun dotemacs-init-neotree ()
