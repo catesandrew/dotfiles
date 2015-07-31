@@ -7682,7 +7682,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (helm-projectile-on)
 
     ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
-    (setq projectile-switch-project-action #'helm-projectile)
+
+    (defun dotemacs-projectile-switch-project ()
+      "Default projectile-switch-project-action hook."
+      (interactive)
+      (when (fboundp 'projectile-dired)
+        (projectile-dired))
+      (when (fboundp 'helm-projectile)
+        (helm-projectile))
+      (when (fboundp 'neotree-projectile-action)
+        (when (neo-global--window-exists-p)
+          (neotree-projectile-action))))
+    (setq projectile-switch-project-action #'dotemacs-projectile-switch-project)
 
     (defconst dotemacs-use-helm-projectile t
       "This variable is only defined if helm-projectile is used.")
