@@ -160,6 +160,20 @@ pressing `<leader> m`. Set it to `nil` to disable it."
   "Major mode leader key accessible in `emacs state' and `insert state'"
   :group 'dotemacs)
 
+; Source Code Pro for Powerline
+(defcustom dotemacs-default-font '("Source Code Pro"
+                                    :size 13
+                                    :weight normal
+                                    :width normal
+                                    :powerline-scale 1.1)
+  "Default font. `powerline-scale' allows to quickly tweak the mode-line
+size to make separators look not too crappy."
+  :group 'dotemacs)
+
+(defcustom dotemacs-verbose-loading nil
+  "If non nil output loading progess in `*Messages*' buffer."
+  :group 'dotemacs)
+
 (defcustom dotemacs-command-key ":"
   "The key used for Evil commands (ex-commands) and Emacs commands (M-x).
 By default the command key is `:' so ex-commands are executed like in Vim
@@ -190,13 +204,13 @@ tool of the list. Supported tools are `ag', `pt', `ack' and `grep'."
 `dotemacs-useless-buffers-regexp'."
   :group 'dotemacs)
 
-(defcustom dotemacs-active-transparency 94
+(defcustom dotemacs-active-transparency 96
   "A value from the range (0..100), in increasing opacity, which describes the
 transparency level of a frame when it's active or selected. Transparency
 can be toggled through `toggle-transparency'."
   :group 'dotemacs)
 
-(defcustom dotemacs-inactive-transparency 94
+(defcustom dotemacs-inactive-transparency 96
   "A value from the range (0..100), in increasing opacity, which describes the
 transparency level of a frame when it's inactive or deselected. Transparency
 can be toggled through `toggle-transparency'."
@@ -652,8 +666,10 @@ FEATURE may be a named feature or a file name, see
 (eval-when-compile
   (require 'cl))
 
+;; bind-key is required by use-package
 (require 'bind-key)
 (require 'diminish)
+
 ;; Minor modes abbrev --------------------------------------------------------
 (when (display-graphic-p)
   (after "eproject"
@@ -774,6 +790,11 @@ FEATURE may be a named feature or a file name, see
 (use-package core-funcs
   :load-path "core/")
 
+;; evil and evil-leader must be installed at the beginning of the
+;; boot sequence.
+(dotemacs-load-or-install-package 'evil t)
+(dotemacs-load-or-install-package 'evil-leader t)
+
 (use-package core-micro-state
   :load-path "core/")
 
@@ -793,6 +814,9 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 (use-package core-themes-support
+  :load-path "core/")
+
+(use-package core-fonts-support
   :load-path "core/")
 
 
@@ -1164,6 +1188,11 @@ the user activate the completion manually."
                              "able to launch a graphical instance of Emacs"
                              "with this build.")))
 
+;; font
+(if (find-font (font-spec :name (car dotemacs-default-font)))
+    (dotemacs-set-default-font dotemacs-default-font)
+  (dotemacs-buffer/warning "Cannot find font \"%s\"!"
+                            (car dotemacs-default-font)))
 
 ;; fringes
 (setq-default fringe-indicator-alist
@@ -1223,56 +1252,6 @@ the user activate the completion manually."
   (let ((dir (concat dotemacs-cache-directory "pcache")))
     (make-directory dir t)
     dir))
-
-(use-package dynamic-fonts              ; Select best available font
-  :ensure t
-  :config
-  (progn
-    (setq dynamic-fonts-preferred-monospace-fonts
-          '(
-            ;; Best fonts for Powerline
-            "Source Code Pro for Powerline"   ; https://github.com/adobe-fonts/source-code-pro
-            "Anonymous Pro for Powerline" ; http://www.marksimonson.com/fonts/view/anonymous-pro
-            ;; Consolas and its free alternative.  Ok, but not my preference
-            "Inconsolata for Powerline"
-            "Consolas for Powerline"
-            ;; Also still kind of ok
-            "Fira Mono for Powerline"
-            ;; Best fonts
-            "Source Code Pro"   ; https://github.com/adobe-fonts/source-code-pro
-            "Anonymous Pro" ; http://www.marksimonson.com/fonts/view/anonymous-pro
-            ;; Consolas and its free alternative.  Ok, but not my preference
-            "Inconsolata"
-            "Consolas"
-            ;; Also still kind of ok
-            "Fira Mono for Powerline"
-            ;; System fonts, as last resort
-            "Menlo"
-            "DejaVu Sans Mono"
-            "Bitstream Vera Mono"
-            "Courier New")
-          dynamic-fonts-preferred-monospace-point-size (pcase system-type
-                                                         (`darwin 13)
-                                                         (_ 10))
-          dynamic-fonts-preferred-proportional-fonts
-          '(
-            ;; Best, from
-            ;; https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/
-            "Fira Sans"
-            ;; System fonts, as last resort
-            "Helvetica"
-            "Segoe UI"
-            "DejaVu Sans"
-            "Bitstream Vera"
-            "Tahoma"
-            "Verdana"
-            "Arial Unicode MS"
-            "Arial")
-          dynamic-fonts-preferred-proportional-point-size (pcase system-type
-                                                            (`darwin 13)
-                                                            (_ 10)))
-
-    (dynamic-fonts-setup)))
 
 (use-package unicode-fonts              ; Map Unicode blocks to fonts
   :ensure t
@@ -3696,6 +3675,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (progn
       (dotemacs-add-company-hook LaTeX-mode))))
 
+(use-package company-math
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init (push 'company-math company-backends-LaTeX-mode))
+
 (use-package company-auctex
   :if (eq dotemacs-completion-engine 'company)
   :defer t
@@ -3703,8 +3688,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (push 'company-auctex-labels company-backends-LaTeX-mode)
     (push 'company-auctex-bibs company-backends-LaTeX-mode)
-    (push '(company-auctex-macros company-auctex-symbols company-auctex-environments)
-          company-backends-LaTeX-mode)))
+    (push '(company-auctex-macros
+            company-auctex-symbols
+            company-auctex-environments) company-backends-LaTeX-mode)))
 
 (use-package tex-buf                    ; TeX buffer management
   :ensure auctex
@@ -4884,7 +4870,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (add-hook 'enh-ruby-mode-hook 'projectile-rails-on))
+    (add-hook 'projectile-mode-hook 'projectile-rails-on))
   :config
   (progn
     (dotemacs-diminish projectile-rails-mode " ⇋" " RoR")
@@ -6142,6 +6128,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (setq-default js2-basic-offset 2)
+    (setq-default js-indent-level 2)
+
     (setq js2-global-externs '("angular" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
 
     (evil-leader/set-key-for-mode 'js2-mode "mw" 'js2-mode-toggle-warnings-and-errors)
@@ -9542,45 +9530,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; The mode line
-; (setq-default header-line-format
-;               '(which-func-mode ("" which-func-format " "))
-;               mode-line-format
-;               '("%e" mode-line-front-space
-;                 "🐮"                   ; My branding :)
-;                 ;; Standard info about the current buffer
-;                 mode-line-mule-info
-;                 mode-line-client
-;                 mode-line-modified
-;                 mode-line-remote
-;                 mode-line-frame-identification
-;                 mode-line-buffer-identification " " mode-line-position
-;                 ;; Some specific information about the current buffer:
-;                 ;; - Dired Omit Mode
-;                 (smartparens-strict-mode (:propertize " ()" face bold))
-;                 (dired-omit-mode " 👻")
-;                 (server-buffer-clients " 💻")
-;                 (projectile-mode projectile-mode-line)
-;                 (vc-mode vc-mode)
-;                 " "
-;                 (flycheck-mode flycheck-mode-line) ; Flycheck status
-;                 (firestarter-mode firestarter-lighter)
-;                 (isearch-mode " 🔍")
-;                 (anzu-mode (:eval                  ; isearch pos/matches
-;                             (when (> anzu--total-matched 0)
-;                               (anzu--update-mode-line))))
-;                 ; (multiple-cursors-mode mc/mode-line) ; Number of cursors
-;                 ;; And the modes, which we don't really care for anyway
-;                 " " mode-line-misc-info mode-line-modes mode-line-end-spaces)
-;               mode-line-remote
-;               '(:eval
-;                 (when-let (host (file-remote-p default-directory 'host))
-;                   (propertize (concat "@" host) 'face
-;                               '(italic warning))))
-;               ;; Remove which func from the mode line, since we have it in the
-;               ;; header line
-;               mode-line-misc-info
-;               (assq-delete-all 'which-func-mode mode-line-misc-info))
-
 (use-package powerline
   :ensure t
   :init
@@ -10072,6 +10021,30 @@ one of `l' or `r'."
           (dotemacs-restore-powerline buffer))))
     (add-hook 'after-init-hook
               'dotemacs-set-powerline-for-startup-buffers)))
+
+(use-package vim-powerline
+  :ensure powerline
+  :defer t
+  :init
+  (progn
+    (if (display-graphic-p)
+          (setq powerline-default-separator 'arrow)
+        (setq powerline-default-separator 'utf-8))
+
+    (after "powerline"
+      (powerline-vimish-theme))
+
+    (defun dotemacs-set-vimish-powerline-for-startup-buffers ()
+       "Set the powerline for buffers created when Emacs starts."
+       (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
+         (when (get-buffer buffer)
+           (with-current-buffer buffer
+
+             (setq-local mode-line-format (default-value 'mode-line-format))
+             (powerline-set-selected-window)
+             (powerline-reset)))))
+     (add-hook 'after-init-hook
+               'dotemacs-set-vimish-powerline-for-startup-buffers)))
 
 (use-package fancy-battery              ; Fancy battery info for mode line
   :ensure t
