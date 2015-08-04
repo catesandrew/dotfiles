@@ -1,3 +1,5 @@
+if [[ "$TERM" != "dumb"   ]]; then
+
 # Path to the bash it configuration
 export BASH_IT=$HOME/.bash
 
@@ -213,4 +215,6 @@ export FZF_DEFAULT_COMMAND='
 
 if [ $(uname) = "Darwin" ]; then
     launchctl setenv PATH $PATH
+fi
+
 fi

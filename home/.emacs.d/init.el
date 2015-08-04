@@ -1969,7 +1969,11 @@ the user activate the completion manually."
   :defer t
   :init
   (progn
-    (setq vc-ignore-dir-regexp
+    (setq tramp-ssh-controlmaster-options
+      (concat
+        "-o ControlPath=~/.ssh/conn-%%r@%%h:%%p"))
+    (setq tramp-default-method "ssh"
+          vc-ignore-dir-regexp
           (format "\\(%s\\)\\|\\(%s\\)"
                   vc-ignore-dir-regexp
                   tramp-file-name-regexp)))
