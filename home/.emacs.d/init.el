@@ -1197,6 +1197,9 @@ the user activate the completion manually."
                             (car dotemacs-default-font)))
 
 ;; fringes
+(custom-set-variables
+  '(fringe-mode (quote (4 . 4)) nil (fringe)))
+
 (setq-default fringe-indicator-alist
               '((truncation . nil) (continuation . nil)))
 
