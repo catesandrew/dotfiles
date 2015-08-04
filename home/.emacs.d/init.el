@@ -2368,9 +2368,9 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
           (add-hook hook #'outline-minor-mode))
   :diminish (outline-minor-mode . "📑"))
 
-(use-package nlinum                     ; Line numbers in display margin
-  :ensure t
-  :bind (("C-c u l" . nlinum-mode)))
+; (use-package nlinum                     ; Line numbers in display margin
+;   :ensure t
+;   :bind (("C-c u l" . nlinum-mode)))
 
 (use-package helm-imenu
   :ensure helm
