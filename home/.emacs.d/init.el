@@ -1265,6 +1265,9 @@ the user activate the completion manually."
                        unicode-fonts-use-prepend t)
                  (unicode-fonts-setup)))
 
+(custom-set-faces
+ '(linum ((t (:height 0.8 :family "Bebas Neue")))))
+
 (use-package linum-relative
   :ensure t
   :commands linum-relative-toggle
