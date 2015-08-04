@@ -257,7 +257,7 @@ case $response in
 
     # update your sources
     exec_sudo_cmd "apt-get update"
-    exec_sudo_cmd "apt-get -y heroku-toolbelt"
+    exec_sudo_cmd "apt-get -y install heroku-toolbelt"
     ;;
   *)
     ;;
