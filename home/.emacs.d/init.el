@@ -1162,10 +1162,11 @@ the user activate the completion manually."
   :ensure t
   :init (turn-on-pbcopy))
 
-(use-package reveal-in-finder
+(use-package reveal-in-finder           ; Reveal current buffer in finder
   :if (eq system-type 'darwin)
   :ensure t
-  :commands reveal-in-finder)
+  :commands reveal-in-finder
+  :bind (("C-c f f" . reveal-in-finder)))
 
 
 ;;; User interface
@@ -2141,10 +2142,6 @@ the user activate the completion manually."
 (use-package launch                     ; Open files in external programs
   :ensure t
   :defer t)
-
-(use-package reveal-in-finder           ; Reveal current buffer in finder
-  :ensure t
-  :bind (("C-c f f" . reveal-in-finder)))
 
 (use-package init-files            ; Personal file tools
   :load-path "config/"
