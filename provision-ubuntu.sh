@@ -61,6 +61,12 @@ fi
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
+if ! groups "${USER}" | grep &>/dev/null '\badm\b'; then
+  print_status "You are not in adm group, adding you now"
+  exec_sudo_cmd "sudo usermod -aG adm $USER"
+  print_status "Added you to adm group, please reboot now for changes to take effect"
+fi
+
 echo ""
 echo "Would you like to set your computer name? (y/n)"
 read -r response
