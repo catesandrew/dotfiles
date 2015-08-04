@@ -1273,11 +1273,12 @@ the user activate the completion manually."
   :commands linum-relative-toggle
   :init
   (progn
+    (defvar dotemacs--relative-linum-loaded nil)
     (defun dotemacs-linum-relative-mode-setup ()
-      (unless (bound-and-true-p my-lrm-ran)
-        (set (make-local-variable 'my-lrm-ran) t)
-        (linum-relative-toggle)))
-    (add-hook 'linum-mode-hook #'dotemacs-linum-relative-mode-setup)
+      (unless dotemacs--relative-linum-loaded
+        (linum-relative-toggle)
+        (setq dotemacs--relative-linum-loaded t)))
+    (add-hook 'linum-mode-hook 'dotemacs-linum-relative-mode-setup)
 
     (after "evil-leader"
       (evil-leader/set-key "tr" 'linum-relative-toggle)))
