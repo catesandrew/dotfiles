@@ -239,6 +239,25 @@ case $response in
 esac
 
 echo ""
+echo "Would you like to install heroku via ppa? (y/n)"
+read -r response
+case $response in
+  [yY])
+    # add heroku repository to apt
+    exec_sudo_cmd "echo 'deb http://toolbelt.heroku.com/ubuntu ./' > /etc/apt/sources.list.d/heroku.list"
+
+    # install heroku's release key for package verification
+    exec_sudo_cmd "wget -O- https://toolbelt.heroku.com/apt/release.key | apt-key add -"
+
+    # update your sources
+    exec_sudo_cmd "apt-get update"
+    exec_sudo_cmd "apt-get -y heroku-toolbelt"
+    ;;
+  *)
+    ;;
+esac
+
+echo ""
 echo "Would you like to install emacs snapshot? (y/n)"
 read -r response
 case $response in
