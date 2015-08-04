@@ -434,8 +434,8 @@ read -r response
 case $response in
   [yY])
     exec_cmd "git clone https://github.com/junegunn/fzf.git ${PREFIX}/fzf"
-    exec_sudo_cmd "chgrp adm ${PREFIX}/nvm"
-    exec_sudo_cmd "chmod g+rwx ${PREFIX}/nvm"
+    exec_sudo_cmd "chgrp adm ${PREFIX}/fzf"
+    exec_sudo_cmd "chmod g+rwx ${PREFIX}/fzf"
     exec_cmd "${PREFIX}/fzf/install"
 
     # exec_sudo_cmd "curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/install | sudo bash -"
