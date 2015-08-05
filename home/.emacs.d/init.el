@@ -3084,6 +3084,7 @@ Disable the highlighting of overlong lines."
   (progn
     (when (member dotemacs-highlight-delimiters '(all current))
       (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
+    (setq hl-paren-delay 0.2)
     (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
     (setq hl-paren-colors '("Springgreen3"
                             "IndianRed1"
