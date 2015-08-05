@@ -1113,7 +1113,7 @@ the user activate the completion manually."
   :init
   (progn
     (after "evil-leader"
-      (evil-leader/set-key "bf" 'reveal-in-finder))
+      (evil-leader/set-key "bf" 'reveal-in-osx-finder))
 
     ;; this is only applicable to GUI mode
     (when (display-graphic-p)
@@ -1212,11 +1212,11 @@ the user activate the completion manually."
              (kbd "#") 'launchctl-unsetenv
              (kbd "h") 'launchctl-help)))
 
-(use-package reveal-in-finder           ; Reveal current buffer in finder
+(use-package reveal-in-osx-finder           ; Reveal current buffer in finder
   :if (eq system-type 'darwin)
   :ensure t
-  :commands reveal-in-finder
-  :bind (("C-c f f" . reveal-in-finder)))
+  :commands reveal-in-osx-finder
+  :bind (("C-c f f" . reveal-in-osx-finder)))
 
 
 ;;; User interface
