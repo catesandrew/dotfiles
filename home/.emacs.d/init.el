@@ -8410,7 +8410,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package toc-org
   :ensure t
   :init
-  (add-hook 'org-mode-hook 'toc-org-enable))
+  (progn
+    (setq toc-org-max-depth 10)
+    (add-hook 'org-mode-hook 'toc-org-enable)))
 
 (use-package htmlize
   :ensure t
