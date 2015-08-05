@@ -6478,7 +6478,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mil" 'racket-insert-lambda
       ;; REPL
       "msb" 'racket-run
-      "msB" 'racket-run-and-switch-to-repl
+      "msB" 'dotemacs-racket-run-and-switch-to-repl
       "mse" 'racket-send-last-sexp
       "msE" 'dotemacs-racket-send-last-sexp-focus
       "msf" 'racket-send-definition

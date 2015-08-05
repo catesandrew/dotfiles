@@ -3,6 +3,13 @@
   (interactive)
   (racket-test t))
 
+(defun dotemacs-racket-run-and-switch-to-repl ()
+  "Call `racket-run-and-switch-to-repl' and enable
+`insert state'."
+  (interactive)
+  (racket-run-and-switch-to-repl)
+  (evil-insert-state))
+
 (defun dotemacs-racket-send-last-sexp-focus ()
   "Call `racket-send-last-sexp' and switch to REPL buffer in
 `insert state'."
