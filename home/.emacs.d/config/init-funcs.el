@@ -80,15 +80,13 @@ a key sequence. NAME is a symbol name used as the prefix command."
       (define-prefix-command command)
       (evil-leader/set-key prefix command))))
 
-;; Waiting to fix the issue with guide-key before reactivating/updating this
-;; function
-;; (defun dotemacs-declare-prefix-for-mode (mode prefix name)
-;;   "Declare a prefix PREFIX. MODE is the mode in which this prefix command should
-;; be added. PREFIX is a string describing a key sequence. NAME is a symbol name
-;; used as the prefix command."
-;;   (let ((command (intern (concat dotemacs-prefix-command-string name))))
-;;     (define-prefix-command command)
-;;     (evil-leader/set-key-for-mode mode prefix command)))
+(defun dotemacs-declare-prefix-for-mode (mode prefix name)
+  "Declare a prefix PREFIX. MODE is the mode in which this prefix command should
+be added. PREFIX is a string describing a key sequence. NAME is a symbol name
+used as the prefix command."
+  (let ((command (intern (concat dotemacs-prefix-command-string name))))
+    (define-prefix-command command)
+    (evil-leader/set-key-for-mode mode prefix command)))
 
 (defun dotemacs-activate-major-mode-leader ()
   "Bind major mode key map to `dotemacs-major-mode-leader-key'."
