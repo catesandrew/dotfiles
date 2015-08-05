@@ -3075,7 +3075,11 @@ Disable the highlighting of overlong lines."
                           :on (highlight-indentation-current-column-mode)
                           :off (highlight-indentation-current-column-mode -1)
                           :documentation "Highlight indentation level at point."
-                          :evil-leader "thc")))
+                          :evil-leader "thc"))
+  :config
+  (progn
+    (dotemacs-diminish highlight-indentation-mode " ⓗ" " h")
+    (dotemacs-diminish highlight-indentation-current-column-mode " ⓗⒸ" " hC")))
 
 (use-package highlight-parentheses
   :defer t
