@@ -8136,6 +8136,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init (progn (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
                (add-hook 'text-mode-hook #'bug-reference-mode)))
 
+(use-package goto-addr                  ; Make links clickable
+  :defer t
+  :init (progn (add-hook 'prog-mode-hook #'goto-address-prog-mode)
+               (add-hook 'text-mode-hook #'goto-address-mode)))
+
 (use-package eww                        ; Emacs' built-in web browser
   :bind (("C-c w b" . eww-list-bookmarks)
          ("C-c w w" . eww)))
@@ -10265,7 +10270,7 @@ one of `l' or `r'."
                          :off (fancy-battery-mode -1)
                          :documentation "Display battery info in mode-line."
                          :evil-leader "tmb")
-    (push 'fancy-battery-mode-line dotemacs--global-mode-excludes)
+    (push 'fancy-battery-mode-line dotemacs--global-mode-line-excludes)
 
     (defun dotemacs-mode-line-battery-percentage ()
       "Return the load percentage or an empty string."
