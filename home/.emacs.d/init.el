@@ -384,6 +384,10 @@ prompts and the prompt is made read-only"
   "If non-nil structured-haskell-mode support is enabled"
   :group 'dotemacs-haskell)
 
+(defcustom dotemacs-haskell-enable-ghc-mod-support t
+  "If non-nil ghc-mod support is enabled"
+  :group 'dotemacs-haskell)
+
 ;; git settings
 (defgroup dotemacs-git nil
   "Configuration options for git."
@@ -5066,6 +5070,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;; This Haskell setup needs:
 ;;
 ;; cabal install hasktags haskell-docs hoogle hindent
+;; cabal install stylish-haskell hlint ghc-mod hasktags
 ;;
 ;; Additionally, to be installed from source:
 ;;
@@ -5304,6 +5309,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package ghc
   :ensure t
+  :if dotemacs-haskell-enable-ghc-mod-support
   :defer t
   :init (add-hook 'haskell-mode-hook 'ghc-init)
   :config
