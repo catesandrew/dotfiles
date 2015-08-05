@@ -5944,6 +5944,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
    ("\\.eex\\'"        . web-mode)
    ("\\.erb\\'"        . web-mode)
    ("\\.eco\\'"        . web-mode)
+   ("\\.ejs\\'"        . web-mode)
    ("\\.djhtml\\'"     . web-mode)))
 
 (use-package emmet-mode
