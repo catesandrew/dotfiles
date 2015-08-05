@@ -1313,7 +1313,7 @@ These should have their own segments in the modeline.")
 (use-package init-scratch          ; My logo in the scratch buffer
   :commands (dotemacs-insert-logo
              dotemacs-insert-logo-into-scratch)
-  :init (add-hook 'after-init-hook #'dotemacs-insert-logo-into-scratch))
+  :init (add-hook 'emacs-startup-hook #'dotemacs-insert-logo-into-scratch))
 
 (defvar pcache-directory
   (let ((dir (concat dotemacs-cache-directory "pcache")))
@@ -8084,7 +8084,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          (setq persp-last current-perspective)))
 
     (define-key persp-mode-map (kbd "C-x x l") 'dotemacs-custom-persp-last)
-    (add-hook 'after-init-hook '(lambda ()
+    (add-hook 'emacs-startup-hook '(lambda ()
                                   (persp-rename "@dotfiles")))
     ))
 
@@ -10274,7 +10274,7 @@ one of `l' or `r'."
       (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
         (when (get-buffer buffer)
           (dotemacs-restore-powerline buffer))))
-    (add-hook 'after-init-hook
+    (add-hook 'emacs-startup-hook
               'dotemacs-set-powerline-for-startup-buffers)))
 
 (use-package vim-powerline
@@ -10294,7 +10294,7 @@ one of `l' or `r'."
              (setq-local mode-line-format (default-value 'mode-line-format))
              (powerline-set-selected-window)
              (powerline-reset)))))
-     (add-hook 'after-init-hook
+     (add-hook 'emacs-startup-hook
                'dotemacs-set-vimish-powerline-for-startup-buffers)))
 
 (use-package fancy-battery              ; Fancy battery info for mode line
