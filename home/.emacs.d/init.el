@@ -6464,6 +6464,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Java
 (dotemacs-defvar-company-backends java-mode)
 
+;; Command prefixes
+(setq java/key-binding-prefixes '(("me" . "errors")
+                                  ("mf" . "find")
+                                  ("mg" . "goto")
+                                  ("mr" . "refactor")
+                                  ("mh" . "documentation")
+                                  ("mm" . "maven")
+                                  ("ma" . "ant")
+                                  ("mp" . "project")
+                                  ("mt" . "test")))
+
+(mapc (lambda(x) (dotemacs-declare-prefix-for-mode 'java-mode (car x) (cdr x)))
+      java/key-binding-prefixes)
+
 (use-package init-java
   :load-path "config/")
 
