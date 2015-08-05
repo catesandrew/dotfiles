@@ -5687,6 +5687,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package clojure-mode
   :defer t
   :ensure t
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode))
+    (add-to-list 'magic-mode-alist '(".* boot" . clojure-mode)))
   :config
   (progn
     (when dotemacs-clojure-enable-fancify-symbols
