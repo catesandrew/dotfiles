@@ -2908,7 +2908,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (sp-with-modes '(web-mode)
       (sp-local-pair "<% " " %>")
       (sp-local-pair "{ " " }")
-      (sp-local-pair "<%= "  "  %>")
+      (sp-local-pair "<%= "  " %>")
       (sp-local-pair "<%# "  " %>")
       (sp-local-pair "<%$ "  " %>")
       (sp-local-pair "<%@ "  " %>")
