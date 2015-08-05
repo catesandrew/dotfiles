@@ -1231,7 +1231,6 @@ the user activate the completion manually."
 ;; tooltips in echo-aera
 (when (and (fboundp 'tooltip-mode) (not (eq tooltip-mode -1)))
   (tooltip-mode -1))
-(setq tooltip-use-echo-area t)
 (unless (eq system-type 'darwin)
   (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
     (menu-bar-mode -1)))
