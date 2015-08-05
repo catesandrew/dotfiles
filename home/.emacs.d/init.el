@@ -10002,7 +10002,7 @@ It is a string holding:
 
   (dotemacs-define-mode-line-segment global-mode
     (powerline-raw (-difference global-mode-string
-                                    dotemacs--global-mode-line-excludes))
+                                dotemacs--global-mode-line-excludes))
     :when (dotemacs-mode-line-nonempty global-mode-string))
 
   (dotemacs-define-mode-line-segment battery
@@ -10030,7 +10030,6 @@ It is a string holding:
   (push 'org-mode-line-string dotemacs--global-mode-line-excludes)
 
   (dotemacs-define-mode-line-segment org-pomodoro
-    (concat "[" (nth 1 org-pomodoro-mode-line) "]")
     (nth 1 org-pomodoro-mode-line)
     :when (and (fboundp 'org-pomodoro-active-p)
                (org-pomodoro-active-p)))
@@ -10265,8 +10264,7 @@ one of `l' or `r'."
   (progn
     (dotemacs-add-toggle mode-line-battery
                          :status fancy-battery-mode
-                         :on
-                         (fancy-battery-mode)
+                         :on (fancy-battery-mode)
                          :off (fancy-battery-mode -1)
                          :documentation "Display battery info in mode-line."
                          :evil-leader "tmb")
