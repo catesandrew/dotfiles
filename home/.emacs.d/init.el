@@ -7190,7 +7190,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (after "evil-leader"
     (evil-leader/set-key
-      "gm" 'git-messenger:popup-message)))
+      "gm" 'git-messenger:popup-message)
+      )
+  :config
+  (define-key git-messenger-map [escape] 'git-messenger:popup-close))
 
 (use-package gitconfig-mode             ; Git configuration mode
   :ensure t
