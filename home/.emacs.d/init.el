@@ -9060,6 +9060,29 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook)
     (add-to-hooks 'emoji-cheat-sheet-plus-display-mode '(markdown-mode))))
 
+(use-package spray
+  :commands spray-mode
+  :ensure t
+  :init
+  (progn
+    (defun dotemacs-start-spray ()
+      "Start spray speed reading on current buffer at current point."
+      (interactive)
+      (evil-insert-state)
+      (spray-mode t)
+      (evil-insert-state-cursor-hide))
+    (evil-leader/set-key "asr" 'dotemacs-start-spray)
+
+    (defadvice spray-quit (after dotemacs-quit-spray activate)
+      "Correctly quit spray."
+      (set-default-evil-insert-state-cursor)
+      (evil-normal-state)))
+  :config
+  (progn
+    (define-key spray-mode-map (kbd "h") 'spray-backward-word)
+    (define-key spray-mode-map (kbd "l") 'spray-forward-word)
+    (define-key spray-mode-map (kbd "q") 'spray-quit)))
+
 ;; vagrant
 (use-package vagrant
   :defer t
