@@ -5906,6 +5906,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
    ("\\.htm\\'"        . web-mode)
    ("\\.[gj]sp\\'"     . web-mode)
    ("\\.as[cp]x\\'"    . web-mode)
+   ("\\.eex\\'"        . web-mode)
    ("\\.erb\\'"        . web-mode)
    ("\\.eco\\'"        . web-mode)
    ("\\.djhtml\\'"     . web-mode)))
