@@ -2733,9 +2733,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                            :documentation "Enable smartparens globally."
                            :evil-leader "t C-p"))
 
-    (setq sp-show-pair-delay 0
+    (setq sp-show-pair-delay 0.2
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
-          sp-show-pair-from-inside t ; fix paren highlighting in normal mode
+          ; fix paren highlighting in normal mode
+          sp-show-pair-from-inside t
           sp-cancel-autoskip-on-backward-movement nil))
   :config
   (progn
