@@ -4930,7 +4930,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (add-hook 'enh-ruby-mode-hook 'ruby-tools-mode)
   :config
-  (dotemacs-hide-lighter ruby-tools-mode))
+  (progn
+      (dotemacs-hide-lighter ruby-tools-mode)
+      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx\'" 'ruby-tools-to-single-quote-string)
+      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx\"" 'ruby-tools-to-double-quote-string)
+      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx:" 'ruby-tools-to-symbol)))
 
 (use-package bundler
   :defer t
