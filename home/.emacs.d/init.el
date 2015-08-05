@@ -3373,6 +3373,12 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :ensure t
   :init (evil-exchange-install))
 
+(use-package iedit
+  :defer t
+  :ensure t
+  :init
+  (setq iedit-toggle-key-default nil))
+
 (use-package evil-iedit-state
   :ensure t
   :init
