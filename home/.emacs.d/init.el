@@ -1300,6 +1300,10 @@ the user activate the completion manually."
 (setq minibuffer-prompt-properties
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 
+(defvar dotemacs--global-mode-line-excludes nil
+  "List of elements to exclude from the global modeline string.
+These should have their own segments in the modeline.")
+
 (use-package init-scratch          ; My logo in the scratch buffer
   :commands (dotemacs-insert-logo
              dotemacs-insert-logo-into-scratch)
@@ -9964,7 +9968,8 @@ It is a string holding:
     :when (bound-and-true-p nyan-mode))
 
   (dotemacs-define-mode-line-segment global-mode
-    (powerline-raw global-mode-string)
+    (powerline-raw (-difference global-mode-string
+                                    dotemacs--global-mode-line-excludes))
     :when (dotemacs-mode-line-nonempty global-mode-string))
 
   (dotemacs-define-mode-line-segment battery
@@ -9985,15 +9990,18 @@ It is a string holding:
                      (dotemacs-custom-flycheck-lighter ,type))))))
 
   (dotemacs-define-mode-line-segment org-clock
-    (funcall dotemacs-mode-line-org-clock-format-function)
+    (substring-no-properties (funcall dotemacs-mode-line-org-clock-format-function))
     :when (and dotemacs-mode-line-org-clock-current-taskp
                (fboundp 'org-clocking-p)
                (org-clocking-p)))
+  (push 'org-mode-line-string dotemacs--global-mode-line-excludes)
 
   (dotemacs-define-mode-line-segment org-pomodoro
     (concat "[" (nth 1 org-pomodoro-mode-line) "]")
+    (nth 1 org-pomodoro-mode-line)
     :when (and (fboundp 'org-pomodoro-active-p)
                (org-pomodoro-active-p)))
+  (push 'org-pomodoro-mode-line dotemacs--global-mode-line-excludes)
 
   ;; END define modeline segments
 
@@ -10226,15 +10234,10 @@ one of `l' or `r'."
                          :status fancy-battery-mode
                          :on
                          (fancy-battery-mode)
-                         (dotemacs-mode-line-battery-remove-from-global)
                          :off (fancy-battery-mode -1)
                          :documentation "Display battery info in mode-line."
                          :evil-leader "tmb")
-
-    (defun dotemacs-mode-line-battery-remove-from-global ()
-      "Remove the battery info from the `global-mode-string'."
-      (setq global-mode-string (delq 'fancy-battery-mode-line
-                                     global-mode-string)))
+    (push 'fancy-battery-mode-line dotemacs--global-mode-excludes)
 
     (defun dotemacs-mode-line-battery-percentage ()
       "Return the load percentage or an empty string."
@@ -10258,7 +10261,6 @@ one of `l' or `r'."
     ;; basically remove all faces and properties.
     (defun fancy-battery-default-mode-line ()
       "Assemble a mode line string for Fancy Battery Mode."
-      (dotemacs-mode-line-battery-remove-from-global)
       (when fancy-battery-last-status
 
         (let* ((type (cdr (assq ?L fancy-battery-last-status)))
