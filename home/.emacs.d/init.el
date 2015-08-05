@@ -2873,14 +2873,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (sp-with-modes '(markdown-mode
                      gfm-mode
                      rst-mode)
-      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
-      (sp-local-pair "_" "_" :wrap "C-_")
       ; (sp-local-tag "2" "**" "**")
       ; (sp-local-tag "s" "```scheme" "```")
       ; (sp-local-tag "<"  "<_>" "</_>" :transform 'sp-match-sgml-tags)
-      ;; Don't do terrible things with Github code blocks (```)
-      (sp-local-pair "`" nil :actions '(:rem autoskip))
-      (sp-local-pair "'" nil :actions nil))
+      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
+      (sp-local-pair "_" "_" :wrap "C-_"))
 
     (sp-with-modes '(rust-mode)
       ;; Don't pair lifetime specifiers
