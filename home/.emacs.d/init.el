@@ -4079,13 +4079,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;;; Programming utilities
 
-;; ignore obsolete function warning generated on startup
-(use-package eval-sexp-fu
-  :ensure t
-  :init
-  (let ((byte-compile-not-obsolete-funcs (append byte-compile-not-obsolete-funcs '(preceding-sexp))))
-    (require 'eval-sexp-fu)))
-
 (use-package init-programming
   :load-path "config/"
   :defer t
