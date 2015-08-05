@@ -3305,6 +3305,9 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (after "smartparens"
       (defadvice evil-delete-backward-char-and-join
           (around dotemacs-evil-delete-backward-char-and-join activate)
+        (defvar smartparens-strict-mode)
+        ;; defadvice compiles this sexp generating a compiler warning for a
+        ;; free variable reference. The line above fixes this
         (if smartparens-strict-mode
             (call-interactively 'sp-backward-delete-char)
           ad-do-it)))))
@@ -4075,6 +4078,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Programming utilities
+
+;; ignore obsolete function warning generated on startup
+(use-package eval-sexp-fu
+  :ensure t
+  :init
+  (let ((byte-compile-not-obsolete-funcs (append byte-compile-not-obsolete-funcs '(preceding-sexp))))
+    (require 'eval-sexp-fu)))
+
 (use-package init-programming
   :load-path "config/"
   :defer t
