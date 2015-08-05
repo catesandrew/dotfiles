@@ -1,0 +1,33 @@
+[DEFAULT]
+# http://stackoverflow.com/questions/2514270/how-to-check-for-changes-on-remote-origin-git-repository
+git_upstream1 = git remote -v update && git status -uno
+git_upstream2 = git remote update &> /dev/null && git status -s -b -uno
+git_upstream3 = git remote update && git diff HEAD FETCH_HEAD && git status -s -uno
+git_upstream4 = git remote update && git status -b -uno
+# http://stackoverflow.com/questions/3258243/git-check-if-pull-needed
+git_upstream5 = git remote update &> /dev/null && LOCAL=$(git rev-parse @) && REMOTE=$(git rev-parse @{u}) && BASE=$(git merge-base @ @{u}) && if [ $LOCAL = $REMOTE ]; then :; elif [ $LOCAL = $BASE ]; then echo "Need to pull" && git status -s -b -uno; elif [ $REMOTE = $BASE ]; then echo "Need to push" && git status -s -b -uno; else echo "Diverged" && git status -s -b -uno; fi
+# http://stackoverflow.com/questions/3878624/how-do-i-programmatically-determine-if-there-are-uncommited-changes
+git_upstream = git remote update &> /dev/null && LOCAL=$(git rev-parse @) && REMOTE=$(git rev-parse @{u}) && BASE=$(git merge-base @ @{u}) && if [ $LOCAL = $REMOTE ]; then if [[ -n $(git status -s) ]]; then git status -s; fi; elif [ $LOCAL = $BASE ]; then echo "Need to pull" && git status -s -b -uno; elif [ $REMOTE = $BASE ]; then echo "Need to push" && git status -s -b -uno; else echo "Diverged" && git status -s -b -uno; fi
+
+git_pullff = git pull --ff-only
+git_gff = git merge --ff-only
+git_pullff = git pull --ff-only
+git_noff = git merge --no-ff
+git_gfa = git fetch -all
+git_pom = git push origin master
+git_pod = git push origin develop
+git_gdi = git diff
+git_gdc = git diff --cached
+git_gds = git diff --stats=160,120
+git_gdh1 = git diff HEAD~1
+git_gst = git status -sb
+git_gs = git status
+git_gss = git status -s
+git_gl = git pull
+git_gpr = git pull --rebase
+git_report1 = git --no-pager log --author=Andrew --since='6am - 1day' --format='%Cgreen%ci%Creset %s%Creset' --no-merges
+git_report2 = git --no-pager log --author=Andrew --after=tea --format='%Cgreen%ci%Creset %s%Creset' --no-merges
+git_report3 = git --no-pager log --author=Andrew --since=yesterday --before=6am --format='%Cgreen%ci%Creset %s%Creset' --no-merges
+git_report4 = git --no-pager log --author=Andrew --since=yesterday --before=6am --pretty=format:'%Cred%h%Creset - %C(yellow)%ae%Creset - %Cgreen%cd%Creset - %s%Creset' --no-merges --abbrev-commit --date=relative
+git_report = git --no-pager log --author=Andrew --since=yesterday --before=6am --pretty=format:'%Cred%h%Creset - %C(yellow)%ae%Creset - %Cgreen%cd%Creset - %s%Creset' --no-merges --abbrev-commit --date=relative
+

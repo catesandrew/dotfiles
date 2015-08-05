@@ -10,3 +10,4 @@ indent.pro skip
 .config recurse
 .mjolnir recurse
 .lein recurse
+.mrconfig skip
