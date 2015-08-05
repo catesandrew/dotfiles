@@ -1531,7 +1531,7 @@ the user activate the completion manually."
         "ff"   'dotemacs-helm-find-files
         "fF"   'helm-find-files
         "fr"   'helm-recentf
-        "hb"   'helm-pp-bookmarks
+        "hb"   'helm-filtered-bookmarks
         "hi"   'helm-info-at-point
         "hl"   'helm-resume
         "hm"   'helm-man-woman
