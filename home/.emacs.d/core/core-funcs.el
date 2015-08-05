@@ -149,13 +149,13 @@ Supported properties:
     (when (file-exists-p elpa-dir)
       (let ((dir (reduce (lambda (x y) (if x x y))
                          (mapcar (lambda (x)
-                                   (if (string-match
-                                        (concat "/"
-                                                (symbol-name pkg)
-                                                "-[0-9]+") x) x))
+                                   (when (string-match
+                                          (concat "/"
+                                                  (symbol-name pkg)
+                                                  "-[0-9]+") x) x))
                                  (directory-files elpa-dir 'full))
                          :initial-value nil)))
-        (if dir (file-name-as-directory dir))))))
+        (when dir (file-name-as-directory dir))))))
 
 (defun dotemacs-load-or-install-package (pkg &optional log file-to-load)
   "Load PKG package. PKG will be installed if it is not already installed.
