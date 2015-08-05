@@ -3026,25 +3026,20 @@ Disable the highlighting of overlong lines."
 
 (use-package hl-anything ;; Highlight things at point, selections, enclosing parentheses
   :ensure t
-  :defer t
   :init
   (progn
+    (hl-highlight-mode)
     (setq-default hl-highlight-save-file (concat dotemacs-cache-directory ".hl-save"))
-    (after "evil-leader"
-      (evil-leader/set-key
-        "hc"  'hl-unhighlight-all-local
-        "hgc" 'hl-unhighlight-all-global
-        "hgh" 'hl-highlight-thingatpt-global
-        "hh"  'hl-highlight-thingatpt-local
-        "hn"  'hl-find-next-thing
-        "hN"  'hl-find-prev-thing
-        "hp"  'hl-paren-mode
-        "hr"  'hl-restore-highlights
-        "hs"  'hl-save-highlights)))
-  :config
-  (progn
-    (dotemacs-diminish hl-paren-mode " (Ⓗ)" " (H)")
-    (dotemacs-hide-lighter hl-highlight-mode)))
+    (evil-leader/set-key
+      "hc"  'hl-unhighlight-all-local
+      "hC"  'hl-unhighlight-all-global
+      "hh"  'hl-highlight-thingatpt-local
+      "hH"  'hl-highlight-thingatpt-global
+      "hn"  'hl-find-next-thing
+      "hN"  'hl-find-prev-thing
+      "hr"  'hl-restore-highlights
+      "hs"  'hl-save-highlights))
+  :config (dotemacs-hide-lighter hl-highlight-mode))
 
 (use-package hi-lock                    ; Custom regexp highlights
   :init (global-hi-lock-mode)
