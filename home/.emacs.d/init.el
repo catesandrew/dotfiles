@@ -4596,6 +4596,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mes"     'ensime-stacktrace-switch
 
       "mgg"     'ensime-edit-definition
+      "mgp"     'ensime-pop-find-definition-stack
       "mgi"     'ensime-goto-impl
       "mgt"     'ensime-goto-test
 
