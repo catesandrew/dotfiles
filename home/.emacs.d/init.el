@@ -5553,6 +5553,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-defvar-company-backends cider-mode)
 (dotemacs-defvar-company-backends cider-repl-mode)
 
+(setq clojure/key-binding-prefixes '(("me" . "evaluation")
+                                     ("mg" . "goto")
+                                     ("mh" . "documentation")
+                                     ("mr" . "refactor")
+                                     ("mt" . "test")))
+(mapc (lambda (x) (dotemacs-declare-prefix-for-mode
+                   'clojure-mode (car x) (cdr x)))
+            clojure/key-binding-prefixes)
+
 (use-package init-clojure
   :load-path "config/")
 
@@ -6475,7 +6484,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                   ("mp" . "project")
                                   ("mt" . "test")))
 
-(mapc (lambda(x) (dotemacs-declare-prefix-for-mode 'java-mode (car x) (cdr x)))
+(mapc (lambda(x) (dotemacs-declare-prefix-for-mode
+                  'java-mode (car x) (cdr x)))
       java/key-binding-prefixes)
 
 (use-package init-java
