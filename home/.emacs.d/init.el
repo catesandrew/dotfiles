@@ -1176,6 +1176,38 @@ the user activate the completion manually."
   :ensure t
   :init (turn-on-pbcopy))
 
+(use-package launchctl
+  :if (eq system-type 'darwin)
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.plist$" . nxml-mode))
+    (evil-leader/set-key "al" 'launchctl))
+  :config
+  (progn
+    (evilify launchctl-mode launchctl-mode-map
+             (kbd "q") 'quit-window
+             (kbd "s") 'tabulated-list-sort
+             (kbd "g") 'launchctl-refresh
+             (kbd "n") 'launchctl-new
+             (kbd "e") 'launchctl-edit
+             (kbd "v") 'launchctl-view
+             (kbd "l") 'launchctl-load
+             (kbd "u") 'launchctl-unload
+             (kbd "r") 'launchctl-reload
+             (kbd "S") 'launchctl-start
+             (kbd "K") 'launchctl-stop
+             (kbd "R") 'launchctl-restart
+             (kbd "D") 'launchctl-remove
+             (kbd "d") 'launchctl-disable
+             (kbd "E") 'launchctl-enable
+             (kbd "i") 'launchctl-info
+             (kbd "f") 'launchctl-filter
+             (kbd "=") 'launchctl-setenv
+             (kbd "#") 'launchctl-unsetenv
+             (kbd "h") 'launchctl-help)))
+
 (use-package reveal-in-finder           ; Reveal current buffer in finder
   :if (eq system-type 'darwin)
   :ensure t
