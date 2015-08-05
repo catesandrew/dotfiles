@@ -2257,19 +2257,19 @@ These should have their own segments in the modeline.")
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
 
-(use-package evil-ranger
+(use-package ranger
   :defer t
   :ensure t
   :init
   (progn
-    (setq evil-ranger-show-literal nil
-          evil-ranger-preview-file t
-          evil-ranger-width-parents 0.15
-          evil-ranger-width-preview 0.65
-          evil-ranger-show-preview t
-          evil-ranger-parent-depth 1
-          evil-ranger-max-preview-size 10)
-    (evil-leader/set-key "ar" 'evil-ranger)))
+    (setq ranger-show-literal nil
+          ranger-preview-file t
+          ranger-width-parents 0.15
+          ranger-width-preview 0.65
+          ranger-show-preview t
+          ranger-parent-depth 1
+          ranger-max-preview-size 10)
+    (evil-leader/set-key "ar" 'ranger)))
 
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
