@@ -961,6 +961,11 @@ the user activate the completion manually."
   :config
   (progn
     (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
+    ;; multi-term commands to create terminals and move through them.
+    (evil-leader/set-key-for-mode 'term-mode "mc" 'multi-term)
+    (evil-leader/set-key-for-mode 'term-mode "mp" 'multi-term-prev)
+    (evil-leader/set-key-for-mode 'term-mode "mn" 'multi-term-next)
+
     (after "evil-leader"
       (evil-leader/set-key "p$t" 'projectile-multi-term-in-root))))
 
