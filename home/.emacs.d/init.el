@@ -2381,10 +2381,13 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (defun dotemacs-ace-buffer-links ()
       "Ace jump to links in `emacs' buffer."
       (interactive)
-      (ali-generic
-       (dotemacs-collect-buffer-links)
-       (forward-char 1)
-       (widget-button-press (point))))))
+      (let ((res (avy--with-avy-keys dotemacs-ace-buffer-links
+                    (avy--process
+                        (dotemacs-collect-buffer-links)
+                        #'avy--overlay-pre))))
+            (when res
+            (goto-char (1+ res))
+            (widget-button-press (point)))))))
 
 (use-package ace-window                 ; Fast window switching
   :ensure t
