@@ -1152,6 +1152,16 @@ the user activate the completion manually."
   :init
   :config
   (progn
+    ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
+    ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
+    ;; warnings, when not using `coreutils' version of 'ls' on OS X.
+    ;; See brew info coreutils
+    (when (executable-find "gls")
+      ;; maybe absolute or relative name of the `ls' program used by
+      ;; `insert-directory'.
+      (setq insert-directory-program "gls"
+            dired-listing-switches "-aBhl --group-directories-first"))
+
     ;; Ignore .DS_Store files with ido mode
     (add-to-list 'ido-ignore-files "\\.DS_Store"))
   :bind ("C-c f o" . dotemacs-open-current-file))
@@ -1948,14 +1958,7 @@ the user activate the completion manually."
   ;; a buffer (removing it from the current window and sending it to the bottom
   ;; of the stack) is very common for dismissing buffers.
   :bind (("C-c e u" . revert-buffer)
-         ("C-c e y" . bury-buffer))
-  :config
-  ;; Use GNU ls for Emacs
-  (when-let (gnu-ls (and (eq system-type 'darwin) (executable-find "gls")))
-    ;; maybe absolute or relative name of the `ls' program used by
-    ;; `insert-directory'.
-    ;; brew install coreutils
-    (setq insert-directory-program gnu-ls)))
+         ("C-c e y" . bury-buffer)))
 
 (defun current-buffer-remote-p ()
   (--any? (and it (file-remote-p it))
