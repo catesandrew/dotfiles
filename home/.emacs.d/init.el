@@ -1614,6 +1614,12 @@ These should have their own segments in the modeline.")
     (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
 
+
+(use-package helm-unicode
+  :defer t
+  :ensure t
+  :init (evil-leader/set-key "iu" 'helm-unicode))
+
 (use-package helm-ls-git
   :defer t
   :ensure t
