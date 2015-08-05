@@ -796,6 +796,14 @@ FEATURE may be a named feature or a file name, see
   :load-path "core/")
 
 (dotemacs-load-or-install-package 's t)
+;; package-build is required by quelpa
+(dotemacs-load-or-install-package 'package-build t)
+(setq quelpa-verbose dotemacs-verbose-loading
+      quelpa-dir (concat dotemacs-cache-directory "quelpa/")
+      quelpa-build-dir (expand-file-name "build" quelpa-dir)
+      quelpa-persistent-cache-file (expand-file-name "cache" quelpa-dir)
+      quelpa-update-melpa-p nil)
+(dotemacs-load-or-install-package 'quelpa t)
 ;; evil and evil-leader must be installed at the beginning of the boot sequence.
 (dotemacs-load-or-install-package 'evil t)
 (dotemacs-load-or-install-package 'evil-leader t)
