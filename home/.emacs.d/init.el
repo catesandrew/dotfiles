@@ -2795,7 +2795,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (setq sp-show-pair-delay 0.2
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
           ; fix paren highlighting in normal mode
-          sp-show-pair-from-inside t
+          sp-show-pair-from-inside (not evil-move-beyond-eol)
           sp-cancel-autoskip-on-backward-movement nil))
   :config
   (progn
