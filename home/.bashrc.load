@@ -5,90 +5,7 @@ export BASH_IT=$HOME/.bash
 
 source "${BASH_IT}/lib/utils.sh"
 
-if [ $(uname) = "Darwin" ]; then
-
-    export CHEATCOLORS=true
-    export JAVA_HOME="`/usr/libexec/java_home`"
-    export HTML_TIDY=$HOME/.tidyrc
-    export TLSOURCE=en TLTARGET=es
-    export LC_CTYPE="utf-8"
-    export LC_ALL=en_US.UTF-8
-    export LANG=en_US.UTF-8
-    export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
-
-    export PERL_LOCAL_LIB_ROOT="${HOME}/perl5:$PERL_LOCAL_LIB_ROOT";
-    export PERL_MB_OPT="--install_base "${HOME}/perl5"";
-    export PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5";
-    export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
-    export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
-    export PATH="${HOME}/perl5/bin:${PATH}"
-    export PATH="${HOME}/.rbenv/shims:${PATH}"
-
-    if hash brew 2>/dev/null; then
-        export BREW_HOME="`brew --prefix`"
-
-        # Cask installation
-        if [ ! -h "${HOME}/.cask" ]; then
-            if [ x"" != x"$(brew ls --versions cask)"  ]; then
-                CASK_HOME="`brew --prefix cask`"
-                ln -s "${CASK_HOME}" "${HOME}/.cask"
-            fi
-        fi
-
-        if [ x"" != x"$(brew ls --versions openconnect)" ]; then
-            export VPNC_SCRIPT=$BREW_HOME/etc/vpnc-script
-        fi
-
-        if brew cask info vagrant 1>/dev/null 2>&1; then
-            export VAGRANT_CHECKPOINT_DISABLE=1
-            export VAGRANT_HOME=~/.vagrant.d
-            export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
-            # Time Machine ignore this directory
-            export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
-        fi
-
-    else
-        echo "homebrew not installed, please consider installing it."
-    fi
-
-
-elif [ $(uname) = "Linux" ]; then
-    export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
-    export PATH="/usr/local/linuxbrew/bin:$PATH"
-    if hash brew 2>/dev/null; then
-        # Fix checks for gcc compiler when not present when `--env=inherit` specified
-        export BREW_HOME="`brew --prefix`"
-        export HOMEBREW_TEMP="${BREW_HOME}/tmp"
-        export MANPATH="${BREW_HOME}/share/man:$MANPATH"
-        export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
-    else
-        echo "linuxbrew not installed, please consider installing it."
-    fi
-
-    dpkg -s vagrant &>/dev/null || {
-        export VAGRANT_CHECKPOINT_DISABLE=1
-        export VAGRANT_HOME=~/.vagrant.d
-        export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
-    }
-
-    dpkg -s vpnc-scripts &>/dev/null || {
-        export VPNC_SCRIPT=/usr/share/vpnc-scripts/vpnc-script
-    }
-fi
-
-if hash brew 2>/dev/null; then
-    if [ x"" != x"$(brew ls --versions go)"  ]; then
-        export GOROOT=$(brew --prefix go)
-        export GOPATH=/usr/local/go
-    fi
-fi
-
-export PATH="${HOME}/.cabal/bin:$PATH"
-export PATH="${HOME}/.bin:$PATH"
 export DFM_REPO="${HOME}/.dotfiles"
-if hash packer 2>/dev/null; then
-    export PACKER_CACHE_DIR="${HOME}/.packer_cache"
-fi
 
 # Lock and load a custom theme file location /.bash/themes/
 export BASH_IT_THEME='powerline-multiline'
@@ -140,15 +57,6 @@ export MANPAGER="less -X"
 # Change this to your console based IRC client of choice.
 export IRC_CLIENT='irssi'
 
-# Node Version Manager
-if hash brew 2>/dev/null; then
-    if [ x"" != x"$(brew ls --versions nvm)" ]; then
-        export NVM_TARGET="$(brew --prefix nvm)"
-        export NVM_DIR="/usr/local/nvm"
-        [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
-    fi
-fi
-
 # Load composure first, so we support function metadata
 source "${BASH_IT}/lib/composure.sh"
 
@@ -165,6 +73,107 @@ for config_file in $LIB
 do
   source $config_file
 done
+
+if [ $(uname) = "Darwin" ]; then
+
+    export CHEATCOLORS=true
+    # export JAVA_HOME="`/usr/libexec/java_home`"
+    export HTML_TIDY=$HOME/.tidyrc
+    export TLSOURCE=en TLTARGET=es
+    export LC_CTYPE="utf-8"
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
+
+    export PERL_LOCAL_LIB_ROOT="${HOME}/perl5:$PERL_LOCAL_LIB_ROOT";
+    export PERL_MB_OPT="--install_base "${HOME}/perl5"";
+    export PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5";
+    export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
+    pathmunge "/usr/local/sbin"
+    pathmunge "/usr/local/bin"
+    pathmunge "${HOME}/.cabal/bin"
+    pathmunge "${HOME}/.bin"
+
+    if hash brew 2>/dev/null; then
+        export BREW_HOME="`brew --prefix`"
+
+        # Cask installation
+        if [ ! -h "${HOME}/.cask" ]; then
+            if [ x"" != x"$(brew ls --versions cask)"  ]; then
+                CASK_HOME="`brew --prefix cask`"
+                ln -s "${CASK_HOME}" "${HOME}/.cask"
+            fi
+        fi
+
+        if [ x"" != x"$(brew ls --versions openconnect)" ]; then
+            export VPNC_SCRIPT=$BREW_HOME/etc/vpnc-script
+        fi
+
+        if brew cask info vagrant 1>/dev/null 2>&1; then
+            export VAGRANT_CHECKPOINT_DISABLE=1
+            export VAGRANT_HOME=~/.vagrant.d
+            export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
+            # Time Machine ignore this directory
+            export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
+        fi
+
+    else
+        echo "homebrew not installed, please consider installing it."
+    fi
+
+
+elif [ $(uname) = "Linux" ]; then
+    pathmunge "/usr/local/sbin"
+    pathmunge "/usr/local/bin"
+    pathmunge "/usr/local/linuxbrew/bin"
+    pathmunge "${HOME}/.cabal/bin"
+    pathmunge "${HOME}/.bin"
+    if hash brew 2>/dev/null; then
+        # Fix checks for gcc compiler when not present when `--env=inherit` specified
+        export BREW_HOME="`brew --prefix`"
+        export HOMEBREW_TEMP="${BREW_HOME}/tmp"
+        export MANPATH="${BREW_HOME}/share/man:$MANPATH"
+        export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
+    else
+        echo "linuxbrew not installed, please consider installing it."
+    fi
+
+    dpkg -s vagrant &>/dev/null || {
+        export VAGRANT_CHECKPOINT_DISABLE=1
+        export VAGRANT_HOME=~/.vagrant.d
+        export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
+    }
+
+    dpkg -s vpnc-scripts &>/dev/null || {
+        export VPNC_SCRIPT=/usr/share/vpnc-scripts/vpnc-script
+    }
+fi
+
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions go)"  ]; then
+        export GOROOT=$(brew --prefix go)
+        export GOPATH=/usr/local/go
+    fi
+fi
+
+if hash packer 2>/dev/null; then
+    export PACKER_CACHE_DIR="${HOME}/.packer_cache"
+fi
+
+# Node Version Manager
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions nvm)" ]; then
+        export NVM_TARGET="$(brew --prefix nvm)"
+        export NVM_DIR="/usr/local/nvm"
+        [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
+    fi
+fi
+
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions pyenv)" ]; then
+        export PYENV_ROOT="$(brew --prefix pyenv)"
+    fi
+fi
 
 # Load enabled aliases, completion, plugins
 for file_type in "aliases" "completion" "plugins"
@@ -213,8 +222,8 @@ export FZF_DEFAULT_COMMAND='
 . ${BASH_IT}/custom.sh
 
 
-if [ $(uname) = "Darwin" ]; then
-    launchctl setenv PATH $PATH
-fi
+# if [ $(uname) = "Darwin" ]; then
+#     launchctl setenv PATH $PATH
+# fi
 
 fi
