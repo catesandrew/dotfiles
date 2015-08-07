@@ -16,7 +16,7 @@ export HISTSIZE=5000
 
 # Increase the maximum number of lines contained in the history file
 # (default is 500)
-export HISTFILESIZE=10000
+export HISTFILESIZE=100000
 
 # Make some commands not show up in history
 export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
