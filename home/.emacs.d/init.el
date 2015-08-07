@@ -7952,9 +7952,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           neo-banner-message nil
           neo-show-updir-line nil
           neo-mode-line-type 'neotree
-          neo-smart-open t
-          neo-dont-be-alone t
-          neo-persist-show nil
+          neo-smart-open nil            ; every time when the neotree window is
+                                        ; opened, it will try to find current
+                                        ; file and jump to node.
+          neo-dont-be-alone t           ; Don't allow neotree to be the only open
+                                        ; window
+          neo-persist-show t
           neo-show-hidden-files nil
           neo-auto-indent-point t)
 
@@ -8034,8 +8037,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "pt" 'neotree-find-project-root)))
 
   :config
+  (progn
+    (when neo-persist-show
+      (add-hook 'popwin:before-popup-hook
+                (lambda () (setq neo-persist-show nil)))
+      (add-hook 'popwin:after-popup-hook
+                (lambda () (setq neo-persist-show t))))
     (add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
-                                      dotemacs-neotree-key-bindings)))
+                                      dotemacs-neotree-key-bindings))))
 
 
 ;;; Perspective
