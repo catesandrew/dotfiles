@@ -221,9 +221,4 @@ export FZF_DEFAULT_COMMAND='
 # Custom (Machine-Specific) Startup #
 . ${BASH_IT}/custom.sh
 
-
-# if [ $(uname) = "Darwin" ]; then
-#     launchctl setenv PATH $PATH
-# fi
-
 fi
