@@ -874,9 +874,7 @@ FEATURE may be a named feature or a file name, see
   :config
   (progn
     (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
-      (add-to-list 'exec-path-from-shell-variables var))
-
-    ))
+      (add-to-list 'exec-path-from-shell-variables var))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
