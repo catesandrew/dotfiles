@@ -208,3 +208,88 @@ This also changes the URL of the git origin `heroku` to make sure you're using t
 ### Introduction ###
 
 This started off from [github-keygen](https://github.com/dolmen/github-keygen), which is also checked in at `home\.bin\github-keygen`. Since the `~/.ssh/config` file was created for me and my accounts, you will probably want to remove the soft link in your own `~/.ssh` folder. I would strongly suggest following the pattern. On Mac OS/X it requires a newer `openssh` you can install from `homebrew/dupes`.
+
+## Global Variables on OSX ##
+
+Nothing quite works right for yosemite for enabling global variables for GUI applications launched from Finder. You can try the `launchctl setenv var val` route but that does not work for `PATH`. You can try the `/etc/paths` route but that too is limited in variable substitutions. I ended up using a combination of these two methods and using a `pathmunge` function helper in my bashrc.load to not add duplicate entries.
+
+### /etc/paths ###
+
+I added my `/usr/local/bin` and `/usr/local/sbin` to the top of the existing paths.
+
+```bash
+/usr/local/bin
+/usr/local/sbin
+/usr/bin
+/bin
+/usr/sbin
+/sbin
+```
+
+### ~/Library/LaunchAgents/environment.plist ###
+
+This works but doesn’t set up PATH environment variable. However, it still proved useful for setting up other global variables that can be used later on. Here I’m adding the most important variable, `NVM_DIR`, which I’ll use next.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>mako.environment</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>sh</string>
+    <string>-c</string>
+    <string>
+        /bin/launchctl setenv BREW_HOME /usr/local
+        /bin/launchctl setenv GOPATH /usr/local/go
+        /bin/launchctl setenv NVM_DIR /usr/local/nvm
+        /bin/launchctl setenv NVM_TARGET /usr/local/opt/nvm
+      </string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>
+```
+### /etc/profile ###
+
+# System-wide .profile for sh(1)
+
+This file is what kicks off `/etc/paths` from the `path_helper` function. Trouble is that it kills anything before it. I’m keeping the existing behavior and then setting up my node paths from nvm. Here, we are grabbing the version nvm is set to use from the `alias/default` file and then using it to add node to the `PATH`. The `NVM_DIR` was set prior in the `launchctl` command.
+
+
+```bash
+if [ -x /usr/libexec/path_helper ]; then
+  eval `/usr/libexec/path_helper -s`
+fi
+
+# BEGIN Global Path
+if ! [ -d "$NVM_DIR" ]; then
+  if [ -d /usr/local/nvm ]; then
+    NVM_DIR=/usr/local/nvm
+  elif [ -d "$HOME" ]; then
+    NVM_DIR="$HOME"/.nvm
+  fi
+fi
+if [ -d "$NVM_DIR" ]; then
+    if [ -f "${NVM_DIR}/alias/default" ]; then
+        NVM_VERSION=`cat ${NVM_DIR}/alias/default`
+        PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:./node_modules/.bin:${PATH}"
+        NVM_BIN="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin"
+        NVM_PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node"
+        export PATH
+        export NVM_DIR
+        export NVM_BIN
+        export NVM_PATH
+    fi
+fi
+# END Global Path
+
+if [ "${BASH-no}" != "no" ]; then
+  [ -r /etc/bashrc ] && . /etc/bashrc
+fi
+```
+
+And through all these files and commands I have the correct node path from nvm loaded into the gloabl environment. Now obviously I doubt this would work once you update the version of node and a reboot or logoff/login will be required for the changes to take effect. But that’s ok with me since I typically only update node once every couple months.
