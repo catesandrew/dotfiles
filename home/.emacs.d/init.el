@@ -6248,9 +6248,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-to-list 'auto-mode-alist '("\\.jscsrc$" . json-mode))
     (add-to-list 'auto-mode-alist '("\\.eslintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode)
-    ;; required to make `<SPC> s l' to work correctly
-    (add-hook 'js2-mode-hook 'js2-imenu-extras-mode))
+    (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode))
   :config
   (progn
     (setq-default js2-basic-offset 2)
@@ -6267,6 +6265,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
     (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)))
 
+(use-package js2-imenu-extras
+  :ensure js2-mode
+  :defer t
+  :init
+  (progn
+    (require 'js2-imenu-extras)
+      (setq js2-imenu-enabled-frameworks 'nil)
+      (js2-imenu-extras-mode)
+      ;; required to make `<LEADER> s l' to work correctly
+      (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)))
 
 (use-package js2-refactor
   :defer t
