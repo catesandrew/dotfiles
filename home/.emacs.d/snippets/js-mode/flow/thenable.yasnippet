@@ -1,8 +1,9 @@
 # -*- coding: utf-8; mode: snippet -*-
 # group: async
 # name: Promise.then
-# key: then
+# key: anti-then
 # --
 .then(function(${1:result}) {
-  return ${0};
-})
+  return ${0:undefined};
+}, function(${2:reason}) {
+})${3:;}

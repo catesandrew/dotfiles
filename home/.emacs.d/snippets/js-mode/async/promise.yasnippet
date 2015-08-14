@@ -1,8 +1,13 @@
 # -*- coding: utf-8; mode: snippet -*-
 # group: async
 # name: Promise
-# key: p
+# key: promise
 # --
-new Promise((resolve, reject) => {
-  ${0}
+new Q.Promise(function(resolve, reject, notify) {
+  return ${0};
 })
+.then(function(${1:result}) {
+  return ${0};
+})
+.catch(function(${2:err} {
+});
