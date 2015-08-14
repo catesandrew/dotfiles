@@ -207,6 +207,17 @@ function geticon() {
   fi
 }
 
+# http://stackoverflow.com/questions/1378274
+# A bad-arse SysOps guy once taught me the Three-Fingered Claw technique:
+yell() { echo "$0: $*" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "cannot $*"; }
+asuser() { sudo su - "$1" -c "${*:2}"; }
+
+# Example usage:
+# try apt-fast upgrade -y
+# try asuser vagrant "echo 'uname -a' >> ~/.profile"
+
 if ! type pathmunge > /dev/null 2>&1
 then
   function pathmunge () {
