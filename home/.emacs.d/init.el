@@ -9290,6 +9290,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (setq flycheck-standard-error-navigation nil
+          flycheck-temp-prefix '.flycheck
           flycheck-completion-system 'ido)
 
     (defun flycheck-turn-on-maybe ()
