@@ -1151,30 +1151,23 @@ the user activate the completion manually."
 (use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
   :load-path "config/"
-  :defer t
-  :commands (dotemacs-id-of-bundle
-             dotemacs-path-of-bundle
-             dotemacs-homebrew-prefix
-             dotemacs-homebrew-installed-p
-             dotemacs-open-current-file
-             dotemacs-chomp
-             dotemacs-get-keychain-password)
-  :init
   :config
   (progn
     ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
     ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
     ;; warnings, when not using `coreutils' version of 'ls' on OS X.
     ;; See brew info coreutils
-    (when (executable-find "gls")
-      ;; maybe absolute or relative name of the `ls' program used by
-      ;; `insert-directory'.
-      (setq insert-directory-program "gls"
+    (when-let (gnu-ls (and (eq system-type 'darwin)
+                             (executable-find "gls")))
+      (setq insert-directory-program gnu-ls
             dired-listing-switches "-aBhl --group-directories-first"))
 
-    ;; Ignore .DS_Store files with ido mode
-    (add-to-list 'ido-ignore-files "\\.DS_Store"))
-  :bind ("C-c f o" . dotemacs-open-current-file))
+    ; (when (executable-find "gls")
+    ;   ;; maybe absolute or relative name of the `ls' program used by
+    ;   ;; `insert-directory'.
+    ;   (setq insert-directory-program "gls"
+    ;         dired-listing-switches "-aBhl --group-directories-first"))
+    ))
 
 (use-package osx-trash                  ; Trash support for OS X
   :if (eq system-type 'darwin)
@@ -7581,6 +7574,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ido-auto-merge-work-directories-length 0))
   :config
   (progn
+    (when (eq system-type 'darwin)
+      ;; Ignore .DS_Store files with ido mode
+      (add-to-list 'ido-ignore-files "\\.DS_Store"))
+
     (ido-mode 1)
     (ido-everywhere 1)))
 
