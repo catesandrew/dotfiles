@@ -25,9 +25,9 @@
   (setq yas-dont-activate t))
 
 (defun dotemacs-auto-yasnippet-expand ()
-      "Call `yas-expand' and switch to `insert state'"
-      (interactive)
-      (call-interactively 'aya-expand)
-      (evil-insert-state))
+  "Call `yas-expand' and switch to `insert state'"
+  (interactive)
+  (call-interactively 'aya-expand)
+  (evil-insert-state))
 
 (provide 'init-yasnippet)
