@@ -12,14 +12,14 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>$HOME/.bin/brew-update-notifier.sh</string>
+        <string>$HOME/.bin/brew-update-notifier.sh</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>StandardErrorPath</key>
-    <string>/var/log/osx.brew-updater.stderr</string>
+    <string>/tmp/osx.brew-updater.stderr</string>
 	<key>StandardOutPath</key>
-    <string>/var/log/osx.brew-updater.stdout</string>
+    <string>/tmp/osx.brew-updater.stdout</string>
 	<key>StartCalendarInterval</key>
 	<array>
 		<dict>

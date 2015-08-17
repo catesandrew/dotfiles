@@ -16,8 +16,8 @@
 	<key>RunAtLoad</key>
 	<true/>
 	<key>StandardErrorPath</key>
-    <string>/var/log/osx.synology-shared-home.stderr</string>
+    <string>/tmp/osx.synology-shared-home.stderr</string>
 	<key>StandardOutPath</key>
-    <string>/var/log/osx.synology-shared-home.stdout</string>
+    <string>/tmp/osx.synology-shared-home.stdout</string>
 </dict>
 </plist>

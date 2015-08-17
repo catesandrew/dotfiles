@@ -19,8 +19,8 @@
   <key>RunAtLoad</key>
   <true/>
   <key>StandardErrorPath</key>
-  <string>/var/log/osx.environment.stderr</string>
+  <string>/tmp/osx.environment.stderr</string>
   <key>StandardOutPath</key>
-  <string>/var/log/osx.environment.stdout</string>
+  <string>/tmp/osx.environment.stdout</string>
 </dict>
 </plist>
