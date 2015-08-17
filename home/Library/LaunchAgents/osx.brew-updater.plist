@@ -17,9 +17,9 @@
 	<key>RunAtLoad</key>
 	<true/>
 	<key>StandardErrorPath</key>
-	<string>/tmp/osx.brew-updater.stderr</string>
+    <string>/var/log/osx.brew-updater.stderr</string>
 	<key>StandardOutPath</key>
-	<string>/tmp/osx.brew-updater.stdout</string>
+    <string>/var/log/osx.brew-updater.stdout</string>
 	<key>StartCalendarInterval</key>
 	<array>
 		<dict>
