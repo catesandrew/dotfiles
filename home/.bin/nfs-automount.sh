@@ -20,19 +20,22 @@ DATESTAMP=`date`
 if [ -f ${CONFIG_FILE} ] ; then
   source ${CONFIG_FILE}
 else
-  echo "nfs-automount [${DATESTAMP}]: [CRIT] Configuration file (${CONFIG}) missing; cannot continue!"
+  echo "nfs-automount [${DATESTAMP}]: [CRIT] Configuration file (${CONFIG_FILE}) missing; cannot continue!"
   exit 1
 fi
 
+SYNO_MOUNT=$("${HOME}/.bin/nfs-synology.sh" "$1" "${LDAP_URI}" "${BASE_DN}" "${USE_TLS}" "${NFS_SERVER}" "${DOMAIN_NAME}")
+
 counter=0
 declare -a MOUNTDATA
+MOUNTDATA[((counter++))]=${SYNO_MOUNT}
 for MOUNT in ${MOUNTS[@]}; do
   MOUNTDATA[((counter++))]=${MOUNT}
 done
 
 # -- LOGGING --
 
-LOGFILEPATH="/var/log/nfs-automount.log"
+LOGFILEPATH="/tmp/nfs-automount.log"
 
 function log {
 
