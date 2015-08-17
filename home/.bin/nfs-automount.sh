@@ -17,8 +17,8 @@ DATESTAMP=`date`
 
 # -- IMPORT CONFIGURATION --
 
-if [ -f ${CONFIG} ] ; then
-  source ${CONFIG}
+if [ -f ${CONFIG_FILE} ] ; then
+  source ${CONFIG_FILE}
 else
   echo "nfs-automount [${DATESTAMP}]: [CRIT] Configuration file (${CONFIG}) missing; cannot continue!"
   exit 1
@@ -219,6 +219,7 @@ function check_remoteshare {
 
   remotesharecheck=`${showmountcmd} -e ${_remotesystem} | ${awkcmd} '{print $1}' | ${grepcmd} "${_remoteshare}"`
 
+  # todo: investigate why showmount -e nfs.cates.io does not show /var/services/homes/... as being available
   if [ $(uname) = "Darwin" ]; then
     _RET=true
   else
