@@ -1,2 +1,5 @@
 .DS_Store skip
+osx.brew-updater.plist chmod 755
+osx.environment.plist   chmod 755
+osx.synology-shared-home.plist chmod 755
 osx.rinker.plist.example skip
