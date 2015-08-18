@@ -24,7 +24,7 @@ else
   exit 1
 fi
 
-SYNO_MOUNT=$("${HOME}/.bin/nfs-synology.sh" "$1" "${LDAP_URI}" "${BASE_DN}" "${USE_TLS}" "${NFS_SERVER}" "${DOMAIN_NAME}")
+SYNO_MOUNT=$("${HOME}/.bin/nfs-synology.sh" "${USER}" "${LDAP_URI}" "${BASE_DN}" "${USE_TLS}" "${NFS_SERVER}" "${DOMAIN_NAME}")
 
 counter=0
 declare -a MOUNTDATA

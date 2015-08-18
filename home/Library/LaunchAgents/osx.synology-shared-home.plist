@@ -10,8 +10,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>$HOME/.bin/nfs-automount.sh</string>
-        <string>$USER</string>
+        <string>${HOME}/.bin/nfs-automount.sh</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
