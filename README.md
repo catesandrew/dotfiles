@@ -259,37 +259,47 @@ This works but doesn’t set up PATH environment variable. However, it still pro
 
 This file is what kicks off `/etc/paths` from the `path_helper` function. Trouble is that it kills anything before it. I’m keeping the existing behavior and then setting up my node paths from nvm. Here, we are grabbing the version nvm is set to use from the `alias/default` file and then using it to add node to the `PATH`. The `NVM_DIR` was set prior in the `launchctl` command.
 
+NOTE: I just added `launchctl setenv` commands to the `/etc/profile` as well because the launchctl was not getting the paths up front. I ran into this while executing a ~/LaunchAgent under my user account to mount nfs drives.
 
 ```bash
+# System-wide .profile for sh(1)
+
 if [ -x /usr/libexec/path_helper ]; then
-  eval `/usr/libexec/path_helper -s`
+	eval `/usr/libexec/path_helper -s`
 fi
 
-# BEGIN Global Path
 if ! [ -d "$NVM_DIR" ]; then
   if [ -d /usr/local/nvm ]; then
     NVM_DIR=/usr/local/nvm
   elif [ -d "$HOME" ]; then
     NVM_DIR="$HOME"/.nvm
   fi
+
+  export NVM_DIR
+  launchctl setenv NVM_DIR "$NVM_DIR"
 fi
+
 if [ -d "$NVM_DIR" ]; then
     if [ -f "${NVM_DIR}/alias/default" ]; then
         NVM_VERSION=`cat ${NVM_DIR}/alias/default`
         PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:./node_modules/.bin:${PATH}"
         NVM_BIN="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin"
         NVM_PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node"
-        export PATH
-        export NVM_DIR
         export NVM_BIN
         export NVM_PATH
+        launchctl setenv NVM_VERSION "$NVM_VERSION"
+        launchctl setenv NVM_BIN "$NVM_BIN"
+        launchctl setenv NVM_PATH "$NVM_PATH"
     fi
 fi
-# END Global Path
+
+export PATH
+launchctl setenv PATH "$PATH"
 
 if [ "${BASH-no}" != "no" ]; then
-  [ -r /etc/bashrc ] && . /etc/bashrc
+	[ -r /etc/bashrc ] && . /etc/bashrc
 fi
+
 ```
 
 And through all these files and commands I have the correct node path from nvm loaded into the gloabl environment. Now obviously I doubt this would work once you update the version of node and a reboot or logoff/login will be required for the changes to take effect. But that’s ok with me since I typically only update node once every couple months.
