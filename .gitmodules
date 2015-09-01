@@ -362,3 +362,9 @@
 [submodule "home/.bin/git-scripts"]
 	path = home/.bin/git-scripts
 	url = https://github.com/jwiegley/git-scripts.git
+[submodule "home/.vim/bundle/splitjoin"]
+	path = home/.vim/bundle/splitjoin
+	url = https://github.com/AndrewRadev/splitjoin.vim.git
+[submodule "home/.vim/bundle/vim-sexp"]
+	path = home/.vim/bundle/vim-sexp
+	url = https://github.com/guns/vim-sexp.git
