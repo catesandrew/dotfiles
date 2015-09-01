@@ -368,3 +368,6 @@
 [submodule "home/.vim/bundle/vim-sexp"]
 	path = home/.vim/bundle/vim-sexp
 	url = https://github.com/guns/vim-sexp.git
+[submodule "home/.vim/bundle/vim-rsi"]
+	path = home/.vim/bundle/vim-rsi
+	url = https://github.com/tpope/vim-rsi.git
