@@ -154,3 +154,4 @@ xcuserdata
 .tern-project
 .tern-port
 configs.patch
+.yo-rc.json
