@@ -1,5 +1,15 @@
 if [[ "$TERM" != "dumb"   ]]; then
 
+# detect ssh or not
+# http://unix.stackexchange.com/questions/9605/
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  export SESSION_TYPE=remote/ssh
+else
+  case $(ps -o comm= -p $PPID) in
+    sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
+  esac
+fi
+
 # Path to the bash it configuration
 export BASH_IT=$HOME/.bash
 

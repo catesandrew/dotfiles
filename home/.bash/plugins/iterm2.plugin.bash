@@ -7,6 +7,7 @@ elif [ "${TERM_PROGRAM:-""}" != "" ]; then
     if ( [ "$TERM_PROGRAM" == "iTerm.app" ] ); then
         [ -f ~/.iterm2_shell_integration.bash ] && source ~/.iterm2_shell_integration.bash
     fi
-else
+elif [ -n "$SESSION_TYPE" ]; then
     [ -f ~/.iterm2_shell_integration.bash ] && source ~/.iterm2_shell_integration.bash
 fi
+
