@@ -2343,31 +2343,21 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (dotimes (i 10)
       (when (= p (point)) ad-do-it))))
 
-;; todo: add choice between avy-jump and ace-jump
-(use-package avy-jump                   ; Jump to characters in buffers
-  :ensure avy
-  :bind (("C-c j s" . avy-isearch)
-         ("C-c j j" . avy-goto-char-2)
-         ("C-c j w" . avy-goto-word-1))
+(use-package avy                   ; Jump to characters in buffers
+  :ensure t
+  :defer t
   :init
   (progn
     (setq avy-keys (number-sequence ?a ?z))
+    (setq avy-all-windows 'all-frames)
+    (setq avy-background t)
     (after "evil-leader"
-      (evil-leader/set-key "SPC" 'avy-goto-word-1)
-      (evil-leader/set-key "l" 'avy-goto-char-2))))
-
-(use-package ace-jump-mode
-  :defer t
-  :disabled t
-  :ensure t
-  :init
-  (progn
-    (evil-leader/set-key "SPC" 'evil-ace-jump-word-mode)
-    (evil-leader/set-key "l" 'evil-ace-jump-line-mode))
+      (evil-leader/set-key
+        "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
+        "l" 'avy-goto-line ; 'avy-goto-char-2
+      )))
   :config
-  (progn
-    (setq ace-jump-mode-scope 'global)
-    (evil-leader/set-key "`" 'ace-jump-mode-pop-mark)))
+  (evil-leader/set-key "`" 'avy-pop-mark))
 
 (use-package ace-link                   ; Fast link jumping
   :commands dotemacs-ace-buffer-links
@@ -8681,14 +8671,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              ("dotemacs-toggle-\\(.+\\)" . "\\1")
              ("select-window-\\([0-9]\\)" . "window \\1")
              ("dotemacs-alternate-buffer" . "last buffer")
-             ("avy-goto-word-1" . "avy word")
+             ("avy-goto-word-or-subword-1" . "avy word")
              ("shell-command" . "shell cmd")
              ("dotemacs-default-pop-shell" . "open shell")
              ("dotemacs-helm-project-smart-do-search-region-or-symbol" . "smart search")
              ("evil-search-highlight-persist-remove-all" . "remove srch hlght")
              ("helm-descbinds" . "show keybindings")
              ("sp-split-sexp" . "split sexp")
-             ("avy-goto-char-2" . "avy line")
+             ("avy-goto-line" . "avy line")
              ("universal-argument" . "universal arg")
              ("er/expand-region" . "expand region")
              ("helm-apropos" . "apropos"))))
