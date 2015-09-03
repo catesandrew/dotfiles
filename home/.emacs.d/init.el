@@ -4840,15 +4840,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; fix for issue #2569 (https://github.com/syl20bnr/spacemacs/issues/2569)
     ;; use `semantic-create-imenu-index' only when `semantic-mode' is enabled,
     ;; otherwise use `python-imenu-create-index'
-    (defun python/imenu-create-index-python-or-semantic ()
+    (defun dotemacs/python-imenu-create-index-python-or-semantic ()
       (if (bound-and-true-p semantic-mode)
           (semantic-create-imenu-index)
         (python-imenu-create-index)))
 
     (defadvice wisent-python-default-setup
-        (after python/set-imenu-create-index-function activate)
+        (after dotemacs/python-set-imenu-create-index-function activate)
       (setq imenu-create-index-function
-            #'python/imenu-create-index-python-or-semantic))
+            #'dotemacs/python-imenu-create-index-python-or-semantic))
 
     (after "smartparens"
       (defadvice python-indent-dedent-line-backspace
