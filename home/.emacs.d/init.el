@@ -4687,6 +4687,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (evil-leader/set-key-for-mode 'cython-mode
       "mhh" 'anaconda-mode-view-doc
+      "mhu" 'anaconda-mode-usages
       "mgg"  'anaconda-mode-goto)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
@@ -4699,6 +4700,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (evil-jumper--push)))
     (evil-leader/set-key-for-mode 'python-mode
       "mhh" 'anaconda-mode-view-doc
+      "mhu" 'anaconda-mode-usages
       "mgg"  'anaconda-mode-goto)
     (dotemacs-hide-lighter anaconda-mode)))
 
@@ -4875,7 +4877,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (push 'company-capf company-backends-pip-requirements-mode)
       (dotemacs-add-company-hook pip-requirements-mode)
 
-      (push 'company-capf company-backends-inferior-python-mode)
+      (push '(company-files company-capf) company-backends-inferior-python-mode)
       (dotemacs-add-company-hook inferior-python-mode)
       (add-hook 'inferior-python-mode-hook (lambda ()
                                              (setq-local company-minimum-prefix-length 0)

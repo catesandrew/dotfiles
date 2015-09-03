@@ -95,17 +95,9 @@
   (local-set-key (kbd "C-j") 'newline-and-indent))
 
 (defun python-setup-shell ()
-  (if (executable-find "ipython")
-      (setq python-shell-interpreter "ipython"
-            python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-            python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-            python-shell-completion-setup-code "from IPython.core.completerlib import module_completion"
-            python-shell-completion-module-string-code "';'.join(module_completion('''%s'''))\n"
-            python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-    (setq python-shell-interpreter "python")))
+  (setq python-shell-interpreter "python"))
 
 (defun inferior-python-setup-hook ()
   (setq indent-tabs-mode t))
-
 
 (provide 'init-python)
