@@ -2676,9 +2676,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                     'dotemacs-helm-buffers-smart-do-search-region-or-symbol)))
            new-bindings)
             (setq ad-return-value (cons new-msg new-bindings)))))
-    (custom-set-variables
-     '(expand-region-contract-fast-key "V")
-     '(expand-region-reset-fast-key "r"))))
+    (setq expand-region-contract-fast-key "V"
+          expand-region-reset-fast-key "r")))
 
 (use-package undo-tree                  ; Branching undo
   :ensure t
@@ -4482,17 +4481,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-define-key 'normal scala-mode-map "J" 'dotemacs-scala-join-line)
 
     ;; Compatibility with `aggressive-indent'
-    (custom-set-variables
-     '(scala-indent:align-forms t)
-     '(scala-indent:align-parameters t)
-     '(scala-indent:default-run-on-strategy scala-indent:operator-strategy))
+    (setq scala-indent:align-forms t
+          scala-indent:align-parameters t
+          scala-indent:default-run-on-strategy scala-indent:operator-strategy)
 
     (require 'noflet)
 
     (defadvice scala-indent:indent-code-line (around retain-trailing-ws activate)
       "Keep trailing-whitespace when indenting."
       (noflet ((scala-lib:delete-trailing-whitespace ()))
-        ad-do-it))))
+              ad-do-it))))
 
 (use-package flycheck-ensime
   :load-path "config/"
@@ -9193,14 +9191,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                               markdown-mode-hook))
   :config
   (progn
-    (custom-set-variables
-     '(ahs-case-fold-search nil)
-     '(ahs-default-range (quote ahs-range-whole-buffer))
-     ;; disable auto-highlight of symbol
-     ;; current symbol should be highlight on demand with <SPC> s h
-     '(ahs-idle-timer 0)
-     '(ahs-idle-interval 0.25)
-     '(ahs-inhibit-face-list nil))
+    (setq ahs-case-fold-search nil
+          ahs-default-range 'ahs-range-whole-buffer
+          ;; disable auto-highlight of symbol
+          ;; current symbol should be highlight on demand with <SPC> s h
+          ahs-idle-timer 0
+          ahs-idle-interval 0.25
+          ahs-inhibit-face-list nil)
 
     (defvar dotemacs-last-ahs-highlight-p nil
       "Info on the last searched highlighted symbol.")
