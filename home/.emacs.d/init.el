@@ -4241,6 +4241,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 ;;; Emacs Lisp
 (dotemacs-defvar-company-backends emacs-lisp-mode)
+(dotemacs-defvar-company-backends ielm-mode)
 
 (bind-key "C-c u d" #'toggle-debug-on-error)
 
@@ -4420,12 +4421,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package ielm                       ; Emacs Lisp REPL
   :bind (("C-c z" . ielm))
   :config
-  (defun ielm-indent-line ()
-    (interactive)
-    (let ((current-point (point)))
-      (save-restriction
-        (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
-        (lisp-indent-line)))))
+  (progn
+    (defun ielm-indent-line ()
+      (interactive)
+      (let ((current-point (point)))
+        (save-restriction
+          (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
+          (lisp-indent-line))))
+    (evil-leader/set-key-for-mode 'emacs-lisp-mode
+      "msi" 'ielm)))
 
 (use-package elisp-mode                  ; Emacs Lisp editing
   :defer t
@@ -4451,6 +4455,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     :post-init
     (progn
       (push 'company-capf company-backends-emacs-lisp-mode)
+      (push '(company-files company-capf) company-backends-ielm-mode)
+      (dotemacs-add-company-hook ielm-mode)
       (dotemacs-add-company-hook emacs-lisp-mode))))
 
 (dotemacs-use-package-add-hook flycheck
