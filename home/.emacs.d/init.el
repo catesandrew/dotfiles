@@ -4687,7 +4687,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (evil-leader/set-key-for-mode 'cython-mode
       "mhh" 'anaconda-mode-view-doc
-      "mhu" 'anaconda-mode-usages
+      "mgu" 'anaconda-mode-usages
       "mgg"  'anaconda-mode-goto)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
@@ -4700,7 +4700,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (evil-jumper--push)))
     (evil-leader/set-key-for-mode 'python-mode
       "mhh" 'anaconda-mode-view-doc
-      "mhu" 'anaconda-mode-usages
+      "mgu" 'anaconda-mode-usages
       "mgg"  'anaconda-mode-goto)
     (dotemacs-hide-lighter anaconda-mode)))
 
