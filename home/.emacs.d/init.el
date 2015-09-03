@@ -143,6 +143,10 @@ with 2 themes variants, one dark and one light")
   "The current theme"
   :group 'dotemacs)
 
+(defcustom dotemacs-colorize-cursor-according-to-state t
+  "If non nil the cursor color matches the state color."
+  :group 'dotemacs)
+
 (defcustom dotemacs-leader-key ","
   "The leader key."
   :group 'dotemacs)
@@ -3224,7 +3228,6 @@ Disable the highlighting of overlong lines."
     (set-default-evil-iedit-state-cursor)
     (set-default-evil-iedit-insert-state-cursor)
     (set-default-evil-replace-state-cursor)
-    (set-default-evil-operator-state-cursor)
 
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
