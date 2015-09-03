@@ -5173,28 +5173,27 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-hook)
 
     ;; settings
-    (setq haskell-process-type 'auto
-          ;; Use notify.el (if you have it installed) at the end of running
-          ;; Cabal commands or generally things worth notifying.
-          haskell-notify-p t
-          ;; To enable tags generation on save.
-          haskell-tags-on-save t
-          ;; Remove annoying error popups
-          haskell-interactive-popup-error nil
-          ;; Suggest adding/removing imports as by GHC warnings and Hoggle/GHCI
-          ;; loaded modules respectively
-          haskell-process-suggest-remove-import-lines t
-          haskell-process-auto-import-loaded-modules t
-          haskell-process-use-presentation-mode t ; Don't clutter the echo area
-          haskell-process-show-debug-tips nil     ; Disable tips
-          haskell-process-log t                   ; Log debugging information
-          ;; Suggest imports automatically with Hayoo.  Hayoo is slower because
-          ;; it's networked, but it covers all of hackage, which is really an
-          ;; advantage.
-          haskell-process-suggest-hoogle-imports nil
-          haskell-process-suggest-hayoo-imports t
-          ;; Disable haskell-stylish on save, it breaks flycheck highlighting
-          haskell-stylish-on-save nil)
+    (setq
+      ;; Use notify.el (if you have it installed) at the end of running
+      ;; Cabal commands or generally things worth notifying.
+      haskell-notify-p t
+      ;; To enable tags generation on save.
+      haskell-tags-on-save t
+      ;; Remove annoying error popups
+      haskell-interactive-popup-error nil
+      ;; Better import handling
+      haskell-process-suggest-remove-import-lines t
+      haskell-process-auto-import-loaded-modules t
+      haskell-process-use-presentation-mode t ; Don't clutter the echo area
+      haskell-process-show-debug-tips nil     ; Disable tips
+      haskell-process-log t                   ; Log debugging information
+      ;; Suggest imports automatically with Hayoo.  Hayoo is slower because
+      ;; it's networked, but it covers all of hackage, which is really an
+      ;; advantage.
+      haskell-process-suggest-hoogle-imports nil
+      haskell-process-suggest-hayoo-imports t
+      ;; Disable haskell-stylish on save, it breaks flycheck highlighting
+      haskell-stylish-on-save nil)
 
     ;; key bindings
     (evil-leader/set-key-for-mode 'haskell-mode
