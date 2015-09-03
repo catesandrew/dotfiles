@@ -81,6 +81,11 @@
   (let ((c (dotemacs-state-color 'iedit-insert)))
     (setq evil-iedit-insert-state-cursor `(,c (bar . 2)))))
 
+(defun set-default-evil-replace-state-cursor ()
+  (let ((c (when dotemacs-colorize-cursor-according-to-state
+             (dotemacs-state-color 'replace))))
+    (setq evil-replace-state-cursor `(,c (hbar . 2)))))
+
 (defun evil-insert-state-cursor-hide ()
   (setq evil-insert-state-cursor '((hbar . 0))))
 
