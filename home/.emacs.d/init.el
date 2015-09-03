@@ -4837,6 +4837,19 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; add this optional key binding for Emacs user, since it is unbound
     (define-key inferior-python-mode-map (kbd "C-c M-l") 'comint-clear-buffer)
 
+    ;; fix for issue #2569 (https://github.com/syl20bnr/spacemacs/issues/2569)
+    ;; use `semantic-create-imenu-index' only when `semantic-mode' is enabled,
+    ;; otherwise use `python-imenu-create-index'
+    (defun python/imenu-create-index-python-or-semantic ()
+      (if (bound-and-true-p semantic-mode)
+          (semantic-create-imenu-index)
+        (python-imenu-create-index)))
+
+    (defadvice wisent-python-default-setup
+        (after python/set-imenu-create-index-function activate)
+      (setq imenu-create-index-function
+            #'python/imenu-create-index-python-or-semantic))
+
     (after "smartparens"
       (defadvice python-indent-dedent-line-backspace
           (around python/sp-backward-delete-char activate)
