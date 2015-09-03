@@ -45,7 +45,7 @@ fi
 if [ -n "$NFS_FOLDER" ]; then
    # Use pre-defined NFS folder if any.
    # echo "-fstype=nfs,tcp,intr $NFS_SERVER:${NFS_FOLDER// /\\ }/${key// /\\ }"
-   echo "rw|$NFS_SERVER|${NFS_FOLDER// /\\ }/${key// /\\ }|/home/shared|"
+   echo "rw|$NFS_SERVER|${NFS_FOLDER// /\\ }/${key// /\\ }|/Volumes/home/$|"
    exit 0
 fi
 
@@ -72,5 +72,5 @@ fi
 num=$(( $uid >> 14 ))
 
 # echo "-fstype=nfs,intr,hard,tcp $NFS_SERVER:/var/services/homes/@LH-$domain/$num/${key// /\\ }-$uid"
-echo "rw|$NFS_SERVER|/var/services/homes/@LH-$domain/$num/${key// /\\ }-$uid|/home/shared|"
+echo "rw|$NFS_SERVER|/var/services/homes/@LH-$domain/$num/${key// /\\ }-$uid|/Volumes/home/$1|"
 
