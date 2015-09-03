@@ -719,12 +719,17 @@ FEATURE may be a named feature or a file name, see
           ("k" .  "lisp")
           ("kd" . "lisp-delete")
           ("kD" . "lisp-delete-backward")
+          ("k`" . "lisp-hybrid")
           ("p" .  "projects")
           ("p$" . "projects/shell")
           ("P" .  "pandoc")
           ("q" .  "quit")
           ("r" .  "registers/rings")
           ("s" .  "search/symbol")
+          ("sa" . "search-ag")
+          ("sg" . "search-grep")
+          ("sk" . "search-ack")
+          ("st" . "search-pt")
           ("sw" . "search-web")
           ("S" .  "spelling")
           ("t" .  "toggles")
@@ -9778,6 +9783,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
+    (dotemacs-declare-prefix "iS" "auto-yasnippet")
     (after "evil-leader"
       (evil-leader/set-key
         "iSc" 'aya-create
