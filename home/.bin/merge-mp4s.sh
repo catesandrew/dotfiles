@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s nullglob
 
 function walk_tree {
       # echo "Directory: $1"
@@ -19,9 +20,23 @@ function walk_tree {
                 final+=" -cat \"$l\"";
             done;
 
-            cmd="MP4Box $final -new \"../${PWD##*/}.mp4\""
-            echo $cmd
-            eval "$cmd"
+            echo $final
+            if [ -n "$final" ]; then
+                cmd="MP4Box $final -new \"../${PWD##*/}.mp4\""
+                eval "$cmd"
+            fi
+
+
+            final=""
+            for l in *.m4v;
+            do
+                final+=" -cat \"$l\"";
+            done;
+
+            if [ -n "$final" ]; then
+                cmd="MP4Box $final -new \"../${PWD##*/}.m4v\""
+                eval "$cmd"
+            fi
 
             cd ..
 
