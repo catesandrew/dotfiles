@@ -88,7 +88,6 @@
 (define-key evil-evilified-state-map "N" 'evil-search-previous)
 (define-key evil-evilified-state-map "v" 'evil-visual-char)
 (define-key evil-evilified-state-map "V" 'evil-visual-line)
-(define-key evil-evilified-state-map "y" 'evil-yank)
 ; Add basic scroll commands to evilified commands
 ;
 ; C-f and C-b's original emacs functions are shadowed by h and l,
