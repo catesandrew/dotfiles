@@ -903,7 +903,12 @@ the user activate the completion manually."
 
       ;; The default frontend screws everything up in short windows like
       ;; terminal often are
-      (setq-local company-frontends '(company-preview-frontend))
+      (defun dotemacs-eshell-switch-company-frontend ()
+        "Sets the company frontend to `company-preview-frontend' in e-shell mode."
+        (setq-local company-frontends '(company-preview-frontend)))
+      (add-hook 'eshell-mode-hook
+                'dotemacs-eshell-switch-company-frontend)
+
       (push 'company-capf company-backends-eshell-mode)
       (dotemacs-add-company-hook eshell-mode))))
 
