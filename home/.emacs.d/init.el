@@ -2138,7 +2138,8 @@ These should have their own segments in the modeline.")
   (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
 
 (use-package bookmark                   ; Bookmarks for Emacs buffers
-  :bind (("C-c l b" . list-bookmarks))
+  :ensure t
+  :defer t
   :init
   (progn
     (setq bookmark-save-flag 1 ;; autosave each change
@@ -7847,6 +7848,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (evil-leader/set-key
         "p!" 'projectile-run-shell-command-in-root
         "p&" 'projectile-run-async-shell-command-in-root
+        "pa" 'projectile-toggle-between-implementation-and-test
         "pc" 'projectile-compile-project
         "pD" 'projectile-dired
         "pG" 'projectile-regenerate-tags
