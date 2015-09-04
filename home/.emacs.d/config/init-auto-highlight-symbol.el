@@ -49,6 +49,7 @@
   (eval '(progn (dotemacs-integrate-evil-search t)
                 (dotemacs-ahs-highlight-now-wrapper)
                 (evil-set-jump)
+                (dotemacs-highlight-symbol-micro-state)
                 (ahs-forward)) nil))
 
 (defun dotemacs-quick-ahs-backward ()
@@ -58,6 +59,7 @@
   (eval '(progn (dotemacs-integrate-evil-search nil)
                 (dotemacs-ahs-highlight-now-wrapper)
                 (evil-set-jump)
+                (dotemacs-highlight-symbol-micro-state)
                 (ahs-backward)) nil))
 
 (defun dotemacs-symbol-highlight ()

@@ -9222,7 +9222,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                    ahs-back-to-start
                    ahs-change-range))
       (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
-        (eval `(defadvice ,sym (after ,advice activate)
+        (eval `(defadvice ,sym (around ,advice activate)
+                 (doteamcs-ahs-highlight-now-wrapper)
+                 ad-do-it
                  (dotemacs-ahs-highlight-now-wrapper)
                  (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))))))
 

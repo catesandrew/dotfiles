@@ -169,7 +169,8 @@ used."
                ,@binding-pre
                (let ((throwp t))
                  (catch 'exit
-                   (when ',wrapped
+                   (when (fboundp ',wrapped)
+                     (setq this-command ',wrapped)
                      (call-interactively ',wrapped)
                      (setq last-command ',wrapped))
                    (setq throwp nil))
