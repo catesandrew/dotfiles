@@ -20,6 +20,9 @@
 ;; - C-c w: Web stuff
 ;; - C-x x: Perspective
 
+;; Without this comment emacs25 adds (package-initialize) here
+;; (package-initialize)
+
 ;;; Code:
 
 ;; No splash screen please ... jeez
@@ -27,32 +30,40 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-echo-area-message t)
 
-;;; Debugging
-(setq message-log-max 10000)
-
-;; Don't be so stingy on the memory, we have lots now. It's the distant future.
-(setq gc-cons-threshold 20000000)
-
 ;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs-cache-directory (concat user-emacs-directory ".cache/")
-  "The storage location for various persistent files."
-  :group 'dotemacs)
+
+(defconst dotemacs-core-directory
+  (expand-file-name (concat user-emacs-directory "core/"))
+  "core directory.")
+
+(defconst dotemacs-config-dir
+  (expand-file-name (concat user-emacs-directory "config/"))
+  "config directory.")
+
+(defconst dotemacs-cache-directory
+  (expand-file-name (concat user-emacs-directory ".cache/"))
+  "The storage location for various persistent files.")
+
+(defconst dotemacs-auto-save-directory
+  (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
+  "Spacemacs auto-save directory")
+
+(defconst user-home-directory
+  (expand-file-name "~/")
+  "User home directory (~/).")
+
+(defconst pcache-directory
+  (concat dotemacs-cache-directory "pcache"))
+(unless (file-exists-p dotemacs-cache-directory)
+    (make-directory dotemacs-cache-directory))
 
 (defcustom dotemacs-erc-nick
   'catesandrew
   "The erc nickname to use"
-  :group 'dotemacs)
-
-; (defcustom dotemacs-elisp-dir (expand-file-name "elisp" user-emacs-directory)
-;   "The storage location lisp."
-;   :group 'dotemacs)
-
-(defcustom dotemacs-config-dir (expand-file-name "config" user-emacs-directory)
-  "The config location lisp."
   :group 'dotemacs)
 
 (defcustom dotemacs-user-settings-dir (concat user-emacs-directory "users/" user-login-name)
@@ -578,25 +589,33 @@ group by projectile projects."
                           (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
                           elapsed)))))))
 
-;; Set up load path(s)
-(add-to-list 'load-path dotemacs-config-dir)
-; (add-to-list 'load-path dotemacs-elisp-dir)
-(add-to-list 'load-path dotemacs-user-settings-dir)
+
+;;; Load Paths
+(defun add-to-load-path (dir) (add-to-list 'load-path dir))
 
-; ;; Add external projects to load path
-; (let ((base dotemacs-elisp-dir))
-;   (add-to-list 'load-path base)
-;   (dolist (dir (directory-files base t "^[^.]"))
-;     (when (file-directory-p dir)
-;       (add-to-list 'load-path dir))))
+;; load paths
+(mapc 'add-to-load-path
+      `(
+        ,dotemacs-core-directory
+        ,dotemacs-config-dir
+        ,dotemacs-user-settings-dir
+        ))
 
 
-;;; Locality
-(setq locale-coding-system 'utf-8) ; pretty
-(set-terminal-coding-system 'utf-8) ; pretty
-(set-keyboard-coding-system 'utf-8) ; pretty
-(set-selection-coding-system 'utf-8) ; please
-(prefer-coding-system 'utf-8) ; with sugar on top
+;;; Core
+(setq message-log-max 16384)
+
+;; Don't be so stingy on the memory, we have lots now. It's the distant future.
+(setq gc-cons-threshold 20000000)
+
+(require 'subr-x nil 'noerror)
+(require 'core-auto-completion)
+(require 'core-themes-support)
+(require 'core-fonts-support)
+(require 'core-toggle)
+(require 'core-micro-state)
+(require 'core-use-package-ext)
+(require 'core-evilify-keymap)
 
 
 ;;; After and other macros
@@ -644,121 +663,92 @@ FEATURE may be a named feature or a file name, see
      ,@commands))
 
 
-;;; Package management
-(setq load-prefer-newer t)
-
-;; Please don't load outdated byte code
+;;; Core Package management
 (require 'package)
+(require 'core-funcs)
+(require 'core-buffers)
 
-;; http://stackoverflow.com/questions/11127109/
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-
-(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-;; inject use-package hooks for easy customization of
-;; stock package configuration
-(setq use-package-inject-hooks t)
-
-
-;;; Requires
-
-(eval-when-compile
-  (require 'use-package))
-
-(eval-when-compile
-  (require 'cl))
-
-;; bind-key is required by use-package
-(require 'bind-key)
-(require 'diminish)
-
-;; Minor modes abbrev --------------------------------------------------------
-(when (display-graphic-p)
-  (after "eproject"
-    '(diminish 'eproject-mode " eⓅ"))
-  (after "flymake"
-    '(diminish 'flymake-mode " Ⓕ2")))
-;; Minor Mode (hidden) ------------------------------------------------------
-(after "abbrev"
-  '(diminish 'abbrev-mode))
-
-(require 'subr-x)
-(require 'rx)
-(require 'time-date)
-
-
-;;; Key Binding Init
-(after "evil-leader"
-  ;; We define prefix commands only for the sake of guide-key
-  (setq dotemacs-key-binding-prefixes
-        '(("a" .  "applications")
-          ("ai" . "applications-irc")
-          ("as" . "applications-shells")
-          ("b" .  "buffers")
-          ("bm" . "buffers-move")
-          ("c" .  "compile/comments")
-          ("C" .  "capture/colors")
-          ("d" .  "dash-at-point")
-          ("e" .  "errors")
-          ("f" .  "files")
-          ("fe" . "files-emacs/dotemacs")
-          ("g" .  "git/versions-control")
-          ("gf" . "file")
-          ("gg" . "gist")
-          ("h" .  "helm/help/highlight")
-          ("hd" . "help-describe")
-          ("i" .  "insertion")
-          ("j" .  "join/split")
-          ("k" .  "lisp")
-          ("kd" . "lisp-delete")
-          ("kD" . "lisp-delete-backward")
-          ("k`" . "lisp-hybrid")
-          ("p" .  "projects")
-          ("p$" . "projects/shell")
-          ("P" .  "pandoc")
-          ("q" .  "quit")
-          ("r" .  "registers/rings")
-          ("s" .  "search/symbol")
-          ("sa" . "search-ag")
-          ("sg" . "search-grep")
-          ("sk" . "search-ack")
-          ("st" . "search-pt")
-          ("sw" . "search-web")
-          ("S" .  "spelling")
-          ("t" .  "toggles")
-          ("tC" . "toggles-colors")
-          ("th" . "toggles-highlight")
-          ("te" . "toggles-errors")
-          ("tm" . "toggles-modeline")
-          ("T" .  "toggles/themes")
-          ("w" .  "windows")
-          ("wp" . "windows-popup")
-          ("x" .  "text")
-          ("xa" . "text-align")
-          ("xd" . "text-delete")
-          ("xg" . "text-google-translate")
-          ("xm" . "text-move")
-          ("xt" . "text-transpose")
-          ("xw" . "text-words")
-          ("y" .  "narrow/numbers")
-          ("z" .  "zoom")))
-  (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
-        dotemacs-key-binding-prefixes)
-
-  (when (eq dotemacs-colors-engine 'rainbow)
-    (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
-    (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
-          colors/key-binding-prefixes)))
+(unless package--initialized
+  (setq load-prefer-newer t)
+  (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+                           ("org" . "http://orgmode.org/elpa/")
+                           ; ("ELPA" . "http://tromey.com/elpa/")
+                           ; ("gnu" . "http://elpa.gnu.org/packages/")
+                           ))
+  ;; optimization, no need to activate all the packages so early
+  ;; http://stackoverflow.com/questions/11127109/
+  (setq package-enable-at-startup nil)
+  ;(package-initialize 'noactivate))
+  (package-initialize))
 
 
 ;;; Initialization
+
+(prefer-coding-system 'utf-8) ; with sugar on top
+
+; (require 'rx)
+; (require 'time-date)
+
+;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
+;; bar, since the top menu bar is always visible anyway, and we'd just empty it
+;; which is rather pointless.
+(when (and (fboundp 'tool-bar-mode) (not (eq tool-bar-mode -1)))
+  (tool-bar-mode -1))
+(when (and (fboundp 'scroll-bar-mode) (not (eq scroll-bar-mode -1)))
+  (scroll-bar-mode -1))
+;; tooltips in echo-aera
+(when (and (fboundp 'tooltip-mode) (not (eq tooltip-mode -1)))
+  (tooltip-mode -1))
+(unless (eq system-type 'darwin)
+  (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
+    (menu-bar-mode -1)))
+;; for convenience and user support
+(unless (fboundp 'tool-bar-mode)
+  (dotemacs-message (concat "No graphical support detected, you won't be"
+                             "able to launch a graphical instance of Emacs"
+                             "with this build.")))
+
+;; font
+(if (find-font (font-spec :name (car dotemacs-default-font)))
+    (dotemacs-set-default-font dotemacs-default-font)
+  (dotemacs-buffer/warning "Cannot find font \"%s\"!"
+                            (car dotemacs-default-font)))
+
+;; fringes
+(custom-set-variables
+  '(fringe-mode (quote (4 . 4)) nil (fringe)))
+(setq-default fringe-indicator-alist
+              '((truncation . nil) (continuation . nil)))
+
+;; mandatory dependencies
+; (dotemacs-load-or-install-package 'dash t)
+(dotemacs-load-or-install-package 's t)
+;; bind-key is required by use-package
+(dotemacs-load-or-install-package 'bind-key t)
+(dotemacs-load-or-install-package 'use-package t)
+;; package-build is required by quelpa
+(dotemacs-load-or-install-package 'package-build t)
+(setq quelpa-verbose dotemacs-verbose-loading
+      quelpa-dir (concat dotemacs-cache-directory "quelpa/")
+      quelpa-build-dir (expand-file-name "build" quelpa-dir)
+      quelpa-persistent-cache-file (expand-file-name "cache" quelpa-dir)
+      quelpa-update-melpa-p nil)
+(dotemacs-load-or-install-package 'quelpa t)
+;; inject use-package hooks for easy customization of
+;; stock package configuration
+(setq use-package-inject-hooks t)
+; ;; which-key
+(dotemacs-load-or-install-package 'which-key t)
+;; evil and evil-leader must be installed at the beginning of the
+;; boot sequence.
+;; Use C-u as scroll-up (must be set before actually loading evil)
+(dotemacs-load-or-install-package 'evil t)
+(dotemacs-load-or-install-package 'evil-leader t)
+(require 'core-evilified-state)
+
+
+;;; Initialization
+
 ;; And disable the site default settings
 (setq inhibit-default-init t)
 
@@ -768,6 +758,21 @@ FEATURE may be a named feature or a file name, see
 
 ;; Disable case insensitivity for filename autocompletion in shell-mode
 (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
+
+(require 'init-funcs)
+
+(when (and (system-is-mac) (version< emacs-version "25"))
+  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
+  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+
+(when (system-is-mac)
+  ;; Warn if the current build is more than a week old
+  (run-with-idle-timer
+   2 nil
+   (lambda ()
+     (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
+       (when (> (time-to-number-of-days time-since-build) 7)
+         (lwarn 'emacs :warning "Your Emacs build is more than a week old!"))))))
 
 (use-package init-util              ; Personal OS X tools
   :load-path "config/"
@@ -786,62 +791,69 @@ FEATURE may be a named feature or a file name, see
             my-buffer-to-unix-format
             my-buffer-to-dos-format))
 
-(use-package init-funcs
-  :load-path "config/")
+
+;;; Key Binding Init
 
-(when (and (system-is-mac) (version< emacs-version "25"))
-  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
-  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+;; We define prefix commands only for the sake of guide-key
+(setq dotemacs-key-binding-prefixes
+      '(("a" .  "applications")
+        ("ai" . "applications-irc")
+        ("as" . "applications-shells")
+        ("b" .  "buffers")
+        ("bm" . "buffers-move")
+        ("c" .  "compile/comments")
+        ("C" .  "capture/colors")
+        ("d" .  "dash-at-point")
+        ("e" .  "errors")
+        ("f" .  "files")
+        ("fe" . "files-emacs/dotemacs")
+        ("g" .  "git/versions-control")
+        ("gf" . "file")
+        ("gg" . "gist")
+        ("h" .  "helm/help/highlight")
+        ("hd" . "help-describe")
+        ("i" .  "insertion")
+        ("j" .  "join/split")
+        ("k" .  "lisp")
+        ("kd" . "lisp-delete")
+        ("kD" . "lisp-delete-backward")
+        ("k`" . "lisp-hybrid")
+        ("p" .  "projects")
+        ("p$" . "projects/shell")
+        ("P" .  "pandoc")
+        ("q" .  "quit")
+        ("r" .  "registers/rings")
+        ("s" .  "search/symbol")
+        ("sa" . "search-ag")
+        ("sg" . "search-grep")
+        ("sk" . "search-ack")
+        ("st" . "search-pt")
+        ("sw" . "search-web")
+        ("S" .  "spelling")
+        ("t" .  "toggles")
+        ("tC" . "toggles-colors")
+        ("th" . "toggles-highlight")
+        ("te" . "toggles-errors")
+        ("tm" . "toggles-modeline")
+        ("T" .  "toggles/themes")
+        ("w" .  "windows")
+        ("wp" . "windows-popup")
+        ("x" .  "text")
+        ("xa" . "text-align")
+        ("xd" . "text-delete")
+        ("xg" . "text-google-translate")
+        ("xm" . "text-move")
+        ("xt" . "text-transpose")
+        ("xw" . "text-words")
+        ("y" .  "narrow/numbers")
+        ("z" .  "zoom")))
+(mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+      dotemacs-key-binding-prefixes)
 
-(when (system-is-mac)
-  ;; Warn if the current build is more than a week old
-  (run-with-idle-timer
-   2 nil
-   (lambda ()
-     (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
-       (when (> (time-to-number-of-days time-since-build) 7)
-         (lwarn 'emacs :warning "Your Emacs build is more than a week old!"))))))
-
-(use-package core-funcs
-  :load-path "core/")
-
-(dotemacs-load-or-install-package 's t)
-;; package-build is required by quelpa
-(dotemacs-load-or-install-package 'package-build t)
-(setq quelpa-verbose dotemacs-verbose-loading
-      quelpa-dir (concat dotemacs-cache-directory "quelpa/")
-      quelpa-build-dir (expand-file-name "build" quelpa-dir)
-      quelpa-persistent-cache-file (expand-file-name "cache" quelpa-dir)
-      quelpa-update-melpa-p nil)
-(dotemacs-load-or-install-package 'quelpa t)
-;; evil and evil-leader must be installed at the beginning of the boot sequence.
-(dotemacs-load-or-install-package 'evil t)
-(dotemacs-load-or-install-package 'evil-leader t)
-(require 'core-evilified-state)
-
-(use-package core-micro-state
-  :load-path "core/")
-
-(use-package core-buffers
-  :load-path "core/")
-
-(use-package core-evilify-keymap
-  :load-path "core/")
-
-(use-package core-toggle
-  :load-path "core/")
-
-(use-package core-auto-completion
-  :load-path "core/")
-
-(use-package core-use-package-ext
-  :load-path "core/")
-
-(use-package core-themes-support
-  :load-path "core/")
-
-(use-package core-fonts-support
-  :load-path "core/")
+(when (eq dotemacs-colors-engine 'rainbow)
+  (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
+  (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+        colors/key-binding-prefixes))
 
 
 ;;; Terminal emulation and shells
@@ -873,15 +885,7 @@ FEATURE may be a named feature or a file name, see
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize))
 
-    (setq user-mail-address (getenv "EMAIL"))
-
-    ;; Re-initialize the `Info-directory-list' from $INFOPATH. Since package.el
-    ;; already initializes info, we need to explicitly add the $INFOPATH
-    ;; directories to `Info-directory-list'.
-    (after "info"
-      (dolist (dir (parse-colon-path (getenv "INFOPATH")))
-        (when dir
-          (add-to-list 'Info-directory-list dir)))))
+    (setq user-mail-address (getenv "EMAIL")))
   :config
   (progn
     (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
@@ -977,8 +981,7 @@ the user activate the completion manually."
   :ensure t
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key "ast" 'shell-pop-multi-term)))
+    (evil-leader/set-key "ast" 'shell-pop-multi-term))
   :config
   (progn
     (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
@@ -986,9 +989,7 @@ the user activate the completion manually."
     (evil-leader/set-key-for-mode 'term-mode "mc" 'multi-term)
     (evil-leader/set-key-for-mode 'term-mode "mp" 'multi-term-prev)
     (evil-leader/set-key-for-mode 'term-mode "mn" 'multi-term-next)
-
-    (after "evil-leader"
-      (evil-leader/set-key "p$t" 'projectile-multi-term-in-root))))
+    (evil-leader/set-key "p$t" 'projectile-multi-term-in-root)))
 
 (use-package shell-pop
   :defer t
@@ -1019,25 +1020,23 @@ the user activate the completion manually."
     (add-hook 'kill-buffer-hook 'dotemacs-term-kill-buffer-hook)
     (add-hook 'term-mode-hook 'ansi-term-handle-close)
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        "'"   'dotemacs-default-pop-shell
-        "ase" 'shell-pop-eshell
-        "asi" 'shell-pop-shell
-        "asm" 'shell-pop-multiterm
-        "ast" 'shell-pop-ansi-term
-        "asT" 'shell-pop-term))))
+    (evil-leader/set-key
+      "'"   'dotemacs-default-pop-shell
+      "ase" 'shell-pop-eshell
+      "asi" 'shell-pop-shell
+      "asm" 'shell-pop-multiterm
+      "ast" 'shell-pop-ansi-term
+      "asT" 'shell-pop-term)))
 
 ;; shell
 (add-hook 'shell-mode-hook 'shell-comint-input-sender-hook)
 
 ;; term
-(after "evil-leader"
-  ;; hack to fix pasting issue, the paste micro-state won't
-  ;; work in term
-  (evil-define-key 'normal term-raw-map "p" 'term-paste)
-  (evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
-  (evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab))
+;; HACK: to fix pasting issue, the paste micro-state won't
+;; work in term
+(evil-define-key 'normal term-raw-map "p" 'term-paste)
+(evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
+(evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab)
 
 (dotemacs-use-package-add-hook helm
   :post-init
@@ -1108,16 +1107,14 @@ the user activate the completion manually."
                                          paradox-token)))))
       (paradox-list-packages nil))
 
-    (after "evil-evilified-state"
-      (evilify paradox-menu-mode paradox-menu-mode-map
-               "H" 'paradox-menu-quick-help
-               "J" 'paradox-next-describe
-               "K" 'paradox-previous-describe
-               "L" 'paradox-menu-view-commit-list
-               "o" 'paradox-menu-visit-homepage))
-    (after "evil-leader"
-      (evil-leader/set-key
-        "aP" 'dotemacs-paradox-list-packages))))
+    (evilify paradox-menu-mode paradox-menu-mode-map
+             "H" 'paradox-menu-quick-help
+             "J" 'paradox-next-describe
+             "K" 'paradox-previous-describe
+             "L" 'paradox-menu-view-commit-list
+             "o" 'paradox-menu-visit-homepage)
+    (evil-leader/set-key
+      "aP" 'dotemacs-paradox-list-packages)))
 
 (use-package bug-hunter                 ; Search init file for bugs
   :ensure t)
@@ -1134,8 +1131,7 @@ the user activate the completion manually."
   :if (eq system-type 'darwin)
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key "bf" 'reveal-in-osx-finder))
+    (evil-leader/set-key "bf" 'reveal-in-osx-finder)
 
     ;; this is only applicable to GUI mode
     (when (display-graphic-p)
@@ -1236,37 +1232,26 @@ the user activate the completion manually."
 
 ;;; User interface
 
-;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
-;; bar, since the top menu bar is always visible anyway, and we'd just empty it
-;; which is rather pointless.
-(when (and (fboundp 'tool-bar-mode) (not (eq tool-bar-mode -1)))
-  (tool-bar-mode -1))
-(when (and (fboundp 'scroll-bar-mode) (not (eq scroll-bar-mode -1)))
-  (scroll-bar-mode -1))
-;; tooltips in echo-aera
-(when (and (fboundp 'tooltip-mode) (not (eq tooltip-mode -1)))
-  (tooltip-mode -1))
-(unless (eq system-type 'darwin)
-  (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
-    (menu-bar-mode -1)))
-;; for convenience and user support
-(unless (fboundp 'tool-bar-mode)
-  (dotemacs-message (concat "No graphical support detected, you won't be"
-                             "able to launch a graphical instance of Emacs"
-                             "with this build.")))
-
-;; font
-(if (find-font (font-spec :name (car dotemacs-default-font)))
-    (dotemacs-set-default-font dotemacs-default-font)
-  (dotemacs-buffer/warning "Cannot find font \"%s\"!"
-                            (car dotemacs-default-font)))
-
-;; fringes
-(custom-set-variables
-  '(fringe-mode (quote (4 . 4)) nil (fringe)))
-
-(setq-default fringe-indicator-alist
-              '((truncation . nil) (continuation . nil)))
+(use-package diminish
+  :ensure t
+  :init
+  (progn
+    ;; Minor modes abbrev --------------------------------------------------------
+    (when (display-graphic-p)
+      (eval-after-load "eproject"
+        '(diminish 'eproject-mode " eⓅ"))
+      (eval-after-load "flymake"
+        '(diminish 'flymake-mode " Ⓕ2")))
+    ;; Minor Mode (hidden) ------------------------------------------------------
+    (eval-after-load 'elisp-slime-nav
+      '(diminish 'elisp-slime-nav-mode))
+    (eval-after-load "hi-lock"
+      '(diminish 'hi-lock-mode))
+    (eval-after-load "abbrev"
+      '(diminish 'abbrev-mode))
+    (eval-after-load "subword"
+      '(when (eval-when-compile (version< "24.3.1" emacs-version))
+         (diminish 'subword-mode)))))
 
 ;; Just don’t show them. Use native Emacs controls:
 (setq use-dialog-box nil)
@@ -1322,11 +1307,6 @@ These should have their own segments in the modeline.")
              dotemacs-insert-logo-into-scratch)
   :init (add-hook 'emacs-startup-hook #'dotemacs-insert-logo-into-scratch))
 
-(defvar pcache-directory
-  (let ((dir (concat dotemacs-cache-directory "pcache")))
-    (make-directory dir t)
-    dir))
-
 (use-package unicode-fonts              ; Map Unicode blocks to fonts
   :ensure t
   ;; Enable emoticon mappings
@@ -1349,8 +1329,7 @@ These should have their own segments in the modeline.")
         (setq dotemacs--relative-linum-loaded t)))
     (add-hook 'linum-mode-hook 'dotemacs-linum-relative-mode-setup)
 
-    (after "evil-leader"
-      (evil-leader/set-key "tr" 'linum-relative-toggle)))
+    (evil-leader/set-key "tr" 'linum-relative-toggle))
   :config
   (progn
     (setq linum-format 'linum-relative)
@@ -1545,35 +1524,34 @@ These should have their own segments in the modeline.")
     (global-set-key (kbd "M-x") 'helm-M-x)
     (global-set-key (kbd "C-x C-d") 'helm-browse-project)
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        "<f1>" 'helm-apropos
-        "bb"   'helm-mini
-        "Cl"   'helm-colors
-        "ff"   'dotemacs-helm-find-files
-        "fF"   'helm-find-files
-        "fr"   'helm-recentf
-        "hb"   'helm-filtered-bookmarks
-        "hi"   'helm-info-at-point
-        "hl"   'helm-resume
-        "hm"   'helm-man-woman
-        "ry"   'helm-show-kill-ring
-        "rr"   'helm-register
-        "rm"   'helm-all-mark-rings
-        "sL"   'dotemacs-last-search-buffer
-        "sl"   'dotemacs-jump-in-buffer)
+    (evil-leader/set-key
+      "<f1>" 'helm-apropos
+      "bb"   'helm-mini
+      "Cl"   'helm-colors
+      "ff"   'dotemacs-helm-find-files
+      "fF"   'helm-find-files
+      "fr"   'helm-recentf
+      "hb"   'helm-filtered-bookmarks
+      "hi"   'helm-info-at-point
+      "hl"   'helm-resume
+      "hm"   'helm-man-woman
+      "ry"   'helm-show-kill-ring
+      "rr"   'helm-register
+      "rm"   'helm-all-mark-rings
+      "sL"   'dotemacs-last-search-buffer
+      "sl"   'dotemacs-jump-in-buffer)
 
-      ;; search with grep
-      (evil-leader/set-key
-        "sgb"  'dotemacs-helm-buffers-do-grep
-        "sgB"  'dotemacs-helm-buffers-do-grep-region-or-symbol
-        "sgf"  'dotemacs-helm-files-do-grep
-        "sgF"  'dotemacs-helm-files-do-grep-region-or-symbol
-        "sgg"  'dotemacs-helm-file-do-grep
-        "sgG"  'dotemacs-helm-file-do-grep-region-or-symbol)
+    ;; search with grep
+    (evil-leader/set-key
+      "sgb"  'dotemacs-helm-buffers-do-grep
+      "sgB"  'dotemacs-helm-buffers-do-grep-region-or-symbol
+      "sgf"  'dotemacs-helm-files-do-grep
+      "sgF"  'dotemacs-helm-files-do-grep-region-or-symbol
+      "sgg"  'dotemacs-helm-file-do-grep
+      "sgG"  'dotemacs-helm-file-do-grep-region-or-symbol)
 
-      (evil-leader/set-key
-        dotemacs-command-key 'helm-M-x))
+    (evil-leader/set-key
+      dotemacs-command-key 'helm-M-x)
 
     (setq helm-display-function 'dotemacs-display-helm-at-bottom)
 
@@ -1594,28 +1572,27 @@ These should have their own segments in the modeline.")
 
     (dotemacs-helm-hjkl-navigation t)
 
-    (after "evil-leader"
-      (dotemacs-define-micro-state helm-navigation
-        :persistent t
-        :disable-evil-leader t
-        :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
-        :on-enter (dotemacs-helm-navigation-ms-on-enter)
-        :on-exit  (dotemacs-helm-navigation-ms-on-exit)
-        :bindings
-        ("<tab>" helm-select-action :exit t)
-        ("C-i" helm-select-action :exit t)
-        ("<RET>" helm-maybe-exit-minibuffer :exit t)
-        ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
-        ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
-        ("e" dotemacs-helm-edit)
-        ("h" helm-previous-source)
-        ("j" helm-next-line)
-        ("k" helm-previous-line)
-        ("l" helm-next-source)
-        ("q" nil :exit t)
-        ("t" helm-toggle-visible-mark)
-        ("T" helm-toggle-all-marks)
-        ("v" helm-execute-persistent-action)))
+    (dotemacs-define-micro-state helm-navigation
+      :persistent t
+      :disable-evil-leader t
+      :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
+      :on-enter (dotemacs-helm-navigation-ms-on-enter)
+      :on-exit  (dotemacs-helm-navigation-ms-on-exit)
+      :bindings
+      ("<tab>" helm-select-action :exit t)
+      ("C-i" helm-select-action :exit t)
+      ("<RET>" helm-maybe-exit-minibuffer :exit t)
+      ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
+      ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
+      ("e" dotemacs-helm-edit)
+      ("h" helm-previous-source)
+      ("j" helm-next-line)
+      ("k" helm-previous-line)
+      ("l" helm-next-source)
+      ("q" nil :exit t)
+      ("t" helm-toggle-visible-mark)
+      ("T" helm-toggle-all-marks)
+      ("v" helm-execute-persistent-action))
 
 
     ;; Swap default TAB and C-z commands.
@@ -1627,7 +1604,6 @@ These should have their own segments in the modeline.")
 
     (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
-
 
 (use-package helm-unicode
   :defer t
@@ -1669,11 +1645,10 @@ These should have their own segments in the modeline.")
                      (if thing thing ""))))))
           (call-interactively 'helm-swoop)))
 
-      (after "evil-leader"
-        (evil-leader/set-key
-          "ss"    'helm-swoop
-          "sS"    'dotemacs-helm-swoop-region-or-symbol
-          "s C-s" 'helm-multi-swoop-all))
+      (evil-leader/set-key
+        "ss"    'helm-swoop
+        "sS"    'dotemacs-helm-swoop-region-or-symbol
+        "s C-s" 'helm-multi-swoop-all)
       (defadvice helm-swoop (before add-evil-jump activate)
         (evil-set-jump)))))
 
@@ -1685,9 +1660,8 @@ These should have their own segments in the modeline.")
   :ensure helm
   :defer t
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "Th" 'helm-themes)))
+  (evil-leader/set-key
+    "Th" 'helm-themes))
 
 (use-package helm-command               ; M-x in Helm
   :ensure helm
@@ -1710,11 +1684,10 @@ These should have their own segments in the modeline.")
   :ensure t
   :defer t
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "hM"    'helm-switch-major-mode
-      ;; "hm"    'helm-disable-minor-mode
-      "h C-m" 'helm-enable-minor-mode)))
+  (evil-leader/set-key
+    "hM"    'helm-switch-major-mode
+    ;; "hm"    'helm-disable-minor-mode
+    "h C-m" 'helm-enable-minor-mode))
 
 
 ;;; Buffer, Windows and Frames
@@ -1728,12 +1701,11 @@ These should have their own segments in the modeline.")
 (use-package buffer-move
   :defer t
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "bmh" 'buf-move-left
-      "bmj" 'buf-move-down
-      "bmk" 'buf-move-up
-      "bml" 'buf-move-right)))
+  (evil-leader/set-key
+    "bmh" 'buf-move-left
+    "bmj" 'buf-move-down
+    "bmk" 'buf-move-up
+    "bml" 'buf-move-right))
 
 (use-package frame
   :bind (("C-c u F" . toggle-frame-fullscreen))
@@ -1780,9 +1752,8 @@ These should have their own segments in the modeline.")
   ;; Show VC Status in ibuffer
   :init
   (progn
-    (after "evil-evilified-state"
-      (evil-leader/set-key "bB" 'ibuffer)
-      (evilify ibuffer-mode ibuffer-mode-map))
+    (evil-leader/set-key "bB" 'ibuffer)
+    (evilify ibuffer-mode ibuffer-mode-map)
 
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
@@ -1846,18 +1817,17 @@ These should have their own segments in the modeline.")
   :config
   (progn
     (setq window-numbering-auto-assign-0-to-minibuffer nil)
-    (after "evil-leader"
-      (evil-leader/set-key
-        "0" 'select-window-0
-        "1" 'select-window-1
-        "2" 'select-window-2
-        "3" 'select-window-3
-        "4" 'select-window-4
-        "5" 'select-window-5
-        "6" 'select-window-6
-        "7" 'select-window-7
-        "8" 'select-window-8
-        "9" 'select-window-9) )
+    (evil-leader/set-key
+      "0" 'select-window-0
+      "1" 'select-window-1
+      "2" 'select-window-2
+      "3" 'select-window-3
+      "4" 'select-window-4
+      "5" 'select-window-5
+      "6" 'select-window-6
+      "7" 'select-window-7
+      "8" 'select-window-8
+      "9" 'select-window-9)
     (window-numbering-mode 1))
 
   (defun dotemacs-window-number ()
@@ -1934,9 +1904,8 @@ These should have their own segments in the modeline.")
   :config
   (progn
     (popwin-mode 1)
-    (after "evil-leader"
-      (evil-leader/set-key "wpm" 'popwin:messages)
-      (evil-leader/set-key "wpp" 'popwin:close-popup-window))
+    (evil-leader/set-key "wpm" 'popwin:messages)
+    (evil-leader/set-key "wpp" 'popwin:close-popup-window)
 
     ;; don't use default value but manage it ourselves
     (setq popwin:special-display-config nil)
@@ -1976,9 +1945,9 @@ These should have their own segments in the modeline.")
 ;; Keep backup files out of the way
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups"))))
 
-(defconst dotemacs-auto-save-directory
-  (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
-  "dotemacs auto-save directory")
+; (defconst dotemacs-auto-save-directory
+;   (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
+;   "dotemacs auto-save directory")
 
 ;; Auto-save file
 (setq auto-save-default (not (null dotemacs-auto-save-file-location)))
@@ -2054,9 +2023,8 @@ These should have their own segments in the modeline.")
   :defer t
   :commands (open-junk-file)
   :init
-  (after "evil-leader"
-    (evil-leader/set-key "fJ" 'open-junk-file))
-    (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/")))
+  (evil-leader/set-key "fJ" 'open-junk-file)
+  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/")))
 
 (use-package dired                      ; Edit directories
   :defer t
@@ -2256,11 +2224,10 @@ These should have their own segments in the modeline.")
       (interactive)
       (fasd-find-file 1))
 
-    (after "evil-leader"
-      (dotemacs-declare-prefix "fa" "fasd-find")
-      (evil-leader/set-key "fad" 'fasd-find-directory-only)
-      (evil-leader/set-key "faf" 'fasd-find-file-only)
-      (evil-leader/set-key "fas" 'fasd-find-file))
+    (dotemacs-declare-prefix "fa" "fasd-find")
+    (evil-leader/set-key "fad" 'fasd-find-directory-only)
+    (evil-leader/set-key "faf" 'fasd-find-file-only)
+    (evil-leader/set-key "fas" 'fasd-find-file)
 
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
@@ -2358,11 +2325,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (setq avy-keys (number-sequence ?a ?z))
     (setq avy-all-windows 'all-frames)
     (setq avy-background t)
-    (after "evil-leader"
-      (evil-leader/set-key
-        "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
-        "l" 'avy-goto-line ; 'avy-goto-char-2
-      )))
+    (evil-leader/set-key
+      "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
+      "l" 'avy-goto-line ; 'avy-goto-char-2
+    ))
   :config
   (evil-leader/set-key "`" 'avy-pop-mark))
 
@@ -2410,11 +2376,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
          ("C-c o" . ace-window))
   :init
   (progn
-    (after "evil-leader"
     (evil-leader/set-key
       "bM"  'ace-swap-window
       "wC"  'ace-delete-window
-      "w <SPC>"  'ace-window))
+      "w <SPC>"  'ace-window)
     ;; set ace-window keys to home-row
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
 
@@ -2535,15 +2500,14 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :ensure t
   :defer t
   :init
-  (after "evil-leader"
-    (dotemacs-define-micro-state move-text
-      :doc "[J] move down [K] move up"
-      :use-minibuffer t
-      :execute-binding-on-enter t
-      :evil-leader "xJ" "xK"
-      :bindings
-      ("J" move-text-down)
-      ("K" move-text-up))))
+  (dotemacs-define-micro-state move-text
+    :doc "[J] move down [K] move up"
+    :use-minibuffer t
+    :execute-binding-on-enter t
+    :evil-leader "xJ" "xK"
+    :bindings
+    ("J" move-text-down)
+    ("K" move-text-up)))
 
 (use-package helm-ring                  ; Helm commands for rings
   :ensure helm
@@ -2653,8 +2617,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :ensure t
   :bind (("C-=" . er/expand-region))
   :defer t
-  :init (after "evil-leader"
-          (evil-leader/set-key "v" 'er/expand-region))
+  :init (evil-leader/set-key "v" 'er/expand-region)
   :config
   (progn
     ;; add search capability to expand-region
@@ -2774,20 +2737,19 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
       (add-hook hook #'smartparens-mode))
 
-    (after "evil-leader"
-      (dotemacs-add-toggle smartparens
-                           :status smartparens-mode
-                           :on (smartparens-mode)
-                           :off (smartparens-mode -1)
-                           :documentation "Enable smartparens."
-                           :evil-leader "tp")
+    (dotemacs-add-toggle smartparens
+                         :status smartparens-mode
+                         :on (smartparens-mode)
+                         :off (smartparens-mode -1)
+                         :documentation "Enable smartparens."
+                         :evil-leader "tp")
 
-      (dotemacs-add-toggle smartparens-globally
-                           :status smartparens-mode
-                           :on (smartparens-global-mode)
-                           :off (smartparens-global-mode -1)
-                           :documentation "Enable smartparens globally."
-                           :evil-leader "t C-p"))
+    (dotemacs-add-toggle smartparens-globally
+                         :status smartparens-mode
+                         :on (smartparens-global-mode)
+                         :off (smartparens-global-mode -1)
+                         :documentation "Enable smartparens globally."
+                         :evil-leader "t C-p")
 
     (setq sp-show-pair-delay 0.2
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
@@ -2964,19 +2926,18 @@ Disable the highlighting of overlong lines."
   :bind (("C-c u w w" . whitespace-mode))
   :init
   (progn
-    (after "evil-leader"
-      (dotemacs-add-toggle whitespace
-                           :status whitespace-mode
-                           :on (whitespace-mode)
-                           :off (whitespace-mode -1)
-                           :documentation "Display whitespace."
-                           :evil-leader "tw")
-      (dotemacs-add-toggle whitespace-globally
-                           :status global-whitespace-mode
-                           :on (global-whitespace-mode)
-                           :off (global-whitespace-mode -1)
-                           :documentation "Globally display whitespace."
-                           :evil-leader "t C-w"))
+    (dotemacs-add-toggle whitespace
+                         :status whitespace-mode
+                         :on (whitespace-mode)
+                         :off (whitespace-mode -1)
+                         :documentation "Display whitespace."
+                         :evil-leader "tw")
+    (dotemacs-add-toggle whitespace-globally
+                         :status global-whitespace-mode
+                         :on (global-whitespace-mode)
+                         :off (global-whitespace-mode -1)
+                         :documentation "Globally display whitespace."
+                         :evil-leader "t C-w")
 
     (defun dotemacs-set-whitespace-style-for-diff ()
       "Whitespace configuration for `diff-mode'"
@@ -3130,8 +3091,7 @@ Disable the highlighting of overlong lines."
   :defer t
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key "tCd" 'rainbow-delimiters-mode))
+    (evil-leader/set-key "tCd" 'rainbow-delimiters-mode)
 
     (when (member dotemacs-highlight-delimiters '(any all))
       (dolist (hook '(text-mode-hook prog-mode-hook))
@@ -3273,20 +3233,19 @@ Disable the highlighting of overlong lines."
     (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
     (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
 
-    (after "evil-leader"
-      (dotemacs-define-micro-state scroll
-        :doc "[k] page up [j] page down [K] half page up [J] half page down"
-        :execute-binding-on-enter t
-        :evil-leader "nn" "np" "nP" "nN"
-        :bindings
-        ;; page
-        ("k" evil-scroll-page-up)
-        ("j" evil-scroll-page-down)
-        ;; half page
-        ("K" dotemacs-scroll-half-page-up)
-        ("J" dotemacs-scroll-half-page-down))
+    (dotemacs-define-micro-state scroll
+      :doc "[k] page up [j] page down [K] half page up [J] half page down"
+      :execute-binding-on-enter t
+      :evil-leader "nn" "np" "nP" "nN"
+      :bindings
+      ;; page
+      ("k" evil-scroll-page-up)
+      ("j" evil-scroll-page-down)
+      ;; half page
+      ("K" dotemacs-scroll-half-page-up)
+      ("J" dotemacs-scroll-half-page-down))
 
-      (evil-leader/set-key "re" 'evil-show-registers))
+    (evil-leader/set-key "re" 'evil-show-registers)
 
     (unless dotemacs-enable-paste-micro-state
       (ad-disable-advice 'evil-paste-before 'after
@@ -3393,9 +3352,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (define-key evil-iedit-state-map
         (kbd evil-leader/leader) evil-leader--default-map))
 
-    (after "evil-leader"
-      (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
-      (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading))))
+    (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
+    (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading)))
 
 (use-package evil-jumper
   :ensure t
@@ -3464,14 +3422,13 @@ Example: (evil-map visual \"<\" \"<gv\")"
              evilnc-copy-and-comment-lines)
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key
-        ";"  'evilnc-comment-operator
-        "cl" 'evilnc-comment-or-uncomment-lines
-        "ci" 'evilnc-toggle-invert-comment-line-by-line
-        "cp" 'evilnc-comment-or-uncomment-paragraphs
-        "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
-        "cy" 'evilnc-copy-and-comment-lines))))
+    (evil-leader/set-key
+      ";"  'evilnc-comment-operator
+      "cl" 'evilnc-comment-or-uncomment-lines
+      "ci" 'evilnc-toggle-invert-comment-line-by-line
+      "cp" 'evilnc-comment-or-uncomment-paragraphs
+      "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
+      "cy" 'evilnc-copy-and-comment-lines)))
 
 (use-package evil-matchit
   :ensure t
@@ -3525,18 +3482,16 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (evil-numbers/dec-at-pt amount)
       (dotemacs-evil-numbers-micro-state-overlay-map))
 
-    (after "evil-leader"
-      (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
-      (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
-      (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease))))
+    (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
+    (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
+    (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease)))
 
 (use-package evil-search-highlight-persist
   :ensure t
   :init
   (progn
     (global-evil-search-highlight-persist)
-    (after "evil-leader"
-      (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)) ;; sc
+    (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all) ;; sc
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
 
     (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
@@ -4265,10 +4220,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key-for-mode 'emacs-lisp-mode
-        "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
-        "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point))
+    (evil-leader/set-key-for-mode 'emacs-lisp-mode
+      "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
+      "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)
     (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode))
   :config
   (defadvice elisp-slime-nav-find-elisp-thing-at-point
@@ -4362,27 +4316,26 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :commands rxt-fontify-regexp-at-point
   :init
   (progn
-    (after "evil-leader"
-      (dotemacs-declare-prefix "R" "pcre2el")
-      (evil-leader/set-key
-        "R/"  'rxt-explain
-        "Rc"  'rxt-convert-syntax
-        "Rx"  'rxt-convert-to-rx
-        "R'"  'rxt-convert-to-strings
-        "Rpe" 'rxt-pcre-to-elisp
-        "R%"  'pcre-query-replace-regexp
-        "Rpx" 'rxt-pcre-to-rx
-        "Rps" 'rxt-pcre-to-sre
-        "Rp'" 'rxt-pcre-to-strings
-        "Rp/" 'rxt-explain-pcre
-        "Re/" 'rxt-explain-elisp
-        "Rep" 'rxt-elisp-to-pcre
-        "Rex" 'rxt-elisp-to-rx
-        "Res" 'rxt-elisp-to-sre
-        "Re'" 'rxt-elisp-to-strings
-        "Ret" 'rxt-toggle-elisp-rx
-        "Rt"  'rxt-toggle-elisp-rx
-        "Rh"  'rxt-fontify-regexp-at-point))))
+    (dotemacs-declare-prefix "R" "pcre2el")
+    (evil-leader/set-key
+      "R/"  'rxt-explain
+      "Rc"  'rxt-convert-syntax
+      "Rx"  'rxt-convert-to-rx
+      "R'"  'rxt-convert-to-strings
+      "Rpe" 'rxt-pcre-to-elisp
+      "R%"  'pcre-query-replace-regexp
+      "Rpx" 'rxt-pcre-to-rx
+      "Rps" 'rxt-pcre-to-sre
+      "Rp'" 'rxt-pcre-to-strings
+      "Rp/" 'rxt-explain-pcre
+      "Re/" 'rxt-explain-elisp
+      "Rep" 'rxt-elisp-to-pcre
+      "Rex" 'rxt-elisp-to-rx
+      "Res" 'rxt-elisp-to-sre
+      "Re'" 'rxt-elisp-to-strings
+      "Ret" 'rxt-toggle-elisp-rx
+      "Rt"  'rxt-toggle-elisp-rx
+      "Rh"  'rxt-fontify-regexp-at-point)))
 
 (use-package visual-regexp-steroids
   :defer t)
@@ -4691,9 +4644,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init (add-hook 'python-mode-hook #'anaconda-mode)
   :config
   (progn
-    (after "evil-jumper"
-      (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)
-        (evil-jumper--push)))
+    (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)
+      (evil-jumper--push))
     (evil-leader/set-key-for-mode 'python-mode
       "mhh" 'anaconda-mode-view-doc
       "mgu" 'anaconda-mode-usages
@@ -7227,10 +7179,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :defer t
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "gm" 'git-messenger:popup-message)
-      )
+  (evil-leader/set-key
+    "gm" 'git-messenger:popup-message)
   :config
   (define-key git-messenger-map [escape] 'git-messenger:popup-close))
 
@@ -7251,17 +7201,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :config
   (progn
-    (after "evil-evilified-state"
-      (evilify git-rebase-mode git-rebase-mode-map
-              "J" 'git-rebase-move-line-down
-              "K" 'git-rebase-move-line-up
-              "u" 'git-rebase-undo
-              "y" 'git-rebase-insert))
+    (evilify git-rebase-mode git-rebase-mode-map
+            "J" 'git-rebase-move-line-down
+            "K" 'git-rebase-move-line-up
+            "u" 'git-rebase-undo
+            "y" 'git-rebase-insert)
 
-    (after "evil-leader"
-      (evil-leader/set-key-for-mode 'git-rebase-mode
-        "mcc" 'git-rebase-server-edit
-        "mk" 'git-rebase-abort))))
+    (evil-leader/set-key-for-mode 'git-rebase-mode
+      "mcc" 'git-rebase-server-edit
+      "mk" 'git-rebase-abort)))
 
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
@@ -7269,9 +7217,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :bind (("C-c v t" . git-timemachine))
   :commands dotemacs-time-machine-micro-state
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "gt" 'dotemacs-time-machine-micro-state))
+  (evil-leader/set-key
+    "gt" 'dotemacs-time-machine-micro-state)
 
   :config
   (progn
@@ -7510,46 +7457,44 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (after "evil-evilified-state"
-      ;; evilify the helm-grep buffer
-      (evilify helm-grep-mode helm-grep-mode-map
-               (kbd "RET") 'helm-grep-mode-jump-other-window
-               (kbd "q") 'quit-window))
+    ;; evilify the helm-grep buffer
+    (evilify helm-grep-mode helm-grep-mode-map
+             (kbd "RET") 'helm-grep-mode-jump-other-window
+             (kbd "q") 'quit-window)
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        ;; opened buffers scope
-        "sb"  'dotemacs-helm-buffers-smart-do-search
-        "sB"  'dotemacs-helm-buffers-smart-do-search-region-or-symbol
-        "sab" 'helm-do-ag-buffers
-        "saB" 'dotemacs-helm-buffers-do-ag-region-or-symbol
-        "skb" 'dotemacs-helm-buffers-do-ack
-        "skB" 'dotemacs-helm-buffers-do-ack-region-or-symbol
-        "stb" 'dotemacs-helm-buffers-do-pt
-        "stB" 'dotemacs-helm-buffers-do-pt-region-or-symbol
-        ;; current file scope
-        "ss"  'dotemacs-helm-file-smart-do-search
-        "sS"  'dotemacs-helm-file-smart-do-search-region-or-symbol
-        "saa" 'helm-ag-this-file
-        "saA" 'dotemacs-helm-file-do-ag-region-or-symbol
-        ;; files scope
-        "sf"  'dotemacs-helm-files-smart-do-search
-        "sF"  'dotemacs-helm-files-smart-do-search-region-or-symbol
-        "saf" 'helm-do-ag
-        "saF" 'dotemacs-helm-files-do-ag-region-or-symbol
-        "skf" 'dotemacs-helm-files-do-ack
-        "skF" 'dotemacs-helm-files-do-ack-region-or-symbol
-        "stf" 'dotemacs-helm-files-do-pt
-        "stF" 'dotemacs-helm-files-do-pt-region-or-symbol
-        ;; current project scope
-        "sp"  'dotemacs-helm-project-smart-do-search
-        "sP"  'dotemacs-helm-project-smart-do-search-region-or-symbol
-        "sap" 'dotemacs-helm-project-do-ag
-        "saP" 'dotemacs-helm-project-do-ag-region-or-symbol
-        "skp" 'dotemacs-helm-project-do-ack
-        "skP" 'dotemacs-helm-project-do-ack-region-or-symbol
-        "stp" 'dotemacs-helm-project-do-pt
-        "stP" 'dotemacs-helm-project-do-pt-region-or-symbol)))
+    (evil-leader/set-key
+      ;; opened buffers scope
+      "sb"  'dotemacs-helm-buffers-smart-do-search
+      "sB"  'dotemacs-helm-buffers-smart-do-search-region-or-symbol
+      "sab" 'helm-do-ag-buffers
+      "saB" 'dotemacs-helm-buffers-do-ag-region-or-symbol
+      "skb" 'dotemacs-helm-buffers-do-ack
+      "skB" 'dotemacs-helm-buffers-do-ack-region-or-symbol
+      "stb" 'dotemacs-helm-buffers-do-pt
+      "stB" 'dotemacs-helm-buffers-do-pt-region-or-symbol
+      ;; current file scope
+      "ss"  'dotemacs-helm-file-smart-do-search
+      "sS"  'dotemacs-helm-file-smart-do-search-region-or-symbol
+      "saa" 'helm-ag-this-file
+      "saA" 'dotemacs-helm-file-do-ag-region-or-symbol
+      ;; files scope
+      "sf"  'dotemacs-helm-files-smart-do-search
+      "sF"  'dotemacs-helm-files-smart-do-search-region-or-symbol
+      "saf" 'helm-do-ag
+      "saF" 'dotemacs-helm-files-do-ag-region-or-symbol
+      "skf" 'dotemacs-helm-files-do-ack
+      "skF" 'dotemacs-helm-files-do-ack-region-or-symbol
+      "stf" 'dotemacs-helm-files-do-pt
+      "stF" 'dotemacs-helm-files-do-pt-region-or-symbol
+      ;; current project scope
+      "sp"  'dotemacs-helm-project-smart-do-search
+      "sP"  'dotemacs-helm-project-smart-do-search-region-or-symbol
+      "sap" 'dotemacs-helm-project-do-ag
+      "saP" 'dotemacs-helm-project-do-ag-region-or-symbol
+      "skp" 'dotemacs-helm-project-do-ack
+      "skP" 'dotemacs-helm-project-do-ack-region-or-symbol
+      "stp" 'dotemacs-helm-project-do-pt
+      "stP" 'dotemacs-helm-project-do-pt-region-or-symbol))
   :config
   (progn
     (setq helm-ag-fuzzy-match t
@@ -7559,13 +7504,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
 
-    (after "evil-leader"
-      (evil-define-key 'normal helm-ag-map "SPC" evil-leader--default-map))
+    (evil-define-key 'normal helm-ag-map "SPC" evil-leader--default-map)
 
-    (after "evil-evilified-state"
-      (evilify helm-ag-mode helm-ag-mode-map
-               (kbd "RET") 'helm-ag-mode-jump-other-window
-               (kbd "q") 'quit-window)))
+    (evilify helm-ag-mode helm-ag-mode-map
+             (kbd "RET") 'helm-ag-mode-jump-other-window
+             (kbd "q") 'quit-window))
 
 
 ;;; Project management for Interactively Do Things (IDO)
@@ -7837,28 +7780,27 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             ".cache"
             ".sass-cache"))
 
-    (after "evil-leader"
-      (unless (boundp 'dotemacs-use-helm-projectile)
-        (evil-leader/set-key
-          "pb" 'projectile-switch-to-buffer
-          "pd" 'projectile-find-dir
-          "pf" 'projectile-find-file
-          "ph" 'helm-projectile
-          "pr" 'projectile-recentf
-          "ps" 'projectile-switch-project))
+    (unless (boundp 'dotemacs-use-helm-projectile)
       (evil-leader/set-key
-        "p!" 'projectile-run-shell-command-in-root
-        "p&" 'projectile-run-async-shell-command-in-root
-        "pa" 'projectile-toggle-between-implementation-and-test
-        "pc" 'projectile-compile-project
-        "pD" 'projectile-dired
-        "pG" 'projectile-regenerate-tags
-        "pI" 'projectile-invalidate-cache
-        "pk" 'projectile-kill-buffers
-        "po" 'projectile-multi-occur
-        "pR" 'projectile-replace
-        "pT" 'projectile-find-test-file
-        "py" 'projectile-find-tag)))
+        "pb" 'projectile-switch-to-buffer
+        "pd" 'projectile-find-dir
+        "pf" 'projectile-find-file
+        "ph" 'helm-projectile
+        "pr" 'projectile-recentf
+        "ps" 'projectile-switch-project))
+    (evil-leader/set-key
+      "p!" 'projectile-run-shell-command-in-root
+      "p&" 'projectile-run-async-shell-command-in-root
+      "pa" 'projectile-toggle-between-implementation-and-test
+      "pc" 'projectile-compile-project
+      "pD" 'projectile-dired
+      "pG" 'projectile-regenerate-tags
+      "pI" 'projectile-invalidate-cache
+      "pk" 'projectile-kill-buffers
+      "po" 'projectile-multi-occur
+      "pR" 'projectile-replace
+      "pT" 'projectile-find-test-file
+      "py" 'projectile-find-tag))
   :config
   (progn
     ;; Remove dead projects when Emacs is idle
@@ -7902,16 +7844,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (defalias 'dotemacs-helm-project-do-grep 'helm-projectile-grep)
     (defalias 'dotemacs-helm-project-do-grep-region-or-symbol 'helm-projectile-grep)
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        "pb"  'helm-projectile-switch-to-buffer
-        "pd"  'helm-projectile-find-dir
-        "pf"  'helm-projectile-find-file
-        "ph"  'helm-projectile
-        "pp"  'helm-projectile-switch-project
-        "pr"  'helm-projectile-recentf
-        "pv"  'projectile-vc
-        "sgp" 'helm-projectile-grep))))
+    (evil-leader/set-key
+      "pb"  'helm-projectile-switch-to-buffer
+      "pd"  'helm-projectile-find-dir
+      "pf"  'helm-projectile-find-file
+      "ph"  'helm-projectile
+      "pp"  'helm-projectile-switch-project
+      "pr"  'helm-projectile-recentf
+      "pv"  'projectile-vc
+      "sgp" 'helm-projectile-grep)))
 
 
 ;;; Project management with Project Explorer
@@ -7924,44 +7865,42 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              project-explorer-toggle)
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key
-        "tn" 'project-explorer-open
-        "tN" 'project-explorer-toggle))
+    (evil-leader/set-key
+      "tn" 'project-explorer-open
+      "tN" 'project-explorer-toggle)
     (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer")))
   :config
   (progn
-    (after "evil"
-      (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)
-      (evil-set-initial-state 'project-explorer-mode 'normal)
-      (evil-define-key 'normal project-explorer-mode-map
-        (kbd "+") 'pe/create-file
-        (kbd "-") 'pe/delete-file
-        (kbd "x") 'pe/fold
-        (kbd "u") 'pe/up-element
-        (kbd "a") 'pe/goto-top
-        (kbd "TAB") 'pe/tab
-        (kbd "<backtab>") 'pe/backtab
-        (kbd "J") 'pe/forward-element
-        (kbd "K") 'pe/backward-element
-        (kbd "]") 'pe/forward-element
-        (kbd "[") 'pe/backward-element
-        (kbd "n") 'next-line
-        (kbd "p") 'previous-line
-        (kbd "j") 'next-line
-        (kbd "k") 'previous-line
-        (kbd "l") 'forward-char
-        (kbd "h") 'backward-char
-        (kbd "RET") 'pe/return
-        (kbd "q") 'pe/quit
-        [escape] 'pe/quit
-        (kbd "s") 'pe/change-directory
-        (kbd "r") 'pe/rename-file
-        (kbd "c") 'pe/copy-file
-        (kbd "f") 'pe/find-file
-        (kbd "w") 'pe/copy-file-name-as-kill
-        (kbd "M-l") 'pe/set-filter-regex
-        (kbd "M-o") 'pe/toggle-omit))))
+    (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)
+    (evil-set-initial-state 'project-explorer-mode 'normal)
+    (evil-define-key 'normal project-explorer-mode-map
+      (kbd "+") 'pe/create-file
+      (kbd "-") 'pe/delete-file
+      (kbd "x") 'pe/fold
+      (kbd "u") 'pe/up-element
+      (kbd "a") 'pe/goto-top
+      (kbd "TAB") 'pe/tab
+      (kbd "<backtab>") 'pe/backtab
+      (kbd "J") 'pe/forward-element
+      (kbd "K") 'pe/backward-element
+      (kbd "]") 'pe/forward-element
+      (kbd "[") 'pe/backward-element
+      (kbd "n") 'next-line
+      (kbd "p") 'previous-line
+      (kbd "j") 'next-line
+      (kbd "k") 'previous-line
+      (kbd "l") 'forward-char
+      (kbd "h") 'backward-char
+      (kbd "RET") 'pe/return
+      (kbd "q") 'pe/quit
+      [escape] 'pe/quit
+      (kbd "s") 'pe/change-directory
+      (kbd "r") 'pe/rename-file
+      (kbd "c") 'pe/copy-file
+      (kbd "f") 'pe/find-file
+      (kbd "w") 'pe/copy-file-name-as-kill
+      (kbd "M-l") 'pe/set-filter-regex
+      (kbd "M-o") 'pe/toggle-omit)))
 
 
 ;;; Project management with NeoTree
@@ -8056,13 +7995,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
 
     ;; neo-global--select-window
-    (after "evil-leader"
-      (evil-leader/set-key
-        "tn" 'neotree-show
-        "tN" 'neotree-hide
-        "n" 'neotree-show
-        "N" 'neotree-hide
-        "pt" 'neotree-find-project-root)))
+    (evil-leader/set-key
+      "tn" 'neotree-show
+      "tN" 'neotree-hide
+      "n" 'neotree-show
+      "N" 'neotree-hide
+      "pt" 'neotree-find-project-root))
 
   :config
   (progn
@@ -8129,10 +8067,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (projectile-persp-bridge helm-projectile-switch-project)
-    (after "evil-leader"
-      (evil-leader/set-key
-        "pp" 'dotemacs-persp-switch-project)
-    )))
+    (evil-leader/set-key
+      "pp" 'dotemacs-persp-switch-project)))
 
 
 ;;; Processes and commands
@@ -8357,44 +8293,43 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       `(defun ,fname () (interactive)
               (org-emphasize ,char)))
 
-    (after "evil-leader"
-      (evil-leader/set-key-for-mode 'org-mode
-        "m'" 'org-edit-special
-        "mc" 'org-capture
-        "md" 'org-deadline
-        "me" 'org-export-dispatch
-        "mf" 'org-set-effort
+    (evil-leader/set-key-for-mode 'org-mode
+      "m'" 'org-edit-special
+      "mc" 'org-capture
+      "md" 'org-deadline
+      "me" 'org-export-dispatch
+      "mf" 'org-set-effort
 
-        ;; headings
-        "mhi" 'org-insert-heading-after-current
-        "mhI" 'org-insert-heading
+      ;; headings
+      "mhi" 'org-insert-heading-after-current
+      "mhI" 'org-insert-heading
 
-        "mI" 'org-clock-in
-        (if dotemacs-major-mode-leader-key
-            (concat "m" dotemacs-major-mode-leader-key)
-          "m,") 'org-ctrl-c-ctrl-c
-          "mn" 'org-narrow-to-subtree
-          "mN" 'widen
-          "mO" 'org-clock-out
-          "mq" 'org-clock-cancel
-          "mR" 'org-refile
-          "ms" 'org-schedule
+      "mI" 'org-clock-in
+      (if dotemacs-major-mode-leader-key
+          (concat "m" dotemacs-major-mode-leader-key)
+        "m,") 'org-ctrl-c-ctrl-c
+        "mn" 'org-narrow-to-subtree
+        "mN" 'widen
+        "mO" 'org-clock-out
+        "mq" 'org-clock-cancel
+        "mR" 'org-refile
+        "ms" 'org-schedule
 
-          ;; insertion of common elements
-          "mil" 'org-insert-link
-          "mif" 'org-footnote-new
-          "mik" 'dotemacs-insert-keybinding-org
+        ;; insertion of common elements
+        "mil" 'org-insert-link
+        "mif" 'org-footnote-new
+        "mik" 'dotemacs-insert-keybinding-org
 
-          ;; images and other link types have no commands in org mode-line
-          ;; could be inserted using yasnippet?
-          ;; region manipulation
-          "mxb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
-          "mxc" (dotemacs-org-emphasize dotemacs-org-code ?~)
-          "mxi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
-          "mxr" (dotemacs-org-emphasize dotemacs-org-clear ? )
-          "mxs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
-          "mxu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
-          "mxv" (dotemacs-org-emphasize dotemacs-org-verbose ?=)))
+        ;; images and other link types have no commands in org mode-line
+        ;; could be inserted using yasnippet?
+        ;; region manipulation
+        "mxb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
+        "mxc" (dotemacs-org-emphasize dotemacs-org-code ?~)
+        "mxi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
+        "mxr" (dotemacs-org-emphasize dotemacs-org-clear ? )
+        "mxs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
+        "mxu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
+        "mxv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
 
     (require 'ox-md)
     (require 'ox-ascii)
@@ -8444,12 +8379,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              ort/goto-todos)
   :init
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key
-        "Ct"  'ort/capture-todo
-        "CT"  'ort/capture-todo-check)
-      (evil-leader/set-key-for-mode 'org-mode
-        "mgt" 'ort/goto-todos))))
+    (evil-leader/set-key
+      "Ct"  'ort/capture-todo
+      "CT"  'ort/capture-todo-check)
+    (evil-leader/set-key-for-mode 'org-mode
+      "mgt" 'ort/goto-todos)))
 
 (use-package evil-org
   :commands evil-org-mode
@@ -8458,14 +8392,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (add-hook 'org-mode-hook 'evil-org-mode)
   :config
   (progn
-    (after "evil-leader"
-      (evil-leader/set-key-for-mode 'org-mode
-        "a" nil "ma" 'org-agenda
-        "b" nil "mb" 'org-tree-to-indirect-buffer
-        "c" nil "mA" 'org-archive-subtree
-        "o" nil "mC" 'evil-org-recompute-clocks
-        "l" nil "ml" 'evil-org-open-links
-        "t" nil "mt" 'org-show-todo-tree))
+    (evil-leader/set-key-for-mode 'org-mode
+      "a" nil "ma" 'org-agenda
+      "b" nil "mb" 'org-tree-to-indirect-buffer
+      "c" nil "mA" 'org-archive-subtree
+      "o" nil "mC" 'evil-org-recompute-clocks
+      "l" nil "ml" 'evil-org-open-links
+      "t" nil "mt" 'org-show-todo-tree)
       (evil-define-key 'normal evil-org-mode-map
         "O" 'evil-open-above)
       (dotemacs-diminish evil-org-mode " ⓔ" " e")))
@@ -8485,11 +8418,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (after "evil-evilified-state"
-      (evilify nil org-present-mode-keymap
-        "h" 'org-present-prev
-        "l" 'org-present-next
-        "q" 'org-present-quit))
+    (evilify nil org-present-mode-keymap
+      "h" 'org-present-prev
+      "l" 'org-present-next
+      "q" 'org-present-quit)
     (add-hook 'org-present-mode-hook 'dotemacs-org-present-start)
     (add-hook 'org-present-mode-quit-hook 'dotemacs-org-present-end)))
 
@@ -8537,15 +8469,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq helm-descbinds-window-style 'split)
     (add-hook 'helm-mode-hook 'helm-descbinds-mode)
-    (after "evil-leader"
-      (evil-leader/set-key "?" 'helm-descbinds))))
+    (evil-leader/set-key "?" 'helm-descbinds)))
 
 (use-package helm-make
   :ensure t
   :defer t
   :init
-  (after "evil-leader"
-    (evil-leader/set-key "hk" 'helm-make)))
+  (evil-leader/set-key "hk" 'helm-make))
 
 (use-package help-mode
   :config
@@ -8626,14 +8556,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                   bzg-big-fringe-mode)
         ad-do-it))
 
-    (after "evil-leader"
-      (dotemacs-add-toggle guide-key
-                      :status guide-key-mode
-                      :on (guide-key-mode)
-                      :off (guide-key-mode -1)
-                      :documentation
-                      "Display a buffer with available key bindings."
-                      :evil-leader "tG"))
+    (dotemacs-add-toggle guide-key
+                    :status guide-key-mode
+                    :on (guide-key-mode)
+                    :off (guide-key-mode -1)
+                    :documentation
+                    "Display a buffer with available key bindings."
+                    :evil-leader "tG")
 
     (setq guide-key/guide-key-sequence `("C-x"
                                          "C-c"
@@ -8669,14 +8598,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq which-key-max-description-length 32)
     (which-key-mode)
-    (after "evil-leader"
-      (dotemacs-add-toggle which-key
-                           :status which-key-mode
-                           :on (which-key-mode)
-                           :off (which-key-mode -1)
-                           :documentation
-                           "Display a buffer with available key bindings."
-                           :evil-leader "tK"))
+    (dotemacs-add-toggle which-key
+                         :status which-key-mode
+                         :on (which-key-mode)
+                         :off (which-key-mode -1)
+                         :documentation
+                         "Display a buffer with available key bindings."
+                         :evil-leader "tK")
 
     (let ((new-descriptions
            ;; being higher in this list means the replacement is applied later
@@ -8717,23 +8645,22 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package doc-view
   :defer t
   :init
-  (after "evil-evilified-state"
-         (evilify doc-view-mode doc-view-mode-map
-           "/"  'dotemacs-doc-view-search-new-query
-           "?"  'dotemacs-doc-view-search-new-query-backward
-           "gg" 'doc-view-first-page
-           "G"  'doc-view-last-page
-           "gt" 'doc-view-goto-page
-           "h"  'doc-view-previous-page
-           "j"  'doc-view-next-line-or-next-page
-           "k"  'doc-view-previous-line-or-previous-page
-           "K"  'doc-view-kill-proc-and-buffer
-           "l"  'doc-view-next-page
-           "n"  'doc-view-search
-           "N"  'doc-view-search-backward
-           (kbd "C-d") 'doc-view-scroll-up-or-next-page
-           (kbd "C-k") 'doc-view-kill-proc
-           (kbd "C-u") 'doc-view-scroll-down-or-previous-page))
+       (evilify doc-view-mode doc-view-mode-map
+         "/"  'dotemacs-doc-view-search-new-query
+         "?"  'dotemacs-doc-view-search-new-query-backward
+         "gg" 'doc-view-first-page
+         "G"  'doc-view-last-page
+         "gt" 'doc-view-goto-page
+         "h"  'doc-view-previous-page
+         "j"  'doc-view-next-line-or-next-page
+         "k"  'doc-view-previous-line-or-previous-page
+         "K"  'doc-view-kill-proc-and-buffer
+         "l"  'doc-view-next-page
+         "n"  'doc-view-search
+         "N"  'doc-view-search-backward
+         (kbd "C-d") 'doc-view-scroll-up-or-next-page
+         (kbd "C-k") 'doc-view-kill-proc
+         (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
   :config
   (progn
     (defun dotemacs-doc-view-search-new-query ()
@@ -9000,12 +8927,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
              google-translate-query-translate-reverse
              google-translate-at-point-reverse)
   :init
-  (after "evil-leader"
-    (evil-leader/set-key
-      "xgQ" 'google-translate-query-translate-reverse
-      "xgq" 'google-translate-query-translate
-      "xgT" 'google-translate-at-point-reverse
-      "xgt" 'google-translate-at-point))
+  (evil-leader/set-key
+    "xgQ" 'google-translate-query-translate-reverse
+    "xgq" 'google-translate-query-translate
+    "xgT" 'google-translate-at-point-reverse
+    "xgt" 'google-translate-at-point)
   :config
   (progn
     (require 'google-translate-default-ui)
@@ -9206,10 +9132,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "Info on the last searched highlighted symbol.")
     (make-variable-buffer-local 'dotemacs-last-ahs-highlight-p)
 
-    (after "evil"
-      '(progn
-         (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)
-         (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward)))
+    '(progn
+       (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)
+       (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward))
 
     (evil-leader/set-key
       "sh" 'dotemacs-symbol-highlight
@@ -9376,28 +9301,26 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'flycheck-after-syntax-check-hook
               #'dotemacs-adjust-flycheck-automatic-syntax-eagerness)
 
-    (after "evil-leader"
-      (dotemacs-add-toggle syntax-checking
-                           :status flycheck-mode
-                           :on (flycheck-mode)
-                           :off (flycheck-mode -1)
-                           :documentation "Enable error and syntax checking."
-                           :evil-leader "ts")))
+    (dotemacs-add-toggle syntax-checking
+                         :status flycheck-mode
+                         :on (flycheck-mode)
+                         :off (flycheck-mode -1)
+                         :documentation "Enable error and syntax checking."
+                         :evil-leader "ts"))
   :config
   (progn
     (dotemacs-diminish flycheck-mode " ⓢ" " s")
 
-    (after "evil-leader"
-      (evil-leader/set-key
-        "ec" 'flycheck-clear
-        "eC" 'flycheck-compile
-        ; https://github.com/flycheck/flycheck/pull/494
-        "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
-        "eL" 'dotemacs-flycheck-hide-list-errors
-        "es" 'flycheck-select-checker
-        "ex" 'flycheck-disable-checker
-        "e?" 'flycheck-describe-checker
-        "tmf" 'dotemacs-mode-line-flycheck-info-toggle))
+    (evil-leader/set-key
+      "ec" 'flycheck-clear
+      "eC" 'flycheck-compile
+      ; https://github.com/flycheck/flycheck/pull/494
+      "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
+      "eL" 'dotemacs-flycheck-hide-list-errors
+      "es" 'flycheck-select-checker
+      "ex" 'flycheck-disable-checker
+      "e?" 'flycheck-describe-checker
+      "tmf" 'dotemacs-mode-line-flycheck-info-toggle)
 
     (dotemacs-set-flycheck-mode-line-faces)
     (unless (display-graphic-p)
@@ -9437,12 +9360,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
               (unless (flycheck-overlays-at (point))
                 (quit-window nil window)))))))
 
-    (after "evil-evilified-state"
-      (add-to-list 'evil-motion-state-modes 'flycheck-error-list-mode)
-      (evil-define-key 'motion flycheck-error-list-mode-map
-        "j" #'flycheck-error-list-next-error
-        "k" #'flycheck-error-list-previous-error
-        "RET" #'flycheck-error-list-goto-error))
+    (add-to-list 'evil-motion-state-modes 'flycheck-error-list-mode)
+    (evil-define-key 'motion flycheck-error-list-mode-map
+      "j" #'flycheck-error-list-next-error
+      "k" #'flycheck-error-list-previous-error
+      "RET" #'flycheck-error-list-goto-error)
 
     (defmacro dotemacs-custom-flycheck-lighter (error)
       "Return a formatted string for the given ERROR (error, warning, info)."
@@ -9534,14 +9456,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           flyspell-issue-message-flag nil)
     (dolist (hook '(text-mode-hook message-mode-hook))
       (add-hook hook '(lambda () (flyspell-mode 1))))
-    (after "evil-leader"
-      (dotemacs-add-toggle spelling-checking
-                           :status flyspell-mode
-                           :on (flyspell-mode)
-                           :off (flyspell-mode -1)
-                           :documentation
-                           "Enable flyspell for automatic spelling checking."
-                           :evil-leader "tS")))
+    (dotemacs-add-toggle spelling-checking
+                         :status flyspell-mode
+                         :on (flyspell-mode)
+                         :off (flyspell-mode -1)
+                         :documentation
+                         "Enable flyspell for automatic spelling checking."
+                         :evil-leader "tS"))
   :config
   (progn
     ;; Undefine mouse buttons which get in the way
@@ -9565,31 +9486,30 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package init-auto-completions
   :load-path "config/")
 
-(after "evil-leader"
-  (dotemacs-add-toggle auto-completion
-                       :status
-                        (if (boundp 'auto-completion-front-end)
-                            (if (eq 'company auto-completion-front-end)
-                                company-mode
-                              auto-complete-mode)
-                          ;; default completion hardcoded to be company for now
-                          (setq auto-completion-front-end 'company)
-                          nil)
-                        :on
-                        (progn
+(dotemacs-add-toggle auto-completion
+                     :status
+                      (if (boundp 'auto-completion-front-end)
                           (if (eq 'company auto-completion-front-end)
-                              (company-mode)
-                            (auto-complete-mode))
-                          (message "Enabled auto-completion (using %S)."
-                                   auto-completion-front-end))
-                        :off
-                        (progn
-                          (if (eq 'company auto-completion-front-end)
-                              (company-mode -1)
-                            (auto-complete-mode -1))
-                          (message "Disabled auto-completion."))
-                        :documentation "Activate auto-completion."
-                        :evil-leader "ta"))
+                              company-mode
+                            auto-complete-mode)
+                        ;; default completion hardcoded to be company for now
+                        (setq auto-completion-front-end 'company)
+                        nil)
+                      :on
+                      (progn
+                        (if (eq 'company auto-completion-front-end)
+                            (company-mode)
+                          (auto-complete-mode))
+                        (message "Enabled auto-completion (using %S)."
+                                 auto-completion-front-end))
+                      :off
+                      (progn
+                        (if (eq 'company auto-completion-front-end)
+                            (company-mode -1)
+                          (auto-complete-mode -1))
+                        (message "Disabled auto-completion."))
+                      :documentation "Activate auto-completion."
+                      :evil-leader "ta")
 
 ;; In `completion-at-point', do not pop up silly completion buffers for less
 ;; than five candidates.  Cycle instead.
@@ -9802,13 +9722,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                              markdown-mode-hook
                                              org-mode-hook))
 
-    (after "evil-leader"
-      (dotemacs-add-toggle yasnippet
-                           :status yas-minor-mode
-                           :on (yas-minor-mode)
-                           :off (yas-minor-mode -1)
-                           :documentation "Enable yasnippet."
-                           :evil-leader "ty"))
+    (dotemacs-add-toggle yasnippet
+                         :status yas-minor-mode
+                         :on (yas-minor-mode)
+                         :off (yas-minor-mode -1)
+                         :documentation "Enable yasnippet."
+                         :evil-leader "ty")
 
     (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
                                                   shell-mode-hook
@@ -9836,11 +9755,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
     (dotemacs-declare-prefix "iS" "auto-yasnippet")
-    (after "evil-leader"
-      (evil-leader/set-key
-        "iSc" 'aya-create
-        "iSe" 'dotemacs-auto-yasnippet-expand
-        "iSw" 'aya-persist-snippet))))
+    (evil-leader/set-key
+      "iSc" 'aya-create
+      "iSe" 'dotemacs-auto-yasnippet-expand
+      "iSw" 'aya-persist-snippet)))
 
 (use-package helm-c-yasnippet
   :ensure t
@@ -9853,8 +9771,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (dotemacs-load-yasnippet)
       (require 'helm-c-yasnippet)
       (call-interactively 'helm-yas-complete))
-    (after "evil-leader"
-      (evil-leader/set-key "is" 'dotemacs-helm-yas))
+    (evil-leader/set-key "is" 'dotemacs-helm-yas)
     (setq helm-c-yas-space-match-any-greedy t)))
 
 
