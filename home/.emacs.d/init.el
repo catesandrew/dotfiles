@@ -817,6 +817,7 @@ FEATURE may be a named feature or a file name, see
 ;; evil and evil-leader must be installed at the beginning of the boot sequence.
 (dotemacs-load-or-install-package 'evil t)
 (dotemacs-load-or-install-package 'evil-leader t)
+(require 'core-evilified-state)
 
 (use-package core-micro-state
   :load-path "core/")
@@ -3204,7 +3205,6 @@ Disable the highlighting of overlong lines."
 
 (use-package evil
   :ensure t
-  :defer t
   :init
   (progn
     ;; put back refresh of the cursor on post-command-hook see status of:
@@ -3234,11 +3234,7 @@ Disable the highlighting of overlong lines."
     ; (setq evil-search-module 'evil-search)
     ; (setq evil-magic 'very-magic)
 
-    (evil-mode 1)
-
-    (after "evil-leader"
-      (use-package evil-evilified-state
-        :load-path "extensions/")))
+    (evil-mode 1))
   :config
   (progn
     ; c-k/c-j for page down/up

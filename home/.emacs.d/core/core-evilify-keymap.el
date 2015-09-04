@@ -9,6 +9,8 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+
+;; new macro
 (defmacro dotemacs-evilify-map (map &rest props)
   "Evilify MAP.
 
@@ -38,7 +40,7 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
          (eval-after-load (plist-get props :eval-after-load))
          (bindings (dotemacs-mplist-get props :bindings))
          (defkey (when bindings `(evil-define-key 'evilified ,map ,@bindings)))
-         (body 
+         (body
           `(progn
              (let ((sorted-map (dotemacs-evilify-sort-keymap
                                 (or ,evilified-map evil-evilified-state-map)))
@@ -64,7 +66,7 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
 
 (defun dotemacs-evilify-configure-default-state (mode)
   "Configure default state for the passed mode."
-  (add-to-list 'evil-evilified-state--modes mode)
+  (add-to-list 'dotemacs-core-evilified-state--modes mode)
   (delq mode evil-emacs-state-modes)
   (add-to-list 'evil-evilified-state-modes mode))
 
@@ -209,3 +211,5 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
                 (string< a b)))))))
 
 (provide 'core-evilify-keymap)
+
+;;; core-evilify-keymap.el ends here

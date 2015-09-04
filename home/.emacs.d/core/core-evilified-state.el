@@ -1,4 +1,4 @@
-;;; evil-lisp-state.el --- An evil state to edit Lisp code
+;;; core-evilified-state.el --- A minimalistic evil state
 
 ;; Copyright (C) 2014, 2015 syl20bnr
 ;;
@@ -32,15 +32,15 @@
 
 (require 'evil)
 
-(defvar evil-evilified-state--modes nil
+(defvar dotemacs-core-evilified-state--modes nil
   "List of all evilified modes.")
 
-(defvar evil-evilified-state--visual-state-map evil-visual-state-map
+(defvar dotemacs-core-evilified-state--visual-state-map evil-visual-state-map
   "Evil visual state map backup.")
 
-(defvar evil-evilified-state--evil-surround nil
+(defvar dotemacs-core-evilified-state--evil-surround nil
   "Evil surround mode variable backup.")
-(make-variable-buffer-local 'evil-evilified-state--evil-surround)
+(make-variable-buffer-local 'dotemacs-core-evilified-state--evil-surround)
 
 (evil-define-state evilified
   "Evilified state.
@@ -50,28 +50,29 @@
   :message "-- EVILIFIED BUFFER --"
   :cursor box)
 
-(add-hook 'evil-evilified-state-entry-hook 'evilified-state-on-entry)
-(add-hook 'evil-evilified-state-exit-hook 'evilified-state-on-exit)
+(add-hook 'evil-evilified-state-entry-hook 'dotemacs-evilified-state-on-entry)
+(add-hook 'evil-evilified-state-exit-hook 'dotemacs-evilified-state-on-exit)
 
-(defun evilified-state-on-entry ()
+(defun dotemacs-evilified-state-on-entry ()
   "Setup evilified state."
-  (setq-local evil-evilified-state--evil-surround
+  (setq-local dotemacs-core-evilified-state--evil-surround
               (bound-and-true-p evil-surround-mode))
-  (when evil-evilified-state--evil-surround
+  (when dotemacs-core-evilified-state--evil-surround
     (evil-surround-mode -1))
   (setq-local evil-visual-state-map (cons 'keymap nil))
   (add-hook 'evil-visual-state-entry-hook
-            'evilified-state--visual-state-set-key nil 'local))
+            'dotemacs-evilified-state--visual-state-set-key nil 'local))
 
-(defun evilified-state-on-exit ()
+(defun dotemacs-evilified-state-on-exit ()
   "Cleanup evilified state."
-  (when evil-evilified-state--evil-surround
+  (when dotemacs-core-evilified-state--evil-surround
     (evil-surround-mode))
-  (setq-local evil-visual-state-map evil-evilified-state--visual-state-map)
+  (setq-local evil-visual-state-map
+              dotemacs-core-evilified-state--visual-state-map)
   (remove-hook 'evil-visual-state-entry-hook
-               'evilified-state--visual-state-set-key 'local))
+               'dotemacs-evilified-state--visual-state-set-key 'local))
 
-(defun evilified-state--visual-state-set-key ()
+(defun dotemacs-evilified-state--visual-state-set-key ()
   "Define key for visual state."
   (local-set-key "y" 'evil-yank))
 
@@ -99,6 +100,7 @@
 (define-key evil-evilified-state-map (kbd "C-j") 'evil-scroll-down)
 (define-key evil-evilified-state-map (kbd "C-k") 'evil-scroll-up)
 
+;; old macro
 (defmacro evilify (mode map &rest body)
   "Set `evilified state' as default for MODE.
 
@@ -106,14 +108,14 @@ BODY is a list of additional key bindings to apply for the given MAP in
 `evilified state'."
   (let ((defkey (when body `(evil-define-key 'evilified ,map ,@body))))
     `(progn (unless ,(null mode)
-              (unless (memq ',mode evil-evilified-state--modes)
-                (push ',mode evil-evilified-state--modes))
-              (unless (or (bound-and-true-p holy-mode)
-                          (memq ',mode evil-evilified-state-modes))
+              (unless (memq ',mode dotemacs-core-evilified-state--modes)
+                (push ',mode dotemacs-core-evilified-state--modes))
+              (unless (memq ',mode evil-evilified-state-modes)
                 (delq ',mode evil-emacs-state-modes)
                 (push ',mode evil-evilified-state-modes)))
             (unless ,(null defkey) (,@defkey)))))
 
-(provide 'evil-evilified-state)
 
-;;; evil-evilified-state.el ends here
+(provide 'core-evilified-state)
+
+;;; core-evilified-state.el ends here
