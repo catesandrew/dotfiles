@@ -9209,9 +9209,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward)))
 
     (evil-leader/set-key
-      "sh"  'dotemacs-symbol-highlight
-      "sH"  'dotemacs-goto-last-searched-ahs-symbol
-      "sR"  'dotemacs-symbol-highlight-reset-range)
+      "sh" 'dotemacs-symbol-highlight
+      "sH" 'dotemacs-goto-last-searched-ahs-symbol
+      "sR" 'dotemacs-symbol-highlight-reset-range)
 
     (dotemacs-hide-lighter auto-highlight-symbol-mode)
     ;; micro-state to easily jump from a highlighted symbol to the others
@@ -9224,8 +9224,47 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
         (eval `(defadvice ,sym (after ,advice activate)
                  (dotemacs-ahs-highlight-now-wrapper)
-                 (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
-                 (dotemacs-auto-highlight-symbol-overlay-map)))))))
+                 (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))))))
+
+    (dotemacs-define-micro-state highlight-symbol
+      :doc (let* ((i 0)
+                  (overlay-count (length ahs-overlay-list))
+                  (overlay (format "%s" (nth i ahs-overlay-list)))
+                  (current-overlay (format "%s" ahs-current-overlay))
+                  (st (ahs-stat))
+                  (plighter (ahs-current-plugin-prop 'lighter))
+                  (plugin (format " <%s> " (cond ((string= plighter "HS") "D")
+                                                 ((string= plighter "HSA") "B")
+                                                 ((string= plighter "HSD") "F"))))
+                  (propplugin (propertize plugin 'face
+                                          `(:foreground "#ffffff"
+                                                        :background ,(face-attribute
+                                                                      'ahs-plugin-defalt-face :foreground)))))
+             (while (not (string= overlay current-overlay))
+               (setq i (1+ i))
+               (setq overlay (format "%s" (nth i ahs-overlay-list))))
+             (let* ((x/y (format "(%s/%s)" (- overlay-count i) overlay-count))
+                    (propx/y (propertize x/y 'face ahs-plugin-whole-buffer-face))
+                    (hidden (if (< 0 (- overlay-count (nth 4 st))) "*" ""))
+                    (prophidden (propertize hidden 'face '(:weight bold))))
+               (format "%s %s%s [n/N] move [e] edit [r] range [R] reset [d/D] definition [/] find in project [f] find in files [b] find in opened buffers [q] exit"
+                       propplugin propx/y prophidden)))
+      :bindings
+      ("d" ahs-forward-definition)
+      ("D" ahs-backward-definition)
+      ("e" nil
+       :post (if (configuration-layer/package-usedp 'evil-iedit-state)
+                 (evil-iedit-state/iedit-mode)
+               (ahs-edit-mode))
+       :exit t)
+      ("n" dotemacs-quick-ahs-forward)
+      ("N" dotemacs-quick-ahs-backward)
+      ("R" ahs-back-to-start)
+      ("r" ahs-change-range)
+      ("/" dotemacs-helm-project-smart-do-search-region-or-symbol :exit t)
+      ("b" dotemacs-helm-buffers-smart-do-search-region-or-symbol :exit t)
+      ("f" dotemacs-helm-files-smart-do-search-region-or-symbol :exit t)
+      ("q" nil :exit t))))
 
 ;; NixOS
 (dotemacs-defvar-company-backends nix-mode)

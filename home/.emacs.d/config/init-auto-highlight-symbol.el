@@ -40,8 +40,7 @@
   "Safe wrapper for ahs-highlight-now"
   (eval '(progn
            (dotemacs-ensure-ahs-enabled-locally)
-           (ahs-highlight-now)
-           ) nil))
+           (ahs-highlight-now)) nil))
 
 (defun dotemacs-quick-ahs-forward ()
   "Go to the next occurrence of symbol under point with
@@ -67,55 +66,12 @@
   (eval '(progn
            (dotemacs-ahs-highlight-now-wrapper)
            (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
-           (dotemacs-auto-highlight-symbol-overlay-map)
-           (dotemacs-integrate-evil-search nil)
-           ) nil))
+           (dotemacs-highlight-symbol-micro-state)
+           (dotemacs-integrate-evil-search nil)) nil))
 
 (defun dotemacs-symbol-highlight-reset-range ()
   "Reset the range for `auto-highlight-symbol'."
   (interactive)
   (eval '(ahs-change-range ahs-default-range) nil))
-
-(defun dotemacs-auto-highlight-symbol-overlay-map ()
-  "Set a temporary overlay map to easily jump from highlighted symbols to
- the nexts."
-  (interactive)
-  (set-temporary-overlay-map
-   (let ((map (make-sparse-keymap)))
-     (define-key map (kbd "d") 'ahs-forward-definition)
-     (define-key map (kbd "D") 'ahs-backward-definition)
-     (define-key map (kbd "e") 'evil-iedit-state/iedit-mode)
-     ; (define-key map (kbd "e") 'ahs-edit-mode)
-     (define-key map (kbd "n") 'ahs-forward)
-     (define-key map (kbd "N") 'ahs-backward)
-     (define-key map (kbd "R") 'ahs-back-to-start)
-     (define-key map (kbd "r") (lambda () (interactive)
-                                 (eval '(ahs-change-range) nil)))
-     (define-key map (kbd "/") 'dotemacs-helm-project-smart-do-search-region-or-symbol)
-     (define-key map (kbd "b") 'dotemacs-helm-buffers-smart-do-search-region-or-symbol)
-     (define-key map (kbd "f") 'dotemacs-helm-files-smart-do-search-region-or-symbol)
-     map) nil)
-  (let* ((i 0)
-         (overlay-count (length ahs-overlay-list))
-         (overlay (format "%s" (nth i ahs-overlay-list)))
-         (current-overlay (format "%s" ahs-current-overlay))
-         (st (ahs-stat))
-         (plighter (ahs-current-plugin-prop 'lighter))
-         (plugin (format " <%s> " (cond ((string= plighter "HS") "D")
-                                        ((string= plighter "HSA") "B")
-                                        ((string= plighter "HSD") "F"))))
-         (propplugin (propertize plugin 'face
-                                 `(:foreground "#ffffff"
-                                   :background ,(face-attribute
-                                                 'ahs-plugin-defalt-face :foreground)))))
-    (while (not (string= overlay current-overlay))
-      (setq i (1+ i))
-      (setq overlay (format "%s" (nth i ahs-overlay-list))))
-    (let* ((x/y (format "[%s/%s]" (- overlay-count i) overlay-count))
-           (propx/y (propertize x/y 'face ahs-plugin-whole-buffer-face))
-           (hidden (if (< 0 (- overlay-count (nth 4 st))) "*" ""))
-           (prophidden (propertize hidden 'face '(:weight bold))))
-      (echo "%s %s%s (n/N) move, (e) edit, (r) range, (R) reset, (d/D) definition, (/) find in project, (f) find in files, (b) find in opened buffers"
-            propplugin propx/y prophidden))))
 
 (provide 'init-auto-highlight-symbol)
