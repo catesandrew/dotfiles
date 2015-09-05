@@ -5737,6 +5737,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (message "Cider REPL clojure-mode font-lock: %s"
                (if cider-repl-use-clojure-font-lock "ON" "OFF")))
 
+    (defun dotemacs-cider-debug-setup ()
+      (when (eq dotemacs-editing-style 'vim)
+        (evil-make-overriding-map cider--debug-mode-map 'normal)
+        (evil-normalize-keymaps)))
+
+    (add-hook 'cider--debug-mode-hook 'dotemacs-cider-debug-setup)
+
     (evilify cider-stacktrace-mode cider-stacktrace-mode-map
              (kbd "C-j") 'cider-stacktrace-next-cause
              (kbd "C-k") 'cider-stacktrace-previous-cause
