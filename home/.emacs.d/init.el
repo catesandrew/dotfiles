@@ -2993,7 +2993,7 @@ Disable the highlighting of overlong lines."
   :init (global-hl-line-mode 1))
 
 (use-package hl-anything ;; Highlight things at point, selections, enclosing parentheses
-  :ensure t
+  :disabled t
   :init
   (progn
     (hl-highlight-mode)
