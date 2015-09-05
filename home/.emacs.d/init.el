@@ -6620,7 +6620,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ("p" web-mode-dom-xpath)
       ("r" web-mode-element-rename)
       ("q" nil :exit t)
-      ("w" web-mode-element-wrap)))
+      ("w" web-mode-element-wrap))
+
+  ; todo: verify these settigns work: And if you want to have 2 space indent
+  ; also for element's attributes, concatenations and contiguous function
+  ; calls:
+  (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil)))
 
   :mode
   (("\\.phtml\\'"      . web-mode)
