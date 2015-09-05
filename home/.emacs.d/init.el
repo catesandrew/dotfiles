@@ -5794,10 +5794,34 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mta" 'dotemacs-cider-test-run-all-tests
         "mtr" 'dotemacs-cider-test-rerun-tests
         "mtt" 'dotemacs-cider-test-run-focused-test
-        "mtp" 'dotemacs-cider-toggle-repl-pretty-printing
+        "mtp" 'dotemacs-cider-toggle-repl-pretty-printing))
 
-        "mdi" 'cider-inspect
-        "mdb" 'cider-debug-defun-at-point))
+    (evil-leader/set-key-for-mode 'cider-repl-mode
+      "mhh" 'cider-doc
+      "mhg" 'cider-grimoire
+      "mhj" 'cider-javadoc
+
+      "mee" 'cider-eval-last-sexp
+      "mef" 'cider-eval-defun-at-point
+      "mer" 'cider-eval-region
+      "mew" 'cider-eval-last-sexp-and-replace
+
+      "mgb" 'cider-jump-back
+      "mge" 'cider-jump-to-compilation-error
+      "mgg" 'cider-jump-to-var
+      "mgr" 'cider-jump-to-resource
+
+      "msn" 'cider-repl-set-ns
+      "msq" 'cider-quit
+      "mss" 'cider-switch-to-last-clojure-buffer
+      "msc" 'cider-repl-clear-buffer
+
+      "mtp" 'dotemacs-cider-toggle-repl-pretty-printing
+      "mtf" 'dotemacs-cider-toggle-repl-font-locking
+
+      "mdi" 'cider-inspect
+      "mdb" 'cider-debug-defun-at-point)
+
     (when dotemacs-clojure-enable-fancify-symbols
       (dotemacs-clojure-fancify-symbols 'cider-repl-mode)))
 
