@@ -1,7 +1,10 @@
 (defun load-gopath-file(gopath name)
   "Search for NAME file in all paths referenced in GOPATH."
-  (let ((paths (split-string gopath ":"))
-        found)
+    (if (eq system-type 'windows-nt)
+      (setq sep '";")
+    (setq sep '":"))
+    (let ((paths (split-string gopath sep))
+          found)
     (loop for p in paths
           for file = (concat p name) when (file-exists-p file)
           do
