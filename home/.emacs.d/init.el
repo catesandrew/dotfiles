@@ -6433,9 +6433,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t)
 
-(use-package php-extras
-  :defer t)
-
 (use-package php-mode                   ; Because sometimes you have to
   :defer t
   :mode ("\\.php\\'" . php-mode))
