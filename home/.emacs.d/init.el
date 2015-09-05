@@ -4095,6 +4095,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (add-hook 'markdown-mode-hook 'flyspell-mode))
 
+(dotemacs-use-package-add-hook emoji-cheat-sheet-plus
+  :post-init
+  (add-hook 'markdown-mode-hook 'emoji-cheat-sheet-plus-display-mode))
+
 
 ;;; Other markup languages
 (use-package rst                        ; ReStructuredText
@@ -8810,6 +8814,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :defer t)
 
+(dotemacs-use-package-add-hook emoji-cheat-sheet-plus
+  :post-init
+  (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -9423,10 +9431,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ;; calling the emoji mode.
       ;; If we directly call the emoji mode at hook runtime then some
       ;; text properties are not applied correctly.
-      (run-at-time 0.1 nil 'emoji-cheat-sheet-plus-display-mode))
-    (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook)
-    (add-to-hooks 'emoji-cheat-sheet-plus-display-mode '(markdown-mode
-                                                         rcirc-mode-hook))))
+      (run-at-time 0.1 nil 'emoji-cheat-sheet-plus-display-mode))))
 
 (use-package company-emoji
   :if (eq dotemacs-completion-engine 'company)
