@@ -5800,11 +5800,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
       (evil-leader/set-key-for-mode m
+        "mr?"  'cljr-describe-refactoring
         "mrad" 'cljr-add-declaration
         "mrai" 'cljr-add-import-to-ns
         "mram" 'cljr-add-missing-libspec
         "mrap" 'cljr-add-project-dependency
         "mrar" 'cljr-add-require-to-ns
+        "mras" 'cljr-add-stubs
         "mrau" 'cljr-add-use-to-ns
         "mrcc" 'cljr-cycle-coll
         "mrci" 'cljr-cycle-if
@@ -5812,10 +5814,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mrcp" 'cljr-cycle-privacy
         "mrdk" 'cljr-destructure-keys
         "mref" 'cljr-extract-function
+        "mrec" 'cljr-extract-constant
         "mrel" 'cljr-expand-let
         "mrfu" 'cljr-find-usages
+        "mrfe" 'cljr-create-fn-from-example
         "mrhd" 'cljr-hotload-dependency
         "mril" 'cljr-introduce-let
+        "mris" 'cljr-inline-symbol
         "mrmf" 'cljr-move-form
         "mrml" 'cljr-move-to-let
         "mrpc" 'cljr-project-clean
@@ -5829,10 +5834,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mrsn" 'cljr-sort-ns
         "mrsp" 'cljr-sort-project-dependencies
         "mrsr" 'cljr-stop-referring
+        "mrsc" 'cljr-show-changelog
         "mrtf" 'cljr-thread-first-all
         "mrth" 'cljr-thread
         "mrtl" 'cljr-thread-last-all
         "mrua" 'cljr-unwind-all
+        "mrup" 'cljr-update-project-dependencies
         "mruw" 'cljr-unwind))))
 
 (use-package clojure-mode
