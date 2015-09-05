@@ -6094,250 +6094,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :commands (flycheck-ocaml-setup)
   :init (add-hook 'flycheck-mode-hook #'flycheck-ocaml-setup))
 
-
-;;; Web languages
-(dotemacs-defvar-company-backends css-mode)
-(dotemacs-defvar-company-backends web-mode)
-(dotemacs-defvar-company-backends jade-mode)
-(dotemacs-defvar-company-backends slim-mode)
-
-(use-package init-web
-  :load-path "config/")
-
-;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
-;; can see the effect of your HTML as you type it.
-(use-package impatient-mode
-  :ensure t
-  :if window-system
-  :defer t
-  :init
-  (progn
-
-    (defun dotemacs-impatient-mode-hook()
-      "my web mode hook for HTML REPL"
-      (interactive)
-      (impatient-mode)
-      (httpd-start))
-
-    (add-hook 'web-mode-hook #'dotemacs-impatient-mode-hook)))
-
-(use-package css-mode
-  :defer t
-  :ensure t
-  :config
-  (progn
-    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
-    ;; `fundamental-mode'.
-    (add-hook 'css-mode-hook (lambda () (run-hooks #'dotemacs-prog-mode-hook)))
-
-    ;; Mark css-indent-offset as safe local variable.
-    (put 'css-indent-offset 'safe-local-variable #'integerp)))
-
-(dotemacs-use-package-add-hook yasnippet
-  :post-init
-  (progn
-    (add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
-                                             jade-mode-hook
-                                             slim-mode-hook))))
-
-(use-package css-eldoc                  ; Basic Eldoc for CSS
-  :ensure t
-  :commands (turn-on-css-eldoc)
-  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
-
-(use-package helm-css-scss
-  :defer t
-  :ensure t
-  :init
-  (after "scss-mode"
-    '(evil-leader/set-key-for-mode 'scss-mode "mgh" 'helm-css-scss)))
-
-(use-package web-mode                   ; Template editing
-  :defer t
-  :ensure t
-  :config
-  (progn
-    ;; Only use smartparens in web-mode
-    (setq web-mode-enable-auto-pairing nil
-          web-mode-markup-indent-offset 2
-          web-mode-code-indent-offset 2
-          web-mode-sql-indent-offset 2
-          web-mode-css-indent-offset 2
-          web-mode-attr-indent-offset 2
-          web-mode-style-padding 2
-          web-mode-script-padding 2)
-
-    (after "flycheck"
-      (when-let (eslint (executable-find "eslint"))
-        (setq flycheck-javascript-eslint-executable eslint)
-        (flycheck-add-mode 'javascript-eslint 'web-mode))
-
-      (when-let (tidy5 (and (eq system-type 'darwin)
-                               (executable-find "tidy5")))
-        (setq flycheck-html-tidy-executable tidy5)
-        (flycheck-add-mode 'html-tidy 'web-mode)))
-
-    (add-hook 'web-mode-hook
-      (lambda ()
-        (run-hooks #'dotemacs-prog-mode-hook)
-        (when (equal web-mode-content-type "jsx")
-          (setq-local cursor-type nil)
-          (after "flycheck"
-            (add-to-list 'flycheck-disabled-checkers 'html-tidy)
-            (flycheck-select-checker 'javascript-eslint)))))
-
-    (evil-leader/set-key-for-mode 'web-mode
-      "meh" 'web-mode-dom-errors-show
-      "mgb" 'web-mode-element-beginning
-      "mgc" 'web-mode-element-child
-      "mgp" 'web-mode-element-parent
-      "mgs" 'web-mode-element-sibling-next
-      "mhp" 'web-mode-dom-xpath
-      "mrc" 'web-mode-element-clone
-      "mrd" 'web-mode-element-vanish
-      "mrk" 'web-mode-element-kill
-      "mrr" 'web-mode-element-rename
-      "mrw" 'web-mode-element-wrap
-      "mz" 'web-mode-fold-or-unfold
-      ;; TODO element close would be nice but broken with evil.
-      )
-
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-          (let ((web-mode-enable-part-face nil)) ad-do-it)
-        ad-do-it))
-
-    (defvar dotemacs--web-mode-ms-doc-toggle 0
-      "Display a short doc when nil, full doc otherwise.")
-
-    (dotemacs-define-micro-state web-mode
-      :doc (dotemacs-web-mode-ms-doc)
-      :persistent t
-      :evil-leader-for-mode (web-mode . "m.")
-      :bindings
-      ("<escape>" nil :exit t)
-      ("?" dotemacs-web-mode-ms-toggle-doc)
-      ("c" web-mode-element-clone)
-      ("d" web-mode-element-vanish)
-      ("D" web-mode-element-kill)
-      ("j" web-mode-element-next)
-      ("J" web-mode-element-sibling-next)
-      ("k" web-mode-element-previous)
-      ("K" web-mode-element-sibling-previous)
-      ("h" web-mode-element-parent)
-      ("l" web-mode-element-child)
-      ("p" web-mode-dom-xpath)
-      ("r" web-mode-element-rename)
-      ("q" nil :exit t)
-      ("w" web-mode-element-wrap)))
-
-  :mode
-  (("\\.phtml\\'"      . web-mode)
-   ("\\.tpl\\.php\\'"  . web-mode)
-   ("\\.html\\'"       . web-mode)
-   ("\\.jsx\\'"        . web-mode)
-   ("\\.htm\\'"        . web-mode)
-   ("\\.[gj]sp\\'"     . web-mode)
-   ("\\.as[cp]x\\'"    . web-mode)
-   ("\\.eex\\'"        . web-mode)
-   ("\\.erb\\'"        . web-mode)
-   ("\\.eco\\'"        . web-mode)
-   ("\\.ejs\\'"        . web-mode)
-   ("\\.djhtml\\'"     . web-mode)))
-
-(use-package emmet-mode
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq emmet-indentation 2
-          emmet-move-cursor-between-quotes t)
-    (add-to-hooks 'emmet-mode '(css-mode-hook
-                                html-mode-hook
-                                web-mode-hook)))
-  :config
-  (progn
-    (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    (dotemacs-hide-lighter emmet-mode)))
-
-(use-package jade-mode
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (add-hook 'jade-mode-hook 'rainbow-delimiters-mode)))
-
-(use-package slim-mode
-  :ensure t
-  :init
-  (progn
-    (add-hook 'slim-mode-hook 'rainbow-delimiters-mode))
-  :defer t)
-
-(use-package scss-mode
-  :defer t
-  :ensure t
-  :mode ("\\.scss\\'" . scss-mode)
-  :init
-  (progn
-    (add-hook 'scss-mode-hook 'rainbow-delimiters-mode)))
-
-(use-package sass-mode
-  :ensure t
-  :defer t
-  :mode ("\\.sass\\'" . sass-mode))
-
-(use-package less-css-mode
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode))
-  :mode ("\\.less\\'" . less-css-mode))
-
-(use-package tagedit
-  :defer t
-  :ensure t
-  :config
-  (progn
-    (tagedit-add-experimental-features)
-    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
-    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (progn
-    (add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
-                                            less-mode-hook
-                                            slim-mode-hook
-                                            sass-mode-hook
-                                            css-mode-hook
-                                            scss-mode-hook
-                                            web-mode-hook))))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook css-mode)
-      (dotemacs-add-company-hook web-mode)
-      (dotemacs-add-company-hook jade-mode)
-      (dotemacs-add-company-hook slim-mode))))
-
-(use-package company-web
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push 'company-css company-backends-css-mode)
-    (push 'company-web-slim company-backends-slim-mode)
-    (push 'company-web-jade company-backends-jade-mode)
-    (push 'company-web-html company-backends-web-mode)))
-
 ;;; PureScript
 (use-package purescript-mode
   :defer t
@@ -6440,7 +6196,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :post-init
   (evil-leader/set-key-for-mode 'react-mode  "m=" 'web-beautify-js))
 
-;; todo: adjust web-mode lower in file
 (dotemacs-use-package-add-hook web-mode
   :post-init
   (define-derived-mode react-mode web-mode "react")
@@ -6731,6 +6486,250 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'json-mode "m=" 'web-beautify-js)
     (evil-leader/set-key-for-mode 'web-mode  "m=" 'web-beautify-html)
     (evil-leader/set-key-for-mode 'css-mode  "m=" 'web-beautify-css)))
+
+
+;;; Web languages
+(dotemacs-defvar-company-backends css-mode)
+(dotemacs-defvar-company-backends web-mode)
+(dotemacs-defvar-company-backends jade-mode)
+(dotemacs-defvar-company-backends slim-mode)
+
+(use-package init-web
+  :load-path "config/")
+
+;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
+;; can see the effect of your HTML as you type it.
+(use-package impatient-mode
+  :ensure t
+  :if window-system
+  :defer t
+  :init
+  (progn
+
+    (defun dotemacs-impatient-mode-hook()
+      "my web mode hook for HTML REPL"
+      (interactive)
+      (impatient-mode)
+      (httpd-start))
+
+    (add-hook 'web-mode-hook #'dotemacs-impatient-mode-hook)))
+
+(use-package css-mode
+  :defer t
+  :ensure t
+  :config
+  (progn
+    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+    ;; `fundamental-mode'.
+    (add-hook 'css-mode-hook (lambda () (run-hooks #'dotemacs-prog-mode-hook)))
+
+    ;; Mark css-indent-offset as safe local variable.
+    (put 'css-indent-offset 'safe-local-variable #'integerp)))
+
+(dotemacs-use-package-add-hook yasnippet
+  :post-init
+  (progn
+    (add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
+                                             jade-mode-hook
+                                             slim-mode-hook))))
+
+(use-package css-eldoc                  ; Basic Eldoc for CSS
+  :ensure t
+  :commands (turn-on-css-eldoc)
+  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+
+(use-package helm-css-scss
+  :defer t
+  :ensure t
+  :init
+  (after "scss-mode"
+    '(evil-leader/set-key-for-mode 'scss-mode "mgh" 'helm-css-scss)))
+
+(use-package web-mode                   ; Template editing
+  :defer t
+  :ensure t
+  :config
+  (progn
+    ;; Only use smartparens in web-mode
+    (setq web-mode-enable-auto-pairing nil
+          web-mode-markup-indent-offset 2
+          web-mode-code-indent-offset 2
+          web-mode-sql-indent-offset 2
+          web-mode-css-indent-offset 2
+          web-mode-attr-indent-offset 2
+          web-mode-style-padding 2
+          web-mode-script-padding 2)
+
+    (after "flycheck"
+      (when-let (eslint (executable-find "eslint"))
+        (setq flycheck-javascript-eslint-executable eslint)
+        (flycheck-add-mode 'javascript-eslint 'web-mode))
+
+      (when-let (tidy5 (and (eq system-type 'darwin)
+                               (executable-find "tidy5")))
+        (setq flycheck-html-tidy-executable tidy5)
+        (flycheck-add-mode 'html-tidy 'web-mode)))
+
+    (add-hook 'web-mode-hook
+      (lambda ()
+        (run-hooks #'dotemacs-prog-mode-hook)
+        (when (equal web-mode-content-type "jsx")
+          (setq-local cursor-type nil)
+          (after "flycheck"
+            (add-to-list 'flycheck-disabled-checkers 'html-tidy)
+            (flycheck-select-checker 'javascript-eslint)))))
+
+    (evil-leader/set-key-for-mode 'web-mode
+      "meh" 'web-mode-dom-errors-show
+      "mgb" 'web-mode-element-beginning
+      "mgc" 'web-mode-element-child
+      "mgp" 'web-mode-element-parent
+      "mgs" 'web-mode-element-sibling-next
+      "mhp" 'web-mode-dom-xpath
+      "mrc" 'web-mode-element-clone
+      "mrd" 'web-mode-element-vanish
+      "mrk" 'web-mode-element-kill
+      "mrr" 'web-mode-element-rename
+      "mrw" 'web-mode-element-wrap
+      "mz" 'web-mode-fold-or-unfold
+      ;; TODO element close would be nice but broken with evil.
+      )
+
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (if (equal web-mode-content-type "jsx")
+          (let ((web-mode-enable-part-face nil)) ad-do-it)
+        ad-do-it))
+
+    (defvar dotemacs--web-mode-ms-doc-toggle 0
+      "Display a short doc when nil, full doc otherwise.")
+
+    (dotemacs-define-micro-state web-mode
+      :doc (dotemacs-web-mode-ms-doc)
+      :persistent t
+      :evil-leader-for-mode (web-mode . "m.")
+      :bindings
+      ("<escape>" nil :exit t)
+      ("?" dotemacs-web-mode-ms-toggle-doc)
+      ("c" web-mode-element-clone)
+      ("d" web-mode-element-vanish)
+      ("D" web-mode-element-kill)
+      ("j" web-mode-element-next)
+      ("J" web-mode-element-sibling-next)
+      ("k" web-mode-element-previous)
+      ("K" web-mode-element-sibling-previous)
+      ("h" web-mode-element-parent)
+      ("l" web-mode-element-child)
+      ("p" web-mode-dom-xpath)
+      ("r" web-mode-element-rename)
+      ("q" nil :exit t)
+      ("w" web-mode-element-wrap)))
+
+  :mode
+  (("\\.phtml\\'"      . web-mode)
+   ("\\.tpl\\.php\\'"  . web-mode)
+   ("\\.html\\'"       . web-mode)
+   ("\\.jsx\\'"        . web-mode)
+   ("\\.htm\\'"        . web-mode)
+   ("\\.[gj]sp\\'"     . web-mode)
+   ("\\.as[cp]x\\'"    . web-mode)
+   ("\\.eex\\'"        . web-mode)
+   ("\\.erb\\'"        . web-mode)
+   ("\\.eco\\'"        . web-mode)
+   ("\\.ejs\\'"        . web-mode)
+   ("\\.djhtml\\'"     . web-mode)))
+
+(use-package emmet-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq emmet-indentation 2
+          emmet-move-cursor-between-quotes t)
+    (add-to-hooks 'emmet-mode '(css-mode-hook
+                                html-mode-hook
+                                web-mode-hook)))
+  :config
+  (progn
+    (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (dotemacs-hide-lighter emmet-mode)))
+
+(use-package jade-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'jade-mode-hook 'rainbow-delimiters-mode)))
+
+(use-package slim-mode
+  :ensure t
+  :init
+  (progn
+    (add-hook 'slim-mode-hook 'rainbow-delimiters-mode))
+  :defer t)
+
+(use-package scss-mode
+  :defer t
+  :ensure t
+  :mode ("\\.scss\\'" . scss-mode)
+  :init
+  (progn
+    (add-hook 'scss-mode-hook 'rainbow-delimiters-mode)))
+
+(use-package sass-mode
+  :ensure t
+  :defer t
+  :mode ("\\.sass\\'" . sass-mode))
+
+(use-package less-css-mode
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode))
+  :mode ("\\.less\\'" . less-css-mode))
+
+(use-package tagedit
+  :defer t
+  :ensure t
+  :config
+  (progn
+    (tagedit-add-experimental-features)
+    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
+    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (progn
+    (add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
+                                            less-mode-hook
+                                            slim-mode-hook
+                                            sass-mode-hook
+                                            css-mode-hook
+                                            scss-mode-hook
+                                            web-mode-hook))))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook css-mode)
+      (dotemacs-add-company-hook web-mode)
+      (dotemacs-add-company-hook jade-mode)
+      (dotemacs-add-company-hook slim-mode))))
+
+(use-package company-web
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-css company-backends-css-mode)
+    (push 'company-web-slim company-backends-slim-mode)
+    (push 'company-web-jade company-backends-jade-mode)
+    (push 'company-web-html company-backends-web-mode)))
 
 
 ;;; Lua
