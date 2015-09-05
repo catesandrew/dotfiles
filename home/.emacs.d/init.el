@@ -6387,6 +6387,75 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "msm" 'psci/load-module!
       "msp" 'psci/load-project-modules!)))
 
+;;; React
+(dotemacs-defvar-company-backends react-mode)
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook react-mode)))
+
+  (dotemacs-use-package-add-hook company-tern
+    :post-init
+    (progn
+      (push 'company-capf company-backends-react-mode))))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-config
+  (progn
+     (flycheck-add-mode 'javascript-eslint 'react-mode)
+     (setq-default
+      ;; disable jshint since we prefer eslint checking
+      flycheck-disabled-checkers (append flycheck-disabled-checkers
+                                         '(javascript-jshint))
+      ;; disable json-jsonlist checking for json files
+      flycheck-disabled-checkers (append flycheck-disabled-checkers
+                                         '(json-jsonlist)))))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'react-mode-hook 'flycheck-turn-on-maybe))
+
+(dotemacs-use-package-add-hook js-doc
+  :post-init
+  (add-hook 'react-mode-hook 'dotemacs-js-doc-require)
+  (dotemacs-js-doc-set-key-bindings 'react-mode))
+
+(dotemacs-use-package-add-hook js2-mode
+  :post-init
+  (add-hook 'react-mode-hook 'js2-imenu-extras-mode)
+  (add-hook 'react-mode-hook 'js2-minor-mode))
+
+(dotemacs-use-package-add-hook js2-refactor
+  :post-init
+  (add-hook 'react-mode-hook 'dotemacs-js2-refactor-require)
+  (dotemacs-js2-refactor-set-key-bindings 'react-mode))
+
+(dotemacs-use-package-add-hook tern
+  :post-init
+  (add-hook 'react-mode-hook 'tern-mode))
+
+(dotemacs-use-package-add-hook web-beautify
+  :post-init
+  (evil-leader/set-key-for-mode 'react-mode  "m=" 'web-beautify-js))
+
+;; todo: adjust web-mode lower in file
+(dotemacs-use-package-add-hook web-mode
+  :post-init
+  (define-derived-mode react-mode web-mode "react")
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . react-mode))
+  (add-to-list 'auto-mode-alist '("\\.react.js\\'" . react-mode))
+  (add-to-list 'magic-mode-alist '("/** @jsx React.DOM */" . react-mode))
+  (defun dotemacs//setup-react-mode ()
+    "Adjust web-mode to accommodate react-mode"
+    (emmet-mode 0)
+    ;; Why do we do this ?
+    (defadvice web-mode-highlight-part (around tweak-jsx activate)
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)))
+  (add-hook 'react-mode-hook 'dotemacs//setup-react-mode))
+
 ;;; JavaScript
 (dotemacs-defvar-company-backends js2-mode)
 
