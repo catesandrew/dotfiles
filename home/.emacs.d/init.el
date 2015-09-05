@@ -734,6 +734,8 @@ FEATURE may be a named feature or a file name, see
       quelpa-persistent-cache-file (expand-file-name "cache" quelpa-dir)
       quelpa-update-melpa-p nil)
 (dotemacs-load-or-install-package 'quelpa t)
+(dotemacs-load-or-install-package 'quelpa-use-package t)
+
 ;; inject use-package hooks for easy customization of
 ;; stock package configuration
 (setq use-package-inject-hooks t)
@@ -6432,6 +6434,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package php-auto-yasnippets
   :defer t
   :ensure t)
+
+(use-package php-extras
+  :defer t
+  :quelpa (php-extras :fetcher github :repo "arnested/php-extras"))
 
 (use-package php-mode                   ; Because sometimes you have to
   :defer t
