@@ -4260,49 +4260,94 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (slime-setup)
     (dolist (m `(,slime-mode-map ,slime-repl-mode-map))
       (define-key m [(tab)] 'slime-fuzzy-complete-symbol))
-    (dolist (m '(lisp-mode))
-      (evil-leader/set-key-for-mode m
-        "mcc" 'slime-compile-file
-        "mcC" 'slime-compile-and-load-file
-        "mcf" 'slime-compile-defun
-        "mcr" 'slime-compile-region
+    ;; TODO: Add bindings for the SLIME debugger?
+    (evil-leader/set-key-for-mode 'lisp-mode
+      "mcc" 'slime-compile-file
+      "mcC" 'slime-compile-and-load-file
+      "mcl" 'slime-load-file
+      "mcf" 'slime-compile-defun
+      "mcr" 'slime-compile-region
+      "mcn" 'slime-remove-notes
 
-        "meb" 'slime-eval-buffer
-        "mef" 'slime-eval-defun
-        "mee" 'slime-eval-last-sexp
-        "mer" 'slime-eval-region
+      "meb" 'slime-eval-buffer
+      "mef" 'slime-eval-defun
+      "meF" 'slime-undefine-function
+      "mee" 'slime-eval-last-sexp
+      "mer" 'slime-eval-region
 
-        "mgg" 'slime-inspect-definition
-        "mgn" 'slime-next-note
-        "mgN" 'slime-previous-note
-        "mgp" 'slime-previous-note
+      "mgg" 'slime-inspect-definition
+      "mgb" 'slime-pop-find-definition-stack
+      "mgn" 'slime-next-note
+      "mgN" 'slime-previous-note
 
-        "mha" 'slime-apropos
-        "mhd" 'slime-disassemble-symbol
-        "mhh" 'slime-describe-function
-        "mhH" 'slime-hyperspec-lookup
+      "mha" 'slime-apropos
+      "mhA" 'slime-apropos-all
+      "mhd" 'slime-disassemble-symbol
+      "mhh" 'slime-describe-symbol
+      "mhH" 'slime-hyperspec-lookup
+      "mhp" 'slime-apropos-package
+      "mht" 'slime-toggle-trace-fdefinition
+      "mhT" 'slime-untrace-all
+      "mh<" 'slime-who-calls
+      "mh>" 'slime-calls-who
+      ;; TODO: Add key bindings for who binds/sets globals?
+      "mhr" 'slime-who-references
+      "mhm" 'slime-who-macroexpands
+      "mhs" 'slime-who-specializes
 
-        "mse" 'slime-eval-last-expression-in-repl
-        "msi" 'slime
-        "msq" 'slime-quit-lisp
+      "mma" 'slime-macroexpand-all
+      "mmo" 'slime-macroexpand-1
 
-        "mtf" 'slime-toggle-fancy-trace))))
+      "mse" 'slime-eval-last-expression-in-repl
+      "msi" 'slime
+      "msq" 'slime-quit-lisp
+
+      "mtf" 'slime-toggle-fancy-trace)))
 
 (dotemacs-defvar-company-backends geiser-mode)
 
 (use-package geiser
   :ensure t
-  :defer t
   :commands run-geiser
   :config
   (progn
-    ))
+    (evil-leader/set-key-for-mode 'scheme-mode
+      "mcc" 'geiser-compile-current-buffer
+      "mcp" 'geiser-add-to-load-path
+
+      "mgg" 'geiser-edit-symbol-at-point
+      "mgb" 'geiser-pop-symbol-stack
+      "mgm" 'geiser-edit-module
+      "mgn" 'next-error
+      "mgN" 'previous-error
+
+      "mhh" 'geiser-doc-symbol-at-point
+      "mhd" 'geiser-doc-look-up-manual
+      "mhm" 'geiser-doc-module
+      "mh<" 'geiser-xref-callers
+      "mh>" 'geiser-xref-callees
+
+      "mil" 'geiser-insert-lambda
+
+      "mme" 'geiser-expand-last-sexp
+      "mmf" 'geiser-expand-definition
+      "mmx" 'geiser-expand-region
+
+      "msi" 'geiser-mode-switch-to-repl
+      "msb" 'geiser-eval-buffer
+      "msB" 'geiser-eval-buffer-and-go
+      "msf" 'geiser-eval-definition
+      "msF" 'geiser-eval-definition-and-go
+      "mse" 'geiser-eval-last-sexp
+      "msr" 'geiser-eval-region
+      "msR" 'geiser-eval-region-and-go)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
-      (dotemacs-add-company-hook geiser-mode))))
+      ;; Geiser provides completion as long as company mode is loaded.
+      (dotemacs-add-company-hook scheme-mode))))
 
 (use-package pcre2el                    ; Convert regexps to RX and back
   :ensure t
