@@ -3898,6 +3898,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Markdown
+(dotemacs-defvar-company-backends markdown-mode)
+
 (use-package init-markdown
   :load-path "config/"
   :defer t)
