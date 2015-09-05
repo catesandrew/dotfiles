@@ -5822,6 +5822,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mdi" 'cider-inspect
       "mdb" 'cider-debug-defun-at-point)
 
+    (evil-define-key 'normal cider-repl-mode-map
+      "C-j" 'cider-repl-next-input
+      "C-k" 'cider-repl-previous-input)
+
     (when dotemacs-clojure-enable-fancify-symbols
       (dotemacs-clojure-fancify-symbols 'cider-repl-mode)))
 
