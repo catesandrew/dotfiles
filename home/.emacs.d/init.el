@@ -1818,8 +1818,6 @@ These should have their own segments in the modeline.")
 
 (use-package window-numbering
   :ensure t
-  ;; not deferred on puprose
-  :demand t
   :config
   (progn
     (setq window-numbering-auto-assign-0-to-minibuffer nil)
