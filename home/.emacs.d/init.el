@@ -7644,6 +7644,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ; testing with ido vs helm completion
           projectile-completion-system 'ido ; helm
           projectile-indexing-method 'alien ; force alien for Windwos
+          ;; note for Windows: GNU find or Cygwin find must be in path
+          ;; default parameters are not supported on Windows, we default
+          ;; to simplest call to find.
+          projectile-generic-command (if (system-is-mswindows)
+                                         "find . -type f"
+                                       projectile-generic-command)
           projectile-find-dir-includes-top-level t
           projectile-enable-caching nil
           projectile-require-project-root t
