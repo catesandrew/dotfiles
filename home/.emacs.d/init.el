@@ -3368,7 +3368,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-leader
   :ensure t
-  :defer t
   :init
   (progn
     (setq evil-leader/leader dotemacs-leader-key)
@@ -3409,7 +3408,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 ; TODO: Add switch between evil-commentary and evil-nerd-commenter
 (use-package evil-commentary
   :ensure t
-  :defer t
   :init (evil-commentary-mode)
   :diminish evil-commentary-mode)
 
@@ -3434,7 +3432,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-matchit
   :ensure t
-  :defer t
   :init
   (progn
     (dolist (hook '(LaTeX-mode-hook
@@ -3446,17 +3443,14 @@ Example: (evil-map visual \"<\" \"<gv\")"
         (turn-on-evil-matchit-mode))))))
 
 (use-package evil-indent-textobject
-  :ensure t
-  :defer t)
+  :quelpa (evil-indent-textobject :fetcher github :repo "TheBB/evil-indent-textobject"))
 
 (use-package evil-easymotion
   :ensure t
-  :defer t
   :init (after "evil"))
 
 (use-package evil-numbers
   :ensure t
-  :defer t
   :config
   (progn
     (defun dotemacs-evil-numbers-micro-state-doc ()
@@ -3510,7 +3504,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (use-package evil-surround
   :ensure t
-  :defer t
   :init
   (progn
     (global-evil-surround-mode 1)
@@ -3577,7 +3570,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package evil-visualstar
   :ensure t
-  :defer t
   :commands (evil-visualstar/begin-search-forward
              evil-visualstar/begin-search-backward)
   :init
