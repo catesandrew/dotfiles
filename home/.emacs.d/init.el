@@ -5808,11 +5808,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "msr" 'dotemacs-cider-send-region-to-repl
         "msR" 'dotemacs-cider-send-region-to-repl-focus
         "mss" 'cider-switch-to-repl-buffer
+        "mstp" 'dotemacs-cider-toggle-repl-pretty-printing
+        "mstf" 'dotemacs-cider-toggle-repl-font-locking
 
         "mta" 'dotemacs-cider-test-run-all-tests
         "mtr" 'dotemacs-cider-test-rerun-tests
         "mtt" 'dotemacs-cider-test-run-focused-test
-        "mtp" 'dotemacs-cider-toggle-repl-pretty-printing))
+
+        "mdi" 'cider-inspect
+        "mdb" 'cider-debug-defun-at-point))
 
     (evil-leader/set-key-for-mode 'cider-repl-mode
       "mhh" 'cider-doc
@@ -5834,8 +5838,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mss" 'cider-switch-to-last-clojure-buffer
       "msc" 'cider-repl-clear-buffer
 
-      "mtp" 'dotemacs-cider-toggle-repl-pretty-printing
-      "mtf" 'dotemacs-cider-toggle-repl-font-locking
+      "mstp" 'dotemacs-cider-toggle-repl-pretty-printing
+      "mstf" 'dotemacs-cider-toggle-repl-font-locking
 
       "mdi" 'cider-inspect
       "mdb" 'cider-debug-defun-at-point)
