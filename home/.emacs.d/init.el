@@ -6594,6 +6594,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package eclim
   :defer t
   :ensure emacs-eclim
+  :diminish eclim-mode
   :init (add-hook 'java-mode-hook 'eclim-mode)
   :config
   (progn
