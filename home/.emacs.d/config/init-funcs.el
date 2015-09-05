@@ -63,6 +63,8 @@
 (defvar dotemacs-prefix-command-string "group:"
   "Prefix string for prefix commands.")
 
+(defvar dotemacs-prefix-titles (list))
+
 (defun dotemacs-jump-in-buffer ()
   (interactive)
   (cond
@@ -71,14 +73,20 @@
    (t
     (call-interactively 'helm-semantic-or-imenu))))
 
-(defun dotemacs-declare-prefix (prefix name)
-  "Declare a prefix PREFIX. PREFIX is a string describing
-a key sequence. NAME is a symbol name used as the prefix command."
-  (let ((command (intern (concat dotemacs-prefix-command-string name))))
+(defun dotemacs-declare-prefix (prefix name &optional long-name)
+  "Declare a prefix PREFIX. PREFIX is a string describing a key
+sequence. NAME is a symbol name used as the prefix command.
+LONG-NAME if given is stored in `dotemacs-prefix-command-alist'."
+  (let ((command (intern (concat dotemacs-prefix-command-string name)))
+        (full-prefix-vim (listify-key-sequence (kbd (concat dotemacs-leader-key " " prefix))))
+        (full-prefix-emacs (listify-key-sequence (kbd (concat dotemacs-emacs-leader-key " " prefix)))))
     ;; define the prefix command only if it does not already exist
+    (unless long-name (setq long-name name))
     (unless (lookup-key evil-leader--default-map prefix)
       (define-prefix-command command)
-      (evil-leader/set-key prefix command))))
+      (evil-leader/set-key prefix command)
+      (push (cons full-prefix-vim long-name) dotemacs-prefix-titles)
+      (push (cons full-prefix-emacs long-name) dotemacs-prefix-titles))))
 
 (defun dotemacs-declare-prefix-for-mode (mode prefix name)
   "Declare a prefix PREFIX. MODE is the mode in which this prefix command should

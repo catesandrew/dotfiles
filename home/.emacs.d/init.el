@@ -809,60 +809,60 @@ FEATURE may be a named feature or a file name, see
 
 ;;; Key Binding Init
 
-;; We define prefix commands only for the sake of guide-key
+;; We define prefix commands only for the sake of which-key
 (setq dotemacs-key-binding-prefixes
-      '(("a" .  "applications")
-        ("ai" . "applications-irc")
-        ("as" . "applications-shells")
-        ("b" .  "buffers")
-        ("bm" . "buffers-move")
-        ("c" .  "compile/comments")
-        ("C" .  "capture/colors")
-        ("d" .  "dash-at-point")
-        ("e" .  "errors")
-        ("f" .  "files")
-        ("fe" . "files-emacs/dotemacs")
-        ("g" .  "git/versions-control")
-        ("gf" . "file")
-        ("gg" . "gist")
-        ("h" .  "helm/help/highlight")
-        ("hd" . "help-describe")
-        ("i" .  "insertion")
-        ("j" .  "join/split")
-        ("k" .  "lisp")
-        ("kd" . "lisp-delete")
-        ("kD" . "lisp-delete-backward")
-        ("k`" . "lisp-hybrid")
-        ("p" .  "projects")
-        ("p$" . "projects/shell")
-        ("P" .  "pandoc")
-        ("q" .  "quit")
-        ("r" .  "registers/rings")
-        ("s" .  "search/symbol")
-        ("sa" . "search-ag")
-        ("sg" . "search-grep")
-        ("sk" . "search-ack")
-        ("st" . "search-pt")
-        ("sw" . "search-web")
-        ("S" .  "spelling")
-        ("t" .  "toggles")
-        ("tC" . "toggles-colors")
-        ("th" . "toggles-highlight")
-        ("te" . "toggles-errors")
-        ("tm" . "toggles-modeline")
-        ("T" .  "toggles/themes")
-        ("w" .  "windows")
-        ("wp" . "windows-popup")
-        ("x" .  "text")
-        ("xa" . "text-align")
-        ("xd" . "text-delete")
-        ("xg" . "text-google-translate")
-        ("xm" . "text-move")
-        ("xt" . "text-transpose")
-        ("xw" . "text-words")
-        ("y" .  "narrow/numbers")
-        ("z" .  "zoom")))
-(mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+      '(("a"  "applications")
+        ("ai" "applications-irc")
+        ("as" "applications-shells")
+        ("b"  "buffers")
+        ("bm" "buffers-move")
+        ("c"  "compile/comments")
+        ("C"  "capture/colors")
+        ("d"  "dash-at-point")
+        ("e"  "errors")
+        ("f"  "files")
+        ("fe" "files-emacs/dotemacs")
+        ("g"  "git/versions-control")
+        ("gf" "file")
+        ("gg" "gist")
+        ("h"  "helm/help/highlight")
+        ("hd" "help-describe")
+        ("i"  "insertion")
+        ("j"  "join/split")
+        ("k"  "lisp")
+        ("kd" "lisp-delete")
+        ("kD" "lisp-delete-backward")
+        ("k`" "lisp-hybrid")
+        ("p"  "projects")
+        ("p$" "projects/shell")
+        ("P"  "pandoc")
+        ("q"  "quit")
+        ("r"  "registers/rings")
+        ("s"  "search/symbol")
+        ("sa" "search-ag")
+        ("sg" "search-grep")
+        ("sk" "search-ack")
+        ("st" "search-pt")
+        ("sw" "search-web")
+        ("S"  "spelling")
+        ("t"  "toggles")
+        ("tC" "toggles-colors")
+        ("th" "toggles-highlight")
+        ("te" "toggles-errors")
+        ("tm" "toggles-modeline")
+        ("T"  "toggles/themes")
+        ("w"  "windows")
+        ("wp" "windows-popup")
+        ("x"  "text")
+        ("xa" "text-align")
+        ("xd" "text-delete")
+        ("xg" "text-google-translate")
+        ("xm" "text-move")
+        ("xt" "text-transpose")
+        ("xw" "text-words")
+        ("y"  "narrow/numbers")
+        ("z"  "zoom")))
+(mapc (lambda (x) (apply #'dotemacs-declare-prefix x))
       dotemacs-key-binding-prefixes)
 
 (when (eq dotemacs-colors-engine 'rainbow)
@@ -8956,15 +8956,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (setq which-key-max-description-length 32)
-    (which-key-mode)
     (dotemacs-add-toggle which-key
-                         :status which-key-mode
-                         :on (which-key-mode)
-                         :off (which-key-mode -1)
-                         :documentation
-                         "Display a buffer with available key bindings."
-                         :evil-leader "tK")
+      :status which-key-mode
+      :on (which-key-mode)
+      :off (which-key-mode -1)
+      :documentation
+      "Display a buffer with available key bindings."
+      :evil-leader "tK")
 
     (let ((new-descriptions
            ;; being higher in this list means the replacement is applied later
@@ -8994,10 +8992,24 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          (concat leader-key " m")    "major mode commands"
          (concat leader-key " " dotemacs-command-key) "helm M-x"))
 
-      ;; disable special key handling for spacemacs, since it can be
+      ;; disable special key handling for dotemacs, since it can be
       ;; disorienting if you don't understand it
-      (setq which-key-special-keys nil)
-      (setq which-key-use-C-h-for-paging t)
+      (setq which-key-prefix-title-alist
+            `((,(listify-key-sequence
+                 (kbd (concat dotemacs-leader-key " m"))) . "Major mode commands")
+              (,(listify-key-sequence
+                 (kbd (concat dotemacs-emacs-leader-key " m"))) . "Major mode commands")
+              (,(listify-key-sequence
+                 (kbd dotemacs-leader-key)) . "dotemacs root")
+              (,(listify-key-sequence
+                 (kbd dotemacs-emacs-leader-key)) . "dotemacs root")))
+      (nconc which-key-prefix-title-alist dotemacs-prefix-titles)
+
+      (setq which-key-special-keys nil
+            which-key-use-C-h-for-paging t
+            which-key-echo-keystrokes 0.02
+            which-key-max-description-length 32)
+      (which-key-mode)
       (dotemacs-diminish which-key-mode " Ⓚ" " K")))
 
 
