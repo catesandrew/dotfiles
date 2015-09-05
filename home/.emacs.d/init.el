@@ -1541,6 +1541,7 @@ These should have their own segments in the modeline.")
       "hi"   'helm-info-at-point
       "hl"   'helm-resume
       "hm"   'helm-man-woman
+      "iu"   'helm-ucs
       "ry"   'helm-show-kill-ring
       "rr"   'helm-register
       "rm"   'helm-all-mark-rings
@@ -1610,11 +1611,6 @@ These should have their own segments in the modeline.")
 
     (after "helm-mode" ; required
       '(dotemacs-hide-lighter helm-mode))))
-
-(use-package helm-unicode
-  :defer t
-  :ensure t
-  :init (evil-leader/set-key "iu" 'helm-unicode))
 
 (use-package helm-ls-git
   :defer t
