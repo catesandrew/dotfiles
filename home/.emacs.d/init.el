@@ -5748,7 +5748,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (when dotemacs-clojure-enable-fancify-symbols
-      (dotemacs-clojure-fancify-symbols 'clojure-mode))
+      (dolist (m '(clojure-mode clojurescript-mode clojurec-mode clojurex-mode))
+        (dotemacs-clojure-fancify-symbols m)))
+
       (define-clojure-indent
         ;; Compojure
         (ANY 2)
