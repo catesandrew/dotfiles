@@ -153,11 +153,29 @@ Ensure that helm is required before calling FUNC."
                       :documentation "Truncate the long lines (no wrap)."
                       :evil-leader "tt")
 (dotemacs-add-toggle visual-line-navigation
-                      :status visual-line-mode
-                      :on (visual-line-mode)
-                      :off (visual-line-mode -1)
-                      :documentation "Move point according to visual lines."
-                      :evil-leader "tv")
+  :status visual-line-mode
+  :on (progn
+        (visual-line-mode)
+        (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+        (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
+        (when (bound-and-true-p evil-escape-mode)
+          (evil-escape-mode -1)
+          (setq evil-escape-motion-state-shadowed-func nil)
+          (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+          (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
+          (evil-escape-mode)))
+  :off (progn
+         (visual-line-mode -1)
+         (define-key evil-motion-state-map "j" 'evil-next-line)
+         (define-key evil-motion-state-map "k" 'evil-previous-line)
+         (when (bound-and-true-p evil-escape-mode)
+           (evil-escape-mode -1)
+           (setq evil-escape-motion-state-shadowed-func nil)
+           (define-key evil-motion-state-map "j" 'evil-next-line)
+           (define-key evil-motion-state-map "k" 'evil-previous-line)
+           (evil-escape-mode)))
+  :documentation "Move point according to visual lines."
+  :evil-leader "tv")
 (dotemacs-add-toggle line-numbers
                       :status linum-mode
                       :on (global-linum-mode)
