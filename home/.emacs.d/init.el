@@ -1437,15 +1437,6 @@ These should have their own segments in the modeline.")
 ;; have no use for these default bindings
 (global-unset-key (kbd "C-x m"))
 
-(use-package savehist                   ; Save minibuffer history
-  :init (savehist-mode t)
-  :config (setq savehist-save-minibuffer-history t
-                enable-recursive-minibuffers t ; Allow commands in minibuffers
-                history-length 1000
-                savehist-file (concat dotemacs-cache-directory "savehist")
-                savehist-additional-variables '(search ring regexp-search-ring)
-                savehist-autosave-interval 180))
-
 ;; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
 ;;
 ;; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
@@ -1828,7 +1819,7 @@ These should have their own segments in the modeline.")
 (use-package window-numbering
   :ensure t
   ;; not deferred on puprose
-  :init (require 'window-numbering)
+  :demand t
   :config
   (progn
     (setq window-numbering-auto-assign-0-to-minibuffer nil)
@@ -2165,10 +2156,30 @@ These should have their own segments in the modeline.")
                               ;; And all other kinds of boring files
                               #'ignoramus-boring-p)))
 
+(use-package savehist                   ; Save minibuffer history
+  :init
+  (progn
+    ;; Minibuffer history
+    (setq savehist-file (concat dotemacs-cache-directory "savehist")
+          enable-recursive-minibuffers t ; Allow commands in minibuffers
+          history-length 1000
+          savehist-additional-variables '(search
+                                          ring
+                                          mark-ring
+                                          global-mark-ring
+                                          search-ring
+                                          regexp-search-ring
+                                          extended-command-history)
+          savehist-autosave-interval 180)
+    (savehist-mode t)))
+
 ;; move cursor to the last position upon open
 (use-package saveplace                  ; Save point position in files
-  :config (setq-default save-place t)
-  (setq save-place-file (concat dotemacs-cache-directory "places")))
+  :init
+  (progn
+    ;; Save point position between sessions
+    (setq save-place t
+          save-place-file (concat dotemacs-cache-directory "places"))))
 
 (setq view-read-only t)                 ; View read-only files
 
@@ -3403,17 +3414,16 @@ It will toggle the overlay under point or create an overlay of one character."
 
 (use-package evil-iedit-state
   :ensure t
+  :commands (evil-iedit-state evil-iedit-state/iedit-mode)
   :init
   (progn
-    (require 'evil-iedit-state)
-    (defun dotemacs-evil-state-lazy-loading ()
-      ;; activate leader in iedit and iedit-insert states
-      (define-key evil-iedit-state-map
-        (kbd evil-leader/leader) evil-leader--default-map))
-
     (evil-leader/set-key "se" 'evil-iedit-state)
-    (evil-leader/set-key "sE" 'evil-iedit-state/iedit-mode)
-    (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading)))
+    (evil-leader/set-key "sE" 'evil-iedit-state/iedit-mode))
+  :config
+  (progn
+    ;; activate leader in iedit and iedit-insert states
+    (define-key evil-iedit-state-map
+      (kbd evil-leader/leader) evil-leader--default-map)))
 
 (use-package evil-jumper
   :ensure t
@@ -3608,11 +3618,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (require 'evil-terminal-cursor-changer)
     (setq evil-visual-state-cursor 'box ; █
           evil-insert-state-cursor 'bar ; ⎸
           evil-emacs-state-cursor 'hbar)) ; _
-  :defer t)
+  )
 
 (use-package evil-tutor
   :disabled t
@@ -4174,6 +4183,28 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
               (lambda ()
                 (run-hooks #'dotemacs-prog-mode-hook)))
     ))
+
+(use-package aggressive-indent
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (dotemacs-add-toggle aggressive-indent
+      :status aggressive-indent-mode
+      :on (aggressive-indent-mode)
+      :off (aggressive-indent-mode -1)
+      :documentation "Always keep code indented."
+      :evil-leader "tI")
+    (dotemacs-add-toggle aggressive-indent-globally
+      :status aggressive-indent-mode
+      :on (global-aggressive-indent-mode)
+      :off (global-aggressive-indent-mode -1)
+      :documentation "Always keep code indented globally."
+      :evil-leader "t C-I"))
+  :config
+  (progn
+    (add-hook 'diff-auto-refine-mode-hook 'dotemacs-toggle-aggressive-indent-off)
+    (dotemacs-diminish aggressive-indent-mode " Ⓘ" " I")))
 
 (use-package prog-mode                  ; Prog Mode
   :bind (("C-c u p" . prettify-symbols-mode))
