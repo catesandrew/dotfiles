@@ -3342,7 +3342,29 @@ Example: (evil-map visual \"<\" \"<gv\")"
   :defer t
   :ensure t
   :init
-  (setq iedit-toggle-key-default nil))
+  (progn
+    (setq iedit-current-symbol-default t
+          iedit-only-at-symbol-boundaries t
+          iedit-toggle-key-default nil))
+  :config
+  (defun iedit-toggle-selection ()
+    "Override default iedit function to be able to add arbitrary overlays.
+
+It will toggle the overlay under point or create an overlay of one character."
+     (interactive)
+     (iedit-barf-if-buffering)
+     (let ((ov (iedit-find-current-occurrence-overlay)))
+       (if ov
+           (iedit-restrict-region (overlay-start ov) (overlay-end ov) t)
+         (save-excursion
+           (push (iedit-make-occurrence-overlay (point) (1+ (point)))
+                 iedit-occurrences-overlays))
+         (setq iedit-mode
+               (propertize
+                (concat " Iedit:" (number-to-string
+                                   (length iedit-occurrences-overlays)))
+                'face 'font-lock-warning-face))
+         (force-mode-line-update)))))
 
 (use-package evil-iedit-state
   :ensure t
@@ -3354,7 +3376,8 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (define-key evil-iedit-state-map
         (kbd evil-leader/leader) evil-leader--default-map))
 
-    (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
+    (evil-leader/set-key "se" 'evil-iedit-state)
+    (evil-leader/set-key "sE" 'evil-iedit-state/iedit-mode)
     (add-hook 'find-file-hook #'dotemacs-evil-state-lazy-loading)))
 
 (use-package evil-jumper
