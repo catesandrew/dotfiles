@@ -5723,6 +5723,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (push 'cider-stacktrace-mode evil-motion-state-modes)
     (push 'cider-popup-buffer-mode evil-motion-state-modes)
 
+    (defun dotemacs-cider-toggle-repl-pretty-printing ()
+      (interactive)
+      (setq cider-repl-use-pretty-printing
+            (if cider-repl-use-pretty-printing nil t))
+      (message "Cider REPL pretty printing: %s"
+               (if cider-repl-use-pretty-printing "ON" "OFF")))
+
     (evilify cider-stacktrace-mode cider-stacktrace-mode-map
              (kbd "C-j") 'cider-stacktrace-next-cause
              (kbd "C-k") 'cider-stacktrace-previous-cause
@@ -5779,7 +5786,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
         "mta" 'dotemacs-cider-test-run-all-tests
         "mtr" 'dotemacs-cider-test-rerun-tests
-        "mtt" 'dotemacs-cider-test-run-focused-test))
+        "mtt" 'dotemacs-cider-test-run-focused-test
+        "mtp" 'dotemacs-cider-toggle-repl-pretty-printing
+
+        "mdi" 'cider-inspect
+        "mdb" 'cider-debug-defun-at-point))
     (when dotemacs-clojure-enable-fancify-symbols
       (dotemacs-clojure-fancify-symbols 'cider-repl-mode)))
 
