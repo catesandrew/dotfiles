@@ -5882,7 +5882,31 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mrtl" 'cljr-thread-last-all
         "mrua" 'cljr-unwind-all
         "mrup" 'cljr-update-project-dependencies
-        "mruw" 'cljr-unwind))))
+        "mruw" 'cljr-unwind))
+
+    (evil-leader/set-key-for-mode 'cider-repl-mode
+      "mrap" 'cljr-add-project-dependency
+      "mras" 'cljr-add-stubs
+      "mrcc" 'cljr-cycle-coll
+      "mrci" 'cljr-cycle-if
+      "mrcp" 'cljr-cycle-privacy
+      "mrdk" 'cljr-destructure-keys
+      "mrel" 'cljr-expand-let
+      "mrfu" 'cljr-find-usages
+      "mrhd" 'cljr-hotload-dependency
+      "mril" 'cljr-introduce-let
+      "mrml" 'cljr-move-to-let
+      "mrpc" 'cljr-project-clean
+      "mrrl" 'cljr-remove-let
+      "mrsp" 'cljr-sort-project-dependencies
+      "mrsc" 'cljr-show-changelog
+      "mrtf" 'cljr-thread-first-all
+      "mrth" 'cljr-thread
+      "mrtl" 'cljr-thread-last-all
+      "mrua" 'cljr-unwind-all
+      "mrup" 'cljr-update-project-dependencies
+      "mruw" 'cljr-unwind
+      "mr?"  'cljr-describe-refactoring)))
 
 (use-package clojure-mode
   :defer t
