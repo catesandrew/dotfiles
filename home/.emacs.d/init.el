@@ -6160,8 +6160,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
-     (flycheck-add-mode 'javascript-eslint 'react-mode)
-     (setq-default
+    (when-let (eslint (executable-find "eslint"))
+      (setq flycheck-javascript-eslint-executable eslint)
+      (flycheck-add-mode 'javascript-eslint 'react-mode))
+
+    (setq-default
+      ;; disable html-tidy
+      flycheck-disabled-checkers (append flycheck-disabled-checkers
+                                        '(html-tidy))
       ;; disable jshint since we prefer eslint checking
       flycheck-disabled-checkers (append flycheck-disabled-checkers
                                          '(javascript-jshint))
@@ -6561,10 +6567,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           web-mode-script-padding 2)
 
     (after "flycheck"
-      (when-let (eslint (executable-find "eslint"))
-        (setq flycheck-javascript-eslint-executable eslint)
-        (flycheck-add-mode 'javascript-eslint 'web-mode))
-
       (when-let (tidy5 (and (eq system-type 'darwin)
                                (executable-find "tidy5")))
         (setq flycheck-html-tidy-executable tidy5)
@@ -6573,11 +6575,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'web-mode-hook
       (lambda ()
         (run-hooks #'dotemacs-prog-mode-hook)
-        (when (equal web-mode-content-type "jsx")
-          (setq-local cursor-type nil)
-          (after "flycheck"
-            (add-to-list 'flycheck-disabled-checkers 'html-tidy)
-            (flycheck-select-checker 'javascript-eslint)))))
+        ; todo: verify this is not needed now
+        ; (when (equal web-mode-content-type "jsx")
+        ;   (setq-local cursor-type nil)
+        ;   (after "flycheck"
+        ;     (flycheck-select-checker 'javascript-eslint)))
+        ))
 
     (evil-leader/set-key-for-mode 'web-mode
       "meh" 'web-mode-dom-errors-show
@@ -6594,11 +6597,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mz" 'web-mode-fold-or-unfold
       ;; TODO element close would be nice but broken with evil.
       )
-
-    (defadvice web-mode-highlight-part (around tweak-jsx activate)
-      (if (equal web-mode-content-type "jsx")
-          (let ((web-mode-enable-part-face nil)) ad-do-it)
-        ad-do-it))
 
     (defvar dotemacs--web-mode-ms-doc-toggle 0
       "Display a short doc when nil, full doc otherwise.")
@@ -6628,7 +6626,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (("\\.phtml\\'"      . web-mode)
    ("\\.tpl\\.php\\'"  . web-mode)
    ("\\.html\\'"       . web-mode)
-   ("\\.jsx\\'"        . web-mode)
    ("\\.htm\\'"        . web-mode)
    ("\\.[gj]sp\\'"     . web-mode)
    ("\\.as[cp]x\\'"    . web-mode)
