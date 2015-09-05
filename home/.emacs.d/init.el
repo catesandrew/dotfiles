@@ -4080,6 +4080,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-elisp)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)))
 
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook markdown-mode)
+      (push 'company-capf company-backends-markdown-mode)))
+  (dotemacs-use-package-add-hook company-emoji
+    :post-init
+    (progn
+      (push 'company-emoji company-backends-markdown-mode))))
+
 (dotemacs-use-package-add-hook flyspell
   :post-init
   (add-hook 'markdown-mode-hook 'flyspell-mode))
@@ -8586,6 +8597,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 
 ;;; Org Mode
+(dotemacs-defvar-company-backends org-mode)
+
 (use-package init-org
   :load-path "config/")
 
@@ -8796,6 +8809,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package htmlize
   :ensure t
   :defer t)
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook org-mode)
+      (push 'company-capf company-backends-org-mode)))
+  (dotemacs-use-package-add-hook company-emoji
+    :post-init
+    (progn
+      (push 'company-emoji company-backends-org-mode))))
 
 
 ;;; Online Help
@@ -9401,7 +9425,14 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ;; text properties are not applied correctly.
       (run-at-time 0.1 nil 'emoji-cheat-sheet-plus-display-mode))
     (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook)
-    (add-to-hooks 'emoji-cheat-sheet-plus-display-mode '(markdown-mode))))
+    (add-to-hooks 'emoji-cheat-sheet-plus-display-mode '(markdown-mode
+                                                         rcirc-mode-hook))))
+
+(use-package company-emoji
+  :if (eq dotemacs-completion-engine 'company)
+  :defer t
+  :init
+  (setq company-emoji-insert-unicode nil))
 
 (use-package spray
   :commands spray-mode
