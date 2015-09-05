@@ -9317,6 +9317,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                          :evil-leader "ts"))
   :config
   (progn
+    ;; Make flycheck recognize packages in loadpath
+    ;; i.e (require 'company) will not give an error now
+    (setq flycheck-emacs-lisp-load-path 'inherit)
+
     (dotemacs-diminish flycheck-mode " ⓢ" " s")
 
     (evil-leader/set-key
