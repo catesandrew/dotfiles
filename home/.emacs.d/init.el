@@ -6505,6 +6505,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                    (setq indent-line-function 'javascript/coffee-indent
                                          evil-shift-width coffee-tab-width)))))
 
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook js2-mode))))
+
+(use-package company-tern       ; JavaScript backend for Company
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-tern company-backends-js2-mode)))
+
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
@@ -6512,13 +6526,30 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'js2-mode-hook 'flycheck-turn-on-maybe)
     (add-hook 'json-mode-hook 'flycheck-turn-on-maybe)))
 
+(use-package js-doc
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (defun dotemacs-js-doc-require ()
+      "Lazy load js-doc"
+      (require 'js-doc))
+    (add-hook 'js2-mode-hook 'dotemacs-js-doc-require)
+
+    (defun dotemacs-js-doc-set-key-bindings (mode)
+      "Setup the key bindings for `js2-doc' for the given MODE."
+      (evil-leader/set-key-for-mode mode "mrdb" 'js-doc-insert-file-doc)
+      (evil-leader/set-key-for-mode mode "mrdf" 'js-doc-insert-function-doc)
+      (evil-leader/set-key-for-mode mode "mrdt" 'js-doc-insert-tag)
+      (evil-leader/set-key-for-mode mode "mrdh" 'js-doc-describe-tag))
+    (dotemacs-js-doc-set-key-bindings 'js2-mode)))
+
 (use-package js2-mode                   ; Javascript editing
   :defer t
   :ensure t
   :init
   (progn
     (after "flycheck"
-
       (when-let (jshint (executable-find "jshint"))
                 (setq flycheck-javascript-jshint-executable jshint)
                 (defun flycheck-jshint-disable ()
@@ -6581,17 +6612,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
     (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)))
 
-(use-package js2-imenu-extras
-  :ensure js2-mode
-  :defer t
-  :init
-  (progn
-    (require 'js2-imenu-extras)
-      (setq js2-imenu-enabled-frameworks 'nil)
-      (js2-imenu-extras-mode)
-      ;; required to make `<LEADER> s l' to work correctly
-      (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)))
-
 (use-package js2-refactor
   :defer t
   :ensure t
@@ -6600,65 +6620,67 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (defun javascript/load-js2-refactor ()
       "Lazy load js2-refactor"
       (require 'js2-refactor))
-    (add-hook 'js2-mode-hook 'javascript/load-js2-refactor))
-  :init
-  (progn
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mr3" "ternary")
-    (evil-leader/set-key-for-mode 'js2-mode "mr3i" 'js2r-ternary-to-if)
+    (add-hook 'js2-mode-hook 'javascript/load-js2-refactor)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mra" "add/args")
-    (evil-leader/set-key-for-mode 'js2-mode "mrag" 'js2r-add-to-globals-annotation)
-    (evil-leader/set-key-for-mode 'js2-mode "mrao" 'js2r-arguments-to-object)
+    (defun dotemacs-js2-refactor-set-key-bindings (mode)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mr3" "ternary")
+      (evil-leader/set-key-for-mode 'js2-mode "mr3i" 'js2r-ternary-to-if)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrb" "barf")
-    (evil-leader/set-key-for-mode 'js2-mode "mrba" 'js2r-forward-barf)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mra" "add/args")
+      (evil-leader/set-key-for-mode 'js2-mode "mrag" 'js2r-add-to-globals-annotation)
+      (evil-leader/set-key-for-mode 'js2-mode "mrao" 'js2r-arguments-to-object)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrc" "contract")
-    (evil-leader/set-key-for-mode 'js2-mode "mrca" 'js2r-contract-array)
-    (evil-leader/set-key-for-mode 'js2-mode "mrco" 'js2r-contract-object)
-    (evil-leader/set-key-for-mode 'js2-mode "mrcu" 'js2r-contract-function)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrb" "barf")
+      (evil-leader/set-key-for-mode 'js2-mode "mrba" 'js2r-forward-barf)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mre" "expand/extract")
-    (evil-leader/set-key-for-mode 'js2-mode "mrea" 'js2r-expand-array)
-    (evil-leader/set-key-for-mode 'js2-mode "mref" 'js2r-extract-function)
-    (evil-leader/set-key-for-mode 'js2-mode "mrem" 'js2r-extract-method)
-    (evil-leader/set-key-for-mode 'js2-mode "mreo" 'js2r-expand-object)
-    (evil-leader/set-key-for-mode 'js2-mode "mreu" 'js2r-expand-function)
-    (evil-leader/set-key-for-mode 'js2-mode "mrev" 'js2r-extract-var)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrc" "contract")
+      (evil-leader/set-key-for-mode 'js2-mode "mrca" 'js2r-contract-array)
+      (evil-leader/set-key-for-mode 'js2-mode "mrco" 'js2r-contract-object)
+      (evil-leader/set-key-for-mode 'js2-mode "mrcu" 'js2r-contract-function)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mri" "inline/inject/introduct")
-    (evil-leader/set-key-for-mode 'js2-mode "mrig" 'js2r-inject-global-in-iife)
-    (evil-leader/set-key-for-mode 'js2-mode "mrip" 'js2r-introduce-parameter)
-    (evil-leader/set-key-for-mode 'js2-mode "mriv" 'js2r-inline-var)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mre" "expand/extract")
+      (evil-leader/set-key-for-mode 'js2-mode "mrea" 'js2r-expand-array)
+      (evil-leader/set-key-for-mode 'js2-mode "mref" 'js2r-extract-function)
+      (evil-leader/set-key-for-mode 'js2-mode "mrem" 'js2r-extract-method)
+      (evil-leader/set-key-for-mode 'js2-mode "mreo" 'js2r-expand-object)
+      (evil-leader/set-key-for-mode 'js2-mode "mreu" 'js2r-expand-function)
+      (evil-leader/set-key-for-mode 'js2-mode "mrev" 'js2r-extract-var)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrl" "localize/log")
-    (evil-leader/set-key-for-mode 'js2-mode "mrlp" 'js2r-localize-parameter)
-    (evil-leader/set-key-for-mode 'js2-mode "mrlt" 'js2r-log-this)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mri" "inline/inject/introduct")
+      (evil-leader/set-key-for-mode 'js2-mode "mrig" 'js2r-inject-global-in-iife)
+      (evil-leader/set-key-for-mode 'js2-mode "mrip" 'js2r-introduce-parameter)
+      (evil-leader/set-key-for-mode 'js2-mode "mriv" 'js2r-inline-var)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrr" "rename")
-    (evil-leader/set-key-for-mode 'js2-mode "mrrv" 'js2r-rename-var)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrl" "localize/log")
+      (evil-leader/set-key-for-mode 'js2-mode "mrlp" 'js2r-localize-parameter)
+      (evil-leader/set-key-for-mode 'js2-mode "mrlt" 'js2r-log-this)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrs" "split/slurp")
-    (evil-leader/set-key-for-mode 'js2-mode "mrsl" 'js2r-forward-slurp)
-    (evil-leader/set-key-for-mode 'js2-mode "mrss" 'js2r-split-string)
-    (evil-leader/set-key-for-mode 'js2-mode "mrsv" 'js2r-split-var-declaration)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrr" "rename")
+      (evil-leader/set-key-for-mode 'js2-mode "mrrv" 'js2r-rename-var)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrt" "toggle")
-    (evil-leader/set-key-for-mode 'js2-mode "mrtf" 'js2r-toggle-function-expression-and-declaration)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrs" "split/slurp")
+      (evil-leader/set-key-for-mode 'js2-mode "mrsl" 'js2r-forward-slurp)
+      (evil-leader/set-key-for-mode 'js2-mode "mrss" 'js2r-split-string)
+      (evil-leader/set-key-for-mode 'js2-mode "mrsv" 'js2r-split-var-declaration)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mru" "unwrap")
-    (evil-leader/set-key-for-mode 'js2-mode "mruw" 'js2r-unwrap)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrt" "toggle")
+      (evil-leader/set-key-for-mode 'js2-mode "mrtf" 'js2r-toggle-function-expression-and-declaration)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrv" "var")
-    (evil-leader/set-key-for-mode 'js2-mode "mrvt" 'js2r-var-to-this)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mru" "unwrap")
+      (evil-leader/set-key-for-mode 'js2-mode "mruw" 'js2r-unwrap)
 
-    (dotemacs-declare-prefix-for-mode 'js2-mode "mrw" "wrap")
-    (evil-leader/set-key-for-mode 'js2-mode "mrwi" 'js2r-wrap-buffer-in-iife)
-    (evil-leader/set-key-for-mode 'js2-mode "mrwl" 'js2r-wrap-in-for-loop)
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrv" "var")
+      (evil-leader/set-key-for-mode 'js2-mode "mrvt" 'js2r-var-to-this)
 
-    (evil-leader/set-key-for-mode 'js2-mode "mk" 'js2r-kill)
-    (evil-leader/set-key-for-mode 'js2-mode "xmj" 'js2r-move-line-down)
-    (evil-leader/set-key-for-mode 'js2-mode "xmk" 'js2r-move-line-up)))
+      (dotemacs-declare-prefix-for-mode 'js2-mode "mrw" "wrap")
+      (evil-leader/set-key-for-mode 'js2-mode "mrwi" 'js2r-wrap-buffer-in-iife)
+      (evil-leader/set-key-for-mode 'js2-mode "mrwl" 'js2r-wrap-in-for-loop)
+
+      (evil-leader/set-key-for-mode 'js2-mode "mk" 'js2r-kill)
+      (evil-leader/set-key-for-mode 'js2-mode "xmj" 'js2r-move-line-down)
+      (evil-leader/set-key-for-mode 'js2-mode "xmk" 'js2r-move-line-up))
+
+    (dotemacs-js2-refactor-set-key-bindings 'js2-mode)))
 
 (use-package json-mode                  ; JSON files
   :ensure t
@@ -6669,8 +6691,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :config
   (evil-leader/set-key-for-mode 'json-mode
-    "mhp" 'jsons-print-path)
-  )
+    "mhp" 'jsons-print-path))
+
+(use-package js2-imenu-extras
+  :ensure js2-mode
+  :defer t
+  :init
+  (progn
+    (require 'js2-imenu-extras)
+    (setq js2-imenu-enabled-frameworks 'nil)
+    (js2-imenu-extras-mode)
+    ;; required to make `<LEADER> s l' to work correctly
+    (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)))
 
 (use-package json-reformat              ; Reformat JSON
   :ensure t
@@ -6690,22 +6722,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'js2-mode (kbd "m C-g") 'tern-pop-find-definition)
     (evil-leader/set-key-for-mode 'js2-mode "mht" 'tern-get-type)))
 
-(use-package js-doc
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (defun javascript/load-js-doc ()
-        "Lazy load js-doc"
-      (require 'js-doc))
-    (add-hook 'js2-mode-hook 'javascript/load-js-doc))
-  :config
-  (progn
-    (evil-leader/set-key-for-mode 'js2-mode "mrdb" 'js-doc-insert-file-doc)
-    (evil-leader/set-key-for-mode 'js2-mode "mrdf" 'js-doc-insert-function-doc)
-    (evil-leader/set-key-for-mode 'js2-mode "mrdt" 'js-doc-insert-tag)
-    (evil-leader/set-key-for-mode 'js2-mode "mrdh" 'js-doc-describe-tag)))
-
 (use-package web-beautify
   :defer t
   :ensure t
@@ -6715,21 +6731,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'json-mode "m=" 'web-beautify-js)
     (evil-leader/set-key-for-mode 'web-mode  "m=" 'web-beautify-html)
     (evil-leader/set-key-for-mode 'css-mode  "m=" 'web-beautify-css)))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (push 'company-capf company-backends-js2-mode)
-      (dotemacs-add-company-hook js2-mode))))
-
-(use-package company-tern       ; JavaScript backend for Company
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push 'company-tern company-backends-js2-mode)))
 
 
 ;;; Lua
