@@ -142,16 +142,16 @@ Ensure that helm is required before calling FUNC."
   "Sn" 'flyspell-goto-next-error)
 ;; toggle ---------------------------------------------------------------------
 (dotemacs-add-toggle highlight-current-line-globally
-                      :status global-hl-line-mode
-                      :on (global-hl-line-mode)
-                      :off (global-hl-line-mode -1)
-                      :documentation "Globally Highlight the current line."
-                      :evil-leader "thh")
+  :status global-hl-line-mode
+  :on (global-hl-line-mode)
+  :off (global-hl-line-mode -1)
+  :documentation "Globally Highlight the current line."
+  :evil-leader "thh")
 (dotemacs-add-toggle truncate-lines
-                      :status nil
-                      :on (toggle-truncate-lines)
-                      :documentation "Truncate the long lines (no wrap)."
-                      :evil-leader "tt")
+  :status nil
+  :on (toggle-truncate-lines)
+  :documentation "Truncate the long lines (no wrap)."
+  :evil-leader "tt")
 (dotemacs-add-toggle visual-line-navigation
   :status visual-line-mode
   :on (progn
@@ -177,76 +177,76 @@ Ensure that helm is required before calling FUNC."
   :documentation "Move point according to visual lines."
   :evil-leader "tv")
 (dotemacs-add-toggle line-numbers
-                      :status linum-mode
-                      :on (global-linum-mode)
-                      :off (global-linum-mode -1)
-                      :documentation "Show the line numbers."
-                      :evil-leader "tl")
+  :status linum-mode
+  :on (global-linum-mode)
+  :off (global-linum-mode -1)
+  :documentation "Show the line numbers."
+  :evil-leader "tl")
 (dotemacs-add-toggle auto-fill-mode
-                      :status auto-fill-function
-                      :on (auto-fill-mode)
-                      :off (auto-fill-mode -1)
-                      :documentation "Break line beyond `current-fill-column` while editing."
-                      :evil-leader "tF")
+  :status auto-fill-function
+  :on (auto-fill-mode)
+  :off (auto-fill-mode -1)
+  :documentation "Break line beyond `current-fill-column` while editing."
+  :evil-leader "tF")
 (dotemacs-add-toggle debug-on-error
-                      :status nil
-                      :on (toggle-debug-on-error)
-                      :documentation "Toggle display of backtrace when an error happens."
-                      :evil-leader "tD")
+  :status nil
+  :on (toggle-debug-on-error)
+  :documentation "Toggle display of backtrace when an error happens."
+  :evil-leader "tD")
 (dotemacs-add-toggle fringe
-                      :status (not (equal fringe-mode 0))
-                      :on (call-interactively 'fringe-mode)
-                      :off (fringe-mode 0)
-                      :documentation "Display the fringe in GUI mode."
-                      :evil-leader "Tf")
+  :status (not (equal fringe-mode 0))
+  :on (call-interactively 'fringe-mode)
+  :off (fringe-mode 0)
+  :documentation "Display the fringe in GUI mode."
+  :evil-leader "Tf")
 (dotemacs-add-toggle fullscreen-frame
-                      :status nil
-                      :on (dotemacs-toggle-frame-fullscreen)
-                      :documentation "Display the current frame in full screen."
-                      :evil-leader "TF")
+  :status nil
+  :on (dotemacs-toggle-frame-fullscreen)
+  :documentation "Display the current frame in full screen."
+  :evil-leader "TF")
 (dotemacs-add-toggle maximize-frame
-                      :if (version< "24.3.50" emacs-version)
-                      :status nil
-                      :on (toggle-frame-maximized)
-                      :documentation "Maximize the current frame."
-                      :evil-leader "TM")
+  :if (version< "24.3.50" emacs-version)
+  :status nil
+  :on (toggle-frame-maximized)
+  :documentation "Maximize the current frame."
+  :evil-leader "TM")
 (dotemacs-add-toggle mode-line
-                      :status hidden-mode-line-mode
-                      :on (hidden-mode-line-mode)
-                      :off (hidden-mode-line-mode -1)
-                      :documentation "Toggle the visibility of modeline."
-                      :evil-leader "tmt")
+  :status hidden-mode-line-mode
+  :on (hidden-mode-line-mode)
+  :off (hidden-mode-line-mode -1)
+  :documentation "Toggle the visibility of modeline."
+  :evil-leader "tmt")
 (dotemacs-add-toggle transparent-frame
-                      :status nil
-                      :on (dotemacs-toggle-transparency)
-                      :documentation "Make the current frame non-opaque."
-                      :evil-leader "TT")
+  :status nil
+  :on (dotemacs-toggle-transparency)
+  :documentation "Make the current frame non-opaque."
+  :evil-leader "TT")
 (dotemacs-add-toggle tool-bar
-                      :if window-system
-                      :status tool-bar-mode
-                      :on (tool-bar-mode)
-                      :off (tool-bar-mode -1)
-                      :documentation "Display the tool bar in GUI mode."
-                      :evil-leader "Tt")
+  :if window-system
+  :status tool-bar-mode
+  :on (tool-bar-mode)
+  :off (tool-bar-mode -1)
+  :documentation "Display the tool bar in GUI mode."
+  :evil-leader "Tt")
 (dotemacs-add-toggle menu-bar
-                      :if (or window-system (version<= "24.3.1" emacs-version))
-                      :status menu-bar-mode
-                      :on (menu-bar-mode)
-                      :off (menu-bar-mode -1)
-                      :documentation "Display the menu bar."
-                      :evil-leader "Tm")
+  :if (or window-system (version<= "24.3.1" emacs-version))
+  :status menu-bar-mode
+  :on (menu-bar-mode)
+  :off (menu-bar-mode -1)
+  :documentation "Display the menu bar."
+  :evil-leader "Tm")
 (dotemacs-add-toggle semantic-stickyfunc
-                      :status semantic-stickyfunc-mode
-                      :on (semantic-stickyfunc-mode)
-                      :off (semantic-stickyfunc-mode -1)
-                      :documentation "Enable semantic-stickyfunc."
-                      :evil-leader "Ts")
+  :status semantic-stickyfunc-mode
+  :on (semantic-stickyfunc-mode)
+  :off (semantic-stickyfunc-mode -1)
+  :documentation "Enable semantic-stickyfunc."
+  :evil-leader "Ts")
 (dotemacs-add-toggle semantic-stickfunc-globally
-                      :status global-semantic-stickyfunc-mode
-                      :on (global-semantic-stickyfunc-mode)
-                      :off (global-semantic-stickyfunc-mode -1)
-                      :documentation "Enable semantic-stickyfunc globally."
-                      :evil-leader "T C-s")
+  :status global-semantic-stickyfunc-mode
+  :on (global-semantic-stickyfunc-mode)
+  :off (global-semantic-stickyfunc-mode -1)
+  :documentation "Enable semantic-stickyfunc globally."
+  :evil-leader "T C-s")
 ;; quit -----------------------------------------------------------------------
 (evil-leader/set-key
   "qs" 'dotemacs-save-buffers-kill-emacs
