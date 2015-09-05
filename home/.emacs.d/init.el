@@ -4005,7 +4005,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mxP"  'markdown-pre-region
       ;; Following and Jumping
       "mN"   'markdown-next-link
-      "mo"   'markdown-follow-thing-at-point
+      "mf"   'markdown-follow-thing-at-point
       "mP"   'markdown-previous-link
       "m <RET>" 'markdown-jump)
 
@@ -8758,7 +8758,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "c" nil "mA" 'org-archive-subtree
       "o" nil "mC" 'evil-org-recompute-clocks
       "l" nil "ml" 'evil-org-open-links
-      "t" nil "mt" 'org-show-todo-tree)
+      "t" nil "mT" 'org-show-todo-tree)
       (evil-define-key 'normal evil-org-mode-map
         "O" 'evil-open-above)
       (dotemacs-diminish evil-org-mode " ⓔ" " e")))
