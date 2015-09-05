@@ -50,7 +50,19 @@
 
 (defconst dotemacs-auto-save-directory
   (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
-  "Spacemacs auto-save directory")
+  "The auto-save directory")
+
+(defconst dotemacs-quelpa-directory
+  (concat dotemacs-cache-directory "quelpa/")
+  "Quelpa directory")
+
+(defconst dotemacs-quelpa-build-directory
+  (expand-file-name "build" dotemacs-quelpa-directory)
+  "Quelpa build directory")
+
+(defconst dotemacs-quelpa-cache-directory
+  (expand-file-name "cache" dotemacs-quelpa-directory)
+  "Quelpa cache directory")
 
 (defconst user-home-directory
   (expand-file-name "~/")
@@ -728,10 +740,11 @@ FEATURE may be a named feature or a file name, see
 (dotemacs-load-or-install-package 'use-package t)
 ;; package-build is required by quelpa
 (dotemacs-load-or-install-package 'package-build t)
+
 (setq quelpa-verbose dotemacs-verbose-loading
-      quelpa-dir (concat dotemacs-cache-directory "quelpa/")
-      quelpa-build-dir (expand-file-name "build" quelpa-dir)
-      quelpa-persistent-cache-file (expand-file-name "cache" quelpa-dir)
+      quelpa-dir dotemacs-quelpa-directory
+      quelpa-build-dir dotemacs-quelpa-build-directory
+      quelpa-persistent-cache-file dotemacs-quelpa-cache-directory
       quelpa-update-melpa-p nil)
 (dotemacs-load-or-install-package 'quelpa t)
 (dotemacs-load-or-install-package 'quelpa-use-package t)
@@ -4710,6 +4723,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-defvar-company-backends inferior-python-mode)
 (dotemacs-defvar-company-backends pip-requirements-mode)
 
+(defvar python-enable-yapf-format-on-save nil
+  "If non-nil, automatically format code with YAPF on save.")
+
+(defvar python-test-runner 'nose
+  "Test runner to use. Possible values are `nose' or `pytest'.")
+
 (use-package init-python
   :load-path "config/")
 
@@ -4797,26 +4816,77 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (evil-leader/set-key-for-mode 'python-mode
     "mV" 'pyvenv-workon))
 
-(use-package pytest
-  :defer t
+(use-package pylookup
+  :quelpa (pylookup :fetcher github :repo "tsgates/pylookup")
+  :commands pylookup-lookup
+  :init
+  (progn
+    (evilify pylookup-mode pylookup-mode-map)
+    (evil-leader/set-key-for-mode 'python-mode
+      "mhH"  'pylookup-lookup))
+  :config
+  (progn
+    (let ((dir dotemacs-quelpa-build-directory))
+      (setq pylookup-dir (concat dir "/pylookup")
+            pylookup-program (concat pylookup-dir "/pylookup.py")
+            pylookup-db-file (concat pylookup-dir "/pylookup.db")))))
+
+(use-package py-yapf
   :ensure t
+  :init
+  (evil-leader/set-key-for-mode 'python-mode "m=" 'py-yapf-buffer)
+  :config
+  (if python-enable-yapf-format-on-save
+      (add-hook 'python-mode-hook 'py-yapf-enable-on-save)))
+
+(use-package nose
+  :ensure t
+  :if (eq 'nose python-test-runner)
+  :commands (nosetests-one
+             nosetests-pdb-one
+             nosetests-all
+             nosetests-pdb-all
+             nosetests-module
+             nosetests-pdb-module
+             nosetests-suite
+             nosetests-pdb-suite)
+  :init
+  (evil-leader/set-key-for-mode 'python-mode
+    "mtA" 'nosetests-pdb-all
+    "mta" 'nosetests-all
+    "mtB" 'nosetests-pdb-module
+    "mtb" 'nosetests-module
+    "mtT" 'nosetests-pdb-one
+    "mtt" 'nosetests-one
+    "mtM" 'nosetests-pdb-module
+    "mtm" 'nosetests-module
+    "mtS" 'nosetests-pdb-suite
+    "mts" 'nosetests-suite)
+  :config
+  (progn
+    (add-to-list 'nose-project-root-files "setup.cfg")
+    (setq nose-use-verbose nil)))
+
+
+(use-package pytest
+  :if (eq 'pytest python-test-runner)
+  :ensure t
+  :defer t
   :commands (pytest-one
              pytest-pdb-one
              pytest-all
              pytest-pdb-all
              pytest-module
              pytest-pdb-module)
-  :init
-  (progn
-    (evil-leader/set-key-for-mode 'python-mode
-      "mTa" 'pytest-pdb-all
-      "mta" 'pytest-all
-      "mTb" 'pytest-pdb-module
-      "mtb" 'pytest-module
-      "mTt" 'pytest-pdb-one
-      "mtt" 'pytest-one
-      "mTm" 'pytest-pdb-module
-      "mtm" 'pytest-module))
+  :init (evil-leader/set-key-for-mode 'python-mode
+          "mtA" 'pytest-pdb-all
+          "mta" 'pytest-all
+          "mtB" 'pytest-pdb-module
+          "mtb" 'pytest-module
+          "mtT" 'pytest-pdb-one
+          "mtt" 'pytest-one
+          "mtM" 'pytest-pdb-module
+          "mtm" 'pytest-module)
   :config (add-to-list 'pytest-project-root-files "setup.cfg"))
 
 (use-package python
