@@ -766,20 +766,6 @@ toggling fullscreen."
 		 'maximized)
 	   'fullboth)))))
 
-(defmacro dotemacs-diminish (mode unicode &optional ascii)
-  "Diminish MODE name in mode line to UNICODE or ASCII depending on the value
-`dotemacs-mode-line-unicode-symbols'.
-
-If ASCII si not provided then UNICODE is used instead."
-  (let ((dim (if dotemacs-mode-line-unicode-symbols
-                 unicode
-               (if ascii ascii unicode))))
-    `(eval-after-load 'diminish '(diminish ',mode ,dim))))
-
-(defmacro dotemacs-hide-lighter (mode)
-  "Diminish MODE name in mode line to LIGHTER."
-  `(eval-after-load 'diminish '(diminish ',mode)))
-
 ;; taken from Prelude: https://github.com/bbatsov/prelude
 (defmacro dotemacs-advise-commands (advice-name commands class &rest body)
   "Apply advice named ADVICE-NAME to multiple COMMANDS.

@@ -12,6 +12,9 @@
 (require 'core-funcs)
 (require 'core-buffers)
 
+(defvar dotemacs--diminished-minor-modes nil
+  "List of diminished modes to unicode or ascii values.")
+
 (defun dotemacs-set-default-font (plist)
   "Set the font given the passed PLIST.
 
@@ -76,5 +79,21 @@ PLIST has the form (\"fontname\" :prop1 val1 :prop2 val2 ...)"
   (let ((scale (if (and (boundp 'powerline-scale) powerline-scale)
                    powerline-scale 1)))
     (truncate (* scale (frame-char-height)))))
+
+(defmacro dotemacs-symbol-value (symbol)
+  "Return the value of SYMBOL corresponding to a dotemacs variable.
+If SYMBOL value is `display-graphic-p' then return the result of
+ `(display-graphic-p)', otherwise return the value of the symbol."
+  `(if (eq 'display-graphic-p ,symbol) (display-graphic-p) ,symbol))
+
+(defmacro dotemacs-diminish (mode unicode &optional ascii)
+  "Diminish MODE name in mode line to UNICODE or ASCII depending on the value
+`dotemacs-mode-line-unicode-symbols'.
+If ASCII is not provided then UNICODE is used instead."
+  `(add-to-list 'dotemacs--diminished-minor-modes '(,mode ,unicode ,ascii)))
+
+(defmacro dotemacs-hide-lighter (mode)
+  "Diminish MODE name in mode line to LIGHTER."
+  `(eval-after-load 'diminish '(diminish ',mode)))
 
 (provide 'core-fonts-support)
