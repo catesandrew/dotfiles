@@ -4347,7 +4347,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     :post-init
     (progn
       ;; Geiser provides completion as long as company mode is loaded.
-      (dotemacs-add-company-hook scheme-mode))))
+      (dotemacs-add-company-hook geiser-mode))))
 
 (use-package pcre2el                    ; Convert regexps to RX and back
   :ensure t
