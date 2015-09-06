@@ -966,7 +966,7 @@ let g:colorizer_skip_comments = 1
 
 map <leader>a :Ack! 
 if executable('ag')
-    let g:ackprg = "ag --nogroup --column --smart-case --follow"
+    let g:ackprg = "ag --hidden --nogroup --column --smart-case --follow"
 endif
 
 " }}}
