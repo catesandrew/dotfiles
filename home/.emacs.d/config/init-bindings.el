@@ -417,6 +417,7 @@ Ensure that helm is required before calling FUNC."
 (dotemacs-define-micro-state window-manipulation
   :doc "[?] for help"
   :evil-leader "w."
+  :use-minibuffer t
   :bindings
   ("?" nil                                   :doc (dotemacs-window-manipulation-full-doc))
   ("0" select-window-0                       :doc (dotemacs-window-manipulation-number-doc))
