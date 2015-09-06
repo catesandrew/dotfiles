@@ -1506,6 +1506,8 @@ These should have their own segments in the modeline.")
           helm-semantic-fuzzy-match t
           helm-buffers-fuzzy-matching t)
 
+
+    ;; helm-locate uses es (from everything on windows, which doesnt like fuzzy)
     (when (not (eq system-type 'darwin))
       (setq helm-locate-fuzzy-match t))
 
@@ -1533,6 +1535,7 @@ These should have their own segments in the modeline.")
       "bb"   'helm-mini
       "Cl"   'helm-colors
       "ff"   'dotemacs-helm-find-files
+      "fa"   'helm-locate
       "fF"   'helm-find-files
       "fr"   'helm-recentf
       "hb"   'helm-filtered-bookmarks
