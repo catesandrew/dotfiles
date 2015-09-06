@@ -8761,6 +8761,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       `(defun ,fname () (interactive)
               (org-emphasize ,char)))
 
+    ;; setup org directory
+    (unless (file-exists-p org-directory)
+      (make-directory org-directory))
+
     (evil-leader/set-key-for-mode 'org-mode
       "m'" 'org-edit-special
       "mc" 'org-capture
