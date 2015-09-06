@@ -11,53 +11,55 @@
 ;;; License: GPLv3
 
 ;; add emacs binary helper functions
-(defun emacsbin-path()
+(defun dotemacs/emacsbin-path()
   (interactive)
-  (concat exec-directory (if (system-is-mswindows) "bin/") "emacs"))
+  (concat exec-directory (if (dotemacs/system-is-mswindows) "bin/") "emacs"))
 
-(defun emacs()
+(defun dotemacs/emacs()
   (interactive)
-  (call-process (emacsbin-path) nil 0 nil)
+  (call-process (dotemacs/emacsbin-path) nil 0 nil)
   (message "Started 'emacs' - it will be ready soon ..."))
 
-(defun emacs-debug-init()
+(defun dotemacs/emacs-debug-init()
   (interactive)
-  (call-process (emacsbin-path) nil 0 nil "--debug-init")
+  (call-process (dotemacs/emacsbin-path) nil 0 nil "--debug-init")
   (message "Started 'emacs --debug-init' - it will be ready soon ..."))
 
-(defun emacs-reload()
+(defun dotemacs/emacs-reload()
   (interactive)
   (load-file user-init-file)
   (message ".emacs reloaded successfully"))
 
-(defun emacs-Q() (interactive)
-  (call-process (emacsbin-path) nil 0 nil "-Q")
+(defun dotemacs/emacs-Q() (interactive)
+  (call-process (dotemacs/emacsbin-path) nil 0 nil "-Q")
   (message "Started 'emacs -Q' - it will be ready soon ..."))
 
 ;; from https://github.com/cofi/dotfiles/blob/master/emacs.d/config/cofi-util.el#L38
-(defun add-to-hooks (fun hooks)
+(defun dotemacs/add-to-hooks (fun hooks)
   "Add function to hooks"
   (dolist (hook hooks)
     (add-hook hook fun)))
-(defun add-all-to-hook (hook &rest funs)
+
+(defun dotemacs/add-all-to-hook (hook &rest funs)
   "Add functions to hook."
-  (add-to-hook hook funs))
-(defun add-to-hook (hook funs)
+  (dotemacs/add-to-hook hook funs))
+
+(defun dotemacs/add-to-hook (hook funs)
   "Add list of functions to hook."
   (dolist (fun funs)
     (add-hook hook fun)))
 
-(defun echo (msg &rest args)
+(defun dotemacs/echo (msg &rest args)
   "Display MSG in echo-area without logging it in *Messages* buffer."
   (interactive)
   (let ((message-log-max nil))
     (apply 'message msg args)))
 
-(defun system-is-mac ()
+(defun dotemacs/system-is-mac ()
   (string-equal system-type "darwin"))
-(defun system-is-linux ()
+(defun dotemacs/system-is-linux ()
   (string-equal system-type "gnu/linux"))
-(defun system-is-mswindows ()
+(defun dotemacs/system-is-mswindows ()
   (string-equal system-type "windows-nt"))
 
 (defvar dotemacs-prefix-command-string "group:"
@@ -142,14 +144,14 @@ the current state and point position."
     (evil-save-state (evil-open-below count))))
 
 ;; insert one or several line above without changing current evil state
-(defun evil-insert-line-above (count)
+(defun dotemacs/evil-insert-line-above (count)
   "Insert one of several lines above the current point's line without changing
 the current state and point position."
   (interactive "p")
   (save-excursion
     (evil-save-state (evil-open-above count))))
 
-(defun evil-goto-next-line-and-indent (&optional count)
+(defun dotemacs/evil-goto-next-line-and-indent (&optional count)
   (interactive "p")
   (let ((counter (or count 1)))
     (while (> counter 0)
@@ -192,7 +194,7 @@ the current state and point position."
       (whitespace-cleanup))))
 
 ;; linum gutter helpers
-(defvar *linum-mdown-line* nil
+(defvar dotemacs-linum-mdown-line nil
   "Define persistent variable for linum selection")
 
 (defun dotemacs-line-at-click ()
@@ -207,25 +209,24 @@ the current state and point position."
       )))
 
 (defun dotemacs-md-select-linum (event)
-  "Set point as *linum-mdown-line*"
+  "Set point as dotemacs-linum-mdown-line"
   (interactive "e")
   (mouse-select-window event)
   (goto-line (dotemacs-line-at-click))
   (set-mark (point))
-  (setq *linum-mdown-line*
+  (setq dotemacs-linum-mdown-line
         (line-number-at-pos)))
 
 (defun dotemacs-mu-select-linum ()
-  "Select code block between point and *linum-mdown-line*"
+  "Select code block between point and dotemacs-linum-mdown-line"
   (interactive)
-  (when *linum-mdown-line*
+  (when dotemacs-linum-mdown-line
     (let (mu-line)
       (setq mu-line (dotemacs-line-at-click))
-      (goto-line (max *linum-mdown-line* mu-line))
+      (goto-line (max dotemacs-linum-mdown-line mu-line))
       (set-mark (line-end-position))
-      (goto-line (min *linum-mdown-line* mu-line))
-      (setq *linum-mdown*
-            nil))))
+      (goto-line (min dotemacs-linum-mdown-line mu-line))
+      (setq spacemacs-linum-mdown-line nil))))
 
 (defun dotemacs-select-current-block ()
   "Select the current block of text between blank lines."
@@ -254,7 +255,7 @@ the current state and point position."
     (call-interactively 'eval-last-sexp)))
 
 ;; from magnars
-(defun eval-and-replace ()
+(defun dotemacs/eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
   (backward-kill-sexp)
@@ -265,7 +266,7 @@ the current state and point position."
            (insert (current-kill 0)))))
 
 ;; from https://gist.github.com/3402786
-(defun toggle-maximize-buffer ()
+(defun dotemacs/toggle-maximize-buffer ()
   "Maximize buffer"
   (interactive)
   (if (and (= 1 (length (window-list)))
@@ -275,7 +276,7 @@ the current state and point position."
       (window-configuration-to-register '_)
       (delete-other-windows))))
 
-(defun toggle-maximize-centered-buffer ()
+(defun dotemacs/toggle-maximize-centered-buffer ()
   "Maximize buffer and center it on the screen"
   (interactive)
   (if (= 1 (length (window-list)))
@@ -286,7 +287,7 @@ the current state and point position."
       (delete-other-windows)
       (bzg-big-fringe-mode 1))))
 
-(defun toggle-triple-double-column-mode ()
+(defun dotemacs/toggle-triple-double-column-mode ()
   " Toggle between triple columns and double columns mode quickly. "
   (interactive)
   (if (= 3 (length (window-list)))
@@ -301,7 +302,7 @@ the current state and point position."
           (progn (split-window-right)
                  (balance-windows)))))))
 
-(defun layout-triple-columns ()
+(defun dotemacs/layout-triple-columns ()
   " Set the layout to triple columns. "
   (interactive)
   (golden-ratio-mode 0)
@@ -309,7 +310,7 @@ the current state and point position."
   (dotimes (i 2) (split-window-right))
   (balance-windows))
 
-(defun layout-double-columns ()
+(defun dotemacs/layout-double-columns ()
   " Set the layout to double columns. "
   (interactive)
   (golden-ratio-mode 1)
@@ -317,7 +318,7 @@ the current state and point position."
   (split-window-right))
 
 ;; from magnars modified by ffevotte for dedicated windows support
-(defun rotate-windows (count)
+(defun dotemacs/rotate-windows (count)
   "Rotate your windows.
 Dedicated windows are left untouched. Giving a negative prefix
 argument takes the kindows rotate backwards."
@@ -346,10 +347,10 @@ argument takes the kindows rotate backwards."
                (set-window-start w2 s1)
                (setq i next-i)))))))
 
-(defun rotate-windows-backward (count)
+(defun dotemacs/rotate-windows-backward (count)
   "Rotate your windows backward."
   (interactive "p")
-  (rotate-windows (* -1 count)))
+  (dotemacs/rotate-windows (* -1 count)))
 
 (defun dotemacs-useless-buffer-p (buffer)
   "Determines if a buffer is useful."
@@ -386,7 +387,7 @@ argument takes the kindows rotate backwards."
       (previous-buffer))))
 
 ;; from magnars
-(defun rename-current-buffer-file ()
+(defun dotemacs/rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
   (interactive)
   (let ((name (buffer-name))
@@ -407,7 +408,7 @@ argument takes the kindows rotate backwards."
                (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
 
 ;; from magnars
-(defun delete-current-buffer-file ()
+(defun dotemacs/delete-current-buffer-file ()
   "Removes file connected to current buffer and kills buffer."
   (interactive)
   (let ((filename (buffer-file-name))
@@ -421,19 +422,19 @@ argument takes the kindows rotate backwards."
         (message "File '%s' successfully removed" filename)))))
 
 ;; from magnars
-(defun find-or-create-file-at-point ()
+(defun dotemacs/find-or-create-file-at-point ()
   "Guesses what parts of the buffer under point is a file name and opens it."
   (interactive)
-  (find-file (file-name-at-point)))
+  (find-file (dotemacs/file-name-at-point)))
 
 ;; from magnars
-(defun find-or-create-file-at-point-other-window ()
+(defun dotemacs/find-or-create-file-at-point-other-window ()
   "Guesses what parts of the buffer under point is a file name and opens it."
   (interactive)
-  (find-file-other-window (file-name-at-point)))
+  (find-file-other-window (dotemacs/file-name-at-point)))
 
 ;; from magnars
-(defun file-name-at-point ()
+(defun dotemacs/file-name-at-point ()
   (save-excursion
     (let* ((file-name-regexp "[./a-zA-Z0-9\-_~]")
            (start (progn
@@ -447,21 +448,21 @@ argument takes the kindows rotate backwards."
       (buffer-substring start end))))
 
 ;; from magnars
-(defun touch-buffer-file ()
+(defun dotemacs/touch-buffer-file ()
   (interactive)
   (insert " ")
   (backward-delete-char 1)
   (save-buffer))
 
 ;; from magnars
-(defun sudo-edit (&optional arg)
+(defun dotemacs/sudo-edit (&optional arg)
   (interactive "p")
   (if (or arg (not buffer-file-name))
       (find-file (concat "/sudo:root@localhost:" (ido-read-file-name "File: ")))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 ;; found at http://emacswiki.org/emacs/KillingBuffers
-(defun kill-other-buffers ()
+(defun dotemacs/kill-other-buffers ()
   "Kill all other buffers."
   (interactive)
   (let (name (buffer-name))
@@ -470,20 +471,21 @@ argument takes the kindows rotate backwards."
       (message "Buffers deleted!"))))
 
 ;; evenly split windows horizontally
-(defun evenly-split-window-right ()
+(defun dotemacs/evenly-split-window-right ()
   "Evenly split frame horizontally."
   (interactive)
   (split-window-right)
   (balance-windows))
+
 ;; evenly split windows vertically
-(defun evenly-split-window-below ()
+(defun dotemacs/evenly-split-window-below ()
   "Evenly split frame vertically."
   (interactive)
   (split-window-below)
   (balance-windows))
 
 ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
-(defun toggle-current-window-dedication ()
+(defun dotemacs/toggle-current-window-dedication ()
   "Toggle dedication state of a window."
  (interactive)
  (let* ((window    (selected-window))
@@ -494,7 +496,7 @@ argument takes the kindows rotate backwards."
             (buffer-name))))
 
 ;; http://camdez.com/blog/2013/11/14/emacs-show-buffer-file-name/
-(defun show-and-copy-buffer-filename ()
+(defun dotemacs/show-and-copy-buffer-filename ()
   "Show the full path to the current file in the minibuffer."
   (interactive)
   (let ((file-name (buffer-file-name)))
@@ -506,7 +508,7 @@ argument takes the kindows rotate backwards."
 
 ;; adapted from bozhidar
 ;; http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
-(defun find-user-init-file ()
+(defun dotemacs/find-user-init-file ()
   "Edit the `user-init-file', in the current window."
   (interactive)
   (find-file-existing user-init-file))
@@ -515,18 +517,18 @@ argument takes the kindows rotate backwards."
   "Return the absolute path to the dotfiles dotfile."
   dotemacs-filepath)
 
-(defun find-dotfile ()
+(defun dotemacs/find-dotfile ()
   "Edit the `dotfile', in the current window."
   (interactive)
   (find-file-existing (dotemacs-location)))
 
-(defun find-contrib-file ()
+(defun dotemacs/find-contrib-file ()
   (interactive)
   "Edit the `file' in the dotfiles base directory, in the current window."
   (ido-find-file-in-dir configuration-layer-contrib-directory))
 
 ;; From http://xugx2007.blogspot.ca/2007/06/benjamin-rutts-emacs-c-development-tips.html
-(setq compilation-finish-function
+(setq dotemacs/compilation-finish-function
       (lambda (buf str)
 
         (if (or (string-match "exited abnormally" str)
@@ -542,35 +544,35 @@ argument takes the kindows rotate backwards."
             (message "compilation ok.")))))
 
 ;; from https://gist.github.com/timcharper/493269
-(defun split-window-vertically-and-switch ()
+(defun dotemacs/split-window-vertically-and-switch ()
   (interactive)
   (split-window-vertically)
   (other-window 1))
 
-(defun split-window-horizontally-and-switch ()
+(defun dotemacs/split-window-horizontally-and-switch ()
   (interactive)
   (split-window-horizontally)
   (other-window 1))
 
-(defun ido-invoke-in-other-window ()
+(defun dotemacs/ido-invoke-in-other-window ()
   "signals ido mode to switch to (or create) another window after exiting"
   (interactive)
   (setq ido-exit-minibuffer-target-window 'other)
   (ido-exit-minibuffer))
 
-(defun ido-invoke-in-horizontal-split ()
+(defun dotemacs/ido-invoke-in-horizontal-split ()
   "signals ido mode to split horizontally and switch after exiting"
   (interactive)
   (setq ido-exit-minibuffer-target-window 'horizontal)
   (ido-exit-minibuffer))
 
-(defun ido-invoke-in-vertical-split ()
+(defun dotemacs/ido-invoke-in-vertical-split ()
   "signals ido mode to split vertically and switch after exiting"
   (interactive)
   (setq ido-exit-minibuffer-target-window 'vertical)
   (ido-exit-minibuffer))
 
-(defun ido-invoke-in-new-frame ()
+(defun dotemacs/ido-invoke-in-new-frame ()
   "signals ido mode to create a new frame after exiting"
   (interactive)
   (setq ido-exit-minibuffer-target-window 'frame)
@@ -583,19 +585,19 @@ argument takes the kindows rotate backwards."
     (cond
      ((equal ido-exit-minibuffer-target-window 'other)
       (if (= 1 (count-windows))
-          (split-window-horizontally-and-switch)
+          (dotemacs/split-window-horizontally-and-switch)
         (other-window 1)))
      ((equal ido-exit-minibuffer-target-window 'horizontal)
-      (split-window-horizontally-and-switch))
+      (dotemacs/split-window-horizontally-and-switch))
 
      ((equal ido-exit-minibuffer-target-window 'vertical)
-      (split-window-vertically-and-switch))
+      (dotemacs/split-window-vertically-and-switch))
      ((equal ido-exit-minibuffer-target-window 'frame)
       (make-frame)))
     (switch-to-buffer this-buffer) ;; why? Some ido commands, such as textmate.el's textmate-goto-symbol don't switch the current buffer
     result))
 
-(defun set-google-translate-languages (source target)
+(defun dotemacs/set-google-translate-languages (source target)
   "Set source language for google translate.
 For instance pass En as source for english."
   (interactive "sEnter source language (ie. En): \nsEnter target language (ie. En): "
@@ -606,7 +608,7 @@ For instance pass En as source for english."
   (setq google-translate-default-target-language target))
 
 ;; from http://www.emacswiki.org/emacs/WordCount
-(defun count-words-analysis (start end)
+(defun dotemacs/count-words-analysis (start end)
   "Count how many times each word is used in the region.
  Punctuation is ignored."
   (interactive "r")
@@ -623,22 +625,22 @@ For instance pass En as source for english."
       (message "%S" words))
     words))
 
-(defun  set-attributes-from-alist (face attr)
+(defun dotemacs/set-attributes-from-alist (face attr)
   "Apply an alist of attributes in the form ((:PROP . VALUE)) to face."
   (while (car attr)
     (set-face-attribute face nil (caar attr) (cdar attr))
     (setq attr (cdr attr))))
 
-(defun new-empty-buffer ()
+(defun dotemacs/new-empty-buffer ()
   "Create a new buffer called untitled(<n>)"
   (interactive)
   (let ((newbuf (generate-new-buffer-name "untitled")))
     (switch-to-buffer newbuf)))
 
 (defun dotemacs-home ()
-  "Go to home dotfiles buffer"
+  "Go to home dotemacs buffer"
   (interactive)
-  (switch-to-buffer "*dotfiles"))
+  (switch-to-buffer "*dotemacs*"))
 
 (defun dotemacs-insert-line-above-no-indent (count)
   (interactive "p")
@@ -664,7 +666,7 @@ For instance pass En as source for english."
       (setq count (1- count)))))
 
 ;; from https://github.com/gempesaw/dotemacs/blob/emacs/dg-defun.el
-(defun kill-matching-buffers-rudely (regexp &optional internal-too)
+(defun dotemacs/kill-matching-buffers-rudely (regexp &optional internal-too)
   "Kill buffers whose name matches the specified REGEXP. This
 function, unlike the built-in `kill-matching-buffers` does so
 WITHOUT ASKING. The optional second argument indicates whether to
@@ -682,12 +684,25 @@ kill internal buffers too."
 (defvar dotemacs-really-kill-emacs nil
   "prevent window manager close from closing instance.")
 
-(defun dotemacs-persistent-server-running-p ()
+(defun dotemacs/persistent-server-running-p ()
   "Requires dotemacs-really-kill-emacs to be toggled and
 dotemacs-persistent-server to be t"
   (and (fboundp 'server-running-p)
        (server-running-p)
        dotemacs-persistent-server))
+
+(defadvice kill-emacs (around dotemacs-really-exit activate)
+  "Only kill emacs if a prefix is set"
+  (if (and (not dotemacs-really-kill-emacs)
+           (dotemacs/persistent-server-running-p))
+      (dotemacs/frame-killer)
+    ad-do-it))
+
+(defadvice save-buffers-kill-emacs (around dotemacs-really-exit activate)
+  "Only kill emacs if a prefix is set"
+  (if (or dotemacs-really-kill-emacs (not dotemacs-persistent-server))
+      ad-do-it
+    (dotemacs/frame-killer)))
 
 (defun dotemacs-save-buffers-kill-emacs ()
   "Save all changed buffers and exit dotfiles"
@@ -730,22 +745,20 @@ dotemacs-persistent-server to be t"
            (* 100 (frame-char-width)))
         2))))
 
-(defun fill-char-to-column (char column)
+(defun dotemacs/fill-char-to-column (char column)
   " Fill the line with CHAR up to the given COLUMN"
   (interactive "cFill with char: \nnUp to column: "
-               char column)
-
-)
+               char column))
 
 (defun dotemacs-toggle-frame-fullscreen ()
   "Respect the `dotemacs-fullscreen-use-non-native' variable when
 toggling fullscreen."
   (interactive)
   (if dotemacs-fullscreen-use-non-native
-      (toggle-frame-fullscreen-non-native)
+      (dotemacs/toggle-frame-fullscreen-non-native)
     (toggle-frame-fullscreen)))
 
-(defun toggle-fullscreen ()
+(defun dotemacs/toggle-fullscreen ()
   "Toggle full screen on X11 and Carbon"
   (interactive)
   (cond
@@ -759,7 +772,7 @@ toggling fullscreen."
      (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))
    ))
 
-(defun toggle-frame-fullscreen-non-native ()
+(defun dotemacs/toggle-frame-fullscreen-non-native ()
   "Toggle full screen non-natively. Uses the `fullboth' frame paramerter
    rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
   (interactive)
@@ -786,7 +799,7 @@ The body of the advice is in BODY."
                     ,@body))
                commands)))
 
-(defun disable-electric-indent-mode ()
+(defun dotemacs/disable-electric-indent-mode ()
   (if (fboundp 'electric-indent-local-mode)
       ;; for 24.4
       (electric-indent-local-mode -1)
@@ -839,9 +852,9 @@ current window."
                      (buffer-file-name))))
     (if file-path
         (cond
-         ((system-is-mswindows) (w32-shell-execute "open" (replace-regexp-in-string "/" "\\\\" file-path)))
-         ((system-is-mac) (shell-command (format "open \"%s\"" file-path)))
-         ((system-is-linux) (let ((process-connection-type nil))
+         ((dotemacs/system-is-mswindows) (w32-shell-execute "open" (replace-regexp-in-string "/" "\\\\" file-path)))
+         ((dotemacs/system-is-mac) (shell-command (format "open \"%s\"" file-path)))
+         ((dotemacs/system-is-linux) (let ((process-connection-type nil))
                               (start-process "" nil "xdg-open" file-path))))
       (message "No file associated to this buffer."))))
 
@@ -861,24 +874,24 @@ current window."
       (call-interactively 'flycheck-previous-error)
     (call-interactively 'previous-error)))
 
-(defun switch-to-minibuffer-window ()
+(defun dotemacs/switch-to-minibuffer-window ()
   "switch to minibuffer window (if active)"
   (interactive)
   (when (active-minibuffer-window)
     (select-window (active-minibuffer-window))))
 
-(defun comint-clear-buffer ()
+(defun dotemacs/comint-clear-buffer ()
   (interactive)
   (let ((comint-buffer-maximum-size 0))
     (comint-truncate-buffer)))
 
 ;; http://stackoverflow.com/a/10216338/4869
-(defun copy-whole-buffer-to-clipboard ()
+(defun dotemacs/copy-whole-buffer-to-clipboard ()
   "Copy entire buffer to clipboard"
   (interactive)
   (clipboard-kill-ring-save (point-min) (point-max)))
 
-(defun copy-clipboard-to-whole-buffer ()
+(defun dotemacs/copy-clipboard-to-whole-buffer ()
   "Copy clipboard and replace buffer"
   (interactive)
   (delete-region (point-min) (point-max))
@@ -887,7 +900,7 @@ current window."
 
 ;; indent on paste
 ;; from Prelude: https://github.com/bbatsov/prelude
-(defun yank-advised-indent-function (beg end)
+(defun dotemacs/yank-advised-indent-function (beg end)
   "Do indentation, as long as the region isn't too large."
   (if (<= (- end beg) dotemacs-yank-indent-threshold)
       (indent-region beg end nil)))
@@ -918,18 +931,18 @@ current window."
              "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
 
 (dotemacs-advise-commands
- "indent" (yank yank-pop evil-paste-before evil-paste-after) after
- "If current mode is not one of dotemacs-indent-sensitive-modes
- indent yanked text (with universal arg don't indent)."
- (if (and (not (equal '(4) (ad-get-arg 0)))
-          (not (member major-mode dotemacs-indent-sensitive-modes))
-          (or (derived-mode-p 'prog-mode)
-              (member major-mode dotemacs-indent-sensitive-modes)))
-     (let ((transient-mark-mode nil))
-       (yank-advised-indent-function (region-beginning) (region-end)))))
+  "indent" (yank yank-pop evil-paste-before evil-paste-after) after
+  "If current mode is not one of dotemacs-indent-sensitive-modes
+  indent yanked text (with universal arg don't indent)."
+  (if (and (not (equal '(4) (ad-get-arg 0)))
+           (not (member major-mode dotemacs-indent-sensitive-modes))
+           (or (derived-mode-p 'prog-mode)
+               (member major-mode dotemacs-indent-sensitive-modes)))
+      (let ((transient-mark-mode nil))
+        (dotemacs/yank-advised-indent-function (region-beginning) (region-end)))))
 
 ;; modified function from http://emacswiki.org/emacs/AlignCommands
-(defun align-repeat (start end regexp &optional justify-right after)
+(defun dotemacs/align-repeat (start end regexp &optional justify-right after)
   "Repeat alignment with respect to the given regular expression.
 If JUSTIFY-RIGHT is non nil justify to the right instead of the
 left. If AFTER is non-nil, add whitespace to the left instead of
@@ -942,7 +955,7 @@ the right."
     (align-regexp start end complete-regexp group 1 t)))
 
 ;; Modified answer from http://emacs.stackexchange.com/questions/47/align-vertical-columns-of-numbers-on-the-decimal-point
-(defun align-repeat-decimal (start end)
+(defun dotemacs/align-repeat-decimal (start end)
   "Align a table of numbers on decimal points and dollar signs (both optional)"
   (interactive "r")
   (require 'align)
@@ -954,22 +967,22 @@ the right."
                        (justify nil t)))
                 nil))
 
-(defmacro create-align-repeat-x (name regexp &optional justify-right default-after)
-  (let ((new-func (intern (concat "align-repeat-" name))))
+(defmacro dotemacs/create-align-repeat-x (name regexp &optional justify-right default-after)
+  (let ((new-func (intern (concat "dotemacs/align-repeat-" name))))
     `(defun ,new-func (start end switch)
        (interactive "r\nP")
        (let ((after (not (eq (if switch t nil) (if ,default-after t nil)))))
-         (align-repeat start end ,regexp ,justify-right after)))))
+         (dotemacs/align-repeat start end ,regexp ,justify-right after)))))
 
-(create-align-repeat-x "comma" "," nil t)
-(create-align-repeat-x "semicolon" ";" nil t)
-(create-align-repeat-x "colon" ":" nil t)
-(create-align-repeat-x "equal" "=")
-(create-align-repeat-x "math-oper" "[+\\-*/]")
-(create-align-repeat-x "ampersand" "&")
-(create-align-repeat-x "bar" "|")
-(create-align-repeat-x "left-paren" "(")
-(create-align-repeat-x "right-paren" ")" t)
+(dotemacs/create-align-repeat-x "comma" "," nil t)
+(dotemacs/create-align-repeat-x "semicolon" ";" nil t)
+(dotemacs/create-align-repeat-x "colon" ":" nil t)
+(dotemacs/create-align-repeat-x "equal" "=")
+(dotemacs/create-align-repeat-x "math-oper" "[+\\-*/]")
+(dotemacs/create-align-repeat-x "ampersand" "&")
+(dotemacs/create-align-repeat-x "bar" "|")
+(dotemacs/create-align-repeat-x "left-paren" "(")
+(dotemacs/create-align-repeat-x "right-paren" ")" t)
 
 (defun dotemacs-write-file ()
   "Write the file if visiting a file.

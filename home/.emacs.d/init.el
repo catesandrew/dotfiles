@@ -776,11 +776,11 @@ FEATURE may be a named feature or a file name, see
 
 (require 'init-funcs)
 
-(when (and (system-is-mac) (version< emacs-version "25"))
+(when (and (dotemacs/system-is-mac) (version< emacs-version "25"))
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
   (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
 
-(when (system-is-mac)
+(when (dotemacs/system-is-mac)
   ;; Warn if the current build is more than a week old
   (run-with-idle-timer
    2 nil
@@ -798,9 +798,6 @@ FEATURE may be a named feature or a file name, see
             my-set-transparency
             my-google
             my-copy-file-name-to-clipboard
-            my-eval-and-replace
-            my-rename-current-buffer-file
-            my-delete-current-buffer-file
             my-goto-scratch-buffer
             my-insert-last-kbd-macro
             my-buffer-to-unix-format
@@ -2744,13 +2741,13 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :defer t
   :init
   (progn
-    (add-to-hooks (if dotemacs-smartparens-strict-mode
+    (dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
                       #'smartparens-strict-mode
                     #'smartparens-mode)
                   '(prog-mode-hook))
 
     ;; but alwayws enable for lisp mode
-    (add-to-hooks #'smartparens-strict-mode '(lisp-mode))
+    (dotemacs/add-to-hooks #'smartparens-strict-mode '(lisp-mode))
 
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
@@ -3250,8 +3247,8 @@ Disable the highlighting of overlong lines."
     ;; Make the current definition and/or comment visible.
     (define-key evil-normal-state-map "zf" 'reposition-window)
     ;; toggle maximize buffer
-    (define-key evil-window-map (kbd "o") 'toggle-maximize-buffer)
-    (define-key evil-window-map (kbd "C-o") 'toggle-maximize-buffer)
+    (define-key evil-window-map (kbd "o") 'dotemacs/toggle-maximize-buffer)
+    (define-key evil-window-map (kbd "C-o") 'dotemacs/toggle-maximize-buffer)
 
     (dotemacs-define-micro-state scroll
       :doc "[k] page up [j] page down [K] half page up [J] half page down"
@@ -3325,7 +3322,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
                          ,start))
                  evil-surround-pairs-alist))))
 
-    (add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
+    (dotemacs/add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
 
     ;; support smart-parens-strict-mode
     (after "smartparens"
@@ -3517,7 +3514,7 @@ It will toggle the overlay under point or create an overlay of one character."
   (progn
     (defun dotemacs-evil-numbers-micro-state-doc ()
       "Display a short documentation in the mini buffer."
-      (echo "+/= to increase the value or - to decrease it"))
+      (dotemacs/echo "+/= to increase the value or - to decrease it"))
 
     (defun dotemacs-evil-numbers-micro-state-overlay-map ()
       "Set a temporary overlay map to easily increase or decrease a number"
@@ -3580,11 +3577,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                     begin-or-fun))
             evil-surround-pairs-alist))
 
-    (add-to-hooks (lambda ()
+    (dotemacs/add-to-hooks (lambda ()
                     (dotemacs-surround-add-pair "`" "`"  "'"))
                   '(emacs-lisp-mode-hook lisp-mode-hook))
 
-    (add-to-hooks (lambda ()
+    (dotemacs/add-to-hooks (lambda ()
                     (dotemacs-surround-add-pair "~" "```"  "```"))
                   '(markdown-mode-hook))
 
@@ -3594,7 +3591,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                  (dotemacs-surround-add-pair "/" "\\emph{" "}")
                                  (dotemacs-surround-add-pair "*" "\\textbf{" "}")
                                  (dotemacs-surround-add-pair "P" "\\(" "\\)")))
-    (add-to-hooks (lambda ()
+    (dotemacs/add-to-hooks (lambda ()
                     (dotemacs-surround-add-pair "c" ":class:`" "`")
                     (dotemacs-surround-add-pair "f" ":func:`" "`")
                     (dotemacs-surround-add-pair "m" ":meth:`" "`")
@@ -4292,7 +4289,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init (progn
           (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
 
-          (add-to-hook 'emacs-lisp-mode
+          (dotemacs/add-to-hook 'emacs-lisp-mode
                        '(lambda ()
                           (dotemacs-define-text-object ";"
                                                        "elisp-comment"
@@ -4354,7 +4351,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (smartparens-strict-mode -1)
       (turn-off-smartparens-mode))
     (add-hook 'slime-repl-mode-hook #'slime/disable-smartparens)
-    (add-to-hooks 'slime-mode '(lisp-mode-hook)))
+    (dotemacs/add-to-hooks 'slime-mode '(lisp-mode-hook)))
   :config
   (progn
     (slime-setup)
@@ -4937,13 +4934,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (after "stickyfunc-enhance"
-      (add-to-hooks 'python-mode-hook 'dotemacs-lazy-load-stickyfunc-enhance))
+      (dotemacs/add-to-hooks 'python-mode-hook 'dotemacs-lazy-load-stickyfunc-enhance))
 
     (after "eldoc"
       (add-hook 'python-mode-hook #'eldoc-mode))
 
     (add-hook 'inferior-python-mode-hook #'inferior-python-setup-hook)
-    (add-all-to-hook 'python-mode-hook
+    (dotemacs/add-all-to-hook 'python-mode-hook
                      'python-default
                      'python-setup-shell))
   :config
@@ -4980,10 +4977,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; this key binding is for recentering buffer in Emacs
     ;; it would be troublesome if Emacs user
     ;; Vim users can use this key since they have other key
-    (define-key inferior-python-mode-map (kbd "C-l") 'comint-clear-buffer)
+    (define-key inferior-python-mode-map (kbd "C-l") 'dotemacs/comint-clear-buffer)
 
     ;; add this optional key binding for Emacs user, since it is unbound
-    (define-key inferior-python-mode-map (kbd "C-c M-l") 'comint-clear-buffer)
+    (define-key inferior-python-mode-map (kbd "C-c M-l") 'dotemacs/comint-clear-buffer)
 
     ;; fix for issue #2569 (https://github.com/syl20bnr/spacemacs/issues/2569)
     ;; use `semantic-create-imenu-index' only when `semantic-mode' is enabled,
@@ -5237,7 +5234,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-to-hooks 'flycheck-turn-on-maybe '(haml-mode-hook
+    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(haml-mode-hook
                                             yaml-mode-hook
                                             ruby-mode-hook
                                             enh-ruby-mode-hook))))
@@ -5735,7 +5732,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-to-hooks 'flycheck-turn-on-maybe '(c-mode-hook c++-mode-hook))))
+    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(c-mode-hook c++-mode-hook))))
 
 (use-package gdb-mi
   :ensure t
@@ -5764,12 +5761,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (evil-leader/set-key-for-mode 'c-mode "mr" 'srefactor-refactor-at-point)
     (evil-leader/set-key-for-mode 'c++-mode "mr" 'srefactor-refactor-at-point)
-    (add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)) ))
+    (dotemacs/add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)) ))
 
 (dotemacs-use-package-add-hook stickyfunc-enhance
   :post-init
   (progn
-    (add-to-hooks 'dotemacs-lazy-load-stickyfunc-enhance '(c-mode-hook c++-mode-hook) )))
+    (dotemacs/add-to-hooks 'dotemacs-lazy-load-stickyfunc-enhance '(c-mode-hook c++-mode-hook) )))
 
 (dotemacs-use-package-add-hook ycmd
   :post-init
@@ -6577,7 +6574,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook yasnippet
   :post-init
   (progn
-    (add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
+    (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
                                              jade-mode-hook
                                              slim-mode-hook))))
 
@@ -6692,7 +6689,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq emmet-indentation 2
           emmet-move-cursor-between-quotes t)
-    (add-to-hooks 'emmet-mode '(css-mode-hook
+    (dotemacs/add-to-hooks 'emmet-mode '(css-mode-hook
                                 html-mode-hook
                                 web-mode-hook)))
   :config
@@ -6750,7 +6747,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
+    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
                                             less-mode-hook
                                             slim-mode-hook
                                             sass-mode-hook
@@ -8037,7 +8034,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; note for Windows: GNU find or Cygwin find must be in path
     ;; default parameters are not supported on Windows, we default
     ;; to simplest call to find.
-    (when (system-is-mswindows)
+    (when (dotemacs/system-is-mswindows)
       (setq projectile-generic-command "find . -type f"))
     (setq projectile-sort-order 'recently-active  ; recentf
           projectile-cache-file (concat dotemacs-cache-directory
@@ -8412,7 +8409,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                 (lambda () (setq neo-persist-show nil)))
       (add-hook 'popwin:after-popup-hook
                 (lambda () (setq neo-persist-show t))))
-    (add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
+    (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
                                       dotemacs-neotree-key-bindings))))
 
 
@@ -8813,7 +8810,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (when (system-is-mac)
+    (when (dotemacs/system-is-mac)
       (setq org-pomodoro-audio-player "/usr/bin/afplay"))
     (evil-leader/set-key-for-mode 'org-mode
       "mp" 'org-pomodoro)))
@@ -9557,7 +9554,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t
   :init
-  (add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
+  (dotemacs/add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
                                               markdown-mode-hook))
   :config
   (progn
@@ -10163,7 +10160,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key yas-minor-mode-map
       (kbd "M-s-/") 'yas-next-field)
 
-    (add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
+    (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
                                              markdown-mode-hook
                                              org-mode-hook))
 
@@ -10174,7 +10171,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                          :documentation "Enable yasnippet."
                          :evil-leader "ty")
 
-    (add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
+    (dotemacs/add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
                                                   shell-mode-hook
                                                   eshell-mode-hook)))
   :config

@@ -2,7 +2,7 @@
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; improve delete-other-windows
-(define-key global-map (kbd "C-x 1") 'toggle-maximize-buffer)
+(define-key global-map (kbd "C-x 1") 'dotemacs/toggle-maximize-buffer)
 
 ;; alternate binding to search next occurrence with isearch without
 ;; exiting isearch
@@ -45,14 +45,14 @@
   "TAB" 'dotemacs-alternate-buffer
   "bh"  'dotemacs-home
   "be"  'dotemacs-safe-erase-buffer
-  "bK"  'kill-other-buffers
+  "bK"  'dotemacs/kill-other-buffers
   "bk"  'ido-kill-buffer
-  "b C-k" 'kill-matching-buffers-rudely
-  "bP"  'copy-clipboard-to-whole-buffer
+  "b C-k" 'dotemacs/kill-matching-buffers-rudely
+  "bP"  'dotemacs/copy-clipboard-to-whole-buffer
   "bn"  'dotemacs-next-useful-buffer
   "bp"  'dotemacs-previous-useful-buffer
   "bR"  'dotemacs-safe-revert-buffer
-  "bY"  'copy-whole-buffer-to-clipboard
+  "bY"  'dotemacs/copy-whole-buffer-to-clipboard
   "bw"  'read-only-mode)
 ;; Cycling settings -----------------------------------------------------------
 (evil-leader/set-key "Tn" 'dotemacs-cycle-dotemacs-theme)
@@ -90,26 +90,26 @@ Ensure that helm is required before calling FUNC."
 ;; file -----------------------------------------------------------------------
 (evil-leader/set-key
   "fc" 'dotemacs-copy-file
-  "fD" 'delete-current-buffer-file
-  "fei" 'find-user-init-file
+  "fD" 'dotemacs/delete-current-buffer-file
+  "fei" 'dotemacs/find-user-init-file
   "fes" 'find-dotemacs-file
-  "fec" 'find-contrib-file
-  "fed" 'find-dotfile
+  "fec" 'dotemacs/find-contrib-file
+  "fed" 'dotemacs/find-dotfile
   "feD" 'ediff-dotfile-and-template
   "fev" 'dotemacs-display-and-copy-version
   "fg" 'rgrep
   "fj" 'dired-jump
   "fl" 'find-file-literally
   "fo" 'dotemacs-open-in-external-app
-  "fR" 'rename-current-buffer-file
+  "fR" 'dotemacs/rename-current-buffer-file
   "fS" 'evil-write-all
   "fs" 'dotemacs-write-file
-  "fy" 'show-and-copy-buffer-filename)
+  "fy" 'dotemacs/show-and-copy-buffer-filename)
 ;; insert stuff ---------------------------------------------------------------
 (evil-leader/set-key
   "iJ" 'dotemacs-insert-line-below-no-indent
   "iK" 'dotemacs-insert-line-above-no-indent
-  "ik" 'evil-insert-line-above
+  "ik" 'dotemacs/evil-insert-line-above
   "ij" 'evil-insert-line-below)
 ;; format ---------------------------------------------------------------------
 ;; <SPC> j k key binding for a frequent action: go and indent line below the point
@@ -120,7 +120,7 @@ Ensure that helm is required before calling FUNC."
   "jo" 'open-line
   "j=" 'dotemacs-indent-region-or-buffer
   "jJ" 'dotemacs-split-and-new-line
-  "jk" 'evil-goto-next-line-and-indent)
+  "jk" 'dotemacs/evil-goto-next-line-and-indent)
 
 ;; navigation -----------------------------------------------------------------
 (evil-leader/set-key
@@ -267,11 +267,11 @@ Ensure that helm is required before calling FUNC."
   (windmove-right))
 
 (evil-leader/set-key
-  "w2"  'layout-double-columns
-  "w3"  'layout-triple-columns
-  "wb"  'switch-to-minibuffer-window
+  "w2"  'dotemacs/layout-double-columns
+  "w3"  'dotemacs/layout-triple-columns
+  "wb"  'dotemacs/switch-to-minibuffer-window
   "wc"  'delete-window
-  "wd"  'toggle-current-window-dedication
+  "wd"  'dotemacs/toggle-current-window-dedication
   "wH"  'evil-window-move-far-left
   "wh"  'evil-window-left
   "wJ"  'evil-window-move-very-bottom
@@ -280,10 +280,10 @@ Ensure that helm is required before calling FUNC."
   "wk"  'evil-window-up
   "wL"  'evil-window-move-far-right
   "wl"  'evil-window-right
-  "wm"  'toggle-maximize-buffer
-  "wM"  'toggle-maximize-centered-buffer
+  "wm"  'dotemacs/toggle-maximize-buffer
+  "wM"  'dotemacs/toggle-maximize-centered-buffer
   "wo"  'other-frame
-  "wR"  'rotate-windows
+  "wR"  'dotemacs/rotate-windows
   "ws"  'split-window-below
   "wS"  'split-window-below-and-focus
   "w-"  'split-window-below
@@ -297,28 +297,28 @@ Ensure that helm is required before calling FUNC."
 ;; text -----------------------------------------------------------------------
 (evil-leader/set-key
   "xaa" 'align
-  "xar" 'align-repeat
-  "xam" 'align-repeat-math-oper
-  "xa." 'align-repeat-decimal
-  "xa," 'align-repeat-comma
-  "xa;" 'align-repeat-semicolon
-  "xa:" 'align-repeat-colon
-  "xa=" 'align-repeat-equal
-  "xa&" 'align-repeat-ampersand
-  "xa|" 'align-repeat-bar
-  "xa(" 'align-repeat-left-paren
-  "xa)" 'align-repeat-right-paren
+  "xar" 'dotemacs/align-repeat
+  "xam" 'dotemacs/align-repeat-math-oper
+  "xa." 'dotemacs/align-repeat-decimal
+  "xa," 'dotemacs/align-repeat-comma
+  "xa;" 'dotemacs/align-repeat-semicolon
+  "xa:" 'dotemacs/align-repeat-colon
+  "xa=" 'dotemacs/align-repeat-equal
+  "xa&" 'dotemacs/align-repeat-ampersand
+  "xa|" 'dotemacs/align-repeat-bar
+  "xa(" 'dotemacs/align-repeat-left-paren
+  "xa)" 'dotemacs/align-repeat-right-paren
   "xdw" 'delete-trailing-whitespace
   "xtc" 'transpose-chars
   "xtl" 'transpose-lines
   "xtw" 'transpose-words
   "xU"  'upcase-region
   "xu"  'downcase-region
-  "xwC" 'count-words-analysis
+  "xwC" 'dotemacs/count-words-analysis
   "xwc" 'count-words-region)
 ;; google translate -----------------------------------------------------------
 (evil-leader/set-key
-  "xgl" 'set-google-translate-languages)
+  "xgl" 'dotemacs/set-google-translate-languages)
 ;; shell ----------------------------------------------------------------------
 (eval-after-load "shell"
   '(progn
@@ -447,7 +447,7 @@ Ensure that helm is required before calling FUNC."
   ("K" evil-window-move-very-top             :doc (dotemacs-window-manipulation-move-doc))
   ("L" evil-window-move-far-right            :doc (dotemacs-window-manipulation-move-doc))
   ("o" other-frame                           :doc (dotemacs-window-manipulation-move-doc))
-  ("R" rotate-windows                        :doc (dotemacs-window-manipulation-move-doc))
+  ("R" dotemacs/rotate-windows               :doc (dotemacs-window-manipulation-move-doc))
   ("s" split-window-below                    :doc (dotemacs-window-manipulation-split-doc))
   ("S" split-window-below-and-focus          :doc (dotemacs-window-manipulation-split-doc))
   ("u" winner-undo                           :doc (dotemacs-window-manipulation-layout-doc))
