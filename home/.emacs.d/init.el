@@ -8785,11 +8785,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "me" 'org-export-dispatch
       "mf" 'org-set-effort
 
-      "a" nil "ma" 'org-agenda
-      "b" nil "mb" 'org-tree-to-indirect-buffer
-      "c" nil "mA" 'org-archive-subtree
-      "l" nil "ml" 'org-open-at-point
-      "t" nil "mT" 'org-show-todo-tree
+      "ma" 'org-agenda
+      "mb" 'org-tree-to-indirect-buffer
+      "mA" 'org-archive-subtree
+      "ml" 'org-open-at-point
+      "mT" 'org-show-todo-tree
 
       ;; headings
       "mhi" 'org-insert-heading-after-current
@@ -8884,10 +8884,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (evil-leader/set-key-for-mode 'org-mode
-      "o" nil "mC" 'evil-org-recompute-clocks)
-      (evil-define-key 'normal evil-org-mode-map
-        "O" 'evil-open-above)
-      (dotemacs-diminish evil-org-mode " ⓔ" " e")))
+      "o" nil "mC" 'evil-org-recompute-clocks
+      ;; evil-org binds these keys, so we unbind them
+      "t" nil "a" nil "b" nil "c" nil "l" nil "o" nil)
+    (evil-define-key 'normal evil-org-mode-map
+      "O" 'evil-open-above)
+    (dotemacs-diminish evil-org-mode " ⓔ" " e")))
 
 (use-package org-pomodoro
   :defer t
