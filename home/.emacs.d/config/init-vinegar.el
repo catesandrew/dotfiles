@@ -86,6 +86,8 @@
 (defun vinegar/dired-setup ()
   "Setup custom dired settings for vinegar"
   (setq dired-omit-verbose nil)
+  (make-local-variable 'dired-hide-symlink-targets)
+  (setq dired-hide-details-hide-symlink-targets nil)
 
   ;; hide details by default
   (dired-hide-details-mode t)
@@ -98,8 +100,7 @@
 
   (local-set-key (kbd  "<mouse-1>") 'vinegar/dired-mouse-click)
   (local-set-key (kbd  "<mouse-3>") 'vinegar/up-directory)
-  (local-set-key (kbd  "<down-mouse-3>") nil)
-  )
+  (local-set-key (kbd  "<down-mouse-3>") nil))
 
 (defun vinegar/dired-mouse-click (event)
   "In Dired, visit the file or directory name you click on."

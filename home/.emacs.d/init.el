@@ -2263,7 +2263,7 @@ These should have their own segments in the modeline.")
     (define-key evil-normal-state-map (kbd "-") 'deer)
 
     ;; set up image-dired to allow picture resize
-    (setq image-dired-dir (concat spacemacs-cache-directory "image-dir"))
+    (setq image-dired-dir (concat dotemacs-cache-directory "image-dir"))
     (unless (file-directory-p image-dired-dir)
       (make-directory image-dired-dir))
 
