@@ -854,6 +854,7 @@ FEATURE may be a named feature or a file name, see
         ("xa" "text-align")
         ("xd" "text-delete")
         ("xg" "text-google-translate")
+        ("xl" "text-lines")
         ("xm" "text-move")
         ("xt" "text-transpose")
         ("xw" "text-words")

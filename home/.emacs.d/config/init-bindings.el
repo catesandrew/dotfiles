@@ -309,6 +309,8 @@ Ensure that helm is required before calling FUNC."
   "xa(" 'dotemacs/align-repeat-left-paren
   "xa)" 'dotemacs/align-repeat-right-paren
   "xdw" 'delete-trailing-whitespace
+  "xls" 'dotemacs/sort-lines
+  "xlu" 'dotemacs/uniquify-lines
   "xtc" 'transpose-chars
   "xtl" 'transpose-lines
   "xtw" 'transpose-words
