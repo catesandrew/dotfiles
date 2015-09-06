@@ -7713,6 +7713,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ("q" nil :exit t))))
 
 ;; github
+(setq github/key-binding-prefixes '(("gf" . "github/file")
+                                    ("gg" . "githib/gist")))
+(mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+      github/key-binding-prefixes)
+
 (use-package gist
   :defer t
   :ensure t
