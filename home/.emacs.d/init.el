@@ -9746,12 +9746,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key
       "ec" 'flycheck-clear
       "eC" 'flycheck-compile
-      ; https://github.com/flycheck/flycheck/pull/494
-      "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
-      "eL" 'dotemacs-flycheck-hide-list-errors
+      ; TODO: Try this toggle functions
+      "el" 'dotemacs-toggle-flycheck-error-list
+      ; ; https://github.com/flycheck/flycheck/pull/494
+      ; "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
+      ; "eL" 'dotemacs-flycheck-hide-list-errors
       "es" 'flycheck-select-checker
       "ex" 'flycheck-disable-checker
-      "e?" 'flycheck-describe-checker
+      "eh" 'flycheck-describe-checker
+      "ev" 'flycheck-verify-setup
       "tmf" 'dotemacs-mode-line-flycheck-info-toggle)
 
     (dotemacs-set-flycheck-mode-line-faces)
@@ -9776,6 +9779,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                     (side            . bottom)
                     (reusable-frames . visible)
                     (window-height   . 0.4)))
+
+    ;; toggle flycheck window
+    (defun dotemacs-toggle-flycheck-error-list ()
+      "Toggle flycheck's error list window.
+If the error list is visible, hide it.  Otherwise, show it."
+      (interactive)
+      (-if-let (window (flycheck-get-error-list-window))
+          (quit-window nil window)
+        (flycheck-list-errors)))
 
     (defun dotemacs-flycheck-pop-to-error-list ()
       (interactive)
@@ -9839,7 +9851,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (flycheck-define-error-level 'info
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-info)))
+      :fringe-face 'flycheck-fringe-info)
+
+    ))
 
 (use-package flycheck-pos-tip
   :ensure t
