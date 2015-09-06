@@ -2389,8 +2389,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package ace-window                 ; Fast window switching
   :ensure t
   :defer t
-  :bind (("C-x o" . ace-window)
-         ("C-c o" . ace-window))
   :init
   (progn
     (evil-leader/set-key
@@ -8955,67 +8953,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   ;; This lets users seach in multiple docsets
   (push '(web-mode . "html,css,javascript") zeal-at-point-mode-alist))
-
-(bind-key "C-c h b" #'describe-personal-keybindings)
-
-(use-package guide-key-tip
-  :ensure t
-  :disabled t
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-toggle-guide-key ()
-      "Toggle golden-ratio mode on and off."
-      (interactive)
-      (if (symbol-value guide-key-mode)
-          (guide-key-mode -1)
-        (guide-key-mode)))
-
-    (defadvice guide-key/popup-guide-buffer-p
-        (around dotemacs-inhibit-guide-buffer activate)
-      "Prevent the popup of the guide-key buffer in some case."
-      ;; a micro-state is running
-      ;; or
-      ;; bzg-big-fringe-mode is on
-      (unless (or overriding-terminal-local-map
-                  bzg-big-fringe-mode)
-        ad-do-it))
-
-    (dotemacs-add-toggle guide-key
-                    :status guide-key-mode
-                    :on (guide-key-mode)
-                    :off (guide-key-mode -1)
-                    :documentation
-                    "Display a buffer with available key bindings."
-                    :evil-leader "tG")
-
-    (setq guide-key/guide-key-sequence `("C-x"
-                                         "C-c"
-                                         "C-w"
-                                         ,dotemacs-leader-key
-                                         ,dotemacs-emacs-leader-key
-                                         ,dotemacs-major-mode-leader-key
-                                         ,dotemacs-major-mode-emacs-leader-key
-                                         ;; M-m in terminal
-                                         "<ESC>m"
-                                         ;; C-M-m in terminal
-                                         "<ESC><RET>"
-                                         "g"
-                                         "\["
-                                         "\]"
-                                         "z"
-                                         "C-h")
-          guide-key/recursive-key-sequence-flag t
-          guide-key/popup-window-position 'bottom
-          guide-key/idle-delay dotemacs-guide-key-delay
-          guide-key/text-scale-amount 0
-          guide-key-tip/enabled (if window-system t)
-          guide-key/highlight-command-regexp
-                 (cons dotemacs-prefix-command-string
-                       font-lock-warning-face))
-
-    (guide-key-mode 1))
-  :diminish (guide-key-mode . " Ⓖ"))
 
 (use-package which-key
   :ensure t
