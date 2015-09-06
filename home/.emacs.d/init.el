@@ -576,10 +576,18 @@ group by projectile projects."
   :group 'dotemacs-ibuffer)
 
 ;;helm
+(defgroup dotemacs-helm nil
+  "Configuration options for helm"
+  :group 'dotemacs
+  :prefix 'dotemacs-helm)
+
 (defface dotemacs-helm-navigation-ms-face
       `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
       "Face for helm heder when helm micro-state is activated."
       :group 'dotemacs)
+
+(defcustom dotemacs-helm-resize nil
+  "If non nil, `helm' will try to miminimize the space it uses.")
 
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
@@ -1573,6 +1581,10 @@ These should have their own segments in the modeline.")
     (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
   :config
   (progn
+    (when dotemacs-helm-resize
+      (setq helm-autoresize-min-height 1)
+      (helm-autoresize-mode 1))
+
     (helm-mode +1)
     (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
 
