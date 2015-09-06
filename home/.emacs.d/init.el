@@ -8882,7 +8882,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "b" nil "mb" 'org-tree-to-indirect-buffer
       "c" nil "mA" 'org-archive-subtree
       "o" nil "mC" 'evil-org-recompute-clocks
-      "l" nil "ml" 'evil-org-open-links
+      "l" nil "ml" 'org-open-at-point
       "t" nil "mT" 'org-show-todo-tree)
       (evil-define-key 'normal evil-org-mode-map
         "O" 'evil-open-above)
