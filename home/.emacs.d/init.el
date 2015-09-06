@@ -7536,18 +7536,23 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
     (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
 
-(setq github-post-extensions '(magit-gh-pulls))
-(use-package magit-gh-pulls
-  :disabled t ; not compatible with magit 2.1
-  :commands magit-gh-pulls-mode
-  :init
+;; magit-gh-pulls has to be loaded via a pre-config hook because the source
+;; code makes assumptions about the status of the magit-mode keymaps that are
+;; incompatible with the spacemacs' evilification feature. To avoid errors,
+;; magit-gh-pulls must be loaded after magit, but before magit is configured by
+;; spacemacs.
+
+(dotemacs-use-package-add-hook magit
+  :pre-config
   (progn
-    (after "magit"
-      '(progn
-         (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode)
-         (define-key magit-mode-map "#gf" 'dotemacs-fetch-gh-pulls-mode))))
-  :config
-  (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))
+    (use-package magit-gh-pulls
+      :ensure t
+      :init
+      (progn
+        (define-key magit-mode-map "#gf" 'dotemacs-fetch-gh-pulls-mode)
+        (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode))
+      :config
+      (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))))
 
 (use-package magit-gitflow
   :ensure t
