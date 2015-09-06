@@ -1535,8 +1535,8 @@ These should have their own segments in the modeline.")
       "bb"   'helm-mini
       "Cl"   'helm-colors
       "ff"   'dotemacs-helm-find-files
-      "fa"   'helm-locate
       "fF"   'helm-find-files
+      "fL"   'helm-locate
       "fr"   'helm-recentf
       "hb"   'helm-filtered-bookmarks
       "hi"   'helm-info-at-point
