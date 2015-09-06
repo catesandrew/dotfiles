@@ -5250,6 +5250,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Rust
 (dotemacs-defvar-company-backends rust-mode)
 
+(defvar rust-enable-racer nil
+  "If non-nil, load the racer package (this has an external dependency).")
+
 (use-package init-rust
   :load-path "config/")
 
@@ -5263,6 +5266,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mct" 'dotemacs-rust-cargo-test
       "mcd" 'dotemacs-rust-cargo-doc
       "mcx" 'dotemacs-rust-cargo-run)))
+
+(use-package racer
+  :if rust-enable-racer
+  :defer t
+  :ensure t
+  :init (dotemacs/add-to-hook 'rust-mode-hook '(racer-mode eldoc-mode)))
 
 (use-package flycheck-rust              ; Flycheck setup for Rust
   :ensure t
