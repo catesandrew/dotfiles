@@ -2564,13 +2564,13 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                           :status subword-mode
                           :on (subword-mode +1)
                           :off (subword-mode -1)
-                          :documentation "Toggle CamelCase motion."
+                          :documentation "Toggle camelCase motions"
                           :evil-leader "tc")
     (dotemacs-add-toggle camel-case-motion-globally
                           :status subword-mode
                           :on (global-subword-mode +1)
                           :off (global-subword-mode -1)
-                          :documentation "Globally toggle CamelCase motion."
+                          :documentation "Globally toggle camelCase motions"
                           :evil-leader "t C-c"))
   :config
   (dotemacs-diminish subword-mode " ⓒ" " c"))
@@ -2951,7 +2951,7 @@ Disable the highlighting of overlong lines."
                          :status global-whitespace-mode
                          :on (global-whitespace-mode)
                          :off (global-whitespace-mode -1)
-                         :documentation "Globally display whitespace."
+                         :documentation "Display whitespace globally"
                          :evil-leader "t C-w")
 
     (defun dotemacs-set-whitespace-style-for-diff ()
@@ -3002,8 +3002,46 @@ Disable the highlighting of overlong lines."
     (dotemacs-diminish whitespace-mode " ⓦ" " w")
     (dotemacs-diminish global-whitespace-mode " Ⓦ" " W")))
 
+(use-package hungry-delete
+  :defer t
+  :init
+  (dotemacs-add-toggle hungry-delete
+    :status hungry-delete-mode
+    :on (hungry-delete-mode)
+    :off (hungry-delete-mode -1)
+    :documentation "Delete consecutive horizontal whitespace with a single key."
+    :evil-leader "td")
+  :config
+  (progn
+    (setq-default hungry-delete-chars-to-skip " \t\f\v") ; only horizontal whitespace
+    (define-key hungry-delete-mode-map (kbd "DEL") 'hungry-delete-backward)
+    (define-key hungry-delete-mode-map (kbd "S-DEL") 'delete-backward-char)))
+
 (use-package hl-line                    ; Highlight the current line
   :init (global-hl-line-mode 1))
+
+(use-package indent-guide
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (setq indent-guide-delay 0.3)
+    (dotemacs-add-toggle indent-guide
+      :status indent-guide-mode
+      :on (indent-guide-mode)
+      :off (indent-guide-mode -1)
+      :documentation
+      "Highlight indentation level at point. (alternative to highlight-indentation)."
+      :evil-leader "ti")
+    (dotemacs-add-toggle indent-guide-globally
+      :status indent-guide-mode
+      :on (indent-guide-global-mode)
+      :off (indent-guide-global-mode -1)
+      :documentation
+      "Highlight indentation level at point globally. (alternative to highlight-indentation)."
+      :evil-leader "t C-i"))
+  :config
+  (dotemacs-diminish indent-guide-mode " ⓘ" " i"))
 
 (use-package hl-anything ;; Highlight things at point, selections, enclosing parentheses
   :disabled t
@@ -9855,7 +9893,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                          :on (flyspell-mode)
                          :off (flyspell-mode -1)
                          :documentation
-                         "Enable flyspell for automatic spelling checking."
+                         "automatic spell checking"
                          :evil-leader "tS"))
   :config
   (progn
@@ -9902,7 +9940,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                             (company-mode -1)
                           (auto-complete-mode -1))
                         (message "Disabled auto-completion."))
-                      :documentation "Activate auto-completion."
+                      :documentation "Enable auto-completion."
                       :evil-leader "ta")
 
 ;; In `completion-at-point', do not pop up silly completion buffers for less
@@ -10120,7 +10158,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                          :status yas-minor-mode
                          :on (yas-minor-mode)
                          :off (yas-minor-mode -1)
-                         :documentation "Enable yasnippet."
+                         :documentation "Enable snippets"
                          :evil-leader "ty")
 
     (dotemacs/add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
