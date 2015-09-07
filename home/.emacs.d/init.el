@@ -1142,6 +1142,7 @@ the user activate the completion manually."
 
 (use-package server                     ; The server of `emacsclient'
   :defer t
+  :disabled t
   :init (server-mode)
   :diminish server-buffer-clients)
 
