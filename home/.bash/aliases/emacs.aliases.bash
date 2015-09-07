@@ -17,12 +17,12 @@ function __emacs_free
 {
     if [ -e "$@" ]
     then
-        # command open -a Emacs "${@}"
-        (command open -a /Applications/Emacs.app "$@") &
+        # start new instances with -n -a
+        (command open -n -a /Applications/Emacs.app "$@") &
     else
         touch "$@"
-        # command open -a Emacs "${@}"
-        (command open -a /Applications/Emacs.app "$@") &
+        # start new instances with -n -a
+        (command open -n -a /Applications/Emacs.app "$@") &
     fi
 }
 
