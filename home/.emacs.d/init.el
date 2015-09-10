@@ -216,6 +216,15 @@ several times cycle between the kill ring content.'"
   "Guide-key delay in seconds."
   :group 'dotemacs)
 
+(defcustom dotemacs-which-key-delay 0.4
+  "Which-key delay in seconds."
+  :group 'dotemacs)
+
+;; Possible options should be: right bottom right-then-bottom
+(defcustom dotemacs-which-key-position 'right-then-bottom
+  "Which-key position"
+  :group 'dotemacs)
+
 (defcustom dotemacs-search-tools '("ag" "pt" "ack" "grep")
   "List of search tool executable names. Dotemacs uses the first installed
 tool of the list. Supported tools are `ag', `pt', `ack' and `grep'."
@@ -9039,6 +9048,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
+    (setq which-key-max-description-length 32
+          which-key-idle-delay dotemacs-which-key-delay)
+    (which-key-mode)
+    (cond
+     ((eq dotemacs-which-key-position 'right) (which-key-setup-side-window-right))
+     ((eq dotemacs-which-key-position 'bottom) (which-key-setup-side-window-bottom))
+     ((eq dotemacs-which-key-position 'right-then-bottom) (which-key-setup-side-window-right-bottom))
+     nil)
+
     (dotemacs-add-toggle which-key
       :status which-key-mode
       :on (which-key-mode)
