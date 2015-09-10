@@ -217,12 +217,17 @@ several times cycle between the kill ring content.'"
   :group 'dotemacs)
 
 (defcustom dotemacs-which-key-delay 0.4
-  "Which-key delay in seconds."
+  "Delay in seconds starting from the last keystroke after which
+the which-key buffer will be shown if you have not completed a
+key sequence. Setting this variable is equivalent to setting
+`which-key-idle-delay'."
   :group 'dotemacs)
 
 ;; Possible options should be: right bottom right-then-bottom
-(defcustom dotemacs-which-key-position 'right-then-bottom
-  "Which-key position"
+(defcustom dotemacs-which-key-position 'bottom
+  "Location of the which-key popup buffer. Possible choices are bottom,
+right, and right-then-bottom. The last one will display on the
+right if possible and fallback to bottom if not."
   :group 'dotemacs)
 
 (defcustom dotemacs-search-tools '("ag" "pt" "ack" "grep")
@@ -9048,15 +9053,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :init
   (progn
-    (setq which-key-max-description-length 32
-          which-key-idle-delay dotemacs-which-key-delay)
-    (which-key-mode)
-    (cond
-     ((eq dotemacs-which-key-position 'right) (which-key-setup-side-window-right))
-     ((eq dotemacs-which-key-position 'bottom) (which-key-setup-side-window-bottom))
-     ((eq dotemacs-which-key-position 'right-then-bottom) (which-key-setup-side-window-right-bottom))
-     nil)
-
     (dotemacs-add-toggle which-key
       :status which-key-mode
       :on (which-key-mode)
@@ -9105,11 +9101,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
               (,(listify-key-sequence
                  (kbd dotemacs-emacs-leader-key)) . "dotemacs root")))
       (nconc which-key-prefix-title-alist dotemacs-prefix-titles)
+      (pcase dotspacemacs-which-key-position
+        (`right (which-key-setup-side-window-right))
+        (`bottom (which-key-setup-side-window-bottom))
+        (`right-then-bottom (which-key-setup-side-window-right-bottom)))
 
       (setq which-key-special-keys nil
             which-key-use-C-h-for-paging t
             which-key-echo-keystrokes 0.02
-            which-key-max-description-length 32)
+            which-key-max-description-length 32
+            which-key-idle-delay dotemacs-which-key-delay)
       (which-key-mode)
       (dotemacs-diminish which-key-mode " Ⓚ" " K")))
 
