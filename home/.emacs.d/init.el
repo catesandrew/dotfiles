@@ -6014,6 +6014,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "msr" 'dotemacs-cider-send-region-to-repl
         "msR" 'dotemacs-cider-send-region-to-repl-focus
         "mss" 'cider-switch-to-repl-buffer
+        "msx" 'cider-refresh
         "mTf" 'dotemacs-cider-toggle-repl-font-locking
         "mTp" 'dotemacs-cider-toggle-repl-pretty-printing
 
@@ -6043,7 +6044,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "msn" 'cider-repl-set-ns
       "msq" 'cider-quit
       "mss" 'cider-switch-to-last-clojure-buffer
-
+      "msx" 'cider-refresh
       "mTf" 'dotemacs-cider-toggle-repl-font-locking
       "mTp" 'dotemacs-cider-toggle-repl-pretty-printing
 
@@ -8426,7 +8427,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           neo-persist-show t
           neo-show-hidden-files nil
           neo-auto-indent-point t
-          neo-modern-sidebar t
           neo-vc-integration '(face))
 
     (defun dotemacs-neotree-expand-or-open ()
