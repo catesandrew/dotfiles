@@ -79,24 +79,38 @@
   "Declare a prefix PREFIX. PREFIX is a string describing a key
 sequence. NAME is a symbol name used as the prefix command.
 LONG-NAME if given is stored in `dotemacs-prefix-command-alist'."
-  (let ((command (intern (concat dotemacs-prefix-command-string name)))
-        (full-prefix-vim (listify-key-sequence (kbd (concat dotemacs-leader-key " " prefix))))
-        (full-prefix-emacs (listify-key-sequence (kbd (concat dotemacs-emacs-leader-key " " prefix)))))
-    ;; define the prefix command only if it does not already exist
-    (unless long-name (setq long-name name))
-    (unless (lookup-key evil-leader--default-map prefix)
-      (define-prefix-command command)
-      (evil-leader/set-key prefix command)
-      (push (cons full-prefix-vim long-name) dotemacs-prefix-titles)
-      (push (cons full-prefix-emacs long-name) dotemacs-prefix-titles))))
+  (let* ((command (intern (concat dotemacs-prefix-command-string name)))
+        (full-prefix (concat dotemacs-leader-key " " prefix))
+        (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix))
+        (full-prefix-lst (listify-key-sequence (kbd full-prefix)))
+        (full-prefix-emacs-lst (listify-key-sequence
+                                (kbd full-prefix-emacs))))
+   ;; define the prefix command only if it does not already exist
+   (unless long-name (setq long-name name))
+   (if (fboundp 'which-key-declare-prefixes)
+       (which-key-declare-prefixes
+         full-prefix-emacs (cons name long-name)
+         full-prefix (cons name long-name))
+     (unless (lookup-key evil-leader--default-map prefix)
+       (define-prefix-command command)
+       (evil-leader/set-key prefix command)
+       (push (cons full-prefix-lst long-name) dotemacs-prefix-titles)
+       (push (cons full-prefix-emacs-lst long-name) dotemacs-prefix-titles)))))
 
-(defun dotemacs-declare-prefix-for-mode (mode prefix name)
+(defun dotemacs-declare-prefix-for-mode (mode prefix name &optional long-name)
   "Declare a prefix PREFIX. MODE is the mode in which this prefix command should
 be added. PREFIX is a string describing a key sequence. NAME is a symbol name
 used as the prefix command."
-  (let ((command (intern (concat dotemacs-prefix-command-string name))))
-    (define-prefix-command command)
-    (evil-leader/set-key-for-mode mode prefix command)))
+  (let  ((command (intern (concat dotemacs-prefix-command-string name)))
+        (full-prefix (concat dotemacs-leader-key " " prefix))
+        (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix)))
+   (unless long-name (setq long-name name))
+   (if (fboundp 'which-key-declare-prefixes-for-mode)
+       (which-key-declare-prefixes-for-mode mode
+         full-prefix-emacs (cons name long-name)
+         full-prefix (cons name long-name))
+     (define-prefix-command command)
+     (evil-leader/set-key-for-mode mode prefix command))))
 
 (defun dotemacs-activate-major-mode-leader ()
   "Bind major mode key map to `dotemacs-major-mode-leader-key'."
@@ -226,7 +240,7 @@ the current state and point position."
       (goto-line (max dotemacs-linum-mdown-line mu-line))
       (set-mark (line-end-position))
       (goto-line (min dotemacs-linum-mdown-line mu-line))
-      (setq spacemacs-linum-mdown-line nil))))
+      (setq dotemacs-linum-mdown-line nil))))
 
 (defun dotemacs-select-current-block ()
   "Select the current block of text between blank lines."

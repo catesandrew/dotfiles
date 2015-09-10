@@ -9090,18 +9090,29 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          (concat leader-key " m")    "major mode commands"
          (concat leader-key " " dotemacs-command-key) "helm M-x"))
 
+      (if (fboundp 'which-key-declare-prefixes)
+          (which-key-declare-prefixes
+            dotemacs-leader-key '("root" . "dotemacs root")
+            dotemacs-emacs-leader-key '("root" . "dotemacs root")
+            (concat dotemacs-leader-key " m")
+            '("major-mode-cmd" . "Major mode commands")
+            (concat dotemacs-emacs-leader-key " m")
+            '("major-mode-cmd" . "Major mode commands"))
+
+       ;; no need to use this after everyone updates which-key
+       (setq which-key-prefix-title-alist
+             `((,(listify-key-sequence
+                  (kbd (concat dotspacemacs-leader-key " m"))) . "Major mode commands")
+               (,(listify-key-sequence
+                  (kbd (concat dotspacemacs-emacs-leader-key " m"))) . "Major mode commands")
+               (,(listify-key-sequence
+                  (kbd dotspacemacs-leader-key)) . "Spacemacs root")
+               (,(listify-key-sequence
+                  (kbd dotspacemacs-emacs-leader-key)) . "Spacemacs root")))
+       (nconc which-key-prefix-title-alist spacemacs/prefix-titles))
+
       ;; disable special key handling for dotemacs, since it can be
       ;; disorienting if you don't understand it
-      (setq which-key-prefix-title-alist
-            `((,(listify-key-sequence
-                 (kbd (concat dotemacs-leader-key " m"))) . "Major mode commands")
-              (,(listify-key-sequence
-                 (kbd (concat dotemacs-emacs-leader-key " m"))) . "Major mode commands")
-              (,(listify-key-sequence
-                 (kbd dotemacs-leader-key)) . "dotemacs root")
-              (,(listify-key-sequence
-                 (kbd dotemacs-emacs-leader-key)) . "dotemacs root")))
-      (nconc which-key-prefix-title-alist dotemacs-prefix-titles)
       (pcase dotspacemacs-which-key-position
         (`right (which-key-setup-side-window-right))
         (`bottom (which-key-setup-side-window-bottom))
