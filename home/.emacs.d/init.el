@@ -9109,6 +9109,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
       (setq which-key-special-keys nil
             which-key-use-C-h-for-paging t
+            which-key-prevent-C-h-from-cycling t
             which-key-echo-keystrokes 0.02
             which-key-max-description-length 32
             which-key-idle-delay dotemacs-which-key-delay)
