@@ -8425,10 +8425,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                                         ; window
           neo-persist-show t
           neo-show-hidden-files nil
-          neo-auto-indent-point t)
-
-    (defun dotemacs-init-neotree ()
-      "Initialize the neotree mode.")
+          neo-auto-indent-point t
+          neo-modern-sidebar t
+          neo-vc-integration '(face))
 
     (defun dotemacs-neotree-expand-or-open ()
       "Collapse a neotree node."
@@ -8508,8 +8507,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                 (lambda () (setq neo-persist-show nil)))
       (add-hook 'popwin:after-popup-hook
                 (lambda () (setq neo-persist-show t))))
-    (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-init-neotree
-                                      dotemacs-neotree-key-bindings))))
+    (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-neotree-key-bindings))))
 
 
 ;;; Perspective
