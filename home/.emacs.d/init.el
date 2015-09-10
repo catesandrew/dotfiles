@@ -1882,7 +1882,8 @@ These should have their own segments in the modeline.")
                        (eq w neo-global--window))
               (window-numbering-assign w 0)))
           windows))
-  (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign))
+  (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign)
+  (add-hook 'neo-after-create-hook '(lambda (w) (window-numbering-update))))
 
 (use-package ediff-wind
   :defer t
