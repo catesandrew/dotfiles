@@ -603,6 +603,10 @@ group by projectile projects."
 (defcustom dotemacs-helm-resize nil
   "If non nil, `helm' will try to miminimize the space it uses.")
 
+
+(defcustom dotemacs-helm-no-header t
+  "if non nil, the helm header is hidden when there is only one source.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -1604,21 +1608,24 @@ These should have their own segments in the modeline.")
     (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
     (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
     (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
+    (defvar helm-source-header-default-height (face-attribute 'helm-source-header :height) )
 
     (defun helm-toggle-header-line ()
-      (if (> (length helm-sources) 1)
-          (set-face-attribute 'helm-source-header
-                              nil
-                              :foreground helm-source-header-default-foreground
-                              :background helm-source-header-default-background
-                              :box helm-source-header-default-box
-                              :height 1.3)
-        (set-face-attribute 'helm-source-header
-                            nil
-                            :foreground (face-attribute 'helm-selection :background)
-                            :background (face-attribute 'helm-selection :background)
-                            :box nil
-                            :height 0.1)))
+     "Hide the `helm' header is there is only one source."
+     (when dotemacs-helm-no-header
+       (if (> (length helm-sources) 1)
+           (set-face-attribute 'helm-source-header
+                               nil
+                               :foreground helm-source-header-default-foreground
+                               :background helm-source-header-default-background
+                               :box helm-source-header-default-box
+                               :height helm-source-header-default-height)
+         (set-face-attribute 'helm-source-header
+                             nil
+                             :foreground (face-attribute 'helm-selection :background)
+                             :background (face-attribute 'helm-selection :background)
+                             :box nil
+                             :height 0.1))))
 
     (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
 
