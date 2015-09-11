@@ -847,6 +847,7 @@ FEATURE may be a named feature or a file name, see
         ("d"  "dash-at-point")
         ("e"  "errors")
         ("f"  "files")
+        ("fC" "files/convert")
         ("fe" "files-emacs/dotemacs")
         ("g"  "git/versions-control")
         ("gf" "file")
