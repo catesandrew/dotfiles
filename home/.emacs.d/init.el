@@ -8957,9 +8957,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Org Mode
 (dotemacs-defvar-company-backends org-mode)
 
-(defvar org-enable-pandoc-support t
-  "If non-nil Pandoc related packages are configured.")
-
 (use-package init-org
   :load-path "config/")
 
@@ -9175,7 +9172,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t)
 
 (use-package ox-pandoc
-  :if org-enable-pandoc-support
   :defer t
   :ensure t
   :init
