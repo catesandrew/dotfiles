@@ -96,6 +96,7 @@ Removes the automatic guessing of the initial value based on thing at point. "
                                                (display-buffer-in-side-window)
                                                (inhibit-same-window . t)
                                                (side . ,dotemacs-helm-position)
+                                               (window-width . 0.6)
                                                (window-height . 0.4)))
 (defvar dotemacs-display-buffer-alist nil)
 (defun dotemacs-helm-prepare-display ()

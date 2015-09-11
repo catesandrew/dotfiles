@@ -1604,8 +1604,10 @@ These should have their own segments in the modeline.")
     (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
   :config
   (progn
-    (when dotemacs-helm-resize
-      (setq helm-autoresize-min-height 1)
+    (when (and dotemacs-helm-resize
+                (or (eq dotemacs-helm-position 'bottom)
+                    (eq dotemacs-helm-position 'top)))
+      (setq helm-autoresize-min-height 10)
       (helm-autoresize-mode 1))
 
     ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
