@@ -4,7 +4,7 @@
       (electric-indent-local-mode -1))
         (when haskell-enable-shm-support
           ;; in structured-haskell-mode line highlighting creates noise
-          (setq global-hl-line-mode nil)))
+          (setq-local global-hl-line-mode nil)))
 
 (defun dotemacs-haskell-process-do-type-on-prev-line ()
   (interactive)
