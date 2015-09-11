@@ -3379,6 +3379,13 @@ Disable the highlighting of overlong lines."
     (define-key evil-window-map (kbd "<right>") 'evil-window-right)
     (define-key evil-window-map (kbd "<up>") 'evil-window-up)
     (define-key evil-window-map (kbd "<down>") 'evil-window-down)
+    ;; Make Y equivalent to y$
+    (defun dotemacs/evil-yank-to-end-of-line ()
+      "Yank from point to end of line."
+      (interactive)
+      (evil-yank (point) (point-at-eol)))
+    (define-key evil-normal-state-map (kbd "Y") 'dotemacs/evil-yank-to-end-of-line)
+    (define-key evil-motion-state-map (kbd "Y") 'dotemacs/evil-yank-to-end-of-line)
 
     (evil-leader/set-key "re" 'evil-show-registers)
 
