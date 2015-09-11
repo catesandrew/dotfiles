@@ -3597,28 +3597,75 @@ It will toggle the overlay under point or create an overlay of one character."
 
 ; TODO: Add switch between evil-commentary and evil-nerd-commenter
 (use-package evil-commentary
+  :diminish evil-commentary-mode
   :ensure t
-  :init (evil-commentary-mode)
-  :diminish evil-commentary-mode)
+  :init
+  (progn
+    (evil-commentary-mode)
+    (evil-leader/set-key ";" 'evil-commentary)))
 
 (use-package evil-nerd-commenter
   :disabled t
   :ensure t
-  :commands (evilnc-comment-operator
-             evilnc-comment-or-uncomment-lines
-             evilnc-toggle-invert-comment-line-by-line
-             evilnc-comment-or-uncomment-paragraphs
-             evilnc-quick-comment-or-uncomment-to-the-line
-             evilnc-copy-and-comment-lines)
+  :commands (evilnc-comment-operator)
   :init
   (progn
+    ;; double all the commenting functions so that the inverse operations
+    ;; can be called without setting a flag
+    (defun dotemacs/comment-or-uncomment-lines-inverse (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line t))
+        (evilnc-comment-or-uncomment-lines arg)))
+
+    (defun dotemacs/comment-or-uncomment-lines (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line nil))
+        (evilnc-comment-or-uncomment-lines arg)))
+
+    (defun dotemacs/copy-and-comment-lines-inverse (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line t))
+        (evilnc-copy-and-comment-lines arg)))
+
+    (defun dotemacs/copy-and-comment-lines (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line nil))
+        (evilnc-copy-and-comment-lines arg)))
+
+    (defun dotemacs/quick-comment-or-uncomment-to-the-line-inverse
+        (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line t))
+        (evilnc-comment-or-uncomment-to-the-line arg)))
+
+    (defun dotemacs/quick-comment-or-uncomment-to-the-line (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line nil))
+        (evilnc-comment-or-uncomment-to-the-line arg)))
+
+    (defun dotemacs/comment-or-uncomment-paragraphs-inverse (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line t))
+        (evilnc-comment-or-uncomment-paragraphs arg)))
+
+    (defun dotemacs/comment-or-uncomment-paragraphs (&optional arg)
+      (interactive "p")
+      (let ((evilnc-invert-comment-line-by-line nil))
+        (evilnc-comment-or-uncomment-paragraphs arg)))
+
+    (define-key evil-normal-state-map "gc" 'evilnc-comment-operator)
+    (define-key evil-normal-state-map "gy" 'dotemacs/copy-and-comment-lines)
+
     (evil-leader/set-key
       ";"  'evilnc-comment-operator
-      "cl" 'evilnc-comment-or-uncomment-lines
-      "ci" 'evilnc-toggle-invert-comment-line-by-line
-      "cp" 'evilnc-comment-or-uncomment-paragraphs
-      "ct" 'evilnc-quick-comment-or-uncomment-to-the-line
-      "cy" 'evilnc-copy-and-comment-lines)))
+      "cl" 'dotemacs/comment-or-uncomment-lines
+      "cL" 'dotemacs/comment-or-uncomment-lines-inverse
+      "cp" 'dotemacs/comment-or-uncomment-paragraphs
+      "cP" 'dotemacs/comment-or-uncomment-paragraphs-inverse
+      "ct" 'dotemacs/quick-comment-or-uncomment-to-the-line
+      "cT" 'dotemacs/quick-comment-or-uncomment-to-the-line-inverse
+      "cy" 'dotemacs/copy-and-comment-lines
+      "cY" 'dotemacs/copy-and-comment-lines-inverse)))
 
 (use-package evil-matchit
   :ensure t
