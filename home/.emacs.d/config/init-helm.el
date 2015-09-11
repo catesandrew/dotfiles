@@ -95,6 +95,7 @@ Removes the automatic guessing of the initial value based on thing at point. "
 (defvar dotemacs-helm-display-buffer-regexp `("*.*helm.**"
                                                (display-buffer-in-side-window)
                                                (inhibit-same-window . t)
+                                               (side . ,dotemacs-helm-position)
                                                (window-height . 0.4)))
 (defvar dotemacs-display-buffer-alist nil)
 (defun dotemacs-helm-prepare-display ()
@@ -110,7 +111,7 @@ Removes the automatic guessing of the initial value based on thing at point. "
     (setq display-buffer-alist nil)
     (popwin-mode -1)))
 
-(defun dotemacs-display-helm-at-bottom (buffer)
+(defun dotemacs-display-helm-window (buffer)
   (let ((display-buffer-alist (list dotemacs-helm-display-help-buffer-regexp
                                     ;; this or any specialized case of Helm buffer must be added AFTER
                                     ;; `spacemacs-helm-display-buffer-regexp'. Otherwise,

@@ -607,6 +607,9 @@ group by projectile projects."
 (defcustom dotemacs-helm-no-header t
   "if non nil, the helm header is hidden when there is only one source.")
 
+(defcustom dotemacs-helm-position 'bottom
+  "Position in which to show the `helm' mini-buffer.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -1588,7 +1591,7 @@ These should have their own segments in the modeline.")
     (evil-leader/set-key
       dotemacs-command-key 'helm-M-x)
 
-    (setq helm-display-function 'dotemacs-display-helm-at-bottom)
+    (setq helm-display-function 'dotemacs-display-helm-window)
 
     (add-hook 'helm-after-initialize-hook 'dotemacs-helm-prepare-display)
     ;;  Restore popwin-mode after a Helm session finishes.
