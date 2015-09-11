@@ -9840,12 +9840,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           ahs-idle-interval 0.25
           ahs-inhibit-face-list nil)
 
-    (defvar dotemacs-last-ahs-highlight-p nil
+    (defvar-local dotemacs-last-ahs-highlight-p nil
       "Info on the last searched highlighted symbol.")
-    (make-variable-buffer-local 'dotemacs-last-ahs-highlight-p)
 
-    (defvar dotemacs--ahs-searching-forward nil)
-    (make-variable-buffer-local 'dotemacs--ahs-searching-forward)
+    (defvar-local dotemacs--ahs-searching-forward t)
 
     '(progn
        (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)

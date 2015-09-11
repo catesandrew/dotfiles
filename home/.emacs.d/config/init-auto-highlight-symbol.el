@@ -45,14 +45,14 @@
   "Go to the next occurrence of symbol under point with
 `auto-highlight-symbol'"
   (interactive)
-  (setq-local dotemacs--ahs-searching-forward t)
+  (setq dotemacs--ahs-searching-forward t)
   (dotemacs-quick-ahs-forward))
 
 (defun dotemacs-enter-ahs-backward ()
   "Go to the previous occurrence of symbol under point with
 `auto-highlight-symbol'"
   (interactive)
-  (setq-local dotemacs--ahs-searching-forward nil)
+  (setq dotemacs--ahs-searching-forward nil)
   (dotemacs-quick-ahs-forward))
 
 (defun dotemacs-quick-ahs-forward ()
