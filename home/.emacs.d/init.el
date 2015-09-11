@@ -9841,6 +9841,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "Info on the last searched highlighted symbol.")
     (make-variable-buffer-local 'dotemacs-last-ahs-highlight-p)
 
+    (defvar dotemacs--ahs-searching-forward nil)
+    (make-variable-buffer-local 'dotemacs--ahs-searching-forward)
+
     '(progn
        (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)
        (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward))
