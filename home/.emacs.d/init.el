@@ -6728,9 +6728,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (join-line -1)))
 
     (evil-leader/set-key-for-mode 'css-mode
-      "mxc" 'css-contract-statement
-      "mxe" 'css-expand-statement
-      ))
+      "mzc" 'css-contract-statement
+      "mzo" 'css-expand-statement))
   :config
   (progn
     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
