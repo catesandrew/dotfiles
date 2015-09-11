@@ -97,6 +97,8 @@ Ensure that helm is required before calling FUNC."
   "fed" 'dotemacs/find-dotfile
   "feD" 'ediff-dotfile-and-template
   "fev" 'dotemacs-display-and-copy-version
+  "fCd" 'dotemacs/unix2dos
+  "fCu" 'dotemacs/dos2unix
   "fg" 'rgrep
   "fj" 'dired-jump
   "fl" 'find-file-literally

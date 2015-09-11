@@ -1016,6 +1016,16 @@ the right."
       (call-interactively 'evil-write)
     (call-interactively 'write-file)))
 
+(defun dotemacs/dos2unix ()
+  "Converts the current buffer to UNIX file format."
+  (interactive)
+  (set-buffer-file-coding-system 'undecided-unix nil))
+
+(defun dotemacs/unix2dos ()
+  "Converts the current buffer to DOS file format."
+  (interactive)
+  (set-buffer-file-coding-system 'undecided-dos nil))
+
 (defun dotemacs-copy-file ()
   "Write the file under new name."
   (interactive)
