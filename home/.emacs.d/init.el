@@ -10262,9 +10262,12 @@ If the error list is visible, hide it.  Otherwise, show it."
 
 (use-package yasnippet
   :ensure t
-  :commands yas-global-mode
+  :commands (yas-global-mode yas-minor-mode)
   :init
   (progn
+    ;; We don't want undefined variable errors
+    (defvar yas-global-mode nil)
+
     ;; disable yas minor mode map, use hippie-expand instead
     (setq yas-minor-mode-map (make-sparse-keymap)
           ;; allow nested expansions
