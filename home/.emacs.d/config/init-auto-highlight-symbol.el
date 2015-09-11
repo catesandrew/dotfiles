@@ -41,25 +41,49 @@
            (dotemacs-ensure-ahs-enabled-locally)
            (ahs-highlight-now)) nil))
 
+(defun dotemacs-enter-ahs-forward ()
+  "Go to the next occurrence of symbol under point with
+`auto-highlight-symbol'"
+  (interactive)
+  (setq-local dotemacs--ahs-searching-forward t)
+  (dotemacs-quick-ahs-forward))
+
+(defun dotemacs-enter-ahs-backward ()
+  "Go to the previous occurrence of symbol under point with
+`auto-highlight-symbol'"
+  (interactive)
+  (setq-local dotemacs--ahs-searching-forward nil)
+  (dotemacs-quick-ahs-forward))
+
 (defun dotemacs-quick-ahs-forward ()
   "Go to the next occurrence of symbol under point with
 `auto-highlight-symbol'"
   (interactive)
-  (dotemacs-integrate-evil-search t)
-  (dotemacs-ahs-highlight-now-wrapper)
-  (evil-set-jump)
-  (dotemacs-highlight-symbol-micro-state)
-  (ahs-forward))
+  (dotemacs-quick-ahs-move t))
 
 (defun dotemacs-quick-ahs-backward ()
   "Go to the previous occurrence of symbol under point with
 `auto-highlight-symbol'"
   (interactive)
-  (dotemacs-integrate-evil-search nil)
-  (dotemacs-ahs-highlight-now-wrapper)
-  (evil-set-jump)
-  (dotemacs-highlight-symbol-micro-state)
-  (ahs-backward))
+  (dotemacs-quick-ahs-move nil))
+
+(defun dotemacs-quick-ahs-move (forward)
+  "Go to the next occurrence of symbol under point with
+`auto-highlight-symbol'"
+  (if (eq forward dotemacs--ahs-searching-forward)
+      (progn
+        (dotemacs-integrate-evil-search t)
+        (dotemacs-ahs-highlight-now-wrapper)
+        (evil-set-jump)
+        (dotemacs-highlight-symbol-micro-state)
+        (ahs-forward))
+    (progn
+      (dotemacs-integrate-evil-search nil)
+      (dotemacs-ahs-highlight-now-wrapper)
+      (evil-set-jump)
+      (dotemacs-highlight-symbol-micro-state)
+      (ahs-backward)
+      )))
 
 (defun dotemacs-symbol-highlight ()
   "Highlight the symbol under point with `auto-highlight-symbol'."
@@ -68,6 +92,11 @@
   (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
   (dotemacs-highlight-symbol-micro-state)
   (dotemacs-integrate-evil-search nil))
+
+(defun dotemacs-ahs-ms-on-exit ()
+  ;; Restore user search direction state as ahs has exitted in a state
+  ;; good for <C-s>, but not for 'n' and 'N'"
+  (setq isearch-forward dotemacs--ahs-searching-forward))
 
 (defun dotemacs-symbol-highlight-reset-range ()
   "Reset the range for `auto-highlight-symbol'."

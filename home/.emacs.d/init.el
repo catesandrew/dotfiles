@@ -9170,7 +9170,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
       ;; disable special key handling for dotemacs, since it can be
       ;; disorienting if you don't understand it
-      (pcase dotspacemacs-which-key-position
+      (pcase dotemacs-which-key-position
         (`right (which-key-setup-side-window-right))
         (`bottom (which-key-setup-side-window-bottom))
         (`right-then-bottom (which-key-setup-side-window-right-bottom)))
@@ -9732,6 +9732,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                     (prophidden (propertize hidden 'face '(:weight bold))))
                (format "%s %s%s [n/N] move [e] edit [r] range [R] reset [d/D] definition [/] find in project [f] find in files [b] find in opened buffers [q] exit"
                        propplugin propx/y prophidden)))
+      :on-exit (dotemacs-ahs-ms-on-exit)
       :bindings
       ("d" ahs-forward-definition)
       ("D" ahs-backward-definition)
