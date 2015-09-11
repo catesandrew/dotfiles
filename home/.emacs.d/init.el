@@ -6702,6 +6702,35 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package css-mode
   :defer t
   :ensure t
+  :init
+  (progn
+    (defun css-expand-statement ()
+      "Expand CSS block"
+      (interactive)
+      (save-excursion
+        (end-of-line)
+        (search-backward "{")
+        (forward-char 1)
+        (while (or (eobp) (not (looking-at "}")))
+        (let ((beg (point)))
+          (newline)
+          (search-forward ";")
+          (indent-region beg (point))
+          ))
+        (newline)))
+
+    (defun css-contract-statement ()
+      "Contract CSS block"
+      (interactive)
+      (end-of-line)
+      (search-backward "{")
+      (while (not (looking-at "}"))
+        (join-line -1)))
+
+    (evil-leader/set-key-for-mode 'css-mode
+      "mxc" 'css-contract-statement
+      "mxe" 'css-expand-statement
+      ))
   :config
   (progn
     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
