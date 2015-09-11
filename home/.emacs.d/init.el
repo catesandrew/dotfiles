@@ -2338,7 +2338,7 @@ These should have their own segments in the modeline.")
           ranger-parent-depth 1
           ranger-max-preview-size 10))
  :config
- (ranger-map (kbd "-") 'ranger-up-directory))
+ (define-key ranger-mode-map (kbd "-") 'ranger-up-directory))
 
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
