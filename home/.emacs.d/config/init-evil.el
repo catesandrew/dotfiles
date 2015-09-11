@@ -120,21 +120,21 @@
 
 ; support for auto-indentation inhibition on universal argument
 (dotemacs-advise-commands
- "handle-indent" (evil-paste-before evil-paste-after) around
- "Handle the universal prefix argument for auto-indentation."
- (let ((prefix (ad-get-arg 0)))
-   (ad-set-arg 0 (unless (equal '(4) prefix) prefix))
-   ad-do-it
-   (ad-set-arg 0 prefix)))
+  "handle-indent" (evil-paste-before evil-paste-after) around
+  "Handle the universal prefix argument for auto-indentation."
+  (let ((prefix (ad-get-arg 0)))
+    (ad-set-arg 0 (unless (equal '(4) prefix) prefix))
+    ad-do-it
+    (ad-set-arg 0 prefix)))
 
 ; pasting micro-state
 (dotemacs-advise-commands
- "paste-micro-state"
- (evil-paste-before evil-paste-after evil-visual-paste) after
- "Initate the paste micro-state."
- (unless (or (evil-ex-p)
-                   (eq 'evil-paste-from-register this-command))
-         (dotemacs-paste-micro-state)))
+  "paste-micro-state"
+  (evil-paste-before evil-paste-after evil-visual-paste) after
+  "Initate the paste micro-state."
+  (unless (or (evil-ex-p)
+                    (eq 'evil-paste-from-register this-command))
+          (dotemacs-paste-micro-state)))
 
 (defun dotemacs-paste-ms-doc ()
   "The documentation for the paste micro-state."
