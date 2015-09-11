@@ -4929,9 +4929,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (evil-leader/set-key-for-mode 'cython-mode
-      "mhh" 'anaconda-mode-view-doc
-      "mgu" 'anaconda-mode-usages
-      "mgg"  'anaconda-mode-goto)))
+      "mhh" 'anaconda-mode-show-doc
+      "mgg" 'anaconda-mode-find-definitions
+      "mga" 'anaconda-mode-find-assignments
+      "mgu" 'anaconda-mode-find-references)
+    (evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
+             (kbd "q") 'kill-buffer-and-window)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
   :defer t
