@@ -7552,6 +7552,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (kbd "C-S-k") 'magit-section-backward
       (kbd "C-n") 'magit-section-forward
       (kbd "C-p") 'magit-section-backward)
+     (dotemacs-evilify-map magit-hunk-section-map
+      :mode magit-status-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map magit-diff-mode-map
       :mode magit-diff-mode
       :bindings
