@@ -2322,7 +2322,6 @@ These should have their own segments in the modeline.")
       "ar" 'ranger
       "ad" 'deer)
 
-    (evil-define-key 'normal 'dired-mode-map "-" 'ranger-up-directory)
     (define-key evil-normal-state-map (kbd "-") 'deer)
 
     ;; set up image-dired to allow picture resize
@@ -2336,7 +2335,9 @@ These should have their own segments in the modeline.")
           ranger-width-preview 0.65
           ranger-show-preview t
           ranger-parent-depth 1
-          ranger-max-preview-size 10)))
+          ranger-max-preview-size 10))
+ :config
+ (ranger-map (kbd "-") 'ranger-up-directory))
 
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
