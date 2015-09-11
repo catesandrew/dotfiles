@@ -3403,6 +3403,11 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
     (dotemacs/add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
 
+    ;; define text-object for entire buffer
+    (evil-define-text-object evil-inner-buffer (count &optional beg end type)
+      (evil-select-paren "\\`" "\\'" beg end type count nil))
+    (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
+
     ;; support smart-parens-strict-mode
     (after "smartparens"
       (defadvice evil-delete-backward-char-and-join
