@@ -3374,6 +3374,12 @@ Disable the highlighting of overlong lines."
       ("K" dotemacs-scroll-half-page-up)
       ("J" dotemacs-scroll-half-page-down))
 
+    ;; make cursor keys work
+    (define-key evil-window-map (kbd "<left>") 'evil-window-left)
+    (define-key evil-window-map (kbd "<right>") 'evil-window-right)
+    (define-key evil-window-map (kbd "<up>") 'evil-window-up)
+    (define-key evil-window-map (kbd "<down>") 'evil-window-down)
+
     (evil-leader/set-key "re" 'evil-show-registers)
 
     (unless dotemacs-enable-paste-micro-state
