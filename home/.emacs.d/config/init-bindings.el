@@ -31,6 +31,10 @@
 
 ;; Universal argument ---------------------------------------------------------
 (evil-leader/set-key "u" 'universal-argument)
+; (when (memq dotemacs-editing-style '(vim hybrid))
+;   (define-key universal-argument-map
+;     (kbd (concat dotemacs-leader-key " u"))
+;     'universal-argument-more))
 ;; shell command  -------------------------------------------------------------
 (evil-leader/set-key "!" 'shell-command)
 ;; applications ---------------------------------------------------------------
