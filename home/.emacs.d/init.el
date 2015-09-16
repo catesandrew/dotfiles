@@ -6880,8 +6880,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t
   :init
-  (after "scss-mode"
-    '(evil-leader/set-key-for-mode 'scss-mode "mgh" 'helm-css-scss)))
+  (dolist (mode '(css-mode scss-mode))
+    (evil-leader/set-key-for-mode mode "mgh" 'helm-css-scss)))
 
 (use-package web-mode                   ; Template editing
   :defer t
@@ -7008,6 +7008,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (add-hook 'slim-mode-hook 'rainbow-delimiters-mode))
   :defer t)
+
+(dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
+                            'smartparens-strict-mode
+                          'smartparens-mode)
+                        '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
 
 (use-package scss-mode
   :defer t
