@@ -746,7 +746,10 @@ dotemacs-persistent-server to be t"
   "Kill server buffer and hide the main Emacs window"
   (interactive)
   (server-kill-buffer)
-  (make-frame-invisible nil 1))
+  (condition-case nil
+      (delete-frame nil 1)
+      (error
+       (make-frame-invisible nil 1))))
 
 ;; A small minor mode to use a big fringe
 ;; from http://bzg.fr/emacs-strip-tease.html
