@@ -473,19 +473,17 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 
-(defcustom dotemacs-evil-cursor-colors '((normal . "DarkGoldenrod2")
-                                         (insert . "chartreuse3")
-                                         (emacs  . "SkyBlue2")
-                                         (replace . "chocolate")
-                                         (evilified . "LightGoldenrod3")
-                                         (visual . "gray")
-                                         (motion . "plum3")
-                                         (lisp   . "HotPink1")
-                                         (iedit  . "firebrick1")
-                                         (iedit-insert  . "firebrick1"))
-  "Colors assigned to evil states."
-  :type '(repeat (symbol))
-  :group 'dotemacs-evil)
+(defvar dotemacs-evil-cursors '(("normal" "DarkGoldenrod2" box)
+                                ("insert" "chartreuse3" (bar . 2))
+                                ("emacs" "SkyBlue2" box)
+                                ("replace" "chocolate" (hbar . 2))
+                                ("evilified" "LightGoldenrod3" box)
+                                ("visual" "gray" (hbar . 2))
+                                ("motion" "plum3" box)
+                                ("lisp" "HotPink1" box)
+                                ("iedit" "firebrick1" box)
+                                ("iedit-insert" "firebrick1" (bar . 2)))
+  "Colors assigned to evil states with cursor definitions.")
 
 ;; colors settings
 (defgroup dotemacs-colors nil
@@ -3300,6 +3298,19 @@ Disable the highlighting of overlong lines."
   :ensure t
   :init
   (progn
+    (loop for (state color cursor) in dotemacs-evil-cursors
+          do
+          (eval `(defface ,(intern (format "dotemacs-%s-face" state))
+                   `((t (:background ,color
+                                    :foreground ,(face-background 'mode-line)
+                                    :box ,(face-attribute 'mode-line :box)
+                                    :inherit 'mode-line)))
+                   (format "%s state face." state)
+                   :group 'dotemacs))
+          (eval `(setq ,(intern (format "evil-%s-state-cursor" state))
+                       (list (when dotemacs-colorize-cursor-according-to-state color)
+                             cursor))))
+
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     (add-hook 'post-command-hook 'evil-refresh-cursor)
@@ -3308,19 +3319,6 @@ Disable the highlighting of overlong lines."
     ;; consisently evaluate expression with eval-last-sexp in
     ;; all modes
     (setq evil-move-beyond-eol t)
-
-    (dotemacs-set-state-faces)
-
-    (set-default-evil-emacs-state-cursor)
-    (set-default-evil-evilified-state-cursor)
-    (set-default-evil-normal-state-cursor)
-    (set-default-evil-insert-state-cursor)
-    (set-default-evil-visual-state-cursor)
-    (set-default-evil-motion-state-cursor)
-    (set-default-evil-lisp-state-cursor)
-    (set-default-evil-iedit-state-cursor)
-    (set-default-evil-iedit-insert-state-cursor)
-    (set-default-evil-replace-state-cursor)
 
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)

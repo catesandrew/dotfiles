@@ -2,17 +2,6 @@
   "Return the symbol of the face for the given STATE."
   (intern (format "dotemacs-%s-face" (symbol-name state))))
 
-(defun dotemacs-defface-state-color (state color)
-  "Define a face for the given STATE and background COLOR."
-  (eval `(defface ,(dotemacs-state-color-face state) '((t ()))
-           ,(format "%s state face." (symbol-name state))
-           :group 'dotemacs))
-  (set-face-attribute (dotemacs-state-color-face state) nil
-                      :background color
-                      :foreground (face-background 'mode-line)
-                      :box (face-attribute 'mode-line :box)
-                      :inherit 'mode-line))
-
 (defun dotemacs-state-color (state)
   "Return the color string associated to STATE."
   (face-background (dotemacs-state-color-face state)))
@@ -31,52 +20,6 @@
                    evil-previous-state
                  evil-state)))
     (dotemacs-state-color-face state)))
-
-(defun dotemacs-set-state-faces ()
-  "Define or set the state faces."
-  (mapcar (lambda (x) (dotemacs-defface-state-color (car x) (cdr x)))
-          dotemacs-evil-cursor-colors))
-
-(defun set-default-evil-emacs-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'emacs))))
-    (setq evil-emacs-state-cursor `(,c box))))
-(defun set-default-evil-evilified-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'evilified))))
-    (setq evil-evilified-state-cursor `(,c box))))
-(defun set-default-evil-normal-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'normal))))
-    (setq evil-normal-state-cursor `(,c box))))
-(defun set-default-evil-insert-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'insert))))
-    (setq evil-insert-state-cursor `(,c (bar . 2)))))
-(defun set-default-evil-visual-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'visual))))
-    (setq evil-visual-state-cursor `(,c (hbar . 2)))))
-(defun set-default-evil-motion-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'motion))))
-    (setq evil-motion-state-cursor `(,c box))))
-(defun set-default-evil-lisp-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'lisp))))
-    (setq evil-lisp-state-cursor `(,c box))))
-(defun set-default-evil-iedit-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'iedit))))
-    (setq evil-iedit-state-cursor `(,c box))))
-(defun set-default-evil-iedit-insert-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'iedit-insert))))
-    (setq evil-iedit-insert-state-cursor `(,c (bar . 2)))))
-(defun set-default-evil-replace-state-cursor ()
-  (let ((c (when dotemacs-colorize-cursor-according-to-state
-             (dotemacs-state-color 'replace))))
-    (setq evil-replace-state-cursor `(,c (hbar . 2)))))
 
 (defun evil-insert-state-cursor-hide ()
   (setq evil-insert-state-cursor '((hbar . 0))))
