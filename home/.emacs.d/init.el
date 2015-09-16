@@ -23,6 +23,9 @@
 ;; Without this comment emacs25 adds (package-initialize) here
 ;; (package-initialize)
 
+;; Don't be so stingy on the memory, we have lots now. It's the distant future.
+(setq gc-cons-threshold 20000000)
+
 ;;; Code:
 
 ;; No splash screen please ... jeez
@@ -645,9 +648,6 @@ group by projectile projects."
 
 ;;; Core
 (setq message-log-max 16384)
-
-;; Don't be so stingy on the memory, we have lots now. It's the distant future.
-(setq gc-cons-threshold 20000000)
 
 (require 'subr-x nil 'noerror)
 (require 'core-auto-completion)
