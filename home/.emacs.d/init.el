@@ -3562,8 +3562,8 @@ It will toggle the overlay under point or create an overlay of one character."
           '(emacs insert normal visual motion))
     ;; experimental: map `<leader> m` to `dotemacs-major-mode-leader-key`
     (when dotemacs-major-mode-leader-key
-      (add-hook 'after-change-major-mode-hook
-                'dotemacs-activate-major-mode-leader))))
+      (add-hook 'evil-local-mode-hook
+                'dotemacs-activate-major-mode-leader t))))
 
 (use-package evil-lisp-state
   :ensure t

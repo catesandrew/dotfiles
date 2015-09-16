@@ -112,23 +112,23 @@ used as the prefix command."
      (define-prefix-command command)
      (evil-leader/set-key-for-mode mode prefix command))))
 
-(defun dotemacs-activate-major-mode-leader ()
-  "Bind major mode key map to `dotemacs-major-mode-leader-key'."
-  (setq mode-map (cdr (assoc major-mode evil-leader--mode-maps)))
-  (when mode-map
-    (setq major-mode-map (lookup-key mode-map (kbd "m")))
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-local-map" s))
-                     ,(kbd dotemacs-major-mode-leader-key)
-                     major-mode-map)))
-          '(normal motion))
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-local-map" s))
-                     ,(kbd dotemacs-major-mode-emacs-leader-key)
-                     major-mode-map)))
-          '(emacs insert normal motion visual))))
+(defun dotemacs/activate-major-mode-leader ()
+  "Bind major mode key map to `dotspacemacs-major-mode-leader-key'."
+  (let* ((mode-map (cdr (assoc major-mode evil-leader--mode-maps)))
+         (major-mode-map (when mode-map (lookup-key mode-map (kbd "m")))))
+    (when major-mode-map
+      (mapc (lambda (s)
+              (eval `(define-key
+                       ,(intern (format "evil-%S-state-local-map" s))
+                       ,(kbd dotemacs-major-mode-leader-key)
+                       major-mode-map)))
+            '(normal motion))
+      (mapc (lambda (s)
+              (eval `(define-key
+                       ,(intern (format "evil-%S-state-local-map" s))
+                       ,(kbd dotemacs-major-mode-emacs-leader-key)
+                       major-mode-map)))
+            '(emacs insert normal motion visual)))))
 
 (defun dotemacs-split-and-new-line ()
   "Split a quoted string or s-expression and insert a new line with
