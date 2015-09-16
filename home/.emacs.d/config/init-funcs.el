@@ -972,15 +972,20 @@ current window."
              "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
 
 (dotemacs-advise-commands
-  "indent" (yank yank-pop evil-paste-before evil-paste-after) after
-  "If current mode is not one of dotemacs-indent-sensitive-modes
-  indent yanked text (with universal arg don't indent)."
-  (if (and (not (equal '(4) (ad-get-arg 0)))
-           (not (member major-mode dotemacs-indent-sensitive-modes))
-           (or (derived-mode-p 'prog-mode)
-               (member major-mode dotemacs-indent-sensitive-modes)))
-      (let ((transient-mark-mode nil))
-        (dotemacs/yank-advised-indent-function (region-beginning) (region-end)))))
+ "indent" (yank yank-pop evil-paste-before evil-paste-after) around
+ "If current mode is not one of spacemacs-indent-sensitive-modes
+ indent yanked text (with universal arg don't indent)."
+ (evil-start-undo-step)
+ ad-do-it
+ (if (and (not (equal '(4) (ad-get-arg 0)))
+          (not (member major-mode dotemacs-indent-sensitive-modes))
+          (or (derived-mode-p 'prog-mode)
+              (member major-mode dotemacs-indent-sensitive-modes)))
+     (let ((transient-mark-mode nil)
+           (save-undo buffer-undo-list))
+       (dotemacs/yank-advised-indent-function (region-beginning)
+                                              (region-end))))
+ (evil-end-undo-step))
 
 ;; modified function from http://emacswiki.org/emacs/AlignCommands
 (defun dotemacs/align-repeat (start end regexp &optional justify-right after)
