@@ -662,6 +662,19 @@ For instance pass En as source for english."
   (let ((newbuf (generate-new-buffer-name "untitled")))
     (switch-to-buffer newbuf)))
 
+(defun dotemacs/layout-triple-columns ()
+  " Set the layout to triple columns. "
+  (interactive)
+  (delete-other-windows)
+  (dotimes (i 2) (split-window-right))
+  (balance-windows))
+
+(defun dotemacs/layout-double-columns ()
+  " Set the layout to double columns. "
+  (interactive)
+  (delete-other-windows)
+  (split-window-right))
+
 (defun dotemacs-home ()
   "Go to home dotemacs buffer"
   (interactive)
