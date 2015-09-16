@@ -2998,6 +2998,15 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (sp-pair "[" nil :post-handlers
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
 
+(use-package evil-matchit-ruby
+  :defer t
+  :ensure t
+  :init (add-hook `enh-ruby-mode `turn-on-evil-matchit-mode)
+  :config
+  (progn
+    (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                               (evilmi-ruby-get-tag evilmi-ruby-jump)))))
+
 
 ;;; Highlights and fontification
 (defun dotemacs-whitespace-style-no-long-lines ()
