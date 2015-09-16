@@ -51,30 +51,14 @@
   :cursor box)
 
 (add-hook 'evil-evilified-state-entry-hook 'dotemacs-evilified-state-on-entry)
-(add-hook 'evil-evilified-state-exit-hook 'dotemacs-evilified-state-on-exit)
 
 (defun dotemacs-evilified-state-on-entry ()
   "Setup evilified state."
-  (setq-local dotemacs-core-evilified-state--evil-surround
-              (bound-and-true-p evil-surround-mode))
-  (when dotemacs-core-evilified-state--evil-surround
+  (when (bound-and-true-p evil-surround-mode)
+    (make-local-variable 'evil-surround-mode)
     (evil-surround-mode -1))
-  (setq-local evil-visual-state-map (cons 'keymap nil))
-  (add-hook 'evil-visual-state-entry-hook
-            'dotemacs-evilified-state--visual-state-set-key nil 'local))
-
-(defun dotemacs-evilified-state-on-exit ()
-  "Cleanup evilified state."
-  (when dotemacs-core-evilified-state--evil-surround
-    (evil-surround-mode))
-  (setq-local evil-visual-state-map
-              dotemacs-core-evilified-state--visual-state-map)
-  (remove-hook 'evil-visual-state-entry-hook
-               'dotemacs-evilified-state--visual-state-set-key 'local))
-
-(defun dotemacs-evilified-state--visual-state-set-key ()
-  "Define key for visual state."
-  (local-set-key "y" 'evil-yank))
+  (setq-local evil-normal-state-map (cons 'keymap nil))
+  (setq-local evil-visual-state-map (cons 'keymap (list (cons ?y 'evil-yank)))))
 
 ;; default key bindings for all evilified buffers
 (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
