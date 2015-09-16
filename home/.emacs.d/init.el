@@ -422,7 +422,8 @@ prompts and the prompt is made read-only"
   :group 'dotemacs-haskell)
 
 (defcustom dotemacs-haskell-enable-hindent-style 'fundamental
-  "If non-nil structured-haskell-mode support is enabled"
+  "Style to use for formatting with hindent; available are: fundamental
+johan-tibell chris-done gibiansky. If nil hindent is disabled."
   :group 'dotemacs-haskell)
 
 (defcustom dotemacs-haskell-enable-ghc-mod-support t
