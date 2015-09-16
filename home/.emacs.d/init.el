@@ -3003,7 +3003,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 (use-package evil-matchit-ruby
   :defer t
-  :ensure t
+  :ensure evil-matchit
   :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
   :config
   (progn
@@ -5176,7 +5176,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package evil-matchit-python
   :defer t
-  :ensure t
+  :ensure evil-matchit
   :init
   (add-hook `python-mode-hook `turn-on-evil-matchit-mode)
   :config
