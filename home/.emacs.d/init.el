@@ -3001,7 +3001,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package evil-matchit-ruby
   :defer t
   :ensure t
-  :init (add-hook `enh-ruby-mode `turn-on-evil-matchit-mode)
+  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
   :config
   (progn
     (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
@@ -5175,10 +5175,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :ensure t
   :init
-  (add-hook `python-mode `turn-onevil-matchit-mode)
+  (add-hook `python-mode-hook `turn-on-evil-matchit-mode)
   :config
-    (plist-put evilmi-plugins 'python-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
-                                             (evilmi-python-get-tag evilmi-python-jump))))
+  (plist-put evilmi-plugins 'python-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-python-get-tag evilmi-python-jump))))
 
 (use-package hy-mode
   :ensure t
