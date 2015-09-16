@@ -9753,12 +9753,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (interactive)
       (evil-insert-state)
       (spray-mode t)
-      (evil-insert-state-cursor-hide))
+      (internal-show-cursor (selected-window) nil))
     (evil-leader/set-key "asr" 'dotemacs-start-spray)
 
     (defadvice spray-quit (after dotemacs-quit-spray activate)
       "Correctly quit spray."
-      (set-default-evil-insert-state-cursor)
+      (internal-show-cursor (selected-window) t)
       (evil-normal-state)))
   :config
   (progn
