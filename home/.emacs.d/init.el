@@ -4936,7 +4936,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mga" 'anaconda-mode-find-assignments
       "mgu" 'anaconda-mode-find-references)
     (evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
-             (kbd "q") 'kill-buffer-and-window)))
+             (kbd "q") 'quit-window)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
   :defer t
