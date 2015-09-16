@@ -62,11 +62,6 @@
 (defun dotemacs/system-is-mswindows ()
   (string-equal system-type "windows-nt"))
 
-(defvar dotemacs-prefix-command-string "group:"
-  "Prefix string for prefix commands.")
-
-(defvar dotemacs-prefix-titles (list))
-
 (defun dotemacs-jump-in-buffer ()
   (interactive)
   (cond
@@ -75,11 +70,14 @@
    (t
     (call-interactively 'helm-semantic-or-imenu))))
 
+(defvar dotemacs-prefix-titles nil
+  "alist for mapping command prefixes to long names.")
+
 (defun dotemacs-declare-prefix (prefix name &optional long-name)
   "Declare a prefix PREFIX. PREFIX is a string describing a key
 sequence. NAME is a symbol name used as the prefix command.
-LONG-NAME if given is stored in `dotemacs-prefix-command-alist'."
-  (let* ((command (intern (concat dotemacs-prefix-command-string name)))
+LONG-NAME if given is stored in `dotemacs-prefix-titles'."
+  (let* ((command name)
         (full-prefix (concat dotemacs-leader-key " " prefix))
         (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix))
         (full-prefix-lst (listify-key-sequence (kbd full-prefix)))
@@ -101,7 +99,7 @@ LONG-NAME if given is stored in `dotemacs-prefix-command-alist'."
   "Declare a prefix PREFIX. MODE is the mode in which this prefix command should
 be added. PREFIX is a string describing a key sequence. NAME is a symbol name
 used as the prefix command."
-  (let  ((command (intern (concat dotemacs-prefix-command-string name)))
+  (let  ((command (intern (concat (symbol-name mode) name)))
         (full-prefix (concat dotemacs-leader-key " " prefix))
         (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix)))
    (unless long-name (setq long-name name))
