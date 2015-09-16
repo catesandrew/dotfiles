@@ -536,11 +536,6 @@ argument takes the kindows rotate backwards."
   (interactive)
   (find-file-existing (dotemacs-location)))
 
-(defun dotemacs/find-contrib-file ()
-  (interactive)
-  "Edit the `file' in the dotfiles base directory, in the current window."
-  (ido-find-file-in-dir configuration-layer-contrib-directory))
-
 ;; byte compile elisp files
 (defun byte-compile-current-buffer ()
   "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."

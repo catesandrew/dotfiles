@@ -92,8 +92,6 @@ Ensure that helm is required before calling FUNC."
   "fc" 'dotemacs-copy-file
   "fD" 'dotemacs/delete-current-buffer-file
   "fei" 'dotemacs/find-user-init-file
-  "fes" 'find-dotemacs-file
-  "fec" 'dotemacs/find-contrib-file
   "fed" 'dotemacs/find-dotfile
   "feD" 'ediff-dotfile-and-template
   "fev" 'dotemacs-display-and-copy-version
