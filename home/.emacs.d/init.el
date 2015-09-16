@@ -5171,6 +5171,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
               ad-do-it
             (call-interactively 'sp-backward-delete-char)))))))
 
+(use-package evil-matchit-python
+  :defer t
+  :ensure t
+  :init
+  (add-hook `python-mode `turn-onevil-matchit-mode)
+  :config
+    (plist-put evilmi-plugins 'python-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
+                                             (evilmi-python-get-tag evilmi-python-jump))))
+
 (use-package hy-mode
   :ensure t
   :defer t)
