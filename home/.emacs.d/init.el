@@ -9130,6 +9130,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-leader/set-key-for-mode 'org-mode
       "mgt" 'ort/goto-todos)))
 
+(use-package gnuplot
+  :defer t
+  :ensure t
+  :init (evil-leader/set-key-for-mode 'org-mode
+          "mtp" 'org-plot/gnuplot))
+
 (use-package evil-org
   :commands evil-org-mode
   :ensure t
