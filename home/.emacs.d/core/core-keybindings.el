@@ -14,7 +14,7 @@
 
 (defun dotemacs-declare-prefix (prefix name &optional long-name)
   "Declare a prefix PREFIX. PREFIX is a string describing a key
-sequence. NAME is a symbol name used as the prefix command.
+sequence. NAME is a string used as the prefix command.
 LONG-NAME if given is stored in `dotemacs-prefix-titles'."
   (let* ((command name)
         (full-prefix (concat dotemacs-leader-key " " prefix))
@@ -29,8 +29,8 @@ LONG-NAME if given is stored in `dotemacs-prefix-titles'."
          full-prefix-emacs (cons name long-name)
          full-prefix (cons name long-name))
      (unless (lookup-key evil-leader--default-map prefix)
-       (define-prefix-command command)
-       (evil-leader/set-key prefix command)
+       (define-prefix-command (intern command))
+       (evil-leader/set-key prefix (intern command))
        (push (cons full-prefix-lst long-name) dotemacs-prefix-titles)
        (push (cons full-prefix-emacs-lst long-name) dotemacs-prefix-titles)))))
 
