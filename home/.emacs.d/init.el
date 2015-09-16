@@ -5953,11 +5953,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-defvar-company-backends cider-mode)
 (dotemacs-defvar-company-backends cider-repl-mode)
 
-(setq clojure/key-binding-prefixes '(("me" . "evaluation")
+(setq clojure/key-binding-prefixes '(("md" . "debug")
+                                     ("me" . "evaluation")
                                      ("mg" . "goto")
                                      ("mh" . "documentation")
                                      ("mr" . "refactor")
-                                     ("mt" . "test")))
+                                     ("ms" . "repl")
+                                     ("mt" . "test")
+                                     ("mT" . "toggle")
+                                     ("mf" . "format")))
 (mapc (lambda (x) (dotemacs-declare-prefix-for-mode
                    'clojure-mode (car x) (cdr x)))
             clojure/key-binding-prefixes)
@@ -5998,6 +6002,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; add support for evil
     (push 'cider-stacktrace-mode evil-motion-state-modes)
     (push 'cider-popup-buffer-mode evil-motion-state-modes)
+
+    (defun dotemacs-cider-display-error-buffer (&optional arg)
+      "Displays the *cider-error* buffer in the current window.
+If called with a prefix argument, uses the other-window instead."
+      (interactive "P")
+      (let ((buffer (get-buffer cider-error-buffer)))
+        (when buffer
+          (funcall (if (equal arg '(4))
+                       'switch-to-buffer-other-window
+                     'switch-to-buffer)
+                   buffer))))
 
     (defun dotemacs-cider-toggle-repl-pretty-printing ()
       (interactive)
@@ -6077,7 +6092,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
         "mgb" 'cider-jump-back
         "mge" 'cider-jump-to-compilation-error
-        "mgg" 'cider-jump-to-var
+        "mgg" 'cider-find-var
         "mgr" 'cider-jump-to-resource
 
         "msb" 'cider-load-buffer
@@ -6103,6 +6118,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mtt" 'dotemacs-cider-test-run-focused-test
 
         "mdb" 'cider-debug-defun-at-point
+        "mde" 'dotemacs-cider-display-error-buffer
         "mdi" 'cider-inspect))
 
     (evil-leader/set-key-for-mode 'cider-repl-mode
@@ -6117,7 +6133,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
       "mgb" 'cider-jump-back
       "mge" 'cider-jump-to-compilation-error
-      "mgg" 'cider-jump-to-var
+      "mgg" 'cider-find-var
       "mgr" 'cider-jump-to-resource
       "msc" 'cider-repl-clear-buffer
 
@@ -6129,6 +6145,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mTp" 'dotemacs-cider-toggle-repl-pretty-printing
 
       "mdb" 'cider-debug-defun-at-point
+      "mde" 'dotemacs-cider-display-error-buffer
       "mdi" 'cider-inspect)
 
     (evil-define-key 'normal cider-repl-mode-map
@@ -6150,8 +6167,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (cljr-add-keybindings-with-prefix "C-c C-f")
-    ;; not supported for now
-    ;; (dotemacs-declare-prefix "mr" "clj-refactor")
 
     (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
       (evil-leader/set-key-for-mode m
@@ -6230,6 +6245,18 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-to-list 'magic-mode-alist '(".* boot" . clojure-mode)))
   :config
   (progn
+
+    (defun dotemacs-clojure-mode-toggle-default-indent-style ()
+      (interactive)
+      (setq clojure-defun-style-default-indent
+            (if clojure-defun-style-default-indent nil t))
+      (message "Clojure-mode default indent style: %s"
+               (if clojure-defun-style-default-indent "ON" "OFF")))
+
+    (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
+      (evil-leader/set-key-for-mode m
+        "mTi" 'dotemacs-clojure-mode-toggle-default-indent-style))
+
     (when dotemacs-clojure-enable-fancify-symbols
       (dolist (m '(clojure-mode clojurescript-mode clojurec-mode clojurex-mode))
         (dotemacs-clojure-fancify-symbols m)))
