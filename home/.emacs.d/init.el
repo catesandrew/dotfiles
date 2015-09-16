@@ -656,6 +656,7 @@ group by projectile projects."
 (require 'core-toggle)
 (require 'core-micro-state)
 (require 'core-use-package-ext)
+(require 'core-keybindings)
 (require 'core-evilify-keymap)
 
 
