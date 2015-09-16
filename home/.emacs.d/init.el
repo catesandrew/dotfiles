@@ -938,28 +938,31 @@ FEATURE may be a named feature or a file name, see
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :pre-init
-    (progn
-      (defun dotemacs-toggle-shell-auto-completion-based-on-path ()
-        "Deactivates automatic completion on remote paths.
+    (dotemacs-use-package-add-hook eshell
+      :post-init
+      (progn
+        (push 'company-capf company-backends-eshell-mode)
+        (dotemacs-add-company-hook eshell-mode))
+      :post-config
+      (progn
+        (defun dotemacs-toggle-shell-auto-completion-based-on-path ()
+          "Deactivates automatic completion on remote paths.
 Retrieving completions for Eshell blocks Emacs. Over remote
 connections the delay is often annoying, so it's better to let
 the user activate the completion manually."
-        (if (current-buffer-remote-p)
-            (setq-local company-idle-delay nil)
-          (setq-local company-idle-delay 0.2)))
-      (add-hook 'eshell-directory-change-hook
-                'dotemacs-toggle-shell-auto-completion-based-on-path)
+          (if (current-buffer-remote-p)
+              (setq-local company-idle-delay nil)
+            (setq-local company-idle-delay 0.2)))
+        (add-hook 'eshell-directory-change-hook
+                  'dotemacs-toggle-shell-auto-completion-based-on-path)
 
-      ;; The default frontend screws everything up in short windows like
-      ;; terminal often are
-      (defun dotemacs-eshell-switch-company-frontend ()
-        "Sets the company frontend to `company-preview-frontend' in e-shell mode."
-        (setq-local company-frontends '(company-preview-frontend)))
-      (add-hook 'eshell-mode-hook
-                'dotemacs-eshell-switch-company-frontend)
-
-      (push 'company-capf company-backends-eshell-mode)
-      (dotemacs-add-company-hook eshell-mode))))
+        ;; The default frontend screws everything up in short windows like
+        ;; terminal often are
+        (defun dotemacs-eshell-switch-company-frontend ()
+          "Sets the company frontend to `company-preview-frontend' in e-shell mode."
+          (setq-local company-frontends '(company-preview-frontend)))
+        (add-hook 'eshell-mode-hook
+                  'dotemacs-eshell-switch-company-frontend)))))
 
 (use-package eshell
   :defer t
