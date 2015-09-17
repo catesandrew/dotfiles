@@ -30,13 +30,13 @@ The initialization function is hooked to `MODE-hook'."
     `(when (eq dotemacs-completion-engine 'company)
        (defun ,func ()
          ,(format "Initialize company for %S" mode)
+         (when auto-completion-enable-snippets-in-popup
+           (setq ,backend-list (mapcar 'dotemacs-show-snippets-in-company
+                                       ,backend-list)))
          (set (make-variable-buffer-local 'auto-completion-front-end)
               'company)
          (set (make-variable-buffer-local 'company-backends)
               ,backend-list))
-       (when auto-completion-enable-snippets-in-popup
-         (setq ,backend-list (mapcar 'dotemacs-show-snippets-in-company
-                                     ,backend-list)))
        (add-hook ',mode-hook ',func t)
        (add-hook ',mode-hook 'company-mode t))))
 
