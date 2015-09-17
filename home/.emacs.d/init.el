@@ -5816,7 +5816,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package go-rename
   :disabled t
   :init
-  (evil-leader/set-key-for-mode 'go-mode "mr" 'go-rename))
+  (evil-leader/set-key-for-mode 'go-mode "mrn" 'go-rename))
 
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-copy-env "GOPATH"))
@@ -5829,13 +5829,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'before-save-hook 'gofmt-before-save)
 
     (evil-leader/set-key-for-mode 'go-mode
-      "mdp" 'godoc-at-point
+      "mhh" 'godoc-at-point
       "mig" 'go-goto-imports
       "mia" 'go-import-add
       "mir" 'go-remove-unused-imports
-      "mpb" 'go-play-buffer
-      "mpr" 'go-play-region
-      "mpd" 'go-download-play
+      "meb" 'go-play-buffer
+      "mer" 'go-play-region
+      "med" 'go-download-play
       "mga" 'ff-find-other-file
       "mgg" 'godef-jump
       "mtp" 'dotemacs-go-run-package-tests)))
