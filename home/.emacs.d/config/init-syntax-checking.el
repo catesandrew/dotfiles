@@ -89,4 +89,35 @@ up before you execute another command."
   (flycheck-clear-idle-change-timer)
   (flycheck-buffer-automatically 'idle-change))
 
+(defvar dotemacs//flycheck-executables-searched nil)
+(defvar dotemacs//flycheck-executable-eslint nil)
+(defvar dotemacs//flycheck-executable-jscs nil)
+(defvar dotemacs//flycheck-executable-jshint nil)
+(defvar dotemacs//flycheck-executable-tidy5 nil)
+
+(defun dotemacs//flycheck-executables-search ()
+  "Lazy locate javascript executables."
+  (unless dotemacs//flycheck-executables-searched
+    (when-let (eslint (executable-find "eslint"))
+              (setq flycheck-javascript-eslint-executable eslint)
+              (setq dotemacs//flycheck-executable-eslint eslint))
+    (when-let (jscs (executable-find "jscs"))
+              (setq flycheck-javascript-jscs-executable jscs)
+              (setq dotemacs//flycheck-executable-jscs jscs))
+    (when-let (jshint (executable-find "jshint"))
+              (setq flycheck-javascript-jshint-executable jshint)
+              (setq dotemacs//flycheck-executable-jshint jshint))
+    (when-let (tidy5 (executable-find "tidy5"))
+              (setq flycheck-html-tidy-executable tidy5)
+              (setq dotemacs//flycheck-executable-tidy5 tidy5))
+    (setq dotemacs//flycheck-executables-searched t)))
+
+(defun dotemacs//flycheck-disable (checker)
+  (interactive)
+  (add-to-list 'flycheck-disabled-checkers checker))
+
+(defun dotemacs//flycheck-enable (checker)
+  (interactive)
+  (setq flycheck-disabled-checkers (remove checker flycheck-disabled-checkers)))
+
 (provide 'init-syntax-checking)

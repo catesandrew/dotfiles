@@ -89,15 +89,26 @@ an array and adds a string for the first argument in the parameter list."
      ((member "lib" current)  (dotemacs-js-jump-to current "lib" "test" 'dotemacs-js-format-test-name))
      (t (error "not within a test or lib directory")))))
 
+(defun dotemacs//js-init-flycheck ()
+  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+    (if dotemacs//flycheck-executable-eslint
+        (progn
+          (dotemacs//flycheck-enable 'javascript-eslint)
+          ;; disable jshint since we prefer eslint checking
+          (when dotemacs//flycheck-executable-jshint
+            (dotemacs//flycheck-disable 'javascript-jshint)))
+      (progn
+        (when dotemacs//flycheck-executable-jshint
+          (dotemacs//flycheck-enable 'javascript-jshint))))
+    (when dotemacs//flycheck-executable-jscs
+      (dotemacs//flycheck-enable 'javascript-jscs))))
+
 (defun dotemacs-js2-mode-defaults ()
   "Default js2-mode coding hook."
 
   (unless (bound-and-true-p my-js2mh-ran)
-    ;; add buffer-local indicator for whether prog-mode-hook has run.
+    ;; add buffer-local indicator for whether `js2-prog-mode-hook` has run.
     (set (make-local-variable 'my-js2mh-ran) t)
-
-    ;; electric-layout-mode doesn't play nice with smartparens
-    ; (setq-local electric-layout-rules '((?\; . after)))
-    ))
+    (dotemacs//js-init-flycheck)))
 
 (provide 'init-js)
