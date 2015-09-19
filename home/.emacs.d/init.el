@@ -10092,7 +10092,6 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (setq flycheck-standard-error-navigation nil
-          flycheck-temp-prefix '.flycheck
           flycheck-completion-system 'ido)
 
     (defun flycheck-turn-on-maybe ()
