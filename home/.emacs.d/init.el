@@ -3552,32 +3552,23 @@ It will toggle the overlay under point or create an overlay of one character."
   :init
   (progn
     (setq evil-leader/leader dotemacs-leader-key)
-    (global-evil-leader-mode))
+    (global-evil-leader-mode)
+    ;; This is the same hook used by evil-leader. We make sure that this
+    ;; function is called after `evil-leader-mode' using the last argument
+    (add-hook 'evil-local-mode-hook
+      #'dotemacs-additional-leader-mode t))
   :config
   (progn
     ;; Unset shortcuts which shadow evil leader
     (after "compile"
       '(progn
          (define-key compilation-mode-map (kbd "h") nil)))
-    ;; make leader available in visual and motion states
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-map" s))
-                     ,(kbd dotemacs-leader-key)
-                     evil-leader--default-map)))
-          '(motion visual))
-    ;; emacs and insert states (make it also available in other states
-    ;; for consistency and POLA.)
-    (mapc (lambda (s)
-            (eval `(define-key
-                     ,(intern (format "evil-%S-state-map" s))
-                     ,(kbd dotemacs-emacs-leader-key)
-                     evil-leader--default-map)))
-          '(emacs insert normal visual motion))
-    ;; experimental: map `<leader> m` to `dotemacs-major-mode-leader-key`
-    (when dotemacs-major-mode-leader-key
-      (add-hook 'evil-local-mode-hook
-                'dotemacs-activate-major-mode-leader t))))
+      ;; evil-leader does not get activated in existing buffers, so we have to
+      ;; force it here
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (evil-leader-mode 1)
+          (dotemacs-additional-leader-mode 1)))))
 
 (use-package evil-lisp-state
   :ensure t
@@ -9206,8 +9197,14 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (evil-leader/set-key-for-mode 'org-mode
       "o" nil "mC" 'evil-org-recompute-clocks
-      ;; evil-org binds these keys, so we unbind them
-      "t" nil "a" nil "b" nil "c" nil "l" nil "o" nil)
+      ;; evil-org binds these keys, so we bind them back to their original
+      ;; value
+      "t" (lookup-key evil-leader--default-map "t")
+      "a" (lookup-key evil-leader--default-map "a")
+      "b" (lookup-key evil-leader--default-map "b")
+      "c" (lookup-key evil-leader--default-map "c")
+      "l" (lookup-key evil-leader--default-map "l")
+      "o" (lookup-key evil-leader--default-map "o"))
     (evil-define-key 'normal evil-org-mode-map
       "O" 'evil-open-above)
     (dotemacs-diminish evil-org-mode " ⓔ" " e")))
