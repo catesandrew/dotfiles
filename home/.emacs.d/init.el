@@ -9182,14 +9182,11 @@ If called with a prefix argument, uses the other-window instead."
 (use-package org-repo-todo
   :ensure t
   :defer t
-  :commands (ort/capture-todo
-             ort/capture-todo-check
-             ort/goto-todos)
   :init
   (progn
     (evil-leader/set-key
       "Ct"  'ort/capture-todo
-      "CT"  'ort/capture-todo-check)
+      "CT"  'ort/capture-checkitem)
     (evil-leader/set-key-for-mode 'org-mode
       "mgt" 'ort/goto-todos)))
 
