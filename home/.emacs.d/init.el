@@ -5176,6 +5176,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
             (call-interactively 'sp-backward-delete-char)))))))
 
 (use-package evil-matchit-python
+  :disabled t
   :defer t
   :ensure evil-matchit
   :init
