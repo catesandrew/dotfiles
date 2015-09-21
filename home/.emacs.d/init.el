@@ -2852,7 +2852,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (setq sp-show-pair-delay 0.2
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
           ; fix paren highlighting in normal mode
-          sp-show-pair-from-inside (not evil-move-beyond-eol)
+          sp-show-pair-from-inside t
           sp-cancel-autoskip-on-backward-movement nil))
   :config
   (progn
@@ -3327,13 +3327,7 @@ Disable the highlighting of overlong lines."
 
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
-    (add-hook 'post-command-hook 'evil-refresh-cursor)
-
-    ;; allow the point to go past the end of line so we can
-    ;; consisently evaluate expression with eval-last-sexp in
-    ;; all modes
-    ;; Temporarily disabled pending resolution of other issues.
-    ;; (setq evil-move-beyond-eol t)
+    ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
 
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
