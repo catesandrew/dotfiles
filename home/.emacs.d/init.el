@@ -7825,6 +7825,13 @@ If called with a prefix argument, uses the other-window instead."
       (kbd "C-S-k") 'magit-section-backward
       (kbd "C-n") 'magit-section-forward
       (kbd "C-p") 'magit-section-backward)
+    (dotemacs-evilify-map magit-stash-mode-map
+      :mode magit-stash-mode
+      :bindings
+      (kbd "C-S-j") 'magit-section-forward
+      (kbd "C-S-k") 'magit-section-backward
+      (kbd "C-n") 'magit-section-forward
+      (kbd "C-p") 'magit-section-backward)
     (dotemacs-evilify-map git-rebase-mode-map
       :mode git-rebase-mode
       :bindings
