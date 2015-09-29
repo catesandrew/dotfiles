@@ -271,7 +271,7 @@ can be toggled through `toggle-transparency'."
   "If non nil advises quit functions to keep server open when quitting.")
   :group 'dotemacs
 
-(defcustom dotemacs-mode-line-unicode-symbols t
+(defcustom dotemacs-mode-line-unicode-symbols nil
   "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
   :group 'dotemacs
 
