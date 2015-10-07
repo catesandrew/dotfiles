@@ -95,6 +95,12 @@ up before you execute another command."
 (defvar dotemacs//flycheck-executable-jshint nil)
 (defvar dotemacs//flycheck-executable-tidy5 nil)
 
+(defun dotemacs//eslint-set-local-eslint-from-projectile ()
+  "use local eslint CLI from `./node_modules` if available."
+  (when-let (eslint (executable-find "eslint"))
+            (setq flycheck-javascript-eslint-executable eslint)
+            (setq dotemacs//flycheck-executable-eslint eslint)))
+
 (defun dotemacs//flycheck-executables-search ()
   "Lazy locate javascript executables."
   (unless dotemacs//flycheck-executables-searched

@@ -6412,6 +6412,7 @@ If called with a prefix argument, uses the other-window instead."
     ;; disable json-jsonlist checking for json files
     (dotemacs//flycheck-disable 'json-jsonlist)))
 
+; todo: update eslint to local for react-mode
 (defun dotemacs-react-mode-defaults ()
   "Default react-mode coding hook."
   (unless (bound-and-true-p my-react-mh-ran)
@@ -6646,28 +6647,37 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'js2-mode-hook 'flycheck-turn-on-maybe)
     (add-hook 'json-mode-hook 'flycheck-turn-on-maybe)))
 
+(defun dotemacs//flycheck-executables-updated ()
+  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+    (when dotemacs//flycheck-executable-eslint
+      (evil-leader/set-key
+        "tee" 'flycheck-eslint-enable
+        "teE" 'flycheck-eslint-disable))
+
+    (when dotemacs//flycheck-executable-jscs
+      (evil-leader/set-key
+        "tec" 'flycheck-jscs-enable
+        "teC" 'flycheck-jscs-disable))
+
+    (when dotemacs//flycheck-executable-jshint
+      (evil-leader/set-key
+        "teh" 'flycheck-jshint-enable
+        "teH" 'flycheck-jshint-disable))
+
+    (when (equal major-mode 'js2-mode)
+      (dotemacs//js-init-flycheck))))
+
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
     (dotemacs//flycheck-executables-search)
-    (when (bound-and-true-p dotemacs//flycheck-executables-searched)
-      (when dotemacs//flycheck-executable-eslint
-        (evil-leader/set-key
-          "tee" 'flycheck-eslint-enable
-          "teE" 'flycheck-eslint-disable))
+    (after "projectile"
+      (dotemacs//eslint-set-local-eslint-from-projectile)
+      (dotemacs//flycheck-executables-updated))
 
-      (when dotemacs//flycheck-executable-jscs
-        (evil-leader/set-key
-          "tec" 'flycheck-jscs-enable
-          "teC" 'flycheck-jscs-disable))
-
-      (when dotemacs//flycheck-executable-jshint
-        (evil-leader/set-key
-          "teh" 'flycheck-jshint-enable
-          "teH" 'flycheck-jshint-disable))
-
-      (when (equal major-mode 'js2-mode)
-        (dotemacs//js-init-flycheck)))))
+    (add-hook 'projectile-switch-project-hook (lambda ()
+      (dotemacs//eslint-set-local-eslint-from-projectile)
+      (dotemacs//flycheck-executables-updated)))))
 
 (use-package js-doc
   :defer t
