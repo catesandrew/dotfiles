@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Helper for contorl-plane to switch nmprc files
+"${NVM_BIN}/npmrc" "$1"
