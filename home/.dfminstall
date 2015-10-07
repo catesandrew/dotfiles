@@ -11,3 +11,4 @@ indent.pro skip
 .mjolnir recurse
 .lein recurse
 .mrconfig skip
+README.md skip

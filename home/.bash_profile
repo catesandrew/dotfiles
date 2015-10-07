@@ -51,7 +51,8 @@ set bell-style visible
 
 # Let me have core dumps
 #ulimit -c unlimited
-ulimit -n 4096
+# ulimit -n 4096
+ulimit -n 65536 65536
 
 if [ -f "${HOME}/.bashrc" ]; then
   source "${HOME}/.bashrc"
