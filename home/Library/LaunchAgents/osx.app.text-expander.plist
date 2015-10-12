@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.text-expander</string>
-	<key>Program</key>
-	<string>/Applications/TextExpander.app/Contents/MacOS/TextExpander</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/TextExpander.app/Contents/MacOS/TextExpander</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

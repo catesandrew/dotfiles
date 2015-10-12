@@ -6,8 +6,12 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.seil</string>
-	<key>Program</key>
-	<string>/Applications/Seil.app/Contents/MacOS/Seil</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>sh</string>
+      <string>-c</string>
+      <string>sleep 10 &amp;&amp; /Applications/Seil.app/Contents/MacOS/Seil</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

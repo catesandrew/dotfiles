@@ -6,8 +6,12 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.drop-zone</string>
-	<key>Program</key>
-	<string>/Applications/Dropzone 3.app/Contents/MacOS/Dropzone 3</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>sh</string>
+      <string>-c</string>
+      <string>sleep 10 &amp;&amp; /Applications/Dropzone\ 3.app/Contents/MacOS/Dropzone\ 3</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

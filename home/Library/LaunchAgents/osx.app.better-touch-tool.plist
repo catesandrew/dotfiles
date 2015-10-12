@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.better-touch-tool</string>
-	<key>Program</key>
-	<string>/Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

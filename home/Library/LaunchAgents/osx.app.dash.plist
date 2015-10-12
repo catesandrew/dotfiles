@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.dash</string>
-	<key>Program</key>
-	<string>/Applications/Dash.app/Contents/MacOS/Dash</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/Dash.app/Contents/MacOS/Dash</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

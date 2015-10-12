@@ -12,7 +12,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-        <string>$HOME/.bin/brew-update-notifier.sh</string>
+        <string>sleep 60 &amp;&amp; $HOME/.bin/brew-update-notifier.sh</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

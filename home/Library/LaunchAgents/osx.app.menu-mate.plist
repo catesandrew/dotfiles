@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.menu-mate</string>
-	<key>Program</key>
-	<string>/Applications/MenuMate.app/Contents/MacOS/MenuMate</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/MenuMate.app/Contents/MacOS/MenuMate</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

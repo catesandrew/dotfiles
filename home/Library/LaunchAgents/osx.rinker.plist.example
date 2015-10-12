@@ -8,7 +8,9 @@
 	  <string>osx.rinker</string>
 	  <key>ProgramArguments</key>
 	  <array>
-      <string>/Users/andrew/.bin/rinker.sh</string>
+          <string>/bin/bash</string>
+          <string>-c</string>
+          <string>$HOME/.bin/rinker.sh</string>
 		  <string>google</string>
 		  <string>USER</string>
 		  <string>PASS</string>
@@ -16,11 +18,7 @@
 		  <string>\"'https://domains.google.com/nic/update?hostname=$HOST&amp;myip=$IP'\"</string>
 	  </array>
 	  <key>RunAtLoad</key>
-	  <true/>
-	  <key>StandardErrorPath</key>
-	  <string>$HOME/Library/Logs/rinker-errors.log</string>
-	  <key>StandardOutPath</key>
-	  <string>$HOME/Library/Logs/rinker-out.log</string>
+      <false/>
 	  <key>StartCalendarInterval</key>
 	  <dict>
 		  <key>Minute</key>

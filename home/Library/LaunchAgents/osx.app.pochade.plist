@@ -6,8 +6,12 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.pochade</string>
-	<key>Program</key>
-	<string>/Applications/Pochade.app/Contents/MacOS/Pochade</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>sh</string>
+      <string>-c</string>
+      <string>sleep 10 &amp;&amp; /Applications/Pochade.app/Contents/MacOS/Pochade</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

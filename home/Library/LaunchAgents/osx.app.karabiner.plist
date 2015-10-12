@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.karabiner</string>
-	<key>Program</key>
-	<string>/Applications/Karabiner.app/Contents/MacOS/Karabiner</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/Karabiner.app/Contents/MacOS/Karabiner</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

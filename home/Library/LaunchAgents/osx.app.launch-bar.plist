@@ -6,8 +6,10 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.launch-bar</string>
-	<key>Program</key>
-	<string>/Applications/LaunchBar.app/Contents/MacOS/LaunchBar</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/LaunchBar.app/Contents/MacOS/LaunchBar</string>
+    </array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
