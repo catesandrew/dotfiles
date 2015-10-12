@@ -7,7 +7,7 @@
 	<key>Label</key>
 	<string>osx.app.bartender</string>
 	<key>Program</key>
-	<string>/Applications/Bartender.app/Contents/MacOS/Bartender 2</string>
+	<string>/Applications/Bartender 2.app/Contents/MacOS/Bartender 2</string>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
