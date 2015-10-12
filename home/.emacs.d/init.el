@@ -7900,9 +7900,9 @@ If called with a prefix argument, uses the other-window instead."
 
 ;; magit-gh-pulls has to be loaded via a pre-config hook because the source
 ;; code makes assumptions about the status of the magit-mode keymaps that are
-;; incompatible with the spacemacs' evilification feature. To avoid errors,
+;; incompatible with the dotemacs' evilification feature. To avoid errors,
 ;; magit-gh-pulls must be loaded after magit, but before magit is configured by
-;; spacemacs.
+;; dotemacs.
 
 (dotemacs-use-package-add-hook magit
   :pre-config
@@ -9422,14 +9422,14 @@ If called with a prefix argument, uses the other-window instead."
        ;; no need to use this after everyone updates which-key
        (setq which-key-prefix-title-alist
              `((,(listify-key-sequence
-                  (kbd (concat dotspacemacs-leader-key " m"))) . "Major mode commands")
+                  (kbd (concat dotemacs-leader-key " m"))) . "Major mode commands")
                (,(listify-key-sequence
-                  (kbd (concat dotspacemacs-emacs-leader-key " m"))) . "Major mode commands")
+                  (kbd (concat dotemacs-emacs-leader-key " m"))) . "Major mode commands")
                (,(listify-key-sequence
-                  (kbd dotspacemacs-leader-key)) . "Spacemacs root")
+                  (kbd dotemacs-leader-key)) . "dotemacs root")
                (,(listify-key-sequence
-                  (kbd dotspacemacs-emacs-leader-key)) . "Spacemacs root")))
-       (nconc which-key-prefix-title-alist spacemacs/prefix-titles))
+                  (kbd dotemacs-emacs-leader-key)) . "dotemacs root")))
+       (nconc which-key-prefix-title-alist dotemacs-prefix-titles))
 
       ;; disable special key handling for dotemacs, since it can be
       ;; disorienting if you don't understand it
