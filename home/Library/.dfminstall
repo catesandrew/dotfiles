@@ -1,7 +1,7 @@
 .DS_Store skip
 extensions skip
 launch-daemons skip
-preferences skip
+Preferences recurse
 LaunchAgents recurse
 KeyBindings recurse
 Application Support recurse
