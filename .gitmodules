@@ -1,9 +1,3 @@
-[submodule "home/library/preferences/IntelliJIdea/tools/nodelint"]
-    path = home/library/preferences/IntelliJIdea/tools/nodelint
-    url = https://github.com/tav/nodelint.git
-[submodule "home/library/preferences/IntelliJIdea/tools/nodelint-config"]
-    path = home/library/preferences/IntelliJIdea/tools/nodelint-config
-    url = https://github.com/factorylabs/nodelint-config.git
 [submodule "home/vim/bundle/nerdtree"]
 	path = home/.vim/bundle/nerdtree
     url = git://github.com/scrooloose/nerdtree.git
