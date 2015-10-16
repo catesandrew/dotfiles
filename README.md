@@ -18,9 +18,8 @@ $ DFM_REPO=~/.dotfiles ~/.dotfiles/home/.bin/dfm install
 On Mac OS/X create a `~/.bashrc` file.
 
 ```sh
-touch ~/.bashrc
-
-cat <<< '. $HOME/.bashrc
+$ touch ~/.bashrc
+$ cat <<< '. $HOME/.bashrc.load
 '> ~/.bashrc
 ```
 
@@ -265,7 +264,7 @@ NOTE: I just added `launchctl setenv` commands to the `/etc/profile` as well bec
 # System-wide .profile for sh(1)
 
 if [ -x /usr/libexec/path_helper ]; then
-	eval `/usr/libexec/path_helper -s`
+  eval `/usr/libexec/path_helper -s`
 fi
 
 if ! [ -d "$NVM_DIR" ]; then
@@ -282,7 +281,7 @@ fi
 if [ -d "$NVM_DIR" ]; then
     if [ -f "${NVM_DIR}/alias/default" ]; then
         NVM_VERSION=`cat ${NVM_DIR}/alias/default`
-        PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:./node_modules/.bin:${PATH}"
+        PATH="./node_modules/.bin:${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:${PATH}"
         NVM_BIN="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin"
         NVM_PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node"
         export NVM_BIN
@@ -297,7 +296,7 @@ export PATH
 launchctl setenv PATH "$PATH"
 
 if [ "${BASH-no}" != "no" ]; then
-	[ -r /etc/bashrc ] && . /etc/bashrc
+  [ -r /etc/bashrc ] && . /etc/bashrc
 fi
 
 ```
