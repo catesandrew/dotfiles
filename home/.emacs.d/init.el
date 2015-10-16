@@ -757,10 +757,11 @@ FEATURE may be a named feature or a file name, see
                             (car dotemacs-default-font)))
 
 ;; fringes
-(custom-set-variables
-  '(fringe-mode (quote (4 . 4)) nil (fringe)))
-(setq-default fringe-indicator-alist
-              '((truncation . nil) (continuation . nil)))
+(when (display-graphic-p)
+  (custom-set-variables
+    '(fringe-mode (quote (4 . 4)) nil (fringe)))
+  (setq-default fringe-indicator-alist
+                '((truncation . nil) (continuation . nil))))
 
 ;; mandatory dependencies
 ; (dotemacs-load-or-install-package 'dash t)
