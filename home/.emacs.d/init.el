@@ -191,7 +191,7 @@ pressing `<leader> m`. Set it to `nil` to disable it."
   :group 'dotemacs)
 
 ; Source Code Pro for Powerline
-(defcustom dotemacs-default-font '("Source Code Pro"
+(defcustom dotemacs-default-font '("Hack"
                                     :size 13
                                     :weight normal
                                     :width normal
