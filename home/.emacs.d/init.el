@@ -6705,8 +6705,19 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     ;; Let flycheck handle parse errors
     (setq js2-show-parse-errors nil
+          js2-use-font-lock-faces t
           js2-strict-missing-semi-warning nil
-          js2-strict-trailing-comma-warning t) ;; jshint does not warn about this now for some reason
+          js2-highlight-external-variables nil
+          js2-include-browser-externs t
+          js2-include-node-externs t
+          js2-missing-semi-one-line-override t
+          js2-strict-cond-assign-warning nil
+          js2-strict-inconsistent-return-warning nil
+          js2-strict-trailing-comma-warning nil
+          js2-strict-var-hides-function-arg-warning nil
+          js2-strict-var-redeclaration-warning nil
+          js2-warn-about-unused-function-arguments nil
+          js2-strict-trailing-comma-warning nil)
 
     (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.jscsrc$" . json-mode))
@@ -6718,7 +6729,7 @@ If called with a prefix argument, uses the other-window instead."
     (setq-default js2-basic-offset 2)
     (setq-default js-indent-level 2)
 
-    (setq js2-global-externs '("angular" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "__dirname" "console" "JSON" "_" "assert" "refute" "buster" "require" "global" "exports" "module" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "expect" "sinon" "test" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
+    (setq js2-global-externs '("__dirname" "_" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "sinon" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
 
     (dotemacs-declare-prefix-for-mode 'js2-mode "mz" "folding")
     (evil-leader/set-key-for-mode 'js2-mode "mw" 'js2-mode-toggle-warnings-and-errors)
