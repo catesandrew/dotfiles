@@ -87,7 +87,6 @@ done
 if [ $(uname) = "Darwin" ]; then
 
     export CHEATCOLORS=true
-    # export JAVA_HOME="`/usr/libexec/java_home`"
     export HTML_TIDY=$HOME/.tidyrc
     export TLSOURCE=en TLTARGET=es
     export LC_CTYPE="utf-8"
@@ -104,8 +103,11 @@ if [ $(uname) = "Darwin" ]; then
     pathmunge "${HOME}/.cabal/bin"
     pathmunge "${HOME}/.bin"
 
+
     if hash brew 2>/dev/null; then
-        export BREW_HOME="`brew --prefix`"
+        if ! [ -d "$BREW_HOME" ]; then
+            export BREW_HOME="`brew --prefix`"
+        fi
 
         # Cask installation
         if [ ! -h "${HOME}/.cask" ]; then
@@ -126,9 +128,6 @@ if [ $(uname) = "Darwin" ]; then
             # Time Machine ignore this directory
             export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
         fi
-
-    else
-        echo "homebrew not installed, please consider installing it."
     fi
 
 

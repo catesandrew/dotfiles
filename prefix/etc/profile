@@ -4,34 +4,15 @@ if [ -x /usr/libexec/path_helper ]; then
 	eval `/usr/libexec/path_helper -s`
 fi
 
-if ! [ -d "$NVM_DIR" ]; then
-  if [ -d /usr/local/nvm ]; then
-    NVM_DIR=/usr/local/nvm
-  elif [ -d "$HOME" ]; then
-    NVM_DIR="$HOME"/.nvm
-  fi
-
-  export NVM_DIR
-  launchctl setenv NVM_DIR "$NVM_DIR"
+if [ -d /etc/profile.d ]; then
+    for i in /etc/profile.d/*.sh; do
+        if [ -r $i ]; then
+            . $i
+        fi
+    done
+    unset i
 fi
 
-if [ -d "$NVM_DIR" ]; then
-    if [ -f "${NVM_DIR}/alias/default" ]; then
-        NVM_VERSION=`cat ${NVM_DIR}/alias/default`
-        PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:./node_modules/.bin:${PATH}"
-        NVM_BIN="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin"
-        NVM_PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node"
-        export NVM_BIN
-        export NVM_PATH
-        launchctl setenv NVM_VERSION "$NVM_VERSION"
-        launchctl setenv NVM_BIN "$NVM_BIN"
-        launchctl setenv NVM_PATH "$NVM_PATH"
-    fi
-fi
-
-export PATH
-launchctl setenv PATH "$PATH"
-
-if [ "${BASH-no}" != "no" ]; then
+if [ "${BASH_NO}" != "no" ]; then
 	[ -r /etc/bashrc ] && . /etc/bashrc
 fi

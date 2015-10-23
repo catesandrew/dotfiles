@@ -267,6 +267,41 @@ if [ -x /usr/libexec/path_helper ]; then
   eval `/usr/libexec/path_helper -s`
 fi
 
+if [ -d /etc/profile.d ]; then
+    for i in /etc/profile.d/*.sh; do
+        if [ -r $i ]; then
+            . $i
+        fi
+    done
+    unset i
+fi
+
+if [ "${BASH_NO}" != "no" ]; then
+  [ -r /etc/bashrc ] && . /etc/bashrc
+fi
+```
+
+Here is a copy of my `/etc/profile.d/environmeht.sh` file:
+
+
+```bash
+if ! [ -d "$BREW_HOME" ]; then
+    if hash brew 2>/dev/null; then
+        BREW_HOME="`brew --prefix`"
+        export BREW_HOME
+        launchctl setenv BREW_HOME "$BREW_HOME"
+
+        # Cask installation
+        if ! [ -d "$CASK_HOME" ]; then
+            if [ x"" != x"$(brew ls --versions cask)"  ]; then
+                CASK_HOME="`brew --prefix cask`"
+                export CASK_HOME
+                launchctl setenv CASK_HOME "$CASK_HOME"
+            fi
+        fi
+    fi
+fi
+
 if ! [ -d "$NVM_DIR" ]; then
   if [ -d /usr/local/nvm ]; then
     NVM_DIR=/usr/local/nvm
@@ -294,11 +329,6 @@ fi
 
 export PATH
 launchctl setenv PATH "$PATH"
-
-if [ "${BASH-no}" != "no" ]; then
-  [ -r /etc/bashrc ] && . /etc/bashrc
-fi
-
 ```
 
 And through all these files and commands I have the correct node path from nvm loaded into the gloabl environment. Now obviously I doubt this would work once you update the version of node and a reboot or logoff/login will be required for the changes to take effect. But that’s ok with me since I typically only update node once every couple months.

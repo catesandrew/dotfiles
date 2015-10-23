@@ -10,11 +10,8 @@
     <string>sh</string>
     <string>-c</string>
     <string>
-        /bin/launchctl setenv BREW_HOME /usr/local
-        /bin/launchctl setenv GOPATH /usr/local/go
-        /bin/launchctl setenv NVM_DIR /usr/local/nvm
-        /bin/launchctl setenv NVM_TARGET /usr/local/opt/nvm
-      </string>
+        BASH_NO=no . /etc/profile
+    </string>
   </array>
   <key>RunAtLoad</key>
   <true/>
