@@ -24,32 +24,32 @@ __docker_complete ()
 # ------------------------------------
 
 # Get latest container ID
-alias dl="docker ps -l -q"
+alias dl="docker --tls ps -l -q"
 
 # Get container process
-alias dps="docker ps"
+alias dps="docker --tls ps"
 
 # Get process included stop container
-alias dpa="docker ps -a"
+alias dpa="docker --tls ps -a"
 
 # Get images
-alias di="docker images"
+alias di="docker --tls images"
 
 # Get container IP
-alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+alias dip="docker --tls inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
-alias dkd="docker run -d -P"
+alias dkd="docker --tls run -d -P"
 
 # Run interactive container, e.g., $dki base /bin/bash
-alias dki="docker run -i -t -P"
+alias dki="docker --tls run -i -t -P"
 
 # Stop all containers
 dstop() {
     if [ $# -eq 0 ] ; then
-        docker stop $(docker ps -a -q);
+        docker --tls stop $(docker --tls ps -a -q);
     else
-        docker stop $1;
+        docker --tls stop $1;
     fi
 }
 __docker_complete dstop _docker_stop
@@ -57,15 +57,15 @@ __docker_complete dstop _docker_stop
 # Remove all containers
 drm() {
     if [ $# -eq 0 ] ; then
-        docker rm $(docker ps -a -q);
+        docker --tls rm $(docker --tls ps -a -q);
     else
-        docker rm $1;
+        docker --tls rm $1;
     fi
 }
 __docker_complete drm _docker_rm
 
 # Stop and Remove all containers
-alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
+alias drmf='docker --tls stop $(docker --tls ps -a -q) && docker --tls rm $(docker --tls ps -a -q)'
 
 # Remove image specified by $1 or remove all untagged images
 dri() {
@@ -76,21 +76,21 @@ dri() {
         # repository column. Then to extract the id out of the third column we
         # pipe it to awk "{print $3}" which will print the third column of each
         # line passed to it.
-        docker rmi $(docker images | grep "^<none>" | awk '{print $3}')
+        docker --tls rmi $(docker --tls images | grep "^<none>" | awk '{print $3}')
     else
-        docker rmi $1;
+        docker --tls rmi $1;
     fi
 }
 __docker_complete dri _docker_rmi
 
 # Remove all images
 drif() {
-    docker rmi $(docker images -q);
+    docker --tls rmi $(docker --tls images -q);
 }
 
 
 # Dockerfile build, e.g., $dbu tcnksm/test
-dbu() { docker build -t=$1 .; }
+dbu() { docker --tls build -t=$1 .; }
 
 # Show all alias related docker
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
@@ -106,7 +106,7 @@ docker2hostfile() {
 
 # enter into a running container
 dent() {
-    docker exec -i -t $1 /bin/bash
+    docker --tls exec -i -t $1 /bin/bash
 }
 __docker_complete dent _docker_exec
 
@@ -114,7 +114,7 @@ __docker_complete dent _docker_exec
 # dbash is particularly useful when diagnosing a failed `docker build`. Just
 # dbash the last generated image and re-run the failed command
 dbash() {
-    docker run --rm -i -t -e TERM=xterm --entrypoint /bin/bash $1 
+    docker --tls run --rm -i -t -e TERM=xterm --entrypoint /bin/bash $1 
 }
 __docker_complete dbash __docker_image_repos
 
