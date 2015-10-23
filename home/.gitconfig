@@ -168,6 +168,7 @@
   cmd="~/Applications/MacVim.app/Contents/MacOS/Vim -d -g -c 'wincmd J'  $MERGED $LOCAL $BASE $REMOTE"
 [gitflow "prefix"]
   feature = feature/
+  bugfix = bugfix/
   release = release/
   hotfix = hotfix/
   support = support/
