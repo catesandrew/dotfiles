@@ -3,5 +3,6 @@ extensions skip
 launch-daemons skip
 Preferences recurse
 LaunchAgents recurse
+Services recurse
 KeyBindings recurse
 Application Support recurse
