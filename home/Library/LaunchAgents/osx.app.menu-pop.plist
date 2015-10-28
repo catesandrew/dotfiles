@@ -5,10 +5,10 @@
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
-	<string>osx.app.menu-mate</string>
+	<string>osx.app.menu-pop</string>
     <key>ProgramArguments</key>
     <array>
-      <string>/Applications/MenuMate.app/Contents/MacOS/MenuMate</string>
+      <string>/Applications/MenuPop.app/Contents/MacOS/MenuPop</string>
     </array>
 	<key>RunAtLoad</key>
 	<true/>
