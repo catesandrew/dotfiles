@@ -83,6 +83,26 @@ function! UpdateJscsConf()
     let g:syntastic_javascript_jscs_args = '-c ' . l:jscsrc
 endfunction
 
+function! s:find_eslintrc(dir)
+    let l:eslintfound = globpath(a:dir, '.eslintrc')
+    if filereadable(l:eslintfound)
+        return l:eslintfound
+    endif
+
+    let l:eslintparent = fnamemodify(a:dir, ':h')
+    if l:eslintparent != a:dir
+        return s:find_eslintrc(l:eslintparent)
+    endif
+
+    return "~/.eslintrc"
+endfunction
+
+function! UpdateEslintConf()
+    let l:dir = expand('%:p:h')
+    let l:eslintrc = s:find_eslintrc(l:dir)
+    let g:syntastic_javascript_eslint_args = '-c ' . l:eslintrc
+endfunction
+
 " Also, you should hook other event, because FileType is too early, and cursor
 " position will be overwritten using info from .viminfo:
 function! MyBufEnter()
