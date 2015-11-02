@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIconFile</key>
+	<string>Netflix</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.kyleacarson.LaunchBar.action.Netflix</string>
+	<key>CFBundleName</key>
+	<string>Netflix</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>LBDescription</key>
+	<dict>
+		<key>LBAuthor</key>
+		<string>Kyle Carson</string>
+		<key>LBRequirements</key>
+		<string>Requires an active internet connection.</string>
+		<key>LBSummary</key>
+		<string>Search Netflix with predictions</string>
+		<key>LBTwitter</key>
+		<string>@kyleacarson</string>
+	</dict>
+	<key>LBScripts</key>
+	<dict>
+		<key>LBDefaultScript</key>
+		<dict>
+			<key>LBAcceptedArgumentTypes</key>
+			<array>
+				<string>string</string>
+			</array>
+			<key>LBRequiresArgument</key>
+			<false/>
+			<key>LBScriptName</key>
+			<string>default.js</string>
+		</dict>
+		<key>LBSuggestionsScript</key>
+		<dict>
+			<key>LBLiveFeedbackEnabled</key>
+			<true/>
+			<key>LBScriptName</key>
+			<string>suggestions.js</string>
+			<key>LBBackgroundKillEnabled</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LBTextInputTitle</key>
+	<string>Netflix</string>
+</dict>
+</plist>

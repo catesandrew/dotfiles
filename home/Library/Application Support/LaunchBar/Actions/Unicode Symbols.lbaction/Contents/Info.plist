@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIconFile</key>
+	<string>at.obdev.LaunchBar:Pref_Shortcuts</string>
+	<key>CFBundleIdentifier</key>
+	<string>nbjahan.launchbar.unisym</string>
+	<key>CFBundleName</key>
+	<string>Unicode Symbols</string>
+	<key>CFBundleVersion</key>
+	<string>1.4.0</string>
+	<key>LBDescription</key>
+	<dict>
+		<key>LBAuthor</key>
+		<string>Nima Jahanshahi</string>
+		<key>LBSummary</key>
+		<string>Collection of unicode symbols to use in text: ⚖ ☯ ∞ ★ ☕</string>
+		<key>LBTwitter</key>
+		<string>@nbjahan</string>
+		<key>LBWebsite</key>
+		<string>https://github.com/nbjahan/launchbar-unisym</string>
+	</dict>
+	<key>LBScripts</key>
+	<dict>
+		<key>LBDefaultScript</key>
+		<dict>
+			<key>LBAcceptedArgumentTypes</key>
+			<array>
+				<string>string</string>
+			</array>
+			<key>LBBackgroundKillEnabled</key>
+			<true/>
+			<key>LBKeepWindowActive</key>
+			<true/>
+			<key>LBLiveFeedbackEnabled</key>
+			<true/>
+			<key>LBResultType</key>
+			<string>unknown</string>
+			<key>LBReturnsResult</key>
+			<true/>
+			<key>LBScriptName</key>
+			<string>unisym</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
