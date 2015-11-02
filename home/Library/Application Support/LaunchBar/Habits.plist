@@ -3347,15 +3347,15 @@
 		<key>net</key>
 		<dict>
 			<key>ODLBPathItem:/Applications/Utilities/Network Utility.app</key>
-			<integer>2</integer>
-			<key>ODLBPathItem:/Applications/iNet Network Scanner.app</key>
-			<integer>5</integer>
-			<key>ODLBPathItem:/Applications/iNet Network Toolbox.app</key>
-			<integer>3</integer>
-			<key>ODLBPathItem:/System/Library/CoreServices/Network Diagnostics.app</key>
 			<integer>1</integer>
-			<key>ODLBPathItem:/usr/local/caskroom/netspot/latest/NetSpot.app</key>
+			<key>ODLBPathItem:/Applications/iNet Network Scanner.app</key>
 			<integer>4</integer>
+			<key>ODLBPathItem:/Applications/iNet Network Toolbox.app</key>
+			<integer>2</integer>
+			<key>ODLBPathItem:/usr/local/caskroom/netspot/latest/NetSpot.app</key>
+			<integer>3</integer>
+			<key>ODLBScriptAction:com.kyleacarson.LaunchBar.action.Netflix</key>
+			<integer>5</integer>
 		</dict>
 		<key>netwo</key>
 		<dict>
@@ -3373,6 +3373,11 @@
 		<dict>
 			<key>ODLBNetworkLocationItem:82B65FE0-454C-4A65-9C3F-0C9E4852AF3D</key>
 			<integer>1</integer>
+		</dict>
+		<key>nf</key>
+		<dict>
+			<key>ODLBScriptAction:com.kyleacarson.LaunchBar.action.Netflix</key>
+			<integer>2</integer>
 		</dict>
 		<key>nfs</key>
 		<dict>
@@ -5041,7 +5046,7 @@
 	<key>accessCounts</key>
 	<dict>
 		<key>Actions</key>
-		<integer>157</integer>
+		<integer>159</integer>
 		<key>ApplicationSwitching</key>
 		<integer>4</integer>
 		<key>Browsing</key>
@@ -5069,7 +5074,7 @@
 		<key>FileOperations</key>
 		<integer>1</integer>
 		<key>FullIndexSearch</key>
-		<integer>7626</integer>
+		<integer>7628</integer>
 		<key>InfoBrowsing</key>
 		<integer>24</integer>
 		<key>InstantOpen</key>
@@ -5083,7 +5088,7 @@
 		<key>OpenLocation</key>
 		<integer>1</integer>
 		<key>OpeningDocuments</key>
-		<integer>20</integer>
+		<integer>22</integer>
 		<key>QuickLook</key>
 		<integer>17</integer>
 		<key>RecentDocuments</key>
@@ -5737,6 +5742,9 @@
 		<real>467995943.64852101</real>
 		<real>467996853.86346698</real>
 		<real>468127730.57572597</real>
+		<real>468132888.91074902</real>
+		<real>468132939.36915702</real>
+		<real>468132951.72793001</real>
 	</array>
 	<key>itemIdentifierVersion</key>
 	<integer>4</integer>
@@ -6880,6 +6888,8 @@
 		<integer>463432737</integer>
 		<key>ODLBScriptAction:at.obdev.LaunchBar.action.iTunesPlay</key>
 		<integer>425335379</integer>
+		<key>ODLBScriptAction:com.kyleacarson.LaunchBar.action.Netflix</key>
+		<integer>468132955</integer>
 		<key>ODLBScriptAction:io.henrik.launchbar.CanIUse</key>
 		<integer>447947621</integer>
 		<key>ODLBScriptAction:io.henrik.launchbar.Forecast</key>
@@ -8131,6 +8141,8 @@
 		<integer>9</integer>
 		<key>ODLBScriptAction:at.obdev.LaunchBar.action.iTunesPlay</key>
 		<integer>2</integer>
+		<key>ODLBScriptAction:com.kyleacarson.LaunchBar.action.Netflix</key>
+		<integer>3</integer>
 		<key>ODLBScriptAction:io.henrik.launchbar.CanIUse</key>
 		<integer>1</integer>
 		<key>ODLBScriptAction:io.henrik.launchbar.Forecast</key>
@@ -8254,7 +8266,7 @@
 		</array>
 	</dict>
 	<key>totalInvocationCount</key>
-	<integer>8282</integer>
+	<integer>8285</integer>
 	<key>version</key>
 	<integer>4</integer>
 </dict>
