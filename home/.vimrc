@@ -1061,7 +1061,7 @@ let g:syntastic_style_error_symbol = '✠'
 let g:syntastic_warning_symbol = '∆'
 let g:syntastic_style_warning_symbol = '≈'
 let g:syntastic_always_populate_loc_list=1
-let g:syntastic_javascript_checkers = ['eslint', 'jshint', 'jscs']
+let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_javascript_closurecompiler_path = '/usr/local/lib/closurecompiler/compiler.jar'
 let g:syntastic_mode_map = { 'mode': 'active',
                             \ 'active_filetypes': ['ruby', 'php', 'javascript', 'html', 'handlebars', 'stylus', 'css'],
