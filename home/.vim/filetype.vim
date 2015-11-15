@@ -4,7 +4,8 @@
 augroup filetypedetect
 	" Detect .txt as 'text'
     autocmd! BufNewFile,BufRead *.txt setfiletype text
-
+    " Tmux
+	au BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
     " Pascal / Delphi
     if (1==1) "change to "1==0" to use original syntax
     au BufNewFile,BufRead *.pas,*.PAS set ft=delphi
