@@ -10,5 +10,6 @@ indent.pro skip
 .config recurse
 .mjolnir recurse
 .lein recurse
+.tmux recurse
 .mrconfig skip
 README.md skip

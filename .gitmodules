@@ -365,3 +365,6 @@
 [submodule "home/.vim/bundle/vim-rsi"]
 	path = home/.vim/bundle/vim-rsi
 	url = https://github.com/tpope/vim-rsi.git
+[submodule "home/.tmux/plugins/tpm"]
+	path = home/.tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
