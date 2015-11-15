@@ -30515,8 +30515,10 @@
 	<string>192 195 535 206 0 0 1440 877 </string>
 	<key>NSWindow Frame Preferences</key>
 	<string>853 959 606 456 0 0 2560 1417 </string>
+	<key>NSWindow Frame SUUpdateAlert</key>
+	<string>410 364 620 392 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>817 4 570 873 0 0 1440 877 </string>
+	<string>5 140 570 587 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>35 241 822 545 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
@@ -31180,6 +31182,8 @@
 	<true/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>465917086.58532298</real>
+	<key>OpenTmuxWindowsIn</key>
+	<integer>1</integer>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -31228,7 +31232,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2015-11-08T12:36:21Z</date>
+	<date>2015-11-15T15:17:19Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>ShowBookmarkName</key>
