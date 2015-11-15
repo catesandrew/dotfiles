@@ -54,6 +54,16 @@ dstop() {
 }
 __docker_complete dstop _docker_stop
 
+# Stop all containers
+dstart() {
+    if [ $# -eq 0 ] ; then
+        docker --tls start $(docker --tls ps -a -q);
+    else
+        docker --tls start $1;
+    fi
+}
+__docker_complete dstart _docker_start
+
 # Remove all containers
 drm() {
     if [ $# -eq 0 ] ; then
