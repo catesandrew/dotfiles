@@ -6,11 +6,11 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.pop-clip</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/PopClip.app/Contents/MacOS/PopClip</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/PopClip.app/Contents/MacOS/PopClip</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
