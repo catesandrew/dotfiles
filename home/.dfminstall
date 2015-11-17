@@ -13,3 +13,4 @@ indent.pro skip
 .tmux recurse
 .mrconfig skip
 README.md skip
+Quiver-settings.json skip
