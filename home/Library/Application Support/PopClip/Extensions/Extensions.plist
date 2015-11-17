@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Installed Extensions</key>
+	<array>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.blockquote</string>
+			<key>Extension Name</key>
+			<string>Blockquote</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Blockquote</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Blockquote.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Blockquote.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.bulletlist</string>
+			<key>Extension Name</key>
+			<string>BulletList</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Default Value</key>
+					<string>*</string>
+					<key>Option Identifier</key>
+					<string>bulletprefix</string>
+					<key>Option Label</key>
+					<string>Bullet Prefix</string>
+					<key>Option Type</key>
+					<string>multiple</string>
+					<key>Option Values</key>
+					<array>
+						<string>*</string>
+						<string>+</string>
+						<string>-</string>
+					</array>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>BulletList</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>BulletList.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/BulletList.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.code</string>
+			<key>Extension Name</key>
+			<string>Code</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Code</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Code.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Code.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.comment</string>
+			<key>Extension Name</key>
+			<string>Comment</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Comment</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Comment.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Comment.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.copycleanlinks</string>
+			<key>Extension Name</key>
+			<string>CopyCleanLinks</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>CopyCleanLinks</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>CopyCleanLinks.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/CopyCleanLinks.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.copyplus</string>
+			<key>Extension Name</key>
+			<string>CopyPLUS</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>CopyPLUS</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>CopyPlus.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/CopyPlus.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.copyurls</string>
+			<key>Extension Name</key>
+			<string>CopyURLS</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>CopyURLS</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>CopyURLS.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/CopyURLS.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.criticmarkup</string>
+			<key>Extension Name</key>
+			<string>CriticMarkup</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Identifier</key>
+					<string>criticmarkupcomment</string>
+					<key>Option Label</key>
+					<string>Signature</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>CriticMarkup</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>CriticMarkup.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/CriticMarkup.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.DefineAbbr</string>
+			<key>Extension Name</key>
+			<string>Define Abbr</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Define Abbr</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>DefineAbbr.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/DefineAbbr.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.editor</string>
+			<key>Extension Name</key>
+			<string>Editor</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Default Value</key>
+					<string>1</string>
+					<key>Option Identifier</key>
+					<string>includedatetime</string>
+					<key>Option Label</key>
+					<string>Include Datetime</string>
+					<key>Option Type</key>
+					<string>boolean</string>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>Editor</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Editor.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Editor.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.fixemail</string>
+			<key>Extension Name</key>
+			<string>FixPoorlyObscuredEmail</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>FixPoorlyObscuredEmail</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>FixPoorlyObscuredEmail.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/FixPoorlyObscuredEmail.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.linkcleaner</string>
+			<key>Extension Name</key>
+			<string>LinkCleaner</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>LinkCleaner</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>LinkCleaner.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/LinkCleaner.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.md2mm</string>
+			<key>Extension Name</key>
+			<string>md2mm</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>md2mm</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Markdown2Mindmap.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Markdown2Mindmap.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.markdownify</string>
+			<key>Extension Name</key>
+			<string>Markdownify</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Markdownify</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>markdownify.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/markdownify.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.openurls</string>
+			<key>Extension Name</key>
+			<string>OpenURLS</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>OpenURLS</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>OpenURLS.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/OpenURLS.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.outdent</string>
+			<key>Extension Name</key>
+			<string>Outdent</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Outdent</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Outdent.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Outdent.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.poortext</string>
+			<key>Extension Name</key>
+			<string>PoorText</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>PoorText</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>PoorText.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/PoorText.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.sum</string>
+			<key>Extension Name</key>
+			<string>Sum</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Default Value</key>
+					<string>,</string>
+					<key>Option Identifier</key>
+					<string>separator</string>
+					<key>Option Label</key>
+					<string>Separator</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Default Value</key>
+					<string>.</string>
+					<key>Option Identifier</key>
+					<string>delimiter</string>
+					<key>Option Label</key>
+					<string>Decimal Delimiter</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Default Value</key>
+					<string>0</string>
+					<key>Option Identifier</key>
+					<string>formatoutput</string>
+					<key>Option Label</key>
+					<string>Format Output</string>
+					<key>Option Type</key>
+					<string>boolean</string>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>Sum</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Sum.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Sum.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.urlencode</string>
+			<key>Extension Name</key>
+			<string>URLEncode</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>URLEncode</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>URLEncode.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/URLEncode.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.webmarkdown</string>
+			<key>Extension Name</key>
+			<string>WebMarkdown</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>WebMarkdown</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>WebMarkdown.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/WebMarkdown.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.brettterpstra.popclip.extension.wrapper</string>
+			<key>Extension Name</key>
+			<string>Wrappers</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakerprefix</string>
+					<key>Option Label</key>
+					<string>Prefix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakersuffix</string>
+					<key>Option Label</key>
+					<string>Suffix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakeroptprefix</string>
+					<key>Option Label</key>
+					<string>⌥ Prefix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakeroptsuffix</string>
+					<key>Option Label</key>
+					<string>⌥ Suffix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakercmdprefix</string>
+					<key>Option Label</key>
+					<string>⌘ Prefix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+				<dict>
+					<key>Option Identifier</key>
+					<string>popmakercmdsuffix</string>
+					<key>Option Label</key>
+					<string>⌘ Suffix</string>
+					<key>Option Type</key>
+					<string>string</string>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>Wrappers</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Wrappers.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Wrappers.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.pilotmoon.popclip.extension.unclutter</string>
+			<key>Extension Name</key>
+			<string>Unclutter</string>
+			<key>Options</key>
+			<array/>
+			<key>Options Account Title</key>
+			<string>Unclutter</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Unclutter.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Unclutter.popclipext</string>
+		</dict>
+		<dict>
+			<key>Enabled</key>
+			<true/>
+			<key>Extension Identifier</key>
+			<string>com.pilotmoon.popclip.extension.base64</string>
+			<key>Extension Name</key>
+			<string>Base64 Encode</string>
+			<key>Options</key>
+			<array>
+				<dict>
+					<key>Option Identifier</key>
+					<string>variant</string>
+					<key>Option Label</key>
+					<dict>
+						<key>en</key>
+						<string>Base64 Variant</string>
+					</dict>
+					<key>Option Type</key>
+					<string>multiple</string>
+					<key>Option Values</key>
+					<array>
+						<string>Standard (+/)</string>
+						<string>URL Safe (-_)</string>
+					</array>
+				</dict>
+			</array>
+			<key>Options Account Title</key>
+			<string>Base64 Encode</string>
+			<key>Options Title</key>
+			<string></string>
+			<key>Package Name</key>
+			<string>Base64Encode.popclipext</string>
+			<key>PackagePath</key>
+			<string>/home/andrew/Library/Application Support/PopClip/Extensions/Base64Encode.popclipext</string>
+		</dict>
+	</array>
+	<key>Version</key>
+	<integer>1</integer>
+</dict>
+</plist>
