@@ -13,6 +13,6 @@
       <string>sleep 10 &amp;&amp; /Applications/Pochade.app/Contents/MacOS/Pochade</string>
     </array>
 	<key>RunAtLoad</key>
-	<true/>
+    <false/>
 </dict>
 </plist>

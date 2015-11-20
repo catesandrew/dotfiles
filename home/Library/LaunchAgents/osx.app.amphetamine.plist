@@ -5,12 +5,12 @@
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
-	<string>osx.app.trickster</string>
+	<string>osx.app.amphetamine</string>
     <key>ProgramArguments</key>
     <array>
-      <string>/Applications/Trickster.app/Contents/MacOS/Trickster</string>
+      <string>/Applications/Amphetamine.app/Contents/MacOS/Amphetamine</string>
     </array>
 	<key>RunAtLoad</key>
-    <false/>
+	<true/>
 </dict>
 </plist>
