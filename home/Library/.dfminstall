@@ -6,3 +6,5 @@ LaunchAgents recurse
 Services recurse
 KeyBindings recurse
 Application Support recurse
+Workflows recurse
+Scripts recurse
