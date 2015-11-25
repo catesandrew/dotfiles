@@ -1,7 +1,14 @@
 cite about-plugin
 about-plugin 'load pyenv, if you are using it'
 
-export PYENV_ROOT="$HOME/.pyenv"
+# Node Version Manager
+if hash brew 2>/dev/null; then
+    if [ x"" != x"$(brew ls --versions pyenv)" ]; then
+        export PYENV_ROOT=/usr/local/var/pyenv
+    fi
+else
+    export PYENV_ROOT="$HOME/.pyenv"
+fi
 pathmunge $PYENV_ROOT
 
 [[ `which pyenv` ]] && eval "$(pyenv init -)"
