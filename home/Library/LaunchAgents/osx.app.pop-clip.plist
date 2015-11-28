@@ -11,6 +11,6 @@
 		<string>/Applications/PopClip.app/Contents/MacOS/PopClip</string>
 	</array>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
