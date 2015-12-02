@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # https://gist.github.com/ttscoff/893afa7acdcd6c696dc7
-# Bash completion for `up` <http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/>
+# Bash completion for [up](http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/)
 _up_complete()
 {
 	local rx

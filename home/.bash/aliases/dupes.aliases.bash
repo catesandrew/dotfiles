@@ -6,6 +6,7 @@ if [ $(uname) = "Darwin" ]; then
     if hash brew 2>/dev/null; then
         if hash ggrep 2>/dev/null; then
             alias grep='ggrep --color'
+            alias grepno="ggrep --color=never -n -E '.*'"
         fi
     fi
 fi

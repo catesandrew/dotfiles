@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Fuzzy Bash completion for tmux session/window using [tm](http://brettterpstra.com/2014/05/11/making-my-tmux-life-easier/)
 # https://gist.github.com/ttscoff/03402e2be664bdbd75c4
 
