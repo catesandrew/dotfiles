@@ -1,4 +1,10 @@
+cite about-plugin
+about-plugin 'up: Quickly cd up a directory tree'
+
+# https://gist.github.com/ttscoff/2251ec8d7f477f7d3fd0
 # http://brettterpstra.com/2014/05/14/up-fuzzy-navigation-up-a-directory-tree/
+# inspired by `bd`: https://github.com/vigneshwaranr/bd
+
 # inspired by `bd`: https://github.com/vigneshwaranr/bd
 function _up() {
 	local rx updir
