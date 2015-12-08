@@ -1,5 +1,4 @@
 .DS_Store skip
-extensions skip
 launch-daemons skip
 Preferences recurse
 LaunchAgents recurse
