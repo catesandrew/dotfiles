@@ -2,7 +2,7 @@
 let mapleader = ","
 
 set nohud
-set smoothscroll
+set nosmoothscroll
 set noautofocus " The opposite of autofocus; this setting stops
                 " sites from focusing on an input box when they load
 set typelinkhints
