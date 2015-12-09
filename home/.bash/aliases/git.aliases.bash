@@ -56,6 +56,7 @@ alias gtl="git tag -l"
 alias gpu="git fetch origin -v; git fetch upstream -v; git merge upstream/master"
 alias gfp="git format-patch --stdout -1"
 alias gnr="git ls-files -o --exclude-standard | xargs rm"
+alias gwc="git whatchanged -p --abbrev-commit --pretty=medium"
 # number of commits on branch.
 # 1 rev-list lists revisions, and
 # 2 master.. refers to "commits since current HEAD diverged from master"
@@ -74,9 +75,22 @@ alias amend='git commit --amend'
 alias wip="git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m \"wip\""
 alias unwip="git log -n 1 | grep -q -c wip && git reset HEAD~1"
 
+# @jasoncodes' aliases
+alias gau='git ls-files --other --exclude-standard -z | xargs -0 git add -Nv'
+alias gaur="git ls-files --exclude-standard --modified -z | xargs -0 git ls-files --stage -z | gawk 'BEGIN { RS=\"\0\"; FS=\"\t\"; ORS=\"\0\" } { if (\$1 ~ / e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 /) { sub(/^[^\t]+\t/, \"\", \$0); print } }' | xargs -0t -n 1 git reset -q -- 2>&1 | sed -e \"s/^git reset -q -- /reset '/\" -e \"s/ *$/'/\""
+alias gld="git fsck --lost-found | grep '^dangling commit' | cut -d ' ' -f 3- | xargs git show -s --format='%ct %H' | sort -nr | cut -d ' ' -f 2 | xargs git show --stat"
+# Usage:
+#   gau   Add all untracked files (with `git add --intent-to-add`)
+#   gaur  Unstage (reset) any files that you haven't added any hunks from
+#   gld   Show all dangling commits
+
 case $OSTYPE in
   darwin*)
     alias gtls="git tag -l | gsort -V"
+
+    # Alias for opening GitX OR Git Tower
+    alias gitx="open -b nl.frim.GitX"
+    alias tower='open -b com.fournova.Tower2 `pwd`'
     ;;
   *)
     alias gtls='git tag -l | sort -V'
