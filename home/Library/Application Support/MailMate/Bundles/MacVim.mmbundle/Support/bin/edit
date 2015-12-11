@@ -1,0 +1,15 @@
+#!/bin/sh
+
+##
+# edit: backend script of the MailMate MacVim bundle, used to invoke vim
+# 
+# Original author: O'Shaughnessy Evans <shaug+mailmate@wumpus.org>
+##
+
+BASH_NO=no . /etc/profile
+
+hash mvim 2>/dev/null && VISUAL=mvim || VISUAL=Vim
+
+open -g -a Marked "$MM_EDIT_FILEPATH" 2>/dev/null
+$VISUAL -gf +$MM_LINE_NUMBER -c "set filetype=markdown" "$MM_EDIT_FILEPATH"
+osascript -e 'tell app "MailMate" to activate'

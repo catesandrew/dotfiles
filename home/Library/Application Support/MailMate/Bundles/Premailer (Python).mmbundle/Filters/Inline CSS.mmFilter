@@ -1,0 +1,5 @@
+{
+	name          = 'Inline CSS';
+	uuid          = '9846E526-1B45-42E8-8E75-F2B47AB5FF76';
+	command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/premailer"\n';
+}

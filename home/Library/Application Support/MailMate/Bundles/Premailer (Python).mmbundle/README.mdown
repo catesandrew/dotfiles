@@ -1,0 +1,54 @@
+# Installation
+
+You can install this bundle in MailMate by opening the preferences and going to the bundles tab. After installation it will be automatically updated for you.
+
+# License
+
+If not otherwise specified (see below), files in this repository fall under the following license:
+
+	Permission to copy, use, modify, sell and distribute this
+	software is granted. This software is provided "as is" without
+	express or implied warranty, and with no claim as to its
+	suitability for any purpose.
+
+An exception is made for files in readable text which contain their own license information, or files where an accompanying file exists (in the same directory) with a “-license” suffix added to the base-name name of the original file, and an extension of txt, html, or similar.
+
+
+# This file shows how the vendor folder has been created.
+# In theory, it can be executed, but it's very fragile. It could easily
+# break if any of the involved parts are changed (or not on 10.11).
+
+# Cleanup
+# sudo rm -r cssselect cssutils lxml premailer vendor
+
+mkdir vendor
+
+# cssutils/encutils
+# https://bitbucket.org/cthedot/cssutils
+hg clone https://bitbucket.org/cthedot/cssutils
+(cd cssutils; python setup.py build)
+rm -r cssutils/build/lib/cssutils/tests
+mv cssutils/build/lib/cssutils vendor/
+mv cssutils/build/lib/encutils vendor/
+(cd cssutils; python setup.py --license) > vendor/cssutils-license.txt
+
+# cssselect
+# https://github.com/SimonSapin/cssselect/
+git clone https://github.com/SimonSapin/cssselect/
+(cd cssselect; python setup.py build)
+mv cssselect/build/lib/cssselect vendor/
+cp cssselect/LICENSE vendor/cssselect-license.txt
+
+# lxml
+# https://github.com/lxml/
+git clone https://github.com/lxml/lxml.git
+sudo pip install cython
+(cd lxml; ARCHFLAGS="-arch x86_64" python setup.py build)
+mv lxml/build/lib.macosx-10.11-intel-2.7/lxml vendor/
+cp lxml/LICENSES.txt vendor/lxml-license.txt
+
+# premailer
+git clone https://github.com/peterbe/premailer
+(cd premailer; python setup.py build)
+mv premailer/build/lib/premailer vendor/
+cp premailer/LICENSE vendor/premailer-license.txt
