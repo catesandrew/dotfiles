@@ -3,6 +3,7 @@ open-connect skip
 Library recurse
 Documents recurse
 indent.pro skip
+.fonts recurse
 .hammerspoon recurse
 .gitconfig-local.template skip
 .gitconfig-private.template skip
