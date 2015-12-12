@@ -241,6 +241,13 @@
                     KeyCode::COMMAND_L,
                     ModifierFlag::OPTION_L | ModifierFlag::SHIFT_L | ModifierFlag::CONTROL_L
                 </autogen>
+
+                <!-- However, lets not remap ctrl-c because its just too common of a shortcut key. -->
+                <autogen>
+                 __KeyToKey__
+                 KeyCode::C, ModifierFlag::COMMAND_L | ModifierFlag::OPTION_L | ModifierFlag::SHIFT_L | ModifierFlag::CONTROL_L,
+                 KeyCode::C, ModifierFlag::CONTROL_L,
+                </autogen>
             </item>
             <item>
                 <name>Restore [Shift-]Opt-(Left/Right)</name>
