@@ -10,13 +10,21 @@ SCM_THEME_PROMPT_PREFIX=' |'
 SCM_THEME_PROMPT_SUFFIX='|'
 SCM_THEME_BRANCH_PREFIX=''
 SCM_THEME_TAG_PREFIX='tag:'
-SCM_THEME_COMMIT_PREFIX='commit:'
-SCM_THEME_REMOTE_PREFIX=''
+SCM_THEME_DETACHED_PREFIX='detached:'
+SCM_THEME_BRANCH_TRACK_PREFIX=' → '
+SCM_THEME_BRANCH_GONE_PREFIX=' ⇢ '
+
+CLOCK_CHAR='☆'
+THEME_CLOCK_CHECK=${THEME_CLOCK_CHECK:=true}
+THEME_BATTERY_PERCENTAGE_CHECK=${THEME_BATTERY_PERCENTAGE_CHECK:=true}
 
 SCM_GIT_SHOW_DETAILS=${SCM_GIT_SHOW_DETAILS:=true}
+SCM_GIT_SHOW_REMOTE_INFO=${SCM_GIT_SHOW_REMOTE_INFO:=auto}
+SCM_GIT_IGNORE_UNTRACKED=${SCM_GIT_IGNORE_UNTRACKED:=false}
 
 SCM_GIT='git'
 SCM_GIT_CHAR='±'
+SCM_GIT_DETACHED_CHAR='⌿'
 SCM_GIT_AHEAD_CHAR="↑"
 SCM_GIT_BEHIND_CHAR="↓"
 SCM_GIT_UNTRACKED_CHAR="?:"
@@ -47,7 +55,7 @@ RBFU_THEME_PROMPT_SUFFIX='|'
 function scm {
   if [[ "$SCM_CHECK" = false ]]; then SCM=$SCM_NONE
   elif [[ -f .git/HEAD ]]; then SCM=$SCM_GIT
-  elif which git &> /dev/null && [[ -n "$(git symbolic-ref HEAD 2> /dev/null)" ]]; then SCM=$SCM_GIT
+  elif which git &> /dev/null && [[ -n "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]]; then SCM=$SCM_GIT
   elif [[ -d .hg ]]; then SCM=$SCM_HG
   elif which hg &> /dev/null && [[ -n "$(hg root 2> /dev/null)" ]]; then SCM=$SCM_HG
   elif [[ -d .svn ]]; then SCM=$SCM_SVN
@@ -88,7 +96,9 @@ function git_prompt_vars {
   local details=''
   SCM_STATE=${GIT_THEME_PROMPT_CLEAN:-$SCM_THEME_PROMPT_CLEAN}
   if [[ "$(git config --get bash-it.hide-status)" != "1" ]]; then
-    local status="$(git status -b --porcelain 2> /dev/null || git status --porcelain 2> /dev/null)"
+    [[ "${SCM_GIT_IGNORE_UNTRACKED}" = "true" ]] && local git_status_flags='-uno'
+    local status="$(git status -b --porcelain ${git_status_flags} 2> /dev/null ||
+		            git status --porcelain ${git_status_flags} 2> /dev/null)"
     if [[ -n "${status}" ]] && [[ "${status}" != "\n" ]] && [[ -n "$(grep -v ^# <<< "${status}")" ]]; then
       SCM_DIRTY=1
       if [[ "${SCM_GIT_SHOW_DETAILS}" = "true" ]]; then
@@ -103,23 +113,50 @@ function git_prompt_vars {
     fi
   fi
 
+  SCM_CHANGE=$(git rev-parse --short HEAD 2>/dev/null)
+
   local ref=$(git symbolic-ref -q HEAD 2> /dev/null)
   if [[ -n "$ref" ]]; then
     SCM_BRANCH=${SCM_THEME_BRANCH_PREFIX}${ref#refs/heads/}
-  else
-    ref=$(git describe --tags --exact-match 2> /dev/null)
-    if [[ -n "$ref" ]]; then
-      SCM_BRANCH=${SCM_THEME_TAG_PREFIX}${ref}
-    else
-      local commit_re='(^remotes/)?(.+-g[a-zA-Z0-9]+)$'
-      local remote_re='^remotes/(.+)$'
-      ref=$(git describe --tags --all --always 2> /dev/null)
-      if [[ "$ref" =~ ${commit_re} ]]; then
-        SCM_BRANCH=${SCM_THEME_COMMIT_PREFIX}${BASH_REMATCH[2]}
-      elif [[ "$ref" =~ ${remote_re} ]]; then
-        SCM_BRANCH=${SCM_THEME_REMOTE_PREFIX}${BASH_REMATCH[1]}
+    local tracking_info="$(grep "${SCM_BRANCH}\.\.\." <<< "${status}")"
+    if [[ -n "${tracking_info}" ]]; then
+      [[ "${tracking_info}" =~ .+\[gone\]$ ]] && local branch_gone="true"
+      tracking_info=${tracking_info#\#\# ${SCM_BRANCH}...}
+      tracking_info=${tracking_info% [*}
+      local remote_name=${tracking_info%%/*}
+      local remote_branch=${tracking_info#${remote_name}/}
+      local remote_info=""
+      local num_remotes=$(git remote | wc -l 2> /dev/null)
+      [[ "${SCM_BRANCH}" = "${remote_branch}" ]] && local same_branch_name=true
+      if ([[ "${SCM_GIT_SHOW_REMOTE_INFO}" = "auto" ]] && [[ "${num_remotes}" -ge 2 ]]) ||
+          [[ "${SCM_GIT_SHOW_REMOTE_INFO}" = "true" ]]; then
+        remote_info="${remote_name}"
+        [[ "${same_branch_name}" != "true" ]] && remote_info+="/${remote_branch}"
+      elif [[ ${same_branch_name} != "true" ]]; then
+        remote_info="${remote_branch}"
+      fi
+      if [[ -n "${remote_info}" ]];then
+        if [[ "${branch_gone}" = "true" ]]; then
+          SCM_BRANCH+="${SCM_THEME_BRANCH_GONE_PREFIX}${remote_info}"
+        else
+          SCM_BRANCH+="${SCM_THEME_BRANCH_TRACK_PREFIX}${remote_info}"
+        fi
       fi
     fi
+    SCM_GIT_DETACHED="false"
+  else
+    local detached_prefix=""
+    ref=$(git describe --tags --exact-match 2> /dev/null)
+    if [[ -n "$ref" ]]; then
+      detached_prefix=${SCM_THEME_TAG_PREFIX}
+    else
+      ref=$(git describe --contains --all HEAD 2> /dev/null)
+      ref=${ref#remotes/}
+      [[ -z "$ref" ]] && ref=${SCM_CHANGE}
+      detached_prefix=${SCM_THEME_DETACHED_PREFIX}
+    fi
+    SCM_BRANCH=${detached_prefix}${ref}
+    SCM_GIT_DETACHED="true"
   fi
 
   local ahead_re='.+ahead ([0-9]+).+'
@@ -134,7 +171,6 @@ function git_prompt_vars {
 
   SCM_PREFIX=${GIT_THEME_PROMPT_PREFIX:-$SCM_THEME_PROMPT_PREFIX}
   SCM_SUFFIX=${GIT_THEME_PROMPT_SUFFIX:-$SCM_THEME_PROMPT_SUFFIX}
-  SCM_CHANGE=$(git rev-parse HEAD 2>/dev/null)
 }
 
 function svn_prompt_vars {
@@ -250,6 +286,22 @@ function virtualenv_prompt {
   fi
 }
 
+function condaenv_prompt {
+  if [[ $CONDA_DEFAULT_ENV ]]; then
+    echo -e "${CONDAENV_THEME_PROMPT_PREFIX}${CONDA_DEFAULT_ENV}${CONDAENV_THEME_PROMPT_SUFFIX}"
+  fi
+}
+
+function py_interp_prompt {
+  py_version=$(python --version 2>&1 | awk '{print "py-"$2;}') || return
+  echo -e "${PYTHON_THEME_PROMPT_PREFIX}${py_version}${PYTHON_THEME_PROMPT_SUFFIX}"
+}
+
+function python_version_prompt {
+  echo -e "$(virtualenv_prompt)$(condaenv_prompt)$(py_interp_prompt)"
+}
+
+
 # backwards-compatibility
 function git_prompt_info {
   git_prompt_vars
@@ -275,10 +327,36 @@ function prompt_char {
     scm_char
 }
 
-if [ ! -e $BASH_IT/plugins/battery.plugin.bash ]; then
-# if user has installed battery plugin, skip this...
+function clock_char {
+    if [[ "${THEME_CLOCK_CHECK}" = true ]]; then
+        DATE_STRING=$(date +"%Y-%m-%d %H:%M:%S")
+        echo -e "${bold_cyan}$DATE_STRING ${red}$CLOCK_CHAR"
+    fi
+}
+
+function battery_char {
+    if [[ "${THEME_BATTERY_PERCENTAGE_CHECK}" = true ]]; then
+        echo -e "${bold_red}$(battery_percentage)%"
+    fi
+}
+
+if [ ! -e $BASH_IT/plugins/enabled/battery.plugin.bash ]; then
+    # if user has installed battery plugin, skip this...
     function battery_charge (){
-		# no op
-			echo -n
+	# no op
+	echo -n
+    }
+
+    function battery_char (){
+	# no op
+	echo -n
     }
 fi
+
+function aws_profile {
+  if [[ $AWS_DEFAULT_PROFILE ]]; then
+    echo -e "${AWS_DEFAULT_PROFILE}"
+  else
+    echo -e "default"
+  fi
+}
