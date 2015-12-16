@@ -38,7 +38,6 @@ if [ "$(uname)" == "Darwin"  ]; then
             else
                 vim "$@"
             fi
-            # /usr/local/bin/vim "$1"
             ;;
         *.md )
             /usr/local/bin/mmdc "$1"
