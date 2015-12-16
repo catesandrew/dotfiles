@@ -48,6 +48,8 @@ RVM_THEME_PROMPT_SUFFIX=""
 RVM_THEME_PROMPT_COLOR=161
 RVM_CHAR=${POWERLINE_RVM_CHAR:="❲r❳ "}
 
+NPM_THEME_PROMPT_COLOR=20
+
 CWD_THEME_PROMPT_COLOR=240
 
 LAST_STATUS_THEME_PROMPT_COLOR=196
@@ -206,11 +208,90 @@ function powerline_scm_prompt {
     else
         SCM_PROMPT=""
     fi
+}
 
+# Modified from http://stackoverflow.com/a/1617048/359287
+
+function npm_limited_pwd() {
+  local begin="" # The unshortened beginning of the path.
+  local shortbegin="" # The shortened beginning of the path.
+  local current="" # The section of the path we're currently working on.
+  local INHOME=0
+  local end="${2:-$(pwd)}/" # The unmodified rest of the path.
+  if [[ ! -z "${local_npm_root}" ]]; then
+    local offset=${#local_npm_root}
+    if [ $offset -gt "0" ]; then
+      end=${end:$offset}
+    fi
+  fi
+
+  if [[ "$end" =~ "$HOME" ]]; then
+    INHOME=1
+    end="${end#$HOME}" #strip /home/username from start of string
+    begin="$HOME"      #start expansion from the right spot
+  fi
+
+  end="${end#/}" # Strip the first /
+  local shortenedpath="$end" # The whole path, to check the length.
+  local maxlength="${3:-0}"
+
+  shopt -q nullglob && NGV="-s" || NGV="-u" # Store the value for later.
+  shopt -s nullglob    # Without this, anything that doesn't exist in the filesystem turns into */*/*/...
+
+  while [[ "$end" ]] && (( ${#shortenedpath} > maxlength ))
+  do
+    current="${end%%/*}" # everything before the first /
+    end="${end#*/}"    # everything after the first /
+
+    local shortcur
+    if [[ "${current}" && -z "${end}" ]]; then
+      shortcur="$current"
+      shortcurstar="$current" # No star if we don't shorten it.
+    else
+      shortcur="$current"
+      shortcurstar="$current" # No star if we don't shorten it.
+
+      for ((i=${#current}-2; i>=0; i--)); do
+        subcurrent="${current:0:i}"
+        matching=("$begin/$subcurrent"*) # Array of all files that start with $subcurrent.
+        (( ${#matching[*]} != 1 )) && break # Stop shortening if more than one file matches.
+        shortcur="$subcurrent"
+        shortcurstar="$subcurrent*"
+      done
+    fi
+
+    #advance
+    begin="$begin/$current"
+    shortbegin="$shortbegin/$shortcurstar"
+    shortenedpath="$shortbegin/$end"
+
+  done
+
+  shortenedpath="${shortenedpath%/}" # strip trailing /
+  shortenedpath="${shortenedpath#/}" # strip leading /
+
+  local relative_pwd
+
+  if [ $INHOME -eq 1 ]; then
+    relative_pwd="~/$shortenedpath" #make sure it starts with ~/
+  else
+    relative_pwd="/$shortenedpath" # Make sure it starts with /
+  fi
+  echo "${relative_pwd}"
+
+  shopt "$NGV" nullglob # Reset nullglob in case this is being used as a function.
 }
 
 function powerline_cwd_prompt {
-    CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) $(limited_pwd) ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
+  local_npm_root="$1"
+  if [[ ! -z "${npm_root}" ]]; then
+   local_npm_root=$(dirname "${local_npm_root}")
+   short_pwd=$(npm_limited_pwd)
+  else
+    short_pwd=$(npm_limited_pwd)
+  fi
+
+    CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) ${short_pwd} ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
     if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
         CWD_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${CWD_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${CWD_PROMPT}
         SEGMENT_AT_LEFT=0
@@ -243,40 +324,65 @@ function powerline_clock_prompt {
     fi
 }
 
-function powerline_battery_status_prompt {
-    BATTERY_STATUS="$(battery_percentage 2> /dev/null)"
-    if [[ -z "${BATTERY_STATUS}" ]] || [[ "${BATTERY_STATUS}" = "-1" ]] || [[ "${BATTERY_STATUS}" = "no" ]]; then
-        BATTERY_PROMPT=""
-    else
-        if [[ "${BATTERY_STATUS}" -le 5 ]]; then
-             BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR}"
-        elif [[ "${BATTERY_STATUS}" -le 25 ]]; then
-            BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_LOW_COLOR}"
-        else
-            BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_GOOD_COLOR}"
-        fi
-        [[ "$(ac_adapter_connected)" ]] && BATTERY_STATUS="${BATTERY_AC_CHAR}${BATTERY_STATUS}"
-        BATTERY_PROMPT="$(set_rgb_color - ${BATTERY_STATUS_THEME_PROMPT_COLOR}) ${BATTERY_STATUS}% "
-        if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
-            BATTERY_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${BATTERY_STATUS_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
-            (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
-        fi
-        RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#BATTERY_STATUS} + 2 ))
-        LAST_THEME_COLOR=${BATTERY_STATUS_THEME_PROMPT_COLOR}
-        (( SEGMENT_AT_RIGHT += 1 ))
+function get_npm_root {
+  local CURRENT_DIR=$(pwd)
+
+  while [ "$CURRENT_DIR" != "/" ]; do
+    if [ -f "$CURRENT_DIR/package.json" ]; then
+      echo "$CURRENT_DIR/package.json"
+      return
+    elif [ -d "$CURRENT_DIR/.git" ]; then
+      return
     fi
+
+    CURRENT_DIR=$(dirname $CURRENT_DIR)
+  done
+}
+
+function powerline_npm_version_prompt {
+  # if hash npm 2> /dev/null; then
+  #   npm_prompt="$(npm show . version 2> /dev/null)"
+
+  if hash JSON.sh 2> /dev/null; then
+    NPM_ROOT="$1"
+
+    if [[ -f "${NPM_ROOT}" ]]; then
+      package_json=$(JSON.sh < "${NPM_ROOT}")
+      npm_version=$(echo "${package_json}" | grep -e '^\[\"version\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
+      npm_name=$(echo "${package_json}" | grep -e '^\[\"name\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
+      npm_prompt="${npm_name}@${npm_version}"
+
+      if [[ -z "${npm_prompt}" ]]; then
+        NPM_VERSION_PROMPT=""
+      else
+        NPM_VERSION_PROMPT="$(set_rgb_color - ${NPM_THEME_PROMPT_COLOR}) ${npm_prompt} "
+        if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
+          NPM_VERSION_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${NPM_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+          (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
+        fi
+        RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#npm_prompt} + 2 ))
+        LAST_THEME_COLOR=${NPM_THEME_PROMPT_COLOR}
+        (( SEGMENT_AT_RIGHT += 1 ))
+      fi
+    else
+      NPM_VERSION_PROMPT=""
+    fi
+  else
+    NPM_VERSION_PROMPT=""
+  fi
 }
 
 function powerline_prompt_command() {
     local LAST_STATUS="$?"
     local MOVE_CURSOR_RIGHTMOST='\033[500C'
+    local npm_root=$(get_npm_root)
     RIGHT_PROMPT_LENGTH=1
 
     ## left prompt ##
     powerline_scm_prompt
     powerline_virtualenv_prompt
     powerline_rvm_prompt
-    powerline_cwd_prompt
+    powerline_cwd_prompt "${npm_root}"
     powerline_last_status_prompt LAST_STATUS
 
     LEFT_PROMPT="${SCM_PROMPT}${VIRTUALENV_PROMPT}${RVM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
@@ -284,28 +390,17 @@ function powerline_prompt_command() {
     ## right prompt ##
     LAST_THEME_COLOR="-"
 
-    if [[ "${SCM_NONE_CHAR}" == "${SCM_CHAR}" ]]; then
-        powerline_shell_prompt
-        powerline_battery_status_prompt
-        powerline_clock_prompt
+    powerline_shell_prompt
+    powerline_npm_version_prompt "${npm_root}"
+    # powerline_clock_prompt
+    CLOCK_PROMPT=""
 
-        [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
+    [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
 
-        RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
-        RIGHT_PROMPT+="${CLOCK_PROMPT}${BATTERY_PROMPT}${SHELL_PROMPT}${normal}"
+    RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
+    RIGHT_PROMPT+="${CLOCK_PROMPT}${NPM_VERSION_PROMPT}${SHELL_PROMPT}${normal}"
 
-        PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
-    else
-      powerline_shell_prompt
-      BATTERY_PROMPT=""
-      CLOCK_PROMPT=""
-
-      [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
-
-      RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
-      RIGHT_PROMPT+="${CLOCK_PROMPT}${BATTERY_PROMPT}${SHELL_PROMPT}${normal}"
-      PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
-    fi
+    PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
 }
 
 PROMPT_COMMAND=powerline_prompt_command
