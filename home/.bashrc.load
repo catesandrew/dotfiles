@@ -18,8 +18,11 @@ source "${BASH_IT}/lib/utils.sh"
 export DFM_REPO="${HOME}/.dotfiles"
 
 # Lock and load a custom theme file location /.bash/themes/
-export BASH_IT_THEME='powerline-multiline'
+# export BASH_IT_THEME='powerline-multiline'
+export BASH_IT_THEME='oh-my-git'
 export THEME_PROMPT_CLOCK_FORMAT="%l:%M:%S"
+export THEME_BATTERY_PERCENTAGE_CHECK=false
+export THEME_CLOCK_CHECK=false
 
 # Set mveditor/MacVim as EDITOR.
 if [ -f "${BASH_IT}/mveditor.sh" ]; then
