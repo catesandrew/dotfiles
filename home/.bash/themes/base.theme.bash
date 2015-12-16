@@ -98,7 +98,7 @@ function git_prompt_vars {
   if [[ "$(git config --get bash-it.hide-status)" != "1" ]]; then
     [[ "${SCM_GIT_IGNORE_UNTRACKED}" = "true" ]] && local git_status_flags='-uno'
     local status="$(git status -b --porcelain ${git_status_flags} 2> /dev/null ||
-		            git status --porcelain ${git_status_flags} 2> /dev/null)"
+                    git status --porcelain ${git_status_flags} 2> /dev/null)"
     if [[ -n "${status}" ]] && [[ "${status}" != "\n" ]] && [[ -n "$(grep -v ^# <<< "${status}")" ]]; then
       SCM_DIRTY=1
       if [[ "${SCM_GIT_SHOW_DETAILS}" = "true" ]]; then
