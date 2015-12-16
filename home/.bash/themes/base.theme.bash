@@ -297,7 +297,7 @@ function hg_prompt_vars {
 }
 
 function rvm_version_prompt {
-  if which rvm &> /dev/null; then
+  if hash rvm 2> /dev/null; then
     rvm=$(rvm tools identifier) || return
     if [ $rvm != "system" ]; then
       echo -e "$RVM_THEME_PROMPT_PREFIX$rvm$RVM_THEME_PROMPT_SUFFIX"
@@ -306,7 +306,7 @@ function rvm_version_prompt {
 }
 
 function rbenv_version_prompt {
-  if which rbenv &> /dev/null; then
+  if hash rbenv 2> /dev/null; then
     rbenv=$(rbenv version-name) || return
     $(rbenv commands | grep -q gemset) && gemset=$(rbenv gemset active 2> /dev/null) && rbenv="$rbenv@${gemset%% *}"
     if [ $rbenv != "system" ]; then
