@@ -7,6 +7,9 @@ node_strip_path() {
     -e "s#$NM_DIR[^/]*$2[^:]*:##g"
 }
 
+# Set Node environment variables
+export NODE_REPL_HISTORY_FILE="$HOME/.node_history"
+
 node_prepend_path() {
   if [ -z "$1" ]; then
     echo "$2"
