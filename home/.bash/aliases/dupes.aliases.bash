@@ -10,4 +10,3 @@ if [ $(uname) = "Darwin" ]; then
         fi
     fi
 fi
-
