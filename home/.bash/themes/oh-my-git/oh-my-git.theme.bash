@@ -457,8 +457,7 @@ function powerline_prompt_command() {
 
     powerline_shell_prompt
     powerline_npm_version_prompt "$local_npm_prompt"
-    # powerline_clock_prompt
-    CLOCK_PROMPT=""
+    powerline_clock_prompt
 
     [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
 
