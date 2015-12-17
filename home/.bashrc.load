@@ -37,6 +37,9 @@ fi
 # Don't check mail when opening terminal.
 unset MAILCHECK
 
+# Add tab completion for sudo.
+complete -cf sudo
+
 # vim and gnome-terminal have support for 256 colours in fedora 8 at least
 # Note debian/ubuntu users need to install the ncurses-term package for this
 # Note this should be set in ~/.profile for Fedora startup scripts to
