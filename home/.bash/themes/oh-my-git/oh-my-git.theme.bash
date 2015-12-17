@@ -211,28 +211,31 @@ function powerline_scm_prompt {
 # Modified from http://stackoverflow.com/a/1617048/359287
 
 function npm_limited_pwd() {
-  local begin="" # The unshortened beginning of the path.
-  local shortbegin="" # The shortened beginning of the path.
-  local current="" # The section of the path we're currently working on.
+  local begin='' # The unshortened beginning of the path.
+  local shortbegin='' # The shortened beginning of the path.
+  local current='' # The section of the path we're currently working on.
   local INHOME=0
+  local npm_root="$1"
   local end="${2:-$(pwd)}/" # The unmodified rest of the path.
-  if [[ ! -z "${local_npm_root}" ]]; then
-    local offset=${#local_npm_root}
+  local maxlength="${3:-0}"
+  local final_max_length="${5:-0}"
+  local relative_pwd=''
+  local end_basename=''
+
+  # treat npm roots as starting point of filesystem
+  if [[ ! -z "${npm_root}" ]]; then
+    local offset=${#npm_root}
     if [ $offset -gt "0" ]; then
       end=${end:$offset}
     fi
-  fi
-
-  if [[ "$end" =~ "$HOME" ]]; then
+  elif [[ "$end" =~ $HOME ]]; then
     INHOME=1
     end="${end#$HOME}" #strip /home/username from start of string
     begin="$HOME"      #start expansion from the right spot
   fi
 
   end="${end#/}" # Strip the first /
-  local end_basename
   local shortenedpath="$end" # The whole path, to check the length.
-  local maxlength="${3:-24}"
   end_basename=$(basename "${end}")
   maxlength=$(($maxlength-${#end_basename}))
 
@@ -244,19 +247,15 @@ function npm_limited_pwd() {
     current="${end%%/*}" # everything before the first /
     end="${end#*/}"    # everything after the first /
 
-    local shortcur
     if [[ "${current}" && -z "${end}" ]]; then
-      shortcur="$current"
       shortcurstar="$current" # No star if we don't shorten it.
     else
-      shortcur="$current"
       shortcurstar="$current" # No star if we don't shorten it.
 
       for ((i=${#current}-2; i>=0; i--)); do
         subcurrent="${current:0:i}"
         matching=("$begin/$subcurrent"*) # Array of all files that start with $subcurrent.
         (( ${#matching[*]} != 1 )) && break # Stop shortening if more than one file matches.
-        shortcur="$subcurrent"
         shortcurstar="$subcurrent*"
       done
     fi
@@ -265,49 +264,77 @@ function npm_limited_pwd() {
     begin="$begin/$current"
     shortbegin="$shortbegin/$shortcurstar"
     shortenedpath="$shortbegin/$end"
-
   done
 
   shortenedpath="${shortenedpath%/}" # strip trailing /
   shortenedpath="${shortenedpath#/}" # strip leading /
-
-  local relative_pwd
 
   if [ $INHOME -eq 1 ]; then
     relative_pwd="~/$shortenedpath" #make sure it starts with ~/
   else
     relative_pwd="/$shortenedpath" # Make sure it starts with /
   fi
-  # echo "${relative_pwd}"
+  eval "$4=\$relative_pwd"
+  # eval "$4='$relative_pwd'"
+  # eval "$4='"${relative_pwd//\'/\'\"\'\"\'}"'"
 
-  local MAX_REL_LENGTH=30
-  local offset=$((${#relative_pwd}-$MAX_REL_LENGTH))
-
+  local offset=$((${#relative_pwd}-$final_max_length))
   if [ $offset -gt "0" ]
   then
-    local truncated_rel=${relative_pwd:$offset:$MAX_REL_LENGTH}
-    echo "${TRUNCATED_SYMBOL}/${truncated_rel#*/}"
+    local truncated_rel=${relative_pwd:$offset:$final_max_length}
+    truncated_rel="${TRUNCATED_SYMBOL}/${truncated_rel#*/}"
+    eval "$6=\$truncated_rel"
   else
-    echo "${relative_pwd}"
+    eval "$6=\$relative_pwd"
   fi
+
   shopt "$NGV" nullglob # Reset nullglob in case this is being used as a function.
 }
 
 function powerline_cwd_prompt {
-  local_npm_root="$1"
-  if [[ ! -z "${npm_root}" ]]; then
-   local_npm_root=$(dirname "${local_npm_root}")
-   short_pwd=$(npm_limited_pwd)
-  else
-    short_pwd=$(npm_limited_pwd)
+  local npm_root=''
+  local npm_prompt=''
+  local short_pwd=''
+  local trunc_short_pwd=''
+  local working_dir=''
+  local sud_sorking_dir=''
+  local git_dir=''
+  local sub_git_dir=''
+
+  npm_root="$1"
+  npm_prompt="$2"
+  git_dir="$3"
+  working_dir=$(pwd)
+  sub_working_dir="${working_dir##*/}"
+
+  if [[ ! -z "${git_dir}" ]]; then
+    sub_git_dir="${git_dir##*/}"
   fi
 
-    CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) ${short_pwd} ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
-    if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
-        CWD_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${CWD_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${CWD_PROMPT}
-        SEGMENT_AT_LEFT=0
-    fi
-    LAST_THEME_COLOR=${CWD_THEME_PROMPT_COLOR}
+  if [[ ! -z "${npm_root}" ]]; then
+    # strip the package.json filename
+    npm_root=$(dirname "${npm_root}")
+    npm_limited_pwd "$npm_root" "$working_dir" 24 short_pwd 30 trunc_short_pwd
+  else
+    npm_limited_pwd '' "$working_dir" 24 short_pwd 30 trunc_short_pwd
+  fi
+
+  if [[ ! -z "${npm_root}" ]]; then
+      title "${npm_prompt}"
+  elif [[ ! -z "${sub_git_dir}" ]]; then
+      title "${sub_git_dir}"
+  else
+      title "${short_pwd}"
+      # real_short_pwd=`realpath ${short_pwd}`
+      # title `basename ${real_short_pwd}`
+  fi
+
+  CWD_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR}) ${trunc_short_pwd} ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
+  if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
+    CWD_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${CWD_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${CWD_PROMPT}
+    SEGMENT_AT_LEFT=0
+  fi
+  LAST_THEME_COLOR=${CWD_THEME_PROMPT_COLOR}
 }
 
 function powerline_last_status_prompt {
@@ -335,65 +362,92 @@ function powerline_clock_prompt {
     fi
 }
 
-function get_npm_root {
-  local CURRENT_DIR=$(pwd)
+function findup_npm_root {
+  local current_dir
+  current_dir=$(pwd)
 
-  while [ "$CURRENT_DIR" != "/" ]; do
-    if [ -f "$CURRENT_DIR/package.json" ]; then
-      echo "$CURRENT_DIR/package.json"
+  while [ "$current_dir" != "/" ]; do
+    if [ -f "$current_dir/package.json" ]; then
+      echo "$current_dir/package.json"
       return
-    elif [ -d "$CURRENT_DIR/.git" ]; then
+    elif [ -d "$current_dir/.git" ]; then
       return
     fi
 
-    CURRENT_DIR=$(dirname $CURRENT_DIR)
+    current_dir=$(dirname "$current_dir")
   done
+}
+
+function find_git_root {
+  git_root=''
+
+  if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
+    git_root="$(git rev-parse --git-dir 2>/dev/null)"
+
+    if [ -d "$git_root" ]; then
+      git_root=$(dirname "$git_root")
+      echo "$git_root"
+    fi
+  fi
+}
+
+function npm_prompt {
+  local npm_root
+  local npm_name
+  local npm_version
+  local package_json
+
+  if hash JSON.sh 2> /dev/null; then
+    npm_root="$1"
+
+    if [[ -f "${npm_root}" ]]; then
+      package_json=$(JSON.sh < "${npm_root}")
+      npm_version=$(echo "${package_json}" | grep -e '^\[\"version\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
+      npm_name=$(echo "${package_json}" | grep -e '^\[\"name\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
+      eval "$2=${npm_name}@${npm_version}"
+    fi
+  fi
 }
 
 function powerline_npm_version_prompt {
   # if hash npm 2> /dev/null; then
   #   npm_prompt="$(npm show . version 2> /dev/null)"
 
-  if hash JSON.sh 2> /dev/null; then
-    NPM_ROOT="$1"
+  local npm_prompt
+  npm_prompt="$1"
 
-    if [[ -f "${NPM_ROOT}" ]]; then
-      package_json=$(JSON.sh < "${NPM_ROOT}")
-      npm_version=$(echo "${package_json}" | grep -e '^\[\"version\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
-      npm_name=$(echo "${package_json}" | grep -e '^\[\"name\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
-      npm_prompt="${npm_name}@${npm_version}"
-
-      if [[ -z "${npm_prompt}" ]]; then
-        NPM_VERSION_PROMPT=""
-      else
-        NPM_VERSION_PROMPT="$(set_rgb_color - ${NPM_THEME_PROMPT_COLOR}) ${npm_prompt} "
-        if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
-          NPM_VERSION_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${NPM_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
-          (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
-        fi
-        RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#npm_prompt} + 2 ))
-        LAST_THEME_COLOR=${NPM_THEME_PROMPT_COLOR}
-        (( SEGMENT_AT_RIGHT += 1 ))
-      fi
-    else
-      NPM_VERSION_PROMPT=""
+  if [[ ! -z "${npm_prompt}" ]]; then
+    NPM_VERSION_PROMPT="$(set_rgb_color - ${NPM_THEME_PROMPT_COLOR}) ${npm_prompt} "
+    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
+      NPM_VERSION_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${NPM_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
     fi
+    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#npm_prompt} + 2 ))
+    LAST_THEME_COLOR=${NPM_THEME_PROMPT_COLOR}
+    (( SEGMENT_AT_RIGHT += 1 ))
   else
     NPM_VERSION_PROMPT=""
   fi
 }
 
 function powerline_prompt_command() {
+    RIGHT_PROMPT_LENGTH=1
     local LAST_STATUS="$?"
     local MOVE_CURSOR_RIGHTMOST='\033[500C'
-    local npm_root=$(get_npm_root)
-    RIGHT_PROMPT_LENGTH=1
+    local local_npm_root
+    local local_git_root
+    local local_npm_prompt
+
+    local_npm_root="$(findup_npm_root)"
+    npm_prompt "$local_npm_root" local_npm_prompt
 
     ## left prompt ##
     powerline_scm_prompt
+    local_git_root="$(find_git_root)"
+
     powerline_virtualenv_prompt
     powerline_rvm_prompt
-    powerline_cwd_prompt "${npm_root}"
+    powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
     powerline_last_status_prompt LAST_STATUS
 
     LEFT_PROMPT="${SCM_PROMPT}${VIRTUALENV_PROMPT}${RVM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
@@ -402,7 +456,7 @@ function powerline_prompt_command() {
     LAST_THEME_COLOR="-"
 
     powerline_shell_prompt
-    powerline_npm_version_prompt "${npm_root}"
+    powerline_npm_version_prompt "$local_npm_prompt"
     # powerline_clock_prompt
     CLOCK_PROMPT=""
 
