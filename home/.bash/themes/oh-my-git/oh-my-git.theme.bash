@@ -14,6 +14,7 @@ VIRTUALENV_THEME_PROMPT_COLOR=35
 SCM_NONE_CHAR=""
 SCM_GIT_CHAR=${POWERLINE_SCM_GIT_CHAR:=" "}
 PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:="❯"}
+TRUNCATED_SYMBOL="…"
 
 omg_is_a_git_repo_symbol=''
 omg_has_untracked_files_symbol=''        #                ?    
@@ -274,8 +275,18 @@ function npm_limited_pwd() {
   else
     relative_pwd="/$shortenedpath" # Make sure it starts with /
   fi
-  echo "${relative_pwd}"
+  # echo "${relative_pwd}"
 
+  local MAX_REL_LENGTH=30
+  local offset=$((${#relative_pwd}-$MAX_REL_LENGTH))
+
+  if [ $offset -gt "0" ]
+  then
+    local truncated_rel=${relative_pwd:$offset:$MAX_REL_LENGTH}
+    echo "${TRUNCATED_SYMBOL}/${truncated_rel#*/}"
+  else
+    echo "${relative_pwd}"
+  fi
   shopt "$NGV" nullglob # Reset nullglob in case this is being used as a function.
 }
 
