@@ -148,33 +148,30 @@ function powerline_scm_prompt {
 
         if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
             # on filesystem
-            SCM_PROMPT="${omg_is_a_git_repo_symbol}  "
+            SCM_PROMPT="${omg_is_a_git_repo_symbol} "
 
-            if [[ $has_stashes ]]; then SCM_PROMPT+="${omg_has_stashes_symbol}  "; fi
-            if [[ $has_untracked_files ]]; then SCM_PROMPT+="${omg_has_untracked_files_symbol}  "; fi
-            if [[ $has_modifications ]]; then SCM_PROMPT+="${omg_has_modifications_symbol}  "; fi
-            if [[ $has_deletions ]]; then SCM_PROMPT+="${omg_has_deletions_symbol}  "; fi
+            if [[ $has_stashes ]]; then SCM_PROMPT+="${omg_has_stashes_symbol} "; fi
+            if [[ $has_untracked_files ]]; then SCM_PROMPT+="${omg_has_untracked_files_symbol} "; fi
+            if [[ $has_modifications ]]; then SCM_PROMPT+="${omg_has_modifications_symbol} "; fi
+            if [[ $has_deletions ]]; then SCM_PROMPT+="${omg_has_deletions_symbol} "; fi
 
             # ready
-            if [[ $has_adds ]]; then SCM_PROMPT+="${omg_has_adds_symbol}  "; fi
-            if [[ $has_modifications_cached ]]; then SCM_PROMPT+="${omg_has_cached_modifications_symbol}  "; fi
-            if [[ $has_deletions_cached ]]; then SCM_PROMPT+="${omg_has_cached_deletions_symbol}  "; fi
+            if [[ $has_adds ]]; then SCM_PROMPT+="${omg_has_adds_symbol} "; fi
+            if [[ $has_modifications_cached ]]; then SCM_PROMPT+="${omg_has_cached_modifications_symbol} "; fi
+            if [[ $has_deletions_cached ]]; then SCM_PROMPT+="${omg_has_cached_deletions_symbol} "; fi
 
             # next operation
-
-            if [[ $ready_to_commit ]]; then SCM_PROMPT+="${omg_ready_to_commit_symbol}  "; fi
+            if [[ $ready_to_commit ]]; then SCM_PROMPT+="${omg_ready_to_commit_symbol} "; fi
 
             # where
-
-
             SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
 
             if [[ $detached == true ]]; then
-                if [[ $detached ]]; then SCM_PROMPT+="${omg_detached_symbol}  "; fi
-                if [[ $detached ]]; then SCM_PROMPT+="(${current_commit_hash:0:7})  "; fi
+                if [[ $detached ]]; then SCM_PROMPT+="${omg_detached_symbol} "; fi
+                if [[ $detached ]]; then SCM_PROMPT+="(${current_commit_hash:0:7}) "; fi
             else
                 if [[ $has_upstream == false ]]; then
-                  SCM_PROMPT+ ="-- ${omg_not_tracked_branch_symbol}  --  (${current_branch})  "
+                  SCM_PROMPT+ ="— ${omg_not_tracked_branch_symbol} — (${current_branch}) "
                 else
                     if [[ $will_rebase == true ]]; then
                         local type_of_upstream=$omg_rebase_tracking_branch_symbol
@@ -186,20 +183,20 @@ function powerline_scm_prompt {
                         SCM_PROMPT+="-${commits_behind} ${omg_has_diverged_symbol} +${commits_ahead}"
                     else
                         if [[ $commits_behind -gt 0 ]]; then
-                            SCM_PROMPT+="-${commits_behind} ${omg_can_fast_forward_symbol} --"
+                            SCM_PROMPT+="-${commits_behind} ${omg_can_fast_forward_symbol} —"
                         fi
                         if [[ $commits_ahead -gt 0 ]]; then
-                            SCM_PROMPT+="-- ${omg_should_push_symbol}  +${commits_ahead}"
+                            SCM_PROMPT+="— ${omg_should_push_symbol} +${commits_ahead}"
                         fi
                         if [[ $commits_ahead == 0 && $commits_behind == 0 ]]; then
-                            SCM_PROMPT+=" --   -- "
+                            SCM_PROMPT+=" — — "
                         fi
 
                     fi
-                    SCM_PROMPT+="(${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/})  "
+                    SCM_PROMPT+="(${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/}) "
                 fi
             fi
-            if [[ ${is_on_a_tag} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit}  "; fi
+            if [[ ${is_on_a_tag} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
         fi
 
         SCM_PROMPT="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})${SCM_PROMPT} ${normal}"
