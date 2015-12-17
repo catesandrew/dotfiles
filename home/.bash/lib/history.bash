@@ -6,9 +6,9 @@ shopt -s histappend
 # history handling
 #
 # Erase duplicates
-# Bash History
-export HISTCONTROL="ignoredups"
-export HISTCONTROL=erasedups
+# Make repeated commands not show up in history.
+# Make commands preceeded by a space not show up in history.
+export HISTCONTROL=ignoreboth:erasedups
 
 # Increase the maximum number of commands to remember
 # (default is 500)
@@ -19,7 +19,7 @@ export HISTSIZE=5000
 export HISTFILESIZE=100000
 
 # Make some commands not show up in history
-export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
+export HISTIGNORE="ls:cd:cd -:pwd;exit:date:* --help"
 
 export AUTOFEATURE=true autotest
 
