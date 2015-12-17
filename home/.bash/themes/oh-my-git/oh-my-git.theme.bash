@@ -84,7 +84,7 @@ function powerline_shell_prompt {
     if [[ -n "${SSH_CLIENT}" ]]; then
         SHELL_PROMPT="${SHELL_SSH_CHAR}${USER}@${HOSTNAME}"
     else
-        SHELL_PROMPT="${USER}"
+        SHELL_PROMPT=""
     fi
     RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#SHELL_PROMPT} + 2 ))
     SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
