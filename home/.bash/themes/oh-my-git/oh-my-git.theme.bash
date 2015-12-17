@@ -230,8 +230,11 @@ function npm_limited_pwd() {
   fi
 
   end="${end#/}" # Strip the first /
+  local end_basename
   local shortenedpath="$end" # The whole path, to check the length.
-  local maxlength="${3:-0}"
+  local maxlength="${3:-24}"
+  end_basename=$(basename "${end}")
+  maxlength=$(($maxlength-${#end_basename}))
 
   shopt -q nullglob && NGV="-s" || NGV="-u" # Store the value for later.
   shopt -s nullglob    # Without this, anything that doesn't exist in the filesystem turns into */*/*/...
