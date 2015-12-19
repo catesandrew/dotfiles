@@ -6,13 +6,7 @@ alias reload='source ~/.bash_profile'
 
 # List directory contents
 alias sl=ls
-
-# Detect which ls flavor is in use.
-if ls --color > /dev/null 2>&1; then # GNU ls
-  alias ls="command ls --color"
-else # OS X ls
-  alias ls="command ls -G"
-fi
+alias ls='ls -G'        # Compact view, show colors
 
 alias la='ls -AF'       # Compact view, show hidden
 alias ll='ls -al'
