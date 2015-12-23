@@ -751,10 +751,12 @@ FEATURE may be a named feature or a file name, see
                              "with this build.")))
 
 ;; font
+(run-with-idle-timer 1 nil
+                     (lambda ()
 (if (find-font (font-spec :name (car dotemacs-default-font)))
     (dotemacs-set-default-font dotemacs-default-font)
   (dotemacs-buffer/warning "Cannot find font \"%s\"!"
-                            (car dotemacs-default-font)))
+                            (car dotemacs-default-font)))))
 
 ;; fringes
 (when (display-graphic-p)
