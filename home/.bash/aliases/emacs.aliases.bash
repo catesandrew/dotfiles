@@ -4,7 +4,7 @@ about-alias 'emacs editor'
 case $OSTYPE in
   linux*)
     alias em='emacs'
-    alias ec='emacsclient -n'
+    alias ec='emacsclient -c -a ""'
     ;;
   darwin*)
     # alias em='open -a emacs'
@@ -15,19 +15,13 @@ esac
 
 function __emacs_free
 {
-    if [ -e "$@" ]
-    then
-        # start new instances with -n -a
-        (command open -n -a /Applications/Emacs.app "$@") &
-    else
-        touch "$@"
-        # start new instances with -n -a
-        (command open -n -a /Applications/Emacs.app "$@") &
-    fi
+    # start new instances with -n -a
+    (command open -n -a /Applications/Emacs.app "$@") &
 }
 
 function __emacs_client
 {
-    osascript -e 'tell application "Emacs" to activate'
-    exec /usr/bin/env emacsclient -c -n -a "" $*
+    # osascript -e 'tell application "Emacs" to activate'
+    # exec /usr/bin/env emacsclient -c -n -a "" $*
+    (exec emacsclient -c -a "" "$@") &
 }
