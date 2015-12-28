@@ -34,6 +34,7 @@ omg_rebase_tracking_branch_symbol=''     #   
 omg_merge_tracking_branch_symbol=''      #  
 omg_should_push_symbol=''                #    
 omg_has_stashes_symbol=''
+omg_space='　'
 
 SCM_THEME_PROMPT_CLEAN=""
 SCM_THEME_PROMPT_DIRTY=""
@@ -157,22 +158,22 @@ function powerline_scm_prompt {
             if [[ $has_deletions ]]; then SCM_PROMPT+="${omg_has_deletions_symbol} "; fi
 
             # ready
-            if [[ $has_adds ]]; then SCM_PROMPT+="${omg_has_adds_symbol} "; fi
-            if [[ $has_modifications_cached ]]; then SCM_PROMPT+="${omg_has_cached_modifications_symbol} "; fi
-            if [[ $has_deletions_cached ]]; then SCM_PROMPT+="${omg_has_cached_deletions_symbol} "; fi
+            if [[ $has_adds ]]; then SCM_PROMPT+="${omg_has_adds_symbol}${omg_space}"; fi
+            if [[ $has_modifications_cached ]]; then SCM_PROMPT+="${omg_has_cached_modifications_symbol}${omg_space}"; fi
+            if [[ $has_deletions_cached ]]; then SCM_PROMPT+="${omg_has_cached_deletions_symbol}${omg_space}"; fi
 
             # next operation
-            if [[ $ready_to_commit ]]; then SCM_PROMPT+="${omg_ready_to_commit_symbol} "; fi
+            if [[ $ready_to_commit ]]; then SCM_PROMPT+="${omg_ready_to_commit_symbol}${omg_space}"; fi
 
             # where
             SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
 
             if [[ $detached == true ]]; then
-                if [[ $detached ]]; then SCM_PROMPT+="${omg_detached_symbol} "; fi
-                if [[ $detached ]]; then SCM_PROMPT+="(${current_commit_hash:0:7}) "; fi
+                if [[ $detached ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
+                if [[ $detached ]]; then SCM_PROMPT+="(${current_commit_hash:0:7})${omg_space}"; fi
             else
                 if [[ $has_upstream == false ]]; then
-                  SCM_PROMPT+ ="— ${omg_not_tracked_branch_symbol} — (${current_branch}) "
+                  SCM_PROMPT+ ="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${current_branch})${omg_space}"
                 else
                     if [[ $will_rebase == true ]]; then
                         local type_of_upstream=$omg_rebase_tracking_branch_symbol
@@ -181,20 +182,20 @@ function powerline_scm_prompt {
                     fi
 
                     if [[ $has_diverged == true ]]; then
-                        SCM_PROMPT+="-${commits_behind} ${omg_has_diverged_symbol} +${commits_ahead}"
+                        SCM_PROMPT+="-${commits_behind}${omg_space}${omg_has_diverged_symbol}${omg_space}+${commits_ahead}"
                     else
                         if [[ $commits_behind -gt 0 ]]; then
-                            SCM_PROMPT+="-${commits_behind} ${omg_can_fast_forward_symbol} —"
+                            SCM_PROMPT+="-${commits_behind}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
                         fi
                         if [[ $commits_ahead -gt 0 ]]; then
-                            SCM_PROMPT+="— ${omg_should_push_symbol} +${commits_ahead}"
+                            SCM_PROMPT+="—${omg_space}${omg_should_push_symbol}${omg_space}+${commits_ahead}"
                         fi
                         if [[ $commits_ahead == 0 && $commits_behind == 0 ]]; then
-                            SCM_PROMPT+=" — — "
+                            SCM_PROMPT+="${omg_space}—${omg_space}—${omg_space}"
                         fi
 
                     fi
-                    SCM_PROMPT+="(${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/}) "
+                    SCM_PROMPT+=" (${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/}) "
                 fi
             fi
             if [[ ${is_on_a_tag} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
