@@ -191,7 +191,7 @@ pressing `<leader> m`. Set it to `nil` to disable it."
   :group 'dotemacs)
 
 ; Source Code Pro for Powerline
-(defcustom dotemacs-default-font '("Hack"
+(defcustom dotemacs-default-font '("Pragmata Pro"
                                     :size 13
                                     :weight normal
                                     :width normal
@@ -751,12 +751,10 @@ FEATURE may be a named feature or a file name, see
                              "with this build.")))
 
 ;; font
-(run-with-idle-timer 1 nil
-                     (lambda ()
 (if (find-font (font-spec :name (car dotemacs-default-font)))
     (dotemacs-set-default-font dotemacs-default-font)
   (dotemacs-buffer/warning "Cannot find font \"%s\"!"
-                            (car dotemacs-default-font)))))
+                            (car dotemacs-default-font)))
 
 ;; fringes
 (when (display-graphic-p)
