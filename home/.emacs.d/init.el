@@ -191,7 +191,8 @@ pressing `<leader> m`. Set it to `nil` to disable it."
   :group 'dotemacs)
 
 ; Source Code Pro for Powerline
-(defcustom dotemacs-default-font '("Pragmata Pro"
+; Pragmata Pro
+(defcustom dotemacs-default-font '("Source Code Pro"
                                     :size 13
                                     :weight normal
                                     :width normal
@@ -271,7 +272,7 @@ can be toggled through `toggle-transparency'."
   "If non nil advises quit functions to keep server open when quitting.")
   :group 'dotemacs
 
-(defcustom dotemacs-mode-line-unicode-symbols nil
+(defcustom dotemacs-mode-line-unicode-symbols t
   "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
   :group 'dotemacs
 
