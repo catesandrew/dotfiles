@@ -4357,7 +4357,32 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (add-hook 'js2-mode-hook
             (lambda ()
-              (push '("function" . 955) prettify-symbols-alist)
+              (push '("not" . 172) prettify-symbols-alist) ;
+              (push '("!" . 172) prettify-symbols-alist) ;
+              (push '("forall" . 8704) prettify-symbols-alist) ;
+              (push '("::" . 8759) prettify-symbols-alist) ;
+              ; (push '("." . 8728) prettify-symbols-alist) ;
+              (push '("~>" . 8669) prettify-symbols-alist) ;
+              ; (push '("()" . #X2205) prettify-symbols-alist) ;
+              (push '("==" . #X225F) prettify-symbols-alist) ;
+              (push '("!=" . #X2260) prettify-symbols-alist) ;
+              (push '("===" . #X2261) prettify-symbols-alist) ;
+              (push '("!==" . #X2262) prettify-symbols-alist) ;
+              (push '(">=" . #X2265) prettify-symbols-alist) ;
+              (push '("<=" . #X2264) prettify-symbols-alist) ;
+              (push '("!!" . #X203C) prettify-symbols-alist) ;
+              (push '("&&" . #X2227) prettify-symbols-alist) ;
+              (push '("||" . #X2228) prettify-symbols-alist) ;
+              ; (push '("null" . 00D8) prettify-symbols-alist) ;
+              (push '("sqrt" . #X221A) prettify-symbols-alist) ;
+              (push '("undefined" . #X22A5) prettify-symbols-alist) ;
+              (push '("pi" . #X3C0) prettify-symbols-alist) ;
+              (push '("function" . 955) prettify-symbols-alist) ; λ
+              (push '("->" . 8594) prettify-symbols-alist) ; →
+              (push '("-<" . 8610) prettify-symbols-alist) ;
+              (push '("<-" . 8592) prettify-symbols-alist) ;
+              (push '("=>" . 8658) prettify-symbols-alist) ; ⇒
+              ; (push '("map" . 8614) prettify-symbols-alist) ; ↦
               (push '("return" . 8592) prettify-symbols-alist))))
 
 ;; http://stackoverflow.com/questions/1085170/how-to-achieve-code-folding-effects-in-emacs
