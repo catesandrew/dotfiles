@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>AMApplicationBuild</key>
-	<string>330</string>
+	<string>419</string>
 	<key>AMApplicationVersion</key>
-	<string>2.2.1</string>
+	<string>2.6</string>
 	<key>AMDocumentVersion</key>
 	<string>2</string>
 	<key>actions</key>
@@ -25,7 +25,7 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>1.1.1</string>
+				<string>1.1.2</string>
 				<key>AMApplication</key>
 				<array>
 					<string>Finder</string>
@@ -56,7 +56,7 @@
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.SpecifiedFiles</string>
 				<key>CFBundleVersion</key>
-				<string>1.1.1</string>
+				<string>1.1.2</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -103,7 +103,7 @@
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>455.500000:910.000000</string>
+				<string>529.000000:308.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Get Specified Finder Items.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -125,7 +125,7 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>2.0.2</string>
+				<string>2.0.3</string>
 				<key>AMApplication</key>
 				<array>
 					<string>Automator</string>
@@ -159,39 +159,47 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>for f in "$@"
+					<string>BASH_NO=no . /etc/profile
+DEST="/home/andrew/Movies"
+
+for f in "$@"
 do
-  filename="${f##*/}"                      
-  dir="${f:0:${#f} - ${#f}}" 
-  base="${f%.[^.]*}"                       
-  ext="${f:${#base} + 1}"                  
-  if [[ -z "$base" &amp;&amp; -n "$ext" ]]; then          
-    base=".$ext"
-    ext=""
+  FILENAME="${f##*/}"
+  FILE_DIR="${f:0:${#f} - ${#f}}"
+  FILE_BASE="${f%.[^.]*}"
+  FILE_EXT="${f:${#FILE_BASE} + 1}"
+  if [[ -z "${FILE_BASE}" &amp;&amp; -n "${FILE_EXT}" ]]; then
+    FILE_BASE=".${FILE_EXT}"
+    FILE_EXT=""
   fi
-  
-  if [ "$ext" = "torrent" ]
-  then
+
+  if [ "${FILE_EXT}" = "torrent" ]; then
     echo "found torrent extension, exiting."
     exit
   fi
-  
-  filename="${f/2010/(2010)}"
-  filename="${filename/.US./.}" # dancing with the stars
-  filename="${filename/.and./.&amp;.}" # law &amp; order
-  filename="${filename/.LA./.los.angeles.}" # law &amp; order: los angeles
-  if [ "$filename" != "$f" ]
+
+  if [ "${FILENAME}" != "$f" ]
   then
-    mv "$f" "$filename"
-    f="$filename"
+    mv "$f" "${FILENAME}"
+    f="${FILENAME}"
   fi
 
-  filename="/Users/andrew/Movies/before/`tvnamer "$f" -m --movedestination=/Users/andrew/Movies/before/ | grep -oE "New filename: (.*)"| sed -E "s/New filename: (.*)/\1/"`"
-  of="`basename "$filename" | sed 's/\(.*\)\..*/\1/'`.m4v"
-  ts handbrake -Z "AppleTV" -m -i "$filename" -o "/Users/andrew/Movies/after/$of" &gt; /dev/null
-  ts -dn mv "/Users/andrew/Movies/after/$of" "/Users/andrew/Movies/done/$of" &gt; /dev/null
-  ts -dn mv "$filename" "/Users/andrew/.Trash" &gt; /dev/null
-  
+  TV_NAMER=$(tvnamer "${f}" -b -m -d "${DEST}/before/")
+  TV_GREP=$(echo "${TV_NAMER}" | grep -oE "New filename: (.*)")
+  if [ -z "${TV_GREP}" ]; then
+    TV_GREP=$(echo "${TV_NAMER}" | grep -oE "Existing filename is correct: (.*)")
+    FILENAME=$(echo "${TV_GREP}" | sed -E "s/Existing filename is correct: (.*)/\1/")
+  else
+    FILENAME=$(echo "${TV_GREP}" | sed -E "s/New filename: (.*)/\1/")
+  fi
+
+  if [ -n "$FILENAME" ]; then
+    FILENAME="${DEST}/before/${FILENAME}"
+    OF="$(basename "${FILENAME}" | sed 's/\(.*\)\..*/\1/').m4v"
+    ts HandBrakeCLI -Z "AppleTV 3" -m -i "${FILENAME}" -o "${DEST}/after/${OF}" &gt; /dev/null
+    ts -dn mv "${DEST}/after/${OF}" "${DEST}/done/${OF}"
+    ts -dn trash "${FILENAME}"
+  fi
 done</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
@@ -205,7 +213,7 @@ done</string>
 				<key>BundleIdentifier</key>
 				<string>com.apple.RunShellScript</string>
 				<key>CFBundleVersion</key>
-				<string>2.0.2</string>
+				<string>2.0.3</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -305,7 +313,7 @@ done</string>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>455.500000:672.000000</string>
+				<string>529.000000:721.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -315,7 +323,7 @@ done</string>
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>D7B8E0E1-F6CD-4F3E-8A2F-BE14BA88EC69</key>
+		<key>4B95C0EF-20A7-4EA0-AF1E-EDC7AD398B80</key>
 		<dict>
 			<key>from</key>
 			<string>F794B1D9-16B1-4513-87F8-578008E89521 - F794B1D9-16B1-4513-87F8-578008E89521</string>

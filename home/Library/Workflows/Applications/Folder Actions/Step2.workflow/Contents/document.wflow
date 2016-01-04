@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>AMApplicationBuild</key>
-	<string>247</string>
+	<string>419</string>
 	<key>AMApplicationVersion</key>
-	<string>2.1</string>
+	<string>2.6</string>
 	<key>AMDocumentVersion</key>
 	<string>2</string>
 	<key>actions</key>
@@ -25,7 +25,11 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>1.1</string>
+				<string>1.1.2</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Finder</string>
+				</array>
 				<key>AMParameterProperties</key>
 				<dict>
 					<key>fileNames</key>
@@ -49,14 +53,10 @@
 					<key>fileNames</key>
 					<array/>
 				</dict>
-				<key>Application</key>
-				<array>
-					<string>Finder</string>
-				</array>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.SpecifiedFiles</string>
 				<key>CFBundleVersion</key>
-				<string>1.1</string>
+				<string>1.1.2</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -103,7 +103,7 @@
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>399.500000:664.000000</string>
+				<string>529.000000:308.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Get Specified Finder Items.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -125,7 +125,11 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>2.0.1</string>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
 				<key>AMParameterProperties</key>
 				<dict>
 					<key>COMMAND_STRING</key>
@@ -155,16 +159,16 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string># http://vicerveza.homeunix.net/~viric/soft/ts/
+					<string>BASH_NO=no . /etc/profile
+DEST="/home/andrew/Movies"
+
 for f in "$@"
 do
-	of="`basename "$f" | sed 's/\(.*\)\..*/\1/'`.m4v"
-	#/usr/local/bin/handbrake -Z "AppleTV" -m -i "$f" -o "/Users/andrew/Movies/after/$of"
-	/usr/local/bin/ts /usr/local/bin/handbrake -Z "AppleTV" -m -i "$f" -o "/Users/andrew/Movies/after/$of" &gt; /dev/null
-	#mv "/Users/andrew/Movies/after/$of" "/Users/andrew/Movies/done/$of"
-	/usr/local/bin/ts -dn mv "/Users/andrew/Movies/after/$of" "/Users/andrew/Movies/done/$of" &gt; /dev/null
-    /usr/local/bin/ts -dn mv "$f" "/Users/andrew/.Trash" &gt; /dev/null
-done</string>
+  OF="$(basename "${f}" | sed 's/\(.*\)\..*/\1/').m4v"
+  ts HandBrakeCLI -Z "AppleTV 3" -m -i "$f" -o "${DEST}/after/${OF}" &gt; /dev/null
+  ts -dn mv "${DEST}/after/${OF}" "${DEST}/done/${OF}" &gt; /dev/null
+done
+</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
 					<key>inputMethod</key>
@@ -174,14 +178,10 @@ done</string>
 					<key>source</key>
 					<string></string>
 				</dict>
-				<key>Application</key>
-				<array>
-					<string>Automator</string>
-				</array>
 				<key>BundleIdentifier</key>
 				<string>com.apple.RunShellScript</string>
 				<key>CFBundleVersion</key>
-				<string>2.0.1</string>
+				<string>2.0.3</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -281,7 +281,7 @@ done</string>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>399.500000:426.000000</string>
+				<string>529.000000:816.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -291,7 +291,7 @@ done</string>
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>A169DF5F-A904-4C57-B8D7-1A63E9FDCA02</key>
+		<key>7C94B004-3359-42EB-8840-7FCB89660CB3</key>
 		<dict>
 			<key>from</key>
 			<string>5DF25BB3-D7A9-431E-8955-64F23399006D - 5DF25BB3-D7A9-431E-8955-64F23399006D</string>

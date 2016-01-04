@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>AMApplicationBuild</key>
-	<string>247.1</string>
+	<string>419</string>
 	<key>AMApplicationVersion</key>
-	<string>2.1.1</string>
+	<string>2.6</string>
 	<key>AMDocumentVersion</key>
 	<string>2</string>
 	<key>actions</key>
@@ -25,7 +25,11 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>1.1</string>
+				<string>1.1.2</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Finder</string>
+				</array>
 				<key>AMParameterProperties</key>
 				<dict>
 					<key>fileNames</key>
@@ -49,14 +53,10 @@
 					<key>fileNames</key>
 					<array/>
 				</dict>
-				<key>Application</key>
-				<array>
-					<string>Finder</string>
-				</array>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.SpecifiedFiles</string>
 				<key>CFBundleVersion</key>
-				<string>1.1</string>
+				<string>1.1.2</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -103,7 +103,7 @@
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>302.000000:1157.000000</string>
+				<string>529.000000:308.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Get Specified Finder Items.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -118,162 +118,6 @@
 					<key>Container</key>
 					<string>List</string>
 					<key>Optional</key>
-					<false/>
-					<key>Types</key>
-					<array>
-						<string>com.apple.cocoa.string</string>
-					</array>
-				</dict>
-				<key>AMActionVersion</key>
-				<string>1.0.4</string>
-				<key>AMParameterProperties</key>
-				<dict>
-					<key>addTags</key>
-					<dict/>
-					<key>overWrite</key>
-					<dict/>
-					<key>removeTags</key>
-					<dict/>
-					<key>sortOrder</key>
-					<dict/>
-				</dict>
-				<key>AMProvides</key>
-				<dict>
-					<key>Container</key>
-					<string>List</string>
-					<key>Types</key>
-					<array>
-						<string>com.apple.cocoa.string</string>
-					</array>
-				</dict>
-				<key>AMRequiredResources</key>
-				<array/>
-				<key>ActionBundlePath</key>
-				<string>/Users/andrew/Library/Automator/Add TV Tags.action</string>
-				<key>ActionName</key>
-				<string>Add TV Tags</string>
-				<key>ActionParameters</key>
-				<dict>
-					<key>addTags</key>
-					<string>1</string>
-					<key>overWrite</key>
-					<true/>
-					<key>removeTags</key>
-					<string>1</string>
-					<key>sortOrder</key>
-					<integer>0</integer>
-				</dict>
-				<key>Application</key>
-				<array>
-					<string>AtomicParsley64</string>
-				</array>
-				<key>BundleIdentifier</key>
-				<string>com.batchRip.Automator.</string>
-				<key>CFBundleVersion</key>
-				<string>1.0.4</string>
-				<key>CanShowSelectedItemsWhenRun</key>
-				<false/>
-				<key>CanShowWhenRun</key>
-				<false/>
-				<key>Category</key>
-				<array>
-					<string>AMCategoryFilesAndFolders</string>
-				</array>
-				<key>Class Name</key>
-				<string>AMShellScriptAction</string>
-				<key>InputUUID</key>
-				<string>B88760BE-E6DA-46B7-B4BD-B8797F5CEB19</string>
-				<key>Keywords</key>
-				<array>
-					<string>tv</string>
-					<string>tag</string>
-					<string>metadata</string>
-					<string>iTunes</string>
-					<string>thetvdb</string>
-					<string>batch</string>
-					<string>macjedi</string>
-				</array>
-				<key>OutputUUID</key>
-				<string>FC7DF52C-1FA9-45F7-A9F3-35F2699FE0E6</string>
-				<key>UUID</key>
-				<string>EBC7BCEE-6319-4664-963E-F9B257595C85</string>
-				<key>UnlocalizedApplications</key>
-				<array>
-					<string>AtomicParsley64</string>
-				</array>
-				<key>arguments</key>
-				<dict>
-					<key>0</key>
-					<dict>
-						<key>default value</key>
-						<string>1</string>
-						<key>name</key>
-						<string>addTags</string>
-						<key>required</key>
-						<string>0</string>
-						<key>type</key>
-						<string>0</string>
-						<key>uuid</key>
-						<string>0</string>
-					</dict>
-					<key>1</key>
-					<dict>
-						<key>default value</key>
-						<string>1</string>
-						<key>name</key>
-						<string>sortOrder</string>
-						<key>required</key>
-						<string>0</string>
-						<key>type</key>
-						<string>0</string>
-						<key>uuid</key>
-						<string>1</string>
-					</dict>
-					<key>2</key>
-					<dict>
-						<key>default value</key>
-						<string>1</string>
-						<key>name</key>
-						<string>removeTags</string>
-						<key>required</key>
-						<string>0</string>
-						<key>type</key>
-						<string>0</string>
-						<key>uuid</key>
-						<string>2</string>
-					</dict>
-					<key>3</key>
-					<dict>
-						<key>default value</key>
-						<string>0</string>
-						<key>name</key>
-						<string>overWrite</string>
-						<key>required</key>
-						<string>0</string>
-						<key>type</key>
-						<string>0</string>
-						<key>uuid</key>
-						<string>3</string>
-					</dict>
-				</dict>
-				<key>isViewVisible</key>
-				<true/>
-				<key>location</key>
-				<string>302.000000:919.000000</string>
-				<key>nibPath</key>
-				<string>/Users/andrew/Library/Automator/Add TV Tags.action/Contents/Resources/English.lproj/main.nib</string>
-			</dict>
-			<key>isViewVisible</key>
-			<true/>
-		</dict>
-		<dict>
-			<key>action</key>
-			<dict>
-				<key>AMAccepts</key>
-				<dict>
-					<key>Container</key>
-					<string>List</string>
-					<key>Optional</key>
 					<true/>
 					<key>Types</key>
 					<array>
@@ -281,7 +125,11 @@
 					</array>
 				</dict>
 				<key>AMActionVersion</key>
-				<string>2.0.1</string>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
 				<key>AMParameterProperties</key>
 				<dict>
 					<key>COMMAND_STRING</key>
@@ -311,46 +159,49 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>for f in "$@"
+					<string>BASH_NO=no . /etc/profile
+DEST="/home/andrew/Movies"
+DEST_TV="${DEST}/Shows"
+
+for f in "$@"
 do
-  tv_dir="~/Desktop/TV Shows"
-  filename="${f##*/}"                      
-  dir="${f:0:${#f} - ${#f}}" 
-  base="${f%.[^.]*}"                       
-  ext="${f:${#base} + 1}"                  
-  if [[ -z "$base" &amp;&amp; -n "$ext" ]]; then          
-    base=".$ext"
-    ext=""
+  FILENAME="${f##*/}"
+  FILE_DIR="${f:0:${#f} - ${#f}}"
+  FILE_BASE="${f%.[^.]*}"
+  FILE_EXT="${f:${#FILE_BASE} + 1}"
+  if [[ -z "${FILE_BASE}" &amp;&amp; -n "${FILE_EXT}" ]]; then
+    FILE_BASE=".${FILE_EXT}"
+    FILE_EXT=""
   fi
-  
-  if [ "$ext" != "m4v" ]
-  then
+
+  if [ "${FILE_EXT}" != "m4v" ]; then
     exit
   fi
 
-  show="`basename "$filename" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\1/'`"
-  season="`basename "$filename" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\3/'`"
-  episode="`basename "$filename" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\4/'`"
-    
-  path=""$tv_dir"/"$show""
-  if [ ! -d "$path" ]; then
-      mkdir "$path"
+  SHOW="$(basename "${FILENAME}" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\1/')"
+  SEASON="$(basename "${FILENAME}" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\3/')"
+  EPISODE="$(basename "${FILENAME}" | sed -E 's/^(.*) ([ \t\r\n\v\f]|\-) S([0-9]{1,2})E([0-9]{1,2}).*$/\4/')"
+
+  #path=""$tv_dir"/"$show"/S"$season"/"$filename""
+  #echo "$filename"
+  #echo "$show"
+  #echo "$season"
+  #echo "$episode"
+  #echo "$path"
+
+  FOLDER="${DEST_TV}/${SHOW}"
+  if [ ! -d "${FOLDER}" ]; then
+      mkdir -p "${FOLDER}" /dev/null
   fi
-  
-  path=""$tv_dir"/"$show"/S"$season""
-  if [ ! -d "$path" ]; then
-      mkdir "$path"
+
+  FOLDER="${DEST_TV}/${SHOW}/S${SEASON}"
+  if [ ! -d "${FOLDER}" ]; then
+      mkdir -p "${FOLDER}" &gt; /dev/null
   fi
-  
-  path=""$tv_dir"/"$show"/S"$season"/"$filename""
-  cp "$f" "$path"
-  mv "$f" "~/.Trash"
-  
-osascript &lt;&lt;EOD
-  tell application "iTunes"
-     add POSIX file "$path" to playlist "Library"   
-  end tell
-EOD
+
+  FOLDER="${DEST_TV}/${SHOW}/S${SEASON}/${FILENAME}"
+  cp "$f" "${FOLDER}"
+  trash "$f"
 done</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
@@ -361,14 +212,10 @@ done</string>
 					<key>source</key>
 					<string></string>
 				</dict>
-				<key>Application</key>
-				<array>
-					<string>Automator</string>
-				</array>
 				<key>BundleIdentifier</key>
 				<string>com.apple.RunShellScript</string>
 				<key>CFBundleVersion</key>
-				<string>2.0.1</string>
+				<string>2.0.3</string>
 				<key>CanShowSelectedItemsWhenRun</key>
 				<false/>
 				<key>CanShowWhenRun</key>
@@ -468,7 +315,7 @@ done</string>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>302.000000:792.000000</string>
+				<string>529.000000:650.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -478,19 +325,12 @@ done</string>
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>1B6127A4-4767-47BE-8BC8-D5AD1862E65B</key>
-		<dict>
-			<key>from</key>
-			<string>EBC7BCEE-6319-4664-963E-F9B257595C85 - EBC7BCEE-6319-4664-963E-F9B257595C85</string>
-			<key>to</key>
-			<string>55D3765A-A4B3-4A07-8181-397DDE3B337C - 55D3765A-A4B3-4A07-8181-397DDE3B337C</string>
-		</dict>
-		<key>665CD2CC-6360-49F9-BDE5-BABECC7F9BC7</key>
+		<key>17538F0D-990D-46E2-8585-9BB11EF3EAA1</key>
 		<dict>
 			<key>from</key>
 			<string>6F2A560C-A5E3-4B97-BB1D-EBBC7F6BDEDA - 6F2A560C-A5E3-4B97-BB1D-EBBC7F6BDEDA</string>
 			<key>to</key>
-			<string>EBC7BCEE-6319-4664-963E-F9B257595C85 - EBC7BCEE-6319-4664-963E-F9B257595C85</string>
+			<string>55D3765A-A4B3-4A07-8181-397DDE3B337C - 55D3765A-A4B3-4A07-8181-397DDE3B337C</string>
 		</dict>
 	</dict>
 	<key>state</key>
