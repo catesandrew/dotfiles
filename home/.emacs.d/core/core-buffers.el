@@ -1,4 +1,3 @@
-
 (defun dotemacs-buffer/set-mode-line (format)
   "Set mode-line format for dotemacs buffer."
   (with-current-buffer (get-buffer-create "*dotemacs*")
@@ -39,6 +38,5 @@ The message is always displayed. "
       (insert msg)
       (if messagebuf (message "(emacs) %s" msg)))
     (dotemacs-buffer/set-mode-line "")))
-
 
 (provide 'core-buffers)
