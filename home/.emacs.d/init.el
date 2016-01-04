@@ -5107,7 +5107,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-to-list 'nose-project-root-files "setup.cfg")
     (setq nose-use-verbose nil)))
 
-
 (use-package pytest
   :if (eq 'pytest python-test-runner)
   :ensure t
@@ -6081,9 +6080,8 @@ If called with a prefix argument, uses the other-window instead."
                (if cider-repl-use-clojure-font-lock "ON" "OFF")))
 
     (defun dotemacs-cider-debug-setup ()
-      (when (eq dotemacs-editing-style 'vim)
-        (evil-make-overriding-map cider--debug-mode-map 'normal)
-        (evil-normalize-keymaps)))
+      (evil-make-overriding-map cider--debug-mode-map 'normal)
+      (evil-normalize-keymaps))
 
     (add-hook 'cider--debug-mode-hook 'dotemacs-cider-debug-setup)
 
