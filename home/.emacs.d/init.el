@@ -192,7 +192,7 @@ pressing `<leader> m`. Set it to `nil` to disable it."
 
 ; Source Code Pro for Powerline
 ; Pragmata Pro
-(defcustom dotemacs-default-font '("Source Code Pro"
+(defcustom dotemacs-default-font '("Hasklig"
                                     :size 13
                                     :weight normal
                                     :width normal
