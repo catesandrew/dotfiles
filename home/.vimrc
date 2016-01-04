@@ -419,7 +419,7 @@ if &t_Co > 2 || has("gui_running")
   syntax on " switch syntax highlighting on, when the terminal has colors
   " http://superuser.com/questions/430344/macvim-lags-while-vim-on-terminal-is-buttery-smooth
   " http://stackoverflow.com/questions/4775605/vim-syntax-highlight-improve-performance
-  syntax sync minlines=256
+  " syntax sync minlines=256
 endif
 
 " }}}
