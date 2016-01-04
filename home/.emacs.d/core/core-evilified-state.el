@@ -85,22 +85,6 @@
 (define-key evil-evilified-state-map (kbd "C-k") 'evil-scroll-up)
 (define-key evil-evilified-state-map (kbd "C-z") 'evil-emacs-state)
 
-;; old macro
-(defmacro evilify (mode map &rest body)
-  "Set `evilified state' as default for MODE.
-
-BODY is a list of additional key bindings to apply for the given MAP in
-`evilified state'."
-  (let ((defkey (when body `(evil-define-key 'evilified ,map ,@body))))
-    `(progn (unless ,(null mode)
-              (unless (memq ',mode dotemacs-core-evilified-state--modes)
-                (push ',mode dotemacs-core-evilified-state--modes))
-              (unless (memq ',mode evil-evilified-state-modes)
-                (delq ',mode evil-emacs-state-modes)
-                (push ',mode evil-evilified-state-modes)))
-            (unless ,(null defkey) (,@defkey)))))
-
-
 (provide 'core-evilified-state)
 
 ;;; core-evilified-state.el ends here
