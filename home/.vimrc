@@ -298,9 +298,10 @@ set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮,trail:␣
 set shiftround                   " use multiple of shiftwidth when indenting with '<' and '>'
 let &showbreak='↪ '
 
-set scrolloff=5                  " keep 5 lines off the edges of the screen when scrolling
-set scrolljump=5
+set scrolloff=8                  " keep 5 lines off the edges of the screen when scrolling
+set scrolljump=8
 set display+=lastline
+let html_no_rendering=1 " Don't render italic, bold, links in HTML
 set wildmenu                     " make tab completion for files/buffers act like bash
 set wildmode=list:longest,full   " show a list when pressing tab and complete
                                  " first full match
@@ -1495,9 +1496,13 @@ if has('gui_running')
       autocmd GUIEnter * simalt ~x
     endif
 
+    " <* <*> <+> <$> *** <|> !! || === ==> <<< >>> <> +++ <- -> => >> << >>= =<< .. ... :: -< >- -<< >>- ++ /= ==
     if s:is_macvim
       " set gfn=Anonymous\ Pro\ for\ Powerline:h14
-      set gfn=Hack:h12
+      " set gfn=Hack:h12
+      " set gfn=Pragmata\ Pro:h12
+      set gfn=Hasklig:h12
+      set macligatures
       set transparency=5          " Make the window slightly transparent
     endif
 
