@@ -51,14 +51,29 @@
   :cursor box)
 
 (add-hook 'evil-evilified-state-entry-hook 'dotemacs-evilified-state-on-entry)
+(add-hook 'evil-evilified-state-exit-hook 'spacemacs//evilified-state-on-exit)
+
+(defun dotemacs-evilify-pre-command-hook ()
+  (let ((map (get-char-property (point) 'keymap)))
+    (when (and map (assq 'evilified-state map))
+      (let* ((submap (cdr (assq 'evilified-state map)))
+             (command (when (and submap (eq 1 (length (this-command-keys))))
+                        (lookup-key submap (this-command-keys)))))
+        (when command
+          (setq this-command command))))))
 
 (defun dotemacs-evilified-state-on-entry ()
   "Setup evilified state."
+  (add-hook 'pre-command-hook 'dotemacs-evilify-pre-command-hook nil 'local)
   (when (bound-and-true-p evil-surround-mode)
     (make-local-variable 'evil-surround-mode)
     (evil-surround-mode -1))
   (setq-local evil-normal-state-map (cons 'keymap nil))
   (setq-local evil-visual-state-map (cons 'keymap (list (cons ?y 'evil-yank)))))
+
+(defun dotemacs-evilified-state-on-exit ()
+  "Clean evilified-state"
+  (remove-hook 'pre-command-hook 'dotemacs-evilify-pre-command-hook 'local))
 
 ;; default key bindings for all evilified buffers
 (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
