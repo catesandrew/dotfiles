@@ -9139,9 +9139,29 @@ If called with a prefix argument, uses the other-window instead."
       "ml" 'org-open-at-point
       "mT" 'org-show-todo-tree
 
+      "m." 'org-time-stamp
+
       ;; headings
       "mhi" 'org-insert-heading-after-current
       "mhI" 'org-insert-heading
+
+      ;; More cycling options (timestamps, headlines, items, properties)
+      "mL" 'org-shiftright
+      "mH" 'org-shiftleft
+      "mJ" 'org-shiftdown
+      "mK" 'org-shiftup
+
+      ;; Change between TODO sets
+      "m C-S-l" 'org-shiftcontrolright
+      "m C-S-h" 'org-shiftcontrolleft
+      "m C-S-j" 'org-shiftcontroldown
+      "m C-S-k" 'org-shiftcontrolup
+
+      ;; Subtree editing
+      "mSl" 'org-demote-subtree
+      "mSh" 'org-promote-subtree
+      "mSj" 'org-move-subtree-down
+      "mSk" 'org-move-subtree-up
 
       ;; tables
       "mta" 'org-table-align
