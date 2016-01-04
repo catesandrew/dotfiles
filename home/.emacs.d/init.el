@@ -9007,6 +9007,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package erc-gitter
   :quelpa (erc-gitter :fetcher github :repo "jleechpe/erc-gitter")
+  :disabled t
   :defer t
   :ensure t
   :config
