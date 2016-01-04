@@ -165,12 +165,12 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
 (defun dotemacs-evilify-wrapper (map map-symbol map-value event
                                        evil-value evil-event)
   "Define a wrapper for the passed event."
-  (eval `(defun ,(dotemacs-evilify-wrapper-name
+  (eval `(evil-define-command ,(dotemacs-evilify-wrapper-name
                   map-symbol map-value event evil-value evil-event) ()
            ,(dotemacs-evilify-wrapper-documentation
              map-value event evil-value evil-event)
            (interactive)
-           (if (eq 'evilified evil-state)
+           (if (memq evil-state '(evilified evil-state))
                ;; evilified state
                ,(if evil-value
                    (dotemacs-evilify-call evil-value event)
