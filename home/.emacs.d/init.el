@@ -9298,7 +9298,6 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package org-mime
   :defer t
-  :ensure t
   :commands (org-mime-htmlize org-mime-org-buffer-htmlize)
   :init
   (progn
