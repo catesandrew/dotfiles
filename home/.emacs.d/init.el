@@ -9005,6 +9005,13 @@ If called with a prefix argument, uses the other-window instead."
     (add-to-list 'erc-modules 'spelling)
     (erc-update-modules)))
 
+(use-package erc-gitter
+  :quelpa (erc-gitter :fetcher github :repo "jleechpe/erc-gitter")
+  :defer t
+  :ensure t
+  :config
+  (add-to-list 'erc-modules 'gitter))
+
 (use-package erc-join                   ; Automatically join channels with ERC
   :defer t
   :config
