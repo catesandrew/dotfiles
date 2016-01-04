@@ -1352,8 +1352,7 @@ the user activate the completion manually."
 These should have their own segments in the modeline.")
 
 (use-package init-scratch          ; My logo in the scratch buffer
-  :commands (dotemacs-insert-logo
-             dotemacs-insert-logo-into-scratch)
+  :commands (dotemacs-insert-logo-into-scratch)
   :init (add-hook 'emacs-startup-hook #'dotemacs-insert-logo-into-scratch))
 
 (use-package unicode-fonts              ; Map Unicode blocks to fonts
@@ -1792,17 +1791,13 @@ These should have their own segments in the modeline.")
 
 (use-package init-buffers          ; Personal buffer tools
   :load-path "config/"
-  :commands (dotemacs-force-save-some-buffers
-             dotemacs-do-not-kill-important-buffers
-             dotemacs-ibuffer-group-by-modes
-             dotemacs-ibuffer-group-by-projects)
-  :init (progn
-          (add-hook 'kill-buffer-query-functions
-                    #'dotemacs-do-not-kill-important-buffers)
-
-          ;; Autosave buffers when focus is lost, see
-          ;; http://emacsredux.com/blog/2014/03/22/a-peek-at-emacs-24-dot-4-focus-hooks/
-          (add-hook 'focus-out-hook #'dotemacs-force-save-some-buffers)))
+  :config
+  (progn
+      (add-hook 'kill-buffer-query-functions
+                #'dotemacs-do-not-kill-important-buffers)
+      ;; Autosave buffers when focus is lost, see
+      ;; http://emacsredux.com/blog/2014/03/22/a-peek-at-emacs-24-dot-4-focus-hooks/
+      (add-hook 'focus-out-hook #'dotemacs-force-save-some-buffers)))
 
 (use-package uniquify                   ; Make buffer names unique
   ;; When having windows with repeated filenames, uniquify them
