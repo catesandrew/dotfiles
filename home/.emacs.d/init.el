@@ -38,7 +38,6 @@
   "Custom configuration for dotemacs."
   :group 'local)
 
-
 (defconst dotemacs-core-directory
   (expand-file-name (concat user-emacs-directory "core/"))
   "core directory.")
@@ -4966,7 +4965,26 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
   :defer t
-  :init (add-hook 'python-mode-hook #'anaconda-mode)
+  :init
+  (progn
+    (defun dotemacs//set-anaconda-mode-directory ()
+      ;; hack to redefine the variable `anaconda-mode-server-directory'
+      ;; we need to do this to retrieve the server version and
+      ;; then redefine the variable
+      (unless (string-match-p dotemacs-cache-directory
+                              anaconda-mode-server-directory)
+        (makunbound 'anaconda-mode-ensure-directory-command)
+        (makunbound 'anaconda-mode-check-installation-command)
+        (makunbound 'anaconda-mode-install-server-command)
+        (setq features (delq 'anaconda-mode features))
+        (setq anaconda-mode-server-directory
+              (concat dotemacs-cache-directory
+                      "anaconda-mode/"
+                      anaconda-mode-server-version))
+        (require 'anaconda-mode)))
+    (dotemacs/add-to-hook 'python-mode-hook
+                           '(dotemacs//set-anaconda-mode-directory
+                             anaconda-mode)))
   :config
   (progn
     (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)

@@ -52,7 +52,6 @@
 
 .cache
 el-get
-anaconda-mode/
 
 *#*
 *.elc
