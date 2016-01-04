@@ -51,10 +51,10 @@
   :cursor box)
 
 (add-hook 'evil-evilified-state-entry-hook 'dotemacs-evilified-state-on-entry)
-(add-hook 'evil-evilified-state-exit-hook 'spacemacs//evilified-state-on-exit)
+(add-hook 'evil-evilified-state-exit-hook 'dotemacs-evilified-state-on-exit)
 
-(add-hook 'evil-visual-state-entry-hook 'dotemacs-evilified-state-on-entry)
-(add-hook 'evil-visual-state-exit-hook 'dotemacs-evilified-state-on-exit)
+(add-hook 'evil-visual-state-entry-hook 'dotemacs-visual-state-on-entry)
+(add-hook 'evil-visual-state-exit-hook 'dotemacs-visual-state-on-exit)
 
 (defun dotemacs-evilify-pre-command-hook ()
   (let ((map (get-char-property (point) 'keymap)))
@@ -75,7 +75,15 @@
   (setq-local evil-visual-state-map (cons 'keymap (list (cons ?y 'evil-yank)))))
 
 (defun dotemacs-evilified-state-on-exit ()
-  "Clean evilified-state"
+  "Clean evilified state"
+  (remove-hook 'pre-command-hook 'dotemacs-evilify-pre-command-hook 'local))
+
+(defun dotemacs-visual-state-on-entry ()
+  "Setup visual state."
+  (add-hook 'pre-command-hook 'dotemacs-evilify-pre-command-hook nil 'local))
+
+(defun dotemacs-visual-state-on-exit ()
+  "Clean visual state"
   (remove-hook 'pre-command-hook 'dotemacs-evilify-pre-command-hook 'local))
 
 ;; default key bindings for all evilified buffers
