@@ -53,6 +53,9 @@
 (add-hook 'evil-evilified-state-entry-hook 'dotemacs-evilified-state-on-entry)
 (add-hook 'evil-evilified-state-exit-hook 'spacemacs//evilified-state-on-exit)
 
+(add-hook 'evil-visual-state-entry-hook 'dotemacs-evilified-state-on-entry)
+(add-hook 'evil-visual-state-exit-hook 'dotemacs-evilified-state-on-exit)
+
 (defun dotemacs-evilify-pre-command-hook ()
   (let ((map (get-char-property (point) 'keymap)))
     (when (and map (assq 'evilified-state map))
