@@ -9302,9 +9302,9 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (evil-leader/set-key-for-mode 'message-mode
-      "mh" 'org-mime-htmlize)
+      "mM" 'org-mime-htmlize)
     (evil-leader/set-key-for-mode 'org-mode
-      "mH" 'org-mime-org-buffer-htmlize)))
+      "mm" 'org-mime-org-buffer-htmlize)))
 
 (use-package org-pomodoro
   :defer t
