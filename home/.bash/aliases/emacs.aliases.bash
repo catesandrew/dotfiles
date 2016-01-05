@@ -21,9 +21,14 @@ function __emacs_free
 
 function __emacs_client
 {
-    (exec emacsclient -c -a "" "$@") &
+    # version 1
+    # (exec emacsclient -c -a "" "$@") &
+
+    # version 2
     # http://stackoverflow.com/questions/778716/how-can-i-make-emacs-start-up-faster
-    # Argument: filename to open in new Emacs frame
-    # emacsclient -e '(let ((default-directory "`pwd`/")) (select-frame (make-frame)) (find-file "'$1'"))'
-    # (exec emacsclient -e "(let ((default-directory \"$(pwd)/\")) (select-frame (make-frame)) (find-file \"$1\"))") &
+    # (exec emacsclient -c -e "(let ((default-directory \"$(pwd)/\")) (select-frame (make-frame)) (find-file \"$1\"))" 2&>/dev/null) &
+
+    # version 3
+    # emacsclient -t $@ || (emacs --daemon && emacsclient -t $@)
+    (exec emacsclient -c "$@" >/dev/null 2>&1) &
 }
