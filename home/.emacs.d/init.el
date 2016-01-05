@@ -6409,36 +6409,11 @@ If called with a prefix argument, uses the other-window instead."
 ;;; React
 (dotemacs-defvar-company-backends react-mode)
 
-(defun dotemacs//react-init-flycheck ()
-  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
-    (if dotemacs//flycheck-executable-eslint
-        (progn
-          (dotemacs//flycheck-enable 'javascript-eslint)
-          ;; disable jshint since we prefer eslint checking
-          (when dotemacs//flycheck-executable-jshint
-            (dotemacs//flycheck-disable 'javascript-jshint)))
-      (progn
-        ;; otherwise enable jshint if eslint is not found
-        (when dotemacs//flycheck-executable-jshint
-          (dotemacs//flycheck-enable 'javascript-jshint))))
-
-    ;; disable html-tidy
-    (when dotemacs//flycheck-executable-tidy5
-      (dotemacs//flycheck-disable 'html-tidy))
-
-    ;; disable jscs
-    (when dotemacs//flycheck-executable-jscs
-      (dotemacs//flycheck-disable 'javascript-jscs))
-
-    ;; disable json-jsonlist checking for json files
-    (dotemacs//flycheck-disable 'json-jsonlist)))
-
 ; todo: update eslint to local for react-mode
 (defun dotemacs-react-mode-defaults ()
   "Default react-mode coding hook."
   (unless (bound-and-true-p my-react-mh-ran)
-    (set (make-local-variable 'my-react-mh-ran) t)
-    (dotemacs//react-init-flycheck)))
+    (set (make-local-variable 'my-react-mh-ran) t)))
 
 (setq dotemacs-react-mode-hook #'dotemacs-react-mode-defaults)
 (add-hook 'react-mode-hook
@@ -6459,17 +6434,17 @@ If called with a prefix argument, uses the other-window instead."
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
-    (dotemacs//flycheck-executables-search)
+    (dotemacs-flycheck-executables-search)
     (when (bound-and-true-p dotemacs//flycheck-executables-searched)
       (when dotemacs//flycheck-executable-eslint
-        (flycheck-add-mode 'javascript-eslint 'react-mode))
-
-      (when (equal major-mode 'react-mode)
-        (dotemacs//react-init-flycheck)))))
+        (flycheck-add-mode 'javascript-eslint 'react-mode)))))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'react-mode-hook 'flycheck-turn-on-maybe))
+  (add-hook 'react-mode-hook
+            (lambda ()
+              (flycheck-turn-on-maybe)
+              (dotemacs-flycheck-init-react))))
 
 (dotemacs-use-package-add-hook js-doc
   :post-init
@@ -6665,40 +6640,25 @@ If called with a prefix argument, uses the other-window instead."
   :post-init
   (progn
     (add-hook 'coffee-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'js2-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'js2-mode-hook
+              (lambda ()
+                (flycheck-turn-on-maybe)
+                (dotemacs-flycheck-init-javascript)))
     (add-hook 'json-mode-hook 'flycheck-turn-on-maybe)))
-
-(defun dotemacs//flycheck-executables-updated ()
-  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
-    (when dotemacs//flycheck-executable-eslint
-      (evil-leader/set-key
-        "tee" 'flycheck-eslint-enable
-        "teE" 'flycheck-eslint-disable))
-
-    (when dotemacs//flycheck-executable-jscs
-      (evil-leader/set-key
-        "tec" 'flycheck-jscs-enable
-        "teC" 'flycheck-jscs-disable))
-
-    (when dotemacs//flycheck-executable-jshint
-      (evil-leader/set-key
-        "teh" 'flycheck-jshint-enable
-        "teH" 'flycheck-jshint-disable))
-
-    (when (equal major-mode 'js2-mode)
-      (dotemacs//js-init-flycheck))))
 
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
-    (dotemacs//flycheck-executables-search)
-    (after "projectile"
-      (dotemacs//eslint-set-local-eslint-from-projectile)
-      (dotemacs//flycheck-executables-updated))
+    (dotemacs-flycheck-executables-search)
+    (with-eval-after-load 'projectile
+      (progn
+        (add-hook 'projectile-after-switch-project-hook
+                  (lambda ()
+                    (dotemacs-eslint-set-local-eslint-from-projectile)
+                    (dotemacs-flycheck-executables-updated)))
 
-    (add-hook 'projectile-switch-project-hook (lambda ()
-      (dotemacs//eslint-set-local-eslint-from-projectile)
-      (dotemacs//flycheck-executables-updated)))))
+        (dotemacs-eslint-set-local-eslint-from-projectile)
+        (dotemacs-flycheck-executables-updated)))))
 
 (use-package js-doc
   :defer t
@@ -7057,7 +7017,7 @@ If called with a prefix argument, uses the other-window instead."
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
-    (dotemacs//flycheck-executables-search)
+    (dotemacs-flycheck-executables-search)
     (when (bound-and-true-p dotemacs//flycheck-executables-searched)
       (when dotemacs//flycheck-executable-tidy5
         (flycheck-add-mode 'html-tidy 'web-mode)))))
@@ -7907,7 +7867,7 @@ If called with a prefix argument, uses the other-window instead."
     (dotemacs-evilify-map magit-stashes-section-map)
     (dotemacs-evilify-map magit-stash-section-map)
 
-    (add-hook 'projectile-switch-project-hook
+    (add-hook 'projectile-after-switch-project-hook
       #'dotemacs-magit-set-repo-dirs-from-projectile)
 
     ;; full screen magit-status
@@ -10159,7 +10119,12 @@ If called with a prefix argument, uses the other-window instead."
              dotemacs-flycheck-mode-line-status
              dotemacs-defface-flycheck-mode-line-color
              dotemacs-set-flycheck-mode-line-faces
-             dotemacs-mode-line-flycheck-info-toggle))
+             dotemacs-mode-line-flycheck-info-toggle
+             dotemacs-eslint-set-local-eslint-from-projectile
+             dotemacs-flycheck-executables-updated
+             dotemacs-flycheck-executables-search
+             dotemacs-flycheck-init-react
+             dotemacs-flycheck-init-javascript))
 
 (use-package flycheck                   ; On-the-fly syntax checking
   :ensure t

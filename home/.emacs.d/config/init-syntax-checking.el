@@ -1,3 +1,6 @@
+;;; package --- Summary
+;;; Commentary:
+;;; Code:
 (require 'flycheck)
 
 (defun dotemacs-discard-undesired-html-tidy-error (err)
@@ -95,13 +98,13 @@ up before you execute another command."
 (defvar dotemacs//flycheck-executable-jshint nil)
 (defvar dotemacs//flycheck-executable-tidy5 nil)
 
-(defun dotemacs//eslint-set-local-eslint-from-projectile ()
-  "use local eslint CLI from `./node_modules` if available."
+(defun dotemacs-eslint-set-local-eslint-from-projectile ()
+  "Use local eslint CLI from `./node_modules` if available."
   (when-let (eslint (executable-find "eslint"))
             (setq flycheck-javascript-eslint-executable eslint)
             (setq dotemacs//flycheck-executable-eslint eslint)))
 
-(defun dotemacs//flycheck-executables-search ()
+(defun dotemacs-flycheck-executables-search ()
   "Lazy locate javascript executables."
   (unless dotemacs//flycheck-executables-searched
     (when-let (eslint (executable-find "eslint"))
@@ -126,4 +129,68 @@ up before you execute another command."
   (interactive)
   (setq flycheck-disabled-checkers (remove checker flycheck-disabled-checkers)))
 
+(defun dotemacs-flycheck-executables-updated ()
+  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+    (when dotemacs//flycheck-executable-eslint
+      (evil-leader/set-key
+        "tee" 'flycheck-eslint-enable
+        "teE" 'flycheck-eslint-disable))
+
+    (when dotemacs//flycheck-executable-jscs
+      (evil-leader/set-key
+        "tec" 'flycheck-jscs-enable
+        "teC" 'flycheck-jscs-disable))
+
+    (when dotemacs//flycheck-executable-jshint
+      (evil-leader/set-key
+        "teh" 'flycheck-jshint-enable
+        "teH" 'flycheck-jshint-disable))
+
+    ;; (when (equal major-mode 'js2-mode)
+    ;;   (dotemacs-flycheck-init-javascript))
+    ))
+
+(defun dotemacs-flycheck-init-react ()
+  "Init flycheck settings for react-mode."
+  (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+    (if dotemacs//flycheck-executable-eslint
+        (progn
+          (dotemacs//flycheck-enable 'javascript-eslint)
+          ;; disable jshint since we prefer eslint checking
+          (when dotemacs//flycheck-executable-jshint
+            (dotemacs//flycheck-disable 'javascript-jshint)))
+      (progn
+        ;; otherwise enable jshint if eslint is not found
+        (when dotemacs//flycheck-executable-jshint
+          (dotemacs//flycheck-enable 'javascript-jshint))))
+
+    ;; disable html-tidy
+    (when dotemacs//flycheck-executable-tidy5
+      (dotemacs//flycheck-disable 'html-tidy))
+
+    ;; disable jscs
+    (when dotemacs//flycheck-executable-jscs
+      (dotemacs//flycheck-disable 'javascript-jscs))
+
+    ;; disable json-jsonlist checking for json files
+    (dotemacs//flycheck-disable 'json-jsonlist)))
+
+(defun dotemacs-flycheck-init-javascript ()
+  "Use flycheck settings for a js2-mode."
+  (if dotemacs//flycheck-executable-eslint
+      (progn
+        (dotemacs//flycheck-enable 'javascript-eslint)
+        ;; disable jshint since we prefer eslint checking
+        (when dotemacs//flycheck-executable-jshint
+          (dotemacs//flycheck-disable 'javascript-jshint)))
+    (progn
+      ;; otherwise enable jshint if eslint is not found
+      (when dotemacs//flycheck-executable-jshint
+        (dotemacs//flycheck-enable 'javascript-jshint))))
+
+  ;; disable jscs
+  (when dotemacs//flycheck-executable-jscs
+    (dotemacs//flycheck-disable 'javascript-jscs)))
+
 (provide 'init-syntax-checking)
+;;; init-syntax-checking.el ends here
