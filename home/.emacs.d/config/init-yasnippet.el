@@ -1,3 +1,5 @@
+(require 'yasnippet)
+
 (defun dotemacs-load-yasnippet ()
       (unless yas-global-mode
         (progn

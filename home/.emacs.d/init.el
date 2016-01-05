@@ -3301,6 +3301,7 @@ Disable the highlighting of overlong lines."
 
 ;;; Evil
 (use-package init-evil
+  :ensure evil
   :load-path "config/")
 
 (use-package evil
@@ -10562,6 +10563,7 @@ If the error list is visible, hide it.  Otherwise, show it."
     ))
 
 (use-package init-yasnippet
+  :ensure yasnippet
   :load-path "config/"
   :commands (dotemacs-load-yasnippet
              dotemacs-auto-yasnippet-expand
@@ -11272,6 +11274,10 @@ one of `l' or `r'."
                        help-echo "mouse-1: go to beginning\n\
 mouse-2: toggle rest visibility\n\
 mouse-3: go to end"))))
+
+; (byte-recompile-directory (expand-file-name dotemacs-core-directory) 0)
+; (byte-recompile-directory (expand-file-name dotemacs-config-dir) 0)
+; (byte-recompile-file (expand-file-name "init.el" user-emacs-directory))
 
 ;; Local Variables:
 ;; coding: utf-8

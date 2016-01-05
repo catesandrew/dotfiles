@@ -1,3 +1,5 @@
+(require 'evil)
+
 (defun dotemacs-state-color-face (state)
   "Return the symbol of the face for the given STATE."
   (intern (format "dotemacs-%s-face" (symbol-name state))))
