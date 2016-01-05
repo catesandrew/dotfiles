@@ -10314,15 +10314,13 @@ If the error list is visible, hide it.  Otherwise, show it."
 
 (use-package flycheck-pos-tip
   :ensure t
-  ;; flycheck errors on a tooltip (doesnt work on console)
-  :if (and dotemacs-s-syntax-checking-enable-tooltips (display-graphic-p))
+  :if dotemacs-s-syntax-checking-enable-tooltips
   :defer t
   :init
-  (after "flycheck"
-    (setq flycheck-display-errors-function
-          #'flycheck-pos-tip-error-messages
-          flycheck-mode-line
-          '(:eval (dotemacs-flycheck-mode-line-status)))))
+  (with-eval-after-load 'flycheck
+    (setq flycheck-mode-line
+          '(:eval (dotemacs-flycheck-mode-line-status)))
+    (flycheck-pos-tip-mode)))
 
 (use-package ispell                     ; Spell checking
   :defer t
