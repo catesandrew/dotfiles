@@ -1,3 +1,4 @@
+#!/bin/bash
 cite 'about-alias'
 about-alias 'emacs editor'
 
@@ -7,7 +8,6 @@ case $OSTYPE in
     alias ec='emacsclient -c -a ""'
     ;;
   darwin*)
-    # alias em='open -a emacs'
     alias em=__emacs_free
     alias ec=__emacs_client
     ;;
@@ -21,7 +21,9 @@ function __emacs_free
 
 function __emacs_client
 {
-    # osascript -e 'tell application "Emacs" to activate'
-    # exec /usr/bin/env emacsclient -c -n -a "" $*
     (exec emacsclient -c -a "" "$@") &
+    # http://stackoverflow.com/questions/778716/how-can-i-make-emacs-start-up-faster
+    # Argument: filename to open in new Emacs frame
+    # emacsclient -e '(let ((default-directory "`pwd`/")) (select-frame (make-frame)) (find-file "'$1'"))'
+    # (exec emacsclient -e "(let ((default-directory \"$(pwd)/\")) (select-frame (make-frame)) (find-file \"$1\"))") &
 }
