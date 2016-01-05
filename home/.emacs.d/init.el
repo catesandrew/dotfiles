@@ -1983,14 +1983,13 @@ These should have their own segments in the modeline.")
     (push '("*ert*"                  :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
     (push '("*grep*"                 :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
     (push '("*nosetests*"            :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '("^\*WoMan.+\*$" :regexp t             :position bottom                                   ) popwin:special-display-config)
-    (push '("^\*Flycheck.+\*$" :regexp t
+    (push '("^\\*WoMan.+\\*$" :regexp t           :position bottom                                   ) popwin:special-display-config)
+    (push '("^\\*Flycheck.+\\*$" :regexp t
                                      :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
     ;; add cider error to popwin special buffers
     (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
     ;; add cider-doc to popwin
     (push '("*cider-doc*"            :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
-
 
     (defun dotemacs-remove-popwin-display-config (str)
       "Removes the popwin display configurations that matches the passed STR"
