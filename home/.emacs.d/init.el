@@ -9926,7 +9926,7 @@ If called with a prefix argument, uses the other-window instead."
     (defadvice vagrant-tramp-term (before dotemacs-load-vagrant activate)
       "Lazy load vagrant-tramp."
       (unless dotemacs--vagrant-tramp-loaded
-        (vagrant-tramp-enable)
+        (vagrant-tramp-add-method)
         (setq dotemacs--vagrant-tramp-loaded t)))
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
