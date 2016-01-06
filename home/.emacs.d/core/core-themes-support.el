@@ -184,7 +184,10 @@ package name does not match theme name + `-theme' suffix.")
       ;; if not we will handle the special themes as we get issues in the tracker.
       (let ((pkg (dotemacs-get-theme-package theme)))
         (dotemacs-load-or-install-package pkg)))))
-  (load-theme theme t))
+  (load-theme theme t)
+  ;; explicitly reload the theme for the first GUI client
+  (eval `(dotemacs|do-after-display-system-init
+          (load-theme ',theme t))))
 
 (defun dotemacs-cycle-dotemacs-theme ()
   "Cycle through themes defined in `dotemacs-themes.'"

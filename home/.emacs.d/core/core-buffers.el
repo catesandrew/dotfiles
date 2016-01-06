@@ -1,3 +1,34 @@
+(defconst dotemacs-buffer-name "*dotemacs*"
+  "The name of the dotemacs buffer.")
+
+(defconst dotemacs-buffer--banner-length 75
+  "Width of a banner.")
+
+(defvar dotemacs-buffer-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [tab] 'widget-forward)
+    (define-key map (kbd "C-i") 'widget-forward)
+    (define-key map [backtab] 'widget-backward)
+    (define-key map (kbd "RET") 'widget-button-press)
+    (define-key map [down-mouse-1] 'widget-button-click)
+    map)
+  "Keymap for dotemacs buffer mode.")
+
+(define-derived-mode dotemacs-buffer-mode special-mode "Dotemacs buffer"
+  "Dotemacs major mode for startup screen.
+
+\\<dotemacs-buffer-mode-map>
+"
+  :group 'dotemacs
+  :syntax-table nil
+  :abbrev-table nil
+  (setq truncate-lines t)
+  (page-break-lines-mode)
+  ;; needed to make tab work correctly in terminal
+  (evil-define-key 'motion dotemacs-buffer-mode-map (kbd "C-i") 'widget-forward)
+  ;; motion state since this is a special mode
+  (evil-set-initial-state 'dotemacs-buffer-mode 'motion))
+
 (defun dotemacs-buffer/set-mode-line (format)
   "Set mode-line format for dotemacs buffer."
   (with-current-buffer (get-buffer-create "*dotemacs*")
@@ -38,5 +69,37 @@ The message is always displayed. "
       (insert msg)
       (if messagebuf (message "(emacs) %s" msg)))
     (dotemacs-buffer/set-mode-line "")))
+
+(defun dotemacs-buffer/goto-buffer ()
+  "Create the special buffer for `dotemacs-buffer-mode' if it doesn't
+already exist, and switch to it."
+  (interactive)
+  (unless (buffer-live-p (get-buffer dotemacs-buffer-name))
+    (with-current-buffer (get-buffer-create dotemacs-buffer-name)
+      (save-excursion
+        (dotemacs-buffer/set-mode-line "")
+        ;; needed in case the buffer was deleted and we are recreating it
+        (setq dotemacs-buffer--note-widgets nil)
+        ; (dotemacs-buffer/insert-banner-and-buttons)
+        ;; non-nil if emacs is loaded
+        (if after-init-time
+            (progn
+              ; (when dotemacs-startup-lists
+              ;   (dotemacs-buffer/insert-startupify-lists))
+              (dotemacs-buffer/set-mode-line dotemacs--default-mode-line)
+              (force-mode-line-update)
+              (dotemacs-buffer-mode))
+          (add-hook 'emacs-startup-hook
+                    (lambda ()
+                      (with-current-buffer (get-buffer dotemacs-buffer-name)
+                        ; (when dotemacs-startup-lists
+                        ;   (dotemacs-buffer/insert-startupify-lists))
+                        (force-mode-line-update)
+                        (dotemacs-buffer-mode)
+                        ; (dotemacs-buffer/goto-link-line)
+                        )) t)))))
+  ; (dotemacs-buffer/goto-link-line)
+  (switch-to-buffer dotemacs-buffer-name)
+  (dotemacs-redisplay))
 
 (provide 'core-buffers)

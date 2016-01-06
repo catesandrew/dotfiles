@@ -33,6 +33,9 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-echo-area-message t)
 
+(defvar dotemacs--default-mode-line mode-line-format
+  "Backup of default mode line format.")
+
 ;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
@@ -236,6 +239,16 @@ right if possible and fallback to bottom if not."
 (defcustom dotemacs-search-tools '("ag" "pt" "ack" "grep")
   "List of search tool executable names. Dotemacs uses the first installed
 tool of the list. Supported tools are `ag', `pt', `ack' and `grep'."
+  :group 'dotemacs)
+
+(defcustom dotemacs-startup-lists '(recents projects)
+  "List of items to show in the startup buffer. If nil it is disabled.
+Possible values are: `recents' `bookmarks' `projects'."
+  :group 'dotemacs)
+
+(defcustom dotemacs-startup-recent-list-size 5
+  "Number of recent files to show in the startup buffer. Ignored if
+`dotemacs-startup-lists' doesn't include `recents'."
   :group 'dotemacs)
 
 ;; Regexp for useful and useless buffers for smarter buffer switching
@@ -651,6 +664,7 @@ group by projectile projects."
 
 (require 'subr-x nil 'noerror)
 (require 'core-auto-completion)
+(require 'core-display-init)
 (require 'core-themes-support)
 (require 'core-fonts-support)
 (require 'core-toggle)
@@ -750,11 +764,20 @@ FEATURE may be a named feature or a file name, see
                              "able to launch a graphical instance of Emacs"
                              "with this build.")))
 
+
 ;; font
-(if (find-font (font-spec :name (car dotemacs-default-font)))
+(dotemacs|do-after-display-system-init
+  (if (find-font (font-spec :name (car dotemacs-default-font)))
     (dotemacs-set-default-font dotemacs-default-font)
   (dotemacs-buffer/warning "Cannot find font \"%s\"!"
-                            (car dotemacs-default-font)))
+                           (car dotemacs-default-font))))
+;; dotemacs init
+(dotemacs-buffer/goto-buffer)
+;; explicitly recreate the home buffer for the first GUI client
+(dotemacs|do-after-display-system-init
+  (kill-buffer (get-buffer dotemacs-buffer-name))
+  (dotemacs-buffer/goto-buffer))
+(setq initial-buffer-choice (lambda () (get-buffer dotemacs-buffer-name)))
 
 ;; fringes
 (when (display-graphic-p)
@@ -1676,7 +1699,7 @@ These should have their own segments in the modeline.")
         (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
         (define-key helm-map (kbd "C-z") 'helm-select-action))) ; list actions using C-z
 
-    (after "helm-mode" ; required
+    (with-eval-after-load 'helm-mode ; required
       '(dotemacs-hide-lighter helm-mode))))
 
 (use-package helm-ls-git
@@ -10766,9 +10789,9 @@ must be a valid segment specification, see documentation for
             (match-string 1 buf-coding)
           buf-coding)))
 
-    (if (display-graphic-p)
-        (setq-default powerline-default-separator 'wave)
-      (setq-default powerline-default-separator 'utf-8))
+    (dotemacs|do-after-display-system-init
+      (setq-default powerline-default-separator
+                    (if (display-graphic-p) 'wave 'utf-8)))
 
     (defun dotemacs-customize-powerline-faces ()
       "Alter powerline face to make them work with more themes."
