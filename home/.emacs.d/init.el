@@ -750,14 +750,11 @@ FEATURE may be a named feature or a file name, see
                              "able to launch a graphical instance of Emacs"
                              "with this build.")))
 
-;; font delayed load to work in dameon mode
-(run-with-idle-timer
- 1 nil
- (lambda ()
-   (if (find-font (font-spec :name (car dotemacs-default-font)))
-       (dotemacs-set-default-font dotemacs-default-font)
-     (dotemacs-buffer/warning "Cannot find font \"%s\"!"
-                              (car dotemacs-default-font)))))
+;; font
+(if (find-font (font-spec :name (car dotemacs-default-font)))
+    (dotemacs-set-default-font dotemacs-default-font)
+  (dotemacs-buffer/warning "Cannot find font \"%s\"!"
+                            (car dotemacs-default-font)))
 
 ;; fringes
 (when (display-graphic-p)
