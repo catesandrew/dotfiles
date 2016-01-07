@@ -407,6 +407,12 @@ endif
 let mapleader=","
 let maplocalleader = "\\"
 
+" map Leader and LocalLeader to 0x00A0 (NO_BREAK_SPACE)
+" let mapleader=' '
+" let maplocalleader=' '
+" inoremap <Leader> <Nop>
+" inoremap <LocalLeader> <Nop>
+
 " }}}
 " Color scheme {{{
 
