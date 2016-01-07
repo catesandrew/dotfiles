@@ -110,27 +110,28 @@ Removes the automatic guessing of the initial value based on thing at point. "
     ;; otherwise Helm cannot reuse its own windows for copyinng/deleting
     ;; etc... because of existing popwin buffers in the alist
     (setq display-buffer-alist nil)
-    (popwin-mode -1)))
+    (popwin-mode -1)
+    ;; workaround for a helm-evil incompatibility
+    ;; see https://github.com/syl20bnr/spacemacs/issues/3700
+    (when helm-prevent-escaping-from-minibuffer
+      (define-key evil-motion-state-map [down-mouse-1] nil))))
 
 (defun dotemacs-display-helm-window (buffer)
   (let ((display-buffer-alist (list dotemacs-helm-display-help-buffer-regexp
                                     ;; this or any specialized case of Helm buffer must be added AFTER
-                                    ;; `spacemacs-helm-display-buffer-regexp'. Otherwise,
-                                    ;; `spacemacs-helm-display-buffer-regexp' will be used before
-                                    ;; `spacemacs-helm-display-help-buffer-regexp' and display
+                                    ;; `dotemacs-helm-display-buffer-regexp'. Otherwise,
+                                    ;; `dotemacs-helm-display-buffer-regexp' will be used before
+                                    ;; `dotemacs-helm-display-help-buffer-regexp' and display
                                     ;; configuration for normal Helm buffer is applied for helm help
                                     ;; buffer, making the help buffer unable to be displayed.
                                     dotemacs-helm-display-buffer-regexp)))
     (helm-default-display-buffer buffer)))
 
 (defun dotemacs-restore-previous-display-config ()
-  (popwin-mode 1)
-  ;; we must enable popwin-mode first then restore `display-buffer-alist'
-  ;; Otherwise, popwin keeps adding up its own buffers to `display-buffer-alist'
-  ;; and could slow down Emacs as the list grows
-  (setq display-buffer-alist dotemacs-display-buffer-alist))
-
-(defun dotemacs-restore-previous-display-config ()
+  ;; workaround for a helm-evil incompatibility
+  ;; see https://github.com/syl20bnr/spacemacs/issues/3700
+  (when helm-prevent-escaping-from-minibuffer
+    (define-key evil-motion-state-map [down-mouse-1] 'evil-mouse-drag-region))
   (popwin-mode 1)
   ;; we must enable popwin-mode first then restore `display-buffer-alist'
   ;; Otherwise, popwin keeps adding up its own buffers to `display-buffer-alist'
@@ -164,10 +165,17 @@ Removes the automatic guessing of the initial value based on thing at point. "
 ARG non nil means that the editing style is `vim'."
   (cond
    (arg
+    ;; better navigation on homerow
+    ;; rebind `describe-key' for convenience
     (define-key helm-map (kbd "C-j") 'helm-next-line)
     (define-key helm-map (kbd "C-k") 'helm-previous-line)
     (define-key helm-map (kbd "C-h") 'helm-next-source)
-    (define-key helm-map (kbd "C-l") 'helm-previous-source))
+    (define-key helm-map (kbd "C-S-h") 'describe-key)
+    (define-key helm-map (kbd "C-l") (kbd "RET"))
+    (dolist (keymap (list helm-find-files-map helm-read-file-map))
+      (define-key keymap (kbd "C-l") 'helm-execute-persistent-action)
+      (define-key keymap (kbd "C-h") 'helm-find-files-up-one-level)
+      (define-key keymap (kbd "C-S-h") 'describe-key)))
    (t
     (define-key helm-map (kbd "C-j") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-k") 'helm-delete-minibuffer-contents)
@@ -487,5 +495,45 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
       (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
                               `(:background ,bg-color :foreground ,bg-color)))
       (setq-local cursor-type nil))))
+
+(defun helm-toggle-header-line ()
+ "Hide the `helm' header is there is only one source."
+ (when dotemacs-helm-no-header
+   (if (> (length helm-sources) 1)
+       (set-face-attribute 'helm-source-header
+                           nil
+                           :foreground helm-source-header-default-foreground
+                           :background helm-source-header-default-background
+                           :box helm-source-header-default-box
+                           :height helm-source-header-default-height)
+     (set-face-attribute 'helm-source-header
+                         nil
+                         :foreground (face-attribute 'helm-selection :background)
+                         :background (face-attribute 'helm-selection :background)
+                         :box nil
+                         :height 0.1))))
+
+(defun dotemacs-helm-multi-files ()
+  "Runs `helm-multi-files`, but first primes the `helm-ls-git` file lists."
+  (interactive)
+  (dotemacs-helm-ls-git-ls)
+  (helm-multi-files))
+
+(defun dotemacs-helm-ls-git-ls ()
+  (interactive)
+  (when (not (helm-ls-git-not-inside-git-repo))
+    (unless (and helm-source-ls-git
+                 helm-source-ls-git-buffers)
+      (setq helm-source-ls-git (helm-make-source "Git files" 'helm-ls-git-source
+                                                 :fuzzy-match helm-ls-git-fuzzy-match)
+            helm-source-ls-git-buffers (helm-make-source "Buffers in project" 'helm-source-buffers
+                                                         :header-name #'helm-ls-git-header-name
+                                                         :buffer-list (lambda () (helm-browse-project-get-buffers
+                                                                                   (helm-ls-git-root-dir))))))))
+
+(defun dotemacs//hide-cursor-in-helm-buffer ()
+  "Hide the cursor in helm buffers."
+  (with-helm-buffer
+    (setq cursor-in-non-selected-windows nil)))
 
 (provide 'init-helm)

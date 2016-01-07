@@ -611,14 +611,8 @@ group by projectile projects."
   :group 'dotemacs
   :prefix 'dotemacs-helm)
 
-(defface dotemacs-helm-navigation-ms-face
-      `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
-      "Face for helm heder when helm micro-state is activated."
-      :group 'dotemacs)
-
 (defcustom dotemacs-helm-resize nil
   "If non nil, `helm' will try to miminimize the space it uses.")
-
 
 (defcustom dotemacs-helm-no-header t
   "if non nil, the helm header is hidden when there is only one source.")
@@ -1503,46 +1497,57 @@ These should have their own segments in the modeline.")
 
 (use-package helm
   :ensure t
-  :bind (("C-c h h" . helm-resume))
   :defer 1
   :commands dotemacs-helm-find-files
+  :config
+  (progn
+    (when (and dotemacs-helm-resize
+                (or (eq dotemacs-helm-position 'bottom)
+                    (eq dotemacs-helm-position 'top)))
+      (setq helm-autoresize-min-height 10)
+      (helm-autoresize-mode 1))
+
+    ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
+    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
+    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
+    (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
+    (defvar helm-source-header-default-height (face-attribute 'helm-source-header :height) )
+
+    ;; Hide the `helm' header is there is only one source.
+    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line))
   :init
   (progn
-    (after "helm-config"
-           (warn "`helm-config' loaded! Get rid of it ASAP!"))
+    (with-eval-after-load 'helm-config
+                          (warn "`helm-config' loaded! Get rid of it ASAP!"))
 
-    (defun dotemacs-helm-multi-files ()
-      "Runs `helm-multi-files`, but first primes the `helm-ls-git` file lists."
-      (interactive)
-      (dotemacs-helm-ls-git-ls)
-      (helm-multi-files))
+    ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
+    ;; brew tap homebrew/dupes
+    ;; brew install homebrew/dupes/grep
+    (when-let (gnu-grep (and (eq system-type 'darwin)
+                             (executable-find "ggrep")))
+              (setq helm-grep-default gnu-grep)
+              (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
+              (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
 
-    (defun dotemacs-helm-ls-git-ls ()
-      (interactive)
-      (when (not (helm-ls-git-not-inside-git-repo))
-        (unless (and helm-source-ls-git
-                     helm-source-ls-git-buffers)
-          (setq helm-source-ls-git (helm-make-source "Git files" 'helm-ls-git-source
-                                                     :fuzzy-match helm-ls-git-fuzzy-match)
-                helm-source-ls-git-buffers (helm-make-source "Buffers in project" 'helm-source-buffers
-                                                             :header-name #'helm-ls-git-header-name
-                                                             :buffer-list (lambda () (helm-browse-project-get-buffers
-                                                                                       (helm-ls-git-root-dir))))))))
+    ; (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
+    ; (defadvice helm-ff-delete-char-backward
+    ;            (around dotemacs-helm-find-files-navigate-back activate)
+    ;            (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
+    ;              (helm-find-files-up-one-level 1)
+    ;              ad-do-it))
 
     ;; https://github.com/syl20bnr/spacemacs/issues/1544
     ;; Vim users are used to CtrlP plugin.
     (setq helm-for-files-preferred-list '(helm-source-buffers-list
-                                          helm-source-buffer-not-found
-                                          helm-source-ls-git
-                                          helm-source-ls-git-buffers
-                                          helm-source-projectile-projects
-                                          helm-source-projectile-files-list
-                                          helm-source-recentf
-                                          helm-source-bookmarks
-                                          helm-source-file-cache
-                                          helm-source-files-in-current-dir
-                                          ))
-    (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
+                                           helm-source-buffer-not-found
+                                           helm-source-ls-git
+                                           helm-source-ls-git-buffers
+                                           helm-source-projectile-projects
+                                           helm-source-projectile-files-list
+                                           helm-source-recentf
+                                           helm-source-bookmarks
+                                           helm-source-file-cache
+                                           helm-source-files-in-current-dir))
 
     (setq helm-prevent-escaping-from-minibuffer t
           helm-bookmark-show-location t
@@ -1550,8 +1555,10 @@ These should have their own segments in the modeline.")
           helm-split-window-in-side-p t
           helm-always-two-windows t
           helm-echo-input-in-header-line t
-          helm-imenu-execute-action-at-once-if-one nil)
+          helm-imenu-execute-action-at-once-if-one nil
+          helm-org-format-outline-path t)
 
+    ;; hide minibuffer in Helm session, since we use the header line already
     (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
 
     ;; fuzzy matching setting
@@ -1564,29 +1571,9 @@ These should have their own segments in the modeline.")
           helm-semantic-fuzzy-match t
           helm-buffers-fuzzy-matching t)
 
-
-    ;; helm-locate uses es (from everything on windows, which doesnt like fuzzy)
-    (when (not (eq system-type 'darwin))
-      (setq helm-locate-fuzzy-match t))
-
-    ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
-    ;; brew tap homebrew/dupes
-    ;; brew install homebrew/dupes/grep
-    (when-let (gnu-grep (and (eq system-type 'darwin)
-                           (executable-find "ggrep")))
-        (setq helm-grep-default gnu-grep)
-        (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
-        (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
-
-    (defadvice helm-ff-delete-char-backward
-        (around dotemacs-helm-find-files-navigate-back activate)
-      (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
-          (helm-find-files-up-one-level 1)
-        ad-do-it))
-
     ;; use helm by default for M-x
     (global-set-key (kbd "M-x") 'helm-M-x)
-    (global-set-key (kbd "C-x C-d") 'helm-browse-project)
+    ; (global-set-key (kbd "C-x C-d") 'helm-browse-project)
 
     (evil-leader/set-key
       "<f1>" 'helm-apropos
@@ -1616,58 +1603,65 @@ These should have their own segments in the modeline.")
       "sgg"  'dotemacs-helm-file-do-grep
       "sgG"  'dotemacs-helm-file-do-grep-region-or-symbol)
 
-    (evil-leader/set-key
-      dotemacs-command-key 'helm-M-x)
+    ;; define the key binding at the very end in order to allow the user
+    ;; to overwrite any key binding
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (evil-leader/set-key dotemacs-command-key 'helm-M-x)))
 
+    ;; Hide the cursor in helm buffers.
+    (add-hook 'helm-after-initialize-hook 'dotemacs//hide-cursor-in-helm-buffer)
+
+    ;; this or any specialized case of Helm buffer must be added AFTER
+    ;; `dotemacs-helm-display-buffer-regexp'. Otherwise,
+    ;; `dotemacs-helm-display-buffer-regexp' will be used before
+    ;; `dotemacs-helm-display-help-buffer-regexp' and display
+    ;; configuration for normal Helm buffer is applied for helm help
+    ;; buffer, making the help buffer unable to be displayed.
     (setq helm-display-function 'dotemacs-display-helm-window)
 
+    ;; Prepare necessary settings to make Helm display properly.
     (add-hook 'helm-after-initialize-hook 'dotemacs-helm-prepare-display)
+
     ;;  Restore popwin-mode after a Helm session finishes.
     (add-hook 'helm-cleanup-hook 'dotemacs-restore-previous-display-config)
 
     ;; Add minibuffer history with `helm-minibuffer-history'
     (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
 
-    (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup))
+    ;; Cleanup some helm related states when quitting.
+    (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup)
+
+    (defface dotemacs-helm-navigation-ms-face
+      `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
+      "Face for helm heder when helm micro-state is activated."
+      :group 'dotemacs))
+
   :config
   (progn
-    (when (and dotemacs-helm-resize
-                (or (eq dotemacs-helm-position 'bottom)
-                    (eq dotemacs-helm-position 'top)))
-      (setq helm-autoresize-min-height 10)
-      (helm-autoresize-mode 1))
-
-    ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
-    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-    (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
-    (defvar helm-source-header-default-height (face-attribute 'helm-source-header :height) )
-
-    (defun helm-toggle-header-line ()
-     "Hide the `helm' header is there is only one source."
-     (when dotemacs-helm-no-header
-       (if (> (length helm-sources) 1)
-           (set-face-attribute 'helm-source-header
-                               nil
-                               :foreground helm-source-header-default-foreground
-                               :background helm-source-header-default-background
-                               :box helm-source-header-default-box
-                               :height helm-source-header-default-height)
-         (set-face-attribute 'helm-source-header
-                             nil
-                             :foreground (face-attribute 'helm-selection :background)
-                             :background (face-attribute 'helm-selection :background)
-                             :box nil
-                             :height 0.1))))
-
-    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
-
     (helm-mode +1)
+
+    ;; helm-locate uses es (from everything on windows, which doesnt like fuzzy)
+    (helm-locate-set-command)
+    (setq helm-locate-fuzzy-match (string-match "locate" helm-locate-command))
+
+    ;; Set the face of diretories for `.' and `..'
     (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
 
+    ;; alter helm-bookmark key bindings to be simpler
     (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
 
+    ;; helm navigation on hjkl
     (dotemacs-helm-hjkl-navigation t)
+
+    ;; Define functions to pick actions
+    (dotimes (n 10)
+      (let ((func (intern (format "dotemacs/helm-action-%d" n)))
+            (doc (format "Select helm action #%d" n)))
+        (eval `(defun ,func ()
+                 ,doc
+                 (intern)
+                 (helm-select-nth-action ,(1- n))))))
 
     (dotemacs-define-micro-state helm-navigation
       :persistent t
@@ -1676,12 +1670,24 @@ These should have their own segments in the modeline.")
       :on-enter (dotemacs-helm-navigation-ms-on-enter)
       :on-exit  (dotemacs-helm-navigation-ms-on-exit)
       :bindings
+      ("1" dotemacs/helm-action-1 :exit t)
+      ("2" dotemacs/helm-action-2 :exit t)
+      ("3" dotemacs/helm-action-3 :exit t)
+      ("4" dotemacs/helm-action-4 :exit t)
+      ("5" dotemacs/helm-action-5 :exit t)
+      ("6" dotemacs/helm-action-6 :exit t)
+      ("7" dotemacs/helm-action-7 :exit t)
+      ("8" dotemacs/helm-action-8 :exit t)
+      ("9" dotemacs/helm-action-9 :exit t)
+      ("0" dotemacs/helm-action-10 :exit t)
       ("<tab>" helm-select-action :exit t)
       ("C-i" helm-select-action :exit t)
       ("<RET>" helm-maybe-exit-minibuffer :exit t)
       ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
       ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
       ("e" dotemacs-helm-edit)
+      ("g" helm-beginning-of-buffer)
+      ("G" helm-end-of-buffer)
       ("h" helm-previous-source)
       ("j" helm-next-line)
       ("k" helm-previous-line)
@@ -1691,13 +1697,15 @@ These should have their own segments in the modeline.")
       ("T" helm-toggle-all-marks)
       ("v" helm-execute-persistent-action))
 
-
     ;; Swap default TAB and C-z commands.
-    (if (not (display-graphic-p)) ;; For GUI.
-      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
-      (progn ;; For terminal.
-        (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-        (define-key helm-map (kbd "C-z") 'helm-select-action))) ; list actions using C-z
+    ;; For GUI.
+    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+    (define-key helm-find-files-map (kbd "S-<tab>") 'helm-find-files-up-one-level)
+    (define-key helm-find-files-map (kbd "<backtab>") 'helm-find-files-up-one-level)
+    ;; For terminal.
+    (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
+    (define-key helm-find-files-map (kbd "S-TAB") 'helm-find-files-up-one-level)
+    (define-key helm-map (kbd "C-z") 'helm-select-action)
 
     (with-eval-after-load 'helm-mode ; required
       '(dotemacs-hide-lighter helm-mode))))
