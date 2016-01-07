@@ -33,7 +33,9 @@ if [ "$(uname)" == "Darwin"  ]; then
     # Do something under Mac OS X platform
     case "$1" in
         *_EDITMSG|*MERGE_MSG|*_TAGMSG )
-            if [ -f "`which mvim`" ]; then
+            if hash emacsclient 2>/dev/null; then
+                emacsclient -c "$@" >/dev/null 2>&1
+            elif hash mvim 2>/dev/null; then
                 mvim -f -c "au VimLeave * maca hide:" "$@"
             else
                 vim "$@"
@@ -46,7 +48,9 @@ if [ "$(uname)" == "Darwin"  ]; then
             /usr/local/bin/mmdc "$1"
             ;;
         * )
-            if [ -f "`which mvim`" ]; then
+            if hash emacsclient 2>/dev/null; then
+                emacsclient -c "$@" >/dev/null 2>&1
+            elif hash mvim 2>/dev/null; then
                 mvim -f -c "au VimLeave * maca hide:" "$@"
             else
                 vim "$@"
