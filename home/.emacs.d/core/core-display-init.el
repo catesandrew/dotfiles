@@ -35,8 +35,6 @@ created."
                      ((boundp 'x-initialized) 'x-initialized)
                      (t 't))))           ; fallback to normal loading behavior
      (if (symbol-value init)
-       (message "!!! symbol %s" init))
-     (if (symbol-value init)
          (progn
            ,@body)
        (push (lambda () ,@body) dotemacs--after-display-system-init-list))))

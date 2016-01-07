@@ -183,7 +183,8 @@ with 2 themes variants, one dark and one light")
   "The leader key accessible in `emacs state' and `insert state'"
   :group 'dotemacs)
 
-(defcustom dotemacs-major-mode-leader-key nil
+;; major-mode-leader to 0x00A0 (NO_BREAK_SPACE)
+(defcustom dotemacs-major-mode-leader-key " "
   "Major mode leader key is a shortcut key which is the equivalent of
 pressing `<leader> m`. Set it to `nil` to disable it."
   :group 'dotemacs)
@@ -774,11 +775,12 @@ FEATURE may be a named feature or a file name, see
 (setq initial-buffer-choice (lambda () (get-buffer dotemacs-buffer-name)))
 
 ;; fringes
-(when (display-graphic-p)
-  (custom-set-variables
-    '(fringe-mode (quote (4 . 4)) nil (fringe)))
-  (setq-default fringe-indicator-alist
-                '((truncation . nil) (continuation . nil))))
+(dotemacs|do-after-display-system-init
+  (when (display-graphic-p)
+    (custom-set-variables
+      '(fringe-mode (quote (4 . 4)) nil (fringe)))
+    (setq-default fringe-indicator-alist
+                  '((truncation . nil) (continuation . nil)))))
 
 ;; mandatory dependencies
 ; (dotemacs-load-or-install-package 'dash t)
@@ -1200,31 +1202,33 @@ the user activate the completion manually."
     (evil-leader/set-key "bf" 'reveal-in-osx-finder)
 
     ;; this is only applicable to GUI mode
-    (when (display-graphic-p)
-      (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
-      (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
-      (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
-      (global-set-key (kbd "M-n") 'new-frame)
-      (global-set-key (kbd "M-v") 'yank)
-      (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
-      (global-set-key (kbd "M-X") 'kill-region)
-      (global-set-key (kbd "M-z") 'undo-tree-undo)
-      (global-set-key (kbd "M-Z") 'undo-tree-redo)
-      (global-set-key (kbd "M-s") 'save-buffer)))
+    (dotemacs|do-after-display-system-init
+      (when (display-graphic-p)
+        (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
+        (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
+        (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
+        (global-set-key (kbd "M-n") 'new-frame)
+        (global-set-key (kbd "M-v") 'yank)
+        (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
+        (global-set-key (kbd "M-X") 'kill-region)
+        (global-set-key (kbd "M-z") 'undo-tree-undo)
+        (global-set-key (kbd "M-Z") 'undo-tree-redo)
+        (global-set-key (kbd "M-s") 'save-buffer))))
   :config
-  (when (display-graphic-p)
-    (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
-                                          ; workspace
-          mac-control-modifier 'control   ; Make control to Control
-          mac-option-modifier 'super      ; Make option do Super (`s` is for super)
-          mac-command-modifier 'meta      ; Option is simply the natural Meta
-                                          ; But command is a lot easier to hit.
-                                          ; (`M` is for meta)
-          mac-right-command-modifier 'left
-          mac-right-option-modifier 'none ; Keep right option for accented input
-          mac-function-modifier 'hyper    ; Just in case we ever need these
-                                          ; keys. (`H` is for hyper)
-          )))
+  (dotemacs|do-after-display-system-init
+    (when (display-graphic-p)
+      (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
+                                            ; workspace
+            mac-control-modifier 'control   ; Make control to Control
+            mac-option-modifier 'super      ; Make option do Super (`s` is for super)
+            mac-command-modifier 'meta      ; Option is simply the natural Meta
+                                            ; But command is a lot easier to hit.
+                                            ; (`M` is for meta)
+            mac-right-command-modifier 'left
+            mac-right-option-modifier 'none ; Keep right option for accented input
+            mac-function-modifier 'hyper    ; Just in case we ever need these
+                                            ; keys. (`H` is for hyper)
+            ))))
 
 (use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
@@ -1303,11 +1307,12 @@ the user activate the completion manually."
   :init
   (progn
     ;; Minor modes abbrev --------------------------------------------------------
-    (when (display-graphic-p)
-      (eval-after-load "eproject"
-        '(diminish 'eproject-mode " eⓅ"))
-      (eval-after-load "flymake"
-        '(diminish 'flymake-mode " Ⓕ2")))
+    (dotemacs|do-after-display-system-init
+      (when (display-graphic-p)
+        (eval-after-load "eproject"
+          '(diminish 'eproject-mode " eⓅ"))
+        (eval-after-load "flymake"
+          '(diminish 'flymake-mode " Ⓕ2"))))
     ;; Minor Mode (hidden) ------------------------------------------------------
     (eval-after-load 'elisp-slime-nav
       '(diminish 'elisp-slime-nav-mode))
@@ -1380,7 +1385,7 @@ These should have their own segments in the modeline.")
                  (unicode-fonts-setup)))
 
 (custom-set-faces
- '(linum ((t (:height 0.8 :family "Bebas Neue")))))
+ '(linum ((t (:height 0.9 :family "Bebas Neue")))))
 
 (use-package linum-relative
   :ensure t
@@ -1573,7 +1578,6 @@ These should have their own segments in the modeline.")
 
     ;; use helm by default for M-x
     (global-set-key (kbd "M-x") 'helm-M-x)
-    ; (global-set-key (kbd "C-x C-d") 'helm-browse-project)
 
     (evil-leader/set-key
       "<f1>" 'helm-apropos
@@ -1811,14 +1815,25 @@ These should have their own segments in the modeline.")
   :bind (("C-c u F" . toggle-frame-fullscreen))
   :init
   (progn
+    (defun dotemacs-set-frame-size ()
+      (when (display-graphic-p)
+        ;; for the height, subtract 60 pixels from the screen height (for
+        ;; panels, menubars and whatnot), then divide by the height of a char to
+        ;; get the height we want.
+        ;; use 120 char wide window for largeish displays and smaller 90 column
+        ;; windows for smaller displays.
+        (let* ((fwp (if (> (x-display-pixel-width) 1680) 120 90))
+               (fhp (/ (- (x-display-pixel-height) 60)
+                       (frame-char-height))))
+          (message "!!! Frame width %s, height %s" fwp fhp)
+          (set-frame-height (selected-frame) fhp)
+          (set-frame-width (selected-frame) fwp))))
+    (dotemacs|do-after-display-system-init
+      (dotemacs-set-frame-size))
+
     ;; Kill `suspend-frame'
     (global-set-key (kbd "C-z") nil)
-    (global-set-key (kbd "C-x C-z") nil))
-  :config
-  (progn
-    ; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-    (add-to-list 'initial-frame-alist '(width . 120))
-    (add-to-list 'initial-frame-alist '(height . 72))))
+    (global-set-key (kbd "C-x C-z") nil)))
 
 (use-package init-buffers          ; Personal buffer tools
   :load-path "config/"
@@ -3786,14 +3801,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute)))
 
 (use-package evil-terminal-cursor-changer
-  :if (not (display-graphic-p))
   :ensure t
   :init
   (progn
-    (setq evil-visual-state-cursor 'box ; █
-          evil-insert-state-cursor 'bar ; ⎸
-          evil-emacs-state-cursor 'hbar)) ; _
-  )
+    (dotemacs|do-after-display-system-init
+      (unless (display-graphic-p)
+        (setq evil-visual-state-cursor 'box ; █
+              evil-insert-state-cursor 'bar ; ⎸
+              evil-emacs-state-cursor 'hbar ; _
+        )))))
 
 (use-package evil-tutor
   :disabled t
@@ -7723,9 +7739,10 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
 
     ;; Fall back to the display margin, if the fringe is unavailable
-    (unless (display-graphic-p)
-      (setq diff-hl-side 'left)
-      (diff-hl-margin-mode))
+    (dotemacs|do-after-display-system-init
+      (unless (display-graphic-p)
+        (setq diff-hl-side 'left)
+        (diff-hl-margin-mode)))
 
     (evil-leader/set-key
         "ghr" 'diff-hl-revert-hunk
@@ -10532,12 +10549,15 @@ If the error list is visible, hide it.  Otherwise, show it."
 (use-package company-quickhelp
   :defer t
   :disabled t
-  :if (and auto-completion-enable-help-tooltip
-           (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
-                                                  ;; is not compatible with 24.3 anymore
-           (eq dotemacs-completion-engine 'company)
-           (display-graphic-p))
-  :init (add-hook 'company-mode-hook 'company-quickhelp-mode))
+  :init
+  (progn
+    (dotemacs|do-after-display-system-init
+    (when (and auto-completion-enable-help-tooltip
+               (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
+                                                      ;; is not compatible with 24.3 anymore
+               (eq dotemacs-completion-engine 'company)
+               (display-graphic-p))
+      (add-hook 'company-mode-hook 'company-quickhelp-mode)))))
 
 (use-package helm-company
   :ensure t
@@ -11178,10 +11198,6 @@ one of `l' or `r'."
   :defer t
   :init
   (progn
-    (if (display-graphic-p)
-          (setq powerline-default-separator 'arrow)
-        (setq powerline-default-separator 'utf-8))
-
     (defun dotemacs-set-vimish-powerline-for-startup-buffers ()
        "Set the powerline for buffers created when Emacs starts."
        (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
