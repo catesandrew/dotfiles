@@ -227,6 +227,15 @@
                 </autogen>
             </item>
             <item>
+             <name>Remap LEADER</name>
+             <appendix>Simultaneous keys presses to Vim LEADER aka NO_BREAK_SPACE</appendix>
+             <appendix>(E+R to LEADER)</appendix>
+             <appendix>(U+I to LEADER)</appendix>
+             <identifier>space_cadet.engelbart_leader</identifier>
+             <autogen>__SimultaneousKeyPresses__ KeyCode::E, KeyCode::R, KeyCode::SPACE, ModifierFlag::OPTION_L</autogen>
+             <autogen>__SimultaneousKeyPresses__ KeyCode::U, KeyCode::I, KeyCode::SPACE, ModifierFlag::OPTION_L</autogen>
+            </item>
+            <item>
                 <name>Remap Left Control to Hyper</name>
                 <appendix>OS X doesn't have a Hyper. This maps Left Control to Control + Shift + Option + Command.</appendix>
                 <appendix>You can use this key in your own custom keyboard shortcuts you create in apps.</appendix>
