@@ -1579,6 +1579,7 @@ These should have their own segments in the modeline.")
       "ff"   'dotemacs-helm-find-files
       "fF"   'helm-find-files
       "fL"   'helm-locate
+      "fm"   'dotemacs-helm-multi-files
       "fr"   'helm-recentf
       "hb"   'helm-filtered-bookmarks
       "hi"   'helm-info-at-point
