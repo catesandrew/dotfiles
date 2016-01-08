@@ -1242,14 +1242,7 @@ the user activate the completion manually."
     (when-let (gnu-ls (and (eq system-type 'darwin)
                              (executable-find "gls")))
       (setq insert-directory-program gnu-ls
-            dired-listing-switches "-aBhl --group-directories-first"))
-
-    ; (when (executable-find "gls")
-    ;   ;; maybe absolute or relative name of the `ls' program used by
-    ;   ;; `insert-directory'.
-    ;   (setq insert-directory-program "gls"
-    ;         dired-listing-switches "-aBhl --group-directories-first"))
-    ))
+            dired-listing-switches "-aBhl --group-directories-first"))))
 
 (use-package osx-trash                  ; Trash support for OS X
   :if (eq system-type 'darwin)
