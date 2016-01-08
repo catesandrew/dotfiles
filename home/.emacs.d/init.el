@@ -2219,10 +2219,136 @@ These should have their own segments in the modeline.")
 
 (use-package ignoramus                  ; Ignore uninteresting files everywhere
   :ensure t
-  :config (progn (dolist (name '(".cask" ".vagrant"))
-                   ;; Ignore some additional directories
-                   (add-to-list 'ignoramus-file-basename-exact-names name))
-                 (ignoramus-setup)))
+  :config
+  (progn
+    (defun dotemacs//ignoramus-setup (fcn)
+      (funcall fcn)
+      ;; neotree
+      (setq neo-hidden-regexp-list (list ignoramus-boring-file-regexp))
+
+      ;; according to what projectile expects
+      ;; (setq projectile-globally-ignored-file-extensions (mapcar #'(lambda (ext)
+      ;;                                                               (replace-regexp-in-string "\\`\\." "" ext))
+      ;;                                                           ignoramus-file-basename-endings))
+      (setq projectile-ignored-file-extensions (mapcar #'(lambda (ext)
+                                                           (replace-regexp-in-string "\\`\\." "" ext))
+                                                       ignoramus-file-basename-endings))
+      ;; (setq projectile-globally-ignored-files ignoramus-file-basename-exact-names)
+      (setq projectile-ignored-files ignoramus-file-basename-exact-names)
+      ;; (setq projectile-globally-ignored-directories ignoramus-file-basename-exact-names)
+      (setq projectile-ignored-directories ignoramus-file-basename-exact-names))
+
+    (advice-add 'ignoramus-setup
+                :around 'dotemacs//ignoramus-setup)
+
+    (dolist (name '(
+                    "pids"
+                    ".grunt"
+                    ".cache"
+                    ".lock-wscript"
+                    ".cask"
+                    ".vagrant"
+                    ".DS_Store"
+                    "lib-cov"
+                    "coverage"
+                    ".builds"
+                    ".bzr"
+                    ".cdv"
+                    ".classpath"
+                    ".coverage"
+                    ".git"
+                    ".hg"
+                    ".idea"
+                    ".ido.last"
+                    ".netrwhist"
+                    ".pc"
+                    ".project"
+                    ".projectile"
+                    ".puppet-bak"
+                    ".rspec"
+                    ".sass-cache"
+                    ".scala_dependencies"
+                    ".svn"
+                    "_darcs"
+                    "auto-save-list"
+                    "bower_components"
+                    "node_modules"
+                    ".cache"
+                    ".sx"
+                    "elpa"
+                    ".tox"
+                    "virtualenv"))
+
+      ;; Ignore some additional directories
+      (add-to-list 'ignoramus-file-basename-exact-names name))
+
+    (dolist (name '(
+                    ".tern-port"
+                    ".png"
+                    ".jpg"
+                    ".jpeg"
+                    ".gif"
+                    "-autoloads.el"
+                    ".class"
+                    ".elc"
+                    ".min.js"
+                    "-min.js"
+                    ".min.css"
+                    "-min.css"
+                    ".pyc"
+                    ".pyd"
+                    ".pyo"
+                    ".rbc"
+                    ".sassc"
+                    ".suo"
+                    ".swo"
+                    ".venv"
+                    ".swp"
+                    ".psd"
+                    ".ai"
+                    ".pdf"
+                    ".mov"
+                    ".aep"
+                    ".dmg"
+                    ".zip"
+                    ".gz"
+                    ".bmp"
+                    ".7z"
+                    ".jar"
+                    ".rar"
+                    ".zip"
+                    ".gz"
+                    ".bzip"
+                    ".bz2"
+                    ".xz"
+                    ".lzma"
+                    ".cab"
+                    ".iso"
+                    ".tar"
+                    ".dmg"
+                    ".xpi"
+                    ".gem"
+                    ".egg"
+                    ".deb"
+                    ".rpm"
+                    ".msi"
+                    ".msm"
+                    ".msp"
+                    ".pid"
+                    ".seed"))
+
+      ;; Ignore some additional filename endings
+      (add-to-list 'ignoramus-file-basename-endings name))
+
+    (dolist (name '(
+                    "\\`\\.flycheck.*\\'"
+                    "\\`.*_flymake\\..*'"
+                    ))
+
+      ;; Ignore some additional filename endings
+      (add-to-list 'ignoramus-file-basename-regexps name))
+
+    (ignoramus-setup)))
 
 (use-package hardhat ; Protect user-writable files
   :ensure t
@@ -8423,9 +8549,6 @@ If called with a prefix argument, uses the other-window instead."
 ;;
 ;; **EDIT**: Don't put it in `.projectile` files or your files won't be ignored when grepping.
 ;;
-;; my ignore directory pattern "[\/]((assets|node_modules|build|tmp|log|vendor\/(rails|gems|plugins)|bower_components|components)|(\.(git|hg|svn|idea|sass-cache)))$"
-;; my ignore file pattern "(\.(#.+|DS_Store|svn|png|jpe?g|gif|elc|rbc|pyc|swp|psd|ai|pdf|mov|aep|dmg|zip|gz|bmp)|(Thumbs\.db))$"
-;;
 ;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
@@ -8530,90 +8653,94 @@ If called with a prefix argument, uses the other-window instead."
             ; "_darcs"      ; Darcs VCS root dir
             ))
 
-    (setq projectile-globally-ignored-files
-          '("TAGS"
-            "GRTAGS"
-            "GTAGS"
-            "GPATH"
-            "Thumbs.db"
-            ".DS_Store"
-            ".#*"
-            "*.o"
-            "*~"
-            "*.pyc"
-            "*.pyo"
-            "*.png"
-            "*.odg"
-            "*.jpe?g"
-            "*.gif"
-            "*.rbc"
-            "*.swp"
-            "*.psd"
-            "*.ai"
-            "*.pdf"
-            "*.mov"
-            "*.aep"
-            "*.dmg"
-            "*.zip"
-            "*.gz"
-            "*.bmp"
-            "*.seed"
-            "*.pid"
-            "*.dxl"
-            "*.lo"
-            "*.la"
-            "*.gmo"
-            "*.mo"
-            "*.toc"
-            "*.aux"
-            "*.cp"
-            "*.fn"
-            "*.ky"
-            "*.bin"
-            "*.lbin"
-            "*.so"
-            "*.a"
-            "*.ln"
-            "*.blg"
-            "*.bbl"
-            "*.elc"
-            "*.lof"
-            "*.glo"
-            "*.idx"
-            "*.fmt"
-            "*.class"
-            "*.lib"
-            "*.fsl"))
+    ;; (setq projectile-globally-ignored-files
+    ;;       '("TAGS"
+    ;;         "GRTAGS"
+    ;;         "GTAGS"
+    ;;         "GPATH"
+    ;;         "Thumbs.db"
+    ;;         ".DS_Store"
+    ;;         ".#*"
+    ;;         "*.o"
+    ;;         "*~"
+    ;;         "*.pyc"
+    ;;         "*.pyo"
+    ;;         "*.png"
+    ;;         "*.odg"
+    ;;         "*.jpe?g"
+    ;;         "*.gif"
+    ;;         "*.rbc"
+    ;;         "*.swp"
+    ;;         "*.psd"
+    ;;         "*.ai"
+    ;;         "*.pdf"
+    ;;         "*.mov"
+    ;;         "*.aep"
+    ;;         "*.dmg"
+    ;;         "*.zip"
+    ;;         "*.gz"
+    ;;         "*.bmp"
+    ;;         "*.seed"
+    ;;         "*.pid"
+    ;;         "*.dxl"
+    ;;         "*.lo"
+    ;;         "*.la"
+    ;;         "*.gmo"
+    ;;         "*.mo"
+    ;;         "*.toc"
+    ;;         "*.aux"
+    ;;         "*.cp"
+    ;;         "*.fn"
+    ;;         "*.ky"
+    ;;         "*.bin"
+    ;;         "*.lbin"
+    ;;         "*.so"
+    ;;         "*.a"
+    ;;         "*.ln"
+    ;;         "*.blg"
+    ;;         "*.bbl"
+    ;;         "*.elc"
+    ;;         "*.lof"
+    ;;         "*.glo"
+    ;;         "*.idx"
+    ;;         "*.fmt"
+    ;;         "*.class"
+    ;;         "*.lib"
+    ;;         "*.fsl"))
 
     (setq projectile-globally-ignored-file-suffixes
           '("class"
             "elc"))
 
-    (setq projectile-globally-ignored-directories
-          '("CVS"
-            ".idea"
-            ".eunit"
-            ".git"
-            ".hg"
-            ".fslckout"
-            ".bzr"
-            "_darcs"
-            ".tox"
-            ".svn"
-            "elpa"
-            ".vagrant"
-            ".directory"
-            "node_modules"
-            "bower_components"
-            "build"
-            "logs"
-            "lib-cov"
-            "coverage"
-            "vendor/rails"
-            "vendor/gems"
-            "vendor/plugins"
-            ".cache"
-            ".sass-cache"))
+    ;; (setq projectile-globally-ignored-directories
+    ;;       '("CVS"
+    ;;         ".idea"
+    ;;         ".eunit"
+    ;;         ".git"
+    ;;         ".hg"
+    ;;         ".fslckout"
+    ;;         ".bzr"
+    ;;         ".sx"
+    ;;         ".cache"
+    ;;         "_darcs"
+    ;;         ".tox"
+    ;;         ".svn"
+    ;;         "elpa"
+    ;;         ".vagrant"
+    ;;         ".directory"
+    ;;         "node_modules"
+    ;;         "bower_components"
+    ;;         "build"
+    ;;         "logs"
+    ;;         "lib-cov"
+    ;;         ".vim/bundle"
+    ;;         ".bower-cache"
+    ;;         "coverage"
+    ;;         "vendor/rails"
+    ;;         "vendor/gems"
+    ;;         "vendor/plugins"
+    ;;         ".cache"
+    ;;         ".sass-cache"))
 
     (unless (boundp 'dotemacs-use-helm-projectile)
       (evil-leader/set-key
@@ -8749,7 +8876,6 @@ If called with a prefix argument, uses the other-window instead."
     (setq neo-window-width 32
           neo-modern-sidebar t
           neo-theme 'nerd
-          neo-hidden-regexp-list '("\\(\\.\\(#.\\+\\|DS_Store\\|svn\\|tern-port\\|png\\|jpe\\?g\\|gif\\|elc\\|rbc\\|pyc\\|swp\\|psd\\|ai\\|pdf\\|mov\\|aep\\|dmg\\|zip\\|gz\\|bmp\\|git\\|hg\\|svn\\|idea\\|sass-cache\\)\\|\\(Thumbs\\.db\\)\\|\\(assets\\|node_modules\\|build\\|tmp\\|log\\|vendor\\|bower_components\\|components\\)\\)$")
           neo-create-file-auto-open t
           neo-banner-message nil
           neo-show-updir-line nil
