@@ -2226,6 +2226,12 @@ These should have their own segments in the modeline.")
       ;; neotree
       (setq neo-hidden-regexp-list (list ignoramus-boring-file-regexp))
 
+      ;; helm-grep
+      (with-eval-after-load 'helm-grep
+        (setq helm-grep-ignored-files (cons ".#*" (delq nil (mapcar #'(lambda (pat)
+                                                                        (concat "*" pat)) ignoramus-file-basename-endings))))
+        (setq helm-grep-ignored-directories ignoramus-file-basename-exact-names))
+
       ;; according to what projectile expects
       ;; (setq projectile-globally-ignored-file-extensions (mapcar #'(lambda (ext)
       ;;                                                               (replace-regexp-in-string "\\`\\." "" ext))
