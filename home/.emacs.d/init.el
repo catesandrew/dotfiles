@@ -1527,7 +1527,6 @@ These should have their own segments in the modeline.")
               (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
               (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
 
-    ; (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
     ; (defadvice helm-ff-delete-char-backward
     ;            (around dotemacs-helm-find-files-navigate-back activate)
     ;            (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
@@ -1537,15 +1536,16 @@ These should have their own segments in the modeline.")
     ;; https://github.com/syl20bnr/spacemacs/issues/1544
     ;; Vim users are used to CtrlP plugin.
     (setq helm-for-files-preferred-list '(helm-source-buffers-list
-                                           helm-source-buffer-not-found
-                                           helm-source-ls-git
-                                           helm-source-ls-git-buffers
-                                           helm-source-projectile-projects
-                                           helm-source-projectile-files-list
-                                           helm-source-recentf
-                                           helm-source-bookmarks
-                                           helm-source-file-cache
-                                           helm-source-files-in-current-dir))
+                                          helm-source-buffer-not-found
+                                          helm-source-ls-git
+                                          helm-source-ls-git-buffers
+                                          helm-source-projectile-projects
+                                          helm-source-projectile-files-list
+                                          helm-source-recentf
+                                          helm-source-bookmarks
+                                          helm-source-file-cache
+                                          helm-source-files-in-current-dir))
+    ;; (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
 
     (setq helm-prevent-escaping-from-minibuffer t
           helm-bookmark-show-location t
