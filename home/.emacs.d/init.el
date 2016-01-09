@@ -3300,16 +3300,20 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (evil-select-paren "\\`" "\\'" beg end type count nil))
     (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
 
-    ;; support smart-parens-strict-mode
-    (with-eval-after-load 'smartparens
-      (defadvice evil-delete-backward-char-and-join
-          (around dotemacs-evil-delete-backward-char-and-join activate)
-        (defvar smartparens-strict-mode)
-        ;; defadvice compiles this sexp generating a compiler warning for a
-        ;; free variable reference. The line above fixes this
-        (if smartparens-strict-mode
-            (call-interactively 'sp-backward-delete-char)
-          ad-do-it)))))
+    ;; support smart 1parens-strict-mode
+    (defadvice evil-delete-backward-char-and-join
+        (around dotemacs-evil-delete-backward-char-and-join activate)
+      (if (bound-and-true-p smartparens-strict-mode)
+          (call-interactively 'sp-backward-delete-char)
+        ad-do-it))
+
+    ;; Define history commands for comint
+    (evil-define-key 'insert comint-mode-map
+      (kbd "C-k") 'comint-next-input
+      (kbd "C-j") 'comint-previous-input)
+    (evil-define-key 'normal comint-mode-map
+      (kbd "C-k") 'comint-next-input
+      (kbd "C-j") 'comint-previous-input)))
 
 (use-package evil-args
   :ensure t
@@ -5020,16 +5024,13 @@ point. Requires smartparens because all movement is done using
   :ensure t
   :init
   (progn
-    (after "stickyfunc-enhance"
-      (dotemacs/add-to-hooks 'python-mode-hook 'dotemacs-lazy-load-stickyfunc-enhance))
-
-    (after "eldoc"
+    (with-eval-after-load 'eldoc
       (add-hook 'python-mode-hook #'eldoc-mode))
 
     (add-hook 'inferior-python-mode-hook #'inferior-python-setup-hook)
     (dotemacs/add-all-to-hook 'python-mode-hook
-                     'python-default
-                     'python-setup-shell))
+                              'python-default
+                              'python-setup-shell))
   :config
   (progn
     ;; PEP 8 compliant filling rules, 79 chars maximum
@@ -5080,22 +5081,14 @@ point. Requires smartparens because all movement is done using
     (defadvice wisent-python-default-setup
         (after dotemacs/python-set-imenu-create-index-function activate)
       (setq imenu-create-index-function
-            #'dotemacs/python-imenu-create-index-python-or-semantic))
+            #'dotemacs/python-imenu-create-index-python-or-semantic))))
 
-    (after "smartparens"
-      (defadvice python-indent-dedent-line-backspace
-          (around python/sp-backward-delete-char activate)
-        (let ((pythonp (or (not smartparens-strict-mode)
-                           (char-equal (char-before) ?\s))))
-          (if pythonp
-              ad-do-it
-            (call-interactively 'sp-backward-delete-char)))))))
+(with-eval-after-load 'evil-matchit
+  (add-hook 'python-mode-hook 'turn-on-evil-matchit-mode))
 
 (use-package evil-matchit-python
   :defer t
   :ensure evil-matchit
-  :init
-  (add-hook `python-mode-hook `turn-on-evil-matchit-mode)
   :config
   (plist-put evilmi-plugins 'python-mode' ((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-python-get-tag evilmi-python-jump))))
@@ -5119,6 +5112,16 @@ point. Requires smartparens because all movement is done using
   :post-init
   (add-hook 'python-mode-hook 'flycheck-turn-on-maybe))
 
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (defadvice python-indent-dedent-line-backspace
+      (around python/sp-backward-delete-char activate)
+    (let ((pythonp (or (not smartparens-strict-mode)
+                       (char-equal (char-before) ?\s))))
+      (if pythonp
+          ad-do-it
+        (call-interactively 'sp-backward-delete-char)))))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
@@ -5127,8 +5130,8 @@ point. Requires smartparens because all movement is done using
       (push 'company-capf company-backends-pip-requirements-mode)
       (dotemacs-add-company-hook pip-requirements-mode)
 
-      (push '(company-files company-capf) company-backends-inferior-python-mode)
       (dotemacs-add-company-hook inferior-python-mode)
+      (push '(company-files company-capf) company-backends-inferior-python-mode)
       (add-hook 'inferior-python-mode-hook (lambda ()
                                              (setq-local company-minimum-prefix-length 0)
                                              (setq-local company-idle-delay 0.5))))))
@@ -5141,12 +5144,28 @@ point. Requires smartparens because all movement is done using
   (progn
     (push 'company-anaconda company-backends-python-mode)))
 
+(dotemacs-use-package-add-hook semantic
+  :post-init
+  (progn
+    (semantic/enable-semantic-mode 'python-mode)
+    (defadvice semantic-python-get-system-include-path (around semantic-python-skip-error-advice activate)
+      "Don't cause error when Semantic cannot retrieve include
+paths for Python then prevent the buffer to be switched. This
+issue might be fixed in Emacs 25. Until then, we need it here to
+fix this issue."
+      (condition-case nil
+          ad-do-it
+        (error nil)))))
+
+(dotemacs-use-package-add-hook stickyfunc-enhance
+  :post-init
+  (add-hook 'python-mode-hook 'dotemacs-lazy-load-stickyfunc-enhance))
+
 
 ;;; Ruby
 (dotemacs-defvar-company-backends enh-ruby-mode)
 ;; TODO: uncomment this when it becomes available
 ;; (dotemacs-defvar-company-backends haml-mode)
-
 
 (use-package rbenv
   :ensure t
@@ -10213,12 +10232,19 @@ If called with a prefix argument, uses the other-window instead."
 (use-package smartparens                ; Parenthesis editing and balancing
   :ensure t
   :defer t
+  :commands (sp-split-sexp sp-newline)
   :init
   (progn
+    (dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
+                                'smartparens-strict-mode
+                              'smartparens-mode)
+                            '(prog-mode-hook))
+
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
-    (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
-      (add-hook hook #'smartparens-mode))
+    ;; TODO move these hooks into their layers
+    ;; (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
+    ;;   (add-hook hook #'smartparens-mode))
 
     (dotemacs-add-toggle smartparens
       :status smartparens-mode
@@ -10238,7 +10264,11 @@ If called with a prefix argument, uses the other-window instead."
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
           ; fix paren highlighting in normal mode
           sp-show-pair-from-inside t
-          sp-cancel-autoskip-on-backward-movement nil))
+          sp-cancel-autoskip-on-backward-movement nil)
+
+    (evil-leader/set-key
+     "J"  'sp-split-sexp
+     "jj" 'sp-newline))
   :config
   (progn
     (require 'smartparens-config)
