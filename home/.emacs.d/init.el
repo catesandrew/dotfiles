@@ -2568,6 +2568,18 @@ point reaches the beginning or end of the buffer, stop there."
       (move-beginning-of-line 1))))
 (global-set-key (kbd "C-a") 'dotemacs-smart-move-beginning-of-line)
 
+(defun spacemacs-backward-kill-word-or-region (&optional arg)
+  "Calls `kill-region' when a region is active and
+`backward-kill-word' otherwise. ARG is passed to
+`backward-kill-word' if no region is active."
+  (interactive "p")
+  (if (region-active-p)
+      ;; call interactively so kill-region handles rectangular selection
+      ;; correctly (see https://github.com/syl20bnr/spacemacs/issues/3278)
+      (call-interactively #'kill-region)
+    (backward-kill-word arg)))
+(global-set-key (kbd "C-w") 'dotemacs-backward-kill-word-or-region)
+
 (setq scroll-margin 3                   ; 0 to drag the point along while scrolling
       scroll-conservatively 1000        ; Never recenter the screen while scrolling
       scroll-error-top-bottom t         ; Move to beg/end of buffer before
