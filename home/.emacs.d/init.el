@@ -10503,7 +10503,6 @@ If the error list is visible, hide it.  Otherwise, show it."
     "xwd" 'define-word-at-point))
 
 (use-package flyspell                   ; On-the-fly spell checking
-  :bind (("C-c u f s" . flyspell-mode))
   :defer t
   :init
   (progn
@@ -10511,14 +10510,17 @@ If the error list is visible, hide it.  Otherwise, show it."
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
     (dolist (hook '(text-mode-hook message-mode-hook))
-      (add-hook hook '(lambda () (flyspell-mode 1))))
+      (add-hook hook 'flyspell-mode))
     (dotemacs-add-toggle spelling-checking
-                         :status flyspell-mode
-                         :on (flyspell-mode)
-                         :off (flyspell-mode -1)
-                         :documentation
-                         "automatic spell checking"
-                         :evil-leader "tS"))
+      :status flyspell-mode
+      :on (flyspell-mode)
+      :off (flyspell-mode -1)
+      :documentation
+      "automatic spell checking"
+      :evil-leader "tS")
+    (evil-leader/set-key
+      "Sd" 'ispell-change-dictionary
+      "Sn" 'flyspell-goto-next-error)))
   :config
   (progn
     ;; Undefine mouse buttons which get in the way
