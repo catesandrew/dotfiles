@@ -2992,182 +2992,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (bind-key [remap just-one-space] #'cycle-spacing)
 
 
-;;; Paired delimiters
-(use-package elec-pair                  ; Electric pairs
-  :disabled t
-  :init (electric-pair-mode))
-
-(use-package paren                      ; Highlight paired delimiters
-  :ensure t
-  :init
-  (progn
-    (setq show-paren-delay 0)
-    (dotemacs-add-toggle show-paren-mode
-      :status show-paren-mode
-      :on (show-paren-mode)
-      :off (show-paren-mode -1)
-      :documentation "Highlight matching pairs of parentheses."
-      :evil-leader "tCP")
-    (if (eq dotemacs-highlight-delimiters 'all)
-      (show-paren-mode)))
-  :config (setq show-paren-when-point-inside-paren t
-                show-paren-when-point-in-periphery t))
-
-(use-package init-smartparens      ; Personal Smartparens extensions
-  :load-path "config/")
-
-;; Use SmartParens instead of Paredit and Electric Pair
-(use-package smartparens                ; Parenthesis editing and balancing
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs/add-to-hooks
-     (if dotemacs-smartparens-strict-mode
-         'smartparens-strict-mode
-       'smartparens-mode)
-     '(prog-mode-hook css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
-
-    ;; but alwayws enable for lisp mode
-    (dotemacs/add-to-hooks #'smartparens-strict-mode '(lisp-mode))
-
-    (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
-
-    (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
-      (add-hook hook #'smartparens-mode))
-
-    (dotemacs-add-toggle smartparens
-      :status smartparens-mode
-      :on (smartparens-mode)
-      :off (smartparens-mode -1)
-      :documentation "Enable smartparens."
-      :evil-leader "tp")
-
-    (dotemacs-add-toggle smartparens-globally
-      :status smartparens-mode
-      :on (smartparens-global-mode)
-      :off (smartparens-global-mode -1)
-      :documentation "Enable smartparens globally."
-      :evil-leader "t C-p")
-
-    (setq sp-show-pair-delay 0.2
-          sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
-          ; fix paren highlighting in normal mode
-          sp-show-pair-from-inside t
-          sp-cancel-autoskip-on-backward-movement nil))
-  :config
-  (progn
-    (require 'smartparens-config)
-    (dotemacs-diminish smartparens-mode " ⓟ" " p")
-
-    (show-smartparens-global-mode +1)
-
-
-    ;;; Additional pairs for various modes
-    (sp-with-modes '(php-mode)
-      (sp-local-pair "/**" "*/" :post-handlers '(("| " "SPC")
-                                                 (dotemacs-php-handle-docstring "RET")))
-      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
-      (sp-local-pair "(" nil :prefix "\\(\\sw\\|\\s_\\)*"))
-
-    (sp-with-modes '(scala-mode)
-      (sp-local-pair "'" nil :actions nil))
-
-    (sp-with-modes '(text-mode)
-      (sp-local-pair "`" "'" :actions '(insert wrap)))
-
-    (sp-with-modes '(racket-mode)
-      (sp-local-pair "'" nil :actions nil)
-      (sp-local-pair "`" nil :actions nil))
-
-    ;; TODO research sp-local-tag or evil-surround with modes
-    (sp-with-modes '(tex-mode
-                     plain-tex-mode
-                     latex-mode)
-      ; (sp-local-tag "i" "\"<" "\">")
-      (sp-local-pair "$" " $")
-      (sp-local-pair "\\[" " \\]")
-      (sp-local-pair "\\(" " \\)")
-      (sp-local-pair "\\{" " \\}")
-      (sp-local-pair "\\left(" " \\right)")
-      (sp-local-pair "\\left\\{" " \\right\\}"))
-
-    (sp-with-modes 'org-mode
-      (sp-local-pair "*" "*" :actions '(insert wrap) :unless '(sp-point-after-word-p sp-point-at-bol-p) :wrap "C-*" :skip-match 'dotemacs-org-skip-asterisk)
-      (sp-local-pair "_" "_" :unless '(sp-point-after-word-p) :wrap "C-_")
-      (sp-local-pair "/" "/" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "~" "~" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "=" "=" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "«" "»"))
-
-    (sp-with-modes '(markdown-mode
-                     gfm-mode
-                     rst-mode)
-      ; (sp-local-tag "2" "**" "**")
-      ; (sp-local-tag "s" "```scheme" "```")
-      ; (sp-local-tag "<"  "<_>" "</_>" :transform 'sp-match-sgml-tags)
-      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
-      (sp-local-pair "_" "_" :wrap "C-_"))
-
-    (sp-with-modes '(rust-mode)
-      ;; Don't pair lifetime specifiers
-      (sp-local-pair "'" nil :actions nil))
-
-    (sp-with-modes '(ruby-mode enh-ruby-mode)
-      (sp-local-pair "{" "}"
-                     :pre-handlers '(sp-ruby-pre-handler)
-                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
-                     :suffix ""))
-
-    (sp-with-modes '(web-mode)
-      (sp-local-pair "<% " " %>")
-      (sp-local-pair "{ " " }")
-      (sp-local-pair "<%= "  " %>")
-      (sp-local-pair "<%# "  " %>")
-      (sp-local-pair "<%$ "  " %>")
-      (sp-local-pair "<%@ "  " %>")
-      (sp-local-pair "<%: "  " %>")
-      (sp-local-pair "{{ "  " }}")
-      (sp-local-pair "{% "  " %}")
-      (sp-local-pair "{%- "  " %}")
-      (sp-local-pair "{# "  " #}"))
-
-    (sp-with-modes '(malabar-mode c++-mode)
-      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
-
-    (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
-                                                        ("* ||\n[i]" "RET")))
-    (sp-with-modes '(haskell-mode)
-      (sp-local-pair "'" nil :unless '(dotemacs-after-symbol-p))
-      (sp-local-pair "\\(" nil :actions nil))
-
-    ;; Emacs Lisp
-    (sp-with-modes '(emacs-lisp-mode
-                     inferior-emacs-lisp-mode
-                     lisp-interaction-mode
-                     lisp-mode)
-      (sp-local-pair "'" nil :actions nil)
-      (sp-local-pair "(" nil :bind "M-(")
-      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
-
-    ;; don't create a pair with single quote in minibuffer
-    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-
-    (sp-pair "{" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
-    (sp-pair "[" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
-
-(use-package evil-matchit-ruby
-  :defer t
-  :ensure evil-matchit
-  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
-  :config
-  (progn
-    (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                               (evilmi-ruby-get-tag evilmi-ruby-jump)))))
-
-
 ;;; Highlights and fontification
 (defun dotemacs-whitespace-style-no-long-lines ()
   "Configure `whitespace-mode' for Org.
@@ -3312,153 +3136,6 @@ Disable the highlighting of overlong lines."
 (use-package hi-lock                    ; Custom regexp highlights
   :init (global-hi-lock-mode)
   :diminish hi-lock-mode)
-
-
-;;; Colors
-(use-package init-colors
-  :load-path "config/")
-
-(use-package highlight-numbers          ; Fontify number literals
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (add-hook 'prog-mode-hook #'highlight-numbers-mode)
-    (add-hook 'asm-mode-hook (lambda () (highlight-numbers-mode -1)))))
-
-(use-package highlight-indentation
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-add-toggle highlight-indentation
-                          :status highlight-indentation-mode
-                          :on (highlight-indentation-mode)
-                          :off (highlight-indentation-mode -1)
-                          :documentation "Highlight indentation levels."
-                          :evil-leader "thi")
-    (dotemacs-add-toggle highlight-indentation-current-column
-                          :status highlight-indentation-current-column-mode
-                          :on (highlight-indentation-current-column-mode)
-                          :off (highlight-indentation-current-column-mode -1)
-                          :documentation "Highlight indentation level at point."
-                          :evil-leader "thc"))
-  :config
-  (progn
-    (dotemacs-diminish highlight-indentation-mode " ⓗ" " h")
-    (dotemacs-diminish highlight-indentation-current-column-mode " ⓗⒸ" " hC")))
-
-(use-package highlight-parentheses
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (when (member dotemacs-highlight-delimiters '(all current))
-      (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
-    (setq hl-paren-delay 0.2)
-    (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
-    (setq hl-paren-colors '("Springgreen3"
-                            "IndianRed1"
-                            "IndianRed3"
-                            "IndianRed4")))
-  :config
-  (dotemacs-hide-lighter highlight-parentheses-mode)
-  (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold))
-
-(use-package highlight-quoted
-  :ensure t
-  :defer t
-  :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
-
-(use-package highlight-symbol           ; Highlighting and commands for symbols
-  :ensure t
-  :defer t
-  :bind
-  (("C-c s %" . highlight-symbol-query-replace)
-   ("C-c s n" . highlight-symbol-next-in-defun)
-   ("C-c s o" . highlight-symbol-occur)
-   ("C-c s p" . highlight-symbol-prev-in-defun))
-  ;; Navigate occurrences of the symbol under point with M-n and M-p, and
-  ;; highlight symbol occurrences
-  :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-               (add-hook 'prog-mode-hook #'highlight-symbol-mode))
-  :config
-  (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
-        highlight-symbol-on-navigation-p t) ; Highlight immediately after
-                                        ; navigation
-  :diminish highlight-symbol-mode)
-
-(use-package rainbow-delimiters         ; Highlight delimiters by depth,  is a "rainbow parentheses"-like
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (evil-leader/set-key "tCd" 'rainbow-delimiters-mode)
-
-    (when (member dotemacs-highlight-delimiters '(any all))
-      (dolist (hook '(text-mode-hook prog-mode-hook))
-        (add-hook hook #'rainbow-delimiters-mode)))))
-
-;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
-;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
-(use-package color-identifiers-mode
-  :ensure t
-  :if (eq dotemacs-colors-engine 'color)
-  :commands color-identifiers-mode
-  :init
-  (progn
-    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (color-identifiers-mode)))))
-  :diminish color-identifiers-mode)
-
-(use-package rainbow-identifiers
-  :ensure t
-  :if (eq dotemacs-colors-engine 'rainbow)
-  :commands rainbow-identifiers-mode
-  :init
-  (progn
-    (setq rainbow-identifiers-choose-face-function 'rainbow-identifiers-cie-l*a*b*-choose-face
-          rainbow-identifiers-cie-l*a*b*-saturation 100
-          rainbow-identifiers-cie-l*a*b*-lightness 40
-          ;; override theme faces
-          rainbow-identifiers-faces-to-override '(highlight-quoted-symbol
-                                                  font-lock-keyword-face
-                                                  font-lock-function-name-face
-                                                  font-lock-variable-name-face))
-
-    (dotemacs-add-toggle rainbow-identifier-globally
-                         :status rainbow-identifiers-mode
-                         :on (rainbow-identifiers-mode)
-                         :off (rainbow-identifiers-mode -1)
-                         :documentation "Colorize identifiers globally."
-                         :evil-leader "tCi")
-
-    (add-hook 'prog-mode-hook 'rainbow-identifiers-mode))
-  (colors//tweak-theme-colors dotemacs--cur-theme)
-
-  (defadvice dotemacs-post-theme-init (after colors/post-theme-init activate)
-    "Adjust lightness and brightness of rainbow-identifiers on post theme init."
-    (colors//tweak-theme-colors dotemacs--cur-theme))
-
-  :config
-  (progn
-    ;; key bindings
-    (evil-leader/set-key "Cis" 'colors/start-change-color-saturation)
-    (evil-leader/set-key "Cil" 'colors/start-change-color-lightness)))
-
-(use-package rainbow-mode               ; Fontify color values in code
-  :commands rainbow-mode
-  :ensure t
-  :bind (("C-c t r" . rainbow-mode))
-  :init
-  (progn
-    (evil-leader/set-key "tCc" 'rainbow-mode)
-    (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
-      (add-hook hook #'rainbow-mode)))
-  :config
-  (dotemacs-hide-lighter rainbow-mode))
 
 
 ;;; Evil
@@ -4842,7 +4519,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode ("/Cask\\'" . emacs-lisp-mode)
   :config
   (progn
-    (message "!!! elisp-mode")
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
       (dotemacs-declare-prefix-for-mode mode "me" "eval")
       (dotemacs-declare-prefix-for-mode mode "mt" "tests")
@@ -4879,10 +4555,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; i.e (require 'company) will not give an error now
     (setq flycheck-emacs-lisp-load-path 'inherit)))
 
-(dotemacs-use-package-add-hook evil
-  :post-init
+(with-eval-after-load 'evil
   (progn
-    (message "!!! elisp-mode post init evil")
     (dotemacs-define-text-object ";" "elisp-comment" ";; " "")))
 
 (dotemacs-use-package-add-hook semantic
@@ -4914,10 +4588,12 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook smartparens
   :post-init
   (progn
-    (message "!!! elisp-mode post init smartparens")
     (if (version< emacs-version "24.4")
         (ad-disable-advice 'preceding-sexp 'around 'evil)
       (advice-remove 'elisp--preceding-sexp 'evil--preceding-sexp))
+
+    ;; but alwayws enable for lisp mode
+    (dotemacs/add-to-hooks 'smartparens-strict-mode '(lisp-mode))
 
     (defun dotemacs-eval-current-form-sp (&optional arg)
       "Call `eval-last-sexp' after moving out of one level of
@@ -4948,8 +4624,8 @@ point. Requires smartparens because all movement is done using
 
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
       (evil-leader/set-key-for-mode mode
-        "ec" 'spacemacs/eval-current-form-sp
-        "es" 'spacemacs/eval-current-symbol-sp))))
+        "ec" 'dotemacs-eval-current-form-sp
+        "es" 'dotemacs-eval-current-symbol-sp))))
 
 
 ;;; Scala
@@ -5628,10 +5304,7 @@ point. Requires smartparens because all movement is done using
 (use-package haml-mode
   :ensure t
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
-  :defer t
-  :init
-  (progn
-    (add-hook 'haml-mode-hook 'rainbow-delimiters-mode)))
+  :defer t)
 
 (use-package ruby-test-mode
   :defer t
@@ -5651,13 +5324,18 @@ point. Requires smartparens because all movement is done using
   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
   (inf-ruby-switch-setup))
 
+(dotemacs-use-package-add-hook rainbow-delimiters
+  :post-init
+  (progn
+    (dotemacs/add-to-hooks 'rainbow-delimiters-mode '(haml-mode-hook))))
+
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
     (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(haml-mode-hook
-                                            yaml-mode-hook
-                                            ruby-mode-hook
-                                            enh-ruby-mode-hook))))
+                                                     yaml-mode-hook
+                                                     ruby-mode-hook
+                                                     enh-ruby-mode-hook))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -7090,7 +6768,6 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-
     (defun dotemacs-impatient-mode-hook()
       "my web mode hook for HTML REPL"
       (interactive)
@@ -7143,13 +6820,16 @@ If called with a prefix argument, uses the other-window instead."
   :post-init
   (progn
     (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
-                                             jade-mode-hook
-                                             slim-mode-hook))))
+                                                      jade-mode-hook
+                                                      slim-mode-hook))))
 
 (use-package css-eldoc                  ; Basic Eldoc for CSS
   :ensure t
   :commands (turn-on-css-eldoc)
   :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+
+(with-eval-after-load 'evil-matchit
+  (add-hook 'web-mode-hook 'turn-on-evil-matchit-mode))
 
 (use-package helm-css-scss
   :defer t
@@ -7157,6 +6837,14 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (dolist (mode '(css-mode scss-mode))
     (evil-leader/set-key-for-mode mode "mgh" 'helm-css-scss)))
+
+(dotemacs-use-package-add-hook rainbow-delimiters
+  :post-init
+  (progn
+    (dotemacs/add-to-hooks 'rainbow-delimiters-mode '(jade-mode-hook
+                                                      less-css-mode-hook
+                                                      scss-mode-hook
+                                                      slim-mode-hook))))
 
 (use-package web-mode                   ; Template editing
   :defer t
@@ -7262,8 +6950,8 @@ If called with a prefix argument, uses the other-window instead."
     (setq emmet-indentation 2
           emmet-move-cursor-between-quotes t)
     (dotemacs/add-to-hooks 'emmet-mode '(css-mode-hook
-                                html-mode-hook
-                                web-mode-hook)))
+                                         html-mode-hook
+                                         web-mode-hook)))
   :config
   (progn
     (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
@@ -7274,30 +6962,16 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package jade-mode
   :defer t
-  :ensure t
-  :init
-  (progn
-    (add-hook 'jade-mode-hook 'rainbow-delimiters-mode)))
+  :ensure t)
 
 (use-package slim-mode
   :ensure t
-  :init
-  (progn
-    (add-hook 'slim-mode-hook 'rainbow-delimiters-mode))
   :defer t)
-
-(dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
-                            'smartparens-strict-mode
-                          'smartparens-mode)
-                        '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
 
 (use-package scss-mode
   :defer t
   :ensure t
-  :mode ("\\.scss\\'" . scss-mode)
-  :init
-  (progn
-    (add-hook 'scss-mode-hook 'rainbow-delimiters-mode)))
+  :mode ("\\.scss\\'" . scss-mode))
 
 (use-package sass-mode
   :ensure t
@@ -7307,10 +6981,29 @@ If called with a prefix argument, uses the other-window instead."
 (use-package less-css-mode
   :defer t
   :ensure t
-  :init
-  (progn
-    (add-hook 'less-css-mode-hook 'rainbow-delimiters-mode))
   :mode ("\\.less\\'" . less-css-mode))
+
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (dotemacs/add-to-hooks
+     (if dotemacs-smartparens-strict-mode
+         'smartparens-strict-mode
+       'smartparens-mode)
+     '(prog-mode-hook css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook)))
+  :post-config
+  (sp-with-modes '(web-mode)
+    (sp-local-pair "<% " " %>")
+    (sp-local-pair "{ " " }")
+    (sp-local-pair "<%= "  " %>")
+    (sp-local-pair "<%# "  " %>")
+    (sp-local-pair "<%$ "  " %>")
+    (sp-local-pair "<%@ "  " %>")
+    (sp-local-pair "<%: "  " %>")
+    (sp-local-pair "{{ "  " }}")
+    (sp-local-pair "{% "  " %}")
+    (sp-local-pair "{%- "  " %}")
+    (sp-local-pair "{# "  " #}")))
 
 (use-package tagedit
   :defer t
@@ -7325,12 +7018,12 @@ If called with a prefix argument, uses the other-window instead."
   :post-init
   (progn
     (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
-                                            less-mode-hook
-                                            slim-mode-hook
-                                            sass-mode-hook
-                                            css-mode-hook
-                                            scss-mode-hook
-                                            web-mode-hook))))
+                                                     less-mode-hook
+                                                     slim-mode-hook
+                                                     sass-mode-hook
+                                                     css-mode-hook
+                                                     scss-mode-hook
+                                                     web-mode-hook))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -10277,6 +9970,7 @@ If called with a prefix argument, uses the other-window instead."
       ("f" dotemacs-helm-files-smart-do-search-region-or-symbol :exit t)
       ("q" nil :exit t))))
 
+
 ;; NixOS
 (dotemacs-defvar-company-backends nix-mode)
 
@@ -10342,6 +10036,306 @@ If called with a prefix argument, uses the other-window instead."
     (define-key adoc-mode-map (kbd "M-h") 'adoc-denote)
     ;; see the comment about  adoc-denote above
     (define-key adoc-mode-map (kbd "M-l") 'adoc-promote)))
+
+
+;;; Colors
+(use-package init-colors
+  :load-path "config/")
+
+(use-package highlight-numbers          ; Fontify number literals
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'prog-mode-hook #'highlight-numbers-mode)
+    (add-hook 'asm-mode-hook (lambda () (highlight-numbers-mode -1)))))
+
+(use-package highlight-indentation
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (dotemacs-add-toggle highlight-indentation
+                          :status highlight-indentation-mode
+                          :on (highlight-indentation-mode)
+                          :off (highlight-indentation-mode -1)
+                          :documentation "Highlight indentation levels."
+                          :evil-leader "thi")
+    (dotemacs-add-toggle highlight-indentation-current-column
+                          :status highlight-indentation-current-column-mode
+                          :on (highlight-indentation-current-column-mode)
+                          :off (highlight-indentation-current-column-mode -1)
+                          :documentation "Highlight indentation level at point."
+                          :evil-leader "thc"))
+  :config
+  (progn
+    (dotemacs-diminish highlight-indentation-mode " ⓗ" " h")
+    (dotemacs-diminish highlight-indentation-current-column-mode " ⓗⒸ" " hC")))
+
+(use-package highlight-parentheses
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (when (member dotemacs-highlight-delimiters '(all current))
+      (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
+    (setq hl-paren-delay 0.2)
+    (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
+    (setq hl-paren-colors '("Springgreen3"
+                            "IndianRed1"
+                            "IndianRed3"
+                            "IndianRed4")))
+  :config
+  (dotemacs-hide-lighter highlight-parentheses-mode)
+  (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold))
+
+(use-package highlight-quoted
+  :ensure t
+  :defer t
+  :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
+
+(use-package highlight-symbol           ; Highlighting and commands for symbols
+  :ensure t
+  :defer t
+  :bind
+  (("C-c s %" . highlight-symbol-query-replace)
+   ("C-c s n" . highlight-symbol-next-in-defun)
+   ("C-c s o" . highlight-symbol-occur)
+   ("C-c s p" . highlight-symbol-prev-in-defun))
+  ;; Navigate occurrences of the symbol under point with M-n and M-p, and
+  ;; highlight symbol occurrences
+  :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+               (add-hook 'prog-mode-hook #'highlight-symbol-mode))
+  :config
+  (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
+        highlight-symbol-on-navigation-p t) ; Highlight immediately after
+                                        ; navigation
+  :diminish highlight-symbol-mode)
+
+(use-package rainbow-delimiters         ; Highlight delimiters by depth,  is a "rainbow parentheses"-like
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (evil-leader/set-key "tCd" 'rainbow-delimiters-mode)
+
+    (when (member dotemacs-highlight-delimiters '(any all))
+      (dolist (hook '(text-mode-hook prog-mode-hook))
+        (add-hook hook #'rainbow-delimiters-mode)))))
+
+;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
+;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
+(use-package color-identifiers-mode
+  :ensure t
+  :if (eq dotemacs-colors-engine 'color)
+  :commands color-identifiers-mode
+  :init
+  (progn
+    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
+      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+                (lambda ()
+                  (color-identifiers-mode)))))
+  :diminish color-identifiers-mode)
+
+(use-package rainbow-identifiers
+  :ensure t
+  :if (eq dotemacs-colors-engine 'rainbow)
+  :commands rainbow-identifiers-mode
+  :init
+  (progn
+    (setq rainbow-identifiers-choose-face-function 'rainbow-identifiers-cie-l*a*b*-choose-face
+          rainbow-identifiers-cie-l*a*b*-saturation 100
+          rainbow-identifiers-cie-l*a*b*-lightness 40
+          ;; override theme faces
+          rainbow-identifiers-faces-to-override '(highlight-quoted-symbol
+                                                  font-lock-keyword-face
+                                                  font-lock-function-name-face
+                                                  font-lock-variable-name-face))
+
+    (dotemacs-add-toggle rainbow-identifier-globally
+                         :status rainbow-identifiers-mode
+                         :on (rainbow-identifiers-mode)
+                         :off (rainbow-identifiers-mode -1)
+                         :documentation "Colorize identifiers globally."
+                         :evil-leader "tCi")
+
+    (add-hook 'prog-mode-hook 'rainbow-identifiers-mode))
+  (colors//tweak-theme-colors dotemacs--cur-theme)
+
+  (defadvice dotemacs-post-theme-init (after colors/post-theme-init activate)
+    "Adjust lightness and brightness of rainbow-identifiers on post theme init."
+    (colors//tweak-theme-colors dotemacs--cur-theme))
+
+  :config
+  (progn
+    ;; key bindings
+    (evil-leader/set-key "Cis" 'colors/start-change-color-saturation)
+    (evil-leader/set-key "Cil" 'colors/start-change-color-lightness)))
+
+(use-package rainbow-mode               ; Fontify color values in code
+  :commands rainbow-mode
+  :ensure t
+  :bind (("C-c t r" . rainbow-mode))
+  :init
+  (progn
+    (evil-leader/set-key "tCc" 'rainbow-mode)
+    (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
+      (add-hook hook #'rainbow-mode)))
+  :config
+  (dotemacs-hide-lighter rainbow-mode))
+
+
+;;; Paired delimiters
+(use-package elec-pair                  ; Electric pairs
+  :disabled t
+  :init (electric-pair-mode))
+
+(use-package paren                      ; Highlight paired delimiters
+  :ensure t
+  :init
+  (progn
+    (setq show-paren-delay 0)
+    (dotemacs-add-toggle show-paren-mode
+      :status show-paren-mode
+      :on (show-paren-mode)
+      :off (show-paren-mode -1)
+      :documentation "Highlight matching pairs of parentheses."
+      :evil-leader "tCP")
+    (if (eq dotemacs-highlight-delimiters 'all)
+      (show-paren-mode)))
+  :config (setq show-paren-when-point-inside-paren t
+                show-paren-when-point-in-periphery t))
+
+(use-package init-smartparens      ; Personal Smartparens extensions
+  :load-path "config/")
+
+;; Use SmartParens instead of Paredit and Electric Pair
+(use-package smartparens                ; Parenthesis editing and balancing
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
+
+    (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
+      (add-hook hook #'smartparens-mode))
+
+    (dotemacs-add-toggle smartparens
+      :status smartparens-mode
+      :on (smartparens-mode)
+      :off (smartparens-mode -1)
+      :documentation "Enable smartparens."
+      :evil-leader "tp")
+
+    (dotemacs-add-toggle smartparens-globally
+      :status smartparens-mode
+      :on (smartparens-global-mode)
+      :off (smartparens-global-mode -1)
+      :documentation "Enable smartparens globally."
+      :evil-leader "t C-p")
+
+    (setq sp-show-pair-delay 0.2
+          sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
+          ; fix paren highlighting in normal mode
+          sp-show-pair-from-inside t
+          sp-cancel-autoskip-on-backward-movement nil))
+  :config
+  (progn
+    (require 'smartparens-config)
+    (dotemacs-diminish smartparens-mode " ⓟ" " p")
+
+    (show-smartparens-global-mode +1)
+
+    ;;; Additional pairs for various modes
+    (sp-with-modes '(php-mode)
+      (sp-local-pair "/**" "*/" :post-handlers '(("| " "SPC")
+                                                 (dotemacs-php-handle-docstring "RET")))
+      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
+      (sp-local-pair "(" nil :prefix "\\(\\sw\\|\\s_\\)*"))
+
+    (sp-with-modes '(scala-mode)
+      (sp-local-pair "'" nil :actions nil))
+
+    (sp-with-modes '(text-mode)
+      (sp-local-pair "`" "'" :actions '(insert wrap)))
+
+    (sp-with-modes '(racket-mode)
+      (sp-local-pair "'" nil :actions nil)
+      (sp-local-pair "`" nil :actions nil))
+
+    ;; TODO research sp-local-tag or evil-surround with modes
+    (sp-with-modes '(tex-mode
+                     plain-tex-mode
+                     latex-mode)
+      ; (sp-local-tag "i" "\"<" "\">")
+      (sp-local-pair "$" " $")
+      (sp-local-pair "\\[" " \\]")
+      (sp-local-pair "\\(" " \\)")
+      (sp-local-pair "\\{" " \\}")
+      (sp-local-pair "\\left(" " \\right)")
+      (sp-local-pair "\\left\\{" " \\right\\}"))
+
+    (sp-with-modes 'org-mode
+      (sp-local-pair "*" "*" :actions '(insert wrap) :unless '(sp-point-after-word-p sp-point-at-bol-p) :wrap "C-*" :skip-match 'dotemacs-org-skip-asterisk)
+      (sp-local-pair "_" "_" :unless '(sp-point-after-word-p) :wrap "C-_")
+      (sp-local-pair "/" "/" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "~" "~" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "=" "=" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "«" "»"))
+
+    (sp-with-modes '(markdown-mode
+                     gfm-mode
+                     rst-mode)
+      ; (sp-local-tag "2" "**" "**")
+      ; (sp-local-tag "s" "```scheme" "```")
+      ; (sp-local-tag "<"  "<_>" "</_>" :transform 'sp-match-sgml-tags)
+      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
+      (sp-local-pair "_" "_" :wrap "C-_"))
+
+    (sp-with-modes '(rust-mode)
+      ;; Don't pair lifetime specifiers
+      (sp-local-pair "'" nil :actions nil))
+
+    (sp-with-modes '(ruby-mode enh-ruby-mode)
+      (sp-local-pair "{" "}"
+                     :pre-handlers '(sp-ruby-pre-handler)
+                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
+                     :suffix ""))
+
+    (sp-with-modes '(malabar-mode c++-mode)
+      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
+
+    (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
+                                                        ("* ||\n[i]" "RET")))
+    (sp-with-modes '(haskell-mode)
+      (sp-local-pair "'" nil :unless '(dotemacs-after-symbol-p))
+      (sp-local-pair "\\(" nil :actions nil))
+
+    ;; Emacs Lisp
+    (sp-with-modes '(emacs-lisp-mode
+                     inferior-emacs-lisp-mode
+                     lisp-interaction-mode
+                     lisp-mode)
+      (sp-local-pair "'" nil :actions nil)
+      (sp-local-pair "(" nil :bind "M-(")
+      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
+
+    ;; don't create a pair with single quote in minibuffer
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+
+    (sp-pair "{" nil :post-handlers
+             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
+    (sp-pair "[" nil :post-handlers
+             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
+
+(use-package evil-matchit-ruby
+  :defer t
+  :ensure evil-matchit
+  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
+  :config
+  (progn
+    (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                               (evilmi-ruby-get-tag evilmi-ruby-jump)))))
 
 
 ;;; Syntax Checking
@@ -10826,8 +10820,8 @@ If the error list is visible, hide it.  Otherwise, show it."
       (kbd "M-s-/") 'yas-next-field)
 
     (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
-                                             markdown-mode-hook
-                                             org-mode-hook))
+                                                      markdown-mode-hook
+                                                      org-mode-hook))
 
     (dotemacs-add-toggle yasnippet
                          :status yas-minor-mode
@@ -10837,8 +10831,8 @@ If the error list is visible, hide it.  Otherwise, show it."
                          :evil-leader "ty")
 
     (dotemacs/add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
-                                                  shell-mode-hook
-                                                  eshell-mode-hook)))
+                                                           shell-mode-hook
+                                                           eshell-mode-hook)))
   :config
   (progn
     ;;  We need to know whether the smartparens was enabled, see
@@ -10913,7 +10907,7 @@ If the error list is visible, hide it.  Otherwise, show it."
                           (if dotemacs-mode-line-unicode-symbols " " "") 'face face)
                          (unless dotemacs-mode-line-unicode-symbols "|"))))
 
-    (defvar dotemacs-mode-line-minor-modesp t
+    (defvar dotemacs-mode-line-minor-modesp nil
       "If not nil, minor modes lighter are displayed in the mode-line.")
     (dotemacs-add-toggle mode-line-minor-modes
       :status dotemacs-mode-line-minor-modesp
@@ -10931,7 +10925,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       :documentation "Show major mode in mode-line."
       :evil-leader "tmM")
 
-    (defvar dotemacs-mode-line-version-controlp t
+    (defvar dotemacs-mode-line-version-controlp nil
       "If not nil, version control info is displayed in the mode-line.")
     (dotemacs-add-toggle mode-line-version-control
       :status dotemacs-mode-line-version-controlp
