@@ -4662,25 +4662,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-defvar-company-backends emacs-lisp-mode)
 (dotemacs-defvar-company-backends ielm-mode)
 
-(bind-key "C-c u d" #'toggle-debug-on-error)
-
-(use-package init-elisp             ; Personal tools for Emacs Lisp
-  :load-path "config/"
-  :commands (dotemacs-elisp-find-cask-file
-             dotemacs-add-use-package-to-imenu)
-  :init (progn
-          (add-hook 'emacs-lisp-mode-hook #'dotemacs-add-use-package-to-imenu)
-
-          (dotemacs/add-to-hook 'emacs-lisp-mode
-                       '(lambda ()
-                          (dotemacs-define-text-object ";"
-                                                       "elisp-comment"
-                                                       ";; "
-                                                       "")))
-
-          (after "lisp-mode"
-            (bind-key "C-c f c" #'dotemacs-elisp-find-cask-file
-                      emacs-lisp-mode-map))))
+;; (use-package init-elisp             ; Personal tools for Emacs Lisp
+;;   :load-path "config/")
 
 (use-package helm-elisp                 ; Helm commands for Emacs Lisp
   :ensure helm
@@ -4693,13 +4676,16 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (evil-leader/set-key-for-mode 'emacs-lisp-mode
-      "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
-      "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)
-    (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode))
+    (add-hook 'emacs-lisp-mode-hook 'elisp-slime-nav-mode)
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "mg" "find-symbol")
+      (dotemacs-declare-prefix-for-mode mode "mh" "help")
+      (evil-leader/set-key-for-mode mode
+        "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
+        "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)))
   :config
   (defadvice elisp-slime-nav-find-elisp-thing-at-point
-             (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
+      (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
     (recenter))
   :diminish elisp-slime-nav-mode)
 
@@ -4881,7 +4867,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       ("q" macrostep-collapse-all :exit t))))
 
 (use-package ielm                       ; Emacs Lisp REPL
-  :bind (("C-c z" . ielm))
   :config
   (progn
     (defun ielm-indent-line ()
@@ -4890,8 +4875,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         (save-restriction
           (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
           (lisp-indent-line))))
-    (evil-leader/set-key-for-mode 'emacs-lisp-mode
-      "msi" 'ielm)))
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "ms" "ielm")
+      (evil-leader/set-key-for-mode mode
+        "msi" 'ielm))))
 
 (use-package elisp-mode                  ; Emacs Lisp editing
   :defer t
@@ -4899,18 +4886,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode ("/Cask\\'" . emacs-lisp-mode)
   :config
   (progn
-    (require 'ert)
-    (evil-leader/set-key-for-mode 'emacs-lisp-mode
-      "me$" 'lisp-state-eval-sexp-end-of-line
-      "meb" 'eval-buffer
-      "mec" 'dotemacs-eval-current-form
-      "mee" 'eval-last-sexp
-      "mer" 'eval-region
-      "mef" 'eval-defun
-      "mel" 'lisp-state-eval-sexp-end-of-line
-      "m,"  'lisp-state-toggle-lisp-state
-      "mtb" 'dotemacs-ert-run-tests-buffer
-      "mtq" 'ert)))
+    (message "!!! elisp-mode")
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "me" "eval")
+      (dotemacs-declare-prefix-for-mode mode "mt" "tests")
+      (evil-leader/set-key-for-mode mode
+        "me$" 'lisp-state-eval-sexp-end-of-line
+        "meb" 'eval-buffer
+        "mee" 'eval-last-sexp
+        "mer" 'eval-region
+        "mef" 'eval-defun
+        "mel" 'lisp-state-eval-sexp-end-of-line
+        "m,"  'lisp-state-toggle-lisp-state
+        "mtb" 'spacemacs/ert-run-tests-buffer
+        "mtq" 'ert))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -4924,8 +4913,87 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)))
+    ;; (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
+    ;; (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)
+    ;; Don't activate flycheck by default in elisp
+    ;; because of too much false warnings
+    ;; (dotemacs-add-flycheck-hook 'emacs-lisp-mode-hook)
+
+    ;; Make flycheck recognize packages in loadpath
+    ;; i.e (require 'company) will not give an error now
+    (setq flycheck-emacs-lisp-load-path 'inherit)))
+
+(dotemacs-use-package-add-hook evil
+  :post-init
+  (progn
+    (message "!!! elisp-mode post init evil")
+    (dotemacs-define-text-object ";" "elisp-comment" ";; " "")))
+
+(dotemacs-use-package-add-hook semantic
+  :post-init
+  (progn
+    (semantic/enable-semantic-mode 'emacs-lisp-mode)
+    (with-eval-after-load 'semantic
+      (semantic-default-elisp-setup))))
+
+(dotemacs-use-package-add-hook srefactor
+  :post-init
+  (progn
+    (add-hook 'emacs-lisp-mode-hook 'dotemacs-lazy-load-srefactor)
+    (use-package srefactor-lisp
+      :ensure t
+      :commands (srefactor-lisp-format-buffer
+                 srefactor-lisp-format-defun
+                 srefactor-lisp-format-sexp
+                 srefactor-lisp-one-line)
+      :init
+      (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+        (dotemacs-declare-prefix-for-mode mode "=" "srefactor")
+        (dotemacs-set-leader-keys-for-major-mode mode
+                                                 "=b" 'srefactor-lisp-format-buffer
+                                                 "=d" 'srefactor-lisp-format-defun
+                                                 "=o" 'srefactor-lisp-one-line
+                                                 "=s" 'srefactor-lisp-format-sexp)))))
+
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (message "!!! elisp-mode post init smartparens")
+    (if (version< emacs-version "24.4")
+        (ad-disable-advice 'preceding-sexp 'around 'evil)
+      (advice-remove 'elisp--preceding-sexp 'evil--preceding-sexp))
+
+    (defun dotemacs-eval-current-form-sp (&optional arg)
+      "Call `eval-last-sexp' after moving out of one level of
+parentheses. Will exit any strings and/or comments first.
+Requires smartparens because all movement is done using
+`sp-up-sexp'. An optional ARG can be used which is passed to
+`sp-up-sexp' to move out of more than one sexp."
+      (interactive "p")
+      (require 'smartparens)
+      (save-excursion
+        (let ((max 10))
+          (while (and (> max 0)
+                      (sp-point-in-string-or-comment))
+            (decf max)
+            (sp-up-sexp)))
+        (sp-up-sexp arg)
+        (call-interactively 'eval-last-sexp)))
+
+    (defun dotemacs-eval-current-symbol-sp ()
+      "Call `eval-last-sexp' on the symbol underneath the
+point. Requires smartparens because all movement is done using
+`sp-forward-symbol'."
+      (interactive)
+      (require 'smartparens)
+      (save-excursion
+        (sp-forward-symbol)
+        (call-interactively 'eval-last-sexp)))
+
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (evil-leader/set-key-for-mode mode
+        "ec" 'spacemacs/eval-current-form-sp
+        "es" 'spacemacs/eval-current-symbol-sp))))
 
 
 ;;; Scala
