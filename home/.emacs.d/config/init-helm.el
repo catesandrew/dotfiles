@@ -13,9 +13,6 @@ Removes the automatic guessing of the initial value based on thing at point. "
       (set-text-properties 0 (length input) nil input)
       (helm-find-files-1 input )))
 
-(defun dotemacs-helm-find-files-navigate-back (orig-fun &rest args)
-  )
-
 (defun dotemacs-helm-do-grep-region-or-symbol (&optional targs use-region-or-symbol-p)
   "Version of `helm-do-grep' with a default input."
   (interactive)

@@ -1527,12 +1527,6 @@ These should have their own segments in the modeline.")
               (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
               (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
 
-    ; (defadvice helm-ff-delete-char-backward
-    ;            (around dotemacs-helm-find-files-navigate-back activate)
-    ;            (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
-    ;              (helm-find-files-up-one-level 1)
-    ;              ad-do-it))
-
     ;; https://github.com/syl20bnr/spacemacs/issues/1544
     ;; Vim users are used to CtrlP plugin.
     (setq helm-for-files-preferred-list '(helm-source-buffers-list
@@ -1650,7 +1644,7 @@ These should have their own segments in the modeline.")
     (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
 
     ;; helm navigation on hjkl
-    (dotemacs-helm-hjkl-navigation t)
+    (dotemacs-helm-hjkl-navigation (member dotemacs-editing-style '(vim hybrid)))
 
     ;; Define functions to pick actions
     (dotimes (n 10)
