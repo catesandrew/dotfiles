@@ -5038,8 +5038,8 @@ point. Requires smartparens because all movement is done using
     (add-hook 'python-mode-hook #'subword-mode)
 
     ;; add support for `ahs-range-beginning-of-defun' for python-mode
-    (after "auto-highlight-symbol"
-      '(add-to-list 'ahs-plugin-bod-modes 'python-mode))
+    (with-eval-after-load 'auto-highlight-symbol
+      (add-to-list 'ahs-plugin-bod-modes 'python-mode))
 
     (evil-leader/set-key-for-mode 'python-mode
       "mcc" 'dotemacs-python-execute-file
@@ -9907,33 +9907,46 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :ensure t
   :init
-  (dotemacs/add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
-                                              markdown-mode-hook))
-  :config
   (progn
     (setq ahs-case-fold-search nil
           ahs-default-range 'ahs-range-whole-buffer
-          ;; disable auto-highlight of symbol
-          ;; current symbol should be highlight on demand with <SPC> s h
-          ahs-idle-timer 0
-          ahs-idle-interval 0.25
+          ;; by default disable auto-highlight of symbol
+          ;; current symbol can always be highlighted with <leader> s h
+          ahs-start-timer nil
+          ahs-idle-interval 1
           ahs-inhibit-face-list nil)
+
+    (dotemacs-add-toggle automatic-symbol-highlight-globally
+      :status (timerp ahs-idle-timer)
+      :on (setq ahs-idle-timer (run-with-idle-timer ahs-idle-interval t
+                                                    'ahs-idle-function))
+      :off (when (timerp ahs-idle-timer)
+             (cancel-timer ahs-idle-timer)
+             (setq ahs-idle-timer nil))
+      :documentation "Automatic highlight of current symbol."
+      :evil-leader "tha")
+
+    (dotemacs/add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
+                                                          markdown-mode-hook)))
+  :config
+  (progn
+    (dotemacs-hide-lighter auto-highlight-symbol-mode)
 
     (defvar-local dotemacs-last-ahs-highlight-p nil
       "Info on the last searched highlighted symbol.")
-
     (defvar-local dotemacs--ahs-searching-forward t)
 
-    '(progn
-       (define-key evil-motion-state-map (kbd "*") 'dotemacs-quick-ahs-forward)
-       (define-key evil-motion-state-map (kbd "#") 'dotemacs-quick-ahs-backward))
+    (with-eval-after-load 'evil
+      (define-key evil-motion-state-map (kbd "*")
+        'dotemacs-enter-ahs-forward)
+      (define-key evil-motion-state-map (kbd "#")
+        'dotemacs-enter-ahs-backward))
 
     (evil-leader/set-key
       "sh" 'dotemacs-symbol-highlight
       "sH" 'dotemacs-goto-last-searched-ahs-symbol
       "sR" 'dotemacs-symbol-highlight-reset-range)
 
-    (dotemacs-hide-lighter auto-highlight-symbol-mode)
     ;; micro-state to easily jump from a highlighted symbol to the others
     (dolist (sym '(ahs-forward
                    ahs-forward-definition
