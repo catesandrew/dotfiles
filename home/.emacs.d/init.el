@@ -8872,21 +8872,22 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (add-to-list 'evil-motion-state-modes 'neotree-mode)
     (setq neo-window-width 32
-          neo-modern-sidebar t
           neo-theme 'nerd
           neo-create-file-auto-open t
           neo-banner-message nil
           neo-show-updir-line nil
           neo-mode-line-type 'neotree
-          neo-smart-open nil            ; every time when the neotree window is
-                                        ; opened, it will try to find current
-                                        ; file and jump to node.
-          neo-dont-be-alone t           ; Don't allow neotree to be the only open
-                                        ; window
-          neo-persist-show t
+          neo-smart-open nil       ; if t, every time when the neotree window is
+                                   ; opened, it will try to find current file
+                                   ; and jump to node.
+
+          neo-dont-be-alone t      ; Don't allow neotree to be the only open
+                                   ; window
+          neo-persist-show nil
           neo-show-hidden-files nil
           neo-auto-indent-point t
-          neo-vc-integration '(face))
+          neo-modern-sidebar t
+          neo-vc-integration nil)
 
     (defun dotemacs-neotree-expand-or-open ()
       "Collapse a neotree node."
