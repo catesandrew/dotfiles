@@ -79,6 +79,9 @@
 (unless (file-exists-p dotemacs-cache-directory)
     (make-directory dotemacs-cache-directory))
 
+(defconst dotemacs-editing-style 'vim
+  "Always `vim', Evil is always enabled.")
+
 (defcustom dotemacs-erc-nick
   'catesandrew
   "The erc nickname to use"
@@ -8925,7 +8928,9 @@ If called with a prefix argument, uses the other-window instead."
       (interactive)
       (if (neo-global--window-exists-p)
           (neotree-hide)
-        (neotree-find (projectile-project-root))))
+        (let ((origin-buffer-file-name (buffer-file-name)))
+          (neotree-find (projectile-project-root))
+          (neotree-find origin-buffer-file-name))))
 
     (defun dotemacs-neotree-key-bindings ()
       "Set the key bindings for a neotree buffer."
@@ -10520,7 +10525,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       :evil-leader "tS")
     (evil-leader/set-key
       "Sd" 'ispell-change-dictionary
-      "Sn" 'flyspell-goto-next-error)))
+      "Sn" 'flyspell-goto-next-error))
   :config
   (progn
     ;; Undefine mouse buttons which get in the way
