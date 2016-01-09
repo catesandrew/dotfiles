@@ -1880,13 +1880,15 @@ These should have their own segments in the modeline.")
   :init
   (progn
     (evil-leader/set-key "bB" 'ibuffer)
-    (evilify ibuffer-mode ibuffer-mode-map)
 
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
 
     (setq ibuffer-expert t
-          ibuffer-show-empty-filter-groups nil)))
+          ibuffer-show-empty-filter-groups nil))
+  :config
+  (dotemacs-evilify-map ibuffer-mode-map
+    :mode ibuffer-mode))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
