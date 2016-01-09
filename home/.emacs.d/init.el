@@ -3301,7 +3301,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
 
     ;; support smart-parens-strict-mode
-    (after "smartparens"
+    (with-eval-after-load 'smartparens
       (defadvice evil-delete-backward-char-and-join
           (around dotemacs-evil-delete-backward-char-and-join activate)
         (defvar smartparens-strict-mode)
