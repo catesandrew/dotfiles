@@ -3003,11 +3003,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (progn
     (setq show-paren-delay 0)
     (dotemacs-add-toggle show-paren-mode
-                         :status show-paren-mode
-                         :on (show-paren-mode)
-                         :off (show-paren-mode -1)
-                         :documentation "Highlight matching pairs of parentheses."
-                         :evil-leader "tCP")
+      :status show-paren-mode
+      :on (show-paren-mode)
+      :off (show-paren-mode -1)
+      :documentation "Highlight matching pairs of parentheses."
+      :evil-leader "tCP")
     (if (eq dotemacs-highlight-delimiters 'all)
       (show-paren-mode)))
   :config (setq show-paren-when-point-inside-paren t
