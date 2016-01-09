@@ -3010,10 +3010,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :defer t
   :init
   (progn
-    (dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
-                      #'smartparens-strict-mode
-                    #'smartparens-mode)
-                  '(prog-mode-hook))
+    (dotemacs/add-to-hooks
+     (if dotemacs-smartparens-strict-mode
+         'smartparens-strict-mode
+       'smartparens-mode)
+     '(prog-mode-hook css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
 
     ;; but alwayws enable for lisp mode
     (dotemacs/add-to-hooks #'smartparens-strict-mode '(lisp-mode))
@@ -3024,18 +3025,18 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (add-hook hook #'smartparens-mode))
 
     (dotemacs-add-toggle smartparens
-                         :status smartparens-mode
-                         :on (smartparens-mode)
-                         :off (smartparens-mode -1)
-                         :documentation "Enable smartparens."
-                         :evil-leader "tp")
+      :status smartparens-mode
+      :on (smartparens-mode)
+      :off (smartparens-mode -1)
+      :documentation "Enable smartparens."
+      :evil-leader "tp")
 
     (dotemacs-add-toggle smartparens-globally
-                         :status smartparens-mode
-                         :on (smartparens-global-mode)
-                         :off (smartparens-global-mode -1)
-                         :documentation "Enable smartparens globally."
-                         :evil-leader "t C-p")
+      :status smartparens-mode
+      :on (smartparens-global-mode)
+      :off (smartparens-global-mode -1)
+      :documentation "Enable smartparens globally."
+      :evil-leader "t C-p")
 
     (setq sp-show-pair-delay 0.2
           sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
