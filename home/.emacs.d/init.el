@@ -666,7 +666,7 @@ group by projectile projects."
 (require 'core-micro-state)
 (require 'core-use-package-ext)
 (require 'core-keybindings)
-(require 'core-evilify-keymap)
+(require 'core-evilified-state)
 
 
 ;;; After and other macros
