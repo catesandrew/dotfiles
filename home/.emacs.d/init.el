@@ -5621,6 +5621,25 @@ fix this issue."
       (define-key haskell-cabal-mode-map
          [?\C-c ?\C-z] 'haskell-interactive-switch))))
 
+;; align rules for Haskell
+(with-eval-after-load 'align
+  (add-to-list 'align-rules-list
+               '(haskell-types
+                 (regexp . "\\(\\s-+\\)\\(::\\|?\\)\\s-+")
+                 (modes . '(haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-assignment
+                 (regexp . "\\(\\s-+\\)=\\s-+")
+                 (modes . '(haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-arrows
+                 (regexp . "\\(\\s-+\\)\\(->\\|?\\)\\s-+")
+                 (modes . '(haskell-mode literate-haskell-mode))))
+  (add-to-list 'align-rules-list
+               '(haskell-left-arrows
+                 (regexp . "\\(\\s-+\\)\\(<-\\|?\\)\\s-+")
+                 (modes . '(haskell-mode literate-haskell-mode)))))
+
 (use-package haskell
   :ensure haskell-mode
   :defer t
@@ -5654,8 +5673,8 @@ fix this issue."
 
 (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
   :ensure t
-  :commands (flycheck-haskell-setup)
-  :init (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
+  :commands flycheck-haskell-configure
+  :init (add-hook 'flycheck-mode-hook 'flycheck-haskell-configure))
 
 (use-package helm-hayoo
   :ensure t
@@ -5680,13 +5699,12 @@ fix this issue."
                                 'haskell-snippets))
 
     (defun haskell-snippets-initialize ()
-      (when (derived-mode-p 'haskell-mode)
-        (let ((snip-dir (expand-file-name "snippets" haskell-snippets-dir)))
-          (add-to-list 'yas-snippet-dirs snip-dir t)
-          (yas-load-directory snip-dir))))
+      (let ((snip-dir (expand-file-name "snippets" haskell-snippets-dir)))
+        (add-to-list 'yas-snippet-dirs snip-dir t)
+        (yas-load-directory snip-dir)))
 
     ;; TODO only load once
-    (add-hook 'haskell-mode-hook #'haskell-snippets-initialize)))
+    (with-eval-after-load 'yasnippet (haskell-snippets-initialize))))
 
 (use-package cmm-mode
   :ensure t
@@ -5698,7 +5716,7 @@ fix this issue."
   :defer t
   :init (add-hook 'haskell-mode-hook 'ghc-init)
   :config
-  (after "flycheck"
+  (progn
     ;; remove overlays from ghc-check.el if flycheck is enabled
     (set-face-attribute 'ghc-face-error nil :underline nil)
     (set-face-attribute 'ghc-face-warn nil :underline nil)))
@@ -5755,9 +5773,10 @@ fix this issue."
   :ensure t
   :defer t
   :init
-  (progn
-    (push '(company-ghc company-dabbrev-code company-yasnippet)
-          company-backends-haskell-mode)))
+  (push (if dotemacs-haskell-enable-ghc-mod-support
+            '(company-ghc company-dabbrev-code company-yasnippet)
+          '(company-dabbrev-code company-yasnippet))
+        company-backends-haskell-mode))
 
 (use-package company-cabal
   :if (eq dotemacs-completion-engine 'company)
