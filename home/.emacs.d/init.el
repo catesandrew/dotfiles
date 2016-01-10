@@ -179,6 +179,10 @@ with 2 themes variants, one dark and one light")
   "If non nil the cursor color matches the state color."
   :group 'dotemacs)
 
+(defcustom dotemacs-remap-Y-to-y$ t
+  "If non nil `Y' is remapped to `y$'."
+  :group 'dotemacs)
+
 (defcustom dotemacs-leader-key ","
   "The leader key."
   :group 'dotemacs)
@@ -3230,8 +3234,12 @@ Disable the highlighting of overlong lines."
       "Yank from point to end of line."
       (interactive)
       (evil-yank (point) (point-at-eol)))
-    (define-key evil-normal-state-map (kbd "Y") 'dotemacs/evil-yank-to-end-of-line)
-    (define-key evil-motion-state-map (kbd "Y") 'dotemacs/evil-yank-to-end-of-line)
+    (when dotemacs-remap-Y-to-y$
+      (define-key evil-normal-state-map (kbd "Y")
+        'dotemacs/evil-yank-to-end-of-line)
+      (define-key evil-motion-state-map (kbd "Y")
+        'dotemacs/evil-yank-to-end-of-line))
+
 
     (evil-leader/set-key "re" 'evil-show-registers)
 
