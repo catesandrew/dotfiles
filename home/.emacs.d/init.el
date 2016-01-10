@@ -3909,6 +3909,13 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :load-path "config/"
   :defer t)
 
+(use-package gh-md
+  :ensure t
+  :defer t
+  :init
+  (evil-leader/set-key-for-mode 'markdown-mode
+    "mcr"  'gh-md-render-buffer))
+
 (use-package markdown-mode              ; Markdown
   :mode (("\\.m[k]d" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
@@ -3976,7 +3983,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mcw"  'markdown-kill-ring-save
       "mcc"  'markdown-check-refs
       "mcn"  'markdown-cleanup-list-numbers
-      "mcr"  'gh-md-render-buffer
       ;; headings
       "mhi"  'markdown-insert-header-dwim
       "mhI"  'markdown-insert-header-setext-dwim
