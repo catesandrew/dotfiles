@@ -1344,7 +1344,10 @@ the user activate the completion manually."
 
 ;; no beep pleeeeeease ! (and no visual blinking too please)
 (setq ring-bell-function #'ignore
+      ;; no welcome buffer
       inhibit-startup-screen t
+      ;; silence ad-handle-definition about advised functions getting redefined
+      ad-redefinition-action 'accept
       visible-bell nil
       initial-scratch-message nil)
 
