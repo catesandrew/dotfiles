@@ -481,6 +481,11 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled."
   :group 'dotemacs
   :prefix 'dotemacs-evil)
 
+(defcustom evil-snipe-enable-alternate-f-and-t-behaviors nil
+  "if non nil f/F/t/T behaviors are replaced by evil-snipe behavior."
+  :group 'dotemacs
+  :prefix 'evil-snipe)
+
 (defcustom dotemacs-evil-evil-state-modes
   '(fundamental-mode
     text-mode
@@ -3361,6 +3366,33 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (evil-define-key 'normal comint-mode-map
       (kbd "C-k") 'comint-next-input
       (kbd "C-j") 'comint-previous-input)))
+
+(use-package evil-snipe
+  :diminish evil-snipe-local-mode
+  :ensure t
+  :init
+  (setq evil-snipe-scope 'whole-buffer
+        evil-snipe-enable-highlight t
+        evil-snipe-enable-incremental-highlight t
+        evil-snipe-auto-disable-substitute t
+        evil-snipe-show-prompt nil
+        evil-snipe-smart-case t)
+  :config
+  (progn
+    (if evil-snipe-enable-alternate-f-and-t-behaviors
+        (progn
+          (setq evil-snipe-repeat-scope 'whole-buffer)
+          (evil-snipe-override-mode 1))
+      (evil-snipe-mode 1))))
+
+(dotemacs-use-package-add-hook magit
+  :post-init
+  (if evil-snipe-enable-alternate-f-and-t-behaviors
+      (progn
+        (add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode)
+        (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-override-mode))
+    (add-hook 'magit-mode-hook 'turn-off-evil-snipe-mode)
+    (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-mode)))
 
 (use-package evil-args
   :ensure t
