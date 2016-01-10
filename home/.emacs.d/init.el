@@ -7959,7 +7959,7 @@ If called with a prefix argument, uses the other-window instead."
 
 ;; github
 (setq github/key-binding-prefixes '(("gf" . "github/file")
-                                    ("gg" . "githib/gist")))
+                                    ("gg" . "github/gist")))
 (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
       github/key-binding-prefixes)
 
