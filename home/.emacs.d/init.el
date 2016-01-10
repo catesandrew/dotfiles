@@ -290,12 +290,18 @@ can be toggled through `toggle-transparency'."
   "Filepath to the installed dotfile.")
 
 (defcustom dotemacs-persistent-server nil
-  "If non nil advises quit functions to keep server open when quitting.")
-  :group 'dotemacs
+  "If non nil advises quit functions to keep server open when quitting."
+  :group 'dotemacs)
+
+(defcustom dotemacs-smooth-scrolling t
+  "If non nil smooth scrolling (native-scrolling) is enabled. Smooth scrolling
+overrides the default behavior of Emacs which recenters the point when
+it reaches the top or bottom of the screen."
+  :group 'dotemacs)
 
 (defcustom dotemacs-mode-line-unicode-symbols t
-  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
-  :group 'dotemacs
+  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)"
+  :group 'dotemacs)
 
 (defcustom dotemacs-fullscreen-use-non-native nil
   "If non nil `dotemacs-toggle-fullscreen' will not use native fullscreen. Use
@@ -1301,6 +1307,36 @@ the user activate the completion manually."
 
 
 ;;; User interface
+
+(defun dotemacs//unset-scroll-margin ()
+  "Set `scroll-margin` to zero."
+  (setq-local scroll-margin 0))
+
+(use-package smooth-scrolling
+  :ensure t
+  :defer t
+  :if dotemacs-smooth-scrolling
+  :init (setq smooth-scroll-margin 5
+              scroll-conservatively 101
+              scroll-preserve-screen-position t
+              auto-window-vscroll nil)
+  :config
+  (progn
+    (setq scroll-margin 5)
+    ;; add hooks here only for emacs built-in packages
+    (spacemacs/add-to-hooks 'dotemacs//unset-scroll-margin
+                            '(messages-buffer-mode-hook
+                              comint-mode-hook
+                              term-mode-hook))))
+
+(unless dotemacs-smooth-scrolling
+  ;; deactivate smooth-scrolling advices
+  (ad-disable-advice 'previous-line 'after 'smooth-scroll-down)
+  (ad-activate 'previous-line)
+  (ad-disable-advice 'next-line 'after 'smooth-scroll-up)
+  (ad-activate 'next-line)
+  (ad-disable-advice 'isearch-repeat 'after 'isearch-smooth-scroll)
+  (ad-activate 'isearch-repeat))
 
 (use-package diminish
   :ensure t
@@ -4571,8 +4607,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    ;; (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
-    ;; (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
+    (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)
     ;; Don't activate flycheck by default in elisp
     ;; because of too much false warnings
     ;; (dotemacs-add-flycheck-hook 'emacs-lisp-mode-hook)
