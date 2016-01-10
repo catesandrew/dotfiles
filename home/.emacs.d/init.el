@@ -9912,17 +9912,21 @@ If called with a prefix argument, uses the other-window instead."
           ahs-default-range 'ahs-range-whole-buffer
           ;; by default disable auto-highlight of symbol
           ;; current symbol can always be highlighted with <leader> s h
-          ahs-start-timer nil
-          ahs-idle-interval 1
+          ahs-idle-timer 0
+          ahs-idle-interval 0.25
           ahs-inhibit-face-list nil)
 
-    (dotemacs-add-toggle automatic-symbol-highlight-globally
+    (dotemacs-add-toggle automatic-symbol-highlight
       :status (timerp ahs-idle-timer)
-      :on (setq ahs-idle-timer (run-with-idle-timer ahs-idle-interval t
-                                                    'ahs-idle-function))
+      :on (progn
+            (auto-highlight-symbol-mode)
+            (setq ahs-idle-timer
+                  (run-with-idle-timer ahs-idle-interval t
+                                       'ahs-idle-function)))
       :off (when (timerp ahs-idle-timer)
+             (auto-highlight-symbol-mode)
              (cancel-timer ahs-idle-timer)
-             (setq ahs-idle-timer nil))
+             (setq ahs-idle-timer 0))
       :documentation "Automatic highlight of current symbol."
       :evil-leader "tha")
 
@@ -9944,8 +9948,7 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-leader/set-key
       "sh" 'dotemacs-symbol-highlight
-      "sH" 'dotemacs-goto-last-searched-ahs-symbol
-      "sR" 'dotemacs-symbol-highlight-reset-range)
+      "sH" 'dotemacs-goto-last-searched-ahs-symbol)
 
     ;; micro-state to easily jump from a highlighted symbol to the others
     (dolist (sym '(ahs-forward
@@ -9961,7 +9964,7 @@ If called with a prefix argument, uses the other-window instead."
                  (dotemacs-ahs-highlight-now-wrapper)
                  (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))))))
 
-    (dotemacs-define-micro-state highlight-symbol
+    (dotemacs-define-micro-state symbol-highlight
       :doc (let* ((i 0)
                   (overlay-count (length ahs-overlay-list))
                   (overlay (format "%s" (nth i ahs-overlay-list)))
