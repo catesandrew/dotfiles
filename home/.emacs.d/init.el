@@ -481,10 +481,9 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled."
   :group 'dotemacs
   :prefix 'dotemacs-evil)
 
-(defcustom evil-snipe-enable-alternate-f-and-t-behaviors nil
+(defcustom dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors nil
   "if non nil f/F/t/T behaviors are replaced by evil-snipe behavior."
-  :group 'dotemacs
-  :prefix 'evil-snipe)
+  :group 'dotemacs-evil)
 
 (defcustom dotemacs-evil-evil-state-modes
   '(fundamental-mode
@@ -1329,7 +1328,7 @@ the user activate the completion manually."
   (progn
     (setq scroll-margin 5)
     ;; add hooks here only for emacs built-in packages
-    (spacemacs/add-to-hooks 'dotemacs//unset-scroll-margin
+    (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
                             '(messages-buffer-mode-hook
                               comint-mode-hook
                               term-mode-hook))))
@@ -2599,7 +2598,7 @@ point reaches the beginning or end of the buffer, stop there."
       (move-beginning-of-line 1))))
 (global-set-key (kbd "C-a") 'dotemacs-smart-move-beginning-of-line)
 
-(defun spacemacs-backward-kill-word-or-region (&optional arg)
+(defun dotemacs-backward-kill-word-or-region (&optional arg)
   "Calls `kill-region' when a region is active and
 `backward-kill-word' otherwise. ARG is passed to
 `backward-kill-word' if no region is active."
@@ -3362,7 +3361,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
         evil-snipe-smart-case t)
   :config
   (progn
-    (if evil-snipe-enable-alternate-f-and-t-behaviors
+    (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
         (progn
           (setq evil-snipe-repeat-scope 'whole-buffer)
           (evil-snipe-override-mode 1))
@@ -3370,7 +3369,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
 
 (dotemacs-use-package-add-hook magit
   :post-init
-  (if evil-snipe-enable-alternate-f-and-t-behaviors
+  (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
       (progn
         (add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode)
         (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-override-mode))
@@ -4607,7 +4606,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
         "mef" 'eval-defun
         "mel" 'lisp-state-eval-sexp-end-of-line
         "m,"  'lisp-state-toggle-lisp-state
-        "mtb" 'spacemacs/ert-run-tests-buffer
+        "mtb" 'dotemacs-ert-run-tests-buffer
         "mtq" 'ert))))
 
 (when (eq dotemacs-completion-engine 'company)
@@ -8240,8 +8239,6 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (ido-vertical-mode t)
-    ;; (when dotspacemacs-use-ido
-    ;;   (dotemacs/set-leader-keys "ff" 'ido-find-file))
     (defun dotemacs//ido-minibuffer-setup ()
       "Setup the minibuffer."
       ;; Since ido is implemented in a while loop where each
