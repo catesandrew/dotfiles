@@ -2002,23 +2002,6 @@ These should have their own segments in the modeline.")
       "9" 'select-window-9)
     (window-numbering-mode 1))
 
-  (defun dotemacs-window-number ()
-    "Return the number of the window."
-    (let* ((num (window-numbering-get-number))
-           (str (if num (int-to-string num))))
-      (cond
-       ((not dotemacs-mode-line-unicode-symbols) str)
-       ((equal str "1")  "➊")
-       ((equal str "2")  "➋")
-       ((equal str "3")  "➌")
-       ((equal str "4")  "➍")
-       ((equal str "5")  "➎")
-       ((equal str "6")  "❻")
-       ((equal str "7")  "➐")
-       ((equal str "8")  "➑")
-       ((equal str "9")  "➒")
-       ((equal str "0")  "➓"))))
-
   (defun dotemacs-window-numbering-assign (windows)
     "Custom number assignment for special buffers."
     (mapc (lambda (w)
@@ -10469,8 +10452,6 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :commands (dotemacs-discard-undesired-html-tidy-error
              dotemacs-flycheck-mode-line-status
-             dotemacs-defface-flycheck-mode-line-color
-             dotemacs-set-flycheck-mode-line-faces
              dotemacs-mode-line-flycheck-info-toggle
              dotemacs-eslint-set-local-eslint-from-projectile
              dotemacs-flycheck-executables-updated
@@ -10531,7 +10512,6 @@ If called with a prefix argument, uses the other-window instead."
       "ev" 'flycheck-verify-setup
       "tmf" 'dotemacs-mode-line-flycheck-info-toggle)
 
-    (dotemacs-set-flycheck-mode-line-faces)
     (unless (display-graphic-p)
       (setq flycheck-display-errors-function
             #'flycheck-display-error-messages-unless-error-list
@@ -10583,15 +10563,6 @@ If the error list is visible, hide it.  Otherwise, show it."
       "j" #'flycheck-error-list-next-error
       "k" #'flycheck-error-list-previous-error
       "RET" #'flycheck-error-list-goto-error)
-
-    (defmacro dotemacs-custom-flycheck-lighter (error)
-      "Return a formatted string for the given ERROR (error, warning, info)."
-      `(let* ((error-counts (flycheck-count-errors
-                             flycheck-current-errors))
-              (errorp (flycheck-has-current-errors-p ',error))
-              (err (or (cdr (assq ',error error-counts)) "?"))
-              (running (eq 'running flycheck-last-status-change)))
-         (if (or errorp running) (format "•%s " err))))
 
     ;; Custom fringe indicator
     (when (fboundp 'define-fringe-bitmap)
@@ -11002,517 +10973,87 @@ If the error list is visible, hide it.  Otherwise, show it."
 
 
 ;;; The mode line
-(use-package powerline
-  :ensure t
+
+(use-package spaceline-config
+  :ensure spaceline
   :init
   (progn
-    ;; Custom format of minor mode lighters, they are separated by a pipe.
-    (defpowerline dotemacs-powerline-minor-modes
-      (mapconcat (lambda (mm)
-                   (propertize
-                    mm
-                    'mouse-face 'mode-line-highlight
-                    'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
-                    'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map
-                                   [mode-line down-mouse-1]
-                                   (powerline-mouse 'minor 'menu mm))
-                                 (define-key map
-                                   [mode-line mouse-2]
-                                   (powerline-mouse 'minor 'help mm))
-                                 (define-key map
-                                   [mode-line down-mouse-3]
-                                   (powerline-mouse 'minor 'menu mm))
-                                 (define-key map
-                                   [header-line down-mouse-3]
-                                   (powerline-mouse 'minor 'menu mm))
-                                 map)))
-                 (split-string (format-mode-line minor-mode-alist))
-                 (concat (propertize
-                          (if dotemacs-mode-line-unicode-symbols " " "") 'face face)
-                         (unless dotemacs-mode-line-unicode-symbols "|"))))
-
-    (defvar dotemacs-mode-line-minor-modesp nil
-      "If not nil, minor modes lighter are displayed in the mode-line.")
-    (dotemacs-add-toggle mode-line-minor-modes
-      :status dotemacs-mode-line-minor-modesp
-      :on (setq dotemacs-mode-line-minor-modesp t)
-      :off (setq dotemacs-mode-line-minor-modesp nil)
-      :documentation "Show minor modes in mode-line."
-      :evil-leader "tmm")
-
-    (defvar dotemacs-mode-line-major-modep t
-      "If not nil, major mode is displayed in the mode-line.")
-    (dotemacs-add-toggle mode-line-major-mode
-      :status dotemacs-mode-line-major-modep
-      :on (setq dotemacs-mode-line-major-modep t)
-      :off (setq dotemacs-mode-line-major-modep nil)
-      :documentation "Show major mode in mode-line."
-      :evil-leader "tmM")
-
-    (defvar dotemacs-mode-line-version-controlp nil
-      "If not nil, version control info is displayed in the mode-line.")
-    (dotemacs-add-toggle mode-line-version-control
-      :status dotemacs-mode-line-version-controlp
-      :on (setq dotemacs-mode-line-version-controlp t)
-      :off (setq dotemacs-mode-line-version-controlp nil)
-      :documentation "Show version control info in mode-line."
-      :evil-leader "tmv")
-
-    (defvar dotemacs-mode-line-display-point-p nil
-      "If not nil, display point alongside row/column in the mode-line.")
-    (dotemacs-add-toggle mode-line-display-point
-      :status dotemacs-mode-line-display-point-p
-      :on (setq dotemacs-mode-line-display-point-p t)
-      :off (setq dotemacs-mode-line-display-point-p nil)
-      :documentation "Show point in the mode-line."
-      :evil-leader "tmp")
-
-    (defvar dotemacs-mode-line-org-clock-current-taskp nil
-      "If not nil, the currently clocked org-mode task will be
-displayed in the mode-line.")
-    (defvar dotemacs-mode-line-org-clock-format-function
-      'org-clock-get-clock-string
-      "Function used to render the currently clocked org-mode task.")
-    (dotemacs-add-toggle mode-line-org-clock-current-task
-      :status dotemacs-mode-line-org-clock-current-taskp
-      :on (setq dotemacs-mode-line-org-clock-current-taskp t)
-      :off (setq dotemacs-mode-line-org-clock-current-taskp nil)
-      :documentation "Show org clock in mode-line."
-      :evil-leader "tmc")
-
-    (defvar dotemacs-mode-line-left
-      '(((workspace-number window-number)
-         :fallback state-tag
-         :separator "|"
-         :face state-face)
-        anzu
-        (buffer-modified buffer-size buffer-id remote-host)
-        major-mode
-        ((flycheck-errors flycheck-warnings flycheck-infos)
-         :when active)
-        ((minor-modes process)
-         :when active)
-        (erc-track :when active)
-        (version-control :when active)
-        (org-pomodoro :when active)
-        (org-clock :when active)
-        nyan-cat)
-      "List of modeline segments to render on the left. Each element
-must be a valid segment specification, see documentation for
-`dotemacs-eval-mode-line-segment'.")
-
-    (defvar dotemacs-mode-line-right
-      '((battery :when active)
-        selection-info
-        ((buffer-encoding-abbrev
-          point-position
-          line-column)
-         :separator " | ")
-        buffer-position
-        hud)
-      "List of modeline segments to render on the right. Each element
-must be a valid segment specification, see documentation for
-`dotemacs-eval-mode-line-segment'.")
-
-    (defun dotemacs-mode-line-file-encoding ()
-      "Return the file encoding to be displayed in the mode-line."
-      (let ((buf-coding (format "%s" buffer-file-coding-system)))
-        (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
-            (match-string 1 buf-coding)
-          buf-coding)))
-
     (dotemacs|do-after-display-system-init
-      (setq-default powerline-default-separator
-                    (if (display-graphic-p) 'wave 'utf-8)))
+     (setq-default powerline-default-separator
+                   (if (display-graphic-p) 'wave 'utf-8)))
 
-    (defun dotemacs-customize-powerline-faces ()
+    (defun dotemacs-set-powerline-for-startup-buffers ()
+      "Set the powerline for buffers created when Emacs starts."
+      (dolist (buffer '("*Messages*" "*dotemacs*" "*scratch" "*Compile-Log*" "*Require Times*"))
+        (when (get-buffer buffer)
+          (dotemacs-restore-powerline buffer))))
+    (add-hook 'emacs-startup-hook
+              'dotemacs-set-powerline-for-startup-buffers))
+  :config
+  (progn
+    (defun dotemacs/customize-powerline-faces ()
       "Alter powerline face to make them work with more themes."
       (set-face-attribute 'powerline-inactive2 nil
                           :inherit 'font-lock-comment-face))
-    (dotemacs-customize-powerline-faces)
+    (dotemacs/customize-powerline-faces)
 
-    (defmacro dotemacs-define-mode-line-segment (name value &rest props)
-      "Defines a modeline segment called `NAME' whose value is
-computed by the form `VALUE'. The optional keyword argument `WHEN'
-defines a condition required for the segment to be shown.
+    (dolist (spec '((minor-modes "tmm")
+                    (major-mode "tmM")
+                    (version-control "tmv")
+                    (point-position "tmp")
+                    (org-clock "tmc")))
+      (let* ((segment (car spec))
+             (status-var (intern (format "spaceline-%S-p" segment))))
+        (eval `(dotemacs-add-toggle ,(intern (format "mode-line-%S" segment))
+                 :status ,status-var
+                 :on (setq ,status-var t)
+                 :off (setq ,status-var nil)
+                 :documentation ,(format "Show %s in the mode-line."
+                                         (replace-regexp-in-string
+                                          "-" " " (format "%S" segment)))
+                 :evil-leader ,(cadr spec)))))
+    (setq spaceline-org-clock-p nil)
 
-This macro defines a function `dotemacs-mode-line-NAME' which
-returns a list of modeline objects (strings or images). If the
-form `VALUE' does not result in a list, the return value will be
-wrapped as a singleton list.
+    (defun dotemacs//evil-state-face ()
+      (if (bound-and-true-p evil-state)
+          (let ((state (if (eq 'operator evil-state) evil-previous-state evil-state)))
+            (intern (format "dotemacs-%S-face" state)))
+        'face-of-god))
+    (setq spaceline-highlight-face-func 'dotemacs//evil-state-face)
 
-All properties are stored in a plist attached to the symbol, to be
-inspected at evaluation time by `dotemacs-eval-mode-line-segment'."
-      (declare (indent 1))
-      (let* ((wrapper-func (intern (format "dotemacs-mode-line-%S" name)))
-             (wrapper-func-available (intern (format "%S-available" wrapper-func)))
-             (condition (if (plist-member props :when)
-                            (plist-get props :when)
-                           t)))
-        `(progn
-           (defun ,wrapper-func ()
-             (when ,condition
-               (let ((value ,value))
-                 (cond ((dotemacs-imagep value)
-                        (list value))
-                       ((listp value) value)
-                       ((and (stringp value)
-                             (= 0 (length value)))
-                        nil)
-                       (t (list value))))))
-           (setplist ',wrapper-func ',props))))
+    (let ((unicodep (dotemacs-symbol-value
+                     dotemacs-mode-line-unicode-symbols)))
+      (setq spaceline-window-numbers-unicode unicodep)
+      (setq spaceline-workspace-numbers-unicode unicodep))
 
-    ;; An intermediate representation of the value of a modeline segment.
-    (defstruct segment
-      objects face-left face-right tight-left tight-right)
-
-    (defun column-number-at-pos (pos)
-      "Analog to line-number-at-pos."
-      (save-excursion (goto-char pos) (current-column)))
-
-    (defun selection-info ()
-      "Info on the current selection for the mode-line.
-
-It is a string holding:
-- the number of columns in the selection if it covers only one line,
-- the number of lines in the selection if if covers several full lines
-- or rowsxcols if it's a block selection."
-    (let* ((lines (count-lines (region-beginning) (min (1+ (region-end)) (point-max))))
-           (chars (- (1+ (region-end)) (region-beginning)))
-           (cols (1+ (abs (- (column-number-at-pos (region-end))
-                             (column-number-at-pos (region-beginning)))))))
-      (if (eq evil-visual-selection 'block)
-          (format "%d×%d block" lines cols)
-        (if (> lines 1) (format "%d lines" lines)
-          (format "%d chars" chars)))))
-
-  ;; BEGIN define modeline segments
-
-  (dotemacs-define-mode-line-segment workspace-number
-    (dotemacs-workspace-number)
-    :when (and (bound-and-true-p eyebrowse-mode)
-               (dotemacs-workspace-number)))
-
-  (dotemacs-define-mode-line-segment window-number
-    (dotemacs-window-number)
-    :when (and (bound-and-true-p window-numbering-mode)
-               (dotemacs-window-number)))
-
-  (dotemacs-define-mode-line-segment state-tag
-    (s-trim (evil-state-property evil-state :tag t)))
-
-  (dotemacs-define-mode-line-segment anzu
-    (anzu--update-mode-line)
-    :when (and active (bound-and-true-p anzu--state)))
-
-  (dotemacs-define-mode-line-segment buffer-modified "%*")
-  (dotemacs-define-mode-line-segment buffer-size
-    (powerline-buffer-size))
-  (dotemacs-define-mode-line-segment buffer-id
-    (powerline-buffer-id))
-  (dotemacs-define-mode-line-segment remote-host
-    (concat "@" (file-remote-p default-directory 'host))
-    :when (file-remote-p default-directory 'host))
-
-  (dotemacs-define-mode-line-segment major-mode
-    (powerline-major-mode)
-    :when dotemacs-mode-line-major-modep)
-  (dotemacs-define-mode-line-segment minor-modes
-    (dotemacs-powerline-minor-modes)
-    :when dotemacs-mode-line-minor-modesp)
-  (dotemacs-define-mode-line-segment process
-    (powerline-raw mode-line-process)
-    :when (dotemacs-mode-line-nonempty mode-line-process))
-
-  (dotemacs-define-mode-line-segment erc-track
-    (let* ((buffers (mapcar 'car erc-modified-channels-alist))
-           (long-names (mapconcat (lambda (buf)
-                                    (or (buffer-name buf) ""))
-                                  buffers " ")))
-      long-names)
-    :when (bound-and-true-p erc-track-mode))
-
-  (dotemacs-define-mode-line-segment version-control
-    (s-trim (powerline-vc))
-    :when (and (powerline-vc)
-               dotemacs-mode-line-version-controlp))
-
-  (dotemacs-define-mode-line-segment selection-info
-    (selection-info)
-    :when (evil-visual-state-p))
-
-  (dotemacs-define-mode-line-segment buffer-encoding
-    (format "%s" buffer-file-coding-system))
-  (dotemacs-define-mode-line-segment buffer-encoding-abbrev
-    (dotemacs-mode-line-file-encoding))
-
-  (dotemacs-define-mode-line-segment point-position
-    (format "%d" (point))
-    :when dotemacs-mode-line-display-point-p)
-  (dotemacs-define-mode-line-segment line-column "%l:%2c")
-  (dotemacs-define-mode-line-segment buffer-position "%p")
-
-  (dotemacs-define-mode-line-segment hud
-    (powerline-hud state-face default-face)
-    :tight t
-    :when (string-match "\%" (format-mode-line "%p")))
-
-  (dotemacs-define-mode-line-segment nyan-cat
-    (powerline-raw (nyan-create) default-face)
-    :when (bound-and-true-p nyan-mode))
-
-  (dotemacs-define-mode-line-segment global-mode
-    (powerline-raw (-difference global-mode-string
-                                dotemacs--global-mode-line-excludes))
-    :when (dotemacs-mode-line-nonempty global-mode-string))
-
-  (dotemacs-define-mode-line-segment battery
-    (powerline-raw (s-trim (fancy-battery-default-mode-line))
-                   (fancy-battery-powerline-face))
-    :when (bound-and-true-p fancy-battery-mode))
-
-  ;; flycheck-errors, flycheck-warnings, flycheck-infos
-  (dolist (type '(error warning info))
-    (let ((segment-name (intern (format "flycheck-%ss" type)))
-          (face (intern (format "dotemacs-mode-line-flycheck-%s-face" type))))
-      (eval
-       `(dotemacs-define-mode-line-segment ,segment-name
-          (powerline-raw (s-trim (dotemacs-custom-flycheck-lighter ,type)) ',face)
-          :when (and (bound-and-true-p flycheck-mode)
-                     (or flycheck-current-errors
-                         (eq 'running flycheck-last-status-change))
-                     (dotemacs-custom-flycheck-lighter ,type))))))
-
-  (dotemacs-define-mode-line-segment org-clock
-    (substring-no-properties (funcall dotemacs-mode-line-org-clock-format-function))
-    :when (and dotemacs-mode-line-org-clock-current-taskp
-               (fboundp 'org-clocking-p)
-               (org-clocking-p)))
-  (push 'org-mode-line-string dotemacs--global-mode-line-excludes)
-
-  (dotemacs-define-mode-line-segment org-pomodoro
-    (nth 1 org-pomodoro-mode-line)
-    :when (and (fboundp 'org-pomodoro-active-p)
-               (org-pomodoro-active-p)))
-  (push 'org-pomodoro-mode-line dotemacs--global-mode-line-excludes)
-
-  ;; END define modeline segments
-
-  (defun dotemacs-eval-mode-line-segment (segment-spec &rest outer-props)
-    "Evaluates a modeline segment given by `SEGMENT-SPEC' with
-additional properties given by `OUTER-PROPS'.
-
-`SEGMENT-SPEC' may be either:
-- A literal value (number or string, for example)
-- A symbol previously defined by `dotemacs-define-mode-line-segment'
-- A list whose car is a segment-spec and whose cdr is a plist of properties
-- A list of segment-specs
-
-The properties applied are, in order of priority:
-- Those given by `SEGMENT-SPEC', if applicable
-- The properties attached to the segment symbol, if applicable
-- `OUTER-PROPS'
-
-Valid properties are:
-- `:tight-left' => if true, the segment should be rendered with no padding
-  or separator on its left side
-- `:tight-right' => corresponding option for the right side
-- `:tight' => shorthand option to set both `:tight-left' and `:tight-right'
-- `:when' => condition that determines whether this segment is shown
-- `:fallback' => segment to evaluate if this segment produces no output
-- `:separator' => string with which to separate nested segments
-- `:face' => the face with which to render the segment
-
-When calling nested or fallback segments, the full property list is passed
-as `OUTER-PROPS', with the exception of `:fallback'. This means that more
-deeply specified properties, as a rule, override the higher level ones.
-The exception is `:when', which must be true at all levels.
-
-The return vaule is a `segment' struct. Its `OBJECTS' list may be nil."
-
-      ;; We get a property list from `SEGMENT-SPEC' if it's a list
-      ;; with more than one element whose second element is a symbol
-      ;; starting with a colon
-      (let* ((input (if (and (listp segment-spec)
-                             (cdr segment-spec)
-                             (keywordp (cadr segment-spec)))
-                        segment-spec
-                      (cons segment-spec nil)))
-             (segment (car input))
-             (segment-symbol (when (symbolp segment)
-                               (intern (format "dotemacs-mode-line-%S" segment))))
-
-             ;; Assemble the properties in the correct order
-             (props (append (cdr input)
-                            (when (symbolp segment) (symbol-plist segment-symbol))
-                            outer-props))
-
-             ;; Property list to be passed to nested or fallback segments
-             (nest-props (append '(:fallback nil) (cdr input) outer-props))
-
-             ;; Parse property list
-             (condition (if (plist-member props :when)
-                            (eval (plist-get props :when))
-                          t))
-             (face (eval (or (plist-get props :face) 'default-face)))
-             (separator (powerline-raw (or (plist-get props :separator) " ") face))
-             (tight-left (or (plist-get props :tight)
-                             (plist-get props :tight-left)))
-             (tight-right (or (plist-get props :tight)
-                              (plist-get props :tight-right)))
-             ;; Final output
-             (result (make-segment :objects nil
-                                   :face-left face
-                                   :face-right face
-                                   :tight-left tight-left
-                                   :tight-right tight-right)))
-
-        ;; Evaluate the segment based on its type
-        (when condition
-          (cond
-           ;; A list of segments
-           ((listp segment)
-            (let ((results (remove-if-not
-                            'segment-objects
-                            (mapcar (lambda (s)
-                                      (apply 'dotemacs-eval-mode-line-segment
-                                             s nest-props))
-                                    segment))))
-              (when results
-                (setf (segment-objects result)
-                      (apply 'append (dotemacs-intersperse
-                                      (mapcar 'segment-objects results)
-                                      (list separator))))
-                (setf (segment-face-left result)
-                      (segment-face-left (car results)))
-                (setf (segment-face-right result)
-                      (segment-face-right (car (last results))))
-                (setf (segment-tight-left result)
-                      (segment-tight-left (car results)))
-                (setf (segment-tight-right result)
-                      (segment-tight-right (car (last results)))))))
-           ;; A single symbol
-           ((symbolp segment)
-            (setf (segment-objects result)
-                  (mapcar (lambda (s)
-                            (if (dotemacs-imagep s) s (powerline-raw s face)))
-                          (funcall segment-symbol))))
-           ;; A literal value
-           (t (setf (segment-objects result)
-                    (list (powerline-raw (format "%s" segment) face))))))
-
-        (cond
-         ;; This segment produced output, so return it
-         ((segment-objects result) result)
-         ;; Return the fallback segment, if any
-         ((plist-get props :fallback)
-          (apply 'dotemacs-eval-mode-line-segment
-                 (plist-get props :fallback) nest-props))
-         ;; No output (objects = nil)
-         (t result))))
-
-    (defun dotemacs-mode-line-prepare-any (spec side)
-      "Prepares one side of the modeline. `SPEC' is a list of segment
-specifications (see `dotemacs-eval-mode-line-segment'), and `SIDE' is
-one of `l' or `r'."
-      (let* ((active (powerline-selected-window-active))
-             (line-face (if active 'powerline-active2 'powerline-inactive2))
-             (default-face (if active 'powerline-active1 'powerline-inactive1))
-             (other-face (if active 'mode-line 'mode-line-inactive))
-             (state-face (if active (dotemacs-current-state-face) line-face))
-
-             ;; Loop through the segments and collect the results
-             (segments (loop with result
-                             for s in spec
-                             do (setq result (dotemacs-eval-mode-line-segment s))
-                             if (segment-objects result)
-                               collect result
-                               and do (rotatef default-face other-face)))
-
-             (dummy (make-segment :face-left line-face :face-right line-face))
-             (separator-style (format "powerline-%S" powerline-default-separator))
-             (default-separator (intern (format "%s-%S" separator-style
-                                                (car powerline-default-separator-dir))))
-             (other-separator (intern (format "%s-%S" separator-style
-                                              (cdr powerline-default-separator-dir)))))
-
-        ;; Collect all segment values and add separators
-        (apply 'append
-               (mapcar
-                (lambda (pair)
-                  (let* ((lhs (car pair))
-                         (rhs (cdr pair))
-                         (objs (if (eq 'l side) lhs rhs))
-                         (add-sep (not (or (segment-tight-right lhs)
-                                           (segment-tight-left rhs)))))
-                    (rotatef default-separator other-separator)
-                    (append
-                     (when (and (eq 'r side) add-sep)
-                       (list (funcall default-separator
-                                      (segment-face-right lhs)
-                                      (segment-face-left rhs))))
-                     (unless (segment-tight-left objs)
-                       (list (powerline-raw " " (segment-face-left objs))))
-                     (segment-objects objs)
-                     (unless (segment-tight-right objs)
-                       (list (powerline-raw " " (segment-face-right objs))))
-                     (when (and (eq 'l side) add-sep)
-                       (list (funcall default-separator
-                                      (segment-face-right lhs)
-                                      (segment-face-left rhs)))))))
-                (-zip (if (eq 'l side) segments (cons dummy segments))
-                      (if (eq 'l side) (append (cdr segments) (list dummy)) segments))))))
-
-    (defun dotemacs-mode-line-prepare-left ()
-      (dotemacs-mode-line-prepare-any dotemacs-mode-line-left 'l))
-
-    (defun dotemacs-mode-line-prepare-right ()
-      (dotemacs-mode-line-prepare-any dotemacs-mode-line-right 'r))
-
-    (defun dotemacs-mode-line-prepare ()
-      (let* ((active (powerline-selected-window-active))
-             (lhs (dotemacs-mode-line-prepare-left))
-             (rhs (dotemacs-mode-line-prepare-right))
-             (line-face (if active 'powerline-active2 'powerline-inactive2)))
-        (concat (powerline-render lhs)
-                (powerline-fill line-face (powerline-width rhs))
-                (powerline-render rhs))))
-
-    (setq-default mode-line-format
-                  '("%e" (:eval (dotemacs-mode-line-prepare))))
+    (spaceline-spacemacs-theme)
+    (spaceline-helm-mode t)
+    ; (when (configuration-layer/package-usedp 'info+)
+    ;   (spaceline-info-mode t))
 
     (defun dotemacs-restore-powerline (buffer)
       "Restore the powerline in buffer"
       (with-current-buffer buffer
-            (setq-local mode-line-format
-                        '("%e" (:eval (dotemacs-mode-line-prepare))))
-            (powerline-set-selected-window)
-            (powerline-reset)))
+        (setq-local mode-line-format (default-value 'mode-line-format))
+        (powerline-set-selected-window)
+        (powerline-reset)))
 
-    (defun dotemacs-set-powerline-for-startup-buffers ()
-      "Set the powerline for buffers created when Emacs starts."
-      (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
-        (when (get-buffer buffer)
-          (dotemacs-restore-powerline buffer))))
-    (add-hook 'emacs-startup-hook
-              'dotemacs-set-powerline-for-startup-buffers)))
-
-(use-package vim-powerline
-  :ensure powerline
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-set-vimish-powerline-for-startup-buffers ()
-       "Set the powerline for buffers created when Emacs starts."
-       (dolist (buffer '("*Messages*" "*scratch" "*Compile-Log*" "*Require Times*"))
-         (when (get-buffer buffer)
-           (with-current-buffer buffer
-             (setq-local mode-line-format (default-value 'mode-line-format))
-             (powerline-set-selected-window)
-             (powerline-reset)))))
-     (add-hook 'emacs-startup-hook
-               'dotemacs-set-vimish-powerline-for-startup-buffers)))
+    (defun dotemacs//prepare-diminish ()
+      (when spaceline-minor-modes-p
+        (let ((unicodep (dotemacs-symbol-value
+                         dotemacs-mode-line-unicode-symbols)))
+          (setq spaceline-minor-modes-separator
+                (if unicodep (if (display-graphic-p) "" " ") "|"))
+          (dolist (mm dotemacs--diminished-minor-modes)
+            (let ((mode (car mm)))
+              (when (and (boundp mode) (symbol-value mode))
+                (let* ((unicode (cadr mm))
+                       (ascii (caddr mm))
+                       (dim (if unicodep
+                                unicode
+                              (if ascii ascii unicode))))
+                  (diminish mode dim))))))))
+    (add-hook 'spaceline-pre-hook 'dotemacs//prepare-diminish)))
 
 (use-package fancy-battery              ; Fancy battery info for mode line
   :ensure t

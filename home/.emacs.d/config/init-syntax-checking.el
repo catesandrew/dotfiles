@@ -46,26 +46,6 @@ most errors from HTML Tidy."
                   'mouse-face 'mode-line-highlight
                   'local-map map))))
 
-;; color mode line faces
-(defun dotemacs-defface-flycheck-mode-line-color (state)
-  "Define a face for the given Flycheck STATE."
-  (let* ((fname (intern (format "dotemacs-mode-line-flycheck-%s-face"
-                                (symbol-name state))))
-        (foreground (face-foreground
-                     (intern (format "flycheck-fringe-%s" state)))))
-    (eval `(defface ,fname '((t ()))
-             ,(format "Color for Flycheck %s feedback in mode line."
-                      (symbol-name state))
-             :group 'spacemacs))
-    (set-face-attribute fname nil
-                        :foreground foreground
-                        :box (face-attribute 'mode-line :box))))
-
-(defun dotemacs-set-flycheck-mode-line-faces ()
-  "Define or set the flycheck info mode-line faces."
-  (mapcar 'dotemacs-defface-flycheck-mode-line-color
-          '(error warning info)))
-
 (defun dotemacs-mode-line-flycheck-info-toggle ()
   "Toggle display of flycheck info."
   (interactive)
