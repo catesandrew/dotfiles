@@ -3916,6 +3916,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (evil-leader/set-key-for-mode 'markdown-mode
     "mcr"  'gh-md-render-buffer))
 
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (add-hook 'markdown-mode-hook 'smartparens-mode)))
+
 (use-package markdown-mode              ; Markdown
   :mode (("\\.m[k]d" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
@@ -10278,7 +10283,7 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
 
     ;; TODO move these hooks into their layers
-    ;; (dolist (hook '(LaTeX-mode-hook markdown-mode-hook web-moode-hook inferior-python-mode-hook))
+    ;; (dolist (hook '(LaTeX-mode-hook web-moode-hook inferior-python-mode-hook))
     ;;   (add-hook hook #'smartparens-mode))
 
     (dotemacs-add-toggle smartparens
