@@ -10984,6 +10984,11 @@ If the error list is visible, hide it.  Otherwise, show it."
               'dotemacs-set-powerline-for-startup-buffers))
   :config
   (progn
+    (spaceline-toggle-battery-off)
+    (spaceline-toggle-version-control-off)
+    (spaceline-toggle-minor-modes-off)
+    (spaceline-toggle-org-clock-off)
+
     (defun dotemacs/customize-powerline-faces ()
       "Alter powerline face to make them work with more themes."
       (set-face-attribute 'powerline-inactive2 nil
@@ -11005,10 +11010,7 @@ If the error list is visible, hide it.  Otherwise, show it."
                                          (replace-regexp-in-string
                                           "-" " " (format "%S" segment)))
                  :evil-leader ,(cadr spec)))))
-    (setq spaceline-org-clock-p nil
-          spaceline-battery nil
-          spaceline-version-control nil
-          spaceline-minor-modes nil)
+    (setq spaceline-org-clock-p nil)
 
     (defun dotemacs//evil-state-face ()
       (if (bound-and-true-p evil-state)
