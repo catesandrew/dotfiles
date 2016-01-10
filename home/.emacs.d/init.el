@@ -1862,7 +1862,6 @@ the user activate the completion manually."
         (let* ((fwp (if (> (x-display-pixel-width) 1680) 120 90))
                (fhp (/ (- (x-display-pixel-height) 60)
                        (frame-char-height))))
-          ; (message "!!! Frame width %s, height %s" fwp fhp)
           (setq dotemacs//frame-width fwp)
           (setq dotemacs//frame-height fhp)
           (add-to-list 'initial-frame-alist `(width . ,dotemacs//frame-width))
@@ -1874,18 +1873,6 @@ the user activate the completion manually."
 
     (dotemacs|do-after-display-system-init
       (dotemacs-set-frame-size))
-
-    ; (add-hook 'before-make-frame-hook
-    ;   (lambda ()
-    ;     (when
-    ;       (and
-    ;         dotemacs//frame-width
-    ;         dotemacs//frame-height)
-    ;         ; (message "!!! before make frame width %s" dotemacs//frame-width)
-    ;         ; (message "!!! before make frame height %s" dotemacs//frame-height)
-    ;         (add-to-list 'default-frame-alist `(height . ,dotemacs//frame-height))
-    ;         (add-to-list 'default-frame-alist `(width  . ,dotemacs//frame-width))
-    ;         )))
 
     ;; Kill `suspend-frame'
     (global-set-key (kbd "C-z") nil)
