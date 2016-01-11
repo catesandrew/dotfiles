@@ -3491,10 +3491,6 @@ It will toggle the overlay under point or create an overlay of one character."
 (use-package evil-indent-textobject
   :quelpa (evil-indent-textobject :fetcher github :repo "TheBB/evil-indent-textobject"))
 
-(use-package evil-easymotion
-  :ensure t
-  :init (after "evil"))
-
 (use-package evil-numbers
   :ensure t
   :config
