@@ -8136,10 +8136,10 @@ If called with a prefix argument, uses the other-window instead."
   :config
   (progn
     ;; Use `grep-find-ignored-files' and `grep-find-ignored-directories' as
-    ;; ignore pattern
+    ;; ignore pattern, but does not seem to be working, need to confirm
     (setq helm-ag-use-grep-ignore-list t)
 
-    ;; (helm-ag-ignore-patterns '("*.md" "*.el"))
+    ;; example: (helm-ag-ignore-patterns '("*.md" "*.el"))
     ;; (setq helm-ag-ignore-patterns '(append grep-find-ignored-files
     ;;                                        grep-find-ignored-directories))
 
@@ -8349,35 +8349,6 @@ If called with a prefix argument, uses the other-window instead."
 
 ;;; Project management with Projectile
 
-;; To ignore files for grepping with `helm-projectile-grep/ack`, you must
-;; customize either one of these four variables:
-;; - `grep-find-ignored-files`: List of file names which rgrep and lgrep
-;;   shall exclude. helm-projectile-grep also uses this variable.
-;; - `grep-find-ignored-directories`: List of names of sub-directories which
-;;   rgrep shall not recurse into. helm-projectile-grep also uses this
-;;   variable.
-;; - `projectile-globally-ignored-files`: A list of files globally ignored by
-;;   Projectile.
-;; - `projectile-globally-ignored-directories`: A list of directories
-;;   globally ignored by Projectile.
-;;
-;; You can add to this to your `init.el`:
-;;
-;; ```
-;; (add-to-list 'projectile-globally-ignored-files "*.png")
-;; ```
-;;
-;; Add more if you want.
-;;
-;; Alternatively, `C-h v` then type `projectile-globally-ignored-files`. In the
-;; customization window, press `INS` button and add "*.png", then press `State`
-;; button and choose `Save for future session`.
-;;
-;; You can read [the guide][1] for `helm-projectile-grep/ack/ag`
-;;
-;; **EDIT**: Don't put it in `.projectile` files or your files won't be ignored when grepping.
-;;
-;; [1]: http://tuhdo.github.io/helm-projectile.html#sec-9
 (use-package projectile
   :ensure t
   :defer 1.4
@@ -8558,54 +8529,6 @@ If called with a prefix argument, uses the other-window instead."
       "pr"  'helm-projectile-recentf
       "pv"  'projectile-vc
       "sgp" 'helm-projectile-grep)))
-
-
-;;; Project management with Project Explorer
-; todo: make choice between project explorer and neo-tree
-(use-package project-explorer
-  :disabled t
-  :defer t
-  :ensure t
-  :commands (project-explorer-open
-             project-explorer-toggle)
-  :init
-  (progn
-    (evil-leader/set-key
-      "tn" 'project-explorer-open
-      "tN" 'project-explorer-toggle)
-    (setq pe/cache-directory (concat dotemacs-cache-directory "project-explorer")))
-  :config
-  (progn
-    (define-key project-explorer-mode-map (kbd "C-l") 'evil-window-right)
-    (evil-set-initial-state 'project-explorer-mode 'normal)
-    (evil-define-key 'normal project-explorer-mode-map
-      (kbd "+") 'pe/create-file
-      (kbd "-") 'pe/delete-file
-      (kbd "x") 'pe/fold
-      (kbd "u") 'pe/up-element
-      (kbd "a") 'pe/goto-top
-      (kbd "TAB") 'pe/tab
-      (kbd "<backtab>") 'pe/backtab
-      (kbd "J") 'pe/forward-element
-      (kbd "K") 'pe/backward-element
-      (kbd "]") 'pe/forward-element
-      (kbd "[") 'pe/backward-element
-      (kbd "n") 'next-line
-      (kbd "p") 'previous-line
-      (kbd "j") 'next-line
-      (kbd "k") 'previous-line
-      (kbd "l") 'forward-char
-      (kbd "h") 'backward-char
-      (kbd "RET") 'pe/return
-      (kbd "q") 'pe/quit
-      [escape] 'pe/quit
-      (kbd "s") 'pe/change-directory
-      (kbd "r") 'pe/rename-file
-      (kbd "c") 'pe/copy-file
-      (kbd "f") 'pe/find-file
-      (kbd "w") 'pe/copy-file-name-as-kill
-      (kbd "M-l") 'pe/set-filter-regex
-      (kbd "M-o") 'pe/toggle-omit)))
 
 
 ;;; Project management with NeoTree
