@@ -176,7 +176,8 @@ with 2 themes variants, one dark and one light")
   :group 'dotemacs)
 
 (defcustom dotemacs-colorize-cursor-according-to-state t
-  "If non nil the cursor color matches the state color."
+  "If non nil the cursor color matches the state color in GUI
+Emacs."
   :group 'dotemacs)
 
 (defcustom dotemacs-remap-Y-to-y$ t
