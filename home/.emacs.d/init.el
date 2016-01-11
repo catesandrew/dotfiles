@@ -180,7 +180,7 @@ with 2 themes variants, one dark and one light")
 Emacs."
   :group 'dotemacs)
 
-(defcustom dotemacs-remap-Y-to-y$ t
+(defvaralias 'dotemacs-remap-Y-to-y$ 'evil-want-Y-yank-to-eol
   "If non nil `Y' is remapped to `y$'."
   :group 'dotemacs)
 
@@ -3165,9 +3165,9 @@ Disable the highlighting of overlong lines."
           do
           (eval `(defface ,(intern (format "dotemacs-%s-face" state))
                    `((t (:background ,color
-                                    :foreground ,(face-background 'mode-line)
-                                    :box ,(face-attribute 'mode-line :box)
-                                    :inherit 'mode-line)))
+                                     :foreground ,(face-background 'mode-line)
+                                     :box ,(face-attribute 'mode-line :box)
+                                     :inherit 'mode-line)))
                    (format "%s state face." state)
                    :group 'dotemacs))
           (eval `(setq ,(intern (format "evil-%s-state-cursor" state))
@@ -3239,17 +3239,6 @@ Disable the highlighting of overlong lines."
     (define-key evil-window-map (kbd "<right>") 'evil-window-right)
     (define-key evil-window-map (kbd "<up>") 'evil-window-up)
     (define-key evil-window-map (kbd "<down>") 'evil-window-down)
-    ;; Make Y equivalent to y$
-    (defun dotemacs/evil-yank-to-end-of-line ()
-      "Yank from point to end of line."
-      (interactive)
-      (evil-yank (point) (point-at-eol)))
-    (when dotemacs-remap-Y-to-y$
-      (define-key evil-normal-state-map (kbd "Y")
-        'dotemacs/evil-yank-to-end-of-line)
-      (define-key evil-motion-state-map (kbd "Y")
-        'dotemacs/evil-yank-to-end-of-line))
-
 
     (evil-leader/set-key "re" 'evil-show-registers)
 
