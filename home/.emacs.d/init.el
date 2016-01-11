@@ -2932,37 +2932,35 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 (use-package expand-region              ; Expand region by semantic units
   :ensure t
-  :bind (("C-=" . er/expand-region))
   :defer t
   :init (evil-leader/set-key "v" 'er/expand-region)
   :config
   (progn
     ;; add search capability to expand-region
-    (after "helm-ag"
-      (defadvice er/prepare-for-more-expansions-internal
-          (around helm-ag/prepare-for-more-expansions-internal activate)
-        ad-do-it
-        (let ((new-msg (concat (car ad-return-value)
-                               ", / to search in project, "
-                               "f to search in files, "
-                               "b to search in opened buffers"))
-              (new-bindings (cdr ad-return-value)))
-          (cl-pushnew
-           '("/" (lambda ()
-                   (call-interactively
-                    'dotemacs-helm-project-smart-do-search-region-or-symbol)))
-           new-bindings)
-          (cl-pushnew
-           '("f" (lambda ()
-                   (call-interactively
-                    'dotemacs-helm-files-smart-do-search-region-or-symbol)))
-           new-bindings)
-          (cl-pushnew
-           '("b" (lambda ()
-                   (call-interactively
-                    'dotemacs-helm-buffers-smart-do-search-region-or-symbol)))
-           new-bindings)
-            (setq ad-return-value (cons new-msg new-bindings)))))
+    (defadvice er/prepare-for-more-expansions-internal
+        (around helm-ag/prepare-for-more-expansions-internal activate)
+      ad-do-it
+      (let ((new-msg (concat (car ad-return-value)
+                             ", / to search in project, "
+                             "f to search in files, "
+                             "b to search in opened buffers"))
+            (new-bindings (cdr ad-return-value)))
+        (cl-pushnew
+         '("/" (lambda ()
+                 (call-interactively
+                  'dotemacs-helm-project-smart-do-search-region-or-symbol)))
+         new-bindings)
+        (cl-pushnew
+         '("f" (lambda ()
+                 (call-interactively
+                  'dotemacs-helm-files-smart-do-search-region-or-symbol)))
+         new-bindings)
+        (cl-pushnew
+         '("b" (lambda ()
+                 (call-interactively
+                  'dotemacs-helm-buffers-smart-do-search-region-or-symbol)))
+         new-bindings)
+        (setq ad-return-value (cons new-msg new-bindings))))
     (setq expand-region-contract-fast-key "V"
           expand-region-reset-fast-key "r")))
 
@@ -8141,8 +8139,6 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package helm-ag
   :ensure t
-  :bind (("C-c a a" . helm-do-ag)
-         ("C-c a A" . helm-ag))
   :defer t
   :init
   (progn
@@ -8152,6 +8148,8 @@ If called with a prefix argument, uses the other-window instead."
              (kbd "q") 'quit-window)
 
     (evil-leader/set-key
+      ;; helm-ag marks
+      "s`"  'helm-ag-pop-stack
       ;; opened buffers scope
       "sb"  'dotemacs-helm-buffers-smart-do-search
       "sB"  'dotemacs-helm-buffers-smart-do-search-region-or-symbol
@@ -8186,15 +8184,20 @@ If called with a prefix argument, uses the other-window instead."
       "stP" 'dotemacs-helm-project-do-pt-region-or-symbol))
   :config
   (progn
+    ;; Use `grep-find-ignored-files' and `grep-find-ignored-directories' as
+    ;; ignore pattern
+    (setq helm-ag-use-grep-ignore-list t)
+
+    ;; (helm-ag-ignore-patterns '("*.md" "*.el"))
+    ;; (setq helm-ag-ignore-patterns '(append grep-find-ignored-files
+    ;;                                        grep-find-ignored-directories))
+
     (setq helm-ag-fuzzy-match t
-          helm-ag-use-grep-ignore-list t ;; Use `grep-find-ignored-files'
-                                         ;; and `grep-find-ignored-directories'
-                                         ;; as ignore pattern
+          helm-ag-base-command "ag --nocolor --nogroup --hidden"
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
 
     (evil-define-key 'normal helm-ag-map "SPC" evil-leader--default-map)
-
     (evilify helm-ag-mode helm-ag-mode-map
              (kbd "RET") 'helm-ag-mode-jump-other-window
              (kbd "q") 'quit-window))
