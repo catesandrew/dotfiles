@@ -4991,7 +4991,7 @@ point. Requires smartparens because all movement is done using
 
 (use-package pylookup
   :quelpa (pylookup :fetcher github :repo "tsgates/pylookup")
-  :commands pylookup-lookup
+  :commands (pylookup-lookup pylookup-update pylookup-update-all)
   :init
   (progn
     (evilify pylookup-mode pylookup-mode-map)
@@ -5000,9 +5000,9 @@ point. Requires smartparens because all movement is done using
   :config
   (progn
     (let ((dir dotemacs-quelpa-build-directory))
-      (setq pylookup-dir (concat dir "/pylookup")
-            pylookup-program (concat pylookup-dir "/pylookup.py")
-            pylookup-db-file (concat pylookup-dir "/pylookup.db")))))
+      (setq pylookup-dir (concat dir "pylookup/")
+            pylookup-program (concat pylookup-dir "pylookup.py")
+            pylookup-db-file (concat pylookup-dir "pylookup.db")))))
 
 (use-package py-yapf
   :ensure t
