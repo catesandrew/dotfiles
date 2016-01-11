@@ -1213,17 +1213,7 @@ the user activate the completion manually."
 
 (use-package init-macosx              ; Personal OS X tools
   :if (eq system-type 'darwin)
-  :load-path "config/"
-  :config
-  (progn
-    ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
-    ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
-    ;; warnings, when not using `coreutils' version of 'ls' on OS X.
-    ;; See brew info coreutils
-    (when-let (gnu-ls (and (eq system-type 'darwin)
-                             (executable-find "gls")))
-      (setq insert-directory-program gnu-ls
-            dired-listing-switches "-aBhl --group-directories-first"))))
+  :load-path "config/")
 
 (use-package osx-trash                  ; Trash support for OS X
   :if (eq system-type 'darwin)
@@ -2121,61 +2111,6 @@ the user activate the completion manually."
   :init
   (evil-leader/set-key "fJ" 'open-junk-file)
   (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/")))
-
-(use-package dired                      ; Edit directories
-  :defer t
-  :config
-  (progn
-    (require 'dired-x)
-
-    (defun dotemacs-dired-mode-defaults ()
-      (unless (bound-and-true-p my-dmh-ran)
-        ;; add buffer-local indicator for whether dired-mode-hook has run.
-        (set (make-local-variable 'my-dmh-ran) t)
-        ;; disable line wrap
-        (unless (bound-and-true-p truncate-lines)
-          (setq truncate-lines t))))
-    (add-hook 'dired-mode-hook #'dotemacs-dired-mode-defaults)
-    (add-hook 'dired-mode-hook 'vinegar/dired-setup)
-
-    (setq dired-auto-revert-buffer t    ; Revert on re-visiting
-          ;; Move files between split panes
-          dired-dwim-target t
-          ;; Better dired flags: `-l' is mandatory, `-a' shows all files, `-h'
-          ;; uses human-readable sizes, and `-F' appends file-type classifiers
-          ;; to file names (for better highlighting)
-          dired-listing-switches "-alhF"
-          dired-ls-F-marks-symlinks t   ; -F marks links with @
-          ;; Inhibit prompts for simple recursive operations
-          dired-recursive-copies 'always)
-
-    (when (or (memq system-type '(gnu gnu/linux))
-              (string= (file-name-nondirectory insert-directory-program) "gls"))
-      ;; If we are on a GNU system or have GNU ls, add some more `ls' switches:
-      ;; `--group-directories-first' lists directories before files, and `-v'
-      ;; sorts numbers in file names naturally, i.e. "image1" goes before
-      ;; "image02"
-      (setq dired-listing-switches
-            (concat dired-listing-switches " --group-directories-first -v")))))
-
-(use-package dired-x                    ; Additional tools for Dired
-  :bind (("C-x C-j" . dired-jump))
-  :init (add-hook 'dired-mode-hook #'dired-omit-mode)
-  :config
-  (progn
-    (setq dired-omit-verbose nil)        ; Shut up, dired
-
-    (when (eq system-type 'darwin)
-      ;; OS X bsdtar is mostly compatible with GNU Tar
-      (setq dired-guess-shell-gnutar "tar"))
-
-    ;; Diminish dired-omit-mode. We need this hack, because Dired Omit Mode has
-    ;; a very peculiar way of registering its lighter explicitly in
-    ;; `dired-omit-startup'.  We can't just use `:diminish' because the lighter
-    ;; isn't there yet after dired-omit-mode is loaded.
-    (add-function :after (symbol-function 'dired-omit-startup)
-                  (lambda () (diminish 'dired-omit-mode))
-                  '((name . dired-omit-mode-diminish)))))
 
 (use-package helm-files
   :ensure helm
@@ -9409,13 +9344,94 @@ If called with a prefix argument, uses the other-window instead."
 ;    single bar
 ; -  right mouse click moves up directory if in blank space or shows context menu
 
+(defvar vinegar-reuse-dired-buffer nil
+  "If non-nil, reuses one dired buffer for navigation.")
+
 (use-package init-vinegar
   :load-path "config/"
   :defer t
-  :commands (vinegar/dired-setup))
+  :commands (vinegar/dired-setup
+             dotemacs-dired-mode-defaults))
 
-(defvar vinegar-reuse-dired-buffer nil
-  "If non-nil, reuses one dired buffer for navigation.")
+; (require 'dired-x)
+(use-package dired-x                    ; Additional tools for Dired
+  :init
+  (progn
+    (add-hook 'dired-mode-hook 'vinegar/dired-setup)
+    (add-hook 'dired-mode-hook 'dotemacs-dired-mode-defaults))
+  :config
+  (progn
+    (define-key evil-normal-state-map (kbd "-") 'dired-jump)
+
+    (when (eq system-type 'darwin)
+      ;; OS X bsdtar is mostly compatible with GNU Tar
+      (setq dired-guess-shell-gnutar "tar"))
+
+    ;; Diminish dired-omit-mode. We need this hack, because Dired Omit Mode has
+    ;; a very peculiar way of registering its lighter explicitly in
+    ;; `dired-omit-startup'.  We can't just use `:diminish' because the lighter
+    ;; isn't there yet after dired-omit-mode is loaded.
+    ;; (add-function :after (symbol-function 'dired-omit-startup)
+    ;;               (lambda () (diminish 'dired-omit-mode))
+    ;;               '((name . dired-omit-mode-diminish)))
+    ))
+
+(use-package dired                      ; Edit directories
+  :defer t
+  :config
+  (progn
+    (evilify dired-mode dired-mode-map
+      "j"         'vinegar/move-down
+      "k"         'vinegar/move-up
+      "-"         'vinegar/up-directory
+      "0"         'dired-back-to-start-of-files
+      "="         'vinegar/dired-diff
+      (kbd "C-j") 'dired-next-subdir
+      (kbd "C-k") 'dired-prev-subdir
+      "I"         'vinegar/dotfiles-toggle
+      (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
+      (kbd "RET") (if vinegar-reuse-dired-buffer
+                      'dired-find-alternate-file
+                    'dired-find-file)
+      "f"         'helm-find-files
+      "J"         'dired-goto-file
+      (kbd "C-f") 'find-name-dired
+      "H"         'diredp-dired-recent-dirs
+      "T"         'dired-tree-down
+      "K"         'dired-do-kill-lines
+      "r"         'revert-buffer
+      "C-r"       'dired-do-redisplay
+      "gg"        'vinegar/back-to-top
+      "G"         'vinegar/jump-to-bottom)
+
+    (setq dired-auto-revert-buffer t    ; Revert on re-visiting
+          ;; Move files between split panes
+          dired-dwim-target t
+          ;; Better dired flags: `-l' is mandatory, `-a' shows all files, `-h'
+          ;; uses human-readable sizes, and `-F' appends file-type classifiers
+          ;; to file names (for better highlighting)
+          dired-listing-switches "-alhF"
+          dired-ls-F-marks-symlinks t   ; -F marks links with @
+          ;; Inhibit prompts for simple recursive operations
+          dired-recursive-copies 'always)
+
+    ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
+    ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
+    ;; warnings, when not using `coreutils' version of 'ls' on OS X.
+    ;; See brew info coreutils
+    (when-let (gnu-ls (and (eq system-type 'darwin)
+                             (executable-find "gls")))
+      (setq insert-directory-program gnu-ls
+            dired-listing-switches "-aBhl --group-directories-first"))
+
+    (when (or (memq system-type '(gnu gnu/linux))
+              (string= (file-name-nondirectory insert-directory-program) "gls"))
+      ;; If we are on a GNU system or have GNU ls, add some more `ls' switches:
+      ;; `--group-directories-first' lists directories before files, and `-v'
+      ;; sorts numbers in file names naturally, i.e. "image1" goes before
+      ;; "image02"
+      (setq dired-listing-switches
+            (concat dired-listing-switches " --group-directories-first -v")))))
 
 (use-package dired+
   :defer t
@@ -9428,35 +9444,6 @@ If called with a prefix argument, uses the other-window instead."
           ;; disable font themeing from dired+
           font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
     (toggle-diredp-find-file-reuse-dir 1)))
-
-(with-eval-after-load 'dired-x
-  (progn
-    (define-key evil-normal-state-map (kbd "-") 'dired-jump)))
-
-(with-eval-after-load 'dired-mode
-  (evilify dired-mode dired-mode-map
-           "j"         'vinegar/move-down
-           "k"         'vinegar/move-up
-           "-"         'vinegar/up-directory
-           "0"         'dired-back-to-start-of-files
-           "="         'vinegar/dired-diff
-           (kbd "C-j") 'dired-next-subdir
-           (kbd "C-k") 'dired-prev-subdir
-           "I"         'vinegar/dotfiles-toggle
-           (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
-           (kbd "RET") (if vinegar-reuse-dired-buffer
-                           'dired-find-alternate-file
-                         'dired-find-file)
-           "f"         'helm-find-files
-           "J"         'dired-goto-file
-           (kbd "C-f") 'find-name-dired
-           "H"         'diredp-dired-recent-dirs
-           "T"         'dired-tree-down
-           "K"         'dired-do-kill-lines
-           "r"         'revert-buffer
-           "C-r"       'dired-do-redisplay
-           "gg"        'vinegar/back-to-top
-           "G"         'vinegar/jump-to-bottom))
 
 ;; unimpaired
 
