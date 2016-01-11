@@ -7592,10 +7592,6 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package magit                      ; The one and only Git frontend
   :ensure t
-  :bind (("C-c v g" . magit-status)
-         ("C-c v v" . magit-status)
-         ("C-c v b" . magit-blame-mode)
-         ("C-c v l" . magit-log-all))
   :commands (magit-status
              magit-blame-mode
              magit-log
@@ -7994,11 +7990,6 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package ag                         ; Search code in files/projects
   :ensure t
-  :bind (("C-c a d" . ag-dired-regexp)
-         ("C-c a D" . ag-dired)
-         ("C-c a f" . ag-files)
-         ("C-c a k" . ag-kill-other-buffers)
-         ("C-c a K" . ag-kill-buffers))
   :config
   ; (add-hook 'ag-mode-hook (lambda () (toggle-truncate-lines t)))
   (setq ag-reuse-buffers t            ; Don't spam buffer list with ag buffers
