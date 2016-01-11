@@ -705,7 +705,7 @@ group by projectile projects."
   (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                            ("org" . "http://orgmode.org/elpa/")
                            ; ("ELPA" . "http://tromey.com/elpa/")
-                           ; ("gnu" . "http://elpa.gnu.org/packages/")
+                           ("gnu" . "http://elpa.gnu.org/packages/")
                            ))
   ;; optimization, no need to activate all the packages so early
   ;; http://stackoverflow.com/questions/11127109/
