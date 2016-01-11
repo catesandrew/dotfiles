@@ -9663,10 +9663,6 @@ If called with a prefix argument, uses the other-window instead."
   :post-init
   (add-hook 'puppet-mode-hook 'flycheck-turn-on-maybe))
 
-(use-package puppetfile-mode
-  :ensure t
-  :defer t)
-
 
 ;;; Finance
 (dotemacs-defvar-company-backends ledger-mode)
