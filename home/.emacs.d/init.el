@@ -8445,7 +8445,7 @@ If called with a prefix argument, uses the other-window instead."
       (when (fboundp 'neotree-projectile-action)
         (when (neo-global--window-exists-p)
           (neotree-projectile-action))))
-    (setq projectile-switch-project-action #'dotemacs-projectile-switch-project)
+    (setq projectile-switch-project-action 'dotemacs-projectile-switch-project)
 
     (defconst dotemacs-use-helm-projectile t
       "This variable is only defined if helm-projectile is used.")
