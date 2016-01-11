@@ -2082,10 +2082,6 @@ the user activate the completion manually."
 ;; Keep backup files out of the way
 (setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups"))))
 
-; (defconst dotemacs-auto-save-directory
-;   (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
-;   "dotemacs auto-save directory")
-
 ;; Auto-save file
 (setq auto-save-default (not (null dotemacs-auto-save-file-location)))
 (setq auto-save-list-file-prefix (concat dotemacs-auto-save-directory))
@@ -2098,7 +2094,7 @@ the user activate the completion manually."
               (null dotemacs-auto-save-file-location))
     (make-directory autosave-dir t)))
 ;; Choose auto-save location
-(case dotemacs-auto-save-file-location
+(cl-case dotemacs-auto-save-file-location
   (cache (let ((autosave-dir (concat dotemacs-auto-save-directory "site/")))
            (add-to-list 'auto-save-file-name-transforms
                         `(".*" ,autosave-dir t) 'append)
