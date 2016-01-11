@@ -9976,7 +9976,7 @@ If called with a prefix argument, uses the other-window instead."
       :evil-leader "tha")
 
     (dotemacs/add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
-                                                          markdown-mode-hook)))
+                                                         markdown-mode-hook)))
   :config
   (progn
     (dotemacs-hide-lighter auto-highlight-symbol-mode)
@@ -10624,7 +10624,7 @@ If the error list is visible, hide it.  Otherwise, show it."
     (setq flyspell-use-meta-tab nil
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
-    (dolist (hook '(text-mode-hook message-mode-hook))
+    (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
       (add-hook hook 'flyspell-mode))
     (dotemacs-add-toggle spelling-checking
       :status flyspell-mode
