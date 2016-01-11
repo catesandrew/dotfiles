@@ -8157,16 +8157,6 @@ If called with a prefix argument, uses the other-window instead."
 ;;; Project management for Interactively Do Things (IDO)
 
 (use-package ido
-  :preface
-  (progn
-    ;; `defvar's to prevent compile warnings
-    ;; https://github.com/DarwinAwardWinner/ido-ubiquitous/issues/68
-    (defvar ido-cur-item nil)
-    (defvar ido-default-item nil)
-    (defvar predicate nil)
-    (defvar inherit-input-method nil)
-    (defvar ido-cur-list nil)
-    (defvar ido-context-switch-command nil))
   :init
   (progn
     (setq ido-enable-flex-matching t ;; enable fuzzy matching
@@ -8174,10 +8164,8 @@ If called with a prefix argument, uses the other-window instead."
           ido-enable-prefix nil
           ido-create-new-buffer 'always
           ido-use-filename-at-point 'guess
-          ido-max-prospects 10
           ido-save-directory-list-file (concat dotemacs-cache-directory "ido.last")
           ido-default-file-method 'selected-window
-          ido-everywhere t
           ido-auto-merge-work-directories-length 0))
   :config
   (progn
