@@ -2530,8 +2530,6 @@ the user activate the completion manually."
       "ar" 'ranger
       "ad" 'deer)
 
-    (define-key evil-normal-state-map (kbd "-") 'deer)
-
     ;; set up image-dired to allow picture resize
     (setq image-dired-dir (concat dotemacs-cache-directory "image-dir"))
     (unless (file-directory-p image-dired-dir)
