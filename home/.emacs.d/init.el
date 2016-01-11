@@ -927,8 +927,9 @@ group by projectile projects."
       ;; login profile. Notably, this affects /usr/texbin from MacTeX
       (setq exec-path-from-shell-arguments '("-l")))
 
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
+    (dotemacs|do-after-display-system-init
+     (when (memq window-system '(mac ns x))
+       (exec-path-from-shell-initialize)))
 
     (setq user-mail-address (getenv "EMAIL")))
   :config
@@ -2346,19 +2347,17 @@ the user activate the completion manually."
   :init
   (progn
     (setq auto-revert-check-vc-info nil
+          auto-revert-mode-text " ♻"
+          auto-revert-tail-mode-text " ♻~"
           auto-revert-verbose nil)
-    (if (not (not window-system))
-        (setq auto-revert-mode-text " ♻"
-              auto-revert-tail-mode-text " ♻~")
-      (setq auto-revert-mode-text " ar"
-            auto-revert-tail-mode-text " ar~"))
     (defun auto-revert-turn-on-maybe ()
       (unless (current-buffer-remote-p)
         (auto-revert-mode)))
     (add-hook 'find-file-hook 'auto-revert-turn-on-maybe))
-  :config (setq auto-revert-verbose nil ; Shut up, please!
-                ;; Revert Dired buffers, too
-                global-auto-revert-non-file-buffers t))
+  :config
+  (setq auto-revert-verbose nil ; Shut up, please!
+        ;; Revert Dired buffers, too
+        global-auto-revert-non-file-buffers t))
 
 (use-package image-file                 ; Visit images as images
   :init (auto-image-file-mode))
@@ -5678,8 +5677,9 @@ fix this issue."
   :init
   (evil-leader/set-key-for-mode 'go-mode "mrn" 'go-rename))
 
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-copy-env "GOPATH"))
+(dotemacs|do-after-display-system-init
+ (when (memq window-system '(mac ns x))
+   (exec-path-from-shell-copy-env "GOPATH")))
 
 (use-package go-mode
   :ensure t
@@ -6724,7 +6724,6 @@ If called with a prefix argument, uses the other-window instead."
 ;; can see the effect of your HTML as you type it.
 (use-package impatient-mode
   :ensure t
-  :if window-system
   :defer t
   :init
   (progn
@@ -6733,8 +6732,8 @@ If called with a prefix argument, uses the other-window instead."
       (interactive)
       (impatient-mode)
       (httpd-start))
-
-    (add-hook 'web-mode-hook #'dotemacs-impatient-mode-hook)))
+    (dotemacs|do-after-display-system-init
+     (add-hook 'web-mode-hook 'dotemacs-impatient-mode-hook))))
 
 (use-package css-mode
   :defer t
