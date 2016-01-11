@@ -334,8 +334,8 @@ Ensure that helm is required before calling FUNC."
 (evil-leader/set-key
   "xgl" 'dotemacs/set-google-translate-languages)
 ;; shell ----------------------------------------------------------------------
-(eval-after-load "shell"
-  '(progn
+(with-eval-after-load 'shell
+  (progn
     (evil-define-key 'insert comint-mode-map [up] 'comint-previous-input)
     (evil-define-key 'insert comint-mode-map [down] 'comint-next-input)))
 

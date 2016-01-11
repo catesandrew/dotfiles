@@ -686,43 +686,7 @@ group by projectile projects."
 (require 'core-keybindings)
 
 
-;;; After and other macros
-
-; "After" macro definition
-;
-; http://www.lunaryorn.com/2013/06/25/introducing-with-eval-after-load.html
-;
-; At June, 13th Emacs trunk introduced a new macro `with-eval-after-load`. It
-; behaves like `eval-after-load`, except that it takes multiple unquoted forms
-; and wraps them into a lambda to enable byte compilation:
-;
-; This supersedes much of my last post about byte compilation in
-; `eval-after-load`. However, the new macro does not load the corresponding
-; features during byte compilation, so I’ll wrap my old `after` macro
-; around it to avoid bogus warnings:
-(defmacro after (feature &rest forms)
-  "After FEATURE is loaded, evaluate FORMS.
-
-FORMS is byte compiled.
-
-FEATURE may be a named feature or a file name, see
-`with-eval-after-load' for details."
-  (declare (indent 1) (debug t))
-  `(,(if (or (not byte-compile-current-file)
-             (if (symbolp feature)
-                 (require feature nil :no-error)
-               (load feature :no-message :no-error)))
-         'progn
-       (message "after: cannot find %s" feature)
-       'with-no-warnings)
-    (with-eval-after-load ',feature ,@forms)))
-
-; To ensure compatibility with releases and older snapshot builds, I define
-; with-eval-after-load if it is absent:
-(unless (fboundp 'with-eval-after-load)
-  (defmacro with-eval-after-load (file &rest body)
-    `(eval-after-load ,file
-       `(funcall (function ,(lambda () ,@body))))))
+;;; Macros
 
 (defmacro dotemacs-bind (&rest commands)
   "Convience macro which creates a lambda interactive command."
@@ -1349,19 +1313,19 @@ the user activate the completion manually."
     ;; Minor modes abbrev --------------------------------------------------------
     (dotemacs|do-after-display-system-init
       (when (display-graphic-p)
-        (eval-after-load "eproject"
-          '(diminish 'eproject-mode " eⓅ"))
-        (eval-after-load "flymake"
-          '(diminish 'flymake-mode " Ⓕ2"))))
+        (with-eval-after-load 'eproject
+          (diminish 'eproject-mode " eⓅ"))
+        (with-eval-after-load 'flymake
+          (diminish 'flymake-mode " Ⓕ2"))))
     ;; Minor Mode (hidden) ------------------------------------------------------
-    (eval-after-load 'elisp-slime-nav
-      '(diminish 'elisp-slime-nav-mode))
-    (eval-after-load "hi-lock"
-      '(diminish 'hi-lock-mode))
-    (eval-after-load "abbrev"
-      '(diminish 'abbrev-mode))
-    (eval-after-load "subword"
-      '(when (eval-when-compile (version< "24.3.1" emacs-version))
+    (with-eval-after-load 'elisp-slime-nav
+      (diminish 'elisp-slime-nav-mode))
+    (with-eval-after-load 'hi-lock
+      (diminish 'hi-lock-mode))
+    (with-eval-after-load 'abbrev
+      (diminish 'abbrev-mode))
+    (with-eval-after-load 'subword
+      (when (eval-when-compile (version< "24.3.1" emacs-version))
          (diminish 'subword-mode)))))
 
 ;; Just don’t show them. Use native Emacs controls:
@@ -1746,7 +1710,7 @@ the user activate the completion manually."
     (define-key helm-map (kbd "C-z") 'helm-select-action)
 
     (with-eval-after-load 'helm-mode ; required
-      '(dotemacs-hide-lighter helm-mode))))
+      (dotemacs-hide-lighter helm-mode))))
 
 (use-package helm-ls-git
   :defer t
@@ -1762,33 +1726,32 @@ the user activate the completion manually."
   :ensure t
   :defer t
   :init
-  (after "helm"
-    (progn
-      (setq helm-swoop-split-with-multiple-windows t
-            helm-swoop-use-line-number-face t
-            helm-swoop-split-direction 'split-window-vertically
-            helm-swoop-speed-or-color t
-            helm-swoop-split-window-function 'helm-default-display-buffer
-            helm-swoop-pre-input-function (lambda () ""))
+  (with-eval-after-load 'helm
+    (setq helm-swoop-split-with-multiple-windows t
+          helm-swoop-use-line-number-face t
+          helm-swoop-split-direction 'split-window-vertically
+          helm-swoop-speed-or-color t
+          helm-swoop-split-window-function 'helm-default-display-buffer
+          helm-swoop-pre-input-function (lambda () ""))
 
-      (defun dotemacs-helm-swoop-region-or-symbol ()
-        "Call `helm-swoop' with default input."
-        (interactive)
-        (let ((helm-swoop-pre-input-function
-               (lambda ()
-                 (if (region-active-p)
-                     (buffer-substring-no-properties (region-beginning)
-                                                     (region-end))
-                   (let ((thing (thing-at-point 'symbol t)))
-                     (if thing thing ""))))))
-          (call-interactively 'helm-swoop)))
+    (defun dotemacs-helm-swoop-region-or-symbol ()
+      "Call `helm-swoop' with default input."
+      (interactive)
+      (let ((helm-swoop-pre-input-function
+             (lambda ()
+               (if (region-active-p)
+                   (buffer-substring-no-properties (region-beginning)
+                                                   (region-end))
+                 (let ((thing (thing-at-point 'symbol t)))
+                   (if thing thing ""))))))
+        (call-interactively 'helm-swoop)))
 
-      (evil-leader/set-key
-        "ss"    'helm-swoop
-        "sS"    'dotemacs-helm-swoop-region-or-symbol
-        "s C-s" 'helm-multi-swoop-all)
-      (defadvice helm-swoop (before add-evil-jump activate)
-        (evil-set-jump)))))
+    (evil-leader/set-key
+      "ss"    'helm-swoop
+      "sS"    'dotemacs-helm-swoop-region-or-symbol
+      "s C-s" 'helm-multi-swoop-all)
+    (defadvice helm-swoop (before add-evil-jump activate)
+      (evil-set-jump))))
 
 (use-package helm-misc                  ; Misc helm commands
   :ensure helm
@@ -2482,18 +2445,15 @@ the user activate the completion manually."
          ("C-c f R" . dotemacs-rename-file-and-buffer)
          ("C-c f w" . dotemacs-copy-filename-as-kill)
          ("C-c f u" . dotemacs-find-user-init-file-other-window)
-         ("C-c w ." . dotemacs-browse-feature-url)))
-
-(use-package find-file-hook
-  :defer t
-  :init (after "init-files"
+         ("C-c w ." . dotemacs-browse-feature-url))
+  :config
   (progn
     (add-hook 'find-file-hook
               (lambda ()
                 (unless (eq major-mode 'org-mode)
                   (setq show-trailing-whitespace t))))
     (add-hook 'find-file-hook #'visual-line-mode)
-    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file))))
+    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file)))
 
 (use-package fasd
   :ensure t
@@ -2655,17 +2615,15 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :commands dotemacs-ace-buffer-links
   :init
   (progn
-    (after "info"
-      (bind-key "C-c j l" #'ace-link-info Info-mode-map)
-      '(define-key Info-mode-map "o" 'ace-link-info))
-    (after "help-mode"
+    (define-key dotemacs-buffer-mode-map "o" 'dotemacs-ace-buffer-links)
+    (with-eval-after-load 'info
+      (define-key Info-mode-map "o" 'ace-link-info))
+    (with-eval-after-load 'help-mode
       (defvar help-mode-map)  ; Silence the byte compiler
-      (bind-key "C-c j l" #'ace-link-help help-mode-map)
-      '(define-key help-mode-map "o" 'ace-link-help))
-    (after "eww"
-      '(progn
-         (define-key eww-link-keymap "o" 'ace-link-eww)
-         (define-key eww-mode-map "o" 'ace-link-eww))))
+      (define-key help-mode-map "o" 'ace-link-help))
+    (with-eval-after-load 'eww
+      (define-key eww-link-keymap "o" 'ace-link-eww)
+      (define-key eww-mode-map "o" 'ace-link-eww)))
   :config
   (progn
     (defvar dotemacs--link-pattern "~?/.+\\|\s\\[")
@@ -2685,8 +2643,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
                         (dotemacs-collect-buffer-links)
                         #'avy--overlay-pre))))
             (when res
-            (goto-char (1+ res))
-            (widget-button-press (point)))))))
+              (goto-char (1+ res))
+              (widget-button-press (point)))))))
 
 (use-package ace-window                 ; Fast window switching
   :ensure t
@@ -2748,8 +2706,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; The C-d rebinding that most shell-like buffers inherit from
 ;; comint-mode assumes non-evil configuration with its
 ;; `comint-delchar-or-maybe-eof' function, so we disable it
-(after "comint"
-  '(define-key comint-mode-map (kbd "C-d") nil))
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "C-d") nil))
 
 ;; enable electric indent
 (setq electric-indent-mode 1)
@@ -3430,9 +3388,8 @@ It will toggle the overlay under point or create an overlay of one character."
   :config
   (progn
     ;; Unset shortcuts which shadow evil leader
-    (after "compile"
-      '(progn
-         (define-key compilation-mode-map (kbd "h") nil)))
+    (with-eval-after-load 'compile
+      (define-key compilation-mode-map (kbd "h") nil))
       ;; evil-leader does not get activated in existing buffers, so we have to
       ;; force it here
       (dolist (buffer (buffer-list))
@@ -3671,8 +3628,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package init-bindings
   :load-path "config/"
   :init
-  (progn (after "projectile"
-           (dotemacs-toggle-transparency))))
+  (with-eval-after-load 'projectile
+                        (dotemacs-toggle-transparency)))
 
 
 ;;; Text editing
@@ -3845,7 +3802,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package auctex-latexmk             ; latexmk command for AUCTeX
   :ensure t
   :defer t
-  :init (after "latex"
+  :init (with-eval-after-load 'latex
           (auctex-latexmk-setup)))
 
 (use-package bibtex                     ; BibTeX editing
@@ -4173,7 +4130,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
          ("\\.handlebars$" . handlebars-mode))
   :init
   (progn
-    (after "flycheck"
+    (with-eval-after-load 'flycheck
       (when-let (handlebars (executable-find "handlebars"))
                 (setq flycheck-handlebars-executable handlebars)))))
 
@@ -4382,7 +4339,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (use-package flycheck-package           ; Check package conventions with Flycheck
   :ensure t
   :defer t
-  :init (after "flycheck" (flycheck-package-setup)))
+  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 (use-package slime
   :ensure t
@@ -4535,9 +4492,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode ("\\*.el\\'" . emacs-lisp-mode)
   :init
   (progn
-    (after "lisp-mode"
-           (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
-           (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map))
+    (with-eval-after-load 'lisp-mode
+      (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
+      (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map))
 
     (dotemacs-define-micro-state macrostep
       :doc "[e] expand [c] collapse [n/N] next/previous [q] quit"
@@ -4688,7 +4645,7 @@ point. Requires smartparens because all movement is done using
   :load-path "config/"
   :commands (flycheck-auto-scalastyle-setup)
   :init
-  (after "scala-mode2"
+  (with-eval-after-load 'scala-mode2
     (add-hook 'flycheck-mode-hook #'flycheck-auto-scalastyle-setup)))
 
 (use-package noflet
@@ -4732,7 +4689,7 @@ point. Requires smartparens because all movement is done using
                               (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
                       (0+ " ")))
 
-            (after "scala-mode2"
+            (with-eval-after-load 'scala-mode2
               (bind-key "C-c c" #'sbt-command scala-mode-map))
 
             (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
@@ -4874,10 +4831,9 @@ point. Requires smartparens because all movement is done using
 
     ;; Don't use scala checker if ensime mode is active, since it provides
     ;; better error checking.
-    (after "flycheck"
-      '(progn
-         (defun scala/disable-flycheck () (flycheck-mode -1))
-         (add-hook 'ensime-mode-hook 'scala/disable-flycheck)))))
+    (with-eval-after-load 'flycheck
+      (defun scala/disable-flycheck () (flycheck-mode -1))
+      (add-hook 'ensime-mode-hook 'scala/disable-flycheck))))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
@@ -5409,8 +5365,8 @@ fix this issue."
     :post-init
     (progn
       (dotemacs-add-company-hook enh-ruby-mode)
-      (after "company-dabbrev-code"
-        '(push 'enh-ruby-mode company-dabbrev-code-modes)))))
+      (with-eval-after-load 'company-dabbrev-code
+        (push 'enh-ruby-mode company-dabbrev-code-modes)))))
 
 
 ;;; Rust
@@ -5669,13 +5625,13 @@ fix this issue."
 (use-package helm-hayoo
   :ensure t
   :defer t
-  :init (after "haskell-mode"
+  :init (with-eval-after-load 'haskell-mode
           (bind-key "C-c h h" #'helm-hayoo haskell-mode-map)))
 
 (use-package helm-hoogle
   :ensure t
   :defer t
-  :init (after "haskell-mode"
+  :init (with-eval-after-load 'haskell-mode
           (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
 
 (use-package haskell-snippets
@@ -5990,8 +5946,8 @@ fix this issue."
   :ensure t
   :init
   (progn
-    (after "eval-sexp-fu"
-      '(require 'cider-eval-sexp-fu))
+    (with-eval-after-load 'eval-sexp-fu
+      (require 'cider-eval-sexp-fu))
     (setq cider-stacktrace-default-filters '(tooling dup)
           cider-repl-pop-to-buffer-on-connect nil
           cider-prompt-save-file-on-load nil
@@ -6351,7 +6307,7 @@ If called with a prefix argument, uses the other-window instead."
       "mia"  'purescript-align-imports
       "min"  'purescript-navigate-imports)))
 
-(after "flycheck"
+(with-eval-after-load 'flycheck
   (flycheck-define-checker purs-check
     "Use purscheck to flycheck PureScript code."
     :command ("purscheck" source source-original temporary-file-name)
@@ -6589,7 +6545,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
-    (after "flycheck"
+    (with-eval-after-load 'flycheck
       (when-let (coffeelint (executable-find "coffeelint"))
         (setq flycheck-coffee-coffeelint-executable coffeelint)))
 
@@ -6940,7 +6896,7 @@ If called with a prefix argument, uses the other-window instead."
         ; todo: verify this is not needed now
         ; (when (equal web-mode-content-type "jsx")
         ;   (setq-local cursor-type nil)
-        ;   (after "flycheck"
+        ;   (with-eval-after-load 'flycheck
         ;     (flycheck-select-checker 'javascript-eslint)))
         ))
 
@@ -7227,7 +7183,7 @@ If called with a prefix argument, uses the other-window instead."
 (use-package skewer-mode
   :ensure t
   :defer t
-  :init (after "js2-mode"
+  :init (with-eval-after-load 'js2-mode
           (skewer-setup))
   :config
   (progn
@@ -7471,7 +7427,7 @@ If called with a prefix argument, uses the other-window instead."
 (use-package swift-mode                 ; Swift sources
   :ensure t
   :defer t
-  :config (after "flycheck"
+  :config (with-eval-after-load 'flycheck
             (add-to-list 'flycheck-checkers 'swift)))
 
 (dotemacs-use-package-add-hook flycheck
@@ -7732,7 +7688,7 @@ If called with a prefix argument, uses the other-window instead."
     (when (eq window-system 'w32)
       (setenv "GIT_ASKPASS" "git-gui--askpass"))
 
-    (after "projectile"
+    (with-eval-after-load 'projectile
       (dotemacs-magit-set-repo-dirs-from-projectile))
 
     (evil-leader/set-key
@@ -7913,9 +7869,8 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-      (eval-after-load 'magit
-        '(progn
-           (define-key magit-mode-map "#f" 'magit-gitflow-popup))))
+      (with-eval-after-load 'magit
+        (define-key magit-mode-map "#f" 'magit-gitflow-popup)))
   :config (dotemacs-diminish magit-gitflow-mode "Flow"))
 
 (use-package magit-svn
@@ -8855,7 +8810,7 @@ If called with a prefix argument, uses the other-window instead."
 (use-package init-firestarter
   :load-path "config/"
   :commands (dotemacs-firestarter-mode-line)
-  :init (after "firestarter"
+  :init (with-eval-after-load 'firestarter
           (setq firestarter-lighter
                 '(:eval (dotemacs-firestarter-mode-line)))))
 
@@ -9016,8 +8971,8 @@ If called with a prefix argument, uses the other-window instead."
           org-startup-with-inline-images t
           org-startup-indented t)
 
-    (after "org-indent"
-      '(dotemacs-hide-lighter org-indent-mode))
+    (with-eval-after-load 'org-indent
+      (dotemacs-hide-lighter org-indent-mode))
 
     (add-hook 'org-load-hook
       (lambda ()
@@ -9288,7 +9243,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :ensure t
   :init
-  (eval-after-load 'org '(require 'ox-pandoc)))
+  (with-eval-after-load 'org (require 'ox-pandoc)))
 
 (dotemacs-use-package-add-hook emoji-cheat-sheet-plus
   :post-init
@@ -9567,11 +9522,11 @@ If called with a prefix argument, uses the other-window instead."
           font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
     (toggle-diredp-find-file-reuse-dir 1)))
 
-(after "dired-x"
-       (progn
-         (define-key evil-normal-state-map (kbd "-") 'dired-jump)))
+(with-eval-after-load 'dired-x
+  (progn
+    (define-key evil-normal-state-map (kbd "-") 'dired-jump)))
 
-(eval-after-load "dired-mode"
+(with-eval-after-load 'dired-mode
   (evilify dired-mode dired-mode-map
            "j"         'vinegar/move-down
            "k"         'vinegar/move-up
@@ -9665,13 +9620,13 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-    (after "yaml-mode"
-      '(add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))))
+    (with-eval-after-load 'yaml-mode
+      (add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))))
 
 (use-package ansible-doc                ; Documentation lookup for Ansible
   :ensure t
   :defer t
-  :init (after "yaml-mode"
+  :init (with-eval-after-load 'yaml-mode
           '(add-hook 'yaml-mode-hook 'ansible/ansible-doc-maybe-enable))
   :diminish (ansible-doc-mode . "❓"))
 
@@ -10836,7 +10791,7 @@ If the error list is visible, hide it.  Otherwise, show it."
   :ensure t
   :if (eq dotemacs-completion-engine 'company)
   :defer t
-  :init (after "company"
+  :init (with-eval-after-load 'company
           ;; Use Company for completion
           (bind-key [remap completion-at-point] #'helm-company company-mode-map)
           (bind-key "C-:" #'helm-company company-mode-map)
@@ -10866,7 +10821,7 @@ If the error list is visible, hide it.  Otherwise, show it."
     (setq-default ac-sources '(ac-source-abbrev
                                ac-source-dictionary
                                ac-source-words-in-same-mode-buffers))
-    (after "yasnippet"
+    (with-eval-after-load 'yasnippet
       (push 'ac-source-yasnippet ac-sources))
 
     (add-to-list 'completion-styles 'initials t)
@@ -10882,9 +10837,8 @@ If the error list is visible, hide it.  Otherwise, show it."
   :init
   (progn
     (setq ac-ispell-requires 4)
-    (after "auto-complete"
-      '(ac-ispell-setup))
-    ))
+    (with-eval-after-load 'auto-complete
+      (ac-ispell-setup))))
 
 (use-package init-yasnippet
   :ensure yasnippet

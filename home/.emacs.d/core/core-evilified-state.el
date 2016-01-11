@@ -176,7 +176,7 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
                (dotemacs-evilify-configure-default-state ',mode)))))
     (if (null eval-after-load)
         `(,@body)
-      `(eval-after-load ',eval-after-load '(,@body)))))
+      `(with-eval-after-load ',eval-after-load ,@body))))
 
 (defun dotemacs-evilify-configure-default-state (mode)
   "Configure default state for the passed mode."
