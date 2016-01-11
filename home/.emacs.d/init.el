@@ -2626,7 +2626,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 (use-package avy                   ; Jump to characters in buffers
   :ensure t
-  :defer t
+  :commands (dotemacs-avy-open-url)
   :init
   (progn
     (setq avy-keys (number-sequence ?a ?z))
@@ -2635,9 +2635,21 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (evil-leader/set-key
       "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
       "l" 'avy-goto-line ; 'avy-goto-char-2
+      "xo" 'dotemacs-avy-open-url
     ))
   :config
-  (evil-leader/set-key "`" 'avy-pop-mark))
+  (progn
+    (defun dotemacs-avy-goto-url()
+      "Use avy to go to an URL in the buffer."
+      (interactive)
+      (avy--generic-jump "https?://" nil 'pre))
+    (defun dotemacs-avy-open-url ()
+      "Use avy to select an URL in the buffer and open it."
+      (interactive)
+      (save-excursion
+        (dotemacs-avy-goto-url)
+        (browse-url-at-point)))
+    (evil-leader/set-key "`" 'avy-pop-mark)))
 
 (use-package ace-link                   ; Fast link jumping
   :commands dotemacs-ace-buffer-links
