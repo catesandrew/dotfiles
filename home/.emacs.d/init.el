@@ -6103,6 +6103,7 @@ If called with a prefix argument, uses the other-window instead."
         "msf" 'dotemacs-cider-send-function-to-repl
         "msF" 'dotemacs-cider-send-function-to-repl-focus
         "msi" 'cider-jack-in
+        "msI" 'cider-jack-in-clojurescript
         "msn" 'dotemacs-cider-send-ns-form-to-repl
         "msN" 'dotemacs-cider-send-ns-form-to-repl-focus
         "msq" 'cider-quit
