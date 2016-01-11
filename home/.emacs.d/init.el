@@ -181,8 +181,7 @@ Emacs."
   :group 'dotemacs)
 
 (defvaralias 'dotemacs-remap-Y-to-y$ 'evil-want-Y-yank-to-eol
-  "If non nil `Y' is remapped to `y$'."
-  :group 'dotemacs)
+  "If non nil `Y' is remapped to `y$'.")
 
 (defcustom dotemacs-leader-key ","
   "The leader key."
@@ -10485,25 +10484,30 @@ If called with a prefix argument, uses the other-window instead."
 
     (dotemacs-diminish flycheck-mode " ⓢ" " s")
 
+    (dotemacs-evilify-map flycheck-error-list-mode-map
+                           :mode flycheck-error-list-mode
+                           :bindings
+                           "RET" 'flycheck-error-list-goto-error
+                           "j" 'flycheck-error-list-next-error
+                           "k" 'flycheck-error-list-previous-error)
+
     (evil-leader/set-key
       "ec" 'flycheck-clear
-      "eC" 'flycheck-compile
-      ; TODO: Try this toggle functions
+      "eh" 'flycheck-describe-checker
       "el" 'dotemacs-toggle-flycheck-error-list
       ; ; https://github.com/flycheck/flycheck/pull/494
-      ; "el" 'dotemacs-flycheck-pop-to-error-list ;flycheck-list-errors
+      ; "el" 'dotemacs-flycheck-pop-to-error-list
       ; "eL" 'dotemacs-flycheck-hide-list-errors
       "es" 'flycheck-select-checker
-      "ex" 'flycheck-disable-checker
-      "eh" 'flycheck-describe-checker
-      "ev" 'flycheck-verify-setup
-      "tmf" 'dotemacs-mode-line-flycheck-info-toggle)
+      "eS" 'flycheck-set-checker-executable
+      "ev" 'flycheck-verify-setup)
 
-    (unless (display-graphic-p)
-      (setq flycheck-display-errors-function
-            #'flycheck-display-error-messages-unless-error-list
-            flycheck-mode-line
-            '(:eval (dotemacs-flycheck-mode-line-status))))
+    (dotemacs|do-after-display-system-init
+      (unless (display-graphic-p)
+        (setq flycheck-display-errors-function
+              #'flycheck-display-error-messages-unless-error-list
+              flycheck-mode-line
+              '(:eval (dotemacs-flycheck-mode-line-status)))))
 
     ;; Don't highlight undesired errors from html tidy
     (add-hook 'flycheck-process-error-functions
@@ -10544,12 +10548,6 @@ If the error list is visible, hide it.  Otherwise, show it."
             (when window
               (unless (flycheck-overlays-at (point))
                 (quit-window nil window)))))))
-
-    (add-to-list 'evil-motion-state-modes 'flycheck-error-list-mode)
-    (evil-define-key 'motion flycheck-error-list-mode-map
-      "j" #'flycheck-error-list-next-error
-      "k" #'flycheck-error-list-previous-error
-      "RET" #'flycheck-error-list-goto-error)
 
     ;; Custom fringe indicator
     (when (fboundp 'define-fringe-bitmap)
