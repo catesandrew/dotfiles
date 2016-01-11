@@ -9155,8 +9155,8 @@ If called with a prefix argument, uses the other-window instead."
     (require 'ox-html)
     (require 'org-bullets)
 
-    (after "org-agenda"
-      '(progn
+    (with-eval-after-load 'org-agenda
+      (progn
          (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
          (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
          ;; Since we could override SPC with <leader>, let's make RET do that functionality
@@ -9177,6 +9177,9 @@ If called with a prefix argument, uses the other-window instead."
     (require 'org-indent)
     (define-key global-map "\C-cl" 'org-store-link)
     (define-key global-map "\C-ca" 'org-agenda)
+
+    ;; Open links and files with RET in normal state
+    (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
 
     (evil-leader/set-key
       "Cc" 'org-capture)))
