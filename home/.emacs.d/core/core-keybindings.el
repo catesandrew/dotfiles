@@ -51,34 +51,10 @@ used as the prefix command."
             (which-key-declare-prefixes-for-mode mode
               full-prefix-emacs prefix-name
               full-prefix prefix-name)
-            (when is-major-mode-prefix
-              (which-key-declare-prefixes-for-mode mode
-                major-mode-prefix prefix-name
-                major-mode-prefix-emacs prefix-name)))
-        (define-prefix-command command)
-        (evil-leader/set-key-for-mode mode prefix command)))))
-
-(defun dotemacs/declare-prefix-for-mode (mode prefix name &optional long-name)
-  "Declare a prefix PREFIX. MODE is the mode in which this prefix command should
-be added. PREFIX is a string describing a key sequence. NAME is a symbol name
-used as the prefix command."
-  (let  ((command (intern (concat (symbol-name mode) name)))
-         (full-prefix (concat dotemacs-leader-key " " prefix))
-         (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix))
-         (is-major-mode-prefix (string-prefix-p "m" prefix))
-         (major-mode-prefix (concat dotemacs-major-mode-leader-key " " (substring prefix 1)))
-         (major-mode-prefix-emacs (concat dotemacs-major-mode-emacs-leader-key " " (substring prefix 1))))
-    (unless long-name (setq long-name name))
-    (let ((prefix-name (cons name long-name)))
-      (if (fboundp 'which-key-declare-prefixes-for-mode)
-          (progn
-            (which-key-declare-prefixes-for-mode mode
-              full-prefix-emacs prefix-name
-              full-prefix prefix-name)
-            (when is-major-mode-prefix
-              (which-key-declare-prefixes-for-mode mode
-                major-mode-prefix prefix-name
-                major-mode-prefix-emacs prefix-name)))
+            (when (and is-major-mode-prefix dotemacs-major-mode-leader-key)
+              (which-key-declare-prefixes-for-mode mode major-mode-prefix prefix-name))
+            (when (and is-major-mode-prefix dotemacs-major-mode-emacs-leader-key)
+              (which-key-declare-prefixes-for-mode mode major-mode-prefix-emacs prefix-name)))
         (define-prefix-command command)
         (evil-leader/set-key-for-mode mode prefix command)))))
 
