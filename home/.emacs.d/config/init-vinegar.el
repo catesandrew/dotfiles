@@ -82,14 +82,6 @@
            (dired-diff))
           (t (error "mark exactly 2 files, at least 1 locally")))))
 
-(defun dotemacs-dired-mode-defaults ()
-  (unless (bound-and-true-p my-dmh-ran)
-    ;; add buffer-local indicator for whether dired-mode-hook has run.
-    (set (make-local-variable 'my-dmh-ran) t)
-    ;; disable line wrap
-    (unless (bound-and-true-p truncate-lines)
-      (setq truncate-lines t))))
-
 (defun vinegar/dired-setup ()
   "Setup custom dired settings for vinegar"
   (setq dired-omit-verbose nil)

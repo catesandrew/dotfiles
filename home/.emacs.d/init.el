@@ -9348,32 +9348,20 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package init-vinegar
   :load-path "config/"
-  :defer t
-  :commands (vinegar/dired-setup
-             dotemacs-dired-mode-defaults))
+  :commands (vinegar/dired-setup))
 
-; (require 'dired-x)
 (use-package dired-x                    ; Additional tools for Dired
+  :defer t
   :init
   (progn
-    (add-hook 'dired-mode-hook 'vinegar/dired-setup)
-    (add-hook 'dired-mode-hook 'dotemacs-dired-mode-defaults))
+    (add-hook 'dired-mode-hook 'vinegar/dired-setup))
   :config
   (progn
     (define-key evil-normal-state-map (kbd "-") 'dired-jump)
 
     (when (eq system-type 'darwin)
       ;; OS X bsdtar is mostly compatible with GNU Tar
-      (setq dired-guess-shell-gnutar "tar"))
-
-    ;; Diminish dired-omit-mode. We need this hack, because Dired Omit Mode has
-    ;; a very peculiar way of registering its lighter explicitly in
-    ;; `dired-omit-startup'.  We can't just use `:diminish' because the lighter
-    ;; isn't there yet after dired-omit-mode is loaded.
-    ;; (add-function :after (symbol-function 'dired-omit-startup)
-    ;;               (lambda () (diminish 'dired-omit-mode))
-    ;;               '((name . dired-omit-mode-diminish)))
-    ))
+      (setq dired-guess-shell-gnutar "tar"))))
 
 (use-package dired                      ; Edit directories
   :defer t
