@@ -158,7 +158,9 @@ region-end is used."
 (defun kill-region-or-backward-word ()
   (interactive)
   (if (region-active-p)
-      (kill-region (region-beginning) (region-end))
+      ;; call interactively so kill-region handles rectangular selection
+      ;; correctly (see https://github.com/syl20bnr/spacemacs/issues/3278)
+      (call-interactively #'kill-region)
     (backward-kill-word 1)))
 
 (defun kill-to-beginning-of-line ()
