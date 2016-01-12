@@ -132,7 +132,6 @@ the current state and point position."
   :type 'number
   :group 'dotemacs)
 
-
 (defun dotemacs-indent-region-or-buffer ()
   "Indent a region if selected, otherwise the whole buffer."
   (interactive)
@@ -498,17 +497,6 @@ argument takes the kindows rotate backwards."
             ;; no errors
             (message "compilation ok.")))))
 
-;; from https://gist.github.com/timcharper/493269
-(defun dotemacs/split-window-vertically-and-switch ()
-  (interactive)
-  (split-window-vertically)
-  (other-window 1))
-
-(defun dotemacs/split-window-horizontally-and-switch ()
-  (interactive)
-  (split-window-horizontally)
-  (other-window 1))
-
 (defun dotemacs/ido-invoke-in-other-window ()
   "signals ido mode to switch to (or create) another window after exiting"
   (interactive)
@@ -603,12 +591,6 @@ Compare them on count first,and in case of tie sort them alphabetically."
   (while (car attr)
     (set-face-attribute face nil (caar attr) (cdar attr))
     (setq attr (cdr attr))))
-
-(defun dotemacs/new-empty-buffer ()
-  "Create a new buffer called untitled(<n>)"
-  (interactive)
-  (let ((newbuf (generate-new-buffer-name "untitled")))
-    (switch-to-buffer newbuf)))
 
 (defun dotemacs/new-empty-buffer ()
   "Create a new buffer called untitled(<n>)"
