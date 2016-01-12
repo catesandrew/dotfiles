@@ -307,6 +307,8 @@ Ensure that helm is required before calling FUNC."
   "w/"  'split-window-right
   "w="  'balance-windows)
 ;; text -----------------------------------------------------------------------
+(defalias 'count-region 'count-words-region)
+
 (evil-leader/set-key
   "xaa" 'align
   "xar" 'dotemacs/align-repeat
@@ -320,6 +322,7 @@ Ensure that helm is required before calling FUNC."
   "xa|" 'dotemacs/align-repeat-bar
   "xa(" 'dotemacs/align-repeat-left-paren
   "xa)" 'dotemacs/align-repeat-right-paren
+  "xc"  'count-region
   "xdw" 'delete-trailing-whitespace
   "xls" 'dotemacs/sort-lines
   "xlu" 'dotemacs/uniquify-lines
@@ -328,8 +331,7 @@ Ensure that helm is required before calling FUNC."
   "xtw" 'transpose-words
   "xU"  'upcase-region
   "xu"  'downcase-region
-  "xwC" 'dotemacs/count-words-analysis
-  "xwc" 'count-words-region)
+  "xwC" 'dotemacs/count-words-analysis)
 ;; google translate -----------------------------------------------------------
 (evil-leader/set-key
   "xgl" 'dotemacs/set-google-translate-languages)
