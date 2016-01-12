@@ -9285,6 +9285,7 @@ If called with a prefix argument, uses the other-window instead."
             which-key-prevent-C-h-from-cycling t
             which-key-echo-keystrokes 0.02
             which-key-max-description-length 32
+            which-key-sort-order 'which-key-prefix-then-key-order
             which-key-idle-delay dotemacs-which-key-delay
             which-key-allow-evil-operators t)
       (which-key-mode)
