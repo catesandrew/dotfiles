@@ -1564,6 +1564,10 @@ the user activate the completion manually."
           helm-semantic-fuzzy-match t
           helm-buffers-fuzzy-matching t)
 
+    ;; Use helm to provide :ls, unless ibuffer is used
+    ;; (unless 'ibuffer
+    ;;   (evil-ex-define-cmd "buffers" 'helm-buffers-list))
+
     ;; use helm by default for M-x
     (global-set-key (kbd "M-x") 'helm-M-x)
 
@@ -1866,7 +1870,9 @@ the user activate the completion manually."
     (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
 
     (setq ibuffer-expert t
-          ibuffer-show-empty-filter-groups nil))
+          ibuffer-show-empty-filter-groups nil)
+    ;; Use ibuffer to provide :ls
+    (evil-ex-define-cmd "buffers" 'ibuffer))
   :config
   (dotemacs-evilify-map ibuffer-mode-map
     :mode ibuffer-mode))
