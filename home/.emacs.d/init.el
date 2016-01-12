@@ -639,6 +639,9 @@ group by projectile projects."
 (defcustom dotemacs-helm-position 'bottom
   "Position in which to show the `helm' mini-buffer.")
 
+(defvar python-fill-column 79
+  "Fill column value for python buffers")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
