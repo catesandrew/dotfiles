@@ -9864,7 +9864,7 @@ If called with a prefix argument, uses the other-window instead."
                    ahs-change-range))
       (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
         (eval `(defadvice ,sym (around ,advice activate)
-                 (doteamcs-ahs-highlight-now-wrapper)
+                 (dotemacs-ahs-highlight-now-wrapper)
                  ad-do-it
                  (dotemacs-ahs-highlight-now-wrapper)
                  (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))))))
