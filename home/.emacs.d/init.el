@@ -3357,7 +3357,7 @@ It will toggle the overlay under point or create an overlay of one character."
 
 (use-package evil-mc
   :ensure t
-  :defer t))
+  :defer t)
 
 ; TODO: Add switch between evil-commentary and evil-nerd-commenter
 (use-package evil-commentary
