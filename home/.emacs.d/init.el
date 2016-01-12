@@ -5450,6 +5450,7 @@ fix this issue."
 
       "mhd"  'inferior-haskell-find-haddock
       "mhh"  'hoogle
+      "mhH"  'hoogle-lookup-from-local
       "mhi"  'haskell-process-do-info
       "mht"  'haskell-process-do-type
       "mhT"  'dotemacs-haskell-process-do-type-on-prev-line
