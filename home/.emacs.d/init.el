@@ -3352,6 +3352,10 @@ It will toggle the overlay under point or create an overlay of one character."
     (setq evil-lisp-state-global t)
     (setq evil-lisp-state-leader-prefix "k")))
 
+(use-package evil-mc
+  :ensure t
+  :defer t))
+
 ; TODO: Add switch between evil-commentary and evil-nerd-commenter
 (use-package evil-commentary
   :diminish evil-commentary-mode
