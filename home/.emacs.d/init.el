@@ -212,10 +212,6 @@ pressing `<leader> m`. Set it to `nil` to disable it."
 size to make separators look not too crappy."
   :group 'dotemacs)
 
-(defcustom dotemacs-verbose-loading nil
-  "If non nil output loading progess in `*Messages*' buffer."
-  :group 'dotemacs)
-
 (defcustom dotemacs-command-key ":"
   "The key used for Evil commands (ex-commands) and Emacs commands (M-x).
 By default the command key is `:' so ex-commands are executed like in Vim
@@ -775,7 +771,8 @@ group by projectile projects."
 ;; package-build is required by quelpa
 (dotemacs-load-or-install-package 'package-build t)
 
-(setq quelpa-verbose dotemacs-verbose-loading
+(setq quelpa-verbose init-file-debug
+      use-package-verbose init-file-debug
       quelpa-dir dotemacs-quelpa-directory
       quelpa-build-dir dotemacs-quelpa-build-directory
       quelpa-persistent-cache-file dotemacs-quelpa-cache-directory

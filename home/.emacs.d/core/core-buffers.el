@@ -36,8 +36,8 @@
 
 (defun dotemacs-buffer/message (msg &rest args)
   "Display MSG in message prepended with '(emacs)'.
-The message is displayed only if `dotemacs-verbose-loading' is non nil."
-  (when dotemacs-verbose-loading
+The message is displayed only if `init-file-debug' is non nil."
+  (when init-file-debug
     (message "(emacs) %s" (apply 'format msg args))))
 
 (defun dotemacs-buffer/warning (msg &rest args)
