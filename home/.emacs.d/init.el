@@ -1498,22 +1498,6 @@ the user activate the completion manually."
   :ensure t
   :defer 1
   :commands dotemacs-helm-find-files
-  :config
-  (progn
-    (when (and dotemacs-helm-resize
-                (or (eq dotemacs-helm-position 'bottom)
-                    (eq dotemacs-helm-position 'top)))
-      (setq helm-autoresize-min-height 10)
-      (helm-autoresize-mode 1))
-
-    ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
-    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-    (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
-    (defvar helm-source-header-default-height (face-attribute 'helm-source-header :height) )
-
-    ;; Hide the `helm' header is there is only one source.
-    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line))
   :init
   (progn
     (with-eval-after-load 'helm-config
@@ -1633,10 +1617,28 @@ the user activate the completion manually."
       `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
       "Face for helm heder when helm micro-state is activated."
       :group 'dotemacs))
-
   :config
   (progn
     (helm-mode +1)
+
+    (when (and dotemacs-helm-resize
+               (or (eq dotemacs-helm-position 'bottom)
+                   (eq dotemacs-helm-position 'top)))
+      (setq helm-autoresize-min-height 10)
+      (helm-autoresize-mode 1))
+
+    ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
+    (defvar helm-source-header-default-background
+      (face-attribute 'helm-source-header :background))
+    (defvar helm-source-header-default-foreground
+      (face-attribute 'helm-source-header :foreground))
+    (defvar helm-source-header-default-box
+      (face-attribute 'helm-source-header :box))
+    (defvar helm-source-header-default-height
+      (face-attribute 'helm-source-header :height) )
+
+    ;; Hide the `helm' header is there is only one source.
+    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
 
     ;; helm-locate uses es (from everything on windows, which doesnt like fuzzy)
     (helm-locate-set-command)
@@ -1697,11 +1699,14 @@ the user activate the completion manually."
     ;; Swap default TAB and C-z commands.
     ;; For GUI.
     (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    (define-key helm-find-files-map (kbd "S-<tab>") 'helm-find-files-up-one-level)
-    (define-key helm-find-files-map (kbd "<backtab>") 'helm-find-files-up-one-level)
+    (define-key helm-find-files-map
+      (kbd "S-<tab>") 'helm-find-files-up-one-level)
+    (define-key helm-find-files-map
+      (kbd "<backtab>") 'helm-find-files-up-one-level)
     ;; For terminal.
     (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-    (define-key helm-find-files-map (kbd "S-TAB") 'helm-find-files-up-one-level)
+    (define-key helm-find-files-map
+      (kbd "S-TAB") 'helm-find-files-up-one-level)
     (define-key helm-map (kbd "C-z") 'helm-select-action)
 
     (with-eval-after-load 'helm-mode ; required
