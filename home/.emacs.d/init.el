@@ -638,6 +638,9 @@ group by projectile projects."
 (defvar python-fill-column 79
   "Fill column value for python buffers")
 
+(defvar syntax-checking-enable-by-default t
+  "Enable syntax-checking by default.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -10290,7 +10293,8 @@ If called with a prefix argument, uses the other-window instead."
 (use-package init-syntax-checking
   :load-path "config/"
   :defer t
-  :commands (dotemacs-discard-undesired-html-tidy-error
+  :commands (dotemacs/add-flycheck-hook
+             dotemacs-discard-undesired-html-tidy-error
              dotemacs-flycheck-mode-line-status
              dotemacs-mode-line-flycheck-info-toggle
              dotemacs-eslint-set-local-eslint-from-projectile

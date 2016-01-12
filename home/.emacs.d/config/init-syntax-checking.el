@@ -3,6 +3,13 @@
 ;;; Code:
 (require 'flycheck)
 
+(defun dotemacs/add-flycheck-hook (mode &optional target)
+  "Enable flycheck for the given MODE, if
+`syntax-checking-enable-by-default' is true."
+  (when syntax-checking-enable-by-default
+    (let ((mode-hook (intern (format "%S-hook" mode))))
+      (add-hook mode-hook 'flycheck-mode))))
+
 (defun dotemacs-discard-undesired-html-tidy-error (err)
   "Discard ERR if it is undesired.
 
