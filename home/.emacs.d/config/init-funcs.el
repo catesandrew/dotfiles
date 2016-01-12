@@ -256,20 +256,16 @@ the current state and point position."
           (progn (split-window-right)
                  (balance-windows)))))))
 
-(defun dotemacs/layout-triple-columns ()
-  " Set the layout to triple columns. "
+;; from https://gist.github.com/timcharper/493269
+(defun dotemacs/split-window-vertically-and-switch ()
   (interactive)
-  (golden-ratio-mode 0)
-  (delete-other-windows)
-  (dotimes (i 2) (split-window-right))
-  (balance-windows))
+  (split-window-vertically)
+  (other-window 1))
 
-(defun dotemacs/layout-double-columns ()
-  " Set the layout to double columns. "
+(defun dotemacs/split-window-horizontally-and-switch ()
   (interactive)
-  (golden-ratio-mode 1)
-  (delete-other-windows)
-  (split-window-right))
+  (split-window-horizontally)
+  (other-window 1))
 
 ;; from magnars modified by ffevotte for dedicated windows support
 (defun dotemacs/rotate-windows (count)
