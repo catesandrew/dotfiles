@@ -6931,6 +6931,8 @@ If called with a prefix argument, uses the other-window instead."
     (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
     (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'hybrid emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'hybrid emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
     (dotemacs-hide-lighter emmet-mode)))
 
 (use-package jade-mode
