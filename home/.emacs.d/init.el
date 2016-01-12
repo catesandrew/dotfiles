@@ -2453,6 +2453,9 @@ the user activate the completion manually."
 (bind-key "C-x p" 'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
 
+;; Keep focus while navigating help buffers
+(setq help-window-select 't)
+
 ;; The commands defined in this layer are taken from various sources like
 ;; [[https://github.com/bbatsov/prelude][Prelude]].
 (defun dotemacs-smart-move-beginning-of-line (arg)
