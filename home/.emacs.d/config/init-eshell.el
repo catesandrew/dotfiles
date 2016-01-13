@@ -48,12 +48,6 @@
   (let ((inhibit-read-only t))
     (erase-buffer)))
 
-(defun dotemacs-term-kill-buffer-hook ()
-  "Function that hook `kill-buffer-hook'."
-  (when (eq major-mode 'term-mode)
-    (when (term-check-proc (current-buffer))
-      (term-quit-subjob))))
-
 (defun dotemacs-default-pop-shell ()
   "Open the default shell in a popup."
   (interactive)

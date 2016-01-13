@@ -1072,7 +1072,6 @@ the user activate the completion manually."
     (make-shell-pop-command multiterm)
     (make-shell-pop-command ansi-term shell-pop-term-shell)
 
-    (add-hook 'kill-buffer-hook 'dotemacs-term-kill-buffer-hook)
     (add-hook 'term-mode-hook 'ansi-term-handle-close)
 
     (evil-leader/set-key
