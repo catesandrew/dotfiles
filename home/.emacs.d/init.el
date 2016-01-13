@@ -5396,17 +5396,9 @@ fix this issue."
   :defer t
   :config
   (progn
-    (bind-key "C-c h d" #'haskell-describe haskell-mode-map)
-    (bind-key "C-c j i" #'haskell-navigate-imports haskell-mode-map)
-    (bind-key "C-c f c" #'haskell-cabal-visit-file haskell-mode-map)
-
-    ;; Haskell main editing mode key bindings.
-    (add-hook 'haskell-mode-hook #'subword-mode)           ; Subword navigation
-    (add-hook 'haskell-mode-hook #'haskell-decl-scan-mode) ; Scan and navigate declarations
-    ;; Insert module templates into new buffers
-    (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
-    (add-hook 'haskell-mode-hook #'dotemacs-init-haskell-mode)
-    (add-hook 'haskell-cabal-mode-hook #'haskell-cabal-hook)
+    ;; hooks
+    (add-hook 'haskell-mode-hook 'dotemacs-init-haskell-mode)
+    (add-hook 'haskell-cabal-mode-hook 'haskell-cabal-hook)
 
     ;; settings
     (setq
@@ -5430,6 +5422,15 @@ fix this issue."
       haskell-process-suggest-hayoo-imports t
       ;; Disable haskell-stylish on save, it breaks flycheck highlighting
       haskell-stylish-on-save nil)
+
+    ;; prefixes
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "mg" "haskell/navigation")
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "ms" "haskell/repl")
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "mc" "haskell/cabal")
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "mh" "haskell/documentation")
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "md" "haskell/debug")
+    (dotemacs-declare-prefix-for-mode 'haskell-interactive-mode "ms" "haskell/repl")
+    (dotemacs-declare-prefix-for-mode 'haskell-cabal-mode "ms" "haskell/repl")
 
     ;; key bindings
     (evil-leader/set-key-for-mode 'haskell-mode
@@ -5474,18 +5475,21 @@ fix this issue."
 
     ;; Cabal-file bindings
     (evil-leader/set-key-for-mode 'haskell-cabal-mode
-      ;; "m="  'haskell-cabal-subsection-arrange-lines ;; Does a bad job, 'gg=G' works better
-      "md" 'haskell-cabal-add-dependency
-      "mb" 'haskell-cabal-goto-benchmark-section
-      "me" 'haskell-cabal-goto-executable-section
-      "mt" 'haskell-cabal-goto-test-suite-section
-      "mm" 'haskell-cabal-goto-exposed-modules
-      "ml" 'haskell-cabal-goto-library-section
-      "mn" 'haskell-cabal-next-subsection
-      "mp" 'haskell-cabal-previous-subsection
-      "mN" 'haskell-cabal-next-section
-      "mP" 'haskell-cabal-previous-section
-      "mf" 'haskell-cabal-find-or-create-source-file)
+      ;; "m="   'haskell-cabal-subsection-arrange-lines ;; Does a bad job, 'gg=G' works better
+      "md"   'haskell-cabal-add-dependency
+      "mb"   'haskell-cabal-goto-benchmark-section
+      "me"   'haskell-cabal-goto-executable-section
+      "mt"   'haskell-cabal-goto-test-suite-section
+      "mm"   'haskell-cabal-goto-exposed-modules
+      "ml"   'haskell-cabal-goto-library-section
+      "mn"   'haskell-cabal-next-subsection
+      "mp"   'haskell-cabal-previous-subsection
+      "msc"  'haskell-interactive-mode-clear
+      "mss"  'dotemacs/haskell-interactive-bring
+      "msS"  'haskell-interactive-switch
+      "mN"   'haskell-cabal-next-section
+      "mP"   'haskell-cabal-previous-section
+      "mf"   'haskell-cabal-find-or-create-source-file)
 
     ;; Make "RET" behaviour in REPL saner
     (evil-define-key 'insert haskell-interactive-mode-map
@@ -5495,7 +5499,6 @@ fix this issue."
 
     ;;GHCi-ng
     (when dotemacs-haskell-enable-ghci-ng-support
-
       (when-let (ghci-ng (executable-find "ghci-ng"))
         ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
         (setq haskell-process-path-ghci ghci-ng)
@@ -5514,45 +5517,26 @@ fix this issue."
     ;; Useful to have these keybindings for .cabal files, too.
     (with-eval-after-load 'haskell-cabal-mode-map
       (define-key haskell-cabal-mode-map
-         [?\C-c ?\C-z] 'haskell-interactive-switch))))
+        [?\C-c ?\C-z] 'haskell-interactive-switch))
 
-;; align rules for Haskell
-(with-eval-after-load 'align
-  (add-to-list 'align-rules-list
-               '(haskell-types
-                 (regexp . "\\(\\s-+\\)\\(::\\|?\\)\\s-+")
-                 (modes . '(haskell-mode literate-haskell-mode))))
-  (add-to-list 'align-rules-list
-               '(haskell-assignment
-                 (regexp . "\\(\\s-+\\)=\\s-+")
-                 (modes . '(haskell-mode literate-haskell-mode))))
-  (add-to-list 'align-rules-list
-               '(haskell-arrows
-                 (regexp . "\\(\\s-+\\)\\(->\\|?\\)\\s-+")
-                 (modes . '(haskell-mode literate-haskell-mode))))
-  (add-to-list 'align-rules-list
-               '(haskell-left-arrows
-                 (regexp . "\\(\\s-+\\)\\(<-\\|?\\)\\s-+")
-                 (modes . '(haskell-mode literate-haskell-mode)))))
-
-(use-package haskell
-  :ensure haskell-mode
-  :defer t
-  :init (dolist (hook '(haskell-mode-hook haskell-cabal-mode-hook))
-          (add-hook hook #'interactive-haskell-mode))
-  :config
-  (progn
-    (bind-key "C-c C-t" #'haskell-mode-show-type-at
-              interactive-haskell-mode-map)
-    (bind-key "M-." #'haskell-mode-goto-loc
-              interactive-haskell-mode-map)
-    (bind-key "C-c u u" #'haskell-mode-find-uses
-              interactive-haskell-mode-map)))
-
-(use-package haskell-interactive-mode
-  :ensure haskell-mode
-  :defer t
-  :config (add-hook 'haskell-interactive-mode-hook #'subword-mode))
+    ;; align rules for Haskell
+    (with-eval-after-load 'align
+      (add-to-list 'align-rules-list
+                   '(haskell-types
+                     (regexp . "\\(\\s-+\\)\\(::\\|?\\)\\s-+")
+                     (modes . '(haskell-mode literate-haskell-mode))))
+      (add-to-list 'align-rules-list
+                   '(haskell-assignment
+                     (regexp . "\\(\\s-+\\)=\\s-+")
+                     (modes . '(haskell-mode literate-haskell-mode))))
+      (add-to-list 'align-rules-list
+                   '(haskell-arrows
+                     (regexp . "\\(\\s-+\\)\\(->\\|?\\)\\s-+")
+                     (modes . '(haskell-mode literate-haskell-mode))))
+      (add-to-list 'align-rules-list
+                   '(haskell-left-arrows
+                     (regexp . "\\(\\s-+\\)\\(<-\\|?\\)\\s-+")
+                     (modes . '(haskell-mode literate-haskell-mode)))))))
 
 (use-package hindent                    ; Automated Haskell indentation
   :defer t
