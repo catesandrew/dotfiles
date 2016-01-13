@@ -9630,13 +9630,17 @@ If called with a prefix argument, uses the other-window instead."
       (kbd "q") 'quit-window
       (kbd "i") 'sunshine-toggle-icons))
   :config
-  ;; just in case location was not set by user, or on OS X,
-  ;; if wasn't set up automatically, will not work with Emac's
-  ;; default for ;; `calendar-location-name'
-  (when (not (boundp 'sunshine-location))
-    (setq sunshine-location (format "%s, %s"
-                                    calendar-latitude
-                                    calendar-longitude))))
+  (progn
+    (setq sunshine-appid "bedbfc11dac244208e29f486c82412b6"
+          sunshine-location "Huntington Beach, CA")
+
+    ;; just in case location was not set by user, or on OS X,
+    ;; if wasn't set up automatically, will not work with Emac's
+    ;; default for ;; `calendar-location-name'
+    (when (not (boundp 'sunshine-location))
+      (setq sunshine-location (format "%s, %s"
+                                      calendar-latitude
+                                      calendar-longitude)))))
 
 (use-package theme-changer
   :if geolocation-enable-automatic-theme-changer
