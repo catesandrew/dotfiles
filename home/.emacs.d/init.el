@@ -5447,8 +5447,8 @@ fix this issue."
       "mhd"  'inferior-haskell-find-haddock
       "mhh"  'hoogle
       "mhH"  'hoogle-lookup-from-local
-      "mhi"  'haskell-process-do-info
-      "mht"  'haskell-process-do-type
+      "mhi"  (lookup-key haskell-mode-map (kbd "C-c C-i"))
+      "mht"  (lookup-key haskell-mode-map (kbd "C-c C-t"))
       "mhT"  'dotemacs-haskell-process-do-type-on-prev-line
       "mhy"  'hayoo
 
@@ -5502,6 +5502,8 @@ fix this issue."
                      '("--ghc-option=-ferror-spans" (concat "--with-ghc=" ghci-ng))))
 
       (evil-leader/set-key-for-mode 'haskell-mode
+        ;; function suggested in
+        ;; https://github.com/chrisdone/ghci-ng#using-with-haskell-mode
         "mu"   'haskell-mode-find-uses
         "mht"  'haskell-mode-show-type-at
         "mgg"  'haskell-mode-goto-loc))
