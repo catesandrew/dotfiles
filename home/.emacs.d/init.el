@@ -641,6 +641,9 @@ group by projectile projects."
 (defvar syntax-checking-enable-by-default t
   "Enable syntax-checking by default.")
 
+(defvar spell-checking-enable-by-default t
+  "Enable spell checking by default.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -955,7 +958,7 @@ group by projectile projects."
 Retrieving completions for Eshell blocks Emacs. Over remote
 connections the delay is often annoying, so it's better to let
 the user activate the completion manually."
-          (if (current-buffer-remote-p)
+          (if (file-remote-p default-directory)
               (setq-local company-idle-delay nil)
             (setq-local company-idle-delay 0.2)))
         (add-hook 'eshell-directory-change-hook
@@ -2090,19 +2093,6 @@ the user activate the completion manually."
   :bind (("C-c e u" . revert-buffer)
          ("C-c e y" . bury-buffer)))
 
-(defun current-buffer-remote-p ()
-  (--any? (and it (file-remote-p it))
-          (list
-            (buffer-file-name)
-             list-buffers-directory
-             default-directory))
-;; (and (fboundp 'tramp-tramp-file-p) (-any? 'tramp-tramp-file-p
-;;             (list
-;;              (buffer-file-name)
-;;              list-buffers-directory
-;;              default-directory)))
-  )
-
 (use-package tramp                      ; Access remote files
   :defer t
   :init
@@ -2365,7 +2355,7 @@ the user activate the completion manually."
           auto-revert-tail-mode-text " ♻~"
           auto-revert-verbose nil)
     (defun auto-revert-turn-on-maybe ()
-      (unless (current-buffer-remote-p)
+      (unless (file-remote-p default-directory)
         (auto-revert-mode)))
     (add-hook 'find-file-hook 'auto-revert-turn-on-maybe))
   :config
@@ -3825,11 +3815,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'LaTeX-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'LaTeX-mode))
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode))
+  (dotemacs/add-flyspell-hook 'LaTeX-mode))
 
 (dotemacs-use-package-add-hook yasnippet
   :post-init
@@ -4045,7 +4035,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
-  (add-hook 'markdown-mode-hook 'flyspell-mode))
+  (dotemacs/add-flyspell-hook 'markdown-mode))
 
 (dotemacs-use-package-add-hook emoji-cheat-sheet-plus
   :post-init
@@ -4068,7 +4058,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'rst-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'rst-mode))
 
 (use-package mustache-mode              ; Mustache mode
   :ensure t
@@ -4087,7 +4077,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'handlebars-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'handlebars-mode))
 
 (use-package jira-markup-mode           ; Jira markup
   :ensure t
@@ -4505,8 +4495,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'emacs-lisp-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'lisp-mode-hook 'flycheck-turn-on-maybe)
+    (dolist (mode '(emacs-lisp-mode lisp-mode))
+      (dotemacs/add-flycheck-hook mode))
     ;; Don't activate flycheck by default in elisp
     ;; because of too much false warnings
     ;; (dotemacs-add-flycheck-hook 'emacs-lisp-mode-hook)
@@ -4788,7 +4778,7 @@ point. Requires smartparens because all movement is done using
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'scala-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'scala-mode))
 
 (use-package ensime-sbt
   :ensure ensime
@@ -5065,7 +5055,7 @@ point. Requires smartparens because all movement is done using
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'python-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'python-mode))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
@@ -5273,7 +5263,7 @@ fix this issue."
     ;; Add standard hooks for Feature Mode, since it is no derived mode
     (add-hook 'feature-mode-hook #'whitespace-mode)
     (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
-    (add-hook 'feature-mode-hook #'flyspell-mode)))
+    (dotemacs/add-flyspell-hook 'feature-mode)))
 
 (use-package haml-mode
   :ensure t
@@ -5305,11 +5295,8 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (progn
-    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(haml-mode-hook
-                                                     yaml-mode-hook
-                                                     ruby-mode-hook
-                                                     enh-ruby-mode-hook))))
+  (dolist (mode '(haml-mode yaml-mode ruby-mode enh-ruby-mode))
+    (dotemacs/add-flycheck-hook mode)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5353,7 +5340,7 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'rust-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'rust-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5657,7 +5644,7 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'haskell-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'haskell-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5729,7 +5716,7 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'go-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'go-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5801,8 +5788,8 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (progn
-    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(c-mode-hook c++-mode-hook))))
+  (dolist (mode '(c-mode-hook c++-mode-hook))
+    (dotemacs/add-flycheck-hook mode)))
 
 (use-package gdb-mi
   :ensure t
@@ -6240,7 +6227,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'tuareg-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'tuareg-mode))
 
 (use-package flycheck-ocaml             ; Check OCaml code with Merlin
   :ensure t
@@ -6282,7 +6269,7 @@ If called with a prefix argument, uses the other-window instead."
 ; Waiting on purscheck to make it to melpa
 ; (dotemacs-use-package-add-hook flycheck
 ;   :post-init
-;   (add-hook 'purescript-mode-hook 'flycheck-turn-on-maybe))
+;   (dotemacs/add-flycheck-hook 'purescript-mode))
 
 (use-package psci
   :defer t
@@ -6331,10 +6318,9 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'react-mode-hook
-            (lambda ()
-              (flycheck-turn-on-maybe)
-              (dotemacs-flycheck-init-react))))
+  (progn
+    (dotemacs/add-flycheck-hook 'react-mode)
+    (add-hook 'react-mode-hook 'dotemacs-flycheck-init-react)))
 
 (dotemacs-use-package-add-hook js-doc
   :post-init
@@ -6390,7 +6376,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'elm-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'elm-mode))
 
 (use-package flycheck-elm
   :ensure t
@@ -6533,12 +6519,9 @@ If called with a prefix argument, uses the other-window instead."
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
-    (add-hook 'coffee-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'js2-mode-hook
-              (lambda ()
-                (flycheck-turn-on-maybe)
-                (dotemacs-flycheck-init-javascript)))
-    (add-hook 'json-mode-hook 'flycheck-turn-on-maybe)))
+    (dolist (mode '(coffee-mode js2-mode json-mode))
+      (dotemacs/add-flycheck-hook mode))
+    (add-hook 'js2-mode-hook 'dotemacs-flycheck-init-javascript)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-config
@@ -7001,14 +6984,8 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (progn
-    (dotemacs/add-to-hooks 'flycheck-turn-on-maybe '(jade-mode-hook
-                                                     less-mode-hook
-                                                     slim-mode-hook
-                                                     sass-mode-hook
-                                                     css-mode-hook
-                                                     scss-mode-hook
-                                                     web-mode-hook))))
+  (dolist (mode '(jade-mode less-mode slim-mode sass-mode css-mode scss-mode web-mode))
+    (dotemacs/add-flycheck-hook mode)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -7036,7 +7013,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'lua-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'lua-mode))
 
 (use-package lua-mode
   :defer t
@@ -7099,7 +7076,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'php-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'php-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -7211,7 +7188,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'racket-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'racket-mode))
 
 
 ;;; Java
@@ -7388,9 +7365,8 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (progn
-    (add-hook 'swift-mode-hook 'flycheck-turn-on-maybe)
-    (add-hook 'sh-mode-hook 'flycheck-turn-on-maybe)))
+  (dolist (mode '(swift-mode sh-mode))
+    (dotemacs/add-flycheck-hook mode)))
 
 
 ;; REST Client
@@ -9571,7 +9547,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'puppet-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'puppet-mode))
 
 
 ;;; Finance
@@ -9602,7 +9578,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (add-hook 'ledger-mode-hook 'flycheck-turn-on-maybe))
+  (dotemacs/add-flycheck-hook 'ledger-mode))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -10305,21 +10281,11 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package flycheck                   ; On-the-fly syntax checking
   :ensure t
-  :if (not noninteractive)
-  :commands (flycheck-mode
-             global-flycheck-mode)
+  :defer t
   :init
   (progn
     (setq flycheck-standard-error-navigation nil
           flycheck-completion-system 'ido)
-
-    (defun flycheck-turn-on-maybe ()
-      (unless
-          (or
-           buffer-read-only
-           (hardhat-buffer-included-p (current-buffer))
-           (current-buffer-remote-p))
-        (flycheck-mode)))
 
     ;; Each buffer gets its own idle-change-delay because of the
     ;; buffer-sensitive adjustment above.
@@ -10329,11 +10295,11 @@ If called with a prefix argument, uses the other-window instead."
               #'dotemacs-adjust-flycheck-automatic-syntax-eagerness)
 
     (dotemacs-add-toggle syntax-checking
-                         :status flycheck-mode
-                         :on (flycheck-mode)
-                         :off (flycheck-mode -1)
-                         :documentation "Enable error and syntax checking."
-                         :evil-leader "ts"))
+      :status flycheck-mode
+      :on (flycheck-mode)
+      :off (flycheck-mode -1)
+      :documentation "Enable error and syntax checking."
+      :evil-leader "ts"))
   :config
   (progn
     ;; Make flycheck recognize packages in loadpath
@@ -10439,9 +10405,7 @@ If the error list is visible, hide it.  Otherwise, show it."
     (flycheck-define-error-level 'info
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-info)
-
-    ))
+      :fringe-face 'flycheck-fringe-info)))
 
 (use-package flycheck-pos-tip
   :ensure t
@@ -10471,6 +10435,11 @@ If the error list is visible, hide it.  Otherwise, show it."
     (unless ispell-program-name
       (warn "No spell checker available. Install Hunspell or ASpell."))))
 
+(use-package init-spell-checking
+  :load-path "config/"
+  :defer t
+  :commands (dotemacs/add-flyspell-hook))
+
 (use-package define-word
   :defer t
   :ensure t
@@ -10485,8 +10454,9 @@ If the error list is visible, hide it.  Otherwise, show it."
     (setq flyspell-use-meta-tab nil
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
-    (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
-      (add-hook hook 'flyspell-mode))
+    (dolist (mode '(org-mode text-mode message-mode))
+      (dotemacs/add-flyspell-hook mode))
+
     (dotemacs-add-toggle spelling-checking
       :status flyspell-mode
       :on (flyspell-mode)
@@ -10502,7 +10472,9 @@ If the error list is visible, hide it.  Otherwise, show it."
     ;; Undefine mouse buttons which get in the way
     (define-key flyspell-mouse-map [down-mouse-2] nil)
     (define-key flyspell-mouse-map [mouse-2] nil)
-    (flyspell-prog-mode)
+    (when spell-checking-enable-by-default
+      (flyspell-prog-mode))
+
     (dotemacs-diminish flyspell-mode " Ⓢ" " S")))
 
 (use-package helm-flycheck
