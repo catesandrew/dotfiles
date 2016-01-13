@@ -3318,8 +3318,7 @@ It will toggle the overlay under point or create an overlay of one character."
   :ensure t
   :init
   (progn
-    (setq evil-jumper-file (concat dotemacs-cache-directory "evil-jumps")
-          evil-jumper-auto-center t
+    (setq evil-jumper-auto-center t
           evil-jumper-auto-save-interval 600)
     (evil-jumper-mode t)))
 
