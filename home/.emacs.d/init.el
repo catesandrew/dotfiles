@@ -4626,31 +4626,32 @@ point. Requires smartparens because all movement is done using
 (use-package sbt-mode                   ; Scala build tool
   :ensure t
   :defer t
-  :config (progn
-            (setq sbt:sbt-prompt-regexp
-                  (rx bol (or (and (optional "scala") ">") ; Default prompt
-                              ;; Sbt Prompt plugin
-                              (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
-                      (0+ " ")))
+  :config
+  (progn
+    (setq sbt:sbt-prompt-regexp
+          (rx bol (or (and (optional "scala") ">") ; Default prompt
+                      ;; Sbt Prompt plugin
+                      (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
+              (0+ " ")))
 
-            (with-eval-after-load 'scala-mode2
-              (bind-key "C-c c" #'sbt-command scala-mode-map))
+    (evil-leader/set-key-for-mode 'scala-mode
+      "mbb" 'sbt-command)
 
-            (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
-              "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
-              (string-prefix-p sbt:buffer-name-base buffer-name))
+    (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
+      "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
+      (string-prefix-p sbt:buffer-name-base buffer-name))
 
-            ;; Get SBT buffers under control: Display them below the current
-            ;; window, at a third of the height of the current window, but try
-            ;; to reuse any existing and visible window for the SBT buffer
-            ;; first.
-            (add-to-list 'display-buffer-alist
-                         '(dotemacs-sbt-buffer-p
-                           (display-buffer-reuse-window
-                            display-buffer-in-side-window)
-                           (side            . bottom)
-                           (reusable-frames . visible)
-                           (window-height   . 0.4)))))
+    ;; Get SBT buffers under control: Display them below the current
+    ;; window, at a third of the height of the current window, but try
+    ;; to reuse any existing and visible window for the SBT buffer
+    ;; first.
+    (add-to-list 'display-buffer-alist
+                 '(dotemacs-sbt-buffer-p
+                   (display-buffer-reuse-window
+                    display-buffer-in-side-window)
+                   (side            . bottom)
+                   (reusable-frames . visible)
+                   (window-height   . 0.4)))))
 
 (use-package ensime                     ; Scala interaction mode
   :ensure t
