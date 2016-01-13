@@ -934,8 +934,8 @@ group by projectile projects."
       (setq exec-path-from-shell-arguments '("-l")))
 
     (dotemacs|do-after-display-system-init
-     (when (memq window-system '(mac ns x))
-       (exec-path-from-shell-initialize)))
+      (when (memq window-system '(mac ns x))
+        (exec-path-from-shell-initialize)))
 
     (setq user-mail-address (getenv "EMAIL")))
   :config
@@ -9372,6 +9372,8 @@ If called with a prefix argument, uses the other-window instead."
     ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
     ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
     ;; warnings, when not using `coreutils' version of 'ls' on OS X.
+    ;; We must look for `gls' after `exec-path-from-shell' was initialized to
+    ;; make sure that `gls' is in `exec-path'
     ;; See brew info coreutils
     (when-let (gnu-ls (and (eq system-type 'darwin)
                              (executable-find "gls")))
