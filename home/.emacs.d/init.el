@@ -8804,6 +8804,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (use-package org-plus-contrib
   :mode ("\\.org$" . org-mode)
+  :commands (org-clock-out org-occur-in-agenda-files)
   :ensure t
   :defer t
   :init
@@ -8817,50 +8818,6 @@ If called with a prefix argument, uses the other-window instead."
 
     (with-eval-after-load 'org-indent
       (dotemacs-hide-lighter org-indent-mode))
-
-    (add-hook 'org-load-hook
-      (lambda ()
-        (unless (file-exists-p org-directory)
-          (make-directory org-directory))
-
-        (setq my-inbox-org-file (concat org-directory "/inbox.org")
-              org-indent-indentation-per-level 2
-              org-use-fast-todo-selection t
-              org-completion-use-ido t
-              org-treat-S-cursor-todo-selection-as-state-change nil
-              org-agenda-files `(,org-directory))
-
-        (setq org-capture-templates
-              '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
-                 "* TODO %?\n%U\n%a\n")
-                ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
-                 "* %? :NOTE:\n%U\n%a\n")
-                ("m" "Meeting" entry (file my-inbox-org-file)
-                 "* MEETING %? :MEETING:\n%U")
-                ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
-                 "* %?\n%U\n")))
-
-        ;; org-mode colors
-        (setq org-todo-keyword-faces
-              '(
-                ("INPR" . (:foreground "yellow" :weight bold))
-                ("DONE" . (:foreground "green" :weight bold))
-                ("IMPEDED" . (:foreground "red" :weight bold))
-                ))
-
-        (setq org-refile-targets '((nil :maxlevel . 9)
-                      (org-agenda-files :maxlevel . 9)))
-
-        (setq org-todo-keywords
-              '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
-                (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
-
-        (setq org-todo-state-tags-triggers
-              ' (("CANCELLED" ("CANCELLED" . t))
-                 ("WAITING" ("WAITING" . t))
-                 ("TODO" ("WAITING") ("CANCELLED"))
-                 ("NEXT" ("WAITING") ("CANCELLED"))
-                 ("DONE" ("WAITING") ("CANCELLED"))))))
 
     (defmacro dotemacs-org-emphasize (fname char)
       "Make function for setting the emphasis in org mode"
@@ -8966,18 +8923,76 @@ If called with a prefix argument, uses the other-window instead."
     (require 'org-bullets)
 
     (with-eval-after-load 'org-agenda
-      (progn
-         (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
-         (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
-         ;; Since we could override SPC with <leader>, let's make RET do that functionality
-         ;; TODO: Check if <leader> equals SPC
-         ; (define-key org-agenda-mode-map
-         ;   (kbd "RET") 'org-agenda-show-and-scroll-up)
-         ; (define-key org-agenda-mode-map
-         ;   (kbd "SPC") evil-leader--default-map)
-         )))
+       ;; Since we could override SPC with <leader>, let's make RET do that functionality
+       ;; TODO: Check if <leader> equals SPC
+       ; (define-key org-agenda-mode-map
+       ;   (kbd "RET") 'org-agenda-show-and-scroll-up)
+       ; (define-key org-agenda-mode-map
+       ;   (kbd "SPC") evil-leader--default-map)
+
+      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+      (define-key org-agenda-mode-map "k" 'org-agenda-previous-line))
+
+    ;; Add global evil-leader mappings. Used to access org-agenda
+    ;; functionalities – and a few others commands – from any other mode.
+    (evil-leader/set-key
+      ;; org-agenda
+      "ao#" 'org-agenda-list-stuck-projects
+      "ao/" 'org-occur-in-agenda-files
+      "aoa" 'org-agenda-list
+      "aoe" 'org-store-agenda-views
+      "aom" 'org-tags-view
+      "aoo" 'org-agenda
+      "aos" 'org-search-view
+      "aot" 'org-todo-list
+      ;; other
+      "aoO" 'org-clock-out
+      "aoc" 'org-capture
+      "aol" 'org-store-link))
   :config
   (progn
+    (unless (file-exists-p org-directory)
+      (make-directory org-directory))
+
+    (setq my-inbox-org-file (concat org-directory "/inbox.org")
+          org-indent-indentation-per-level 2
+          org-use-fast-todo-selection t
+          org-completion-use-ido t
+          org-treat-S-cursor-todo-selection-as-state-change nil
+          org-agenda-files `(,org-directory))
+
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
+             "* TODO %?\n%U\n%a\n")
+            ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
+             "* %? :NOTE:\n%U\n%a\n")
+            ("m" "Meeting" entry (file my-inbox-org-file)
+             "* MEETING %? :MEETING:\n%U")
+            ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
+             "* %?\n%U\n")))
+
+    ;; org-mode colors
+    (setq org-todo-keyword-faces
+          '(
+            ("INPR" . (:foreground "yellow" :weight bold))
+            ("DONE" . (:foreground "green" :weight bold))
+            ("IMPEDED" . (:foreground "red" :weight bold))
+            ))
+
+    (setq org-refile-targets '((nil :maxlevel . 9)
+                  (org-agenda-files :maxlevel . 9)))
+
+    (setq org-todo-keywords
+          '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
+            (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
+
+    (setq org-todo-state-tags-triggers
+          ' (("CANCELLED" ("CANCELLED" . t))
+             ("WAITING" ("WAITING" . t))
+             ("TODO" ("WAITING") ("CANCELLED"))
+             ("NEXT" ("WAITING") ("CANCELLED"))
+             ("DONE" ("WAITING") ("CANCELLED"))))
+
     (font-lock-add-keywords
      'org-mode '(("\\(@@html:<kbd>@@\\) \\(.*\\) \\(@@html:</kbd>@@\\)"
                   (1 font-lock-comment-face prepend)
@@ -9000,7 +9015,7 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (setq org-bullets-bullet-list '("✿" "❀" "☢" "☯" "✸" ))
-    (add-hook 'org-mode-hook #'org-bullets-mode)))
+    (add-hook 'org-mode-hook 'org-bullets-mode)))
 
 (use-package org-repo-todo
   :ensure t
