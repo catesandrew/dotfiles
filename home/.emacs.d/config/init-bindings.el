@@ -56,6 +56,7 @@
   "bn"  'dotemacs-next-useful-buffer
   "bp"  'dotemacs-previous-useful-buffer
   "bR"  'dotemacs-safe-revert-buffer
+  "bs"  'dotemacs/switch-to-scratch-buffer
   "bY"  'dotemacs/copy-whole-buffer-to-clipboard
   "bw"  'read-only-mode)
 ;; Cycling settings -----------------------------------------------------------

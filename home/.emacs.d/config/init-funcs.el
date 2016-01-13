@@ -1012,6 +1012,12 @@ is nonempty."
           ((stringp val) (< 0 (length val)))
           (t))))
 
+(defun dotemacs/switch-to-scratch-buffer ()
+  "Switch to the `*scratch*' buffer. Create it first if needed."
+  (interactive)
+  ;; consider (my-goto-scratch-buffer)
+  (switch-to-buffer (get-buffer-create "*scratch*")))
+
 (defun dotemacs/uniquify-lines ()
   "Remove duplicate adjacent lines in region or current buffer"
   (interactive)
