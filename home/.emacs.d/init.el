@@ -8331,6 +8331,7 @@ If called with a prefix argument, uses the other-window instead."
     (when (dotemacs/system-is-mswindows)
       (setq projectile-generic-command "find . -type f"))
     (setq projectile-sort-order 'recently-active  ; recentf
+          projectile-switch-project-action 'projectile-dired
           projectile-cache-file (concat dotemacs-cache-directory
                                         "projectile.cache")
           projectile-known-projects-file (concat dotemacs-cache-directory
@@ -8416,8 +8417,24 @@ If called with a prefix argument, uses the other-window instead."
       "py" 'projectile-find-tag))
   :config
   (progn
+    ; (add-hook 'projectile-after-switch-project-hook 'pyenv-mode-set-local-version)
+    (defun dotemacs//projectile-switch-project-by-name (fcn project-to-switch &optional args)
+      (apply fcn project-to-switch args)
+      (when (and (projectile-project-p) (fboundp 'neotree-dir))
+        (if (neo-global--window-exists-p)
+            (neotree-dir (projectile-project-root))
+          (progn
+            (neotree-dir (projectile-project-root))
+            (neotree-hide)
+            (let ((origin-buffer-file-name (buffer-file-name)))
+              (neotree-find (projectile-project-root))
+              (neotree-find origin-buffer-file-name))
+            (neotree-hide)))))
+    (advice-add 'projectile-switch-project-by-name
+                :around 'dotemacs//projectile-switch-project-by-name)
+
     ;; Remove dead projects when Emacs is idle
-    ; (run-with-idle-timer 10 nil #'projectile-cleanup-known-projects)
+    (run-with-idle-timer 10 nil 'projectile-cleanup-known-projects)
     (projectile-global-mode)
     (dotemacs-hide-lighter projectile-mode)))
 
@@ -8434,21 +8451,7 @@ If called with a prefix argument, uses the other-window instead."
              helm-projectile-switch-project)
   :init
   (progn
-    (helm-projectile-on)
-
-    ; (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)
-
-    (defun dotemacs-projectile-switch-project ()
-      "Default projectile-switch-project-action hook."
-      (interactive)
-      (when (fboundp 'projectile-dired)
-        (projectile-dired))
-      (when (fboundp 'helm-projectile)
-        (helm-projectile))
-      (when (fboundp 'neotree-projectile-action)
-        (when (neo-global--window-exists-p)
-          (neotree-projectile-action))))
-    (setq projectile-switch-project-action 'dotemacs-projectile-switch-project)
+    (setq projectile-switch-project-action 'helm-projectile)
 
     (defconst dotemacs-use-helm-projectile t
       "This variable is only defined if helm-projectile is used.")
@@ -8465,7 +8468,10 @@ If called with a prefix argument, uses the other-window instead."
       "pp"  'helm-projectile-switch-project
       "pr"  'helm-projectile-recentf
       "pv"  'projectile-vc
-      "sgp" 'helm-projectile-grep)))
+      "sgp" 'helm-projectile-grep))
+  :config
+  (with-eval-after-load 'projectile
+    (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)))
 
 
 ;;; Project management with NeoTree
