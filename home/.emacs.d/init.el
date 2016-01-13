@@ -5295,6 +5295,15 @@ fix this issue."
   ;; Easily switch to Inf Ruby from compilation modes to Inf Ruby
   (inf-ruby-switch-setup))
 
+(use-package evil-matchit-ruby
+  :defer t
+  :ensure evil-matchit
+  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
+  :config
+  (progn
+    (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                               (evilmi-ruby-get-tag evilmi-ruby-jump)))))
+
 (dotemacs-use-package-add-hook rainbow-delimiters
   :post-init
   (progn
@@ -9577,8 +9586,9 @@ If called with a prefix argument, uses the other-window instead."
     (progn
       (push 'company-capf company-backends-ledger-mode)
       (dotemacs-add-company-hook ledger-mode))))
+
 
-;;; Misc
+;;; Google Translate
 (use-package google-translate
   :ensure t
   :commands (google-translate-query-translate
@@ -9599,7 +9609,8 @@ If called with a prefix argument, uses the other-window instead."
     (setq google-translate-default-source-language "En")
     (setq google-translate-default-target-language "Sp")))
 
-;; search engine
+
+;; Search Engine
 (use-package engine-mode
   :commands (defengine dotemacs-search-engine-select)
   :ensure t
@@ -9666,7 +9677,8 @@ If called with a prefix argument, uses the other-window instead."
     (helm :sources (list (dotemacs-search-engine-source
                           search-engine-alist)))))
 
-;; emoji
+
+;; Emoji
 (use-package emoji-cheat-sheet-plus
   :ensure t
   :commands (emoji-cheat-sheet-plus-insert
@@ -9716,7 +9728,8 @@ If called with a prefix argument, uses the other-window instead."
     (define-key spray-mode-map (kbd "l") 'spray-forward-word)
     (define-key spray-mode-map (kbd "q") 'spray-quit)))
 
-;; vagrant
+
+;; Vagrant
 (use-package vagrant
   :defer t
   :ensure t
@@ -9746,6 +9759,8 @@ If called with a prefix argument, uses the other-window instead."
         (setq dotemacs--vagrant-tramp-loaded t)))
     (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
 
+
+;; Pandoc
 (use-package pandoc-mode ; http://joostkremers.github.io/pandoc-mode/
   :defer t
   :commands dotemacs-run-pandoc
@@ -9910,7 +9925,8 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (push 'company-nixos-options company-backends-nix-mode)))
 
-;; asciidoc
+
+;; Asciidoc
 (use-package adoc-mode
   ;; We will NOT default `.txt' files to AsciiDoc mode,
   ;; and `.asciidoc' extension is just plain stupid.
@@ -10245,15 +10261,6 @@ If called with a prefix argument, uses the other-window instead."
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
     (sp-pair "[" nil :post-handlers
              '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
-
-(use-package evil-matchit-ruby
-  :defer t
-  :ensure evil-matchit
-  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
-  :config
-  (progn
-    (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                               (evilmi-ruby-get-tag evilmi-ruby-jump)))))
 
 
 ;;; Syntax Checking
