@@ -2339,9 +2339,12 @@ the user activate the completion manually."
 (use-package saveplace                  ; Save point position in files
   :init
   (progn
+    (if (fboundp 'save-place-mode)
+        ;; Emacs 25 has a proper mode for `save-place'
+        (save-place-mode)
+      (setq save-place t))
     ;; Save point position between sessions
-    (setq save-place t
-          save-place-file (concat dotemacs-cache-directory "places"))))
+    (setq save-place-file (concat dotemacs-cache-directory "places"))))
 
 (setq view-read-only t)                 ; View read-only files
 
