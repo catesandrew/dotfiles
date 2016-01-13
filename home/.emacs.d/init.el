@@ -381,7 +381,7 @@ NOERROR and NOMESSAGE are passed to `load'."
   "Height in percents for the shell window."
   :group 'dotemacs-shell)
 
-(defcustom dotemacs-shell-default-term-shell "/bin/bash"
+(defcustom dotemacs-shell-default-term-shell shell-file-name
   "Default shell to use in `term' and `ansi-term' shells."
   :group 'dotemacs-shell)
 
