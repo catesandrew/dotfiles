@@ -2033,6 +2033,8 @@ the user activate the completion manually."
     (push '("^\\*WoMan.+\\*$" :regexp t           :position bottom                                   ) popwin:special-display-config)
     (push '("^\\*Flycheck.+\\*$" :regexp t
                                      :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
+      ;; Pin the weather forecast to the bottom window
+    (push '("*Sunshine*"             :dedicated t :position bottom                                   ) popwin:special-display-config)
     ;; add cider error to popwin special buffers
     (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
     ;; add cider-doc to popwin
@@ -9586,6 +9588,65 @@ If called with a prefix argument, uses the other-window instead."
     (progn
       (push 'company-capf company-backends-ledger-mode)
       (dotemacs-add-company-hook ledger-mode))))
+
+
+;;; geolocation
+(defvar geolocation-enable-osx-location-service-support t
+  "If non nil enable the OS X location service support.")
+
+(defvar geolocation-enable-weather-forecast t
+  "If non nil enable the weather forecast service.")
+
+(defvar geolocation-enable-automatic-theme-changer nil
+  "If non nil enable the automatic change of theme based on the current time.")
+
+(use-package osx-location
+  :if geolocation-enable-osx-location-service-support
+  :ensure t
+  :init
+  (progn
+    (add-hook 'osx-location-changed-hook
+              (lambda ()
+                (setq calendar-latitude osx-location-latitude
+                      calendar-longitude osx-location-longitude)
+                (unless (bound-and-true-p calendar-location-name)
+                  (setq calendar-location-name
+                        (format "%s, %s"
+                                osx-location-latitude
+                                osx-location-longitude)))))
+    (osx-location-watch)))
+
+(use-package sunshine
+  :if geolocation-enable-weather-forecast
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (evil-leader/set-key
+      "aw" 'sunshine-forecast
+      "aW" 'sunshine-quick-forecast)
+
+    (evilify sunshine-mode sunshine-mode-map
+      (kbd "q") 'quit-window
+      (kbd "i") 'sunshine-toggle-icons))
+  :config
+  ;; just in case location was not set by user, or on OS X,
+  ;; if wasn't set up automatically, will not work with Emac's
+  ;; default for ;; `calendar-location-name'
+  (when (not (boundp 'sunshine-location))
+    (setq sunshine-location (format "%s, %s"
+                                    calendar-latitude
+                                    calendar-longitude))))
+
+(use-package theme-changer
+  :if geolocation-enable-automatic-theme-changer
+  :ensure t
+  :config
+  (progn
+    (when (> (length dotemacs-themes) 1)
+      (change-theme (nth 0 dotemacs-themes)
+                    (nth 1 dotemacs-themes)))))
+
 
 
 ;;; Google Translate
