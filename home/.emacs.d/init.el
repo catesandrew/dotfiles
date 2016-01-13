@@ -7597,6 +7597,9 @@ If called with a prefix argument, uses the other-window instead."
 (use-package init-magit
   :load-path "config/")
 
+;; gravatars from magit use this to store their cache
+(setq url-configuration-directory (concat dotemacs-cache-directory "url/"))
+
 (use-package magit                      ; The one and only Git frontend
   :ensure t
   :commands (magit-status
