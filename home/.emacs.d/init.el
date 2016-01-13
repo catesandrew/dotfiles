@@ -4108,6 +4108,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; Highlight and allow to open http link at point in programming buffers
     ;; goto-address-prog-mode only highlights links in strings and comments
     (add-hook 'prog-mode-hook 'goto-address-prog-mode)
+    ;; Highlight and follow bug references in comments and strings
+    (add-hook 'prog-mode-hook 'bug-reference-prog-mode)
 
     (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
     (add-hook 'prog-mode-hook
