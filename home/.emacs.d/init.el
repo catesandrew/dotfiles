@@ -3431,14 +3431,8 @@ It will toggle the overlay under point or create an overlay of one character."
 (use-package evil-matchit
   :ensure t
   :init
-  (progn
-    (dolist (hook '(LaTeX-mode-hook
-                    web-mode-hook
-                    js2-mode-hook
-                    mustache-mode-hook
-                    handlebars-mode-hook))
-      (add-hook hook '(lambda ()
-        (turn-on-evil-matchit-mode))))))
+  (dolist (hook '(LaTeX-mode-hook mustache-mode-hook handlebars-mode-hook ruby-mode-hook))
+    (add-hook hook 'turn-on-evil-matchit-mode)))
 
 (use-package evil-indent-textobject
   :quelpa (evil-indent-textobject :fetcher github :repo "TheBB/evil-indent-textobject"))
@@ -6602,6 +6596,11 @@ If called with a prefix argument, uses the other-window instead."
     (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
     (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)))
 
+(use-package evil-matchit-js2
+  :defer t
+  :ensure evil-matchit
+  :init (add-hook `js2-mode-hook `turn-on-evil-matchit-mode))
+
 (use-package js2-refactor
   :defer t
   :ensure t
@@ -6799,8 +6798,10 @@ If called with a prefix argument, uses the other-window instead."
   :commands (turn-on-css-eldoc)
   :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
 
-(with-eval-after-load 'evil-matchit
-  (add-hook 'web-mode-hook 'turn-on-evil-matchit-mode))
+(use-package evil-matchit-web
+  :defer t
+  :ensure evil-matchit
+  :init (add-hook `web-mode-hook `turn-on-evil-matchit-mode))
 
 (use-package helm-css-scss
   :defer t
