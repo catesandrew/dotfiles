@@ -910,6 +910,9 @@ group by projectile projects."
 ;;; Terminal emulation and shells
 (dotemacs-defvar-company-backends eshell-mode)
 
+;; move point to the end of buffer on new output
+(setq comint-move-point-for-output t)
+
 (use-package init-eshell
   :load-path "config/")
 
