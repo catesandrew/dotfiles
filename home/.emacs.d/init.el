@@ -9012,22 +9012,14 @@ If called with a prefix argument, uses the other-window instead."
           "mtp" 'org-plot/gnuplot))
 
 (use-package evil-org
+  :load-path "extensions/"
   :commands evil-org-mode
-  :ensure t
   :init
   (add-hook 'org-mode-hook 'evil-org-mode)
   :config
   (progn
     (evil-leader/set-key-for-mode 'org-mode
-      "o" nil "mC" 'evil-org-recompute-clocks
-      ;; evil-org binds these keys, so we bind them back to their original
-      ;; value
-      "t" (lookup-key evil-leader--default-map "t")
-      "a" (lookup-key evil-leader--default-map "a")
-      "b" (lookup-key evil-leader--default-map "b")
-      "c" (lookup-key evil-leader--default-map "c")
-      "l" (lookup-key evil-leader--default-map "l")
-      "o" (lookup-key evil-leader--default-map "o"))
+      "mC" 'evil-org-recompute-clocks)
     (evil-define-key 'normal evil-org-mode-map
       "O" 'evil-open-above)
     (dotemacs-diminish evil-org-mode " ⓔ" " e")))
