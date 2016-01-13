@@ -10886,6 +10886,7 @@ If the error list is visible, hide it.  Otherwise, show it."
     (spaceline-toggle-battery-off)
     (spaceline-toggle-version-control-off)
     (spaceline-toggle-minor-modes-off)
+    (spaceline-toggle-major-mode-off)
     (spaceline-toggle-org-clock-off)
 
     (defun dotemacs/customize-powerline-faces ()
