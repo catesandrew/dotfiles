@@ -5793,7 +5793,7 @@ fix this issue."
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (dolist (mode '(c-mode-hook c++-mode-hook))
+  (dolist (mode '(c-mode c++-mode))
     (dotemacs/add-flycheck-hook mode)))
 
 (use-package gdb-mi
