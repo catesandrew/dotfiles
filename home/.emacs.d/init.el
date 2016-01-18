@@ -8010,6 +8010,7 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-leader/set-key
       "gb" 'dotemacs/git-blame-micro-state
+      "gi" 'magit-init
       "gl" 'magit-log-all
       "gL" 'magit-log-buffer-file
       "gs" 'magit-status
