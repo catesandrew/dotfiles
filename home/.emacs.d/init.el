@@ -8776,7 +8776,7 @@ If called with a prefix argument, uses the other-window instead."
     (defun dotemacs//projectile-switch-project-by-name (fcn project-to-switch &optional args)
       (apply fcn project-to-switch args)
       (when (projectile-project-p)
-        (message "Switching to project: %s" (projectile-project-root)))
+        (message "Switching to project: %s" (projectile-project-root))
         (when (fboundp 'neotree-dir)
           (if (neo-global--window-exists-p)
               (neotree-dir (projectile-project-root))
@@ -8786,7 +8786,7 @@ If called with a prefix argument, uses the other-window instead."
               (let ((origin-buffer-file-name (buffer-file-name)))
                 (neotree-find (projectile-project-root))
                 (neotree-find origin-buffer-file-name))
-              (neotree-hide)))))
+              (neotree-hide))))))
     (advice-add 'projectile-switch-project-by-name
                 :around 'dotemacs//projectile-switch-project-by-name)
 
