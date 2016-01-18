@@ -3857,6 +3857,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode (("\\.m[k]d" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
          ("\\.apib$" . markdown-mode))
+  :defer t
   :ensure t
   :init
   (progn
@@ -3900,6 +3901,15 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
     (bind-key "C-c C-s C" #'markdown-insert-gfm-code-block markdown-mode-map)
     (bind-key "C-c C-s P" #'markdown-insert-gfm-code-block markdown-mode-map)
+
+    ;; Declare prefixes and bind keys
+    (dolist (prefix '(("mc" . "markdown/command")
+                      ("mh" . "markdown/header")
+                      ("mi" . "markdown/insert")
+                      ("ml" . "markdown/lists")
+                      ("mx" . "markdown/text")))
+      (dotemacs-declare-prefix-for-mode
+       'markdown-mode (car prefix) (cdr prefix)))
 
     (evil-leader/set-key-for-mode 'markdown-mode
       ;; Movement
@@ -3949,6 +3959,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "mxb"  'markdown-insert-bold
       "mxi"  'markdown-insert-italic
       "mxc"  'markdown-insert-code
+      "mxC"  'markdown-insert-gfm-code-block
       "mxq"  'markdown-insert-blockquote
       "mxQ"  'markdown-blockquote-region
       "mxp"  'markdown-insert-pre
