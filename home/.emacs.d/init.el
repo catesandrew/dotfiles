@@ -8298,7 +8298,6 @@ If called with a prefix argument, uses the other-window instead."
         (concat dotemacs-major-mode-leader-key "c") 'with-editor-finish
         (concat dotemacs-major-mode-leader-key "a") 'with-editor-cancel))
 
-    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
     (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
 
 (use-package evil-magit
