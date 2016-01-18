@@ -5803,6 +5803,12 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (add-hook 'before-save-hook 'gofmt-before-save)
 
+    (defun dotemacs/go-run-main ()
+      (interactive)
+      (shell-command
+       (format "go run %s"
+               (shell-quote-argument (buffer-file-name)))))
+
     (evil-leader/set-key-for-mode 'go-mode
       "mhh" 'godoc-at-point
       "mig" 'go-goto-imports
@@ -5811,6 +5817,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
       "meb" 'go-play-buffer
       "mer" 'go-play-region
       "med" 'go-download-play
+      "mxx" 'dotemacs/go-run-main
       "mga" 'ff-find-other-file
       "mgg" 'godef-jump
       "mtp" 'dotemacs-go-run-package-tests)))
