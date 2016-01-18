@@ -40,6 +40,8 @@ This functions should be added to the hooks of major modes for programming."
   (when spell-checking-enable-by-default
     (flyspell-prog-mode))
 
+  ;; Underscore "_" is now a word character in programming mode
+  (modify-syntax-entry ?_ "w")
   (unless (bound-and-true-p my-pmh-ran)
     ;; add buffer-local indicator for whether prog-mode-hook has run.
     (set (make-local-variable 'my-pmh-ran) t)
