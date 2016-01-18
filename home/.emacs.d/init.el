@@ -8184,7 +8184,7 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
       (with-eval-after-load 'magit
-        (define-key magit-mode-map "#f" 'magit-gitflow-popup)))
+        (define-key magit-mode-map "%" 'magit-gitflow-popup)))
   :config (dotemacs-diminish magit-gitflow-mode "Flow"))
 
 (use-package magit-svn

@@ -2,13 +2,7 @@
   "Start `magit-gh-pulls-mode' only after a manual request."
   (interactive)
   (magit-gh-pulls-mode)
-  (magit-gh-pulls-reload))
-
-(defun dotemacs-fetch-gh-pulls-mode ()
-  "Start `magit-gh-pulls-mode' only after a manual request."
-  (interactive)
-  (magit-gh-pulls-mode)
-  (magit-gh-pulls-fetch-commits))
+  (magit-gh-pulls-popup))
 
 (defun dotemacs-git-link-copy-url-only ()
   "Only copy the generated link to the kill ring."
@@ -43,15 +37,15 @@
 (defun magit-toggle-whitespace ()
   (interactive)
   (if (member "-w" (if (derived-mode-p 'magit-diff-mode)
-  	     magit-refresh-args
-  	   magit-diff-section-arguments))
+                       magit-refresh-args
+                     magit-diff-section-arguments))
       (magit-dont-ignore-whitespace)
     (magit-ignore-whitespace)))
 
 (defun magit-ignore-whitespace ()
   (interactive)
   (add-to-list (if (derived-mode-p 'magit-diff-mode)
-  	 'magit-refresh-args 'magit-diff-section-arguments) "-w")
+                   'magit-refresh-args 'magit-diff-section-arguments) "-w")
   (magit-refresh))
 
 (defun magit-dont-ignore-whitespace ()
@@ -63,3 +57,4 @@
                   magit-diff-section-arguments))) (magit-refresh))
 
 (provide 'init-magit)
+;;; init-magit.el ends here
