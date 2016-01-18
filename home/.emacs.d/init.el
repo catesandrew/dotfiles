@@ -4242,6 +4242,22 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     ;; don't display eldoc on modeline
     (dotemacs-hide-lighter eldoc-mode)))
 
+(use-package auto-compile
+  :defer t
+  :ensure t
+  :diminish (auto-compile-mode . "")
+  :init
+  (progn
+    (setq auto-compile-display-buffer nil
+          ;; lets spaceline manage the mode-line
+          auto-compile-use-mode-line nil
+          auto-compile-mode-line-counter t)
+    (add-hook 'emacs-lisp-mode-hook 'auto-compile-mode))
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'emacs-lisp-mode
+      "mcl" 'auto-compile-display-log)))
+
 
 ;;; Emacs Lisp
 (dotemacs-defvar-company-backends emacs-lisp-mode)
@@ -4472,9 +4488,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "mc" "compile")
       (dotemacs-declare-prefix-for-mode mode "me" "eval")
       (dotemacs-declare-prefix-for-mode mode "mt" "tests")
       (evil-leader/set-key-for-mode mode
+        "mcc" 'emacs-lisp-byte-compile
         "me$" 'lisp-state-eval-sexp-end-of-line
         "meb" 'eval-buffer
         "mee" 'eval-last-sexp
@@ -10658,6 +10676,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       :documentation
       "automatic spell checking"
       :evil-leader "tS")
+
     (evil-leader/set-key
       "Sd" 'ispell-change-dictionary
       "Sn" 'flyspell-goto-next-error))
