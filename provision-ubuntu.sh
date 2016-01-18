@@ -80,6 +80,30 @@ case $response in
   *) ;;
 esac
 
+# Edit `/etc/hostname` and add your unqualified hostname:
+#
+# `boson`
+#
+# Edit `/etc/hosts`:
+#
+# `sudo vi /etc/hosts`
+#
+# Add an entry of your desired hostname by replacing `boson.dev.local boson`
+# where `boson.dev.local` is the fully qualified hostname and `boson` is
+# hostname.
+#
+# NOTE: It is important to note that the first domain in `/etc/hosts` should be
+# your FQDN.
+#
+#     127.0.1.1       boson.dev.local boson
+#
+# Test your configuration by opening a terminal and enter the below commands:
+#
+#  - `hostname`
+#   - This should output `boson`
+#  - `hostname -f`
+#   - This should output `boson.dev.local`
+
 PRE_INSTALL_PKGS=""
 
 # Check that HTTPS transport is available to APT
@@ -109,6 +133,9 @@ if [ "X${PRE_INSTALL_PKGS}" != "X" ]; then
 fi
 
 DISTRO=$(lsb_release -c -s)
+
+# open ssh server
+# sudo apt-get install openssh-server
 
 ###############################################################################
 # Git
@@ -153,7 +180,8 @@ echo "Would you like to install the basics? (y/n)"
 read -r response
 case $response in
   [yY])
-    exec_sudo_cmd "apt-get -y install curl wget unzip git ack-grep htop vim tmux software-properties-common"
+    exec_sudo_cmd "apt-get -y install p7zip-rar p7zip-full unace unrar zip unzip sharutils rar uudeview mpack arj cabextract file-roller"
+    exec_sudo_cmd "apt-get -y install curl wget git ack-grep htop vim tmux software-properties-common"
     ;;
   *)
     ;;
@@ -516,6 +544,7 @@ case $response in
     ;;
 esac
 
+# https://www.digitalocean.com/community/tutorials/installing-and-using-ranger-a-terminal-file-manager-on-a-ubuntu-vps
 echo ""
 echo "Would you like to install Ranger file manager? (y/n)"
 read -r response
@@ -603,10 +632,16 @@ case $response in
   [yY])
     print_status "Updating vbox guest additions"
 
+    # TODO: Investigate doing this
+    # another post on the web where someone had a similar problem. The
+    # virtualbox-additions package and CD are apparently missing some pieces,
+    # so this solves it:
+    exec_sudo_cmd "apt-get install virtualbox-guest-dkms"
+
+    # TODO: Vs these commands
     VBOX_LATEST_VERSION=$(curl http://download.virtualbox.org/virtualbox/LATEST.TXT)
     wget -c "http://download.virtualbox.org/virtualbox/${VBOX_LATEST_VERSION}/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso" -O "/tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso"
-
-    exec_sudo_cmd "mkdir -p /media/guestadditions; sudo mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
+    exec_sudo_cmd "mkdir -p /media/guestadditions; mount -o loop /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
     exec_sudo_cmd "/media/guestadditions/VBoxLinuxAdditions.run"
     exec_sudo_cmd "umount -l /media/guestadditions"
     exec_sudo_cmd "rm -rf /tmp/VBoxGuestAdditions_${VBOX_LATEST_VERSION}.iso /media/guestadditions"
@@ -766,6 +801,7 @@ case $response in
   *)
     ;;
 esac
+
 
 # disallow remote log in directly as root user with ssh
 echo ""
