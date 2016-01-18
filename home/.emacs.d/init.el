@@ -5223,6 +5223,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (dotemacs-hide-lighter ruby-tools-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
+      (dotemacs-declare-prefix-for-mode mode "mx" "ruby/text")
       (evil-leader/set-key-for-mode mode
         "mx\'" 'ruby-tools-to-single-quote-string
         "mx\"" 'ruby-tools-to-double-quote-string
@@ -5233,6 +5234,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :ensure t
   :init
   (dolist (mode '(ruby-mode enh-ruby-mode))
+    (dotemacs-declare-prefix-for-mode mode "mb" "ruby/bundle")
     (evil-leader/set-key-for-mode mode
       "mbc" 'bundle-check
       "mbi" 'bundle-install
@@ -5313,6 +5315,9 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (dotemacs-hide-lighter robe-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
+      (dotemacs-declare-prefix-for-mode mode "mg" "ruby/goto")
+      (dotemacs-declare-prefix-for-mode mode "mh" "ruby/docs")
+      (dotemacs-declare-prefix-for-mode mode "ms" "ruby/repl")
       (evil-leader/set-key-for-mode mode
         ;; robe mode specific
         "mgg" 'robe-jump
@@ -5361,6 +5366,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (dotemacs-hide-lighter ruby-test-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
+      (dotemacs-declare-prefix-for-mode mode "mt" "ruby/test")
       (evil-leader/set-key-for-mode mode "mtb" 'ruby-test-run)
       (evil-leader/set-key-for-mode mode "mtt" 'ruby-test-run-at-point))))
 
