@@ -1482,7 +1482,7 @@ the user activate the completion manually."
 (defvar eyebrowse-display-help t
   "If non-nil additional help is displayed when selecting a workspace.")
 
-;; (dotemacs-declare-prefix "W" "workspaces")
+(dotemacs-declare-prefix "W" "workspaces")
 
 (use-package eyebrowse
   :ensure t
