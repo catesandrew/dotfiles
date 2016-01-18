@@ -1,4 +1,4 @@
-;;; funcs.el --- Auto-completion functions File
+;;; init-auto-completions.el --- Auto-completion functions File
 ;;
 ;; Copyright (c) 2012-2014 Sylvain Benner
 ;; Copyright (c) 2014-2015 Sylvain Benner & Contributors
@@ -9,6 +9,7 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+;;; Commentary:
 
 ;; auto-completion key bindings functions
 
@@ -124,5 +125,5 @@
       second-key
       dotemacs--auto-completion-shadowed-emacs-binding)))
 
-
 (provide 'init-auto-completions)
+;;; init-auto-completions.el ends here

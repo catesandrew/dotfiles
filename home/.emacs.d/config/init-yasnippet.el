@@ -1,26 +1,25 @@
+;;; Code:
 (require 'yasnippet)
 
 (defun dotemacs-load-yasnippet ()
-      (unless yas-global-mode
-        (progn
-          (yas-global-mode 1)
-          (let ((private-yas-dir (if dotemacs-ac-private-snippets-directory
-                                     dotemacs-ac-private-snippets-directory
-                                   (concat dotemacs-private-dir "snippets/")))
-                (yas-dir (concat user-emacs-directory "snippets/")))
-            (setq yas-snippet-dirs
-                  (append (when (boundp 'yas-snippet-dirs)
-                            yas-snippet-dirs)
-                          (list private-yas-dir yas-dir)))
-
-            (if (file-exists-p yas-dir)
-              (yas-load-directory yas-dir t))
-
-            (if (file-exists-p private-yas-dir)
-              (yas-load-directory private-yas-dir t))
-
-            (setq yas-wrap-around-region t))))
-      (yas-minor-mode 1))
+  (unless yas-global-mode
+    (progn
+      (yas-global-mode 1)
+      (let ((private-yas-dir (if dotemacs-ac-private-snippets-directory
+                                 dotemacs-ac-private-snippets-directory
+                               (concat dotemacs-private-dir "snippets/")))
+            (dotemacs-snippets-dir
+             (expand-file-name
+              (concat user-emacs-directory "snippets/"))))
+        (setq yas-snippet-dirs
+              (append (list private-yas-dir)
+                      (when (boundp 'yas-snippet-dirs)
+                        yas-snippet-dirs)
+                      dotemacs-snippets-dir))
+        (yas-load-directory dotemacs-snippets-dir t)
+        (yas-load-directory private-yas-dir t)
+        (setq yas-wrap-around-region t))))
+  (yas-minor-mode 1))
 
 (defun dotemacs-force-yasnippet-off ()
   (yas-minor-mode -1)
@@ -33,3 +32,4 @@
   (evil-insert-state))
 
 (provide 'init-yasnippet)
+;;; init-yasnippet.el ends here
