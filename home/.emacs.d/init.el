@@ -7978,15 +7978,12 @@ If called with a prefix argument, uses the other-window instead."
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
   :defer t
-  :bind (("C-c v t" . git-timemachine))
   :commands dotemacs-time-machine-micro-state
   :init
   (evil-leader/set-key
     "gt" 'dotemacs-time-machine-micro-state)
-
   :config
   (progn
-
     (dotemacs-define-micro-state time-machine
       :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
       :on-enter (let (golden-ratio-mode) (call-interactively 'git-timemachine))
