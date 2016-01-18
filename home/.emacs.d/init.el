@@ -8358,7 +8358,7 @@ If called with a prefix argument, uses the other-window instead."
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
 
-    (evil-define-key 'normal helm-ag-map "SPC" evil-leader--default-map)
+    (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) evil-leader--default-map)
     (evilify helm-ag-mode helm-ag-mode-map
              (kbd "RET") 'helm-ag-mode-jump-other-window
              (kbd "q") 'quit-window))
