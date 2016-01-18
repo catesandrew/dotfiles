@@ -8775,16 +8775,18 @@ If called with a prefix argument, uses the other-window instead."
     ; (add-hook 'projectile-after-switch-project-hook 'pyenv-mode-set-local-version)
     (defun dotemacs//projectile-switch-project-by-name (fcn project-to-switch &optional args)
       (apply fcn project-to-switch args)
-      (when (and (projectile-project-p) (fboundp 'neotree-dir))
-        (if (neo-global--window-exists-p)
-            (neotree-dir (projectile-project-root))
-          (progn
-            (neotree-dir (projectile-project-root))
-            (neotree-hide)
-            (let ((origin-buffer-file-name (buffer-file-name)))
-              (neotree-find (projectile-project-root))
-              (neotree-find origin-buffer-file-name))
-            (neotree-hide)))))
+      (when (projectile-project-p)
+        (message "Switching to project: %s" (projectile-project-root)))
+        (when (fboundp 'neotree-dir)
+          (if (neo-global--window-exists-p)
+              (neotree-dir (projectile-project-root))
+            (progn
+              (neotree-dir (projectile-project-root))
+              (neotree-hide)
+              (let ((origin-buffer-file-name (buffer-file-name)))
+                (neotree-find (projectile-project-root))
+                (neotree-find origin-buffer-file-name))
+              (neotree-hide)))))
     (advice-add 'projectile-switch-project-by-name
                 :around 'dotemacs//projectile-switch-project-by-name)
 
@@ -8792,6 +8794,38 @@ If called with a prefix argument, uses the other-window instead."
     (run-with-idle-timer 10 nil 'projectile-cleanup-known-projects)
     (projectile-global-mode)
     (dotemacs-hide-lighter projectile-mode)))
+
+(use-package dired-open
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (defun dotemacs-dired-open-file ()
+      "Hook dired to translate to projectile and neotree."
+      (interactive)
+      (let ((file (ignore-errors (dired-get-file-for-visit))))
+        (when file
+          (find-file (expand-file-name file (projectile-project-root)))
+          (run-hooks 'projectile-find-file-hook)
+          (message "Projectile root found: %s" (projectile-project-root))
+          (when (fboundp 'neotree-dir)
+            (if (neo-global--window-exists-p)
+                (neotree-dir (projectile-project-root))
+              (progn
+                (neotree-dir (projectile-project-root))
+                (neotree-hide)
+                (let ((origin-buffer-file-name (buffer-file-name)))
+                  (neotree-find (projectile-project-root))
+                  (neotree-find origin-buffer-file-name))
+                (neotree-hide)))))))
+    (with-eval-after-load 'projectile
+      (setq dired-open-functions 'dotemacs-dired-open-file))))
+
+(dotemacs-use-package-add-hook dired+
+  :post-config
+  (with-eval-after-load 'projectile
+    (evilify dired-mode dired-mode-map
+             (kbd "RET") 'dired-open-file)))
 
 (use-package helm-projectile
   :ensure t
