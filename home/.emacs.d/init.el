@@ -1901,8 +1901,17 @@ the user activate the completion manually."
     ;; Use ibuffer to provide :ls
     (evil-ex-define-cmd "buffers" 'ibuffer))
   :config
-  (dotemacs-evilify-map ibuffer-mode-map
-    :mode ibuffer-mode))
+  (progn
+
+    ;; Since we could override `,` with <leader>, let's make `;` do that
+    ;; functionality
+    (when (equal dotemacs-leader-key ",")
+      (define-key ibuffer-mode-map
+        (kbd ";") 'ibuffer-toggle-sorting-mode)
+      (define-key ibuffer-mode-map
+        (kbd ",") nil))
+    (dotemacs-evilify-map ibuffer-mode-map
+      :mode ibuffer-mode)))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
@@ -9195,12 +9204,13 @@ If called with a prefix argument, uses the other-window instead."
     (require 'org-bullets)
 
     (with-eval-after-load 'org-agenda
-       ;; Since we could override SPC with <leader>, let's make RET do that functionality
-       ;; TODO: Check if <leader> equals SPC
-       ; (define-key org-agenda-mode-map
-       ;   (kbd "RET") 'org-agenda-show-and-scroll-up)
-       ; (define-key org-agenda-mode-map
-       ;   (kbd "SPC") evil-leader--default-map)
+       ;; Since we could override SPC with <leader>, let's make RET do that
+       ;; functionality
+      (when (equal dotemacs-leader-key "SPC")
+       (define-key org-agenda-mode-map
+         (kbd "RET") 'org-agenda-show-and-scroll-up)
+       (define-key org-agenda-mode-map
+         (kbd "SPC") evil-leader--default-map))
 
       (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
       (define-key org-agenda-mode-map "k" 'org-agenda-previous-line))
