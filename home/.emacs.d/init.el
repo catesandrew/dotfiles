@@ -7984,12 +7984,9 @@ If called with a prefix argument, uses the other-window instead."
   :config
   (progn
 
-    (defun dotemacs-time-machine-ms-on-enter ()
-      "Initiate git-timemachine")
-
     (dotemacs-define-micro-state time-machine
       :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
-      :on-enter (dotemacs-time-machine-ms-on-enter)
+      :on-enter (let (golden-ratio-mode) (call-interactively 'git-timemachine))
       :on-exit (git-timemachine-quit)
       :persistent t
       :bindings
