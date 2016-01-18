@@ -6847,6 +6847,9 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
+    ;; Mark `css-indent-offset' as safe-local variable
+    (put 'css-indent-offset 'safe-local-variable #'integerp)
+
     (defun css-expand-statement ()
       "Expand CSS block"
       (interactive)
