@@ -2330,6 +2330,11 @@ the user activate the completion manually."
                               ;; And all other kinds of boring files
                               #'ignoramus-boring-p)))
 
+(use-package restart-emacs
+  :defer t
+  :init
+  (evil-leader/set-key "qr" 'restart-emacs))
+
 (use-package savehist                   ; Save minibuffer history
   :init
   (progn
