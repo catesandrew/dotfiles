@@ -127,6 +127,7 @@
                              inkpot
                              ir-black
                              jazz
+                             jbeans
                              light-soap
                              lush
                              material
