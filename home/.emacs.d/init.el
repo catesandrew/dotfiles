@@ -5137,8 +5137,16 @@ fix this issue."
 
 ;;; Ruby
 (dotemacs-defvar-company-backends enh-ruby-mode)
+(dotemacs-defvar-company-backends ruby-mode)
+
 ;; TODO: uncomment this when it becomes available
 ;; (dotemacs-defvar-company-backends haml-mode)
+
+(defvar ruby-use-built-in-ruby-mode nil
+  "If non-nil, use built-in Ruby Mode.
+
+Otherwise use Enh Ruby Mode, which is the default.")
+
 
 (use-package rbenv
   :ensure t
@@ -5146,8 +5154,8 @@ fix this issue."
   :if (eq dotemacs-ruby-version-manager 'rbenv)
   :defer t
   :init (global-rbenv-mode)
-  :config (add-hook 'enh-ruby-mode-hook
-                    (lambda () (rbenv-use-corresponding))))
+  :config (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+            (add-hook hook (lambda () (rbenv-use-corresponding)))))
 
 (use-package rvm
   :ensure t
@@ -5155,10 +5163,11 @@ fix this issue."
   :defer t
   :if (eq dotemacs-ruby-version-manager 'rvm)
   :init (rvm-use-default)
-  :config (add-hook 'enh-ruby-mode-hook
-                    (lambda () (rvm-activate-corresponding-ruby))))
+  :config (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+            (add-hook hook (lambda () (rvm-activate-corresponding-ruby)))))
 
 (use-package enh-ruby-mode
+  :if (unless ruby-use-built-in-ruby-mode)
   :ensure t
   :mode (("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
          ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
@@ -5166,30 +5175,55 @@ fix this issue."
   :config
   (progn
     (setq enh-ruby-deep-indent-paren nil
-          enh-ruby-hanging-paren-deep-indent-level 2)))
+          enh-ruby-hanging-paren-deep-indent-level 2)
+    (sp-with-modes '(enh-ruby-mode)
+      (sp-local-pair "{" "}"
+                     :pre-handlers '(sp-ruby-pre-handler)
+                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
+                     :suffix ""))))
+
+(use-package ruby-mode
+  :if (when ruby-use-built-in-ruby-mode)
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'ruby-mode
+      "m'" 'ruby-toggle-string-quotes
+      "m{" 'ruby-toggle-block)
+
+    (sp-with-modes 'ruby-mode
+      (sp-local-pair "{" "}"
+                     :pre-handlers '(sp-ruby-pre-handler)
+                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
+                     :suffix ""))))
 
 (use-package ruby-tools
   :defer t
   :ensure t
   :init
-  (add-hook 'enh-ruby-mode-hook 'ruby-tools-mode)
+  (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+    (add-hook hook 'ruby-tools-mode))
   :config
   (progn
-      (dotemacs-hide-lighter ruby-tools-mode)
-      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx\'" 'ruby-tools-to-single-quote-string)
-      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx\"" 'ruby-tools-to-double-quote-string)
-      (evil-leader/set-key-for-mode 'enh-ruby-mode "mx:" 'ruby-tools-to-symbol)))
+    (dotemacs-hide-lighter ruby-tools-mode)
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (evil-leader/set-key-for-mode mode
+        "mx\'" 'ruby-tools-to-single-quote-string
+        "mx\"" 'ruby-tools-to-double-quote-string
+        "mx:" 'ruby-tools-to-symbol))))
 
 (use-package bundler
   :defer t
   :ensure t
   :init
-  (progn
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbc" 'bundle-check)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbi" 'bundle-install)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbs" 'bundle-console)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbu" 'bundle-update)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mbx" 'bundle-exec)))
+  (dolist (mode '(ruby-mode enh-ruby-mode))
+    (evil-leader/set-key-for-mode mode
+      "mbc" 'bundle-check
+      "mbi" 'bundle-install
+      "mbs" 'bundle-console
+      "mbu" 'bundle-update
+      "mbx" 'bundle-exec)))
 
 (use-package projectile-rails
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
@@ -5202,50 +5236,51 @@ fix this issue."
   (progn
     (dotemacs-diminish projectile-rails-mode " ⇋" " RoR")
     ;; Find files
-    (evil-leader/set-key-for-mode 'enh-ruby-mode
-      "mrfa" 'projectile-rails-find-locale
-      "mrfc" 'projectile-rails-find-controller
-      "mrfe" 'projectile-rails-find-environment
-      "mrff" 'projectile-rails-find-feature
-      "mrfh" 'projectile-rails-find-helper
-      "mrfi" 'projectile-rails-find-initializer
-      "mrfj" 'projectile-rails-find-javascript
-      "mrfl" 'projectile-rails-find-lib
-      "mrfm" 'projectile-rails-find-model
-      "mrfn" 'projectile-rails-find-migration
-      "mrfo" 'projectile-rails-find-log
-      "mrfp" 'projectile-rails-find-spec
-      "mrfr" 'projectile-rails-find-rake-task
-      "mrfs" 'projectile-rails-find-stylesheet
-      "mrft" 'projectile-rails-find-test
-      "mrfu" 'projectile-rails-find-fixture
-      "mrfv" 'projectile-rails-find-view
-      "mrfy" 'projectile-rails-find-layout
-      "mrf@" 'projectile-rails-find-mailer
-      ;; Goto file
-      "mrgc" 'projectile-rails-find-current-controller
-      "mrgd" 'projectile-rails-goto-schema
-      "mrge" 'projectile-rails-goto-seeds
-      "mrgh" 'projectile-rails-find-current-helper
-      "mrgj" 'projectile-rails-find-current-javascript
-      "mrgg" 'projectile-rails-goto-gemfile
-      "mrgm" 'projectile-rails-find-current-model
-      "mrgn" 'projectile-rails-find-current-migration
-      "mrgp" 'projectile-rails-find-current-spec
-      "mrgr" 'projectile-rails-goto-routes
-      "mrgs" 'projectile-rails-find-current-stylesheet
-      "mrgt" 'projectile-rails-find-current-test
-      "mrgu" 'projectile-rails-find-current-fixture
-      "mrgv" 'projectile-rails-find-current-view
-      "mrgz" 'projectile-rails-goto-spec-helper
-      "mrg." 'projectile-rails-goto-file-at-point
-      ;; Rails external commands
-      "mrcc" 'projectile-rails-generate
-      "mri" 'projectile-rails-console
-      "mrr:" 'projectile-rails-rake
-      "mrxs" 'projectile-rails-server
-      ;; Refactoring 'projectile-rails-mode
-      "mrRx" 'projectile-rails-extract-region)
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (evil-leader/set-key-for-mode mode
+        "mrfa" 'projectile-rails-find-locale
+        "mrfc" 'projectile-rails-find-controller
+        "mrfe" 'projectile-rails-find-environment
+        "mrff" 'projectile-rails-find-feature
+        "mrfh" 'projectile-rails-find-helper
+        "mrfi" 'projectile-rails-find-initializer
+        "mrfj" 'projectile-rails-find-javascript
+        "mrfl" 'projectile-rails-find-lib
+        "mrfm" 'projectile-rails-find-model
+        "mrfn" 'projectile-rails-find-migration
+        "mrfo" 'projectile-rails-find-log
+        "mrfp" 'projectile-rails-find-spec
+        "mrfr" 'projectile-rails-find-rake-task
+        "mrfs" 'projectile-rails-find-stylesheet
+        "mrft" 'projectile-rails-find-test
+        "mrfu" 'projectile-rails-find-fixture
+        "mrfv" 'projectile-rails-find-view
+        "mrfy" 'projectile-rails-find-layout
+        "mrf@" 'projectile-rails-find-mailer
+        ;; Goto file
+        "mrgc" 'projectile-rails-find-current-controller
+        "mrgd" 'projectile-rails-goto-schema
+        "mrge" 'projectile-rails-goto-seeds
+        "mrgh" 'projectile-rails-find-current-helper
+        "mrgj" 'projectile-rails-find-current-javascript
+        "mrgg" 'projectile-rails-goto-gemfile
+        "mrgm" 'projectile-rails-find-current-model
+        "mrgn" 'projectile-rails-find-current-migration
+        "mrgp" 'projectile-rails-find-current-spec
+        "mrgr" 'projectile-rails-goto-routes
+        "mrgs" 'projectile-rails-find-current-stylesheet
+        "mrgt" 'projectile-rails-find-current-test
+        "mrgu" 'projectile-rails-find-current-fixture
+        "mrgv" 'projectile-rails-find-current-view
+        "mrgz" 'projectile-rails-goto-spec-helper
+        "mrg." 'projectile-rails-goto-file-at-point
+        ;; Rails external commands
+        "mrcc" 'projectile-rails-generate
+        "mri" 'projectile-rails-console
+        "mrr:" 'projectile-rails-rake
+        "mrxs" 'projectile-rails-server
+        ;; Refactoring 'projectile-rails-mode
+        "mrRx" 'projectile-rails-extract-region))
     ;; Ex-commands
     (evil-ex-define-cmd "A" 'projectile-toggle-between-implementation-and-test)))
 
@@ -5254,23 +5289,27 @@ fix this issue."
   :ensure t
   :init
   (progn
-    (add-hook 'enh-ruby-mode-hook 'robe-mode)
+    (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+      (add-hook hook 'robe-mode))
     (when (eq dotemacs-completion-engine 'company)
-      (push 'company-robe company-backends-enh-ruby-mode)))
+      (push 'company-robe company-backends-enh-ruby-mode)
+      (push 'company-robe company-backends-ruby-mode)))
   :config
   (progn
     (dotemacs-hide-lighter robe-mode)
-    ;; robe mode specific
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mgg" 'robe-jump)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mhd" 'robe-doc)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mrsr" 'robe-rails-refresh)
-    ;; inf-enh-ruby-mode
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "msf" 'ruby-send-definition)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "msF" 'ruby-send-definition-and-go)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "msi" 'robe-start)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "msr" 'ruby-send-region)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "msR" 'ruby-send-region-and-go)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mss" 'ruby-switch-to-inf)))
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (evil-leader/set-key-for-mode mode
+        ;; robe mode specific
+        "mgg" 'robe-jump
+        "mhd" 'robe-doc
+        "mrsr" 'robe-rails-refresh
+        ;; inf-enh-ruby-mode
+        "msf" 'ruby-send-definition
+        "msF" 'ruby-send-definition-and-go
+        "msi" 'robe-start
+        "msr" 'ruby-send-region
+        "msR" 'ruby-send-region-and-go
+        "mss" 'ruby-switch-to-inf))))
 
 (use-package yaml-mode                  ; YAML
   :ensure t
@@ -5301,12 +5340,14 @@ fix this issue."
 (use-package ruby-test-mode
   :defer t
   :ensure t
-  :init (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
+  :init (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+          (add-hook hook 'ruby-test-mode))
   :config
   (progn
     (dotemacs-hide-lighter ruby-test-mode)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mtb" 'ruby-test-run)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mtt" 'ruby-test-run-at-point)))
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (evil-leader/set-key-for-mode mode "mtb" 'ruby-test-run)
+      (evil-leader/set-key-for-mode mode "mtt" 'ruby-test-run-at-point))))
 
 (use-package inf-ruby                   ; Ruby REPL
   :ensure t
@@ -5317,13 +5358,16 @@ fix this issue."
   (inf-ruby-switch-setup))
 
 (use-package evil-matchit-ruby
-  :defer t
   :ensure evil-matchit
-  :init (add-hook `enh-ruby-mode-hook `turn-on-evil-matchit-mode)
   :config
   (progn
     (plist-put evilmi-plugins 'enh-ruby-mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                                (evilmi-ruby-get-tag evilmi-ruby-jump)))))
+
+(dotemacs-use-package-add-hook evil-matchit
+  :post-init
+  (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+    (add-hook hook `turn-on-evil-matchit-mode)))
 
 (dotemacs-use-package-add-hook rainbow-delimiters
   :post-init
@@ -5340,8 +5384,11 @@ fix this issue."
     :post-init
     (progn
       (dotemacs-add-company-hook enh-ruby-mode)
+      (dotemacs-add-company-hook ruby-mode)
+
       (with-eval-after-load 'company-dabbrev-code
-        (push 'enh-ruby-mode company-dabbrev-code-modes)))))
+        (dolist (mode '(ruby-mode enh-ruby-mode))
+          (push mode company-dabbrev-code-modes))))))
 
 
 ;;; Rust
@@ -10467,12 +10514,6 @@ If called with a prefix argument, uses the other-window instead."
     (sp-with-modes '(rust-mode)
       ;; Don't pair lifetime specifiers
       (sp-local-pair "'" nil :actions nil))
-
-    (sp-with-modes '(ruby-mode enh-ruby-mode)
-      (sp-local-pair "{" "}"
-                     :pre-handlers '(sp-ruby-pre-handler)
-                     :post-handlers '(sp-ruby-post-handler (dotemacs-smartparens-pair-newline-and-indent "RET"))
-                     :suffix ""))
 
     (sp-with-modes '(malabar-mode c++-mode)
       (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
