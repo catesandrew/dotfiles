@@ -7726,6 +7726,7 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-leader/set-key
       "gb" 'magit-blame
+      "gB" 'magit-blame-quit
       "gl" 'magit-log-all
       "gL" 'magit-log-buffer-file
       "gs" 'magit-status
