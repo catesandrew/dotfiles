@@ -9278,6 +9278,14 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'helm-mode-hook 'helm-descbinds-mode)
     (evil-leader/set-key "?" 'helm-descbinds)))
 
+(use-package helm-flx
+  :ensure t
+  :defer t)
+
+(dotemacs-use-package-add-hook helm
+  :pre-config
+  (helm-flx-mode))
+
 (use-package helm-make
   :ensure t
   :defer t
