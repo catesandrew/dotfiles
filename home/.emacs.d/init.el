@@ -1559,7 +1559,25 @@ the user activate the completion manually."
       ("N" eyebrowse-prev-window-config)
       ("p" eyebrowse-prev-window-config)
       ("r" dotemacs/workspaces-ms-rename :exit t)
-      ("s" eyebrowse-switch-to-window-config :exit t))))
+      ("w" eyebrowse-switch-to-window-config :exit t))
+
+    (defun dotemacs-eyebrowse-switch ()
+      "Hook eyebrowse to projectile and neotree."
+      (interactive)
+      (when (projectile-project-p)
+        (message "eyebrowse switching to: %s" (projectile-project-root))
+        (when (fboundp 'neotree-dir)
+          (if (neo-global--window-exists-p)
+              (neotree-dir (projectile-project-root))
+            (progn
+              (neotree-dir (projectile-project-root))
+              (neotree-hide)
+              (let ((origin-buffer-file-name (buffer-file-name)))
+                (neotree-find (projectile-project-root))
+                (neotree-find origin-buffer-file-name))
+              (neotree-hide))))))
+    (with-eval-after-load 'projectile
+      (add-hook 'eyebrowse-post-window-switch-hook 'dotemacs-eyebrowse-switch))))
 
 
 ;;; Minibuffer and Helm
