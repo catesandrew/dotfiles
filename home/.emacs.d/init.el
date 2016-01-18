@@ -859,7 +859,7 @@ group by projectile projects."
         ("fe" "emacs(dotemacs)")
         ("g"  "git/versions-control")
         ("gf" "file")
-        ("gg" "gist")
+        ("gg" "github gist")
         ("h"  "helm/help/highlight")
         ("hd" "help-describe")
         ("i"  "insertion")
@@ -7729,6 +7729,159 @@ If called with a prefix argument, uses the other-window instead."
         "ghn" 'diff-hl-next-hunk
         "ghg" 'diff-hl-diff-goto-hunk)))
 
+;; git
+(use-package git-commit                 ; Git commit message mode
+  :ensure t
+  :defer t)
+
+(use-package git-messenger
+  :ensure t
+  :defer t
+  :init
+  (evil-leader/set-key
+    "gm" 'git-messenger:popup-message)
+  :config
+  (define-key git-messenger-map [escape] 'git-messenger:popup-close))
+
+(use-package gitconfig-mode             ; Git configuration mode
+  :ensure t
+  :defer t)
+
+(use-package gitignore-mode             ; .gitignore mode
+  :ensure t
+  :defer t)
+
+(use-package gitattributes-mode         ; Git attributes mode
+  :ensure t
+  :defer t)
+
+(use-package git-rebase-mode            ; Mode for git rebase -i
+  :disabled t ; not compatible with magit 2.1
+  :defer t
+  :config
+  (progn
+    (evilify git-rebase-mode git-rebase-mode-map
+            "J" 'git-rebase-move-line-down
+            "K" 'git-rebase-move-line-up
+            "u" 'git-rebase-undo
+            "y" 'git-rebase-insert)
+
+    (evil-leader/set-key-for-mode 'git-rebase-mode
+      "mcc" 'git-rebase-server-edit
+      "mk" 'git-rebase-abort)))
+
+(use-package git-timemachine            ; Go back in Git time
+  :ensure t
+  :defer t
+  :commands dotemacs-time-machine-micro-state
+  :init
+  (evil-leader/set-key
+    "gt" 'dotemacs-time-machine-micro-state)
+  :config
+  (progn
+    (dotemacs-define-micro-state time-machine
+      :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
+      :on-enter (let (golden-ratio-mode) (call-interactively 'git-timemachine))
+      :on-exit (git-timemachine-quit)
+      :persistent t
+      :bindings
+      ("c" git-timemachine-show-current-revision)
+      ("p" git-timemachine-show-previous-revision)
+      ("n" git-timemachine-show-next-revision)
+      ("N" git-timemachine-show-previous-revision)
+      ("Y" git-timemachine-kill-revision)
+      ("q" nil :exit t))))
+
+;; Github
+(setq github/key-binding-prefixes '(("gh" . "github")
+                                    ("gg" . "github gist")))
+(mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+      github/key-binding-prefixes)
+
+(use-package gist
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evilify gist-list-mode gist-list-menu-mode-map
+             "f" 'gist-fetch-current
+             "K" 'gist-kill-current
+             "o" 'gist-browse-current-url)
+
+    (evil-leader/set-key
+      "ggb" 'gist-buffer
+      "ggB" 'gist-buffer-private
+      "ggl" 'gist-list
+      "ggr" 'gist-region
+      "ggR" 'gist-region-private)))
+
+(use-package github-browse-file
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key
+    "gho" 'github-browse-file))
+
+(use-package github-clone
+  :defer t
+  :ensure t
+  :init
+  (evil-leader/set-key
+   "gh C-c" 'github-clone))
+
+(use-package git-link
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (evil-leader/set-key
+      "ghl" 'git-link
+      "ghL" 'dotemacs-git-link-copy-url-only
+      "ghc" 'git-link-commit
+      "ghC" 'dotemacs-git-link-commit-copy-url-only)
+
+    ;; default is to open the generated link
+    (setq git-link-open-in-browser t))
+  :config
+  (progn
+    (defun git-link-ibaset (hostname dirname filename branch commit start end)
+      (format "https://git.ibaset.com/%s/blob/%s/%s#%s"
+        dirname
+        (or branch commit)
+        filename
+        (if (and start end)
+            (format "L%s-L%s" start end)
+          (format "L%s" start))))
+
+    (defun git-link-commit-ibaset (hostname dirname commit)
+      (format "https://git.ibaset.com/%s/commit/%s" dirname commit))
+
+    (add-to-list 'git-link-remote-alist
+      '("git.ibaset.com" git-link-github))
+    (add-to-list 'git-link-commit-remote-alist
+      '("git.ibaset.com" git-link-commit-github))
+    (add-to-list 'git-link-remote-alist
+      '("andrew.git.ibaset.com" git-link-ibaset))
+    (add-to-list 'git-link-commit-remote-alist
+      '("andrew.git.ibaset.com" git-link-commit-ibaset))))
+
+;; magit-gh-pulls has to be loaded via a pre-config hook because the source
+;; code makes assumptions about the status of the magit-mode keymaps that are
+;; incompatible with the dotemacs' evilification feature. To avoid errors,
+;; magit-gh-pulls must be loaded after magit, but before magit is configured by
+;; dotemacs.
+
+(dotemacs-use-package-add-hook magit
+  :pre-config
+  (progn
+    (use-package magit-gh-pulls
+      :ensure t
+      :init
+      (progn
+        (define-key magit-mode-map "#" 'dotemacs-load-gh-pulls-mode))
+      :config
+      (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))))
+
 ;; magit
 (use-package init-magit
   :load-path "config/")
@@ -7931,24 +8084,6 @@ If called with a prefix argument, uses the other-window instead."
     (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
     (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
 
-;; magit-gh-pulls has to be loaded via a pre-config hook because the source
-;; code makes assumptions about the status of the magit-mode keymaps that are
-;; incompatible with the dotemacs' evilification feature. To avoid errors,
-;; magit-gh-pulls must be loaded after magit, but before magit is configured by
-;; dotemacs.
-
-(dotemacs-use-package-add-hook magit
-  :pre-config
-  (progn
-    (use-package magit-gh-pulls
-      :ensure t
-      :init
-      (progn
-        (define-key magit-mode-map "#gf" 'dotemacs-fetch-gh-pulls-mode)
-        (define-key magit-mode-map "#gg" 'dotemacs-load-gh-pulls-mode))
-      :config
-      (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))))
-
 (use-package magit-gitflow
   :ensure t
   :commands turn-on-magit-gitflow
@@ -7970,144 +8105,8 @@ If called with a prefix argument, uses the other-window instead."
     (evil-define-key 'emacs magit-status-mode-map
       "N" 'magit-key-mode-popup-svn)))
 
-;; git
-(use-package git-commit                 ; Git commit message mode
-  :ensure t
-  :defer t)
-
-(use-package git-messenger
-  :ensure t
-  :defer t
-  :init
-  (evil-leader/set-key
-    "gm" 'git-messenger:popup-message)
-  :config
-  (define-key git-messenger-map [escape] 'git-messenger:popup-close))
-
-(use-package gitconfig-mode             ; Git configuration mode
-  :ensure t
-  :defer t)
-
-(use-package gitignore-mode             ; .gitignore mode
-  :ensure t
-  :defer t)
-
-(use-package gitattributes-mode         ; Git attributes mode
-  :ensure t
-  :defer t)
-
-(use-package git-rebase-mode            ; Mode for git rebase -i
-  :disabled t ; not compatible with magit 2.1
-  :defer t
-  :config
-  (progn
-    (evilify git-rebase-mode git-rebase-mode-map
-            "J" 'git-rebase-move-line-down
-            "K" 'git-rebase-move-line-up
-            "u" 'git-rebase-undo
-            "y" 'git-rebase-insert)
-
-    (evil-leader/set-key-for-mode 'git-rebase-mode
-      "mcc" 'git-rebase-server-edit
-      "mk" 'git-rebase-abort)))
-
-(use-package git-timemachine            ; Go back in Git time
-  :ensure t
-  :defer t
-  :commands dotemacs-time-machine-micro-state
-  :init
-  (evil-leader/set-key
-    "gt" 'dotemacs-time-machine-micro-state)
-  :config
-  (progn
-    (dotemacs-define-micro-state time-machine
-      :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
-      :on-enter (let (golden-ratio-mode) (call-interactively 'git-timemachine))
-      :on-exit (git-timemachine-quit)
-      :persistent t
-      :bindings
-      ("c" git-timemachine-show-current-revision)
-      ("p" git-timemachine-show-previous-revision)
-      ("n" git-timemachine-show-next-revision)
-      ("N" git-timemachine-show-previous-revision)
-      ("Y" git-timemachine-kill-revision)
-      ("q" nil :exit t))))
-
-;; github
-(setq github/key-binding-prefixes '(("gf" . "github/file")
-                                    ("gg" . "github/gist")))
-(mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
-      github/key-binding-prefixes)
-
-(use-package gist
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (evilify gist-list-mode gist-list-menu-mode-map
-             "f" 'gist-fetch-current
-             "K" 'gist-kill-current
-             "o" 'gist-browse-current-url)
-
-    (evil-leader/set-key
-      "ggb" 'gist-buffer
-      "ggB" 'gist-buffer-private
-      "ggl" 'gist-list
-      "ggr" 'gist-region
-      "ggR" 'gist-region-private)))
-
-(use-package github-browse-file
-  :defer t
-  :ensure t
-  :init
-  (evil-leader/set-key
-    "gfb" 'github-browse-file))
-
-(use-package git-link
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (evil-leader/set-key
-      "gfl" 'git-link
-      "gfL" 'dotemacs-git-link-copy-url-only
-      "gfc" 'git-link-commit
-      "gfC" 'dotemacs-git-link-commit-copy-url-only)
-
-    ;; default is to open the generated link
-    (setq git-link-open-in-browser t))
-  :config
-  (progn
-
-    (defun git-link-ibaset (hostname dirname filename branch commit start end)
-      (format "https://git.ibaset.com/%s/blob/%s/%s#%s"
-        dirname
-        (or branch commit)
-        filename
-        (if (and start end)
-            (format "L%s-L%s" start end)
-          (format "L%s" start))))
-
-    (defun git-link-commit-ibaset (hostname dirname commit)
-      (format "https://git.ibaset.com/%s/commit/%s" dirname commit))
-
-    (add-to-list 'git-link-remote-alist
-      '("git.ibaset.com" git-link-github))
-    (add-to-list 'git-link-commit-remote-alist
-      '("git.ibaset.com" git-link-commit-github))
-    (add-to-list 'git-link-remote-alist
-      '("andrew.git.ibaset.com" git-link-ibaset))
-    (add-to-list 'git-link-commit-remote-alist
-      '("andrew.git.ibaset.com" git-link-commit-ibaset))))
-
 
 ;;; Search
-(use-package isearch                   ; Search buffers
-  :bind (("C-c s s" . isearch-forward-symbol-at-point))
-  ;; `:diminish' doesn't work for isearch, because it uses eval-after-load on
-  ;; the feature name, but isearch.el does not provide any feature
-  :init (diminish 'isearch-mode))
-
 (use-package helm-regex                 ; Helm regex tools
   :ensure helm
   :bind (([remap occur] . helm-occur)
