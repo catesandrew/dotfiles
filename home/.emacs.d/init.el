@@ -10669,9 +10669,6 @@ If the error list is visible, hide it.  Otherwise, show it."
     ;; Undefine mouse buttons which get in the way
     (define-key flyspell-mouse-map [down-mouse-2] nil)
     (define-key flyspell-mouse-map [mouse-2] nil)
-    (when spell-checking-enable-by-default
-      (flyspell-prog-mode))
-
     (dotemacs-diminish flyspell-mode " Ⓢ" " S")))
 
 (use-package helm-flycheck

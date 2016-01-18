@@ -37,6 +37,9 @@ This functions should be added to the hooks of major modes for programming."
 (defun dotemacs-prog-mode-defaults ()
   "Default coding hook, useful with any programming language."
 
+  (when spell-checking-enable-by-default
+    (flyspell-prog-mode))
+
   (unless (bound-and-true-p my-pmh-ran)
     ;; add buffer-local indicator for whether prog-mode-hook has run.
     (set (make-local-variable 'my-pmh-ran) t)
