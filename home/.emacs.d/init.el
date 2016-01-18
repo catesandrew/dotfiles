@@ -1509,7 +1509,11 @@ the user activate the completion manually."
 
 (dotemacs-use-package-add-hook helm
   :pre-config
-  (helm-flx-mode))
+  (progn
+    ;; Disable for helm-find-files until performance issues are sorted
+    ;; https://github.com/PythonNut/helm-flx/issues/9
+    (setq helm-flx-for-helm-find-files nil)
+    (helm-flx-mode)))
 
 (use-package helm
   :ensure t
