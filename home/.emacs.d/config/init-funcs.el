@@ -532,13 +532,15 @@ argument takes the kindows rotate backwards."
 
 (defun dotemacs/set-google-translate-languages (source target)
   "Set source language for google translate.
-For instance pass En as source for english."
-  (interactive "sEnter source language (ie. En): \nsEnter target language (ie. En): "
-               source target)
-  (message (format "Set google translate source language to %s and target to %s"
-                   source target))
-  (setq google-translate-default-source-language source)
-  (setq google-translate-default-target-language target))
+For instance pass En as source for English."
+  (interactive
+   "sEnter source language (ie. en): \nsEnter target language (ie. en): "
+   source target)
+  (message
+   (format "Set google translate source language to %s and target to %s"
+           source target))
+  (setq google-translate-default-source-language (downcase source))
+  (setq google-translate-default-target-language (downcase target)))
 
 ;; from http://www.emacswiki.org/emacs/WordCount
 (defun dotemacs/count-words-analysis (start end)

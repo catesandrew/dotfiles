@@ -9954,8 +9954,8 @@ If called with a prefix argument, uses the other-window instead."
     (require 'google-translate-default-ui)
     (setq google-translate-enable-ido-completion t)
     (setq google-translate-show-phonetic t)
-    (setq google-translate-default-source-language "En")
-    (setq google-translate-default-target-language "Sp")))
+    (setq google-translate-default-source-language "en")
+    (setq google-translate-default-target-language "sp")))
 
 
 ;; Search Engine
