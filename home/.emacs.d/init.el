@@ -5856,6 +5856,28 @@ fix this issue."
   (progn
     (push 'company-ycmd company-backends-c-mode-common)))
 
+(use-package srefactor
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (defun dotemacs-lazy-load-srefactor ()
+      "Lazy load the package."
+      (require 'srefactor)
+      ;; currently, evil-mode overrides key mapping of srefactor menu
+      ;; must expplicity enable evil-emacs-state. This is ok since
+      ;; srefactor supports j,k,/ and ? commands when Evil is
+      ;; available
+      (add-hook 'srefactor-ui-menu-mode-hook 'evil-emacs-state))))
+
+(use-package stickyfunc-enhance
+  :defer t
+  :ensure t
+  :init
+  (defun dotemacs-lazy-load-stickyfunc-enhance ()
+    "Lazy load the package."
+    (require 'stickyfunc-enhance)))
+
 
 ;;; Clojure
 (dotemacs-defvar-company-backends cider-mode)
