@@ -1480,6 +1480,7 @@ the user activate the completion manually."
 
 
 ;;; Minibuffer and Helm
+
 ;; Display current keystrokes almost immediately in mini buffer
 (setq echo-keystrokes 0.02)
 
@@ -1501,6 +1502,14 @@ the user activate the completion manually."
 ;; with: (helm-mode 1)
 (use-package init-helm
   :load-path "config/")
+
+(use-package helm-flx
+  :ensure t
+  :defer t)
+
+(dotemacs-use-package-add-hook helm
+  :pre-config
+  (helm-flx-mode))
 
 (use-package helm
   :ensure t
@@ -9294,14 +9303,6 @@ If called with a prefix argument, uses the other-window instead."
     (setq helm-descbinds-window-style 'split)
     (add-hook 'helm-mode-hook 'helm-descbinds-mode)
     (evil-leader/set-key "?" 'helm-descbinds)))
-
-(use-package helm-flx
-  :ensure t
-  :defer t)
-
-(dotemacs-use-package-add-hook helm
-  :pre-config
-  (helm-flx-mode))
 
 (use-package helm-make
   :ensure t
