@@ -7258,7 +7258,7 @@ If called with a prefix argument, uses the other-window instead."
     (push 'company-css company-backends-css-mode)
     (push 'company-web-slim company-backends-slim-mode)
     (push 'company-web-jade company-backends-jade-mode)
-    (push 'company-web-html company-backends-web-mode)))
+    (push '(company-web-html company-css) company-backends-web-mode)))
 
 
 ;;; Lua
