@@ -8289,17 +8289,28 @@ If called with a prefix argument, uses the other-window instead."
               (pop-to-buffer buffer)
               (delete-other-windows))))
 
-    ;; rebase mode
-    (evil-leader/set-key-for-mode 'git-rebase-mode
-      "mcc" 'git-rebase-server-edit
-      "mk" 'git-rebase-abort)
-    ;; commit mode
-    (evil-leader/set-key-for-mode 'git-commit-mode
-      "mcc" 'git-commit-commit
-      "mk" 'git-commit-abort)
+    (when dotemacs-major-mode-leader-key
+      (add-hook 'with-editor-mode-hook 'evil-normalize-keymaps)
+      (evil-define-key 'normal with-editor-mode-map
+        (concat dotemacs-major-mode-leader-key "c") 'with-editor-finish
+        (concat dotemacs-major-mode-leader-key "a") 'with-editor-cancel)
+      (evil-define-key 'motion with-editor-mode-map
+        (concat dotemacs-major-mode-leader-key "c") 'with-editor-finish
+        (concat dotemacs-major-mode-leader-key "a") 'with-editor-cancel))
 
     (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
     (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
+
+(use-package evil-magit
+  :defer t
+  :ensure t
+  :init
+  (with-eval-after-load 'magit
+    (require 'evil-magit)
+    (setq evil-magit-state 'motion)
+    ;; (evil-define-key 'motion magit-mode-map
+    ;;   (kbd dotemacs-leader-key) dotemacs-default-map)
+    ))
 
 (use-package magit-gitflow
   :ensure t
