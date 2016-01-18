@@ -4541,7 +4541,6 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (add-hook 'emacs-lisp-mode-hook 'dotemacs-lazy-load-srefactor)
     (use-package srefactor-lisp
-      :ensure t
       :commands (srefactor-lisp-format-buffer
                  srefactor-lisp-format-defun
                  srefactor-lisp-format-sexp
@@ -4549,11 +4548,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       :init
       (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
         (dotemacs-declare-prefix-for-mode mode "=" "srefactor")
-        (dotemacs-set-leader-keys-for-major-mode mode
-                                                 "=b" 'srefactor-lisp-format-buffer
-                                                 "=d" 'srefactor-lisp-format-defun
-                                                 "=o" 'srefactor-lisp-one-line
-                                                 "=s" 'srefactor-lisp-format-sexp)))))
+        (evil-leader/set-key-for-mode mode
+          "=b" 'srefactor-lisp-format-buffer
+          "=d" 'srefactor-lisp-format-defun
+          "=o" 'srefactor-lisp-one-line
+          "=s" 'srefactor-lisp-format-sexp)))))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
@@ -5857,7 +5856,6 @@ fix this issue."
     (push 'company-ycmd company-backends-c-mode-common)))
 
 (use-package srefactor
-  :defer t
   :ensure t
   :init
   (progn
@@ -5871,7 +5869,6 @@ fix this issue."
       (add-hook 'srefactor-ui-menu-mode-hook 'evil-emacs-state))))
 
 (use-package stickyfunc-enhance
-  :defer t
   :ensure t
   :init
   (defun dotemacs-lazy-load-stickyfunc-enhance ()
@@ -7524,7 +7521,6 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-
     (defun restclient-http-send-current-raw-stay-in-window ()
       (interactive)
       (restclient-http-send-current t t))
