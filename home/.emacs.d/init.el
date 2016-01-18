@@ -5142,11 +5142,10 @@ fix this issue."
 ;; TODO: uncomment this when it becomes available
 ;; (dotemacs-defvar-company-backends haml-mode)
 
-(defvar ruby-use-built-in-ruby-mode nil
-  "If non-nil, use built-in Ruby Mode.
+(defvar ruby-enable-enh-ruby-mode nil
+  "If non-nil, use `enh-ruby-mode' package insted of the built-in Ruby Mode.
 
 Otherwise use Enh Ruby Mode, which is the default.")
-
 
 (use-package rbenv
   :ensure t
@@ -5167,7 +5166,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
             (add-hook hook (lambda () (rvm-activate-corresponding-ruby)))))
 
 (use-package enh-ruby-mode
-  :if (unless ruby-use-built-in-ruby-mode)
+  :if (when ruby-enable-enh-ruby-mode)
   :ensure t
   :mode (("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
          ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
@@ -5183,7 +5182,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
                      :suffix ""))))
 
 (use-package ruby-mode
-  :if (when ruby-use-built-in-ruby-mode)
+  :if (unless ruby-enable-enh-ruby-mode)
   :ensure t
   :defer t
   :config
