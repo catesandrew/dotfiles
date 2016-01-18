@@ -10894,7 +10894,7 @@ If the error list is visible, hide it.  Otherwise, show it."
                 #b00000000
                 #b00000000
                 #b00000000
-                #b01111111)))
+                #b00000000)))
 
     (flycheck-define-error-level 'error
       :overlay-category 'flycheck-error-overlay
