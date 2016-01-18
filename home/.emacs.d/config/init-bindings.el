@@ -113,6 +113,9 @@ Ensure that helm is required before calling FUNC."
   "fR" 'dotemacs/rename-current-buffer-file
   "fS" 'evil-write-all
   "fs" 'dotemacs-write-file
+  "fvd" 'add-dir-local-variable
+  "fvf" 'add-file-local-variable
+  "fvp" 'add-file-local-variable-prop-line
   "fy" 'dotemacs/show-and-copy-buffer-filename)
 ;; insert stuff ---------------------------------------------------------------
 (evil-leader/set-key
