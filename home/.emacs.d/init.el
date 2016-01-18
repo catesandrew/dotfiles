@@ -4742,6 +4742,19 @@ point. Requires smartparens because all movement is done using
       (kbd "n") 'forward-button
       (kbd "N") 'backward-button)
 
+    (dolist (prefix '(("mb" . "scala/build")
+                      ("mc" . "scala/check")
+                      ("md" . "scala/debug")
+                      ("me" . "scala/errors")
+                      ("mg" . "scala/goto")
+                      ("mh" . "scala/docs")
+                      ("mi" . "scala/inspect")
+                      ("mn" . "scala/ensime")
+                      ("mr" . "scala/refactor")
+                      ("mt" . "scala/test")
+                      ("ms" . "scala/repl")))
+      (dotemacs-declare-prefix-for-mode 'scala-mode (car prefix) (cdr prefix)))
+
     (evil-leader/set-key-for-mode 'scala-mode
       "m/"     'ensime-search
 
