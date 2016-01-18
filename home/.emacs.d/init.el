@@ -1077,6 +1077,7 @@ the user activate the completion manually."
     (make-shell-pop-command ansi-term shell-pop-term-shell)
 
     (add-hook 'term-mode-hook 'ansi-term-handle-close)
+    (add-hook 'term-mode-hook (lambda () (linum-mode -1)))
 
     (evil-leader/set-key
       "'"   'dotemacs-default-pop-shell
