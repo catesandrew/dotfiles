@@ -11205,8 +11205,9 @@ If the error list is visible, hide it.  Otherwise, show it."
       (when spaceline-minor-modes-p
         (let ((unicodep (dotemacs-symbol-value
                          dotemacs-mode-line-unicode-symbols)))
-          (setq spaceline-minor-modes-separator
-                (if unicodep (if (display-graphic-p) "" " ") "|"))
+          (dotemacs|do-after-display-system-init
+           (setq spaceline-minor-modes-separator
+                 (if unicodep (if (display-graphic-p) "" " ") "|")))
           (dolist (mm dotemacs--diminished-minor-modes)
             (let ((mode (car mm)))
               (when (and (boundp mode) (symbol-value mode))
