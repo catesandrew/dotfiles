@@ -12,3 +12,4 @@ Will work on both org-mode and any mode that accepts plain html."
       (forward-char -6))))
 
 (provide 'init-markdown)
+;;; init-markdown.el ends here

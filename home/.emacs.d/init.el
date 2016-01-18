@@ -5793,7 +5793,8 @@ Otherwise use Enh Ruby Mode, which is the default.")
 
 (dotemacs|do-after-display-system-init
  (when (memq window-system '(mac ns x))
-   (exec-path-from-shell-copy-env "GOPATH")))
+   (exec-path-from-shell-copy-env "GOPATH")
+   (exec-path-from-shell-copy-env "GO15VENDOREXPERIMENT")))
 
 (use-package go-mode
   :ensure t
