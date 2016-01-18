@@ -1404,9 +1404,7 @@ the user activate the completion manually."
     (evil-leader/set-key "tr" 'linum-relative-toggle))
   :config
   (progn
-    (setq linum-format 'linum-relative)
-    (setq linum-relative-current-symbol "→")
-    (linum-relative-toggle)))
+    (setq linum-relative-current-symbol "→")))
 
 (use-package fill-column-indicator
   :defer t
