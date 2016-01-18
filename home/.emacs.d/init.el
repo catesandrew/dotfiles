@@ -1130,8 +1130,9 @@ the user activate the completion manually."
 (use-package cus-edit
   :defer t
   :config
-  (setq custom-file dotemacs-custom-file
-        custom-buffer-done-kill nil            ; Kill when existing
+  (unless (bound-and-true-p custom-file)
+    (setq custom-file (dotemacs-custom-file)))
+  (setq custom-buffer-done-kill nil            ; Kill when existing
         custom-buffer-verbose-help nil         ; Remove redundant help text
         ;; Show me the real variable name
         custom-unlispify-tag-names nil
