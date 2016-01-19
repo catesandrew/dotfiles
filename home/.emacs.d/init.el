@@ -6566,8 +6566,22 @@ If called with a prefix argument, uses the other-window instead."
 (use-package tuareg                     ; OCaml editing
   :ensure t
   :defer t
+  :init
+  (progn
+    ;; (dotemacs//init-ocaml-opam)
+    (evil-leader/set-key-for-mode 'tuareg-mode
+      "mga" 'tuareg-find-alternate-file
+      "mcc" 'compile)
+    ;; Make OCaml-generated files invisible to filename completion
+    (dolist (ext '(".cmo" ".cmx" ".cma" ".cmxa" ".cmi" ".cmxs" ".cmt" ".annot"))
+      (add-to-list 'completion-ignored-extensions ext)))
   :config
   (progn
+    (when (fboundp 'sp-local-pair)
+      ;; don't auto-close apostrophes (type 'a = foo) and backticks (`Foo)
+      (sp-local-pair 'tuareg-mode "'" nil :actions nil)
+      (sp-local-pair 'tuareg-mode "`" nil :actions nil))
+
     ;; Disable SMIE indentation in Tuareg.  It's just broken currently…
     (setq tuareg-use-smie nil)
 
