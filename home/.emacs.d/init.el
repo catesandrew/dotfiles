@@ -8148,12 +8148,13 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-leader/set-key
       "gb" 'dotemacs/git-blame-micro-state
+      "gc" 'magit-checkout
+      "gC" 'magit-commit
+      "gd" 'dotemacs-magit-diff-head
       "gi" 'magit-init
       "gl" 'magit-log-all
       "gL" 'magit-log-buffer-file
-      "gs" 'magit-status
-      "gd" 'dotemacs-magit-diff-head
-      "gC" 'magit-commit)
+      "gs" 'magit-status)
 
     (dotemacs-define-micro-state git-blame
       :doc (concat "Press [b] again to blame further in the history, "
