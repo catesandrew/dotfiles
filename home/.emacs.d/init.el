@@ -2436,32 +2436,28 @@ the user activate the completion manually."
           eshell-directory-name (concat dotemacs-cache-directory "eshell" )
           tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))))
 
-;; original
-(run-with-timer 1800 1800 'recentf-save-list)
-;; original
-
 (use-package recentf                    ; Save recently visited files
   :defer t
   :init
-  ;; lazy load recentf
-  (add-hook 'find-file-hook (lambda () (unless recentf-mode
-                                         (recentf-mode)
-                                         (recentf-track-opened-file))))
+  (progn
+    ;; lazy load recentf
+    (add-hook 'find-file-hook (lambda () (unless recentf-mode
+                                      (recentf-mode)
+                                      (recentf-track-opened-file))))
+    (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
+          recentf-max-saved-items 5000
+          recentf-max-menu-items 10
+          recentf-auto-save-timer (run-with-idle-timer 1800 t 'recentf-save-list)
+          ;; Cleanup recent files only when Emacs is idle, but not when the mode
+          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+          ;; idles often enough to have the recent files list clean up regularly
+          recentf-auto-cleanup 300))
   :config
-  (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
-        recentf-max-saved-items 200
-        recentf-max-menu-items 50
-        recentf-auto-save-timer (run-with-idle-timer 600 t 'recentf-save-list)
-        ;; Cleanup recent files only when Emacs is idle, but not when the mode
-        ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
-        ;; idles often enough to have the recent files list clean up regularly
-        recentf-auto-cleanup 300
-        recentf-exclude (list "COMMIT_EDITMSG\\'"
-                              "/\\.git/.*\\'" ; Git contents
-                              "/elpa/.*\\'" ; Package files
-                              "/itsalltext/" ; It's all text temp files
-                              ;; And all other kinds of boring files
-                              #'ignoramus-boring-p)))
+  (progn
+    (setq recentf-exclude (append (list "COMMIT_EDITMSG\\'"
+                                        (expand-file-name package-user-dir)
+                                        (expand-file-name dotemacs-cache-directory))
+                                  (list ignoramus-boring-file-regexp)))))
 
 (use-package restart-emacs
   :defer t
@@ -7534,7 +7530,7 @@ If called with a prefix argument, uses the other-window instead."
       (add-hook 'racket-mode-hook 'company-mode)))
 
   ;; Bug exists in Racket company backend that opens docs in new window when
-  ;; company-quickhelp calls it. Note hook is appendended for proper ordering.
+  ;; company-quickhelp calls it. Note hook is appended for proper ordering.
   (dotemacs-use-package-add-hook company-quickhelp
     :post-init
     (progn
