@@ -3243,6 +3243,9 @@ Disable the highlighting of overlong lines."
                        (list (when dotemacs-colorize-cursor-according-to-state color)
                              cursor))))
 
+    ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
+    (setq evil-want-fine-undo t)
+
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
@@ -5667,22 +5670,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
       "Force `haskell-mode' loading when visiting cabal file."
       (require 'haskell-mode))
     (add-hook 'haskell-cabal-mode-hook
-              'dotemacs//force-haskell-mode-loading)
-
-    (setq
-     ;; Use notify.el (if you have it installed) at the end of running
-     ;; Cabal commands or generally things worth notifying.
-     haskell-notify-p t
-     ;; To enable tags generation on save.
-     haskell-tags-on-save t
-     ;; Remove annoying error popups
-     haskell-interactive-popup-errors nil
-     ;; Better import handling
-     haskell-process-suggest-remove-import-lines t
-     haskell-process-auto-import-loaded-modules t
-     ;; Disable haskell-stylish-on-save, as it breaks flycheck highlighting.
-     ;; NOTE: May not be true anymore - taksuyu 2015-10-06
-     haskell-stylish-on-save nil))
+              'dotemacs//force-haskell-mode-loading))
   :config
   (progn
     ;; hooks
