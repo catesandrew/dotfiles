@@ -2140,8 +2140,6 @@ the user activate the completion manually."
         desktop-base-lock-name (concat "emacs_" emacs-version-short
                                        ".desktop.lock")
         desktop-path (list desktop-dirname)
-        desktop-save t
-        desktop-files-not-to-save "^$" ;reload tramp paths
         desktop-load-locked-desktop nil
         ;; Fix the frameset warning at startup
         desktop-restore-frames nil
