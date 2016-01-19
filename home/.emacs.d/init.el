@@ -5661,6 +5661,28 @@ Otherwise use Enh Ruby Mode, which is the default.")
 (use-package haskell-mode
   :ensure t
   :defer t
+  :init
+  (progn
+    (defun dotemacs//force-haskell-mode-loading ()
+      "Force `haskell-mode' loading when visiting cabal file."
+      (require 'haskell-mode))
+    (add-hook 'haskell-cabal-mode-hook
+              'dotemacs//force-haskell-mode-loading)
+
+    (setq
+     ;; Use notify.el (if you have it installed) at the end of running
+     ;; Cabal commands or generally things worth notifying.
+     haskell-notify-p t
+     ;; To enable tags generation on save.
+     haskell-tags-on-save t
+     ;; Remove annoying error popups
+     haskell-interactive-popup-errors nil
+     ;; Better import handling
+     haskell-process-suggest-remove-import-lines t
+     haskell-process-auto-import-loaded-modules t
+     ;; Disable haskell-stylish-on-save, as it breaks flycheck highlighting.
+     ;; NOTE: May not be true anymore - taksuyu 2015-10-06
+     haskell-stylish-on-save nil))
   :config
   (progn
     ;; hooks
