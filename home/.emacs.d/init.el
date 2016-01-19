@@ -9007,7 +9007,7 @@ If called with a prefix argument, uses the other-window instead."
       (define-key evil-motion-state-local-map (kbd "?")   'evil-search-backward)
       (define-key evil-motion-state-local-map (kbd "c")   'neotree-create-node)
       (define-key evil-motion-state-local-map (kbd "d")   'neotree-delete-node)
-      (define-key evil-motion-state-local-map (kbd "g")   'neotree-refresh)
+      (define-key evil-motion-state-local-map (kbd "gr")  'neotree-refresh)
       (define-key evil-motion-state-local-map (kbd "h")   'dotemacs-neotree-collapse-or-up)
       (define-key evil-motion-state-local-map (kbd "H")   'neotree-select-previous-sibling-node)
       (define-key evil-motion-state-local-map (kbd "J")   'neotree-select-down-node)
