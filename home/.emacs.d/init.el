@@ -10109,7 +10109,8 @@ If called with a prefix argument, uses the other-window instead."
       (dotemacs-add-company-hook ledger-mode))))
 
 
-;;; geolocation
+;; Miscellaneous
+
 (defvar geolocation-enable-osx-location-service-support t
   "If non nil enable the OS X location service support.")
 
@@ -10170,6 +10171,16 @@ If called with a prefix argument, uses the other-window instead."
       (change-theme (nth 0 dotemacs-themes)
                     (nth 1 dotemacs-themes)))))
 
+(use-package lorem-ipsum
+  :ensure t
+  :commands (lorem-ipsum-insert-list
+             lorem-ipsum-insert-paragraphs
+             lorem-ipsum-insert-sentences)
+  :init
+  (evil-leader/set-key
+    "xil" 'lorem-ipsum-insert-list
+    "xip" 'lorem-ipsum-insert-paragraphs
+    "xis" 'lorem-ipsum-insert-sentences))
 
 
 ;;; Google Translate
@@ -11502,37 +11513,6 @@ If the error list is visible, hide it.  Otherwise, show it."
 (use-package rfringe
   :ensure t
   :defer t)
-
-(use-package smart-mode-line   ; smart-mode-line-powerline-theme
-  :ensure t
-  :disabled t
-  :defer t
-  :config
-  (progn
-    (setq sml/no-confirm-load-theme t
-          sml/theme 'dark
-          sml/shorten-directory t
-          sml/shorten-modes t
-          sml/name-width 20
-          sml/mode-width 'full)
-    ; (powerline-default-theme)
-    (sml/setup)
-    (add-to-list 'sml/replacer-regexp-list '("^/usr/local/src" ":🐘src:") t)
-    (add-to-list 'sml/replacer-regexp-list '(":🐘src:/ibaset/\\(.*\\)" ":🌰ibaset/\\1:") t)))
-
-(use-package which-func                 ; Current function name in header line
-  :init (which-function-mode)
-  :disabled t
-  :config
-  (setq which-func-unknown "⊥" ; The default is really boring…
-        which-func-format
-        `((:propertize (" ➤ " which-func-current)
-                       local-map ,which-func-keymap
-                       face which-func
-                       mouse-face mode-line-highlight
-                       help-echo "mouse-1: go to beginning\n\
-mouse-2: toggle rest visibility\n\
-mouse-3: go to end"))))
 
 ; (byte-recompile-directory (expand-file-name dotemacs-core-directory) 0)
 ; (byte-recompile-directory (expand-file-name dotemacs-config-dir) 0)
