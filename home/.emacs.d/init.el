@@ -9933,6 +9933,9 @@ If called with a prefix argument, uses the other-window instead."
 ;    single bar
 ; -  right mouse click moves up directory if in blank space or shows context menu
 
+(defvar vinegar-reuse-dired-buffer nil
+  "If non-nil, reuses one dired buffer for navigation.")
+
 (use-package init-vinegar
   :load-path "config/"
   :commands (vinegar/dired-setup))
@@ -9940,11 +9943,35 @@ If called with a prefix argument, uses the other-window instead."
 (use-package dired-x                    ; Additional tools for Dired
   :defer t
   :init
-  (progn
-    (add-hook 'dired-mode-hook 'vinegar/dired-setup))
+  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
   :config
   (progn
     (define-key evil-normal-state-map (kbd "-") 'dired-jump)
+
+    (with-eval-after-load 'dired
+      (evilify dired-mode dired-mode-map
+               "j"         'vinegar/move-down
+               "k"         'vinegar/move-up
+               "-"         'vinegar/up-directory
+               "0"         'dired-back-to-start-of-files
+               "="         'vinegar/dired-diff
+               (kbd "C-j") 'dired-next-subdir
+               (kbd "C-k") 'dired-prev-subdir
+               "I"         'vinegar/dotfiles-toggle
+               (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
+               (kbd "RET") (if vinegar-reuse-dired-buffer
+                               'dired-find-alternate-file
+                             'dired-find-file)
+               "f"         'helm-find-files
+               "J"         'dired-goto-file
+               (kbd "C-f") 'find-name-dired
+               "H"         'diredp-dired-recent-dirs
+               "T"         'dired-tree-down
+               "K"         'dired-do-kill-lines
+               "r"         'revert-buffer
+               (kbd "C-r") 'dired-do-redisplay
+               "gg"        'vinegar/back-to-top
+               "G"         'vinegar/jump-to-bottom))
 
     (when (eq system-type 'darwin)
       ;; OS X bsdtar is mostly compatible with GNU Tar
@@ -9995,29 +10022,7 @@ If called with a prefix argument, uses the other-window instead."
           ;; use single buffer for all dired navigation
           ;; disable font themeing from dired+
           font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
-    (toggle-diredp-find-file-reuse-dir 1))
-  :config
-  (evilify dired-mode dired-mode-map
-    "j"         'vinegar/move-down
-    "k"         'vinegar/move-up
-    "-"         'vinegar/up-directory
-    "0"         'dired-back-to-start-of-files
-    "="         'vinegar/dired-diff
-    (kbd "C-j") 'dired-next-subdir
-    (kbd "C-k") 'dired-prev-subdir
-    "I"         'vinegar/dotfiles-toggle
-    (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
-    (kbd "RET") 'dired-find-file
-    "f"         'helm-find-files
-    "J"         'dired-goto-file
-    (kbd "C-f") 'find-name-dired
-    "H"         'diredp-dired-recent-dirs
-    "T"         'dired-tree-down
-    "K"         'dired-do-kill-lines
-    "r"         'revert-buffer
-    "C-r"       'dired-do-redisplay
-    "gg"        'vinegar/back-to-top
-    "G"         'vinegar/jump-to-bottom))
+    (toggle-diredp-find-file-reuse-dir 1)))
 
 ;; unimpaired
 
