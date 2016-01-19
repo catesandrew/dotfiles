@@ -31,8 +31,45 @@
           "mrs" 'go-oracle-callstack
           "mrt" 'go-oracle-describe)))))
 
-(defun dotemacs-go-run-package-tests ()
+(defun dotemacs/go-run-main ()
   (interactive)
-  (shell-command "go test"))
+  (shell-command
+   (format "go run %s"
+           (shell-quote-argument (buffer-file-name)))))
+
+(defun dotemacs/go-run-tests (args)
+  (interactive)
+  (save-selected-window
+    (async-shell-command (concat "go test " args))))
+
+(defun dotemacs/go-run-package-tests ()
+  (interactive)
+  (dotemacs/go-run-tests ""))
+
+(defun dotemacs/go-run-package-tests-nested ()
+  (interactive)
+  (dotemacs/go-run-tests "./..."))
+
+(defun dotemacs/go-run-test-current-function ()
+  (interactive)
+  (if (string-match "_test\\.go" buffer-file-name)
+      (let ((test-method (if go-use-gocheck-for-testing
+                             "-check.f"
+                           "-run")))
+        (save-excursion
+          (re-search-backward "^func[ ]+([[:alnum:]]*?[ ]?[*]?\\([[:alnum:]]+\\))[ ]+\\(Test[[:alnum:]]+\\)(.*)")
+          (dotemacs/go-run-tests (concat test-method "='" (match-string-no-properties 2) "'"))))
+    (message "Must be in a _test.go file to run go-run-test-current-function")))
+
+(defun dotemacs/go-run-test-current-suite ()
+  (interactive)
+  (if (string-match "_test\.go" buffer-file-name)
+      (if go-use-gocheck-for-testing
+          (save-excursion
+            (re-search-backward "^func[ ]+([[:alnum:]]*?[ ]?[*]?\\([[:alnum:]]+\\))[ ]+\\(Test[[:alnum:]]+\\)(.*)")
+            (dotemacs/go-run-tests (concat "-check.f='" (match-string-no-properties 1) "'")))
+        (message "Gocheck is needed to test the current suite"))
+    (message "Must be in a _test.go file to run go-test-current-suite")))
 
 (provide 'init-go)
+;;; init-go.el ends here

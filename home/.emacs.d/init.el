@@ -5909,6 +5909,11 @@ Otherwise use Enh Ruby Mode, which is the default.")
 ;;; Go
 (dotemacs-defvar-company-backends go-mode)
 
+(defvar go-use-gocheck-for-testing nil
+  "If using gocheck for testing when running the tests -check.f
+  will be used instead of -run to specify the test that will be
+  ran. Gocheck is mandatory for testing suites.")
+
 (use-package init-go
   :commands (load-gopath-file
              go/init-go-oracle
@@ -5932,12 +5937,6 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (add-hook 'before-save-hook 'gofmt-before-save)
 
-    (defun dotemacs/go-run-main ()
-      (interactive)
-      (shell-command
-       (format "go run %s"
-               (shell-quote-argument (buffer-file-name)))))
-
     (evil-leader/set-key-for-mode 'go-mode
       "mhh" 'godoc-at-point
       "mig" 'go-goto-imports
@@ -5949,7 +5948,10 @@ Otherwise use Enh Ruby Mode, which is the default.")
       "mxx" 'dotemacs/go-run-main
       "mga" 'ff-find-other-file
       "mgg" 'godef-jump
-      "mtp" 'dotemacs-go-run-package-tests)))
+      "mtt" 'dotemacs/go-run-test-current-function
+      "mts" 'dotemacs/go-run-test-current-suite
+      "mtp" 'dotemacs/go-run-package-tests
+      "mtP" 'dotemacs/go-run-package-tests-nested)))
 
 (use-package go-eldoc
   :disabled t
