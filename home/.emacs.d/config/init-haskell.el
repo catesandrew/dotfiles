@@ -21,3 +21,4 @@
     (display-buffer buffer)))
 
 (provide 'init-haskell)
+;;; init-haskell.el ends here

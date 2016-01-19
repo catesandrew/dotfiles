@@ -5680,7 +5680,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
 
       "msb"  'haskell-process-load-or-reload
       "msc"  'haskell-interactive-mode-clear
-      "mss"  'haskell-interactive-bring
+      "mss"  'dotemacs/haskell-interactive-bring
       "msS"  'haskell-interactive-switch
 
       "mca"  'haskell-process-cabal
