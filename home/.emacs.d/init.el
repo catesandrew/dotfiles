@@ -2273,6 +2273,34 @@ the user activate the completion manually."
                 ;; Find library from `require', `declare-function' and friends
                 helm-ff-search-library-in-sexp t))
 
+(use-package recentf                    ; Save recently visited files
+  :defer t
+  :init
+  (progn
+    ;; lazy load recentf
+    (add-hook 'find-file-hook (lambda () (unless recentf-mode
+                                      (recentf-mode)
+                                      (recentf-track-opened-file))))
+    (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
+          recentf-max-saved-items 5000
+          recentf-max-menu-items 10
+          recentf-auto-save-timer (run-with-idle-timer 1800 t 'recentf-save-list)
+          ;; Cleanup recent files only when Emacs is idle, but not when the mode
+          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+          ;; idles often enough to have the recent files list clean up regularly
+          recentf-auto-cleanup 300))
+  :config
+  (progn
+    (setq recentf-exclude (list "COMMIT_EDITMSG\\'"
+                                (expand-file-name package-user-dir)
+                                (expand-file-name dotemacs-cache-directory)))))
+
+(dotemacs-use-package-add-hook ignoramus
+  :post-config
+  (with-eval-after-load 'recentf
+    (setq recentf-exclude (append recentf-exclude
+                                  (list ignoramus-boring-file-regexp)))))
+
 (use-package ignoramus                  ; Ignore uninteresting files everywhere
   :ensure t
   :config
@@ -2435,29 +2463,6 @@ the user activate the completion manually."
           url-configuration-directory (concat dotemacs-cache-directory "url")
           eshell-directory-name (concat dotemacs-cache-directory "eshell" )
           tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))))
-
-(use-package recentf                    ; Save recently visited files
-  :defer t
-  :init
-  (progn
-    ;; lazy load recentf
-    (add-hook 'find-file-hook (lambda () (unless recentf-mode
-                                      (recentf-mode)
-                                      (recentf-track-opened-file))))
-    (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
-          recentf-max-saved-items 5000
-          recentf-max-menu-items 10
-          recentf-auto-save-timer (run-with-idle-timer 1800 t 'recentf-save-list)
-          ;; Cleanup recent files only when Emacs is idle, but not when the mode
-          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
-          ;; idles often enough to have the recent files list clean up regularly
-          recentf-auto-cleanup 300))
-  :config
-  (progn
-    (setq recentf-exclude (append (list "COMMIT_EDITMSG\\'"
-                                        (expand-file-name package-user-dir)
-                                        (expand-file-name dotemacs-cache-directory))
-                                  (list ignoramus-boring-file-regexp)))))
 
 (use-package restart-emacs
   :defer t
