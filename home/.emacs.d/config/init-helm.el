@@ -536,4 +536,14 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   (with-helm-buffer
     (setq cursor-in-non-selected-windows nil)))
 
+(defun dotemacs/helm-faces ()
+  "Describe face."
+  (interactive)
+  (require 'helm-elisp)
+  (let ((default (thing-at-point 'symbol)))
+    (helm :sources (list (helm-def-source--emacs-faces default))
+          :buffer "*helm faces*"
+          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
+
 (provide 'init-helm)
+;;; init-helm.el ends here

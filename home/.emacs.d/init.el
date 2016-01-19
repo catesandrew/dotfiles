@@ -1705,6 +1705,7 @@ the user activate the completion manually."
       "fm"   'dotemacs-helm-multi-files
       "fr"   'helm-recentf
       "hb"   'helm-filtered-bookmarks
+      "hdF"  'dotemacs/helm-faces
       "hi"   'helm-info-at-point
       "hl"   'helm-resume
       "hm"   'helm-man-woman
@@ -11308,6 +11309,8 @@ If the error list is visible, hide it.  Otherwise, show it."
 
     ;; disable yas minor mode map, use hippie-expand instead
     (setq yas-minor-mode-map (make-sparse-keymap)
+          ;; stop polluting messages buffer
+          yas-verbosity 0
           ;; allow nested expansions
           yas-triggers-in-field t
           ;; add key into candidate list
