@@ -5158,6 +5158,14 @@ point. Requires smartparens because all movement is done using
     (with-eval-after-load 'auto-highlight-symbol
       (add-to-list 'ahs-plugin-bod-modes 'python-mode))
 
+    (dotemacs-declare-prefix-for-mode 'python-mode "mc" "execute")
+    (dotemacs-declare-prefix-for-mode 'python-mode "md" "debug")
+    (dotemacs-declare-prefix-for-mode 'python-mode "mh" "help")
+    (dotemacs-declare-prefix-for-mode 'python-mode "mg" "goto")
+    (dotemacs-declare-prefix-for-mode 'python-mode "mt" "test")
+    (dotemacs-declare-prefix-for-mode 'python-mode "ms" "send to REPL")
+    (dotemacs-declare-prefix-for-mode 'python-mode "mr" "refactor")
+    (dotemacs-declare-prefix-for-mode 'python-mode "mv" "venv")
     (evil-leader/set-key-for-mode 'python-mode
       "mcc" 'dotemacs-python-execute-file
       "mcC" 'dotemacs-python-execute-file-focus
