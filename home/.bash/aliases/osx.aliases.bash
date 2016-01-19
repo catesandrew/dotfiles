@@ -1,7 +1,12 @@
 cite 'about-alias'
 about-alias 'osx-specific aliases'
 
-alias cwd="echo -n `pwd` | pbcopy; echo \"Copied `pwd`\""
+alias cwd=__cwd
+
+function __cwd
+{
+    echo -n "$(pwd)" | pbcopy; echo "Copied '$(pwd)'"
+}
 
 # Requires growlnotify, which can be found in the Growl DMG under "Extras"
 alias grnot='growlnotify -s -t Terminal -m "Done"'
