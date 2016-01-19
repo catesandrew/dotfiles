@@ -194,8 +194,12 @@ package name does not match theme name + `-theme' suffix.")
   (interactive)
   (when dotemacs--cur-theme
     (disable-theme dotemacs--cur-theme)
-    (setq dotemacs--cycle-themes
-          (append dotemacs--cycle-themes (list dotemacs--cur-theme))))
+    ;; if current theme isn't in cycleable themes, start over
+    (if (not (member dotemacs--cur-theme dotemacs-themes))
+        (setq dotemacs--cycle-themes dotemacs-themes)
+      (setq dotemacs--cycle-themes
+            (append dotemacs--cycle-themes (list dotemacs--cur-theme)))))
+
   (setq dotemacs--cur-theme (pop dotemacs--cycle-themes))
   (message "Loading theme %s..." dotemacs--cur-theme)
   (dotemacs-load-theme dotemacs--cur-theme))
