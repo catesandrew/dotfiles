@@ -321,6 +321,13 @@ Default value is `cache'."
   :type 'boolean
   :group 'dotemacs)
 
+(defvar dotemacs-whitespace-cleanup 'changed
+  "Delete whitespace while saving buffer.
+
+Possible values are `all', `trailing', `changed' or `nil'.
+Default is `changed' (cleanup whitespace on changed lines)")
+
+
 (defcustom dotemacs-highlight-delimiters 'all
   "Select a scope to highlight delimiters. Possible values are `any',
   `current', `all' or `nil'. Default is `all' (highlight any scope and
@@ -2790,6 +2797,11 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil))
 
+;; whitespace-cleanup configuration
+(pcase dotemacs-whitespace-cleanup
+  (`all (add-hook 'before-save-hook 'whitespace-cleanup))
+  (`trailing (add-hook 'before-save-hook 'delete-trailing-whitespace)))
+
 ;; enable electric indent
 (setq electric-indent-mode 1)
 
@@ -2873,14 +2885,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package delsel                     ; Delete the selection instead of insert
   :defer t
   :init (delete-selection-mode))
-
-(use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
-  :ensure t
-  :bind (("C-c u w c" . whitespace-cleanup-mode)
-         ("C-c e w" . whitespace-cleanup))
-  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-          (add-hook hook #'whitespace-cleanup-mode))
-  :diminish (whitespace-cleanup-mode . "⌫"))
 
 (use-package subword                    ; Subword/superword editing
   :ensure t
@@ -3130,6 +3134,22 @@ Disable the highlighting of overlong lines."
                         :background nil)
     (dotemacs-diminish whitespace-mode " ⓦ" " w")
     (dotemacs-diminish global-whitespace-mode " Ⓦ" " W")))
+
+(use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
+  :ensure t
+  :bind (("C-c u w c" . whitespace-cleanup-mode)
+         ("C-c e w" . whitespace-cleanup))
+  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+          (add-hook hook #'whitespace-cleanup-mode))
+  :diminish (whitespace-cleanup-mode . "⌫"))
+
+(use-package ws-butler
+  :if (eq 'changed dotemacs-whitespace-cleanup)
+  :ensure t
+  :config
+  (progn
+    (ws-butler-global-mode 1)
+    (dotemacs-hide-lighter ws-butler-mode)))
 
 (use-package hungry-delete
   :defer t
