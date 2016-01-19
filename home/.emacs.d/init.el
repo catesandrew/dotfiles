@@ -290,8 +290,9 @@ can be toggled through `toggle-transparency'."
 (defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
   "Filepath to the installed dotfile.")
 
-(defvar dotemacs-global-line-numbers t
-  "If non nil line numbers are turned on in all `prog-mode' and `text-mode'.")
+(defvar dotemacs-global-line-numbers 'relative
+  "If non nil line numbers are turned on in all `prog-mode' and `text-mode'.
+derivatives. If set to `'relative', also turns on relative line numbers.")
 
 (defcustom dotemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting."
@@ -1417,16 +1418,11 @@ the user activate the completion manually."
 
 (use-package linum-relative
   :ensure t
-  :commands linum-relative-toggle
+  :commands (linum-relative-toggle linum-relative-on)
   :init
   (progn
-    (defvar dotemacs--relative-linum-loaded nil)
-    (defun dotemacs-linum-relative-mode-setup ()
-      (unless dotemacs--relative-linum-loaded
-        (linum-relative-toggle)
-        (setq dotemacs--relative-linum-loaded t)))
-    (add-hook 'linum-mode-hook 'dotemacs-linum-relative-mode-setup)
-
+    (when (eq dotemacs-global-line-numbers 'relative)
+      (linum-relative-on))
     (evil-leader/set-key "tr" 'linum-relative-toggle))
   :config
   (progn
