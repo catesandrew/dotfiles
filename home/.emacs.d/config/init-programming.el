@@ -58,7 +58,7 @@ This functions should be added to the hooks of major modes for programming."
       (setq truncate-lines t))
 
     ;; enable line number-mode
-    (when dotemacs-global-line-numbers
+    (when dotemacs-line-numbers
       (unless (bound-and-true-p linum-mode)
         (linum-mode)))
 
