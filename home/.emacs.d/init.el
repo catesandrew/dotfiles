@@ -910,6 +910,7 @@ group by projectile projects."
         ("xa" "align")
         ("xd" "delete")
         ("xg" "google-translate")
+        ("xi" "insert")
         ("xl" "lines")
         ("xm" "move")
         ("xt" "transpose")
@@ -10177,10 +10178,12 @@ If called with a prefix argument, uses the other-window instead."
              lorem-ipsum-insert-paragraphs
              lorem-ipsum-insert-sentences)
   :init
-  (evil-leader/set-key
-    "xil" 'lorem-ipsum-insert-list
-    "xip" 'lorem-ipsum-insert-paragraphs
-    "xis" 'lorem-ipsum-insert-sentences))
+  (progn
+    (dotemacs-declare-prefix "xil" "lorem ipsum")
+    (evil-leader/set-key
+      "xill" 'lorem-ipsum-insert-list
+      "xilp" 'lorem-ipsum-insert-paragraphs
+      "xils" 'lorem-ipsum-insert-sentences)))
 
 
 ;;; Google Translate
