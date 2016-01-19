@@ -655,6 +655,9 @@ group by projectile projects."
 (defvar spell-checking-enable-by-default t
   "Enable spell checking by default.")
 
+(defvar spell-checking-enable-auto-dictionary nil
+  "Specify if auto-dictionary should be enabled or not.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -11010,11 +11013,23 @@ If the error list is visible, hide it.  Otherwise, show it."
     "xwd" 'define-word-at-point))
 
 (use-package auto-dictionary
-  :disabled t
+  :if spell-checking-enable-auto-dictionary
   :defer t
   :ensure t
   :init
-  (add-hook 'flyspell-mode-hook 'auto-dictionary-mode))
+  (progn
+    (add-hook 'flyspell-mode-hook 'auto-dictionary-mode)
+    ;; Select the buffer local dictionary if it was set, otherwise
+    ;; auto-dictionary will replace it with a guessed one at each activation.
+    ;; https://github.com/nschum/auto-dictionary-mode/issues/5
+    (defun dotemacs//adict-set-local-dictionary ()
+      "Set the local dictionary if not nil."
+      (when (and (fboundp 'adict-change-dictionary)
+                 ispell-local-dictionary)
+        (adict-change-dictionary ispell-local-dictionary)))
+
+    (add-hook 'auto-dictionary-mode-hook
+              'spacemacs//adict-set-local-dictionary 'append)))
 
 (use-package flyspell                   ; On-the-fly spell checking
   :defer t
@@ -11026,15 +11041,22 @@ If the error list is visible, hide it.  Otherwise, show it."
     (dolist (mode '(org-mode text-mode message-mode))
       (spell-checking/add-flyspell-hook mode))
 
+    (add-hook 'flyspell-mode-hook 'flyspell-buffer)
+
     (dotemacs-add-toggle spelling-checking
       :status flyspell-mode
-      :on (flyspell-mode)
-      :off (flyspell-mode -1)
-      :documentation
-      "automatic spell checking"
+      :on (if (derived-mode-p 'prog-mode)
+              (flyspell-prog-mode)
+            (flyspell-mode))
+      :off (progn
+             (flyspell-mode-off)
+             ;; Also disable auto-dictionary when disabling spell-checking.
+             (when (fboundp 'auto-dictionary-mode) (auto-dictionary-mode -1)))
+      :documentation "Enable automatic spell checking."
       :evil-leader "tS")
 
     (evil-leader/set-key
+      "Sb" 'flyspell-buffer
       "Sd" 'spell-checing/change-dictionary
       "Sn" 'flyspell-goto-next-error))
   :config
