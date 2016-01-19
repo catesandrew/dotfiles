@@ -3972,7 +3972,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
-  (dotemacs/add-flyspell-hook 'LaTeX-mode))
+  (spell-checking/add-flyspell-hook 'LaTeX-mode))
 
 (dotemacs-use-package-add-hook yasnippet
   :post-init
@@ -4199,7 +4199,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
-  (dotemacs/add-flyspell-hook 'markdown-mode))
+  (spell-checking/add-flyspell-hook 'markdown-mode))
 
 (dotemacs-use-package-add-hook emoji-cheat-sheet-plus
   :post-init
@@ -5512,7 +5512,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
     ;; Add standard hooks for Feature Mode, since it is no derived mode
     (add-hook 'feature-mode-hook #'whitespace-mode)
     (add-hook 'feature-mode-hook #'whitespace-cleanup-mode)
-    (dotemacs/add-flyspell-hook 'feature-mode)))
+    (spell-checking/add-flyspell-hook 'feature-mode)))
 
 (use-package haml-mode
   :ensure t
@@ -10996,7 +10996,8 @@ If the error list is visible, hide it.  Otherwise, show it."
 (use-package init-spell-checking
   :load-path "config/"
   :defer t
-  :commands (dotemacs/add-flyspell-hook))
+  :commands (spell-checking/add-flyspell-hook
+             spell-checking/change-dictionary))
 
 (use-package define-word
   :defer t
@@ -11004,6 +11005,13 @@ If the error list is visible, hide it.  Otherwise, show it."
   :init
   (evil-leader/set-key
     "xwd" 'define-word-at-point))
+
+(use-package auto-dictionary
+  :disabled t
+  :defer t
+  :ensure t
+  :init
+  (add-hook 'flyspell-mode-hook 'auto-dictionary-mode))
 
 (use-package flyspell                   ; On-the-fly spell checking
   :defer t
@@ -11013,7 +11021,7 @@ If the error list is visible, hide it.  Otherwise, show it."
           flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
           flyspell-issue-message-flag nil)
     (dolist (mode '(org-mode text-mode message-mode))
-      (dotemacs/add-flyspell-hook mode))
+      (spell-checking/add-flyspell-hook mode))
 
     (dotemacs-add-toggle spelling-checking
       :status flyspell-mode
@@ -11024,7 +11032,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       :evil-leader "tS")
 
     (evil-leader/set-key
-      "Sd" 'ispell-change-dictionary
+      "Sd" 'spell-checing/change-dictionary
       "Sn" 'flyspell-goto-next-error))
   :config
   (progn
