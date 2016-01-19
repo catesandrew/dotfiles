@@ -7955,6 +7955,7 @@ If called with a prefix argument, uses the other-window instead."
            "j" 'diff-hunk-next
            "k" 'diff-hunk-prev))
 
+(dotemacs-declare-prefix "gd" "diff")
 (use-package diff-hl                    ; Highlight hunks in fringe
   :ensure t
   :defer t
@@ -7973,10 +7974,10 @@ If called with a prefix argument, uses the other-window instead."
         (diff-hl-margin-mode)))
 
     (evil-leader/set-key
-        "ghr" 'diff-hl-revert-hunk
-        "ghN" 'diff-hl-previous-hunk
-        "ghn" 'diff-hl-next-hunk
-        "ghg" 'diff-hl-diff-goto-hunk)))
+      "gdg" 'diff-hl-diff-goto-hunk
+      "gdn" 'diff-hl-next-hunk
+      "gdN" 'diff-hl-previous-hunk
+      "gdr" 'diff-hl-revert-hunk)))
 
 ;; git
 (use-package git-commit                 ; Git commit message mode
@@ -8170,9 +8171,9 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-leader/set-key
       "gb" 'dotemacs/git-blame-micro-state
-      "gc" 'magit-checkout
-      "gC" 'magit-commit
-      "gd" 'dotemacs-magit-diff-head
+      "gc" 'magit-commit
+      "gC" 'magit-checkout
+      "gdh" 'dotemacs-magit-diff-head
       "gi" 'magit-init
       "gl" 'magit-log-all
       "gL" 'magit-log-buffer-file
