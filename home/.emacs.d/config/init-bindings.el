@@ -190,8 +190,8 @@ Ensure that helm is required before calling FUNC."
   :evil-leader "tv")
 (dotemacs-add-toggle line-numbers
   :status linum-mode
-  :on (global-linum-mode)
-  :off (global-linum-mode -1)
+  :on (linum-mode)
+  :off (linum-mode -1)
   :documentation "Show the line numbers."
   :evil-leader "tl")
 (dotemacs-add-toggle auto-fill-mode

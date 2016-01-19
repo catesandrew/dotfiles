@@ -286,6 +286,9 @@ can be toggled through `toggle-transparency'."
 (defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
   "Filepath to the installed dotfile.")
 
+(defvar dotemacs-global-line-numbers t
+  "If non nil line numbers are turned on in all `prog-mode' and `text-mode'.")
+
 (defcustom dotemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting."
   :group 'dotemacs)
@@ -1337,6 +1340,9 @@ the user activate the completion manually."
 (setq line-number-mode t)
 ;; Show column number in mode line
 (setq column-number-mode t)
+(when dotemacs-global-line-numbers
+  (add-hook 'text-mode-hook 'linum-mode))
+
 ;; line number
 (setq linum-format "%4d")
 
