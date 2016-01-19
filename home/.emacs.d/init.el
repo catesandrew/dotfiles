@@ -74,6 +74,10 @@
   (expand-file-name "~/")
   "User home directory (~/).")
 
+(defconst emacs-version-short (replace-regexp-in-string
+                               "\\([0-9]+\\)\\.\\([0-9]+\\).*"
+                               "\\1_\\2" emacs-version))
+
 (defconst pcache-directory
   (concat dotemacs-cache-directory "pcache"))
 (unless (file-exists-p dotemacs-cache-directory)
