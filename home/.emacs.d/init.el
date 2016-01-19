@@ -815,6 +815,10 @@ group by projectile projects."
 ;; And disable the site default settings
 (setq inhibit-default-init t)
 
+;; save custom variables
+(unless (bound-and-true-p custom-file)
+  (setq custom-file dotemacs-custom-file))
+
 ;; start scratch in text mode (usefull to get a faster Emacs load time
 ;; because it avoids autoloads of elisp modes)
 (setq initial-major-mode 'text-mode)
@@ -1140,15 +1144,13 @@ the user activate the completion manually."
 ;;; Customization, init file and package management
 (use-package cus-edit
   :defer t
+  :init (load dotemacs-custom-file 'no-error 'no-message)
   :config
-  (unless (bound-and-true-p custom-file)
-    (setq custom-file (dotemacs-custom-file)))
   (setq custom-buffer-done-kill nil            ; Kill when existing
         custom-buffer-verbose-help nil         ; Remove redundant help text
         ;; Show me the real variable name
         custom-unlispify-tag-names nil
-        custom-unlispify-menu-entries nil)
-  :init (load dotemacs-custom-file 'no-error 'no-message))
+        custom-unlispify-menu-entries nil))
 
 (use-package paradox                    ; Better package menu
   :ensure t
