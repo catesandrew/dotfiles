@@ -4352,7 +4352,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     ;; Space to toggle folds.
-    (define-key evil-motion-state-map " " 'evil-toggle-fold)
+    (define-key evil-motion-state-map (kbd "SPC") 'evil-toggle-fold)
     ;; TODO: Figure out how to only map " " when in hs-minor-mode
     ;; (evil-define-key 'motion hs-minor-mode-map " " 'evil-toggle-fold)
 
