@@ -5021,9 +5021,9 @@ point. Requires smartparens because all movement is done using
       "mrt"     'ensime-import-type-at-point
       "mrv"     'ensime-refactor-extract-local
 
-      "mta"     'ensime-sbt-do-test
-      "mtr"     'ensime-sbt-do-test-quick
-      "mtt"     'ensime-sbt-do-test-only
+      "mta"     'ensime-sbt-do-test-dwim
+      "mtr"     'ensime-sbt-do-test-quick-dwim
+      "mtt"     'ensime-sbt-do-test-only-dwim
 
       "msa"     'ensime-inf-load-file
       "msb"     'ensime-inf-eval-buffer
