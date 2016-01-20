@@ -1718,8 +1718,7 @@ the user activate the completion manually."
   "Delay in seconds between each layouts auto-save.")
 
 (use-package init-perspective
-  :load-path "config/"
-  :defer t)
+  :load-path "config/")
 
 (use-package persp-mode
   :diminish persp-mode
