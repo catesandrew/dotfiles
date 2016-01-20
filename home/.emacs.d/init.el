@@ -4684,10 +4684,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :mode ("\\*.el\\'" . emacs-lisp-mode)
   :init
   (progn
-    (with-eval-after-load 'lisp-mode
-      (bind-key "C-c e e" #'macrostep-expand emacs-lisp-mode-map)
-      (bind-key "C-c e e" #'macrostep-expand lisp-interaction-mode-map))
-
+    (evil-define-key 'normal macrostep-keymap "q" 'macrostep-collapse-all)
     (dotemacs-define-micro-state macrostep
       :doc "[e] expand [c] collapse [n/N] next/previous [q] quit"
       :disable-evil-leader t
