@@ -415,7 +415,7 @@ argument takes the kindows rotate backwards."
   "Kill all other buffers."
   (interactive)
   (let (name (buffer-name))
-    (when (yes-or-no-p (format "Killing all buffers except \"%s\" ? " buffer-file-name))
+    (when (yes-or-no-p (format "Killing all buffers except \"%s\"? " (buffer-name)))
       (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
       (message "Buffers deleted!"))))
 
