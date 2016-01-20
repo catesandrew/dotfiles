@@ -11157,8 +11157,6 @@ If the error list is visible, hide it.  Otherwise, show it."
     (dolist (mode '(org-mode text-mode message-mode))
       (spell-checking/add-flyspell-hook mode))
 
-    (add-hook 'flyspell-mode-hook 'flyspell-buffer)
-
     (dotemacs-add-toggle spelling-checking
       :status flyspell-mode
       :on (if (derived-mode-p 'prog-mode)
