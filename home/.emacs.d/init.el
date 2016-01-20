@@ -2764,6 +2764,12 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
         (browse-url-at-point)))
     (evil-leader/set-key "`" 'avy-pop-mark)))
 
+(use-package ace-jump-helm-line
+  :ensure t
+  :init
+  (with-eval-after-load "helm"
+    (define-key helm-map (kbd "C-'") 'ace-jump-helm-line)))
+
 (use-package ace-link                   ; Fast link jumping
   :commands dotemacs-ace-buffer-links
   :init
