@@ -3302,7 +3302,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (setq avy-background t)
     (evil-leader/set-key
       "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
-      "l" 'avy-goto-line ; 'avy-goto-char-2
+      "L" 'avy-goto-line ; 'avy-goto-char-2
       "xo" 'dotemacs-avy-open-url
     ))
   :config
