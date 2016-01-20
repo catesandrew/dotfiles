@@ -900,6 +900,7 @@ group by projectile projects."
         ("kd" "delete")
         ("kD" "delete-backward")
         ("k`" "hybrid")
+        ("n"  "narrow/numbers")
         ("p"  "projects")
         ("p$" "projects/shell")
         ("P"  "pandoc")
@@ -929,7 +930,6 @@ group by projectile projects."
         ("xm" "move")
         ("xt" "transpose")
         ("xw" "words")
-        ("y"  "narrow/numbers")
         ("z"  "zoom")))
 (mapc (lambda (x) (apply #'dotemacs-declare-prefix x))
       dotemacs-key-binding-prefixes)
@@ -9507,10 +9507,7 @@ If called with a prefix argument, uses the other-window instead."
 
     ;; neo-global--select-window
     (evil-leader/set-key
-      "tn" 'neotree-show
-      "tN" 'neotree-hide
-      "n" 'neotree-show
-      "N" 'neotree-hide
+      "ft" 'neotree-toggle
       "pt" 'neotree-find-project-root))
 
   :config

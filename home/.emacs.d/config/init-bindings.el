@@ -144,10 +144,10 @@ Ensure that helm is required before calling FUNC."
 (evil-leader/set-key "cr" 'recompile)
 ;; narrow & widen -------------------------------------------------------------
 (evil-leader/set-key
-  "yr" 'narrow-to-region
-  "yp" 'narrow-to-page
-  "yf" 'narrow-to-defun
-  "yw" 'widen)
+  "nr" 'narrow-to-region
+  "np" 'narrow-to-page
+  "nf" 'narrow-to-defun
+  "nw" 'widen)
 ;; spell check  ---------------------------------------------------------------
 (evil-leader/set-key
   "Sd" 'ispell-change-dictionary
