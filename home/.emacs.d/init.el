@@ -26,7 +26,6 @@
 ;; Don't be so stingy on the memory, we have lots now. It's the distant future.
 (setq gc-cons-threshold 100000000)
 
-
 ;;; Code:
 
 ;; No splash screen please ... jeez
@@ -361,6 +360,16 @@ NOERROR and NOMESSAGE are passed to `load'."
 (defcustom dotemacs-clojure-enable-fancify-symbols nil
   "If non nil the `fancify-symbols' function is enabled."
   :group 'dotemacs)
+
+(defvar dotemacs-default-layout-name "Default"
+  " Name of the default layout.")
+
+(defvar dotemacs-display-default-layout nil
+  "If non nil the default layout name is displayed in the mode-line.")
+
+(defvar dotemacs-auto-resume-layouts nil
+  "If non nil then the last auto saved layouts are resume automatically upon
+start.")
 
 ;; c-c++ settings
 (defgroup dotemacs-c-c++ nil
@@ -931,6 +940,9 @@ group by projectile projects."
         colors/key-binding-prefixes))
 
 
+;;; Evil
+
+
 ;;; Terminal emulation and shells
 (dotemacs-defvar-company-backends eshell-mode)
 
@@ -1497,6 +1509,355 @@ the user activate the completion manually."
     (global-set-key (kbd "<C-wheel-down>") 'dotemacs-zoom-frm-out)))
 
 (bind-key "C-c u v" #'variable-pitch-mode)
+
+
+;;; Perspective
+
+(defvar dotemacs-layouts-directory
+  (expand-file-name (concat dotemacs-cache-directory "layouts/"))
+  "Save layouts in this directory.")
+
+(defvar layouts-enable-autosave nil
+  "If true, saves perspectives to file per `layouts-autosave-delay'")
+
+(defvar layouts-autosave-delay 900
+  "Delay in seconds between each layouts auto-save.")
+
+(use-package init-perspective
+  :load-path "config/"
+  :defer t)
+
+(use-package persp-mode
+  :diminish persp-mode
+  :ensure t
+  :init
+  (progn
+    (setq persp-auto-resume-time (if dotemacs-auto-resume-layouts 1 -1)
+          persp-nil-name dotemacs-default-layout-name
+          persp-reset-windows-on-nil-window-conf nil
+          persp-set-last-persp-for-new-frames nil
+          persp-save-dir dotemacs-layouts-directory)
+
+    ;; always activate persp-mode
+    (persp-mode)
+
+    (defvar dotemacs--layouts-ms-doc-toggle 0
+      "Display a short doc when nil, full doc otherwise.")
+
+    (defvar dotemacs--last-selected-layout persp-nil-name
+      "Previously selected layout.")
+
+    (defvar dotemacs--custom-layout-alist nil
+      "List of custom layouts with their bound keys.
+ Do not modify directly, use provided `dotemacs|define-custom-layout'")
+
+    (defvar dotemacs--layouts-autosave-timer nil
+      "Timer for layouts auto-save.")
+
+    (defun dotemacs/jump-to-last-layout ()
+      "Open the previously selected layout, if it exists."
+      (interactive)
+      (unless (eq 'non-existent
+                  (gethash dotemacs--last-selected-layout
+                           *persp-hash* 'non-existent))
+        (persp-switch dotemacs--last-selected-layout)))
+
+    ;; Perspectives micro-state -------------------------------------------
+
+    (defun dotemacs//layouts-ms-toggle-doc ()
+      "Toggle the full documenation for the layouts micro-state."
+      (interactive)
+      (setq dotemacs--layouts-ms-doc-toggle
+            (logxor dotemacs--layouts-ms-doc-toggle 1)))
+
+    (defun dotemacs//layout-format-name (name pos)
+      "Format the layout name given by NAME for display in mode-line."
+      (let* ((layout-name (if (file-directory-p name)
+                              (file-name-nondirectory (directory-file-name name))
+                            name))
+             (string-name (format "%s" layout-name))
+             (current (equal name (dotemacs//current-layout-name)))
+             (caption (concat (number-to-string (if (eq 9 pos) 0 (1+ pos)))
+                              ":" string-name)))
+        (if current
+            (concat (when current "[") caption (when current "]"))
+          caption)))
+
+    (defvar dotemacs--layouts-ms-documentation
+        "
+  [?]                  toggle this help
+  [0,9]                go to nth layout
+  [tab]                last layout
+  [a]                  add a buffer from another layout
+  [A]                  add all buffers from another layout
+  [b]                  select a buffer of the current layout
+  [c]                  close layout (buffers are not closed)
+  [C]                  close other layout(s) (buffers are not closed)
+  [h]                  go to default layout
+  [l]                  jump to a layout
+  [L]                  load saved layouts
+  [n] or [C-l]         next layout
+  [N] or [p] or [C-h]  previous layout
+  [o]                  custom layouts
+  [r]                  remove current buffer from layout
+  [R]                  rename or create layout
+  [s]                  save all layouts
+  [S]                  save layouts by names
+  [t]                  show a buffer without adding it to current layout
+  [w]                  workspaces micro-state
+  [x]                  kill layout and its buffers
+  [X]                  kill other layout(s) and their buffers")
+
+     (defun dotemacs//layouts-ms-doc ()
+       "Return the docstring for the layouts micro-state."
+       (let* ((persp-list (or (persp-names-current-frame-fast-ordered)
+                              (list persp-nil-name)))
+              (formatted-persp-list
+               (concat
+                (mapconcat
+                 (lambda (persp)
+                   (dotemacs//layout-format-name
+                    persp (position persp persp-list))) persp-list " | "))))
+         (concat formatted-persp-list
+                 (when (equal 1 dotemacs--layouts-ms-doc-toggle)
+                   dotemacs--layouts-ms-documentation))))
+
+     (dotemacs-define-micro-state layouts
+       :doc (dotemacs//layouts-ms-doc)
+       :use-minibuffer t
+       :evil-leader "l"
+       :bindings
+       ;; need to exit in case number doesn't exist
+       ("?" dotemacs//layouts-ms-toggle-doc)
+       ("1" dotemacs/persp-switch-to-1 :exit t)
+       ("2" dotemacs/persp-switch-to-2 :exit t)
+       ("3" dotemacs/persp-switch-to-3 :exit t)
+       ("4" dotemacs/persp-switch-to-4 :exit t)
+       ("5" dotemacs/persp-switch-to-5 :exit t)
+       ("6" dotemacs/persp-switch-to-6 :exit t)
+       ("7" dotemacs/persp-switch-to-7 :exit t)
+       ("8" dotemacs/persp-switch-to-8 :exit t)
+       ("9" dotemacs/persp-switch-to-9 :exit t)
+       ("0" dotemacs/persp-switch-to-0 :exit t)
+       ("<tab>" dotemacs/jump-to-last-layout)
+       ("<return>" nil :exit t)
+       ("C-h" persp-prev)
+       ("C-l" persp-next)
+       ("a" persp-add-buffer :exit t)
+       ("A" persp-import-buffers :exit t)
+       ("b" dotemacs/persp-helm-mini :exit t)
+       ("c" dotemacs/layouts-ms-close)
+       ("C" dotemacs/layouts-ms-close-other :exit t)
+       ("h" dotemacs/layout-goto-default :exit t)
+       ("l" dotemacs/helm-perspectives :exit t)
+       ("L" persp-load-state-from-file :exit t)
+       ("n" persp-next)
+       ("N" persp-prev)
+       ("o" dotemacs/select-custom-layout :exit t)
+       ("p" persp-prev)
+       ("r" persp-remove-buffer :exit t)
+       ("R" dotemacs/layouts-ms-rename :exit t)
+       ("s" persp-save-state-to-file :exit t)
+       ("S" persp-save-to-file-by-names :exit t)
+       ("t" persp-temporarily-display-buffer :exit t)
+       ("w" dotemacs/layout-workspaces-micro-state :exit t)
+       ("x" dotemacs/layouts-ms-kill)
+       ("X" dotemacs/layouts-ms-kill-other :exit t))
+
+     (defun dotemacs/layout-switch-by-pos (pos)
+       "Switch to perspective of position POS."
+       (let ((persp-to-switch
+              (nth pos (persp-names-current-frame-fast-ordered))))
+         (if persp-to-switch
+             (persp-switch persp-to-switch)
+           (when (y-or-n-p
+                  (concat "Perspective in this position doesn't exist.\n"
+                          "Do you want to create one? "))
+             (let ((persp-reset-windows-on-nil-window-conf t))
+               (persp-switch nil)
+               (dotemacs/home))))))
+
+     ;; Define all `dotemacs/persp-switch-to-X' functions
+     (dolist (i (number-sequence 9 0 -1))
+       (eval `(defun ,(intern (format "dotemacs/persp-switch-to-%s" i)) nil
+                ,(format "Switch to layout %s." i)
+                (interactive)
+                (dotemacs/layout-switch-by-pos ,(if (eq 0 i) 9 (1- i)))
+                (dotemacs/layouts-micro-state))))
+
+     (defun dotemacs/layout-goto-default ()
+       "Go to `dotemacs-default-layout-name` layout"
+       (interactive)
+       (when dotemacs-default-layout-name
+         (persp-switch dotemacs-default-layout-name)))
+
+     (defun dotemacs/layouts-ms-rename ()
+       "Rename a layout and get back to the perspectives micro-state."
+       (interactive)
+       (call-interactively 'persp-rename)
+       (dotemacs/layouts-micro-state))
+
+     (defun dotemacs/layouts-ms-close ()
+       "Kill current perspective"
+       (interactive)
+       (persp-kill-without-buffers (dotemacs//current-layout-name)))
+
+     (defun dotemacs/layouts-ms-close-other ()
+       (interactive)
+       (call-interactively 'dotemacs/helm-persp-close)
+       (dotemacs/layouts-micro-state))
+
+     (defun dotemacs/layouts-ms-kill ()
+       "Kill current perspective"
+       (interactive)
+       (persp-kill (dotemacs//current-layout-name)))
+
+     (defun dotemacs/layouts-ms-kill-other ()
+       (interactive)
+       (call-interactively 'dotemacs/helm-persp-kill)
+       (dotemacs/layouts-micro-state))
+
+     (defun dotemacs/layouts-ms-last ()
+       "Switch to the last active perspective"
+       (interactive)
+       (persp-switch persp-last-persp-name))
+
+     ;; Custom perspectives micro-state -------------------------------------
+
+     (defun dotemacs//custom-layout-func-name (name)
+       "Return the name of the custom-perspective function for NAME."
+       (intern (concat "dotemacs/custom-perspective-" name)))
+
+     (defmacro dotemacs|define-custom-layout (name &rest props)
+       "Define a custom-perspective called NAME.
+
+FUNC is a FUNCTION defined using NAME and the result of
+`dotemacs//custom-layout-func-name', it takes care of
+creating the perspective NAME and executing the expressions given
+in the :body property to this macro.
+
+NAME is a STRING.
+
+Available PROPS:
+
+`:binding STRING'
+   Key to be bound to the function FUNC
+
+`:body EXPRESSIONS'
+  One or several EXPRESSIONS that are going to be evaluated after
+  we change into the perspective NAME."
+      (declare (indent 1))
+      (let* ((func (dotemacs//custom-layout-func-name name))
+             (binding (car (dotemacs-mplist-get props :binding)))
+             (body (dotemacs-mplist-get props :body))
+             (already-defined? (cdr (assoc binding
+                                           dotemacs--custom-layout-alist))))
+        `(progn
+           (defun ,func ()
+             ,(format "Open custom perspective %s" name)
+             (interactive)
+             (let ((initialize (not (gethash ,name *persp-hash*))))
+               (persp-switch ,name)
+               (when initialize
+                 (delete-other-windows)
+                 ,@body)))
+           ;; Check for Clashes
+           (if ,already-defined?
+               (unless (equal ,already-defined? ,name)
+                 (warn "Replacing existing binding \"%s\" for %s with %s"
+                       ,binding ,already-defined? ,name )
+                 (push '(,binding . ,name) dotemacs--custom-layout-alist))
+             (push '(,binding . ,name) dotemacs--custom-layout-alist)))))
+
+    (dotemacs|define-custom-layout "@Dotemacs"
+      :binding "e"
+      :body
+      (dotemacs/find-dotfile))
+
+    (defun dotemacs/select-custom-layout ()
+      "Update the custom-perspectives microstate and then activate it."
+      (interactive)
+      (dotemacs//update-custom-layouts)
+      (dotemacs/custom-layouts-micro-state))
+
+    (defun dotemacs//custom-layouts-ms-documentation ()
+      "Return the docstring for the custom perspectives micro-state."
+      (if dotemacs--custom-layout-alist
+          (mapconcat (lambda (custom-persp)
+                       (format "[%s] %s"
+                               (car custom-persp) (cdr custom-persp)))
+                     dotemacs--custom-layout-alist " ")
+        (warn (format "`dotemacs--custom-layout-alist' variable is empty" ))))
+
+    (defun dotemacs//update-custom-layouts ()
+      "Ensure the custom-perspectives micro-state is updated.
+Takes each element in the list `dotemacs--custom-layout-alist'
+format so they are supported by the
+`dotemacs/custom-layouts-micro-state' macro."
+      (let (bindings)
+        (dolist (custom-persp dotemacs--custom-layout-alist bindings)
+          (let* ((binding (car custom-persp))
+                 (name (cdr custom-persp))
+                 (func-name (dotemacs//custom-layout-func-name name)))
+            (push (list binding func-name) bindings)))
+        (eval `(dotemacs-define-micro-state custom-layouts
+                 :doc (dotemacs//custom-layouts-ms-documentation)
+                 :use-minibuffer t
+                 :bindings
+                 ,@bindings))))
+    )
+  :config
+  (progn
+    (defadvice persp-activate (before dotemacs//save-toggle-layout activate)
+      (setq dotemacs--last-selected-layout persp-last-persp-name))
+    (add-hook 'persp-mode-hook 'dotemacs//layout-autosave)
+    ;; By default, persp mode wont affect either helm or ido
+    (remove-hook 'ido-make-buffer-list-hook 'persp-restrict-ido-buffers)))
+
+(dotemacs-use-package-add-hook spaceline-config
+  :post-init
+  (setq spaceline-display-default-perspective
+        dotemacs-display-default-layout))
+
+(dotemacs-use-package-add-hook eyebrowse
+  :post-init
+  (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
+  (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
+  (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
+
+(dotemacs-use-package-add-hook helm
+  :post-init
+  (evil-leader/set-key
+    "pl" 'dotemacs/helm-persp-switch-project))
+
+(dotemacs-use-package-add-hook swiper
+  :post-init
+  (evil-leader/set-key
+    "pl" 'dotemacs/ivy-persp-switch-project))
+
+
+;;; Processes and commands
+(use-package proced                     ; Edit system processes
+  ;; Proced isn't available on OS X
+  :if (not (eq system-type 'darwin))
+  :bind ("C-x p" . proced))
+
+(use-package firestarter                ; Run commands after save
+  :ensure t
+  :init (firestarter-mode)
+  :config (progn (setq firestarter-default-type 'failure)
+                 (dotemacs-load-private-file "firestarter-safe-values.el"
+                                              'noerror))
+
+  ;; Remove space from firestarter lighter
+  :diminish firestarter-mode)
+
+(use-package init-firestarter
+  :load-path "config/"
+  :commands (dotemacs-firestarter-mode-line)
+  :init (with-eval-after-load 'firestarter
+          (setq firestarter-lighter
+                '(:eval (dotemacs-firestarter-mode-line)))))
 
 (defvar eyebrowse-display-help t
   "If non-nil additional help is displayed when selecting a workspace.")
@@ -3287,6 +3648,7 @@ Disable the highlighting of overlong lines."
 
 
 ;;; Evil
+
 (use-package init-evil
   :ensure evil
   :load-path "config/")
@@ -3309,7 +3671,7 @@ Disable the highlighting of overlong lines."
                              cursor))))
 
     ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
-    (setq evil-want-fine-undo t)
+    ;; (setq evil-want-fine-undo t)
 
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
@@ -3546,7 +3908,7 @@ It will toggle the overlay under point or create an overlay of one character."
   :ensure t
   :init
   (progn
-    (setq evil-jumper-auto-center t
+    (setq evil-jumper-post-jump-hook 'recenter
           evil-jumper-auto-save-interval 600)
     (evil-jumper-mode t)))
 
@@ -9161,88 +9523,6 @@ If called with a prefix argument, uses the other-window instead."
     (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-neotree-key-bindings))))
 
 
-;;; Perspective
-(use-package init-perspective
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-persp-switch-project
-             dotemacs-custom-persp-last))
-
-(use-package perspective
-  :ensure t
-  :defer t
-  :commands (custom-persp
-             persp-add-buffer
-             persp-set-buffer
-             persp-kill
-             persp-remove-buffer
-             persp-rename
-             persp-switch
-             projectile-persp-bridge)
-  :init
-  (progn
-    (persp-mode t)
-    ;; muh perspectives
-    ; (defun custom-persp/emacs ()
-    ;   (interactive)
-    ;   (custom-persp ".emacs.d"
-    ;                 (find-file (locate-user-emacs-file "init.el"))))
-
-    ; (defun custom-persp/org ()
-    ;   (interactive)
-    ;   (custom-persp "@org"
-    ;                   (find-file (first org-agenda-files))))
-  )
-  :config
-  (progn
-    ;; loading code for our custom perspectives
-    ;; taken from Magnar Sveen
-    (defmacro custom-persp (name &rest body)
-      `(let ((initialize (not (gethash ,name perspectives-hash)))
-             (current-perspective persp-curr))
-         (persp-switch ,name)
-         (when initialize ,@body)
-         (setq persp-last current-perspective)))
-
-    (define-key persp-mode-map (kbd "C-x x l") 'dotemacs-custom-persp-last)
-    (add-hook 'emacs-startup-hook '(lambda ()
-                                  (persp-rename "@dotfiles")))
-    ))
-
-(use-package persp-projectile
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (projectile-persp-bridge helm-projectile-switch-project)
-    (evil-leader/set-key
-      "pp" 'dotemacs-persp-switch-project)))
-
-
-;;; Processes and commands
-(use-package proced                     ; Edit system processes
-  ;; Proced isn't available on OS X
-  :if (not (eq system-type 'darwin))
-  :bind ("C-x p" . proced))
-
-(use-package firestarter                ; Run commands after save
-  :ensure t
-  :init (firestarter-mode)
-  :config (progn (setq firestarter-default-type 'failure)
-                 (dotemacs-load-private-file "firestarter-safe-values.el"
-                                              'noerror))
-
-  ;; Remove space from firestarter lighter
-  :diminish firestarter-mode)
-
-(use-package init-firestarter
-  :load-path "config/"
-  :commands (dotemacs-firestarter-mode-line)
-  :init (with-eval-after-load 'firestarter
-          (setq firestarter-lighter
-                '(:eval (dotemacs-firestarter-mode-line)))))
-
-
 ;;; Date and time
 (use-package calendar                   ; Built-in calendar
   :bind ("C-c u c" . calendar)
@@ -11145,7 +11425,7 @@ If the error list is visible, hide it.  Otherwise, show it."
         (adict-change-dictionary ispell-local-dictionary)))
 
     (add-hook 'auto-dictionary-mode-hook
-              'spacemacs//adict-set-local-dictionary 'append)))
+              'dotemacs//adict-set-local-dictionary 'append)))
 
 (use-package flyspell                   ; On-the-fly spell checking
   :defer t
