@@ -3695,7 +3695,8 @@ It will toggle the overlay under point or create an overlay of one character."
   :init
   (progn
     (global-evil-search-highlight-persist)
-    (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all) ;; sc
+    (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)
+    ;; (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all)
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
 
     (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
@@ -5032,8 +5033,12 @@ point. Requires smartparens because all movement is done using
       "msr"     'ensime-inf-eval-region
       "msR"     'ensime-inf-eval-region-switch
 
-      "mz"      'ensime-expand-selection-command
-      )
+      "mz"      'ensime-expand-selection-command)
+
+    ;; Enable Expand Region integration from Ensime.  Ignore load errors to
+    ;; handle older Ensime versions gracefully.
+    (with-eval-after-load 'expand-region
+      (require 'ensime-expand-region nil 'noerror))
 
     ;; Don't use scala checker if ensime mode is active, since it provides
     ;; better error checking.
