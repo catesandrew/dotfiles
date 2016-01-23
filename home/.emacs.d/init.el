@@ -11752,6 +11752,9 @@ If the error list is visible, hide it.  Otherwise, show it."
     (define-key yas-minor-mode-map
       (kbd "M-s-/") 'yas-next-field)
 
+    ;; on multiple keys, fall back to completing read typically this means helm
+    (setq yas-prompt-functions '(yas-completing-prompt))
+
     (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
                                                       markdown-mode-hook
                                                       org-mode-hook))
