@@ -9746,10 +9746,17 @@ If called with a prefix argument, uses the other-window instead."
       "mtto" 'org-table-toggle-coordinate-overlays
       "mtw" 'org-table-wrap-region
 
-      "mI" 'org-clock-in
+      ;; Multi-purpose keys
       (if dotemacs-major-mode-leader-key
           (concat "m" dotemacs-major-mode-leader-key)
         "m,") 'org-ctrl-c-ctrl-c
+        "m*" 'org-ctrl-c-star
+        "m RET" 'org-ctrl-c-ret
+        "m-" 'org-ctrl-c-minus
+        "m^" 'org-sort
+        "m/" 'org-sparse-tree
+
+        "mI" 'org-clock-in
         "mn" 'org-narrow-to-subtree
         "mN" 'widen
         "mO" 'org-clock-out
