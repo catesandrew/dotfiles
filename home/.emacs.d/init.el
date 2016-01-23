@@ -1499,8 +1499,16 @@ the user activate the completion manually."
 (use-package reveal-in-osx-finder           ; Reveal current buffer in finder
   :if (eq system-type 'darwin)
   :ensure t
-  :commands reveal-in-osx-finder
-  :bind (("C-c f f" . reveal-in-osx-finder)))
+  :commands reveal-in-osx-finder)
+
+(when (eq system-type 'darwin)
+  (dotemacs-use-package-add-hook helm
+    ;; Use `mdfind' instead of `locate'.
+    :pre-init
+    ;; Disable fuzzy matchting to make mdfind work with helm-locate
+    ;; https://github.com/emacs-helm/helm/issues/799
+    (setq helm-locate-fuzzy-match nil)
+    (setq helm-locate-command "mdfind -name %s %s")))
 
 
 ;;; User interface
