@@ -9346,38 +9346,6 @@ If called with a prefix argument, uses the other-window instead."
     (projectile-global-mode)
     (dotemacs-hide-lighter projectile-mode)))
 
-(use-package dired-open
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-dired-open-file ()
-      "Hook dired to translate to projectile and neotree."
-      (interactive)
-      (let ((file (ignore-errors (dired-get-file-for-visit))))
-        (when file
-          (find-file (expand-file-name file (projectile-project-root)))
-          (run-hooks 'projectile-find-file-hook)
-          (message "Projectile root found: %s" (projectile-project-root))
-          (when (fboundp 'neotree-dir)
-            (if (neo-global--window-exists-p)
-                (neotree-dir (projectile-project-root))
-              (progn
-                (neotree-dir (projectile-project-root))
-                (neotree-hide)
-                (let ((origin-buffer-file-name (buffer-file-name)))
-                  (neotree-find (projectile-project-root))
-                  (neotree-find origin-buffer-file-name))
-                (neotree-hide)))))))
-    (with-eval-after-load 'projectile
-      (setq dired-open-functions 'dotemacs-dired-open-file))))
-
-(dotemacs-use-package-add-hook dired+
-  :post-config
-  (with-eval-after-load 'projectile
-    (evilify dired-mode dired-mode-map
-             (kbd "RET") 'dired-open-file)))
-
 (use-package helm-projectile
   :ensure t
   :defer t
@@ -10201,6 +10169,42 @@ If called with a prefix argument, uses the other-window instead."
         ad-do-it))))
 
 
+;;; Dired
+
+(use-package dired-open
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (defun dotemacs-dired-open-file ()
+      "Hook dired to translate to projectile and neotree."
+      (interactive)
+      (message "!! dired open fill hooked")
+      (let ((file (ignore-errors (dired-get-file-for-visit))))
+        (when file
+          (find-file (expand-file-name file (projectile-project-root)))
+          (run-hooks 'projectile-find-file-hook)
+          (message "Projectile root found: %s" (projectile-project-root))
+          (when (fboundp 'neotree-dir)
+            (if (neo-global--window-exists-p)
+                (neotree-dir (projectile-project-root))
+              (progn
+                (neotree-dir (projectile-project-root))
+                (neotree-hide)
+                (let ((origin-buffer-file-name (buffer-file-name)))
+                  (neotree-find (projectile-project-root))
+                  (neotree-find origin-buffer-file-name))
+                (neotree-hide)))))))
+    (with-eval-after-load 'projectile
+      (setq dired-open-functions 'dotemacs-dired-open-file))))
+
+(dotemacs-use-package-add-hook dired
+  :post-config
+  (with-eval-after-load 'projectile
+    (evilify dired-mode dired-mode-map
+      (kbd "RET") 'dired-open-file)))
+
+
 ;;; Tim Pope
 
 ;; vinegar
@@ -10228,42 +10232,18 @@ If called with a prefix argument, uses the other-window instead."
   :load-path "config/"
   :commands (vinegar/dired-setup))
 
-(use-package dired-x                    ; Additional tools for Dired
+; (dotemacs|do-after-display-system-init)
+(use-package dired+
   :defer t
+  :ensure t
   :init
-  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
-  :config
   (progn
-    (define-key evil-normal-state-map (kbd "-") 'dired-jump)
-
-    (with-eval-after-load 'dired
-      (evilify dired-mode dired-mode-map
-               "j"         'vinegar/move-down
-               "k"         'vinegar/move-up
-               "-"         'vinegar/up-directory
-               "0"         'dired-back-to-start-of-files
-               "="         'vinegar/dired-diff
-               (kbd "C-j") 'dired-next-subdir
-               (kbd "C-k") 'dired-prev-subdir
-               "I"         'vinegar/dotfiles-toggle
-               (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
-               (kbd "RET") (if vinegar-reuse-dired-buffer
-                               'dired-find-alternate-file
-                             'dired-find-file)
-               "f"         'helm-find-files
-               "J"         'dired-goto-file
-               (kbd "C-f") 'find-name-dired
-               "H"         'diredp-dired-recent-dirs
-               "T"         'dired-tree-down
-               "K"         'dired-do-kill-lines
-               "r"         'revert-buffer
-               (kbd "C-r") 'dired-do-redisplay
-               "gg"        'vinegar/back-to-top
-               "G"         'vinegar/jump-to-bottom))
-
-    (when (eq system-type 'darwin)
-      ;; OS X bsdtar is mostly compatible with GNU Tar
-      (setq dired-guess-shell-gnutar "tar"))))
+    (setq diredp-hide-details-initially-flag t
+          diredp-hide-details-propagate-flag t
+          ;; use single buffer for all dired navigation
+          ;; disable font themeing from dired+
+          font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
+    (toggle-diredp-find-file-reuse-dir 1)))
 
 (use-package dired                      ; Edit directories
   :defer t
@@ -10279,6 +10259,34 @@ If called with a prefix argument, uses the other-window instead."
           dired-ls-F-marks-symlinks t   ; -F marks links with @
           ;; Inhibit prompts for simple recursive operations
           dired-recursive-copies 'always)
+
+    (evilify dired-mode dired-mode-map
+      "j"         'vinegar/move-down
+      "k"         'vinegar/move-up
+      "-"         'vinegar/up-directory
+      "0"         'dired-back-to-start-of-files
+      "="         'vinegar/dired-diff
+      (kbd "C-j") 'dired-next-subdir
+      (kbd "C-k") 'dired-prev-subdir
+      "I"         'vinegar/dotfiles-toggle
+      (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
+      (kbd "RET") (if vinegar-reuse-dired-buffer
+                      'dired-find-alternate-file
+                    'dired-find-file)
+      "f"         'helm-find-files
+      "J"         'dired-goto-file
+      (kbd "C-f") 'find-name-dired
+      "H"         'diredp-dired-recent-dirs
+      "T"         'dired-tree-down
+      "K"         'dired-do-kill-lines
+      "r"         'revert-buffer
+      (kbd "C-r") 'dired-do-redisplay
+      "gg"        'vinegar/back-to-top
+      "G"         'vinegar/jump-to-bottom)
+
+    (when (eq system-type 'darwin)
+      ;; OS X bsdtar is mostly compatible with GNU Tar
+      (setq dired-guess-shell-gnutar "tar"))
 
     ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
     ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
@@ -10300,17 +10308,12 @@ If called with a prefix argument, uses the other-window instead."
       (setq dired-listing-switches
             (concat dired-listing-switches " --group-directories-first -v")))))
 
-(use-package dired+
+(use-package dired-x                    ; Additional tools for Dired
   :defer t
-  :ensure t
   :init
-  (progn
-    (setq diredp-hide-details-initially-flag t
-          diredp-hide-details-propagate-flag t
-          ;; use single buffer for all dired navigation
-          ;; disable font themeing from dired+
-          font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
-    (toggle-diredp-find-file-reuse-dir 1)))
+  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
+  :config
+  (define-key evil-normal-state-map (kbd "-") 'dired-jump))
 
 ;; unimpaired
 
