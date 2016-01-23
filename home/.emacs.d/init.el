@@ -9507,6 +9507,8 @@ If called with a prefix argument, uses the other-window instead."
 
     ;; neo-global--select-window
     (evil-leader/set-key
+      "fn" 'neotree-show
+      "fN" 'neotree-hide
       "ft" 'neotree-toggle
       "pt" 'neotree-find-project-root))
 
