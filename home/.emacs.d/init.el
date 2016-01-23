@@ -1722,6 +1722,7 @@ the user activate the completion manually."
 
 (use-package persp-mode
   :diminish persp-mode
+  :disabled t
   :ensure t
   :init
   (progn
@@ -1868,7 +1869,7 @@ the user activate the completion manually."
                           "Do you want to create one? "))
              (let ((persp-reset-windows-on-nil-window-conf t))
                (persp-switch nil)
-               (dotemacs/home))))))
+               (dotemacs-home))))))
 
      ;; Define all `dotemacs/persp-switch-to-X' functions
      (dolist (i (number-sequence 9 0 -1))
@@ -2007,26 +2008,26 @@ format so they are supported by the
     ;; By default, persp mode wont affect either helm or ido
     (remove-hook 'ido-make-buffer-list-hook 'persp-restrict-ido-buffers)))
 
-(dotemacs-use-package-add-hook spaceline-config
-  :post-init
-  (setq spaceline-display-default-perspective
-        dotemacs-display-default-layout))
+;; (dotemacs-use-package-add-hook spaceline-config
+;;   :post-init
+;;   (setq spaceline-display-default-perspective
+;;         dotemacs-display-default-layout))
 
-(dotemacs-use-package-add-hook eyebrowse
-  :post-init
-  (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
-  (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
-  (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
+;; (dotemacs-use-package-add-hook eyebrowse
+;;   :post-init
+;;   (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
+;;   (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
+;;   (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
 
-(dotemacs-use-package-add-hook helm
-  :post-init
-  (evil-leader/set-key
-    "pl" 'dotemacs/helm-persp-switch-project))
+;; (dotemacs-use-package-add-hook helm
+;;   :post-init
+;;   (evil-leader/set-key
+;;     "pl" 'dotemacs/helm-persp-switch-project))
 
-(dotemacs-use-package-add-hook swiper
-  :post-init
-  (evil-leader/set-key
-    "pl" 'dotemacs/ivy-persp-switch-project))
+;; (dotemacs-use-package-add-hook swiper
+;;   :post-init
+;;   (evil-leader/set-key
+;;     "pl" 'dotemacs/ivy-persp-switch-project))
 
 
 ;;; Processes and commands
