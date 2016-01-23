@@ -6303,6 +6303,21 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :init (add-hook 'haskell-mode-hook 'ghc-init)
   :config
   (progn
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "mm" "haskell/ghc-mod")
+    (evil-leader/set-key-for-mode 'haskell-mode
+      "mmt" 'ghc-insert-template-or-signature
+      "mmu" 'ghc-initial-code-from-signature
+      "mma" 'ghc-auto
+      "mmf" 'ghc-refine
+      "mme" 'ghc-expand-th
+      "mmn" 'ghc-goto-next-hole
+      "mmp" 'ghc-goto-prev-hole
+      "mm>"  'ghc-make-indent-deeper
+      "mm<"  'ghc-make-indent-shallower)))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-config
+  (progn
     ;; remove overlays from ghc-check.el if flycheck is enabled
     (set-face-attribute 'ghc-face-error nil :underline nil)
     (set-face-attribute 'ghc-face-warn nil :underline nil)))
