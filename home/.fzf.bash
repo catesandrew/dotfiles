@@ -8,7 +8,7 @@ if hash brew 2>/dev/null; then
 
         # Auto-completion
         # ---------------
-        [[ $- =~ i ]] && source "${FZF_TARGET}/shell/completion.bash"
+        [[ $- == *i* ]] && source "${FZF_TARGET}/shell/completion.bash" 2> /dev/null
 
         # Key bindings
         # ------------

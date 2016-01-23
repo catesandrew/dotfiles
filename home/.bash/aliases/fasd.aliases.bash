@@ -3,7 +3,10 @@ about-alias 'fasd abbreviations'
 
 # Fasd can mimic v's behavior by this alias:
 alias v='f -t -e vim -b viminfo'
+alias m='f -e emacsclient' # quick opening files with emacs client
+alias o='a -e open' # quick opening files with open
 
+_fasd_bash_hook_cmd_complete v m o
 
 # Jumping around the filesystem
 

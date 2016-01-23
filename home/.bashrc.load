@@ -193,6 +193,14 @@ if hash brew 2>/dev/null; then
     fi
 fi
 
+# fasd
+fasd_cache="$HOME/.fasd-init-bash"
+if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+  fasd --init posix-alias posix-hook bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
+fi
+source "$fasd_cache"
+unset fasd_cache
+
 # Load enabled aliases, completion, plugins
 for file_type in "aliases" "completion" "plugins"
 do
@@ -218,23 +226,13 @@ PREVIEW="less"
 [ -s /usr/bin/gloobus-preview ] && PREVIEW="gloobus-preview"
 [ -s /Applications/Preview.app ] && PREVIEW="/Applications/Preview.app"
 
-# Start Up Scripts #
-
-# fasd
-fasd_cache="$HOME/.fasd-init-bash"
-if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
-  fasd --init posix-alias bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
-fi
-source "$fasd_cache"
-unset fasd_cache
-
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -l -g ""'
 
 # If you're running fzf in a large git repository, git ls-tree can boost up the speed of the traversal.
-export FZF_DEFAULT_COMMAND='
-  (git ls-tree -r --name-only HEAD ||
-   find * -name ".*" -prune -o -type f -print -o -type l -print) 2> /dev/null'
+# export FZF_DEFAULT_COMMAND='
+#   (git ls-tree -r --name-only HEAD ||
+#    find * -name ".*" -prune -o -type f -print -o -type l -print) 2> /dev/null'
 
 # Custom (Machine-Specific) Startup #
 . ${BASH_IT}/custom.sh
