@@ -11771,7 +11771,11 @@ If the error list is visible, hide it.  Otherwise, show it."
   :defer t
   :init
   (progn
-    (setq aya-persist-snippets-dir (concat dotemacs-private-dir "snippets/"))
+    (setq aya-persist-snippets-dir (if dotemacs-ac-private-snippets-directory
+                                       dotemacs-ac-private-snippets-directory
+                                     (concat
+                                      dotemacs-private-dir
+                                      "snippets/")))
     (dotemacs-declare-prefix "iS" "auto-yasnippet")
     (evil-leader/set-key
       "iSc" 'aya-create
