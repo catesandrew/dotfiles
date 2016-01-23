@@ -9912,6 +9912,15 @@ If called with a prefix argument, uses the other-window instead."
       "O" 'evil-open-above)
     (dotemacs-diminish evil-org-mode " ⓔ" " e")))
 
+(dotemacs-use-package-add-hook evil-surround
+  :post-init
+  (defun dotemacs/add-org-surrounds ()
+    (push '(?: . dotemacs//surround-drawer) evil-surround-pairs-alist))
+  (add-hook 'org-mode-hook 'dotemacs/add-org-surrounds)
+  (defun dotemacs//surround-drawer ()
+    (let ((dname (read-from-minibuffer "" "")))
+      (cons (format ":%s:" (or dname "")) ":END:"))))
+
 (use-package org-mime
   :defer t
   :commands (org-mime-htmlize org-mime-org-buffer-htmlize)
