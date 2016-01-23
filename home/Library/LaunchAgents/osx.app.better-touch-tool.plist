@@ -2,14 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Disabled</key>
+	<false/>
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
 	<string>osx.app.better-touch-tool</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
+	</array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

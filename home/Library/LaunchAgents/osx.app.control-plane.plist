@@ -7,15 +7,11 @@
 	<key>Label</key>
 	<string>osx.app.control-plane</string>
 	<key>ProgramArguments</key>
-    <array>
-      <string>/bin/bash</string>
-      <string>-c</string>
-      <string>
-        BASH_NO=no . /etc/profile
-        sleep 10
-        /Applications/ControlPlane.app/Contents/MacOS/ControlPlane
-      </string>
-    </array>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 6 &amp;&amp; /Applications/ControlPlane.app/Contents/MacOS/ControlPlane</string>
+	</array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
