@@ -1701,13 +1701,20 @@ the user activate the completion manually."
   :init
   (progn
     (dotemacs-define-micro-state zoom-frm
-      :doc "[+] zoom frame in [-] zoom frame out [=] reset zoom"
+      :doc "[+/=] zoom frame in [-] zoom frame out [0] reset zoom [q]uit"
       :evil-leader "zf"
       :use-minibuffer t
       :bindings
-      ("+" dotemacs-zoom-frm-in)
-      ("-" dotemacs-zoom-frm-out)
-      ("=" dotemacs-zoom-frm-unzoom))
+      ("+" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
+      ("=" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
+      ("-" dotemacs-zoom-frm-out :post (dotemacs-zoom-frm-powerline-reset))
+      ("0" dotemacs-zoom-frm-unzoom :post (dotemacs-zoom-frm-powerline-reset))
+      ("q" nil :exit t))
+
+    (defun dotemacs-zoom-frm-powerline-reset ()
+      (when (fboundp 'powerline-reset)
+        (setq-default powerline-height (dotemacs-compute-powerline-height))
+        (powerline-reset)))
 
     (defun dotemacs-zoom-frm-do (arg)
       "Perform a zoom action depending on ARG value."
