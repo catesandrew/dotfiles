@@ -673,6 +673,9 @@ group by projectile projects."
 (defvar spell-checking-enable-auto-dictionary nil
   "Specify if auto-dictionary should be enabled or not.")
 
+(defvar dotemacs-really-kill-emacs nil
+  "prevent window manager close from closing instance.")
+
 ;; perf measurments
 (with-current-buffer (get-buffer-create "*Require Times*")
   (insert "| feature | timestamp | elapsed |\n")
@@ -3089,7 +3092,11 @@ format so they are supported by the
 (use-package restart-emacs
   :defer t
   :init
-  (evil-leader/set-key "qr" 'restart-emacs))
+  (evil-leader/set-key "qr" 'dotemacs/restart-emacs)
+  (defun dotemacs/restart-emacs ()
+    (interactive)
+    (setq dotemacs-really-kill-emacs t)
+    (restart-emacs)))
 
 (use-package savehist                   ; Save minibuffer history
   :init

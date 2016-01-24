@@ -647,9 +647,6 @@ kill internal buffers too."
 
 ;; advise to prevent server from closing
 
-(defvar dotemacs-really-kill-emacs nil
-  "prevent window manager close from closing instance.")
-
 (defun dotemacs/persistent-server-running-p ()
   "Requires dotemacs-really-kill-emacs to be toggled and
 dotemacs-persistent-server to be t"
