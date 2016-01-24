@@ -540,10 +540,11 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   "Describe face."
   (interactive)
   (require 'helm-elisp)
-  (let ((default (thing-at-point 'symbol)))
-    (helm :sources (list (helm-def-source--emacs-faces default))
-          :buffer "*helm faces*"
-          :preselect (and default (concat "\\_<" (regexp-quote default) "\\_>")))))
+  (let ((default (face-at-point)))
+    (helm :sources (helm-def-source--emacs-faces (if default
+                                                     (symbol-name default)
+                                                   "default"))
+          :buffer "*helm faces*")))
 
 (provide 'init-helm)
 ;;; init-helm.el ends here
