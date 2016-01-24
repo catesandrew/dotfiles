@@ -9322,8 +9322,8 @@ If called with a prefix argument, uses the other-window instead."
     ;; note for Windows: GNU find or Cygwin find must be in path to enable
     ;; fast indexing
     (when (and (dotemacs/system-is-mswindows) (executable-find "find"))
-      (setq projectile-indexing-method 'alien)
-            projectile-generic-command "find . -type f")
+      (setq projectile-indexing-method 'alien
+            projectile-generic-command "find . -type f"))
     (setq projectile-sort-order 'recentf
           projectile-switch-project-action 'projectile-dired
           projectile-cache-file (concat dotemacs-cache-directory
