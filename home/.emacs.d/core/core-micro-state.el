@@ -171,7 +171,7 @@ used."
                   (dotemacs-micro-state-set-minibuffer-height defdoc)
                   (apply ',msg-func
                          (list (dotemacs-micro-state-propertize-doc
-                                (format "%S: %s" ',name defdoc)))))))))
+                                (format "%S: %s" ',name defdoc)))) defdoc)))))
          (wrapper-func
           (if (and (boundp wrapped)
                    (eval `(keymapp ,wrapped)))
