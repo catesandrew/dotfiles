@@ -737,18 +737,32 @@ group by projectile projects."
 (require 'core-funcs)
 (require 'core-buffers)
 
+(defvar dotemacs-elpa-https t
+  "If non nil ELPA repositories are contacted via HTTPS whenever it's
+possible. Set it to nil if you have no way to use HTTPS in your
+environment, otherwise it is strongly recommended to let it set to t.")
+
 (unless package--initialized
-  (setq load-prefer-newer t)
-  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                           ("org" . "http://orgmode.org/elpa/")
-                           ; ("ELPA" . "http://tromey.com/elpa/")
-                           ("gnu" . "https://elpa.gnu.org/packages/")
-                           ))
+  (let ((archives '((melpa . "melpa.org/packages/")
+                    ("org" . "orgmode.org/elpa/")
+                    ("gnu" . "elpa.gnu.org/packages/"))))
+    (setq package-archives
+          (mapcar (lambda (x)
+                    (cons (car x) (concat
+                                   (if (and dotemacs-elpa-https
+                                            ;; for now org ELPA repository does
+                                            ;; not support HTTPS
+                                            ;; TODO when org ELPA repo support
+                                            ;; HTTPS remove the check
+                                            ;; `(not (equal "org" (car x)))'
+                                            (not (equal "org" (car x))))
+                                       "https://"
+                                     "http://") (cdr x))))
+                  archives)))
   ;; optimization, no need to activate all the packages so early
   ;; http://stackoverflow.com/questions/11127109/
   (setq package-enable-at-startup nil)
-  ;(package-initialize 'noactivate))
-  (package-initialize))
+  (package-initialize)) ;; noactivate
 
 
 ;;; Initialization
