@@ -9042,6 +9042,9 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (ido-mode t)))
 
+(dotemacs-evilify-map package-menu-mode-map
+                       :mode package-menu-mode)
+
 (use-package ido-vertical-mode
   :ensure t
   :init
