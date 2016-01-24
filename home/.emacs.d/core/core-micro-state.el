@@ -107,6 +107,7 @@ used."
               ,@on-enter
               (let ((doc ,@doc))
                 (when doc
+                  (setq max-mini-window-height (1+ (how-many-str "\n" doc)))
                   (apply ',msg-func (list (dotemacs-micro-state-propertize-doc
                                       (format "%S: %s" ',name doc))))))
               ,(when exec-binding
@@ -151,17 +152,19 @@ used."
          (binding-pre (dotemacs-mplist-get binding :pre))
          (binding-post (dotemacs-mplist-get binding :post))
          (wrapper-name (intern (format "dotemacs-%S-%S-%s" name wrapped key)))
-         (doc-body `((let ((bdoc ,@binding-doc)
-                           (defdoc ,@default-doc))
-                       (if bdoc
-                           (apply ',msg-func
-                                  (list (dotemacs-micro-state-propertize-doc
-                                    (format "%S: %s" ',name bdoc))))
-                         (when (and defdoc
-                                    ',wrapped (not (plist-get ',binding :exit)))
-                           (apply ',msg-func
-                                  (list (dotemacs-micro-state-propertize-doc
-                                    (format "%S: %s" ',name defdoc)))))))))
+         (doc-body
+          `((let ((bdoc ,@binding-doc)
+                  (defdoc ,@default-doc))
+              (if bdoc
+                  (apply ',msg-func
+                         (list (dotemacs-micro-state-propertize-doc
+                                (format "%S: %s" ',name bdoc))))
+                (when (and defdoc
+                           ',wrapped (not (plist-get ',binding :exit)))
+                  (setq max-mini-window-height (1+ (how-many-str "\n" defdoc)))
+                  (apply ',msg-func
+                         (list (dotemacs-micro-state-propertize-doc
+                                (format "%S: %s" ',name defdoc)))))))))
          (wrapper-func
           (if (and (boundp wrapped)
                    (eval `(keymapp ,wrapped)))
@@ -179,6 +182,7 @@ used."
                    (setq throwp nil))
                  ,@binding-post
                  (when throwp (throw 'exit nil)))
+               (setq max-mini-window-height (1+ (how-many-str "\n" ,@doc-body)))
                ,@doc-body))))
     (append (list (car binding) (eval wrapper-func)) binding)))
 
