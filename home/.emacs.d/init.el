@@ -7193,7 +7193,7 @@ If called with a prefix argument, uses the other-window instead."
       "mht" 'elm-oracle-type-at-point
 
       ;; repl
-      "msi" 'load-elm-repl
+      "msi" 'elm-repl-load
       "msf" 'push-decl-elm-repl
       "msF" 'dotemacs/push-decl-elm-repl-focus
       "msr" 'push-elm-repl
