@@ -743,9 +743,9 @@ possible. Set it to nil if you have no way to use HTTPS in your
 environment, otherwise it is strongly recommended to let it set to t.")
 
 (unless package--initialized
-  (let ((archives '((melpa . "melpa.org/packages/")
-                    ("org" . "orgmode.org/elpa/")
-                    ("gnu" . "elpa.gnu.org/packages/"))))
+  (let ((archives '(("melpa" . "melpa.org/packages/")
+                    ("org"   . "orgmode.org/elpa/")
+                    ("gnu"   . "elpa.gnu.org/packages/"))))
     (setq package-archives
           (mapcar (lambda (x)
                     (cons (car x) (concat
