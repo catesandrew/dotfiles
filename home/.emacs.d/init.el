@@ -4387,11 +4387,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :defer t
   :init
   (progn
-    (eval-after-load "tex-mode"
-      '(progn
-         (auctex-latexmk-setup)
-         (setq auctex-latexmk-inherit-TeX-PDF-mode t)))
-    (add-hook 'LaTeX-mode-hook (lambda() (setq TeX-command-default "LatexMk")))))
+    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+    (dotemacs-use-package-add-hook tex
+      :post-config
+      (auctex-latexmk-setup))))
 
 (use-package bibtex                     ; BibTeX editing
   :defer t
