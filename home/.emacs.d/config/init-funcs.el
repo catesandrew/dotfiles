@@ -848,6 +848,14 @@ current window."
   (when (active-minibuffer-window)
     (select-window (active-minibuffer-window))))
 
+;; http://stackoverflow.com/questions/11847547/emacs-regexp-count-occurrences
+(defun how-many-str (regexp str)
+  (loop with start = 0
+        for count from 0
+        while (string-match regexp str start)
+        do (setq start (match-end 0))
+        finally return count))
+
 (defun dotemacs/comint-clear-buffer ()
   (interactive)
   (let ((comint-buffer-maximum-size 0))

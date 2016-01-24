@@ -9893,6 +9893,14 @@ If called with a prefix argument, uses the other-window instead."
     (evil-leader/set-key-for-mode 'org-mode
       "mgt" 'ort/goto-todos)))
 
+
+(dotemacs-use-package-add-hook persp-mode
+  :post-init
+  (dotemacs-define-custom-layout "@Org"
+                                  :binding "o"
+                                  :body
+                                  (find-file (first org-agenda-files))))
+
 (use-package gnuplot
   :defer t
   :ensure t
