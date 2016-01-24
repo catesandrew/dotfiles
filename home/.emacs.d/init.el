@@ -842,7 +842,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; Use C-u as scroll-up (must be set before actually loading evil)
 (dotemacs-load-or-install-package 'evil t)
 (dotemacs-load-or-install-package 'evil-leader t)
-(require 'core-evilified-state)
 
 
 ;;; Initialization
@@ -1407,161 +1406,6 @@ the user activate the completion manually."
 (dotemacs-use-package-add-hook magit
   :post-init
   (defalias 's 'magit-status))
-
-
-;;; Customization, init file and package management
-(use-package cus-edit
-  :defer t
-  :init (load dotemacs-custom-file 'no-error 'no-message)
-  :config
-  (setq custom-buffer-done-kill nil            ; Kill when existing
-        custom-buffer-verbose-help nil         ; Remove redundant help text
-        ;; Show me the real variable name
-        custom-unlispify-tag-names nil
-        custom-unlispify-menu-entries nil))
-
-(use-package paradox                    ; Better package menu
-  :ensure t
-  :bind (("C-c l p" . paradox-list-packages)
-         ("C-c l P" . package-list-packages-no-fetch))
-  :commands paradox-list-packages
-  :init
-  (progn
-    (setq paradox-execute-asynchronously nil)
-    (defun dotemacs-paradox-list-packages ()
-      "Load depdendencies for auth and open the package list."
-      (interactive)
-      (require 'epa-file)
-      (require 'auth-source)
-      (when (and (not (boundp 'paradox-github-token))
-                 (file-exists-p "~/.authinfo.gpg"))
-        (let ((authinfo-result (car (auth-source-search
-                                     :max 1
-                                     :host "github.com"
-                                     :port "paradox"
-                                     :user "paradox"
-                                     :require '(:secret)))))
-          (let ((paradox-token (plist-get authinfo-result :secret)))
-            (setq paradox-github-token (if (functionp paradox-token)
-                                           (funcall paradox-token)
-                                         paradox-token)))))
-      (paradox-list-packages nil))
-
-    (evilify paradox-menu-mode paradox-menu-mode-map
-             "H" 'paradox-menu-quick-help
-             "J" 'paradox-next-describe
-             "K" 'paradox-previous-describe
-             "L" 'paradox-menu-view-commit-list
-             "o" 'paradox-menu-visit-homepage)
-    (evil-leader/set-key
-      "aP" 'dotemacs-paradox-list-packages)))
-
-(use-package bug-hunter                 ; Search init file for bugs
-  :ensure t)
-
-(use-package server                     ; The server of `emacsclient'
-  :defer t
-  :disabled t
-  :init (server-mode)
-  :diminish server-buffer-clients)
-
-
-;;; OS X support
-(use-package ns-win                     ; OS X window support
-  :defer t
-  :if (eq system-type 'darwin)
-  :init
-  (progn
-    (evil-leader/set-key "bf" 'reveal-in-osx-finder)
-
-    ;; this is only applicable to GUI mode
-    (dotemacs|do-after-display-system-init
-      (when (display-graphic-p)
-        (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
-        (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
-        (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
-        (global-set-key (kbd "M-n") 'new-frame)
-        (global-set-key (kbd "M-v") 'yank)
-        (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
-        (global-set-key (kbd "M-X") 'kill-region)
-        (global-set-key (kbd "M-z") 'undo-tree-undo)
-        (global-set-key (kbd "M-Z") 'undo-tree-redo)
-        (global-set-key (kbd "M-s") 'save-buffer))))
-  :config
-  (dotemacs|do-after-display-system-init
-    (when (display-graphic-p)
-      (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
-                                            ; workspace
-            mac-control-modifier 'control   ; Make control to Control
-            mac-option-modifier 'super      ; Make option do Super (`s` is for super)
-            mac-command-modifier 'meta      ; Option is simply the natural Meta
-                                            ; But command is a lot easier to hit.
-                                            ; (`M` is for meta)
-            mac-right-command-modifier 'left
-            mac-right-option-modifier 'none ; Keep right option for accented input
-            mac-function-modifier 'hyper    ; Just in case we ever need these
-                                            ; keys. (`H` is for hyper)
-            ))))
-
-(use-package init-macosx              ; Personal OS X tools
-  :if (eq system-type 'darwin)
-  :load-path "config/")
-
-(use-package osx-trash                  ; Trash support for OS X
-  :if (eq system-type 'darwin)
-  :ensure t
-  :init (osx-trash-setup))
-
-(use-package pbcopy
-  :if (and (eq system-type 'darwin) (not (display-graphic-p)))
-  :ensure t
-  :init (turn-on-pbcopy))
-
-(use-package launchctl
-  :if (eq system-type 'darwin)
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (add-to-list 'auto-mode-alist '("\\.plist$" . nxml-mode))
-    (evil-leader/set-key "al" 'launchctl))
-  :config
-  (progn
-    (evilify launchctl-mode launchctl-mode-map
-             (kbd "q") 'quit-window
-             (kbd "s") 'tabulated-list-sort
-             (kbd "g") 'launchctl-refresh
-             (kbd "n") 'launchctl-new
-             (kbd "e") 'launchctl-edit
-             (kbd "v") 'launchctl-view
-             (kbd "l") 'launchctl-load
-             (kbd "u") 'launchctl-unload
-             (kbd "r") 'launchctl-reload
-             (kbd "S") 'launchctl-start
-             (kbd "K") 'launchctl-stop
-             (kbd "R") 'launchctl-restart
-             (kbd "D") 'launchctl-remove
-             (kbd "d") 'launchctl-disable
-             (kbd "E") 'launchctl-enable
-             (kbd "i") 'launchctl-info
-             (kbd "f") 'launchctl-filter
-             (kbd "=") 'launchctl-setenv
-             (kbd "#") 'launchctl-unsetenv
-             (kbd "h") 'launchctl-help)))
-
-(use-package reveal-in-osx-finder           ; Reveal current buffer in finder
-  :if (eq system-type 'darwin)
-  :ensure t
-  :commands reveal-in-osx-finder)
-
-(when (eq system-type 'darwin)
-  (dotemacs-use-package-add-hook helm
-    ;; Use `mdfind' instead of `locate'.
-    :pre-init
-    ;; Disable fuzzy matchting to make mdfind work with helm-locate
-    ;; https://github.com/emacs-helm/helm/issues/799
-    (setq helm-locate-fuzzy-match nil)
-    (setq helm-locate-command "mdfind -name %s %s")))
 
 
 ;;; User interface
@@ -2646,7 +2490,7 @@ format so they are supported by the
         (kbd ";") 'ibuffer-toggle-sorting-mode)
       (define-key ibuffer-mode-map
         (kbd ",") nil))
-    (dotemacs-evilify-map ibuffer-mode-map
+    (evilified-state-evilify-map ibuffer-mode-map
       :mode ibuffer-mode)))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
@@ -3908,7 +3752,6 @@ Disable the highlighting of overlong lines."
 
 ;;; Evil
 
-
 (use-package evil-snipe
   :diminish evil-snipe-local-mode
   :ensure t
@@ -4225,6 +4068,170 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key evil-visual-state-map (kbd "#")
       'evil-visualstar/begin-search-backward)))
 
+(use-package core-evilified-state
+  :load-path "/core")
+
+(with-eval-after-load 'evil-leader
+  (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
+    evil-leader--default-map))
+
+
+;;; Customization, init file and package management
+(use-package cus-edit
+  :defer t
+  :init (load dotemacs-custom-file 'no-error 'no-message)
+  :config
+  (setq custom-buffer-done-kill nil            ; Kill when existing
+        custom-buffer-verbose-help nil         ; Remove redundant help text
+        ;; Show me the real variable name
+        custom-unlispify-tag-names nil
+        custom-unlispify-menu-entries nil))
+
+(use-package paradox                    ; Better package menu
+  :ensure t
+  :bind (("C-c l p" . paradox-list-packages)
+         ("C-c l P" . package-list-packages-no-fetch))
+  :commands paradox-list-packages
+  :init
+  (progn
+    (setq paradox-execute-asynchronously nil)
+    (defun dotemacs-paradox-list-packages ()
+      "Load depdendencies for auth and open the package list."
+      (interactive)
+      (require 'epa-file)
+      (require 'auth-source)
+      (when (and (not (boundp 'paradox-github-token))
+                 (file-exists-p "~/.authinfo.gpg"))
+        (let ((authinfo-result (car (auth-source-search
+                                     :max 1
+                                     :host "github.com"
+                                     :port "paradox"
+                                     :user "paradox"
+                                     :require '(:secret)))))
+          (let ((paradox-token (plist-get authinfo-result :secret)))
+            (setq paradox-github-token (if (functionp paradox-token)
+                                           (funcall paradox-token)
+                                         paradox-token)))))
+      (paradox-list-packages nil))
+
+    (evilified-state-evilify paradox-menu-mode paradox-menu-mode-map
+             "H" 'paradox-menu-quick-help
+             "J" 'paradox-next-describe
+             "K" 'paradox-previous-describe
+             "L" 'paradox-menu-view-commit-list
+             "o" 'paradox-menu-visit-homepage)
+    (evil-leader/set-key
+      "aP" 'dotemacs-paradox-list-packages)))
+
+(use-package bug-hunter                 ; Search init file for bugs
+  :ensure t)
+
+(use-package server                     ; The server of `emacsclient'
+  :defer t
+  :disabled t
+  :init (server-mode)
+  :diminish server-buffer-clients)
+
+
+;;; OS X support
+(use-package ns-win                     ; OS X window support
+  :defer t
+  :if (eq system-type 'darwin)
+  :init
+  (progn
+    (evil-leader/set-key "bf" 'reveal-in-osx-finder)
+
+    ;; this is only applicable to GUI mode
+    (dotemacs|do-after-display-system-init
+      (when (display-graphic-p)
+        (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
+        (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
+        (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
+        (global-set-key (kbd "M-n") 'new-frame)
+        (global-set-key (kbd "M-v") 'yank)
+        (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
+        (global-set-key (kbd "M-X") 'kill-region)
+        (global-set-key (kbd "M-z") 'undo-tree-undo)
+        (global-set-key (kbd "M-Z") 'undo-tree-redo)
+        (global-set-key (kbd "M-s") 'save-buffer))))
+  :config
+  (dotemacs|do-after-display-system-init
+    (when (display-graphic-p)
+      (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
+                                            ; workspace
+            mac-control-modifier 'control   ; Make control to Control
+            mac-option-modifier 'super      ; Make option do Super (`s` is for super)
+            mac-command-modifier 'meta      ; Option is simply the natural Meta
+                                            ; But command is a lot easier to hit.
+                                            ; (`M` is for meta)
+            mac-right-command-modifier 'left
+            mac-right-option-modifier 'none ; Keep right option for accented input
+            mac-function-modifier 'hyper    ; Just in case we ever need these
+                                            ; keys. (`H` is for hyper)
+            ))))
+
+(use-package init-macosx              ; Personal OS X tools
+  :if (eq system-type 'darwin)
+  :load-path "config/")
+
+(use-package osx-trash                  ; Trash support for OS X
+  :if (eq system-type 'darwin)
+  :ensure t
+  :init (osx-trash-setup))
+
+(use-package pbcopy
+  :if (and (eq system-type 'darwin) (not (display-graphic-p)))
+  :ensure t
+  :init (turn-on-pbcopy))
+
+(use-package launchctl
+  :if (eq system-type 'darwin)
+  :defer t
+  :ensure t
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.plist$" . nxml-mode))
+    (evil-leader/set-key "al" 'launchctl))
+  :config
+  (progn
+    (evilified-state-evilify launchctl-mode launchctl-mode-map
+             (kbd "q") 'quit-window
+             (kbd "s") 'tabulated-list-sort
+             (kbd "g") 'launchctl-refresh
+             (kbd "n") 'launchctl-new
+             (kbd "e") 'launchctl-edit
+             (kbd "v") 'launchctl-view
+             (kbd "l") 'launchctl-load
+             (kbd "u") 'launchctl-unload
+             (kbd "r") 'launchctl-reload
+             (kbd "S") 'launchctl-start
+             (kbd "K") 'launchctl-stop
+             (kbd "R") 'launchctl-restart
+             (kbd "D") 'launchctl-remove
+             (kbd "d") 'launchctl-disable
+             (kbd "E") 'launchctl-enable
+             (kbd "i") 'launchctl-info
+             (kbd "f") 'launchctl-filter
+             (kbd "=") 'launchctl-setenv
+             (kbd "#") 'launchctl-unsetenv
+             (kbd "h") 'launchctl-help)))
+
+(use-package reveal-in-osx-finder           ; Reveal current buffer in finder
+  :if (eq system-type 'darwin)
+  :ensure t
+  :commands reveal-in-osx-finder)
+
+(when (eq system-type 'darwin)
+  (dotemacs-use-package-add-hook helm
+    ;; Use `mdfind' instead of `locate'.
+    :pre-init
+    ;; Disable fuzzy matchting to make mdfind work with helm-locate
+    ;; https://github.com/emacs-helm/helm/issues/799
+    (setq helm-locate-fuzzy-match nil)
+    (setq helm-locate-command "mdfind -name %s %s")))
+
+
+;;; Bindings
 (use-package init-bindings
   :load-path "config/"
   :init
@@ -5520,7 +5527,7 @@ point. Requires smartparens because all movement is done using
       "mgg" 'anaconda-mode-find-definitions
       "mga" 'anaconda-mode-find-assignments
       "mgu" 'anaconda-mode-find-references)
-    (evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
+    (evilified-state-evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
              (kbd "q") 'quit-window)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
@@ -5606,7 +5613,7 @@ point. Requires smartparens because all movement is done using
   :commands (pylookup-lookup pylookup-update pylookup-update-all)
   :init
   (progn
-    (evilify pylookup-mode pylookup-mode-map)
+    (evilified-state-evilify pylookup-mode pylookup-mode-map)
     (evil-leader/set-key-for-mode 'python-mode
       "mhH"  'pylookup-lookup))
   :config
@@ -6758,7 +6765,7 @@ If called with a prefix argument, uses the other-window instead."
 
     (add-hook 'cider--debug-mode-hook 'dotemacs-cider-debug-setup)
 
-    (evilify cider-stacktrace-mode cider-stacktrace-mode-map
+    (evilified-state-evilify cider-stacktrace-mode cider-stacktrace-mode-map
              (kbd "C-j") 'cider-stacktrace-next-cause
              (kbd "C-k") 'cider-stacktrace-previous-cause
              (kbd "TAB") 'cider-stacktrace-cycle-current-cause
@@ -6778,16 +6785,16 @@ If called with a prefix argument, uses the other-window instead."
     ;; open cider-doc directly and close it with q
     (setq cider-prompt-for-symbol nil)
 
-    (evilify cider-docview-mode cider-docview-mode-map
+    (evilified-state-evilify cider-docview-mode cider-docview-mode-map
              (kbd "q") 'cider-popup-buffer-quit)
 
-    (evilify cider-inspector-mode cider-inspector-mode-map
+    (evilified-state-evilify cider-inspector-mode cider-inspector-mode-map
              (kbd "L") 'cider-inspector-pop
              (kbd "n") 'cider-inspector-next-page
              (kbd "N") 'cider-inspector-previous-page
              (kbd "r") 'cider-inspector-refresh)
 
-    (evilify cider-test-report-mode cider-test-report-mode-map
+    (evilified-state-evilify cider-test-report-mode cider-test-report-mode-map
              (kbd "C-j") 'cider-test-next-result
              (kbd "C-k") 'cider-test-previous-result
              (kbd "RET") 'cider-test-jump
@@ -7276,7 +7283,7 @@ If called with a prefix argument, uses the other-window instead."
       "mpc" 'elm-package-catalog
       "mpd" 'elm-documentation-lookup)
 
-    (evilify elm-package-mode elm-package-mode-map
+    (evilified-state-evilify elm-package-mode elm-package-mode-map
              "g" 'elm-package-refresh
              "n" 'elm-package-next
              "p" 'elm-package-prev
@@ -8516,7 +8523,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :ensure t
   :config
-  (evilify diff-mode diff-mode-map
+  (evilified-state-evilify diff-mode diff-mode-map
            "j" 'diff-hunk-next
            "k" 'diff-hunk-prev))
 
@@ -8575,7 +8582,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :config
   (progn
-    (evilify git-rebase-mode git-rebase-mode-map
+    (evilified-state-evilify git-rebase-mode git-rebase-mode-map
             "J" 'git-rebase-move-line-down
             "K" 'git-rebase-move-line-up
             "u" 'git-rebase-undo
@@ -8621,7 +8628,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
-    (evilify gist-list-mode gist-list-menu-mode-map
+    (evilified-state-evilify gist-list-mode gist-list-menu-mode-map
              "f" 'gist-fetch-current
              "K" 'gist-kill-current
              "o" 'gist-browse-current-url)
@@ -8766,92 +8773,92 @@ If called with a prefix argument, uses the other-window instead."
 
     (unless (boundp 'dotemacs-use-evil-magit)
       ;; mode maps
-      (dotemacs-evilify-map magit-mode-map)
-      (dotemacs-evilify-map magit-status-mode-map
+      (evilified-state-evilify-map magit-mode-map)
+      (evilified-state-evilify-map magit-status-mode-map
         :mode magit-status-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-refs-mode-map
+      (evilified-state-evilify-map magit-refs-mode-map
         :mode magit-refs-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-blame-mode-map
+      (evilified-state-evilify-map magit-blame-mode-map
         :mode magit-blame-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-hunk-section-map
+      (evilified-state-evilify-map magit-hunk-section-map
         :mode magit-status-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-diff-mode-map
+      (evilified-state-evilify-map magit-diff-mode-map
         :mode magit-diff-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-log-read-revs-map
+      (evilified-state-evilify-map magit-log-read-revs-map
         :mode magit-log-read-revs
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-log-mode-map
+      (evilified-state-evilify-map magit-log-mode-map
         :mode magit-log-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-log-select-mode-map
+      (evilified-state-evilify-map magit-log-select-mode-map
         :mode magit-log-select-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-cherry-mode-map
+      (evilified-state-evilify-map magit-cherry-mode-map
         :mode magit-cherry-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-reflog-mode-map
+      (evilified-state-evilify-map magit-reflog-mode-map
         :mode magit-reflog-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-process-mode-map
+      (evilified-state-evilify-map magit-process-mode-map
         :mode magit-process-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map magit-stash-mode-map
+      (evilified-state-evilify-map magit-stash-mode-map
         :mode magit-stash-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
         (kbd "C-S-k") 'magit-section-backward
         (kbd "C-n") 'magit-section-forward
         (kbd "C-p") 'magit-section-backward)
-      (dotemacs-evilify-map git-rebase-mode-map
+      (evilified-state-evilify-map git-rebase-mode-map
         :mode git-rebase-mode
         :bindings
         (kbd "C-S-j") 'magit-section-forward
@@ -8869,20 +8876,20 @@ If called with a prefix argument, uses the other-window instead."
         (add-to-list 'evil-emacs-state-modes mode))
       (dotemacs-evilify-configure-default-state 'magit-revision-mode)
       ;; section maps
-      (dotemacs-evilify-map magit-tag-section-map)
-      (dotemacs-evilify-map magit-untracked-section-map)
-      (dotemacs-evilify-map magit-branch-section-map)
-      (dotemacs-evilify-map magit-remote-section-map)
-      (dotemacs-evilify-map magit-file-section-map)
-      (dotemacs-evilify-map magit-hunk-section-map)
-      (dotemacs-evilify-map magit-unstaged-section-map)
-      (dotemacs-evilify-map magit-staged-section-map)
-      (dotemacs-evilify-map magit-commit-section-map)
-      (dotemacs-evilify-map magit-module-commit-section-map)
-      (dotemacs-evilify-map magit-unpulled-section-map)
-      (dotemacs-evilify-map magit-unpushed-section-map)
-      (dotemacs-evilify-map magit-stashes-section-map)
-      (dotemacs-evilify-map magit-stash-section-map))
+      (evilified-state-evilify-map magit-tag-section-map)
+      (evilified-state-evilify-map magit-untracked-section-map)
+      (evilified-state-evilify-map magit-branch-section-map)
+      (evilified-state-evilify-map magit-remote-section-map)
+      (evilified-state-evilify-map magit-file-section-map)
+      (evilified-state-evilify-map magit-hunk-section-map)
+      (evilified-state-evilify-map magit-unstaged-section-map)
+      (evilified-state-evilify-map magit-staged-section-map)
+      (evilified-state-evilify-map magit-commit-section-map)
+      (evilified-state-evilify-map magit-module-commit-section-map)
+      (evilified-state-evilify-map magit-unpulled-section-map)
+      (evilified-state-evilify-map magit-unpushed-section-map)
+      (evilified-state-evilify-map magit-stashes-section-map)
+      (evilified-state-evilify-map magit-stash-section-map))
 
     (add-hook 'projectile-after-switch-project-hook
       #'dotemacs-magit-set-repo-dirs-from-projectile)
@@ -9041,7 +9048,7 @@ If called with a prefix argument, uses the other-window instead."
           (helm-exit-and-execute-action 'dotemacs-helm-project-smart-do-search-in-dir))))
 
     ;; evilify the helm-grep buffer
-    (evilify helm-grep-mode helm-grep-mode-map
+    (evilified-state-evilify helm-grep-mode helm-grep-mode-map
              (kbd "RET") 'helm-grep-mode-jump-other-window
              (kbd "q") 'quit-window)
 
@@ -9098,7 +9105,7 @@ If called with a prefix argument, uses the other-window instead."
           helm-ag-source-type 'file-line))
 
     (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) evil-leader--default-map)
-    (evilify helm-ag-mode helm-ag-mode-map
+    (evilified-state-evilify helm-ag-mode helm-ag-mode-map
              (kbd "RET") 'helm-ag-mode-jump-other-window
              (kbd "q") 'quit-window))
 
@@ -9120,7 +9127,7 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (ido-mode t)))
 
-(dotemacs-evilify-map package-menu-mode-map
+(evilified-state-evilify-map package-menu-mode-map
                        :mode package-menu-mode)
 
 (use-package ido-vertical-mode
@@ -10030,7 +10037,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
-    (evilify nil org-present-mode-keymap
+    (evilified-state-evilify nil org-present-mode-keymap
       "h" 'org-present-prev
       "l" 'org-present-next
       "q" 'org-present-quit)
@@ -10257,7 +10264,7 @@ If called with a prefix argument, uses the other-window instead."
 (use-package doc-view
   :defer t
   :init
-       (evilify doc-view-mode doc-view-mode-map
+       (evilified-state-evilify doc-view-mode doc-view-mode-map
          "/"  'dotemacs-doc-view-search-new-query
          "?"  'dotemacs-doc-view-search-new-query-backward
          "gg" 'doc-view-first-page
@@ -10328,7 +10335,7 @@ If called with a prefix argument, uses the other-window instead."
 (dotemacs-use-package-add-hook dired
   :post-config
   (with-eval-after-load 'projectile
-    (evilify dired-mode dired-mode-map
+    (evilified-state-evilify dired-mode dired-mode-map
       (kbd "RET") 'dired-open-file)))
 
 
@@ -10387,7 +10394,7 @@ If called with a prefix argument, uses the other-window instead."
           ;; Inhibit prompts for simple recursive operations
           dired-recursive-copies 'always)
 
-    (evilify dired-mode dired-mode-map
+    (evilified-state-evilify dired-mode dired-mode-map
       "j"         'vinegar/move-down
       "k"         'vinegar/move-up
       "-"         'vinegar/up-directory
@@ -10595,7 +10602,7 @@ If called with a prefix argument, uses the other-window instead."
       "mt"    'ledger-insert-effective-date
       "my"    'ledger-set-year
       "m RET" 'ledger-set-month)
-    (evilify ledger-report-mode ledger-report-mode-map)))
+    (evilified-state-evilify ledger-report-mode ledger-report-mode-map)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
@@ -10646,7 +10653,7 @@ If called with a prefix argument, uses the other-window instead."
       "aw" 'sunshine-forecast
       "aW" 'sunshine-quick-forecast)
 
-    (evilify sunshine-mode sunshine-mode-map
+    (evilified-state-evilify sunshine-mode sunshine-mode-map
       (kbd "q") 'quit-window
       (kbd "i") 'sunshine-toggle-icons))
   :config
@@ -10785,7 +10792,7 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (evil-leader/set-key "aE" 'emoji-cheat-sheet-plus-buffer)
     (evil-leader/set-key "ie" 'emoji-cheat-sheet-plus-insert)
-    (evilify emoji-cheat-sheet-plus-buffer-mode
+    (evilified-state-evilify emoji-cheat-sheet-plus-buffer-mode
              emoji-cheat-sheet-plus-buffer-mode-map
              "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
     (defun dotemacs-delay-emoji-cheat-sheet-hook ()
@@ -11395,7 +11402,7 @@ If called with a prefix argument, uses the other-window instead."
 
     (dotemacs-diminish flycheck-mode " ⓢ" " s")
 
-    (dotemacs-evilify-map flycheck-error-list-mode-map
+    (evilified-state-evilify-map flycheck-error-list-mode-map
                            :mode flycheck-error-list-mode
                            :bindings
                            "RET" 'flycheck-error-list-goto-error
