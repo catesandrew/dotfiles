@@ -6371,9 +6371,10 @@ Otherwise use Enh Ruby Mode, which is the default.")
 (dotemacs-use-package-add-hook flycheck
   :post-config
   (progn
-    ;; remove overlays from ghc-check.el if flycheck is enabled
-    (set-face-attribute 'ghc-face-error nil :underline nil)
-    (set-face-attribute 'ghc-face-warn nil :underline nil)))
+    (with-eval-after-load 'ghc
+      ;; remove overlays from ghc-check.el if flycheck is enabled
+      (set-face-attribute 'ghc-face-error nil :underline nil)
+      (set-face-attribute 'ghc-face-warn nil :underline nil))))
 
 (use-package shm
   :defer t
