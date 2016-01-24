@@ -442,8 +442,8 @@ prompts and the prompt is made read-only"
   :group 'dotemacs
   :prefix 'dotemacs-latex)
 
-(defcustom dotemacs-latex-build-command "LaTeX"
-  "The default command to use with `SPC m b'"
+(defcustom dotemacs-latex-build-command (if (executable-find "latexmk") "LatexMk" "LaTeX")
+  "The default command to use with `, m b'"
   :group 'dotemacs-latex)
 
 (defcustom dotemacs-latex-enable-auto-fill t
@@ -4379,14 +4379,19 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
                               (,(rx (0+ space) "\\minisec{") 5))
           ;; No language-specific hyphens please
           LaTeX-babel-hyphen nil)
-
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)))    ; Easy math input
 
 (use-package auctex-latexmk             ; latexmk command for AUCTeX
   :ensure t
+  :if (string= dotemacs-latex-build-command "LatexMk")
   :defer t
-  :init (with-eval-after-load 'latex
-          (auctex-latexmk-setup)))
+  :init
+  (progn
+    (eval-after-load "tex-mode"
+      '(progn
+         (auctex-latexmk-setup)
+         (setq auctex-latexmk-inherit-TeX-PDF-mode t)))
+    (add-hook 'LaTeX-mode-hook (lambda() (setq TeX-command-default "LatexMk")))))
 
 (use-package bibtex                     ; BibTeX editing
   :defer t
