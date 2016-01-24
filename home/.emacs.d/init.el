@@ -4115,11 +4115,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (paradox-list-packages nil))
 
     (evilified-state-evilify paradox-menu-mode paradox-menu-mode-map
-             "H" 'paradox-menu-quick-help
-             "J" 'paradox-next-describe
-             "K" 'paradox-previous-describe
-             "L" 'paradox-menu-view-commit-list
-             "o" 'paradox-menu-visit-homepage)
+      "H" 'paradox-menu-quick-help
+      "J" 'paradox-next-describe
+      "K" 'paradox-previous-describe
+      "L" 'paradox-menu-view-commit-list
+      "o" 'paradox-menu-visit-homepage)
     (evil-leader/set-key
       "aP" 'dotemacs-paradox-list-packages)))
 
@@ -4195,26 +4195,26 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :config
   (progn
     (evilified-state-evilify launchctl-mode launchctl-mode-map
-             (kbd "q") 'quit-window
-             (kbd "s") 'tabulated-list-sort
-             (kbd "g") 'launchctl-refresh
-             (kbd "n") 'launchctl-new
-             (kbd "e") 'launchctl-edit
-             (kbd "v") 'launchctl-view
-             (kbd "l") 'launchctl-load
-             (kbd "u") 'launchctl-unload
-             (kbd "r") 'launchctl-reload
-             (kbd "S") 'launchctl-start
-             (kbd "K") 'launchctl-stop
-             (kbd "R") 'launchctl-restart
-             (kbd "D") 'launchctl-remove
-             (kbd "d") 'launchctl-disable
-             (kbd "E") 'launchctl-enable
-             (kbd "i") 'launchctl-info
-             (kbd "f") 'launchctl-filter
-             (kbd "=") 'launchctl-setenv
-             (kbd "#") 'launchctl-unsetenv
-             (kbd "h") 'launchctl-help)))
+      (kbd "q") 'quit-window
+      (kbd "s") 'tabulated-list-sort
+      (kbd "g") 'launchctl-refresh
+      (kbd "n") 'launchctl-new
+      (kbd "e") 'launchctl-edit
+      (kbd "v") 'launchctl-view
+      (kbd "l") 'launchctl-load
+      (kbd "u") 'launchctl-unload
+      (kbd "r") 'launchctl-reload
+      (kbd "S") 'launchctl-start
+      (kbd "K") 'launchctl-stop
+      (kbd "R") 'launchctl-restart
+      (kbd "D") 'launchctl-remove
+      (kbd "d") 'launchctl-disable
+      (kbd "E") 'launchctl-enable
+      (kbd "i") 'launchctl-info
+      (kbd "f") 'launchctl-filter
+      (kbd "=") 'launchctl-setenv
+      (kbd "#") 'launchctl-unsetenv
+      (kbd "h") 'launchctl-help)))
 
 (use-package reveal-in-osx-finder           ; Reveal current buffer in finder
   :if (eq system-type 'darwin)
@@ -5528,7 +5528,7 @@ point. Requires smartparens because all movement is done using
       "mga" 'anaconda-mode-find-assignments
       "mgu" 'anaconda-mode-find-references)
     (evilified-state-evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
-             (kbd "q") 'quit-window)))
+      (kbd "q") 'quit-window)))
 
 (use-package anaconda-mode              ; Powerful Python backend for Emacs
   :defer t
@@ -6766,44 +6766,44 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'cider--debug-mode-hook 'dotemacs-cider-debug-setup)
 
     (evilified-state-evilify cider-stacktrace-mode cider-stacktrace-mode-map
-             (kbd "C-j") 'cider-stacktrace-next-cause
-             (kbd "C-k") 'cider-stacktrace-previous-cause
-             (kbd "TAB") 'cider-stacktrace-cycle-current-cause
-             (kbd "0")   'cider-stacktrace-cycle-all-causes
-             (kbd "1")   'cider-stacktrace-cycle-cause-1
-             (kbd "2")   'cider-stacktrace-cycle-cause-2
-             (kbd "3")   'cider-stacktrace-cycle-cause-3
-             (kbd "4")   'cider-stacktrace-cycle-cause-4
-             (kbd "5")   'cider-stacktrace-cycle-cause-5
-             (kbd "a")   'cider-stacktrace-toggle-all
-             (kbd "c")   'cider-stacktrace-toggle-clj
-             (kbd "d")   'cider-stacktrace-toggle-duplicates
-             (kbd "J")   'cider-stacktrace-toggle-java
-             (kbd "r")   'cider-stacktrace-toggle-repl
-             (kbd "T")   'cider-stacktrace-toggle-tooling)
+      (kbd "C-j") 'cider-stacktrace-next-cause
+      (kbd "C-k") 'cider-stacktrace-previous-cause
+      (kbd "TAB") 'cider-stacktrace-cycle-current-cause
+      (kbd "0")   'cider-stacktrace-cycle-all-causes
+      (kbd "1")   'cider-stacktrace-cycle-cause-1
+      (kbd "2")   'cider-stacktrace-cycle-cause-2
+      (kbd "3")   'cider-stacktrace-cycle-cause-3
+      (kbd "4")   'cider-stacktrace-cycle-cause-4
+      (kbd "5")   'cider-stacktrace-cycle-cause-5
+      (kbd "a")   'cider-stacktrace-toggle-all
+      (kbd "c")   'cider-stacktrace-toggle-clj
+      (kbd "d")   'cider-stacktrace-toggle-duplicates
+      (kbd "J")   'cider-stacktrace-toggle-java
+      (kbd "r")   'cider-stacktrace-toggle-repl
+      (kbd "T")   'cider-stacktrace-toggle-tooling)
 
     ;; open cider-doc directly and close it with q
     (setq cider-prompt-for-symbol nil)
 
     (evilified-state-evilify cider-docview-mode cider-docview-mode-map
-             (kbd "q") 'cider-popup-buffer-quit)
+      (kbd "q") 'cider-popup-buffer-quit)
 
     (evilified-state-evilify cider-inspector-mode cider-inspector-mode-map
-             (kbd "L") 'cider-inspector-pop
-             (kbd "n") 'cider-inspector-next-page
-             (kbd "N") 'cider-inspector-previous-page
-             (kbd "r") 'cider-inspector-refresh)
+      (kbd "L") 'cider-inspector-pop
+      (kbd "n") 'cider-inspector-next-page
+      (kbd "N") 'cider-inspector-previous-page
+      (kbd "r") 'cider-inspector-refresh)
 
     (evilified-state-evilify cider-test-report-mode cider-test-report-mode-map
-             (kbd "C-j") 'cider-test-next-result
-             (kbd "C-k") 'cider-test-previous-result
-             (kbd "RET") 'cider-test-jump
-             (kbd "d")   'cider-test-ediff
-             (kbd "e")   'cider-test-stacktrace
-             (kbd "q")   'cider-popup-buffer-quit
-             (kbd "r")   'cider-test-rerun-tests
-             (kbd "t")   'cider-test-run-test
-             (kbd "T")   'cider-test-run-tests)
+      (kbd "C-j") 'cider-test-next-result
+      (kbd "C-k") 'cider-test-previous-result
+      (kbd "RET") 'cider-test-jump
+      (kbd "d")   'cider-test-ediff
+      (kbd "e")   'cider-test-stacktrace
+      (kbd "q")   'cider-popup-buffer-quit
+      (kbd "r")   'cider-test-rerun-tests
+      (kbd "t")   'cider-test-run-test
+      (kbd "T")   'cider-test-run-tests)
 
     ;; TODO: having this work for cider-macroexpansion-mode would be nice,
     ;;       but the problem is that it uses clojure-mode as its major-mode
@@ -7284,14 +7284,14 @@ If called with a prefix argument, uses the other-window instead."
       "mpd" 'elm-documentation-lookup)
 
     (evilified-state-evilify elm-package-mode elm-package-mode-map
-             "g" 'elm-package-refresh
-             "n" 'elm-package-next
-             "p" 'elm-package-prev
-             "v" 'elm-package-view
-             "m" 'elm-package-mark
-             "u" 'elm-package-unmark
-             "x" 'elm-package-install
-             "q" 'quit-window)))
+      "g" 'elm-package-refresh
+      "n" 'elm-package-next
+      "p" 'elm-package-prev
+      "v" 'elm-package-view
+      "m" 'elm-package-mark
+      "u" 'elm-package-unmark
+      "x" 'elm-package-install
+      "q" 'quit-window)))
 
 (dotemacs-use-package-add-hook popwin
   :post-config
@@ -8524,8 +8524,8 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :config
   (evilified-state-evilify diff-mode diff-mode-map
-           "j" 'diff-hunk-next
-           "k" 'diff-hunk-prev))
+    "j" 'diff-hunk-next
+    "k" 'diff-hunk-prev))
 
 (dotemacs-declare-prefix "gd" "diff")
 (use-package diff-hl                    ; Highlight hunks in fringe
@@ -8583,10 +8583,10 @@ If called with a prefix argument, uses the other-window instead."
   :config
   (progn
     (evilified-state-evilify git-rebase-mode git-rebase-mode-map
-            "J" 'git-rebase-move-line-down
-            "K" 'git-rebase-move-line-up
-            "u" 'git-rebase-undo
-            "y" 'git-rebase-insert)
+      "J" 'git-rebase-move-line-down
+      "K" 'git-rebase-move-line-up
+      "u" 'git-rebase-undo
+      "y" 'git-rebase-insert)
 
     (evil-leader/set-key-for-mode 'git-rebase-mode
       "mcc" 'git-rebase-server-edit
@@ -8629,9 +8629,9 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (evilified-state-evilify gist-list-mode gist-list-menu-mode-map
-             "f" 'gist-fetch-current
-             "K" 'gist-kill-current
-             "o" 'gist-browse-current-url)
+      "f" 'gist-fetch-current
+      "K" 'gist-kill-current
+      "o" 'gist-browse-current-url)
 
     (evil-leader/set-key
       "ggb" 'gist-buffer
@@ -9049,8 +9049,8 @@ If called with a prefix argument, uses the other-window instead."
 
     ;; evilify the helm-grep buffer
     (evilified-state-evilify helm-grep-mode helm-grep-mode-map
-             (kbd "RET") 'helm-grep-mode-jump-other-window
-             (kbd "q") 'quit-window)
+      (kbd "RET") 'helm-grep-mode-jump-other-window
+      (kbd "q") 'quit-window)
 
     (evil-leader/set-key
       ;; helm-ag marks
@@ -9106,8 +9106,8 @@ If called with a prefix argument, uses the other-window instead."
 
     (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) evil-leader--default-map)
     (evilified-state-evilify helm-ag-mode helm-ag-mode-map
-             (kbd "RET") 'helm-ag-mode-jump-other-window
-             (kbd "q") 'quit-window))
+      (kbd "RET") 'helm-ag-mode-jump-other-window
+      (kbd "q") 'quit-window))
 
 
 ;;; Project management for Interactively Do Things (IDO)
@@ -9128,7 +9128,7 @@ If called with a prefix argument, uses the other-window instead."
     (ido-mode t)))
 
 (evilified-state-evilify-map package-menu-mode-map
-                       :mode package-menu-mode)
+  :mode package-menu-mode)
 
 (use-package ido-vertical-mode
   :ensure t
@@ -10793,8 +10793,8 @@ If called with a prefix argument, uses the other-window instead."
     (evil-leader/set-key "aE" 'emoji-cheat-sheet-plus-buffer)
     (evil-leader/set-key "ie" 'emoji-cheat-sheet-plus-insert)
     (evilified-state-evilify emoji-cheat-sheet-plus-buffer-mode
-             emoji-cheat-sheet-plus-buffer-mode-map
-             "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
+      emoji-cheat-sheet-plus-buffer-mode-map
+      "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
     (defun dotemacs-delay-emoji-cheat-sheet-hook ()
       "Work-around for org buffers."
       ;; we need to wait for org buffer to be fully loaded before
@@ -11403,11 +11403,11 @@ If called with a prefix argument, uses the other-window instead."
     (dotemacs-diminish flycheck-mode " ⓢ" " s")
 
     (evilified-state-evilify-map flycheck-error-list-mode-map
-                           :mode flycheck-error-list-mode
-                           :bindings
-                           "RET" 'flycheck-error-list-goto-error
-                           "j" 'flycheck-error-list-next-error
-                           "k" 'flycheck-error-list-previous-error)
+      :mode flycheck-error-list-mode
+      :bindings
+      "RET" 'flycheck-error-list-goto-error
+      "j" 'flycheck-error-list-next-error
+      "k" 'flycheck-error-list-previous-error)
 
     (evil-leader/set-key
       "ec" 'flycheck-clear
