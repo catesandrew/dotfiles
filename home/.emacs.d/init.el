@@ -8852,7 +8852,6 @@ If called with a prefix argument, uses the other-window instead."
 
     (with-eval-after-load 'magit
       (require 'evil-magit)
-      (setq evil-magit-state 'motion)
       ;; (evil-define-key 'motion magit-mode-map
       ;;   (kbd dotemacs-leader-key) dotemacs-default-map)
       )))
