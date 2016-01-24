@@ -4032,8 +4032,10 @@ It will toggle the overlay under point or create an overlay of one character."
   (dolist (hook '(LaTeX-mode-hook mustache-mode-hook handlebars-mode-hook ruby-mode-hook))
     (add-hook hook 'turn-on-evil-matchit-mode)))
 
-(use-package evil-indent-textobject
-  :quelpa (evil-indent-textobject :fetcher github :repo "TheBB/evil-indent-textobject"))
+(use-package evil-indent-plus
+  :ensure t
+  :init
+  (evil-indent-plus-default-bindings))
 
 (use-package evil-numbers
   :ensure t
