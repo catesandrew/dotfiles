@@ -151,12 +151,6 @@
   (with-current-buffer (htmlize-buffer buffer)
     (buffer-string)))
 
-(defun sudo-edit (&optional arg)
-  (interactive "p")
-  (if (or arg (not buffer-file-name))
-      (find-file (concat "/sudo:root@localhost:" (ido-read-file-name "File: ")))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
-
 (defun add-file-find-hook-with-pattern (pattern fn &optional contents)
   "Add a find-file-hook that calls FN for files where PATTERN
 matches the file name, and optionally, where CONTENT matches file contents.

@@ -110,6 +110,7 @@ Ensure that helm is required before calling FUNC."
   "fj" 'dired-jump
   "fl" 'find-file-literally
   "fo" 'dotemacs-open-in-external-app
+  "fE" 'dotemacs/sudo-edit
   "fR" 'dotemacs/rename-current-buffer-file
   "fS" 'evil-write-all
   "fs" 'dotemacs-write-file
