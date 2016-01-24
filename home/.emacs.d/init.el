@@ -2882,7 +2882,7 @@ format so they are supported by the
   :commands (open-junk-file)
   :init
   (evil-leader/set-key "fJ" 'open-junk-file)
-  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/")))
+  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
 
 (use-package helm-files
   :ensure helm
