@@ -228,9 +228,9 @@ Ensure that helm is required before calling FUNC."
   :documentation "Maximize the current frame."
   :evil-leader "TM")
 (dotemacs-add-toggle mode-line
-  :status hidden-mode-line-mode
-  :on (hidden-mode-line-mode)
-  :off (hidden-mode-line-mode -1)
+  :status (not hidden-mode-line-mode)
+  :on (hidden-mode-line-mode -1)
+  :off (hidden-mode-line-mode)
   :documentation "Toggle the visibility of modeline."
   :evil-leader "tmt")
 (dotemacs-add-toggle transparent-frame
