@@ -1,4 +1,4 @@
-;;; evilified-state.el --- A minimalistic evil state
+;;; evil-evilified-state.el --- A minimalistic evil state
 
 ;; Copyright (C) 2014, 2015 syl20bnr
 ;;
@@ -261,6 +261,5 @@ Currently this function infloops when the list is circular."
       (push (pop tail) result))
     (nreverse result)))
 
-(provide 'core-evilified-state)
-
-;;; core-evilified-state.el ends here
+(provide 'evil-evilified-state)
+;;; evil-evilified-state.el ends here

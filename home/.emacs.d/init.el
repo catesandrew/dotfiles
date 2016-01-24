@@ -4068,8 +4068,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (define-key evil-visual-state-map (kbd "#")
       'evil-visualstar/begin-search-backward)))
 
-(use-package core-evilified-state
-  :load-path "/core")
+(use-package evil-evilified-state
+  :load-path "/config")
 
 (with-eval-after-load 'evil-leader
   (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
