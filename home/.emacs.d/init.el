@@ -10048,7 +10048,9 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key "hk" 'helm-make))
+  (evil-leader/set-key
+   "cc" 'helm-make-projectile
+   "cm" 'helm-make))
 
 (use-package help-mode
   :config

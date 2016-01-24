@@ -853,6 +853,11 @@ current window."
         do (setq start (match-end 0))
         finally return count))
 
+(defun dotemacs/close-compilation-window ()
+  "Close the window containing the '*compilation*' buffer."
+  (interactive)
+  (delete-windows-on "*compilation*"))
+
 (defun dotemacs/comint-clear-buffer ()
   (interactive)
   (let ((comint-buffer-maximum-size 0))

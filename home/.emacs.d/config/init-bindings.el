@@ -138,10 +138,13 @@ Ensure that helm is required before calling FUNC."
 (evil-leader/set-key
   "jh" 'dotemacs-push-mark-and-goto-beginning-of-line
   "jl" 'dotemacs-push-mark-and-goto-end-of-line)
+
 ;; Compilation ----------------------------------------------------------------
-(evil-leader/set-key "cc" 'helm-make-projectile)
-(evil-leader/set-key "cC" 'compile)
-(evil-leader/set-key "cr" 'recompile)
+(evil-leader/set-key
+  "cC" 'compile
+  "cr" 'recompile
+  "cq" 'dotemacs/close-compilation-window)
+
 ;; narrow & widen -------------------------------------------------------------
 (evil-leader/set-key
   "nr" 'narrow-to-region
