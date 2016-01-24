@@ -23,7 +23,7 @@
   "Highlight keywords in comments."
   (interactive)
   (font-lock-add-keywords
-   nil '(("\\<\\(\\(FIX\\(ME\\)?\\|BUG\\|CHECK\\|DONE\\|TODO\\|OPTIMIZE\\|HACK\\|REFACTOR\\):?\\)"
+   nil '(("\\<\\(\\(FIX\\(ME\\)?\\|BUG\\|CHECK\\|DONE\\|TODO\\|OPTIMIZE\\|HACK\\|REFACTOR\\)\\>:?\\)"
           1 font-lock-warning-face t))))
 
 ;; To augment and/or counteract these defaults your own function
