@@ -10234,7 +10234,6 @@ If called with a prefix argument, uses the other-window instead."
     (defun dotemacs-dired-open-file ()
       "Hook dired to translate to projectile and neotree."
       (interactive)
-      (message "!! dired open fill hooked")
       (let ((file (ignore-errors (dired-get-file-for-visit))))
         (when file
           (find-file (expand-file-name file (projectile-project-root)))
