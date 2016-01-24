@@ -8254,12 +8254,28 @@ If called with a prefix argument, uses the other-window instead."
 
 ;;; Misc programming languages
 (use-package sh-script                  ; Shell scripts
-  :mode ("\\.zsh\\'" . sh-mode)
-  :config
-  ;; Use two spaces in shell scripts.
-  (setq sh-indentation 2                ; The basic indentation
-        sh-basic-offset 2               ; The offset for nested indentation
-        ))
+  :defer t
+  :init
+  (progn
+    ;; Use two spaces in shell scripts.
+    (setq sh-indentation 2
+          sh-basic-offset 2)
+
+    ;; Use sh-mode when opening `.zsh' files, and when opening Prezto runcoms.
+    (dolist (pattern '("\\.zsh\\'"
+                       "zlogin\\'"
+                       "zlogout\\'"
+                       "zpreztorc\\'"
+                       "zprofile\\'"
+                       "zshenv\\'"
+                       "zshrc\\'"))
+      (add-to-list 'auto-mode-alist (cons pattern 'sh-mode)))
+
+    (defun dotemacs//setup-shell ()
+      (when (and buffer-file-name
+                 (string-match-p "\\.zsh\\'" buffer-file-name))
+        (sh-set-shell "zsh")))
+    (add-hook 'sh-mode-hook 'dotemacs//setup-shell)))
 
 (use-package nxml-mode                  ; XML editing
   :defer t
