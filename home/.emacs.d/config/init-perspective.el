@@ -197,8 +197,8 @@ FRAME defaults to the current frame."
 (defun dotemacs/layout-workspaces-micro-state ()
   "Launches the workspaces micro state, if defined."
   (interactive)
-  (if (fboundp 'dotemacs/workspaces-micro-state)
-      (call-interactively 'dotemacs/workspaces-micro-state)
+  (if (fboundp 'dotemacs-workspaces-micro-state)
+      (call-interactively 'dotemacs-workspaces-micro-state)
     (message "You need the eyebrowse layer to use this feature.")))
 
 (provide 'init-perspective)

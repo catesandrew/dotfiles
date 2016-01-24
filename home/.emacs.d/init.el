@@ -1730,7 +1730,6 @@ the user activate the completion manually."
 
 (use-package persp-mode
   :diminish persp-mode
-  :disabled t
   :ensure t
   :init
   (progn
@@ -1751,7 +1750,7 @@ the user activate the completion manually."
 
     (defvar dotemacs--custom-layout-alist nil
       "List of custom layouts with their bound keys.
- Do not modify directly, use provided `dotemacs|define-custom-layout'")
+ Do not modify directly, use provided `dotemacs-define-custom-layout'")
 
     (defvar dotemacs--layouts-autosave-timer nil
       "Timer for layouts auto-save.")
@@ -1885,7 +1884,7 @@ the user activate the completion manually."
                 ,(format "Switch to layout %s." i)
                 (interactive)
                 (dotemacs/layout-switch-by-pos ,(if (eq 0 i) 9 (1- i)))
-                (dotemacs/layouts-micro-state))))
+                (dotemacs-layouts-micro-state))))
 
      (defun dotemacs/layout-goto-default ()
        "Go to `dotemacs-default-layout-name` layout"
@@ -1897,7 +1896,7 @@ the user activate the completion manually."
        "Rename a layout and get back to the perspectives micro-state."
        (interactive)
        (call-interactively 'persp-rename)
-       (dotemacs/layouts-micro-state))
+       (dotemacs-layouts-micro-state))
 
      (defun dotemacs/layouts-ms-close ()
        "Kill current perspective"
@@ -1907,7 +1906,7 @@ the user activate the completion manually."
      (defun dotemacs/layouts-ms-close-other ()
        (interactive)
        (call-interactively 'dotemacs/helm-persp-close)
-       (dotemacs/layouts-micro-state))
+       (dotemacs-layouts-micro-state))
 
      (defun dotemacs/layouts-ms-kill ()
        "Kill current perspective"
@@ -1917,7 +1916,7 @@ the user activate the completion manually."
      (defun dotemacs/layouts-ms-kill-other ()
        (interactive)
        (call-interactively 'dotemacs/helm-persp-kill)
-       (dotemacs/layouts-micro-state))
+       (dotemacs-layouts-micro-state))
 
      (defun dotemacs/layouts-ms-last ()
        "Switch to the last active perspective"
@@ -1930,7 +1929,7 @@ the user activate the completion manually."
        "Return the name of the custom-perspective function for NAME."
        (intern (concat "dotemacs/custom-perspective-" name)))
 
-     (defmacro dotemacs|define-custom-layout (name &rest props)
+     (defmacro dotemacs-define-custom-layout (name &rest props)
        "Define a custom-perspective called NAME.
 
 FUNC is a FUNCTION defined using NAME and the result of
@@ -1971,7 +1970,7 @@ Available PROPS:
                  (push '(,binding . ,name) dotemacs--custom-layout-alist))
              (push '(,binding . ,name) dotemacs--custom-layout-alist)))))
 
-    (dotemacs|define-custom-layout "@Dotemacs"
+    (dotemacs-define-custom-layout "@Dotemacs"
       :binding "e"
       :body
       (dotemacs/find-dotfile))
@@ -1980,7 +1979,7 @@ Available PROPS:
       "Update the custom-perspectives microstate and then activate it."
       (interactive)
       (dotemacs//update-custom-layouts)
-      (dotemacs/custom-layouts-micro-state))
+      (dotemacs-custom-layouts-micro-state))
 
     (defun dotemacs//custom-layouts-ms-documentation ()
       "Return the docstring for the custom perspectives micro-state."
@@ -1995,7 +1994,7 @@ Available PROPS:
       "Ensure the custom-perspectives micro-state is updated.
 Takes each element in the list `dotemacs--custom-layout-alist'
 format so they are supported by the
-`dotemacs/custom-layouts-micro-state' macro."
+`dotemacs-custom-layouts-micro-state' macro."
       (let (bindings)
         (dolist (custom-persp dotemacs--custom-layout-alist bindings)
           (let* ((binding (car custom-persp))
@@ -2016,26 +2015,26 @@ format so they are supported by the
     ;; By default, persp mode wont affect either helm or ido
     (remove-hook 'ido-make-buffer-list-hook 'persp-restrict-ido-buffers)))
 
-;; (dotemacs-use-package-add-hook spaceline-config
-;;   :post-init
-;;   (setq spaceline-display-default-perspective
-;;         dotemacs-display-default-layout))
+(dotemacs-use-package-add-hook spaceline-config
+  :post-init
+  (setq spaceline-display-default-perspective
+        dotemacs-display-default-layout))
 
-;; (dotemacs-use-package-add-hook eyebrowse
-;;   :post-init
-;;   (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
-;;   (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
-;;   (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
+(dotemacs-use-package-add-hook eyebrowse
+  :post-init
+  (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
+  (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
+  (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
 
-;; (dotemacs-use-package-add-hook helm
-;;   :post-init
-;;   (evil-leader/set-key
-;;     "pl" 'dotemacs/helm-persp-switch-project))
+(dotemacs-use-package-add-hook helm
+  :post-init
+  (evil-leader/set-key
+    "pl" 'dotemacs/helm-persp-switch-project))
 
-;; (dotemacs-use-package-add-hook swiper
-;;   :post-init
-;;   (evil-leader/set-key
-;;     "pl" 'dotemacs/ivy-persp-switch-project))
+(dotemacs-use-package-add-hook swiper
+  :post-init
+  (evil-leader/set-key
+    "pl" 'dotemacs/ivy-persp-switch-project))
 
 
 ;;; Processes and commands
@@ -2084,7 +2083,7 @@ format so they are supported by the
       "Rename a workspace and get back to micro-state."
       (interactive)
       (eyebrowse-rename-window-config (eyebrowse--get 'current-slot))
-      (dotemacs/workspaces-micro-state))
+      (dotemacs-workspaces-micro-state))
 
     (defun dotemacs//workspaces-ms-get-slot-name (window-config)
       "Return the name for the given window-config"
@@ -8652,7 +8651,7 @@ If called with a prefix argument, uses the other-window instead."
       (dotemacs-magit-set-repo-dirs-from-projectile))
 
     (evil-leader/set-key
-      "gb" 'dotemacs/git-blame-micro-state
+      "gb" 'dotemacs-git-blame-micro-state
       "gc" 'magit-commit
       "gC" 'magit-checkout
       "gdh" 'dotemacs-magit-diff-head
@@ -9050,7 +9049,7 @@ If called with a prefix argument, uses the other-window instead."
       ;; track of any activated ido navigation micro-state and force
       ;; the reactivation at each iteration.
       (when dotemacs--ido-navigation-ms-enabled
-        (dotemacs/ido-navigation-micro-state)))
+        (dotemacs-ido-navigation-micro-state)))
     (add-hook 'ido-minibuffer-setup-hook 'dotemacs//ido-minibuffer-setup)
 
     (defun dotemacs//ido-setup ()
@@ -9088,8 +9087,8 @@ If called with a prefix argument, uses the other-window instead."
       (define-key ido-completion-map (kbd "<left>") 'ido-delete-backward-updir)
       (define-key ido-completion-map (kbd "<right>") 'ido-exit-minibuffer)
       ;; initiate micro-state
-      (define-key ido-completion-map (kbd "M-SPC") 'dotemacs/ido-navigation-micro-state)
-      (define-key ido-completion-map (kbd "s-M-SPC") 'dotemacs/ido-navigation-micro-state)
+      (define-key ido-completion-map (kbd "M-SPC") 'dotemacs-ido-navigation-micro-state)
+      (define-key ido-completion-map (kbd "s-M-SPC") 'dotemacs-ido-navigation-micro-state)
       )
     (add-hook 'ido-setup-hook 'dotemacs//ido-setup)
 
