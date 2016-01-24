@@ -196,12 +196,7 @@ ARG non nil means that the editing style is `vim'."
   (setq dotemacs--helm-navigation-ms-face-cookie-minibuffer
         (face-remap-add-relative
          'minibuffer-prompt
-         'dotemacs-helm-navigation-ms-face))
-  ;; bind actions on numbers starting from 1 which executes action 0
-  (dotimes (n 10)
-    (define-key helm-map (number-to-string n)
-      `(lambda () (interactive) (helm-select-nth-action
-                                 ,(% (+ n 9) 10))))))
+         'dotemacs-helm-navigation-ms-face)))
 
 (defun dotemacs-helm-navigation-ms-set-face ()
   "Set the face for helm header in helm navigation micro-state"
@@ -213,9 +208,6 @@ ARG non nil means that the editing style is `vim'."
 
 (defun dotemacs-helm-navigation-ms-on-exit ()
   "Action to perform when exiting helm micro-state."
-  ;; restore helm key map
-  (dotimes (n 10) (define-key helm-map (number-to-string n) nil))
-  ;; restore faces
   (with-helm-window
     (face-remap-remove-relative
      dotemacs--helm-navigation-ms-face-cookie-header))
