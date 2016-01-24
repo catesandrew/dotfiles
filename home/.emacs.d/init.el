@@ -1140,23 +1140,20 @@ Example: (evil-map visual \"<\" \"<gv\")"
           (dotemacs-additional-leader-mode 1)))))
 
 
-;;; Terminal emulation and shells
-(dotemacs-defvar-company-backends eshell-mode)
+;;; Shell
+
+;; Emacs built-in variables
 
 ;; move point to the end of buffer on new output
 (setq comint-move-point-for-output t)
 
-(use-package init-eshell
-  :load-path "config/")
+;; Add shell buffers to useful buffers list
+(push "\\*\\(ansi-term\\|eshell\\|shell\\|terminal\.\+\\)\\*" dotemacs-useful-buffers-regexp)
 
-(use-package shell                      ; Dump shell in Emacs
-  :config (add-to-list 'display-buffer-alist
-                       `(,(rx bos "*shell")
-                         (display-buffer-reuse-window
-                          display-buffer-in-side-window
-                          (side            . bottom)
-                          (reusable-frames . visible)
-                          (window-height   . 0.4)))))
+;; Variables
+
+;;; Terminal emulation and shells
+(dotemacs-defvar-company-backends eshell-mode)
 
 ;;; Setup environment variables from the user's shell.
 (use-package exec-path-from-shell
@@ -1170,14 +1167,17 @@ Example: (evil-map visual \"<\" \"<gv\")"
       (setq exec-path-from-shell-arguments '("-l")))
 
     (dotemacs|do-after-display-system-init
-      (when (memq window-system '(mac ns x))
-        (exec-path-from-shell-initialize)))
+     (when (memq window-system '(mac ns x))
+       (exec-path-from-shell-initialize)))
 
     (setq user-mail-address (getenv "EMAIL")))
   :config
   (progn
     (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
       (add-to-list 'exec-path-from-shell-variables var))))
+
+(use-package init-eshell
+  :load-path "config/")
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -1213,6 +1213,7 @@ the user activate the completion manually."
   :ensure t
   :init
   (progn
+    (dotemacs-register-repl 'eshell 'eshell)
     (setq eshell-cmpl-cycle-completions nil
           ;; auto truncate after 20k lines
           eshell-buffer-maximum-lines 20000
@@ -1227,6 +1228,9 @@ the user activate the completion manually."
 
     (when dotemacs-shell-protect-eshell-prompt
       (add-hook 'eshell-after-prompt-hook 'dotemacs-protect-eshell-prompt))
+
+    (autoload 'eshell-delchar-or-maybe-eof "em-rebind")
+
     (add-hook 'eshell-mode-hook 'dotemacs-init-eshell))
   :config
   (progn
@@ -1252,7 +1256,20 @@ the user activate the completion manually."
 
     ;; automatically truncate buffer after output
     (when (boundp 'eshell-output-filter-functions)
-      (push 'eshell-truncate-buffer eshell-output-filter-functions))))
+      (push 'eshell-truncate-buffer eshell-output-filter-functions))
+
+    ;; These don't work well in normal state due to evil/emacs cursor
+    ;; incompatibility
+    (evil-define-key 'insert eshell-mode-map
+      (kbd "C-k") 'eshell-previous-matching-input-from-input
+      (kbd "C-j") 'eshell-next-matching-input-from-input)))
+
+(use-package eshell-z
+  :defer t
+  :ensure t
+  :init
+  (with-eval-after-load 'eshell
+    (require 'eshell-z)))
 
 (use-package esh-help
   :defer t
@@ -1261,8 +1278,8 @@ the user activate the completion manually."
   :config (setup-esh-help-eldoc))
 
 (use-package eshell-prompt-extras
-  :commands epe-theme-lambda
   :ensure t
+  :commands epe-theme-lambda
   :init
   (setq eshell-highlight-prompt nil
         eshell-prompt-function 'epe-theme-lambda))
@@ -1272,15 +1289,38 @@ the user activate the completion manually."
   :ensure t
   :init
   (progn
+    (dotemacs-register-repl 'multi-term 'multi-term)
     (evil-leader/set-key "ast" 'shell-pop-multi-term))
   :config
   (progn
     (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
     ;; multi-term commands to create terminals and move through them.
-    (evil-leader/set-key-for-mode 'term-mode "mc" 'multi-term)
-    (evil-leader/set-key-for-mode 'term-mode "mp" 'multi-term-prev)
-    (evil-leader/set-key-for-mode 'term-mode "mn" 'multi-term-next)
+    (evil-leader/set-key-for-mode 'term-mode "c" 'multi-term)
+    (evil-leader/set-key-for-mode 'term-mode "p" 'multi-term-prev)
+    (evil-leader/set-key-for-mode 'term-mode "n" 'multi-term-next)
     (evil-leader/set-key "p$t" 'projectile-multi-term-in-root)))
+
+(use-package comint
+  :init
+  (setq comint-prompt-read-only t))
+
+(use-package xterm-color
+  :ensure t
+  :init
+  (progn
+    ;; Comint and Shell
+    (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
+    (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions))
+    (setq font-lock-unfontify-region-function 'xterm-color-unfontify-region)
+    (with-eval-after-load 'esh-mode
+      (add-hook 'eshell-mode-hook (lambda () (setq xterm-color-preserve-properties t)))
+      (add-hook 'eshell-preoutput-filter-functions 'xterm-color-filter)
+      (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))))
+
+(use-package shell                      ; Dump shell in Emacs
+  :init
+  (dotemacs-register-repl 'shell 'shell)
+  (add-hook 'shell-mode-hook 'shell-comint-input-sender-hook))
 
 (use-package shell-pop
   :defer t
@@ -1319,40 +1359,36 @@ the user activate the completion manually."
       "ast" 'shell-pop-ansi-term
       "asT" 'shell-pop-term)))
 
-;; shell
-(add-hook 'shell-mode-hook 'shell-comint-input-sender-hook)
-
-;; term
-;; HACK: to fix pasting issue, the paste micro-state won't
-;; work in term
-(evil-define-key 'normal term-raw-map "p" 'term-paste)
-(evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
-(evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab)
-
-(dotemacs-use-package-add-hook helm
-  :post-init
+(use-package term
+  :init
   (progn
-    ;; eshell
-    (defun dotemacs-helm-eshell-history ()
-      "Correctly revert to insert state after selection."
+    (dotemacs-register-repl 'term 'term)
+    (dotemacs-register-repl 'term 'ansi-term)
+    (defun term-send-tab ()
+      "Send tab in term mode."
       (interactive)
-      (helm-eshell-history)
-      (evil-insert-state))
-    (defun dotemacs-helm-shell-history ()
-      "Correctly revert to insert state after selection."
-      (interactive)
-      (helm-comint-input-ring)
-      (evil-insert-state))
-    (defun dotemacs-init-helm-eshell ()
-      "Initialize helm-eshell."
-      ;; this is buggy for now
-      ;; (define-key eshell-mode-map (kbd "<tab>") 'helm-esh-pcomplete)
-      (evil-leader/set-key-for-mode 'eshell-mode
-        "mH" 'dotemacs-helm-eshell-history))
-    (add-hook 'eshell-mode-hook 'dotemacs-init-helm-eshell)
-    ;;shell
-    (evil-leader/set-key-for-mode 'shell-mode
-      "mH" 'dotemacs-helm-shell-history)))
+      (term-send-raw-string "\t"))
+
+    ;; hack to fix pasting issue, the paste micro-state won't
+    ;; work in term
+    (evil-define-key 'normal term-raw-map "p" 'term-paste)
+    (evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
+    (evil-define-key 'insert term-raw-map (kbd "C-c C-z") 'term-stop-subjob)
+    (evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab)
+
+    (evil-define-key 'insert term-raw-map
+      (kbd "C-k") 'term-send-up
+      (kbd "C-j") 'term-send-down)
+    (evil-define-key 'normal term-raw-map
+      (kbd "C-k") 'term-send-up
+      (kbd "C-j") 'term-send-down)))
+
+(dotemacs-use-package-add-hook smooth-scrolling
+  :post-init
+  (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
+                          '(eshell-mode-hook
+                            comint-mode-hook
+                            term-mode-hook)))
 
 (dotemacs-use-package-add-hook magit
   :post-init
@@ -1533,9 +1569,7 @@ the user activate the completion manually."
     (setq scroll-margin 5)
     ;; add hooks here only for emacs built-in packages
     (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
-                            '(messages-buffer-mode-hook
-                              comint-mode-hook
-                              term-mode-hook))))
+                            '(messages-buffer-mode-hook))))
 
 (unless dotemacs-smooth-scrolling
   ;; deactivate smooth-scrolling advices

@@ -9,6 +9,9 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+(defvar dotemacs-repl-list '()
+  "List of all registered REPLs.")
+
 (defun dotemacs-mplist-get (plist prop)
   "Get the values associated to PROP in PLIST, a modified plist.
 
@@ -182,4 +185,46 @@ FILE-TO-LOAD is an explicit file to load after the installation."
            (load-file (concat pkg-elpa-dir file-to-load)))
          pkg-elpa-dir)))))
 
+;; hide mode line
+;; from http://bzg.fr/emacs-hide-mode-line.html
+(defvar-local hidden-mode-line-mode nil)
+(defvar-local hide-mode-line nil)
+(define-minor-mode hidden-mode-line-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global t
+  :variable hidden-mode-line-mode
+  :group 'editing-basics
+  (if hidden-mode-line-mode
+      (setq hide-mode-line mode-line-format
+            mode-line-format nil)
+    (setq mode-line-format hide-mode-line
+          hide-mode-line nil))
+  (force-mode-line-update)
+  ;; Apparently force-mode-line-update is not always enough to
+  ;; redisplay the mode-line
+  (redraw-display)
+  (when (and (called-interactively-p 'interactive)
+             hidden-mode-line-mode)
+    (run-with-idle-timer
+     0 nil 'message
+     (concat "Hidden Mode Line Mode enabled.  "
+             "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
+
+(defun spacemacs-recompile-elpa ()
+  "Recompile packages in elpa directory. Useful if you switch
+Emacs versions."
+  (interactive)
+  (byte-recompile-directory package-user-dir nil t))
+
+(defun dotemacs-register-repl (feature repl-func &optional tag)
+  "Register REPL-FUNC to the global list of REPLs DOTEMACS-REPL-LIST.
+FEATURE will be loaded before running the REPL, in case it is not already
+loaded. If TAG is non-nil, it will be used as the string to show in the helm
+buffer."
+  (push `(,(or tag (symbol-name repl-func))
+          . (,feature . ,repl-func))
+        dotemacs-repl-list))
+
 (provide 'core-funcs)
+;;; core-funcs.el ends here

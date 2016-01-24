@@ -42,11 +42,14 @@
            ;; Send other commands to the default handler.
            (t (comint-simple-send proc command))))))
 
+;; Defining a function like this makes it possible to type 'clear' in eshell and
+;; have it work
 (defun eshell/clear ()
   "Clear contents in eshell."
   (interactive)
   (let ((inhibit-read-only t))
-    (erase-buffer)))
+    (erase-buffer))
+  (eshell-send-input))
 
 (defun dotemacs-default-pop-shell ()
   "Open the default shell in a popup."
@@ -109,7 +112,10 @@ is achieved by adding the relevant text properties."
               'dotemacs-eshell-auto-end nil t))
   ; (after "semantic"
   ;   (semantic-mode -1))
-  )
+
+  ;; Caution! this will erase buffer's content at C-l
+  (define-key eshell-mode-map (kbd "C-l") 'eshell/clear)
+  (define-key eshell-mode-map (kbd "C-d") 'eshell-delchar-or-maybe-eof))
 
 (provide 'init-eshell)
 ;;; init-eshell.el ends here
