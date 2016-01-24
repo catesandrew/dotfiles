@@ -10145,6 +10145,8 @@ If called with a prefix argument, uses the other-window instead."
       "Display a buffer with available key bindings."
       :evil-leader "tK")
 
+    (evil-leader/set-key "hh" 'which-key-show-top-level)
+
     (let ((new-descriptions
            ;; being higher in this list means the replacement is applied later
            '(
