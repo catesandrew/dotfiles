@@ -104,13 +104,13 @@ used."
     `(progn (defun ,func ()
               ,(format "%S micro-state." name)
               (interactive)
+              ,@on-enter
               (let ((doc ,@doc))
                 (when doc
                   (apply ',msg-func (list (dotemacs-micro-state-propertize-doc
                                       (format "%S: %s" ',name doc))))))
               ,(when exec-binding
                  (dotemacs-micro-state-auto-execute bindings))
-              ,@on-enter
               (,(if (version< emacs-version "24.4")
                     'set-temporary-overlay-map
                   'set-transient-map)
