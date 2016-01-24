@@ -777,19 +777,19 @@ group by projectile projects."
                              "able to launch a graphical instance of Emacs"
                              "with this build.")))
 
-
 ;; font
 (dotemacs|do-after-display-system-init
   (if (find-font (font-spec :name (car dotemacs-default-font)))
     (dotemacs-set-default-font dotemacs-default-font)
   (dotemacs-buffer/warning "Cannot find font \"%s\"!"
                            (car dotemacs-default-font))))
+
 ;; dotemacs init
 (dotemacs-buffer/goto-buffer)
 ;; explicitly recreate the home buffer for the first GUI client
 (dotemacs|do-after-display-system-init
-  (kill-buffer (get-buffer dotemacs-buffer-name))
-  (dotemacs-buffer/goto-buffer))
+ (kill-buffer (get-buffer dotemacs-buffer-name))
+ (dotemacs-buffer/goto-buffer))
 (setq initial-buffer-choice (lambda () (get-buffer dotemacs-buffer-name)))
 
 ;; fringes
@@ -1652,10 +1652,6 @@ the user activate the completion manually."
 ;; Tip taken from Xah Lee: http://ergoemacs.org/emacs/emacs_stop_cursor_enter_prompt.html
 (setq minibuffer-prompt-properties
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
-
-(use-package init-scratch          ; My logo in the scratch buffer
-  :commands (dotemacs-insert-logo-into-scratch)
-  :init (add-hook 'emacs-startup-hook #'dotemacs-insert-logo-into-scratch))
 
 (use-package unicode-fonts              ; Map Unicode blocks to fonts
   :ensure t

@@ -70,6 +70,27 @@ The message is always displayed. "
       (if messagebuf (message "(emacs) %s" msg)))
     (dotemacs-buffer/set-mode-line "")))
 
+;; logo into buffer
+(defconst dotemacs-logo-file (locate-user-emacs-file "logo.png")
+  "The path to my logo.")
+
+(defconst dotemacs-logo-url "http://ibasetsolumina.wpengine.com/wp-content/uploads/2014/08/logo.jpg"
+  "The URL of my logo.")
+
+(defun dotemacs-insert-logo ()
+  "Insert my logo into the current buffer."
+  (interactive)
+  (unless (file-exists-p dotemacs-logo-file)
+    (url-copy-file dotemacs-logo-url dotemacs-logo-file
+                   nil 'keep-time))
+  (insert-image (create-image dotemacs-logo-file) "logo")
+  (insert "\n"))
+
+(defun dotemacs-insert-logo-into-scratch ()
+  "Insert my logo into the scratch buffer."
+  (goto-char (point-min))
+  (dotemacs-insert-logo))
+
 (defun dotemacs-buffer/goto-buffer ()
   "Create the special buffer for `dotemacs-buffer-mode' if it doesn't
 already exist, and switch to it."
@@ -80,6 +101,9 @@ already exist, and switch to it."
         (dotemacs-buffer/set-mode-line "")
         ;; needed in case the buffer was deleted and we are recreating it
         (setq dotemacs-buffer--note-widgets nil)
+        ;; start scratch in text mode (usefull to get a faster Emacs load time
+        ;; because it avoids autoloads of elisp modes)
+        (setq initial-major-mode 'text-mode)
         ; (dotemacs-buffer/insert-banner-and-buttons)
         ;; non-nil if emacs is loaded
         (if after-init-time
@@ -92,6 +116,7 @@ already exist, and switch to it."
           (add-hook 'emacs-startup-hook
                     (lambda ()
                       (with-current-buffer (get-buffer dotemacs-buffer-name)
+                        (dotemacs-insert-logo-into-scratch)
                         ; (when dotemacs-startup-lists
                         ;   (dotemacs-buffer/insert-startupify-lists))
                         (force-mode-line-update)
@@ -103,3 +128,4 @@ already exist, and switch to it."
   (dotemacs-redisplay))
 
 (provide 'core-buffers)
+;;; core-buffers.el ends here
