@@ -7330,7 +7330,7 @@ If called with a prefix argument, uses the other-window instead."
           js-doc-author (format "Andrew Cates <%s>" js-doc-mail-address)
           js-doc-url "https://git.ibaset.com/u/andrew"
           js-doc-license "SEE LICENSE IN LICENSE.md"
-          js-doc-parameter-line " * @arg {} %p\n")
+          js-doc-parameter-line " * @param {} %p\n")
 
     (setq js-doc-file-doc-lines
             '(js-doc-top-line
