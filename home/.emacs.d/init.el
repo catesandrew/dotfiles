@@ -9694,6 +9694,7 @@ If called with a prefix argument, uses the other-window instead."
       "md" 'org-deadline
       "me" 'org-export-dispatch
       "mf" 'org-set-effort
+      "mP" 'org-set-property
 
       "ma" 'org-agenda
       "mb" 'org-tree-to-indirect-buffer
