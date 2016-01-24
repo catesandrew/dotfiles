@@ -720,7 +720,6 @@ group by projectile projects."
 (require 'core-toggle)
 (require 'core-micro-state)
 (require 'core-use-package-ext)
-(require 'core-keybindings)
 
 
 ;;; Macros
@@ -769,9 +768,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 (prefer-coding-system 'utf-8) ; with sugar on top
 
-; (require 'rx)
-; (require 'time-date)
-
 ;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
 ;; bar, since the top menu bar is always visible anyway, and we'd just empty it
 ;; which is rather pointless.
@@ -819,6 +815,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (dotemacs-load-or-install-package 's t)
 ;; bind-key is required by use-package
 (dotemacs-load-or-install-package 'bind-key t)
+(dotemacs-load-or-install-package 'bind-map t)
 (dotemacs-load-or-install-package 'use-package t)
 ;; package-build is required by quelpa
 (dotemacs-load-or-install-package 'package-build t)
@@ -837,11 +834,10 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (setq use-package-inject-hooks t)
 ; ;; which-key
 (dotemacs-load-or-install-package 'which-key t)
-;; evil and evil-leader must be installed at the beginning of the
-;; boot sequence.
+;; evil must be installed at the beginning of the boot sequence.
 ;; Use C-u as scroll-up (must be set before actually loading evil)
 (dotemacs-load-or-install-package 'evil t)
-(dotemacs-load-or-install-package 'evil-leader t)
+(require 'core-keybindings)
 
 
 ;;; Initialization
@@ -4069,11 +4065,10 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       'evil-visualstar/begin-search-backward)))
 
 (use-package evil-evilified-state
-  :load-path "/config")
-
-(with-eval-after-load 'evil-leader
+  :load-path "/config"
+  :config
   (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
-    evil-leader--default-map))
+    dotemacs-default-map))
 
 
 ;;; Customization, init file and package management

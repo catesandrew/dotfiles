@@ -87,6 +87,8 @@
   (remove-hook 'pre-command-hook 'evilified-state--pre-command-hook 'local))
 
 ;; default key bindings for all evilified buffers
+(define-key evil-evilified-state-map (kbd dotemacs-leader-key)
+  dotemacs-default-map)
 (define-key evil-evilified-state-map "/" 'evil-search-forward)
 (define-key evil-evilified-state-map ":" 'evil-ex)
 (define-key evil-evilified-state-map "h" 'evil-backward-char)
