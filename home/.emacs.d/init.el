@@ -6110,12 +6110,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
       "Force `haskell-mode' loading when visiting cabal file."
       (require 'haskell-mode))
     (add-hook 'haskell-cabal-mode-hook
-              'dotemacs//force-haskell-mode-loading))
-  :config
-  (progn
-    ;; hooks
-    (add-hook 'haskell-mode-hook 'dotemacs-init-haskell-mode)
-    (add-hook 'haskell-cabal-mode-hook 'haskell-cabal-hook)
+              'dotemacs//force-haskell-mode-loading)
 
     ;; settings
     (setq
@@ -6138,7 +6133,12 @@ Otherwise use Enh Ruby Mode, which is the default.")
       haskell-process-suggest-hoogle-imports nil
       haskell-process-suggest-hayoo-imports t
       ;; Disable haskell-stylish on save, it breaks flycheck highlighting
-      haskell-stylish-on-save nil)
+      haskell-stylish-on-save nil))
+  :config
+  (progn
+    ;; hooks
+    (add-hook 'haskell-mode-hook 'dotemacs-init-haskell-mode)
+    (add-hook 'haskell-cabal-mode-hook 'haskell-cabal-hook)
 
     ;; prefixes
     (dotemacs-declare-prefix-for-mode 'haskell-mode "mg" "haskell/navigation")
