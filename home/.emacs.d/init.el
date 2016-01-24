@@ -6180,6 +6180,9 @@ Otherwise use Enh Ruby Mode, which is the default.")
       "mda"  'haskell-debug/abandon
       "mdr"  'haskell-debug/refresh)
 
+    ;; configure C-c C-l so it doesn't throw any errors
+    (bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
+
     ;; Switch back to editor from REPL
     (evil-leader/set-key-for-mode 'haskell-interactive-mode
       "msS"  'haskell-interactive-switch-back)
