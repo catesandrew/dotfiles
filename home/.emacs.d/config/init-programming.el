@@ -19,12 +19,11 @@
     (hs-minor-mode)
     (dotemacs-hide-lighter hs-minor-mode)))
 
-(defun dotemacs-font-lock-comment-annotations ()
-  "Highlight a bunch of well known comment annotations.
-
-This functions should be added to the hooks of major modes for programming."
+(defun dotemacs-highlight-TODO-words ()
+  "Highlight keywords in comments."
+  (interactive)
   (font-lock-add-keywords
-   nil '(("\\<\\(\\(FIX\\(ME\\)?\\|TODO\\|OPTIMIZE\\|HACK\\|REFACTOR\\):\\)"
+   nil '(("\\<\\(\\(FIX\\(ME\\)?\\|BUG\\|CHECK\\|DONE\\|TODO\\|OPTIMIZE\\|HACK\\|REFACTOR\\):?\\)"
           1 font-lock-warning-face t))))
 
 ;; To augment and/or counteract these defaults your own function
@@ -78,6 +77,7 @@ This functions should be added to the hooks of major modes for programming."
     ;   (hs-minor-mode t))
     (dotemacs-enable-hs-minor-mode)
     (dotemacs-local-comment-auto-fill)
-    (dotemacs-font-lock-comment-annotations)))
+    (dotemacs-highlight-TODO-words)))
 
 (provide 'init-programming)
+;;; init-programming.el ends here
