@@ -11429,10 +11429,11 @@ If the error list is visible, hide it.  Otherwise, show it."
   :if dotemacs-s-syntax-checking-enable-tooltips
   :defer t
   :init
-  (with-eval-after-load 'flycheck
-    (setq flycheck-mode-line
-          '(:eval (dotemacs-flycheck-mode-line-status)))
-    (flycheck-pos-tip-mode)))
+  (setq flycheck-display-errors-function 'flycheck-pos-tip-error-messages)
+  :config
+  (dotemacs|do-after-display-system-init
+   (unless (display-graphic-p)
+     (flycheck-pos-tip-mode))))
 
 (use-package ispell                     ; Spell checking
   :defer t
