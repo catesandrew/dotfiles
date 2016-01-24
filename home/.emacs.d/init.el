@@ -9269,41 +9269,30 @@ If called with a prefix argument, uses the other-window instead."
         (projectile-add-known-project (file-name-as-directory
                                        (file-truename it)))))
 
-    ;; note for Windows: GNU find or Cygwin find must be in path
-    ;; default parameters are not supported on Windows, we default
-    ;; to simplest call to find.
-    (when (dotemacs/system-is-mswindows)
-      (setq projectile-generic-command "find . -type f"))
-    (setq projectile-sort-order 'recently-active  ; recentf
+    ;; note for Windows: GNU find or Cygwin find must be in path to enable
+    ;; fast indexing
+    (when (and (dotemacs/system-is-mswindows) (executable-find "find"))
+      (setq projectile-indexing-method 'alien)
+            projectile-generic-command "find . -type f")
+    (setq projectile-sort-order 'recentf
           projectile-switch-project-action 'projectile-dired
           projectile-cache-file (concat dotemacs-cache-directory
                                         "projectile.cache")
           projectile-known-projects-file (concat dotemacs-cache-directory
-                                                   "projectile-bookmarks.eld")
-          ; testing with ido vs helm completion
-          projectile-completion-system 'ido ; helm
-          projectile-indexing-method 'alien ; force alien for Windwos
+                                                 "projectile-bookmarks.eld")
           projectile-find-dir-includes-top-level t
-          projectile-enable-caching nil
           projectile-require-project-root t
-          projectile-verbose nil
-          projectile-file-exists-local-cache-expire nil
-          projectile-file-exists-remote-cache-expire (* 15 60)
-          projectile-project-root-files-functions '(projectile-root-bottom-up
-                                                    projectile-root-top-down
-                                                    projectile-root-top-down-recurring)
-          projectile-mode-line '(:propertize
-                                 (:eval (concat " " (projectile-project-name)))
-                                 face font-lock-constant-face))
+          projectile-verbose nil)
 
-    (defadvice projectile-mode (before maybe-use-cache activate)
-      (when
-        (--any? (and it (file-remote-p it))
-                (list
-                  (buffer-file-name)
-                   list-buffers-directory
-                   default-directory))
-        (setq-local projectile-enable-caching t)))
+    ;; (setq projectile-enable-caching nil)
+    ;; (defadvice projectile-mode (before maybe-use-cache activate)
+    ;;   (when
+    ;;     (--any? (and it (file-remote-p it))
+    ;;             (list
+    ;;               (buffer-file-name)
+    ;;                list-buffers-directory
+    ;;                default-directory))
+    ;;     (setq-local projectile-enable-caching t)))
 
     (setq projectile-project-root-files '(
             ; "rebar.config"       ; Rebar project file
