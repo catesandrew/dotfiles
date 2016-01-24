@@ -9807,6 +9807,7 @@ If called with a prefix argument, uses the other-window instead."
 
     ;; Add global evil-leader mappings. Used to access org-agenda
     ;; functionalities – and a few others commands – from any other mode.
+    (dotemacs-declare-prefix "ao" "org")
     (evil-leader/set-key
       ;; org-agenda
       "ao#" 'org-agenda-list-stuck-projects
