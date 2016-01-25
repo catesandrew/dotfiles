@@ -9747,10 +9747,10 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-    (when (featurep 'org)
-      (dotemacs-buffer/append
-       (concat
-        "Org features were loaded before the `org' layer initialized.\n") t))
+    ;; (when (featurep 'org)
+    ;;   (dotemacs-buffer/append
+    ;;    (concat
+    ;;     "Org features were loaded before the `org' layer initialized.\n") t))
 
     (setq org-replace-disputed-keys t ;; Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
           org-src-fontify-natively t ;; Fontify org-mode code blocks
