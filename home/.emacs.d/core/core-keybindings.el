@@ -77,6 +77,7 @@ pairs. For example,
   (while key
     (define-key dotemacs-default-map (kbd key) def)
     (setq key (pop bindings) def (pop bindings))))
+(put 'dotemacs-set-leader-keys 'lisp-indent-function 'defun)
 
 (defalias 'evil-leader/set-key 'dotemacs-set-leader-keys)
 
@@ -110,6 +111,7 @@ they are in `dotemacs-set-leader-keys'."
       (while key
         (define-key (symbol-value map) (kbd key) def)
         (setq key (pop bindings) def (pop bindings))))))
+(put 'dotemacs-set-leader-keys-for-major-mode 'lisp-indent-function 'defun)
 
 (defalias 'evil-leader/set-key-for-mode 'dotemacs-set-leader-keys-for-major-mode)
 
@@ -125,6 +127,7 @@ they are in `dotemacs-set-leader-keys'."
       (while key
         (define-key (symbol-value map) (kbd key) def)
         (setq key (pop bindings) def (pop bindings))))))
+(put 'dotemacs-set-leader-keys-for-minor-mode 'lisp-indent-function 'defun)
 
 (provide 'core-keybindings)
 ;;; core-keybindings.el ends here
