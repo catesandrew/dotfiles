@@ -982,7 +982,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
 
-
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
     ; (setq evil-search-module 'evil-search)
@@ -6014,6 +6013,11 @@ Otherwise use Enh Ruby Mode, which is the default.")
                        ; (electric-indent-local-mode -1)
                        (run-hooks 'prog-mode-hook)
                        (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (add-hook 'yaml-mode-hook 'company-mode)))
 
 (use-package feature-mode               ; Feature files for ecukes/cucumber
   :ensure t
