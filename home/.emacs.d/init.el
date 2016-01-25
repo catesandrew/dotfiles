@@ -2683,6 +2683,8 @@ format so they are supported by the
     (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
     ;; add cider-doc to popwin
     (push '("*cider-doc*"            :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
+    (push '("*elm*" :tail t :noselect t) popwin:special-display-config)
+    (push '("*elm-make*" :tail t :noselect t) popwin:special-display-config)
 
     (defun dotemacs-remove-popwin-display-config (str)
       "Removes the popwin display configurations that matches the passed STR"
@@ -7292,11 +7294,6 @@ If called with a prefix argument, uses the other-window instead."
       "u" 'elm-package-unmark
       "x" 'elm-package-install
       "q" 'quit-window)))
-
-(dotemacs-use-package-add-hook popwin
-  :post-config
-  (push '("*elm*" :tail t :noselect t) popwin:special-display-config)
-  (push '("*elm-make*" :tail t :noselect t) popwin:special-display-config))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
