@@ -4122,6 +4122,11 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :if (eq system-type 'darwin)
   :init
   (progn
+    ;; Use the OS X Emoji font for Emoticons
+    (set-fontset-font "fontset-default"
+                      '(#x1F600 . #x1F64F)
+                      (font-spec :name "Apple Color Emoji") nil 'prepend)
+
     (dotemacs-set-leader-keys "bf" 'reveal-in-osx-finder)
 
     ;; this is only applicable to GUI mode
