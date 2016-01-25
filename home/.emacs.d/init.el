@@ -5510,10 +5510,10 @@ point. Requires smartparens because all movement is done using
   :init
   (progn
     (dotemacs-set-leader-keys-for-major-mode 'cython-mode
-      "mhh" 'anaconda-mode-show-doc
-      "mgg" 'anaconda-mode-find-definitions
-      "mga" 'anaconda-mode-find-assignments
-      "mgu" 'anaconda-mode-find-references)
+      "hh" 'anaconda-mode-show-doc
+      "gg" 'anaconda-mode-find-definitions
+      "ga" 'anaconda-mode-find-assignments
+      "gu" 'anaconda-mode-find-references)
     (evilified-state-evilify anaconda-mode-view-mode anaconda-mode-view-mode-map
       (kbd "q") 'quit-window)))
 
