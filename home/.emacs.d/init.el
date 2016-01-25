@@ -9378,15 +9378,15 @@ If called with a prefix argument, uses the other-window instead."
           projectile-require-project-root t
           projectile-verbose nil)
 
-    ;; (setq projectile-enable-caching nil)
-    ;; (defadvice projectile-mode (before maybe-use-cache activate)
-    ;;   (when
-    ;;     (--any? (and it (file-remote-p it))
-    ;;             (list
-    ;;               (buffer-file-name)
-    ;;                list-buffers-directory
-    ;;                default-directory))
-    ;;     (setq-local projectile-enable-caching t)))
+    (setq projectile-enable-caching nil)
+    (defadvice projectile-mode (before maybe-use-cache activate)
+      (when
+        (--any? (and it (file-remote-p it))
+                (list
+                  (buffer-file-name)
+                   list-buffers-directory
+                   default-directory))
+        (setq-local projectile-enable-caching t)))
 
     (setq projectile-project-root-files '(
             ; "rebar.config"       ; Rebar project file
