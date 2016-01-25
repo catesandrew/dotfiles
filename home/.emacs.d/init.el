@@ -7276,6 +7276,13 @@ If called with a prefix argument, uses the other-window instead."
       "pc" 'elm-package-catalog
       "pd" 'elm-documentation-lookup)
 
+    (dolist (x '(("mR" . "reactor")
+                 ("mc" . "compile")
+                 ("mh" . "help")
+                 ("mp" . "package")
+                 ("ms" . "repl")))
+      (dotemacs-declare-prefix-for-mode 'elm-mode (car x) (cdr x)))
+
     (evilified-state-evilify elm-package-mode elm-package-mode-map
       "g" 'elm-package-refresh
       "n" 'elm-package-next
