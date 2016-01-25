@@ -12,7 +12,7 @@ Will work on both org-mode and any mode that accepts plain html."
       (forward-char -8))))
 
 (defun dotemacs-org-present-start ()
-  "Initiate `org-present' mode"
+  "Initiate `org-present' mode."
   (org-present-big)
   (org-display-inline-images)
   (org-present-hide-cursor)
@@ -20,12 +20,12 @@ Will work on both org-mode and any mode that accepts plain html."
   (evil-evilified-state))
 
 (defun dotemacs-org-present-end ()
-  "Terminate `org-present' mode"
+  "Terminate `org-present' mode."
   (org-present-small)
   (org-remove-inline-images)
   (org-present-show-cursor)
   (org-present-read-write)
   (evil-normal-state))
 
-
 (provide 'init-org)
+;;; init-org.el ends here
