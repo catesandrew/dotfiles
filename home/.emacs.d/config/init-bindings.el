@@ -535,7 +535,7 @@ otherwise it is scaled down."
 
 ;; Transparency micro-state
 
-(defun dotemacs-toggle-transparency ()
+(defun dotemacs-toggle-transparency-core ()
   "Toggle between transparent or opaque display."
   (interactive)
   ;; Define alpha if it's nil
@@ -546,7 +546,12 @@ otherwise it is scaled down."
       (set-frame-parameter (selected-frame) 'alpha '(100 100))
     (set-frame-parameter (selected-frame) 'alpha
                          (list dotemacs-active-transparency
-                               dotemacs-inactive-transparency)))
+                               dotemacs-inactive-transparency))))
+
+(defun dotemacs-toggle-transparency ()
+  "Toggle between transparent or opaque display, then enter the micro-state."
+  (interactive)
+  (dotemacs-toggle-transparency-core)
   ;; Immediately enter the micro-state
   (dotemacs-scale-transparency-micro-state))
 
@@ -575,3 +580,4 @@ otherwise it is scaled down."
   ("q" nil :exit t))
 
 (provide 'init-bindings)
+;;; init-bindings.el ends here

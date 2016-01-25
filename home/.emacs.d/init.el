@@ -4223,9 +4223,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
 ;;; Bindings
 (use-package init-bindings
   :load-path "config/"
-  :init
-  (with-eval-after-load 'projectile
-                        (dotemacs-toggle-transparency)))
+  :config (dotemacs-toggle-transparency-core))
 
 
 ;;; Text editing
