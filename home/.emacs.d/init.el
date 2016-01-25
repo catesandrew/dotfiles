@@ -185,8 +185,11 @@ with 2 themes variants, one dark and one light")
 Emacs."
   :group 'dotemacs)
 
-(defvaralias 'dotemacs-remap-Y-to-y$ 'evil-want-Y-yank-to-eol
+(defvar dotemacs-remap-Y-to-y$ t
   "If non nil `Y' is remapped to `y$'.")
+
+(defvar dotemacs-ex-substitute-global nil
+  "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
 
 (defcustom dotemacs-leader-key ","
   "The leader key."
@@ -530,19 +533,6 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled."
   :type '(repeat (symbol))
   :group 'dotemacs-evil)
 
-(defvar dotemacs-evil-cursors '(("normal" "DarkGoldenrod2" box)
-                                ("insert" "chartreuse3" (bar . 2))
-                                ("emacs" "SkyBlue2" box)
-                                ("hybrid" "SkyBlue2" (bar . 2))
-                                ("replace" "chocolate" (hbar . 2))
-                                ("evilified" "LightGoldenrod3" box)
-                                ("visual" "gray" (hbar . 2))
-                                ("motion" "plum3" box)
-                                ("lisp" "HotPink1" box)
-                                ("iedit" "firebrick1" box)
-                                ("iedit-insert" "firebrick1" (bar . 2)))
-  "Colors assigned to evil states with cursor definitions.")
-
 ;; colors settings
 (defgroup dotemacs-colors nil
   "Configuration options for colors."
@@ -709,7 +699,7 @@ group by projectile projects."
         ))
 
 
-;;; Core
+;;; Core Package management
 (setq message-log-max 16384)
 
 (require 'subr-x nil 'noerror)
@@ -720,18 +710,6 @@ group by projectile projects."
 (require 'core-toggle)
 (require 'core-micro-state)
 (require 'core-use-package-ext)
-
-
-;;; Macros
-
-(defmacro dotemacs-bind (&rest commands)
-  "Convience macro which creates a lambda interactive command."
-  `(lambda ()
-     (interactive)
-     ,@commands))
-
-
-;;; Core Package management
 (require 'package)
 (require 'core-funcs)
 (require 'core-buffers)
@@ -813,9 +791,13 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; mandatory dependencies
 ; (dotemacs-load-or-install-package 'dash t)
 (dotemacs-load-or-install-package 's t)
-;; bind-key is required by use-package
-(dotemacs-load-or-install-package 'bind-key t)
+;; (dotemacs-load-or-install-package 'f t)
+(setq evil-want-Y-yank-to-eol dotemacs-remap-Y-to-y$
+      evil-ex-substitute-global dotemacs-ex-substitute-global)
+(dotemacs-load-or-install-package 'evil t)
 (dotemacs-load-or-install-package 'bind-map t)
+(dotemacs-load-or-install-package 'bind-key t)
+(dotemacs-load-or-install-package 'which-key t)
 (dotemacs-load-or-install-package 'use-package t)
 ;; package-build is required by quelpa
 (dotemacs-load-or-install-package 'package-build t)
@@ -832,11 +814,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; inject use-package hooks for easy customization of
 ;; stock package configuration
 (setq use-package-inject-hooks t)
-; ;; which-key
-(dotemacs-load-or-install-package 'which-key t)
-;; evil must be installed at the beginning of the boot sequence.
-;; Use C-u as scroll-up (must be set before actually loading evil)
-(dotemacs-load-or-install-package 'evil t)
 (require 'core-keybindings)
 
 
@@ -962,6 +939,19 @@ environment, otherwise it is strongly recommended to let it set to t.")
   :ensure t
   :init
   (progn
+    (defvar dotemacs-evil-cursors '(("normal" "DarkGoldenrod2" box)
+                                    ("insert" "chartreuse3" (bar . 2))
+                                    ("emacs" "SkyBlue2" box)
+                                    ("hybrid" "SkyBlue2" (bar . 2))
+                                    ("replace" "chocolate" (hbar . 2))
+                                    ("evilified" "LightGoldenrod3" box)
+                                    ("visual" "gray" (hbar . 2))
+                                    ("motion" "plum3" box)
+                                    ("lisp" "HotPink1" box)
+                                    ("iedit" "firebrick1" box)
+                                    ("iedit-insert" "firebrick1" (bar . 2)))
+      "Colors assigned to evil states with cursor definitions.")
+
     (loop for (state color cursor) in dotemacs-evil-cursors
           do
           (eval `(defface ,(intern (format "dotemacs-%s-face" state))
@@ -1000,6 +990,8 @@ environment, otherwise it is strongly recommended to let it set to t.")
     ; that's how I mapped them in Emacs:
     (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
     (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
+    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
 
     (global-set-key (kbd "C-w") 'evil-window-map)
     (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
@@ -1008,59 +1000,50 @@ environment, otherwise it is strongly recommended to let it set to t.")
     (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
     (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
 
-    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
-    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
-
-    (define-key evil-normal-state-map (kbd "Q") 'my-window-killer)
-    (define-key evil-normal-state-map (kbd "Y") (kbd "y$"))
-
-    (define-key evil-visual-state-map (kbd ", e") 'eval-region)
-
     ;; evil ex-command key
-    (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
-    (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
-    (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
+
+    ;; bind function keys
+
+    ;; bind evil-jump-forward for GUI only.
+    (define-key evil-motion-state-map [C-i] 'evil-jump-forward)
+
     ;; Make the current definition and/or comment visible.
     (define-key evil-normal-state-map "zf" 'reposition-window)
     ;; toggle maximize buffer
-    (define-key evil-window-map (kbd "o") 'dotemacs/toggle-maximize-buffer)
-    (define-key evil-window-map (kbd "C-o") 'dotemacs/toggle-maximize-buffer)
-
-    (dotemacs-define-micro-state scroll
-      :doc "[k] page up [j] page down [K] half page up [J] half page down"
-      :execute-binding-on-enter t
-      :evil-leader "nn" "np" "nP" "nN"
-      :bindings
-      ;; page
-      ("k" evil-scroll-page-up)
-      ("j" evil-scroll-page-down)
-      ;; half page
-      ("K" dotemacs-scroll-half-page-up)
-      ("J" dotemacs-scroll-half-page-down))
-
+    (define-key evil-window-map (kbd "o") 'dotemacs-toggle-maximize-buffer)
+    (define-key evil-window-map (kbd "C-o") 'dotemacs-toggle-maximize-buffer)
     ;; make cursor keys work
     (define-key evil-window-map (kbd "<left>") 'evil-window-left)
     (define-key evil-window-map (kbd "<right>") 'evil-window-right)
     (define-key evil-window-map (kbd "<up>") 'evil-window-up)
     (define-key evil-window-map (kbd "<down>") 'evil-window-down)
-
     (dotemacs-set-leader-keys "re" 'evil-show-registers)
+    (define-key evil-visual-state-map (kbd "<escape>") 'keyboard-quit)
+    ;; motions keys for help buffers
+    (evil-define-key 'motion help-mode-map (kbd "<tab>") 'forward-button)
+    (evil-define-key 'motion help-mode-map (kbd "S-<tab>") 'backward-button)
+    (evil-define-key 'motion help-mode-map (kbd "]") 'help-go-forward)
+    (evil-define-key 'motion help-mode-map (kbd "gf") 'help-go-forward)
+    (evil-define-key 'motion help-mode-map (kbd "[") 'help-go-back)
+    (evil-define-key 'motion help-mode-map (kbd "gb") 'help-go-back)
+    (evil-define-key 'motion help-mode-map (kbd "gh") 'help-follow-symbol)
 
-    (unless dotemacs-enable-paste-micro-state
-      (ad-disable-advice 'evil-paste-before 'after
-                         'evil-paste-before-paste-micro-state)
-      (ad-activate 'evil-paste-before)
-      (ad-disable-advice 'evil-paste-after 'after
-                         'evil-paste-after-paste-micro-state)
-      (ad-activate 'evil-paste-after)
-      (ad-disable-advice 'evil-visual-paste 'after
-                         'evil-visual-paste-paste-micro-state)
-      (ad-activate 'evil-visual-paste))
+    ;; replace `dired-goto-file' with `helm-find-files', since `helm-find-files'
+    ;; can do the same thing and with fuzzy matching and other features.
+    (with-eval-after-load 'dired
+      (evil-define-key 'normal dired-mode-map "J" 'dotemacs-helm-find-files)
+      (define-key dired-mode-map "j" 'dotemacs-helm-find-files)
+      (evil-define-key 'normal dired-mode-map (kbd dotemacs-leader-key)
+        dotemacs-default-map))
 
-    ;; butter fingers
-    (evil-ex-define-cmd "Q" 'evil-quit)
-    (evil-ex-define-cmd "Qa" 'evil-quit-all)
-    (evil-ex-define-cmd "QA" 'evil-quit-all)
+    ;; It's better that the default value is too small than too big
+    (setq-default evil-shift-width 2)
+
+    ;; After major mode has changed, reset evil-shift-width
+    (add-hook 'after-change-major-mode-hook 'dotemacs-set-evil-shift-width 'append)
 
     (defmacro evil-map (state key seq)
       "Map for a given STATE a KEY to a sequence SEQ of keys.
@@ -1085,6 +1068,54 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (define-key evil-normal-state-map
       (kbd "gd") 'dotemacs-evil-smart-goto-definition)
 
+    (dotemacs-define-micro-state scroll
+      :doc "[,] page up [.] page down [<] half page up [>] half page down"
+      :execute-binding-on-enter t
+      :evil-leader "n." "n," "n<" "n>"
+      :bindings
+      ;; page
+      ("," evil-scroll-page-up)
+      ("." evil-scroll-page-down)
+      ;; half page
+      ("<" dotemacs-scroll-half-page-up)
+      (">" dotemacs-scroll-half-page-down))
+
+    ; support for auto-indentation inhibition on universal argument
+    (dotemacs-advise-commands
+     "handle-indent" (evil-paste-before evil-paste-after) around
+     "Handle the universal prefix argument for auto-indentation."
+     (let ((prefix (ad-get-arg 0)))
+       (ad-set-arg 0 (unless (equal '(4) prefix) prefix))
+       ad-do-it
+       (ad-set-arg 0 prefix)))
+
+    ; pasting micro-state
+    (dotemacs-advise-commands
+     "paste-micro-state"
+     (evil-paste-before evil-paste-after evil-visual-paste) after
+     "Initate the paste micro-state."
+     (unless (or (evil-ex-p)
+                 (eq 'evil-paste-from-register this-command))
+       (dotemacs-paste-micro-state)))
+
+    (dotemacs-define-micro-state paste
+      :doc (dotemacs-paste-ms-doc)
+      :use-minibuffer t
+      :bindings
+      ("p" evil-paste-pop)
+      ("P" evil-paste-pop-next))
+
+    (unless dotemacs-enable-paste-micro-state
+      (ad-disable-advice 'evil-paste-before 'after
+                         'evil-paste-before-paste-micro-state)
+      (ad-activate 'evil-paste-before)
+      (ad-disable-advice 'evil-paste-after 'after
+                         'evil-paste-after-paste-micro-state)
+      (ad-activate 'evil-paste-after)
+      (ad-disable-advice 'evil-visual-paste 'after
+                         'evil-visual-paste-paste-micro-state)
+      (ad-activate 'evil-visual-paste))
+
     ;; define text objects
     (defmacro dotemacs-define-text-object (key name start end)
       (let ((inner-name (make-symbol (concat "evil-inner-" name)))
@@ -1104,27 +1135,42 @@ Example: (evil-map visual \"<\" \"<gv\")"
                          ,start))
                  evil-surround-pairs-alist))))
 
-    (dotemacs/add-to-hook 'prog-mode-hook '(dotemacs-standard-text-objects))
+      (dotemacs-define-text-object "$" "dollar" "$" "$")
+      (dotemacs-define-text-object "*" "star" "*" "*")
+      (dotemacs-define-text-object "8" "block-star" "/*" "*/")
+      (dotemacs-define-text-object "|" "bar" "|" "|")
+      (dotemacs-define-text-object "%" "percent" "%" "%")
+      (dotemacs-define-text-object "/" "slash" "/" "/")
+      (dotemacs-define-text-object "_" "underscore" "_" "_")
+      (dotemacs-define-text-object "-" "hyphen" "-" "-")
+      (dotemacs-define-text-object "~" "tilde" "~" "~")
+      (dotemacs-define-text-object "=" "equal" "=" "=")
 
-    ;; define text-object for entire buffer
-    (evil-define-text-object evil-inner-buffer (count &optional beg end type)
-      (evil-select-paren "\\`" "\\'" beg end type count nil))
-    (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
+      (evil-define-text-object evil-pasted (count &rest args)
+        (list (save-excursion (evil-goto-mark ?\[) (point))
+              (save-excursion (evil-goto-mark ?\]) (point))))
+      (define-key evil-inner-text-objects-map "P" 'evil-pasted)
 
-    ;; support smart 1parens-strict-mode
-    (defadvice evil-delete-backward-char-and-join
-        (around dotemacs-evil-delete-backward-char-and-join activate)
-      (if (bound-and-true-p smartparens-strict-mode)
-          (call-interactively 'sp-backward-delete-char)
-        ad-do-it))
+      ;; define text-object for entire buffer
+      (evil-define-text-object evil-inner-buffer (count &optional beg end type)
+        (evil-select-paren "\\`" "\\'" beg end type count nil))
+      (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
 
-    ;; Define history commands for comint
-    (evil-define-key 'insert comint-mode-map
-      (kbd "C-k") 'comint-next-input
-      (kbd "C-j") 'comint-previous-input)
-    (evil-define-key 'normal comint-mode-map
-      (kbd "C-k") 'comint-next-input
-      (kbd "C-j") 'comint-previous-input)))
+      ;; support smart 1parens-strict-mode
+      (with-eval-after-load 'smartparens
+        (defadvice evil-delete-backward-char-and-join
+            (around dotemacs-evil-delete-backward-char-and-join activate)
+          (if (bound-and-true-p smartparens-strict-mode)
+              (call-interactively 'sp-backward-delete-char)
+            ad-do-it)))
+
+      ;; Define history commands for comint
+      (evil-define-key 'insert comint-mode-map
+        (kbd "C-k") 'comint-next-input
+        (kbd "C-j") 'comint-previous-input)
+      (evil-define-key 'normal comint-mode-map
+        (kbd "C-k") 'comint-next-input
+        (kbd "C-j") 'comint-previous-input)))
 
 
 ;;; Shell
@@ -3323,6 +3369,39 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (`all (add-hook 'before-save-hook 'whitespace-cleanup))
   (`trailing (add-hook 'before-save-hook 'delete-trailing-whitespace)))
 
+;; Thanks to `editorconfig-emacs' for many of these
+(defvar dotemacs--indent-variable-alist
+  '(((awk-mode c-mode c++-mode java-mode groovy-mode
+      idl-mode java-mode objc-mode pike-mode) . c-basic-offset)
+    (python-mode . python-indent-offset)
+    (cmake-mode . cmake-tab-width)
+    (coffee-mode . coffee-tab-width)
+    (cperl-mode . cperl-indent-level)
+    (css-mode . css-indent-offset)
+    (elixir-mode . elixir-smie-indent-basic)
+    ((emacs-lisp-mode lisp-mode) . lisp-indent-offset)
+    (enh-ruby-mode . enh-ruby-indent-level)
+    (erlang-mode . erlang-indent-level)
+    ((js-mode json-mode) . js-indent-level)
+    (js2-mode . js2-basic-offset)
+    (js3-mode . js3-indent-level)
+    (latex-mode . (LaTeX-indent-level tex-indent-basic))
+    (livescript-mode . livescript-tab-width)
+    (mustache-mode . mustache-basic-offset)
+    (nxml-mode . nxml-child-indent)
+    (perl-mode . perl-indent-level)
+    (puppet-mode . puppet-indent-level)
+    (ruby-mode . ruby-indent-level)
+    (scala-mode . scala-indent:step)
+    (sgml-mode . sgml-basic-offset)
+    (sh-mode . sh-basic-offset)
+    (web-mode . web-mode-markup-indent-offset)
+    (yaml-mode . yaml-indent-offset))
+  "An alist where each key is either a symbol corresponding
+to a major mode, a list of such symbols, or the symbol t,
+acting as default. The values are either integers, symbols
+or lists of these.")
+
 ;; enable electric indent
 (setq electric-indent-mode 1)
 
@@ -3959,6 +4038,16 @@ It will toggle the overlay under point or create an overlay of one character."
   :ensure t
   :init
   (progn
+    (defun dotemacs-turn-on-search-highlight-persist ()
+      "Enable search-highlight-persist in the current buffer."
+      (interactive)
+      (evil-search-highlight-persist 1))
+
+    (defun dotemacs-turn-off-search-highlight-persist ()
+      "Disable evil-search-highlight-persist in the current buffer."
+      (interactive)
+      (evil-search-highlight-persist -1))
+
     (global-evil-search-highlight-persist)
     (dotemacs-set-leader-keys "/" 'evil-search-highlight-persist-remove-all)
     ;; (dotemacs-set-leader-keys "sc" 'evil-search-highlight-persist-remove-all)

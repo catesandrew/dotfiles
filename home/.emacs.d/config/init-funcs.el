@@ -851,6 +851,29 @@ current window."
   (interactive)
   (delete-windows-on "*compilation*"))
 
+(defun dotemacs-set-evil-shift-width ()
+  "Set the value of `evil-shift-width' based on the indentation settings of the
+current major mode."
+  (let ((shift-width
+         (catch 'break
+           (dolist (test dotemacs--indent-variable-alist)
+             (let ((mode (car test))
+                   (val (cdr test)))
+               (when (or (and (symbolp mode) (derived-mode-p mode))
+                         (and (listp mode) (apply 'derived-mode-p mode))
+                         (eq 't mode))
+                 (when (not (listp val))
+                   (setq val (list val)))
+                 (dolist (v val)
+                   (cond
+                    ((integerp v) (throw 'break v))
+                    ((and (symbolp v) (boundp v))
+                     (throw 'break (symbol-value v))))))))
+           (throw 'break (default-value 'evil-shift-width)))))
+    (when (and (integerp shift-width)
+               (< 0 shift-width))
+      (setq-local evil-shift-width shift-width))))
+
 (defun dotemacs/comint-clear-buffer ()
   (interactive)
   (let ((comint-buffer-maximum-size 0))
