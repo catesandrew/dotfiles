@@ -5343,7 +5343,8 @@ point. Requires smartparens because all movement is done using
   :commands (ensime-mode)
   :init
   (progn
-    (add-hook 'ensime-mode-hook 'scala/enable-eldoc)
+    (when scala-enable-eldoc
+      (add-hook 'ensime-mode-hook 'scala/enable-eldoc))
     (add-hook 'scala-mode-hook 'scala/configure-flyspell)
     (add-hook 'scala-mode-hook 'scala/configure-ensime)
     (add-hook 'scala-mode-hook 'scala/maybe-start-ensime))
