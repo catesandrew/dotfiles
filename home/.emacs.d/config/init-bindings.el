@@ -34,21 +34,21 @@
 ;; ---------------------------------------------------------------------------
 
 ;; Universal argument ---------------------------------------------------------
-(evil-leader/set-key "u" 'universal-argument)
+(dotemacs-set-leader-keys "u" 'universal-argument)
 ; (when (memq dotemacs-editing-style '(vim hybrid))
 ;   (define-key universal-argument-map
 ;     (kbd (concat dotemacs-leader-key " u"))
 ;     'universal-argument-more))
 ;; shell command  -------------------------------------------------------------
-(evil-leader/set-key "!" 'shell-command)
+(dotemacs-set-leader-keys "!" 'shell-command)
 ;; applications ---------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "ac"  'calc-dispatch
   "ad"  'dired
   "ap"  'proced
   "au"  'undo-tree-visualize)
 ;; buffers --------------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "bd"  'kill-this-buffer
   "TAB" 'dotemacs-alternate-buffer
   "bh"  'dotemacs-home
@@ -64,7 +64,7 @@
   "bY"  'dotemacs/copy-whole-buffer-to-clipboard
   "bw"  'read-only-mode)
 ;; Cycling settings -----------------------------------------------------------
-(evil-leader/set-key "Tn" 'dotemacs-cycle-dotemacs-theme)
+(dotemacs-set-leader-keys "Tn" 'dotemacs-cycle-dotemacs-theme)
 ;; describe functions ---------------------------------------------------------
 (defmacro dotemacs-set-helm-key (keys func)
   "Define a key bindings for FUNC using KEYS.
@@ -77,7 +77,7 @@ Ensure that helm is required before calling FUNC."
          (interactive)
          (require 'helm)
          (call-interactively ',func))
-       (evil-leader/set-key ,keys ',func-name))))
+       (dotemacs-set-leader-keys ,keys ',func-name))))
 (dotemacs-set-helm-key "hdb" describe-bindings)
 (dotemacs-set-helm-key "hdc" describe-char)
 (dotemacs-set-helm-key "hdf" describe-function)
@@ -91,13 +91,13 @@ Ensure that helm is required before calling FUNC."
 (dotemacs-set-helm-key "sww" helm-wikipedia-suggest)
 (dotemacs-set-helm-key "swg" helm-google-suggest)
 ;; errors ---------------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "ej" 'dotemacs-next-error
   "ek" 'dotemacs-previous-error
   "en" 'dotemacs-next-error
   "ep" 'dotemacs-previous-error)
 ;; file -----------------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "fc" 'dotemacs-copy-file
   "fD" 'dotemacs/delete-current-buffer-file
   "fei" 'dotemacs/find-user-init-file
@@ -119,7 +119,7 @@ Ensure that helm is required before calling FUNC."
   "fvp" 'add-file-local-variable-prop-line
   "fy" 'dotemacs/show-and-copy-buffer-filename)
 ;; insert stuff ---------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "iJ" 'dotemacs-insert-line-below-no-indent
   "iK" 'dotemacs-insert-line-above-no-indent
   "ik" 'dotemacs/evil-insert-line-above
@@ -127,7 +127,7 @@ Ensure that helm is required before calling FUNC."
 ;; format ---------------------------------------------------------------------
 ;; <SPC> j k key binding for a frequent action: go and indent line below the point
 ;; <SPC> J split the current line at point and indent it
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "J"  'sp-split-sexp
   "jj" 'sp-newline
   "jo" 'open-line
@@ -136,24 +136,24 @@ Ensure that helm is required before calling FUNC."
   "jk" 'dotemacs/evil-goto-next-line-and-indent)
 
 ;; navigation -----------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "jh" 'dotemacs-push-mark-and-goto-beginning-of-line
   "jl" 'dotemacs-push-mark-and-goto-end-of-line)
 
 ;; Compilation ----------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "cC" 'compile
   "cr" 'recompile
   "cq" 'dotemacs/close-compilation-window)
 
 ;; narrow & widen -------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "nr" 'narrow-to-region
   "np" 'narrow-to-page
   "nf" 'narrow-to-defun
   "nw" 'widen)
 ;; spell check  ---------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "Sd" 'ispell-change-dictionary
   "Sn" 'flyspell-goto-next-error)
 ;; toggle ---------------------------------------------------------------------
@@ -265,7 +265,7 @@ Ensure that helm is required before calling FUNC."
   :documentation "Enable semantic-stickyfunc globally."
   :evil-leader "T C-s")
 ;; quit -----------------------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "qs" 'dotemacs-save-buffers-kill-emacs
   "qq" 'dotemacs-prompt-kill-emacs
   "qQ" 'dotemacs-kill-emacs
@@ -283,7 +283,7 @@ Ensure that helm is required before calling FUNC."
   (split-window-right)
   (windmove-right))
 
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "w2"  'dotemacs/layout-double-columns
   "w3"  'dotemacs/layout-triple-columns
   "wb"  'dotemacs/switch-to-minibuffer-window
@@ -322,7 +322,7 @@ Ensure that helm is required before calling FUNC."
 ;; text -----------------------------------------------------------------------
 (defalias 'count-region 'count-words-region)
 
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "xaa" 'align
   "xar" 'dotemacs/align-repeat
   "xam" 'dotemacs/align-repeat-math-oper
@@ -346,7 +346,7 @@ Ensure that helm is required before calling FUNC."
   "xu"  'downcase-region
   "xwC" 'dotemacs/count-words-analysis)
 ;; google translate -----------------------------------------------------------
-(evil-leader/set-key
+(dotemacs-set-leader-keys
   "xgl" 'dotemacs/set-google-translate-languages)
 ;; shell ----------------------------------------------------------------------
 (with-eval-after-load 'shell

@@ -133,17 +133,17 @@ up before you execute another command."
 (defun dotemacs-flycheck-executables-updated ()
   (when (bound-and-true-p dotemacs//flycheck-executables-searched)
     (when dotemacs//flycheck-executable-eslint
-      (evil-leader/set-key
+      (dotemacs-set-leader-keys
         "tee" 'flycheck-eslint-enable
         "teE" 'flycheck-eslint-disable))
 
     (when dotemacs//flycheck-executable-jscs
-      (evil-leader/set-key
+      (dotemacs-set-leader-keys
         "tec" 'flycheck-jscs-enable
         "teC" 'flycheck-jscs-disable))
 
     (when dotemacs//flycheck-executable-jshint
-      (evil-leader/set-key
+      (dotemacs-set-leader-keys
         "teh" 'flycheck-jshint-enable
         "teH" 'flycheck-jshint-disable))
 

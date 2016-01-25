@@ -17,19 +17,19 @@
          "GOPATH variable not found, go-oracle configuration skipped.")
       (when (load-gopath-file
              go-path "/src/golang.org/x/tools/cmd/oracle/oracle.el")
-        (evil-leader/set-key-for-mode 'go-mode
-          "mro" 'go-oracle-set-scope
-          "mr<" 'go-oracle-callers
-          "mr>" 'go-oracle-callees
-          "mrc" 'go-oracle-peers
-          "mrd" 'go-oracle-definition
-          "mrf" 'go-oracle-freevars
-          "mrg" 'go-oracle-callgraph
-          "mri" 'go-oracle-implements
-          "mrp" 'go-oracle-pointsto
-          "mrr" 'go-oracle-referrers
-          "mrs" 'go-oracle-callstack
-          "mrt" 'go-oracle-describe)))))
+        (dotemacs-set-leader-keys-for-major-mode 'go-mode
+          "ro" 'go-oracle-set-scope
+          "r<" 'go-oracle-callers
+          "r>" 'go-oracle-callees
+          "rc" 'go-oracle-peers
+          "rd" 'go-oracle-definition
+          "rf" 'go-oracle-freevars
+          "rg" 'go-oracle-callgraph
+          "ri" 'go-oracle-implements
+          "rp" 'go-oracle-pointsto
+          "rr" 'go-oracle-referrers
+          "rs" 'go-oracle-callstack
+          "rt" 'go-oracle-describe)))))
 
 (defun dotemacs/go-run-main ()
   (interactive)

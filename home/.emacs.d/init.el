@@ -1044,7 +1044,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
     (define-key evil-window-map (kbd "<up>") 'evil-window-up)
     (define-key evil-window-map (kbd "<down>") 'evil-window-down)
 
-    (evil-leader/set-key "re" 'evil-show-registers)
+    (dotemacs-set-leader-keys "re" 'evil-show-registers)
 
     (unless dotemacs-enable-paste-micro-state
       (ad-disable-advice 'evil-paste-before 'after
@@ -1125,28 +1125,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (evil-define-key 'normal comint-mode-map
       (kbd "C-k") 'comint-next-input
       (kbd "C-j") 'comint-previous-input)))
-
-(use-package evil-leader
-  :ensure t
-  :init
-  (progn
-    (setq evil-leader/leader dotemacs-leader-key)
-    (global-evil-leader-mode)
-    ;; This is the same hook used by evil-leader. We make sure that this
-    ;; function is called after `evil-leader-mode' using the last argument
-    (add-hook 'evil-local-mode-hook
-      #'dotemacs-additional-leader-mode t))
-  :config
-  (progn
-    ;; Unset shortcuts which shadow evil leader
-    (with-eval-after-load 'compile
-      (define-key compilation-mode-map (kbd "h") nil))
-      ;; evil-leader does not get activated in existing buffers, so we have to
-      ;; force it here
-      (dolist (buffer (buffer-list))
-        (with-current-buffer buffer
-          (evil-leader-mode 1)
-          (dotemacs-additional-leader-mode 1)))))
 
 
 ;;; Shell
@@ -1299,15 +1277,15 @@ the user activate the completion manually."
   :init
   (progn
     (dotemacs-register-repl 'multi-term 'multi-term)
-    (evil-leader/set-key "ast" 'shell-pop-multi-term))
+    (dotemacs-set-leader-keys "ast" 'shell-pop-multi-term))
   :config
   (progn
     (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
     ;; multi-term commands to create terminals and move through them.
-    (evil-leader/set-key-for-mode 'term-mode "c" 'multi-term)
-    (evil-leader/set-key-for-mode 'term-mode "p" 'multi-term-prev)
-    (evil-leader/set-key-for-mode 'term-mode "n" 'multi-term-next)
-    (evil-leader/set-key "p$t" 'projectile-multi-term-in-root)))
+    (dotemacs-set-leader-keys-for-major-mode 'term-mode "c" 'multi-term)
+    (dotemacs-set-leader-keys-for-major-mode 'term-mode "p" 'multi-term-prev)
+    (dotemacs-set-leader-keys-for-major-mode 'term-mode "n" 'multi-term-next)
+    (dotemacs-set-leader-keys "p$t" 'projectile-multi-term-in-root)))
 
 (use-package comint
   :init
@@ -1360,7 +1338,7 @@ the user activate the completion manually."
     (add-hook 'term-mode-hook 'ansi-term-handle-close)
     (add-hook 'term-mode-hook (lambda () (linum-mode -1)))
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "'"   'dotemacs-default-pop-shell
       "ase" 'shell-pop-eshell
       "asi" 'shell-pop-shell
@@ -1433,6 +1411,15 @@ the user activate the completion manually."
   (ad-activate 'next-line)
   (ad-disable-advice 'isearch-repeat 'after 'isearch-smooth-scroll)
   (ad-activate 'isearch-repeat))
+
+
+(use-package bind-map
+  :ensure t
+  :init
+  (bind-map dotemacs-default-map
+    :prefix-cmd dotemacs-cmds
+    :keys (dotemacs-emacs-leader-key)
+    :evil-keys (dotemacs-leader-key)))
 
 (use-package diminish
   :ensure t
@@ -1524,7 +1511,7 @@ the user activate the completion manually."
   (progn
     (when (eq dotemacs-line-numbers 'relative)
       (linum-relative-on))
-    (evil-leader/set-key "tr" 'linum-relative-toggle))
+    (dotemacs-set-leader-keys "tr" 'linum-relative-toggle))
   :config
   (progn
     (setq linum-relative-current-symbol "→")))
@@ -1922,12 +1909,12 @@ format so they are supported by the
 
 (dotemacs-use-package-add-hook helm
   :post-init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "pl" 'dotemacs/helm-persp-switch-project))
 
 (dotemacs-use-package-add-hook swiper
   :post-init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "pl" 'dotemacs/ivy-persp-switch-project))
 
 
@@ -2152,7 +2139,7 @@ format so they are supported by the
     ;; use helm by default for M-x
     (global-set-key (kbd "M-x") 'helm-M-x)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "<f1>" 'helm-apropos
       "bb"   'helm-mini
       "Cl"   'helm-colors
@@ -2174,7 +2161,7 @@ format so they are supported by the
       "sl"   'dotemacs-jump-in-buffer)
 
     ;; search with grep
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "sgb"  'dotemacs-helm-buffers-do-grep
       "sgB"  'dotemacs-helm-buffers-do-grep-region-or-symbol
       "sgf"  'dotemacs-helm-files-do-grep
@@ -2186,7 +2173,7 @@ format so they are supported by the
     ;; to overwrite any key binding
     (add-hook 'emacs-startup-hook
               (lambda ()
-                (evil-leader/set-key dotemacs-command-key 'helm-M-x)))
+                (dotemacs-set-leader-keys dotemacs-command-key 'helm-M-x)))
 
     ;; Hide the cursor in helm buffers.
     (add-hook 'helm-after-initialize-hook 'dotemacs//hide-cursor-in-helm-buffer)
@@ -2344,7 +2331,7 @@ format so they are supported by the
                    (if thing thing ""))))))
         (call-interactively 'helm-swoop)))
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ss"    'helm-swoop
       "sS"    'dotemacs-helm-swoop-region-or-symbol
       "s C-s" 'helm-multi-swoop-all)
@@ -2359,7 +2346,7 @@ format so they are supported by the
   :ensure helm
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "Th" 'helm-themes))
 
 (use-package helm-command               ; M-x in Helm
@@ -2383,7 +2370,7 @@ format so they are supported by the
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "hM"    'helm-switch-major-mode
     ;; "hm"    'helm-disable-minor-mode
     "h C-m" 'helm-enable-minor-mode))
@@ -2400,7 +2387,7 @@ format so they are supported by the
 (use-package buffer-move
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "bmh" 'buf-move-left
     "bmj" 'buf-move-down
     "bmk" 'buf-move-up
@@ -2467,7 +2454,7 @@ format so they are supported by the
   ;; Show VC Status in ibuffer
   :init
   (progn
-    (evil-leader/set-key "bB" 'ibuffer)
+    (dotemacs-set-leader-keys "bB" 'ibuffer)
 
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
@@ -2543,7 +2530,7 @@ format so they are supported by the
   :config
   (progn
     (setq window-numbering-auto-assign-0-to-minibuffer nil)
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "0" 'select-window-0
       "1" 'select-window-1
       "2" 'select-window-2
@@ -2671,8 +2658,8 @@ format so they are supported by the
   :config
   (progn
     (popwin-mode 1)
-    (evil-leader/set-key "wpm" 'popwin:messages)
-    (evil-leader/set-key "wpp" 'popwin:close-popup-window)
+    (dotemacs-set-leader-keys "wpm" 'popwin:messages)
+    (dotemacs-set-leader-keys "wpp" 'popwin:close-popup-window)
 
     ;; don't use default value but manage it ourselves
     (setq popwin:special-display-config nil)
@@ -2774,7 +2761,7 @@ format so they are supported by the
   :defer t
   :commands (open-junk-file)
   :init
-  (evil-leader/set-key "fJ" 'open-junk-file)
+  (dotemacs-set-leader-keys "fJ" 'open-junk-file)
   (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
 
 (use-package helm-files
@@ -2982,7 +2969,7 @@ format so they are supported by the
 (use-package restart-emacs
   :defer t
   :init
-  (evil-leader/set-key "qr" 'dotemacs/restart-emacs)
+  (dotemacs-set-leader-keys "qr" 'dotemacs/restart-emacs)
   (defun dotemacs/restart-emacs ()
     (interactive)
     (setq dotemacs-really-kill-emacs t)
@@ -3081,9 +3068,9 @@ format so they are supported by the
       (fasd-find-file 1))
 
     (dotemacs-declare-prefix "fa" "fasd-find")
-    (evil-leader/set-key "fad" 'fasd-find-directory-only)
-    (evil-leader/set-key "faf" 'fasd-find-file-only)
-    (evil-leader/set-key "fas" 'fasd-find-file)
+    (dotemacs-set-leader-keys "fad" 'fasd-find-directory-only)
+    (dotemacs-set-leader-keys "faf" 'fasd-find-file-only)
+    (dotemacs-set-leader-keys "fas" 'fasd-find-file)
 
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
@@ -3093,7 +3080,7 @@ format so they are supported by the
   :ensure t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ar" 'ranger
       "ad" 'deer)
 
@@ -3205,7 +3192,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (progn
     (setq avy-all-windows 'all-frames)
     (setq avy-background t)
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
       "y" 'avy-goto-line ; 'avy-goto-char-2
       "xo" 'dotemacs-avy-open-url
@@ -3222,7 +3209,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
       (save-excursion
         (dotemacs-avy-goto-url)
         (browse-url-at-point)))
-    (evil-leader/set-key "`" 'avy-pop-mark)))
+    (dotemacs-set-leader-keys "`" 'avy-pop-mark)))
 
 (use-package ace-jump-helm-line
   :ensure t
@@ -3271,7 +3258,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :defer t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "bM"  'ace-swap-window
       "wC"  'ace-delete-window
       "w <SPC>"  'ace-window)
@@ -3508,7 +3495,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package expand-region              ; Expand region by semantic units
   :ensure t
   :defer t
-  :init (evil-leader/set-key "v" 'er/expand-region)
+  :init (dotemacs-set-leader-keys "v" 'er/expand-region)
   :config
   (progn
     ;; add search capability to expand-region
@@ -3730,7 +3717,7 @@ Disable the highlighting of overlong lines."
   (progn
     (hl-highlight-mode)
     (setq-default hl-highlight-save-file (concat dotemacs-cache-directory ".hl-save"))
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "hc"  'hl-unhighlight-all-local
       "hC"  'hl-unhighlight-all-global
       "hh"  'hl-highlight-thingatpt-local
@@ -3825,11 +3812,11 @@ It will toggle the overlay under point or create an overlay of one character."
 (use-package evil-iedit-state
   :ensure t
   :commands (evil-iedit-state evil-iedit-state/iedit-mode)
-  :init (evil-leader/set-key "se" 'evil-iedit-state/iedit-mode)
+  :init (dotemacs-set-leader-keys "se" 'evil-iedit-state/iedit-mode)
   :config
   ;; activate leader in iedit and iedit-insert states
   (define-key evil-iedit-state-map
-    (kbd evil-leader/leader) evil-leader--default-map))
+    (kbd evil-leader/leader) dotemacs-default-map))
 
 (use-package evil-jumper
   :ensure t
@@ -3857,7 +3844,7 @@ It will toggle the overlay under point or create an overlay of one character."
   :init
   (progn
     (evil-commentary-mode)
-    (evil-leader/set-key ";" 'evil-commentary)))
+    (dotemacs-set-leader-keys ";" 'evil-commentary)))
 
 (use-package evil-nerd-commenter
   :disabled t
@@ -3911,7 +3898,7 @@ It will toggle the overlay under point or create an overlay of one character."
     (define-key evil-normal-state-map "gc" 'evilnc-comment-operator)
     (define-key evil-normal-state-map "gy" 'dotemacs/copy-and-comment-lines)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       ";"  'evilnc-comment-operator
       "cl" 'dotemacs/comment-or-uncomment-lines
       "cL" 'dotemacs/comment-or-uncomment-lines-inverse
@@ -3962,17 +3949,17 @@ It will toggle the overlay under point or create an overlay of one character."
       (evil-numbers/dec-at-pt amount)
       (dotemacs-evil-numbers-micro-state-overlay-map))
 
-    (evil-leader/set-key "n+" 'dotemacs-evil-numbers-increase)
-    (evil-leader/set-key "n=" 'dotemacs-evil-numbers-increase)
-    (evil-leader/set-key "n-" 'dotemacs-evil-numbers-decrease)))
+    (dotemacs-set-leader-keys "n+" 'dotemacs-evil-numbers-increase)
+    (dotemacs-set-leader-keys "n=" 'dotemacs-evil-numbers-increase)
+    (dotemacs-set-leader-keys "n-" 'dotemacs-evil-numbers-decrease)))
 
 (use-package evil-search-highlight-persist
   :ensure t
   :init
   (progn
     (global-evil-search-highlight-persist)
-    (evil-leader/set-key "/" 'evil-search-highlight-persist-remove-all)
-    ;; (evil-leader/set-key "sc" 'evil-search-highlight-persist-remove-all)
+    (dotemacs-set-leader-keys "/" 'evil-search-highlight-persist-remove-all)
+    ;; (dotemacs-set-leader-keys "sc" 'evil-search-highlight-persist-remove-all)
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
 
     (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
@@ -4051,7 +4038,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq evil-tutor-working-directory
           (concat dotemacs-cache-directory ".tutor/"))
-    (evil-leader/set-key "hT" 'evil-tutor-start)))
+    (dotemacs-set-leader-keys "hT" 'evil-tutor-start)))
 
 (use-package evil-visualstar
   :ensure t
@@ -4115,7 +4102,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       "K" 'paradox-previous-describe
       "L" 'paradox-menu-view-commit-list
       "o" 'paradox-menu-visit-homepage)
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "aP" 'dotemacs-paradox-list-packages)))
 
 (use-package bug-hunter                 ; Search init file for bugs
@@ -4134,7 +4121,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :if (eq system-type 'darwin)
   :init
   (progn
-    (evil-leader/set-key "bf" 'reveal-in-osx-finder)
+    (dotemacs-set-leader-keys "bf" 'reveal-in-osx-finder)
 
     ;; this is only applicable to GUI mode
     (dotemacs|do-after-display-system-init
@@ -4186,7 +4173,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (add-to-list 'auto-mode-alist '("\\.plist$" . nxml-mode))
-    (evil-leader/set-key "al" 'launchctl))
+    (dotemacs-set-leader-keys "al" 'launchctl))
   :config
   (progn
     (evilified-state-evilify launchctl-mode launchctl-mode-map
@@ -4303,35 +4290,35 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (setcar (cdr (assoc "Check" TeX-command-list)) "chktex -v6 %s")
 
     ;; Key bindings for plain TeX
-    (evil-leader/set-key-for-mode 'tex-mode
-      "m\\" 'TeX-insert-macro
-      "mb" 'latex/build
-      "mC" 'TeX-command-master
+    (dotemacs-set-leader-keys-for-major-mode 'tex-mode
+      "\\" 'TeX-insert-macro
+      "b" 'latex/build
+      "C" 'TeX-command-master
       ;; Find a way to rebind tex-fonts
-      "mf" 'TeX-font
-      "mv" 'TeX-view)
+      "f" 'TeX-font
+      "v" 'TeX-view)
 
     ;; Key bindings for LaTeX
-    (evil-leader/set-key-for-mode 'latex-mode
-      "m\\" 'TeX-insert-macro
-      "mb" 'latex/build
-      "mc" 'LaTeX-close-environment
-      "mC" 'TeX-command-master
-      "me" 'LaTeX-environment
+    (dotemacs-set-leader-keys-for-major-mode 'latex-mode
+      "\\" 'TeX-insert-macro
+      "b" 'latex/build
+      "c" 'LaTeX-close-environment
+      "C" 'TeX-command-master
+      "e" 'LaTeX-environment
       ;; Find a way to rebind tex-fonts
-      "mf" 'TeX-font
-      "mhd" 'TeX-doc
-      "mi" 'LaTeX-insert-item
+      "f" 'TeX-font
+      "hd" 'TeX-doc
+      "i" 'LaTeX-insert-item
       ;; TeX-doc is a very slow function
-      "mpb" 'preview-buffer
-      "mpc" 'preview-clearout
-      "mpd" 'preview-document
-      "mpe" 'preview-environment
-      "mpf" 'preview-cache-preamble
-      "mpp" 'preview-at-point
-      "mpr" 'preview-region
-      "mps" 'preview-section
-      "mv" 'TeX-view)))
+      "pb" 'preview-buffer
+      "pc" 'preview-clearout
+      "pd" 'preview-document
+      "pe" 'preview-environment
+      "pf" 'preview-cache-preamble
+      "pp" 'preview-at-point
+      "pr" 'preview-region
+      "ps" 'preview-section
+      "v" 'TeX-view)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -4428,20 +4415,20 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   (progn
     (setq reftex-plug-into-AUCTeX '(nil nil t t t))
 
-    (evil-leader/set-key-for-mode 'latex-mode
-      "mrc"    'reftex-citation
-      "mrg"    'reftex-grep-document
-      "mri"    'reftex-index-selection-or-word
-      "mrI"    'reftex-display-index
-      "mr C-i" 'reftex-index
-      "mrl"    'reftex-label
-      "mrp"    'reftex-index-phrase-selection-or-word
-      "mrP"    'reftex-index-visit-phrases-buffer
-      "mrr"    'reftex-reference
-      "mrs"    'reftex-search-document
-      "mrt"    'reftex-toc
-      "mrT"    'reftex-toc-recenter
-      "mrv"    'reftex-view-crossref)
+    (dotemacs-set-leader-keys-for-major-mode 'latex-mode
+      "rc"    'reftex-citation
+      "rg"    'reftex-grep-document
+      "ri"    'reftex-index-selection-or-word
+      "rI"    'reftex-display-index
+      "r C-i" 'reftex-index
+      "rl"    'reftex-label
+      "rp"    'reftex-index-phrase-selection-or-word
+      "rP"    'reftex-index-visit-phrases-buffer
+      "rr"    'reftex-reference
+      "rs"    'reftex-search-document
+      "rt"    'reftex-toc
+      "rT"    'reftex-toc-recenter
+      "rv"    'reftex-view-crossref)
 
     ;; Plug into AUCTeX
     (setq reftex-plug-into-AUCTeX t
@@ -4502,8 +4489,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key-for-mode 'markdown-mode
-    "mcr"  'gh-md-render-buffer))
+  (dotemacs-set-leader-keys-for-major-mode 'markdown-mode
+    "cr"  'gh-md-render-buffer))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
@@ -4568,64 +4555,64 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (dotemacs-declare-prefix-for-mode
        'markdown-mode (car prefix) (cdr prefix)))
 
-    (evil-leader/set-key-for-mode 'markdown-mode
+    (dotemacs-set-leader-keys-for-major-mode 'markdown-mode
       ;; Movement
-      "m{"   'markdown-backward-paragraph
-      "m}"   'markdown-forward-paragraph
+      "{"   'markdown-backward-paragraph
+      "}"   'markdown-forward-paragraph
       ;; Completion, and Cycling
-      "m]"   'markdown-complete
+      "]"   'markdown-complete
       ;; Indentation
-      "m>"   'markdown-indent-region
-      "m<"   'markdown-exdent-region
+      ">"   'markdown-indent-region
+      "<"   'markdown-exdent-region
       ;; Buffer-wide commands
-      "mc]"  'markdown-complete-buffer
-      "mcc"  'markdown-check-refs
-      "mce"  'markdown-export
-      "mcm"  'markdown-other-window
-      "mcn"  'markdown-cleanup-list-numbers
-      "mco"  'markdown-open
-      "mcp"  'markdown-preview
-      "mcv"  'markdown-export-and-preview
-      "mcw"  'markdown-kill-ring-save
+      "c]"  'markdown-complete-buffer
+      "cc"  'markdown-check-refs
+      "ce"  'markdown-export
+      "cm"  'markdown-other-window
+      "cn"  'markdown-cleanup-list-numbers
+      "co"  'markdown-open
+      "cp"  'markdown-preview
+      "cv"  'markdown-export-and-preview
+      "cw"  'markdown-kill-ring-save
       ;; headings
-      "mhi"  'markdown-insert-header-dwim
-      "mhI"  'markdown-insert-header-setext-dwim
-      "mh1"  'markdown-insert-header-atx-1
-      "mh2"  'markdown-insert-header-atx-2
-      "mh3"  'markdown-insert-header-atx-3
-      "mh4"  'markdown-insert-header-atx-4
-      "mh5"  'markdown-insert-header-atx-5
-      "mh6"  'markdown-insert-header-atx-6
-      "mh!"  'markdown-insert-header-setext-1
-      "mh@"  'markdown-insert-header-setext-2
+      "hi"  'markdown-insert-header-dwim
+      "hI"  'markdown-insert-header-setext-dwim
+      "h1"  'markdown-insert-header-atx-1
+      "h2"  'markdown-insert-header-atx-2
+      "h3"  'markdown-insert-header-atx-3
+      "h4"  'markdown-insert-header-atx-4
+      "h5"  'markdown-insert-header-atx-5
+      "h6"  'markdown-insert-header-atx-6
+      "h!"  'markdown-insert-header-setext-1
+      "h@"  'markdown-insert-header-setext-2
       ;; Insertion of common elements
-      "m-"   'markdown-insert-hr
-      "mif"  'markdown-insert-footnote
-      "mii"  'markdown-insert-image
-      "mik"  'dotemacs-insert-keybinding-markdown
-      "miI"  'markdown-insert-reference-image
-      "mil"  'markdown-insert-link
-      "miL"  'markdown-insert-reference-link-dwim
-      "miw"  'markdown-insert-wiki-link
-      "miu"  'markdown-insert-uri
+      "-"   'markdown-insert-hr
+      "if"  'markdown-insert-footnote
+      "ii"  'markdown-insert-image
+      "ik"  'dotemacs-insert-keybinding-markdown
+      "iI"  'markdown-insert-reference-image
+      "il"  'markdown-insert-link
+      "iL"  'markdown-insert-reference-link-dwim
+      "iw"  'markdown-insert-wiki-link
+      "iu"  'markdown-insert-uri
       ;; Element removal
-      "mk"   'markdown-kill-thing-at-point
+      "k"   'markdown-kill-thing-at-point
       ;; List editing
-      "mli"  'markdown-insert-list-item
+      "li"  'markdown-insert-list-item
       ;; region manipulation
-      "mxb"  'markdown-insert-bold
-      "mxi"  'markdown-insert-italic
-      "mxc"  'markdown-insert-code
-      "mxC"  'markdown-insert-gfm-code-block
-      "mxq"  'markdown-insert-blockquote
-      "mxQ"  'markdown-blockquote-region
-      "mxp"  'markdown-insert-pre
-      "mxP"  'markdown-pre-region
+      "xb"  'markdown-insert-bold
+      "xi"  'markdown-insert-italic
+      "xc"  'markdown-insert-code
+      "xC"  'markdown-insert-gfm-code-block
+      "xq"  'markdown-insert-blockquote
+      "xQ"  'markdown-blockquote-region
+      "xp"  'markdown-insert-pre
+      "xP"  'markdown-pre-region
       ;; Following and Jumping
-      "mN"   'markdown-next-link
-      "mf"   'markdown-follow-thing-at-point
-      "mP"   'markdown-previous-link
-      "m <RET>" 'markdown-jump)
+      "N"   'markdown-next-link
+      "f"   'markdown-follow-thing-at-point
+      "P"   'markdown-previous-link
+      "<RET>" 'markdown-jump)
 
     ;; Header navigation in normal state movements
     (evil-define-key 'normal markdown-mode-map
@@ -4649,9 +4636,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :commands mmm-parse-buffer
   :ensure t
   :init
-  (evil-leader/set-key-for-mode 'markdown-mode
+  (dotemacs-set-leader-keys-for-major-mode 'markdown-mode
     ;; Highlight code blocks
-    "mcs"   'mmm-parse-buffer)
+    "cs"   'mmm-parse-buffer)
   :config
   (progn
     (mmm-add-classes '((markdown-python
@@ -4931,8 +4918,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (add-hook 'emacs-lisp-mode-hook 'auto-compile-mode))
   :config
   (progn
-    (evil-leader/set-key-for-mode 'emacs-lisp-mode
-      "mcl" 'auto-compile-display-log)))
+    (dotemacs-set-leader-keys-for-major-mode 'emacs-lisp-mode
+      "cl" 'auto-compile-display-log)))
 
 
 ;;; Emacs Lisp
@@ -4957,9 +4944,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
       (dotemacs-declare-prefix-for-mode mode "mg" "find-symbol")
       (dotemacs-declare-prefix-for-mode mode "mh" "help")
-      (evil-leader/set-key-for-mode mode
-        "mgg" 'elisp-slime-nav-find-elisp-thing-at-point
-        "mhh" 'elisp-slime-nav-describe-elisp-thing-at-point)))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "gg" 'elisp-slime-nav-find-elisp-thing-at-point
+        "hh" 'elisp-slime-nav-describe-elisp-thing-at-point)))
   :config
   (defadvice elisp-slime-nav-find-elisp-thing-at-point
       (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
@@ -5003,48 +4990,48 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
     (dolist (m `(,slime-mode-map ,slime-repl-mode-map))
       (define-key m [(tab)] 'slime-fuzzy-complete-symbol))
     ;; TODO: Add bindings for the SLIME debugger?
-    (evil-leader/set-key-for-mode 'lisp-mode
-      "mcc" 'slime-compile-file
-      "mcC" 'slime-compile-and-load-file
-      "mcl" 'slime-load-file
-      "mcf" 'slime-compile-defun
-      "mcr" 'slime-compile-region
-      "mcn" 'slime-remove-notes
+    (dotemacs-set-leader-keys-for-major-mode 'lisp-mode
+      "cc" 'slime-compile-file
+      "cC" 'slime-compile-and-load-file
+      "cl" 'slime-load-file
+      "cf" 'slime-compile-defun
+      "cr" 'slime-compile-region
+      "cn" 'slime-remove-notes
 
-      "meb" 'slime-eval-buffer
-      "mef" 'slime-eval-defun
-      "meF" 'slime-undefine-function
-      "mee" 'slime-eval-last-sexp
-      "mer" 'slime-eval-region
+      "eb" 'slime-eval-buffer
+      "ef" 'slime-eval-defun
+      "eF" 'slime-undefine-function
+      "ee" 'slime-eval-last-sexp
+      "er" 'slime-eval-region
 
-      "mgg" 'slime-inspect-definition
-      "mgb" 'slime-pop-find-definition-stack
-      "mgn" 'slime-next-note
-      "mgN" 'slime-previous-note
+      "gg" 'slime-inspect-definition
+      "gb" 'slime-pop-find-definition-stack
+      "gn" 'slime-next-note
+      "gN" 'slime-previous-note
 
-      "mha" 'slime-apropos
-      "mhA" 'slime-apropos-all
-      "mhd" 'slime-disassemble-symbol
-      "mhh" 'slime-describe-symbol
-      "mhH" 'slime-hyperspec-lookup
-      "mhp" 'slime-apropos-package
-      "mht" 'slime-toggle-trace-fdefinition
-      "mhT" 'slime-untrace-all
-      "mh<" 'slime-who-calls
-      "mh>" 'slime-calls-who
+      "ha" 'slime-apropos
+      "hA" 'slime-apropos-all
+      "hd" 'slime-disassemble-symbol
+      "hh" 'slime-describe-symbol
+      "hH" 'slime-hyperspec-lookup
+      "hp" 'slime-apropos-package
+      "ht" 'slime-toggle-trace-fdefinition
+      "hT" 'slime-untrace-all
+      "h<" 'slime-who-calls
+      "h>" 'slime-calls-who
       ;; TODO: Add key bindings for who binds/sets globals?
-      "mhr" 'slime-who-references
-      "mhm" 'slime-who-macroexpands
-      "mhs" 'slime-who-specializes
+      "hr" 'slime-who-references
+      "hm" 'slime-who-macroexpands
+      "hs" 'slime-who-specializes
 
-      "mma" 'slime-macroexpand-all
-      "mmo" 'slime-macroexpand-1
+      "ma" 'slime-macroexpand-all
+      "mo" 'slime-macroexpand-1
 
-      "mse" 'slime-eval-last-expression-in-repl
-      "msi" 'slime
-      "msq" 'slime-quit-lisp
+      "se" 'slime-eval-last-expression-in-repl
+      "si" 'slime
+      "sq" 'slime-quit-lisp
 
-      "mtf" 'slime-toggle-fancy-trace)))
+      "tf" 'slime-toggle-fancy-trace)))
 
 (dotemacs-defvar-company-backends geiser-mode)
 
@@ -5053,36 +5040,36 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :commands run-geiser
   :config
   (progn
-    (evil-leader/set-key-for-mode 'scheme-mode
-      "mcc" 'geiser-compile-current-buffer
-      "mcp" 'geiser-add-to-load-path
+    (dotemacs-set-leader-keys-for-major-mode 'scheme-mode
+      "cc" 'geiser-compile-current-buffer
+      "cp" 'geiser-add-to-load-path
 
-      "mgg" 'geiser-edit-symbol-at-point
-      "mgb" 'geiser-pop-symbol-stack
-      "mgm" 'geiser-edit-module
-      "mgn" 'next-error
-      "mgN" 'previous-error
+      "gg" 'geiser-edit-symbol-at-point
+      "gb" 'geiser-pop-symbol-stack
+      "gm" 'geiser-edit-module
+      "gn" 'next-error
+      "gN" 'previous-error
 
-      "mhh" 'geiser-doc-symbol-at-point
-      "mhd" 'geiser-doc-look-up-manual
-      "mhm" 'geiser-doc-module
-      "mh<" 'geiser-xref-callers
-      "mh>" 'geiser-xref-callees
+      "hh" 'geiser-doc-symbol-at-point
+      "hd" 'geiser-doc-look-up-manual
+      "hm" 'geiser-doc-module
+      "h<" 'geiser-xref-callers
+      "h>" 'geiser-xref-callees
 
-      "mil" 'geiser-insert-lambda
+      "il" 'geiser-insert-lambda
 
-      "mme" 'geiser-expand-last-sexp
-      "mmf" 'geiser-expand-definition
-      "mmx" 'geiser-expand-region
+      "me" 'geiser-expand-last-sexp
+      "mf" 'geiser-expand-definition
+      "mx" 'geiser-expand-region
 
-      "msi" 'geiser-mode-switch-to-repl
-      "msb" 'geiser-eval-buffer
-      "msB" 'geiser-eval-buffer-and-go
-      "msf" 'geiser-eval-definition
-      "msF" 'geiser-eval-definition-and-go
-      "mse" 'geiser-eval-last-sexp
-      "msr" 'geiser-eval-region
-      "msR" 'geiser-eval-region-and-go)))
+      "si" 'geiser-mode-switch-to-repl
+      "sb" 'geiser-eval-buffer
+      "sB" 'geiser-eval-buffer-and-go
+      "sf" 'geiser-eval-definition
+      "sF" 'geiser-eval-definition-and-go
+      "se" 'geiser-eval-last-sexp
+      "sr" 'geiser-eval-region
+      "sR" 'geiser-eval-region-and-go)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5098,7 +5085,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
   :init
   (progn
     (dotemacs-declare-prefix "R" "pcre2el")
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "R/"  'rxt-explain
       "Rc"  'rxt-convert-syntax
       "Rx"  'rxt-convert-to-rx
@@ -5132,7 +5119,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       :doc "[e] expand [c] collapse [n/N] next/previous [q] quit"
       :disable-evil-leader t
       :persistent t
-      :evil-leader-for-mode (emacs-lisp-mode . "mdm")
+      :evil-leader-for-mode (emacs-lisp-mode . "dm")
       :bindings
       ("e" macrostep-expand)
       ("c" macrostep-collapse)
@@ -5151,8 +5138,8 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
           (lisp-indent-line))))
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
       (dotemacs-declare-prefix-for-mode mode "ms" "ielm")
-      (evil-leader/set-key-for-mode mode
-        "msi" 'ielm))))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "si" 'ielm))))
 
 (use-package elisp-mode                  ; Emacs Lisp editing
   :defer t
@@ -5164,17 +5151,17 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       (dotemacs-declare-prefix-for-mode mode "mc" "compile")
       (dotemacs-declare-prefix-for-mode mode "me" "eval")
       (dotemacs-declare-prefix-for-mode mode "mt" "tests")
-      (evil-leader/set-key-for-mode mode
-        "mcc" 'emacs-lisp-byte-compile
-        "me$" 'lisp-state-eval-sexp-end-of-line
-        "meb" 'eval-buffer
-        "mee" 'eval-last-sexp
-        "mer" 'eval-region
-        "mef" 'eval-defun
-        "mel" 'lisp-state-eval-sexp-end-of-line
-        "m,"  'lisp-state-toggle-lisp-state
-        "mtb" 'dotemacs-ert-run-tests-buffer
-        "mtq" 'ert))))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "cc" 'emacs-lisp-byte-compile
+        "e$" 'lisp-state-eval-sexp-end-of-line
+        "eb" 'eval-buffer
+        "ee" 'eval-last-sexp
+        "er" 'eval-region
+        "ef" 'eval-defun
+        "el" 'lisp-state-eval-sexp-end-of-line
+        ","  'lisp-state-toggle-lisp-state
+        "tb" 'dotemacs-ert-run-tests-buffer
+        "tq" 'ert))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -5221,7 +5208,7 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       :init
       (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
         (dotemacs-declare-prefix-for-mode mode "=" "srefactor")
-        (evil-leader/set-key-for-mode mode
+        (dotemacs-set-leader-keys-for-major-mode mode
           "=b" 'srefactor-lisp-format-buffer
           "=d" 'srefactor-lisp-format-defun
           "=o" 'srefactor-lisp-one-line
@@ -5265,7 +5252,7 @@ point. Requires smartparens because all movement is done using
         (call-interactively 'eval-last-sexp)))
 
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (evil-leader/set-key-for-mode mode
+      (dotemacs-set-leader-keys-for-major-mode mode
         "ec" 'dotemacs-eval-current-form-sp
         "es" 'dotemacs-eval-current-symbol-sp))))
 
@@ -5323,8 +5310,8 @@ point. Requires smartparens because all movement is done using
                       (and "[" (1+ (not (any "]")))"] " (1+ word) ":"))
               (0+ " ")))
 
-    (evil-leader/set-key-for-mode 'scala-mode
-      "mbb" 'sbt-command)
+    (dotemacs-set-leader-keys-for-major-mode 'scala-mode
+      "bb" 'sbt-command)
 
     (defun dotemacs-sbt-buffer-p (buffer-name &rest _)
       "Determine whether BUFFER-OR-NAME denotes an SBT buffer."
@@ -5405,75 +5392,75 @@ point. Requires smartparens because all movement is done using
                       ("ms" . "scala/repl")))
       (dotemacs-declare-prefix-for-mode 'scala-mode (car prefix) (cdr prefix)))
 
-    (evil-leader/set-key-for-mode 'scala-mode
-      "m/"     'ensime-search
+    (dotemacs-set-leader-keys-for-major-mode 'scala-mode
+      "/"     'ensime-search
 
-      "mbc"     'ensime-sbt-do-compile
-      "mbC"     'ensime-sbt-do-clean
-      "mbi"     'ensime-sbt-switch
-      "mbp"     'ensime-sbt-do-package
-      "mbr"     'ensime-sbt-do-run
+      "bc"     'ensime-sbt-do-compile
+      "bC"     'ensime-sbt-do-clean
+      "bi"     'ensime-sbt-switch
+      "bp"     'ensime-sbt-do-package
+      "br"     'ensime-sbt-do-run
 
-      "mct"     'ensime-typecheck-current-file
-      "mcT"     'ensime-typecheck-all
+      "ct"     'ensime-typecheck-current-file
+      "cT"     'ensime-typecheck-all
 
-      "mdA"     'ensime-db-attach
-      "mdb"     'ensime-db-set-break
-      "mdB"     'ensime-db-clear-break
-      "mdC"     'ensime-db-clear-all-breaks
-      "mdc"     'ensime-db-continue
-      "mdd"     'ensime-db-start
-      "mdi"     'ensime-db-inspect-value-at-point
-      "mdl"     'ensime-db-list-locals
-      "mdn"     'ensime-db-next
-      "mdo"     'ensime-db-step-out
-      "mdq"     'ensime-db-quit
-      "mdr"     'ensime-db-run
-      "mds"     'ensime-db-step
-      "mdt"     'ensime-db-backtrace
+      "dA"     'ensime-db-attach
+      "db"     'ensime-db-set-break
+      "dB"     'ensime-db-clear-break
+      "dC"     'ensime-db-clear-all-breaks
+      "dc"     'ensime-db-continue
+      "dd"     'ensime-db-start
+      "di"     'ensime-db-inspect-value-at-point
+      "dl"     'ensime-db-list-locals
+      "dn"     'ensime-db-next
+      "do"     'ensime-db-step-out
+      "dq"     'ensime-db-quit
+      "dr"     'ensime-db-run
+      "ds"     'ensime-db-step
+      "dt"     'ensime-db-backtrace
 
-      "mee"     'ensime-print-errors-at-point
-      "mel"     'ensime-show-all-errors-and-warnings
-      "mes"     'ensime-stacktrace-switch
+      "ee"     'ensime-print-errors-at-point
+      "el"     'ensime-show-all-errors-and-warnings
+      "es"     'ensime-stacktrace-switch
 
-      "mgg"     'ensime-edit-definition
-      "mgp"     'ensime-pop-find-definition-stack
-      "mgi"     'ensime-goto-impl
-      "mgt"     'ensime-goto-test
+      "gg"     'ensime-edit-definition
+      "gp"     'ensime-pop-find-definition-stack
+      "gi"     'ensime-goto-impl
+      "gt"     'ensime-goto-test
 
-      "mhh"     'ensime-show-doc-for-symbol-at-point
-      "mhu"     'ensime-show-uses-of-symbol-at-point
-      "mht"     'ensime-print-type-at-point
+      "hh"     'ensime-show-doc-for-symbol-at-point
+      "hu"     'ensime-show-uses-of-symbol-at-point
+      "ht"     'ensime-print-type-at-point
 
-      "mii"     'ensime-inspect-type-at-point
-      "miI"     'ensime-inspect-type-at-point-other-frame
-      "mip"     'ensime-inspect-project-package
+      "ii"     'ensime-inspect-type-at-point
+      "iI"     'ensime-inspect-type-at-point-other-frame
+      "ip"     'ensime-inspect-project-package
 
-      "mnF"     'ensime-reload-open-files
-      "mns"     'ensime
-      "mnS"     'ensime-gen-and-restart
+      "nF"     'ensime-reload-open-files
+      "ns"     'ensime
+      "nS"     'ensime-gen-and-restart
 
-      "mrd"     'ensime-refactor-inline-local
-      "mrD"     'ensime-undo-peek
-      "mrf"     'ensime-format-source
-      "mri"     'ensime-refactor-organize-imports
-      "mrm"     'ensime-refactor-extract-method
-      "mrr"     'ensime-refactor-rename
-      "mrt"     'ensime-import-type-at-point
-      "mrv"     'ensime-refactor-extract-local
+      "rd"     'ensime-refactor-inline-local
+      "rD"     'ensime-undo-peek
+      "rf"     'ensime-format-source
+      "ri"     'ensime-refactor-organize-imports
+      "rm"     'ensime-refactor-extract-method
+      "rr"     'ensime-refactor-rename
+      "rt"     'ensime-import-type-at-point
+      "rv"     'ensime-refactor-extract-local
 
-      "mta"     'ensime-sbt-do-test-dwim
-      "mtr"     'ensime-sbt-do-test-quick-dwim
-      "mtt"     'ensime-sbt-do-test-only-dwim
+      "ta"     'ensime-sbt-do-test-dwim
+      "tr"     'ensime-sbt-do-test-quick-dwim
+      "tt"     'ensime-sbt-do-test-only-dwim
 
-      "msa"     'ensime-inf-load-file
-      "msb"     'ensime-inf-eval-buffer
-      "msB"     'ensime-inf-eval-buffer-switch
-      "msi"     'ensime-inf-switch
-      "msr"     'ensime-inf-eval-region
-      "msR"     'ensime-inf-eval-region-switch
+      "sa"     'ensime-inf-load-file
+      "sb"     'ensime-inf-eval-buffer
+      "sB"     'ensime-inf-eval-buffer-switch
+      "si"     'ensime-inf-switch
+      "sr"     'ensime-inf-eval-region
+      "sR"     'ensime-inf-eval-region-switch
 
-      "mz"      'ensime-expand-selection-command)
+      "z"      'ensime-expand-selection-command)
 
     ;; Enable Expand Region integration from Ensime.  Ignore load errors to
     ;; handle older Ensime versions gracefully.
@@ -5517,7 +5504,7 @@ point. Requires smartparens because all movement is done using
   :ensure t
   :init
   (progn
-    (evil-leader/set-key-for-mode 'cython-mode
+    (dotemacs-set-leader-keys-for-major-mode 'cython-mode
       "mhh" 'anaconda-mode-show-doc
       "mgg" 'anaconda-mode-find-definitions
       "mga" 'anaconda-mode-find-assignments
@@ -5536,10 +5523,10 @@ point. Requires smartparens because all movement is done using
   (progn
     (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)
       (evil-jumper--push))
-    (evil-leader/set-key-for-mode 'python-mode
-      "mhh" 'anaconda-mode-view-doc
-      "mgu" 'anaconda-mode-usages
-      "mgg"  'anaconda-mode-goto)
+    (dotemacs-set-leader-keys-for-major-mode 'python-mode
+      "hh" 'anaconda-mode-view-doc
+      "gu" 'anaconda-mode-usages
+      "gg"  'anaconda-mode-goto)
     (dotemacs-hide-lighter anaconda-mode)))
 
 (use-package pip-requirements           ; requirements.txt files
@@ -5551,57 +5538,57 @@ point. Requires smartparens because all movement is done using
   :ensure t
   :init
   (progn
-    (evil-leader/set-key-for-mode 'python-mode
+    (dotemacs-set-leader-keys-for-major-mode 'python-mode
       ; d*j*ango f*a*bric
-      "mjaf" 'pony-fabric
-      "mjad" 'pony-fabric-deploy
+      "jaf" 'pony-fabric
+      "jad" 'pony-fabric-deploy
       ; d*j*ango *f*iles
-      "mjfs" 'pony-goto-settings
-      "mjfc" 'pony-setting
-      "mjft" 'pony-goto-template
-      "mjfr" 'pony-resolve
+      "jfs" 'pony-goto-settings
+      "jfc" 'pony-setting
+      "jft" 'pony-goto-template
+      "jfr" 'pony-resolve
       ; d*j*ango *i*nteractive
-      "mjid" 'pony-db-shell
-      "mjis" 'pony-shell
+      "jid" 'pony-db-shell
+      "jis" 'pony-shell
       ; d*j*ango *m*anage
       ; not including one-off management commands like "flush" and
       ; "startapp" even though they're implemented in pony-mode,
       ; because this is much handier
-      "mjm" 'pony-manage
+      "jm" 'pony-manage
       ; d*j*ango *r*unserver
-      "mjrd" 'pony-stopserver
-      "mjro" 'pony-browser
-      "mjrr" 'pony-restart-server
-      "mjru" 'pony-runserver
-      "mjrt" 'pony-temp-server
+      "jrd" 'pony-stopserver
+      "jro" 'pony-browser
+      "jrr" 'pony-restart-server
+      "jru" 'pony-runserver
+      "jrt" 'pony-temp-server
       ; d*j*ango *s*outh/*s*yncdb
-      "mjsc" 'pony-south-convert
-      "mjsh" 'pony-south-schemamigration
-      "mjsi" 'pony-south-initial
-      "mjsm" 'pony-south-migrate
-      "mjss" 'pony-syncdb
+      "jsc" 'pony-south-convert
+      "jsh" 'pony-south-schemamigration
+      "jsi" 'pony-south-initial
+      "jsm" 'pony-south-migrate
+      "jss" 'pony-syncdb
       ; d*j*ango *t*est
-      "mjtd" 'pony-test-down
-      "mjte" 'pony-test-goto-err
-      "mjto" 'pony-test-open
-      "mjtt" 'pony-test
-      "mjtu" 'pony-test-up)))
+      "jtd" 'pony-test-down
+      "jte" 'pony-test-goto-err
+      "jto" 'pony-test-open
+      "jtt" 'pony-test
+      "jtu" 'pony-test-up)))
 
 (use-package pyenv-mode
   :defer t
   :ensure t
   :init
   (progn
-    (evil-leader/set-key-for-mode 'python-mode
-      "mvs" 'pyenv-mode-set
-      "mvu" 'pyenv-mode-unset)))
+    (dotemacs-set-leader-keys-for-major-mode 'python-mode
+      "vs" 'pyenv-mode-set
+      "vu" 'pyenv-mode-unset)))
 
 (use-package pyvenv
   :defer t
   :ensure t
   :init
-  (evil-leader/set-key-for-mode 'python-mode
-    "mV" 'pyvenv-workon))
+  (dotemacs-set-leader-keys-for-major-mode 'python-mode
+    "V" 'pyvenv-workon))
 
 (use-package pylookup
   :quelpa (pylookup :fetcher github :repo "tsgates/pylookup")
@@ -5609,8 +5596,8 @@ point. Requires smartparens because all movement is done using
   :init
   (progn
     (evilified-state-evilify pylookup-mode pylookup-mode-map)
-    (evil-leader/set-key-for-mode 'python-mode
-      "mhH"  'pylookup-lookup))
+    (dotemacs-set-leader-keys-for-major-mode 'python-mode
+      "mhH" 'pylookup-lookup))
   :config
   (progn
     (let ((dir dotemacs-quelpa-build-directory))
@@ -5621,7 +5608,7 @@ point. Requires smartparens because all movement is done using
 (use-package py-yapf
   :ensure t
   :init
-  (evil-leader/set-key-for-mode 'python-mode "m=" 'py-yapf-buffer)
+  (dotemacs-set-leader-keys-for-major-mode 'python-mode "=" 'py-yapf-buffer)
   :config
   (if python-enable-yapf-format-on-save
       (add-hook 'python-mode-hook 'py-yapf-enable-on-save)))
@@ -5638,17 +5625,17 @@ point. Requires smartparens because all movement is done using
              nosetests-suite
              nosetests-pdb-suite)
   :init
-  (evil-leader/set-key-for-mode 'python-mode
-    "mtA" 'nosetests-pdb-all
-    "mta" 'nosetests-all
-    "mtB" 'nosetests-pdb-module
-    "mtb" 'nosetests-module
-    "mtT" 'nosetests-pdb-one
-    "mtt" 'nosetests-one
-    "mtM" 'nosetests-pdb-module
-    "mtm" 'nosetests-module
-    "mtS" 'nosetests-pdb-suite
-    "mts" 'nosetests-suite)
+  (dotemacs-set-leader-keys-for-major-mode 'python-mode
+    "tA" 'nosetests-pdb-all
+    "ta" 'nosetests-all
+    "tB" 'nosetests-pdb-module
+    "tb" 'nosetests-module
+    "tT" 'nosetests-pdb-one
+    "tt" 'nosetests-one
+    "tM" 'nosetests-pdb-module
+    "tm" 'nosetests-module
+    "tS" 'nosetests-pdb-suite
+    "ts" 'nosetests-suite)
   :config
   (progn
     (add-to-list 'nose-project-root-files "setup.cfg")
@@ -5664,15 +5651,15 @@ point. Requires smartparens because all movement is done using
              pytest-pdb-all
              pytest-module
              pytest-pdb-module)
-  :init (evil-leader/set-key-for-mode 'python-mode
-          "mtA" 'pytest-pdb-all
-          "mta" 'pytest-all
-          "mtB" 'pytest-pdb-module
-          "mtb" 'pytest-module
-          "mtT" 'pytest-pdb-one
-          "mtt" 'pytest-one
-          "mtM" 'pytest-pdb-module
-          "mtm" 'pytest-module)
+  :init (dotemacs-set-leader-keys-for-major-mode 'python-mode
+          "tA" 'pytest-pdb-all
+          "ta" 'pytest-all
+          "tB" 'pytest-pdb-module
+          "tb" 'pytest-module
+          "tT" 'pytest-pdb-one
+          "tt" 'pytest-one
+          "tM" 'pytest-pdb-module
+          "tm" 'pytest-module)
   :config (add-to-list 'pytest-project-root-files "setup.cfg"))
 
 (use-package python
@@ -5705,18 +5692,18 @@ point. Requires smartparens because all movement is done using
     (dotemacs-declare-prefix-for-mode 'python-mode "ms" "send to REPL")
     (dotemacs-declare-prefix-for-mode 'python-mode "mr" "refactor")
     (dotemacs-declare-prefix-for-mode 'python-mode "mv" "venv")
-    (evil-leader/set-key-for-mode 'python-mode
-      "mcc" 'dotemacs-python-execute-file
-      "mcC" 'dotemacs-python-execute-file-focus
-      "mdb" 'python-toggle-breakpoint
-      "mri" 'python-remove-unused-imports
-      "msB" 'python-shell-send-buffer-switch
-      "msb" 'python-shell-send-buffer
-      "msF" 'python-shell-send-defun-switch
-      "msf" 'python-shell-send-defun
-      "msi" 'python-start-or-switch-repl
-      "msR" 'python-shell-send-region-switch
-      "msr" 'python-shell-send-region)
+    (dotemacs-set-leader-keys-for-major-mode 'python-mode
+      "cc" 'dotemacs-python-execute-file
+      "cC" 'dotemacs-python-execute-file-focus
+      "db" 'python-toggle-breakpoint
+      "ri" 'python-remove-unused-imports
+      "sB" 'python-shell-send-buffer-switch
+      "sb" 'python-shell-send-buffer
+      "sF" 'python-shell-send-defun-switch
+      "sf" 'python-shell-send-defun
+      "si" 'python-start-or-switch-repl
+      "sR" 'python-shell-send-region-switch
+      "sr" 'python-shell-send-region)
 
     ;; the default in Emacs is M-n
     (define-key inferior-python-mode-map (kbd "C-j") 'comint-next-input)
@@ -5765,7 +5752,7 @@ point. Requires smartparens because all movement is done using
   :defer t
   :ensure t
   :init
-  (evil-leader/set-key-for-mode 'python-mode "mhd" 'helm-pydoc))
+  (dotemacs-set-leader-keys-for-major-mode 'python-mode "hd" 'helm-pydoc))
 
 (use-package flycheck-virtualenv        ; Setup Flycheck by virtualenv
   :load-path "config/"
@@ -5878,9 +5865,9 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :defer t
   :config
   (progn
-    (evil-leader/set-key-for-mode 'ruby-mode
-      "m'" 'ruby-toggle-string-quotes
-      "m{" 'ruby-toggle-block)
+    (dotemacs-set-leader-keys-for-major-mode 'ruby-mode
+      "'" 'ruby-toggle-string-quotes
+      "{" 'ruby-toggle-block)
 
     (sp-with-modes 'ruby-mode
       (sp-local-pair "{" "}"
@@ -5899,10 +5886,10 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dotemacs-hide-lighter ruby-tools-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-declare-prefix-for-mode mode "mx" "ruby/text")
-      (evil-leader/set-key-for-mode mode
-        "mx\'" 'ruby-tools-to-single-quote-string
-        "mx\"" 'ruby-tools-to-double-quote-string
-        "mx:" 'ruby-tools-to-symbol))))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "x\'" 'ruby-tools-to-single-quote-string
+        "x\"" 'ruby-tools-to-double-quote-string
+        "x:" 'ruby-tools-to-symbol))))
 
 (use-package bundler
   :defer t
@@ -5910,12 +5897,12 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :init
   (dolist (mode '(ruby-mode enh-ruby-mode))
     (dotemacs-declare-prefix-for-mode mode "mb" "ruby/bundle")
-    (evil-leader/set-key-for-mode mode
-      "mbc" 'bundle-check
-      "mbi" 'bundle-install
-      "mbs" 'bundle-console
-      "mbu" 'bundle-update
-      "mbx" 'bundle-exec)))
+    (dotemacs-set-leader-keys-for-major-mode mode
+      "bc" 'bundle-check
+      "bi" 'bundle-install
+      "bs" 'bundle-console
+      "bu" 'bundle-update
+      "bx" 'bundle-exec)))
 
 (use-package projectile-rails
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
@@ -5929,50 +5916,50 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dotemacs-diminish projectile-rails-mode " ⇋" " RoR")
     ;; Find files
     (dolist (mode '(ruby-mode enh-ruby-mode))
-      (evil-leader/set-key-for-mode mode
-        "mrfa" 'projectile-rails-find-locale
-        "mrfc" 'projectile-rails-find-controller
-        "mrfe" 'projectile-rails-find-environment
-        "mrff" 'projectile-rails-find-feature
-        "mrfh" 'projectile-rails-find-helper
-        "mrfi" 'projectile-rails-find-initializer
-        "mrfj" 'projectile-rails-find-javascript
-        "mrfl" 'projectile-rails-find-lib
-        "mrfm" 'projectile-rails-find-model
-        "mrfn" 'projectile-rails-find-migration
-        "mrfo" 'projectile-rails-find-log
-        "mrfp" 'projectile-rails-find-spec
-        "mrfr" 'projectile-rails-find-rake-task
-        "mrfs" 'projectile-rails-find-stylesheet
-        "mrft" 'projectile-rails-find-test
-        "mrfu" 'projectile-rails-find-fixture
-        "mrfv" 'projectile-rails-find-view
-        "mrfy" 'projectile-rails-find-layout
-        "mrf@" 'projectile-rails-find-mailer
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "rfa" 'projectile-rails-find-locale
+        "rfc" 'projectile-rails-find-controller
+        "rfe" 'projectile-rails-find-environment
+        "rff" 'projectile-rails-find-feature
+        "rfh" 'projectile-rails-find-helper
+        "rfi" 'projectile-rails-find-initializer
+        "rfj" 'projectile-rails-find-javascript
+        "rfl" 'projectile-rails-find-lib
+        "rfm" 'projectile-rails-find-model
+        "rfn" 'projectile-rails-find-migration
+        "rfo" 'projectile-rails-find-log
+        "rfp" 'projectile-rails-find-spec
+        "rfr" 'projectile-rails-find-rake-task
+        "rfs" 'projectile-rails-find-stylesheet
+        "rft" 'projectile-rails-find-test
+        "rfu" 'projectile-rails-find-fixture
+        "rfv" 'projectile-rails-find-view
+        "rfy" 'projectile-rails-find-layout
+        "rf@" 'projectile-rails-find-mailer
         ;; Goto file
-        "mrgc" 'projectile-rails-find-current-controller
-        "mrgd" 'projectile-rails-goto-schema
-        "mrge" 'projectile-rails-goto-seeds
-        "mrgh" 'projectile-rails-find-current-helper
-        "mrgj" 'projectile-rails-find-current-javascript
-        "mrgg" 'projectile-rails-goto-gemfile
-        "mrgm" 'projectile-rails-find-current-model
-        "mrgn" 'projectile-rails-find-current-migration
-        "mrgp" 'projectile-rails-find-current-spec
-        "mrgr" 'projectile-rails-goto-routes
-        "mrgs" 'projectile-rails-find-current-stylesheet
-        "mrgt" 'projectile-rails-find-current-test
-        "mrgu" 'projectile-rails-find-current-fixture
-        "mrgv" 'projectile-rails-find-current-view
-        "mrgz" 'projectile-rails-goto-spec-helper
-        "mrg." 'projectile-rails-goto-file-at-point
+        "rgc" 'projectile-rails-find-current-controller
+        "rgd" 'projectile-rails-goto-schema
+        "rge" 'projectile-rails-goto-seeds
+        "rgh" 'projectile-rails-find-current-helper
+        "rgj" 'projectile-rails-find-current-javascript
+        "rgg" 'projectile-rails-goto-gemfile
+        "rgm" 'projectile-rails-find-current-model
+        "rgn" 'projectile-rails-find-current-migration
+        "rgp" 'projectile-rails-find-current-spec
+        "rgr" 'projectile-rails-goto-routes
+        "rgs" 'projectile-rails-find-current-stylesheet
+        "rgt" 'projectile-rails-find-current-test
+        "rgu" 'projectile-rails-find-current-fixture
+        "rgv" 'projectile-rails-find-current-view
+        "rgz" 'projectile-rails-goto-spec-helper
+        "rg." 'projectile-rails-goto-file-at-point
         ;; Rails external commands
-        "mrcc" 'projectile-rails-generate
-        "mri" 'projectile-rails-console
-        "mrr:" 'projectile-rails-rake
-        "mrxs" 'projectile-rails-server
+        "rcc" 'projectile-rails-generate
+        "ri" 'projectile-rails-console
+        "rr:" 'projectile-rails-rake
+        "rxs" 'projectile-rails-server
         ;; Refactoring 'projectile-rails-mode
-        "mrRx" 'projectile-rails-extract-region))
+        "rRx" 'projectile-rails-extract-region))
     ;; Ex-commands
     (evil-ex-define-cmd "A" 'projectile-toggle-between-implementation-and-test)))
 
@@ -5993,18 +5980,18 @@ Otherwise use Enh Ruby Mode, which is the default.")
       (dotemacs-declare-prefix-for-mode mode "mg" "ruby/goto")
       (dotemacs-declare-prefix-for-mode mode "mh" "ruby/docs")
       (dotemacs-declare-prefix-for-mode mode "ms" "ruby/repl")
-      (evil-leader/set-key-for-mode mode
+      (dotemacs-set-leader-keys-for-major-mode mode
         ;; robe mode specific
-        "mgg" 'robe-jump
-        "mhd" 'robe-doc
-        "mrsr" 'robe-rails-refresh
+        "gg" 'robe-jump
+        "hd" 'robe-doc
+        "rsr" 'robe-rails-refresh
         ;; inf-enh-ruby-mode
-        "msf" 'ruby-send-definition
-        "msF" 'ruby-send-definition-and-go
-        "msi" 'robe-start
-        "msr" 'ruby-send-region
-        "msR" 'ruby-send-region-and-go
-        "mss" 'ruby-switch-to-inf))))
+        "sf" 'ruby-send-definition
+        "sF" 'ruby-send-definition-and-go
+        "si" 'robe-start
+        "sr" 'ruby-send-region
+        "sR" 'ruby-send-region-and-go
+        "ss" 'ruby-switch-to-inf))))
 
 (use-package yaml-mode                  ; YAML
   :ensure t
@@ -6042,8 +6029,8 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dotemacs-hide-lighter ruby-test-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-declare-prefix-for-mode mode "mt" "ruby/test")
-      (evil-leader/set-key-for-mode mode "mtb" 'ruby-test-run)
-      (evil-leader/set-key-for-mode mode "mtt" 'ruby-test-run-at-point))))
+      (dotemacs-set-leader-keys-for-major-mode mode "tb" 'ruby-test-run)
+      (dotemacs-set-leader-keys-for-major-mode mode "tt" 'ruby-test-run-at-point))))
 
 (use-package inf-ruby                   ; Ruby REPL
   :ensure t
@@ -6101,11 +6088,11 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :defer t
   :config
   (progn
-    (evil-leader/set-key-for-mode 'rust-mode
-      "mcc" 'dotemacs-rust-cargo-build
-      "mct" 'dotemacs-rust-cargo-test
-      "mcd" 'dotemacs-rust-cargo-doc
-      "mcx" 'dotemacs-rust-cargo-run)))
+    (dotemacs-set-leader-keys-for-major-mode 'rust-mode
+      "cc" 'dotemacs-rust-cargo-build
+      "ct" 'dotemacs-rust-cargo-test
+      "cd" 'dotemacs-rust-cargo-doc
+      "cx" 'dotemacs-rust-cargo-run)))
 
 (use-package racer
   :if rust-enable-racer
@@ -6213,66 +6200,66 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dotemacs-declare-prefix-for-mode 'haskell-cabal-mode "ms" "haskell/repl")
 
     ;; key bindings
-    (evil-leader/set-key-for-mode 'haskell-mode
-      "mgg"  'haskell-mode-jump-to-def-or-tag
-      "mgi"  'haskell-navigate-imports
-      "mf"   'haskell-mode-stylish-buffer
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
+      "gg"  'haskell-mode-jump-to-def-or-tag
+      "gi"  'haskell-navigate-imports
+      "f"   'haskell-mode-stylish-buffer
 
-      "msb"  'haskell-process-load-or-reload
-      "msc"  'haskell-interactive-mode-clear
-      "mss"  'dotemacs/haskell-interactive-bring
-      "msS"  'haskell-interactive-switch
+      "sb"  'haskell-process-load-or-reload
+      "sc"  'haskell-interactive-mode-clear
+      "ss"  'dotemacs/haskell-interactive-bring
+      "sS"  'haskell-interactive-switch
 
-      "mca"  'haskell-process-cabal
-      "mcb"  'haskell-process-cabal-build
-      "mcc"  'haskell-compile
-      "mcv"  'haskell-cabal-visit-file
+      "ca"  'haskell-process-cabal
+      "cb"  'haskell-process-cabal-build
+      "cc"  'haskell-compile
+      "cv"  'haskell-cabal-visit-file
 
-      "mhd"  'inferior-haskell-find-haddock
-      "mhh"  'hoogle
-      "mhH"  'hoogle-lookup-from-local
-      "mhi"  (lookup-key haskell-mode-map (kbd "C-c C-i"))
-      "mht"  (lookup-key haskell-mode-map (kbd "C-c C-t"))
-      "mhT"  'dotemacs-haskell-process-do-type-on-prev-line
-      "mhy"  'hayoo
+      "hd"  'inferior-haskell-find-haddock
+      "hh"  'hoogle
+      "hH"  'hoogle-lookup-from-local
+      "hi"  (lookup-key haskell-mode-map (kbd "C-c C-i"))
+      "ht"  (lookup-key haskell-mode-map (kbd "C-c C-t"))
+      "hT"  'dotemacs-haskell-process-do-type-on-prev-line
+      "hy"  'hayoo
 
-      "mdd"  'haskell-debug
-      "mdb"  'haskell-debug/break-on-function
-      "mdn"  'haskell-debug/next
-      "mdN"  'haskell-debug/previous
-      "mdB"  'haskell-debug/delete
-      "mdc"  'haskell-debug/continue
-      "mda"  'haskell-debug/abandon
-      "mdr"  'haskell-debug/refresh)
+      "dd"  'haskell-debug
+      "db"  'haskell-debug/break-on-function
+      "dn"  'haskell-debug/next
+      "dN"  'haskell-debug/previous
+      "dB"  'haskell-debug/delete
+      "dc"  'haskell-debug/continue
+      "da"  'haskell-debug/abandon
+      "dr"  'haskell-debug/refresh)
 
     ;; configure C-c C-l so it doesn't throw any errors
     (bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
 
     ;; Switch back to editor from REPL
-    (evil-leader/set-key-for-mode 'haskell-interactive-mode
-      "msS"  'haskell-interactive-switch-back)
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-interactive-mode
+      "sS"  'haskell-interactive-switch-back)
 
     ;; Compile
-    (evil-leader/set-key-for-mode 'haskell-cabal
-      "mC"  'haskell-compile)
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-cabal
+      "C"  'haskell-compile)
 
     ;; Cabal-file bindings
-    (evil-leader/set-key-for-mode 'haskell-cabal-mode
-      ;; "m="   'haskell-cabal-subsection-arrange-lines ;; Does a bad job, 'gg=G' works better
-      "md"   'haskell-cabal-add-dependency
-      "mb"   'haskell-cabal-goto-benchmark-section
-      "me"   'haskell-cabal-goto-executable-section
-      "mt"   'haskell-cabal-goto-test-suite-section
-      "mm"   'haskell-cabal-goto-exposed-modules
-      "ml"   'haskell-cabal-goto-library-section
-      "mn"   'haskell-cabal-next-subsection
-      "mp"   'haskell-cabal-previous-subsection
-      "msc"  'haskell-interactive-mode-clear
-      "mss"  'dotemacs/haskell-interactive-bring
-      "msS"  'haskell-interactive-switch
-      "mN"   'haskell-cabal-next-section
-      "mP"   'haskell-cabal-previous-section
-      "mf"   'haskell-cabal-find-or-create-source-file)
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-cabal-mode
+      ;; "="   'haskell-cabal-subsection-arrange-lines ;; Does a bad job, 'gg=G' works better
+      "d"   'haskell-cabal-add-dependency
+      "b"   'haskell-cabal-goto-benchmark-section
+      "e"   'haskell-cabal-goto-executable-section
+      "t"   'haskell-cabal-goto-test-suite-section
+      "m"   'haskell-cabal-goto-exposed-modules
+      "l"   'haskell-cabal-goto-library-section
+      "n"   'haskell-cabal-next-subsection
+      "p"   'haskell-cabal-previous-subsection
+      "sc"  'haskell-interactive-mode-clear
+      "ss"  'dotemacs/haskell-interactive-bring
+      "sS"  'haskell-interactive-switch
+      "N"   'haskell-cabal-next-section
+      "P"   'haskell-cabal-previous-section
+      "f"   'haskell-cabal-find-or-create-source-file)
 
     ;; Make "RET" behaviour in REPL saner
     (evil-define-key 'insert haskell-interactive-mode-map
@@ -6290,12 +6277,12 @@ Otherwise use Enh Ruby Mode, which is the default.")
         (add-to-list 'haskell-process-args-cabal-repl
                      '("--ghc-option=-ferror-spans" (concat "--with-ghc=" ghci-ng))))
 
-      (evil-leader/set-key-for-mode 'haskell-mode
+      (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
         ;; function suggested in
         ;; https://github.com/chrisdone/ghci-ng#using-with-haskell-mode
-        "mu"   'haskell-mode-find-uses
-        "mht"  'haskell-mode-show-type-at
-        "mgg"  'haskell-mode-goto-loc))
+        "u"   'haskell-mode-find-uses
+        "ht"  'haskell-mode-show-type-at
+        "gg"  'haskell-mode-goto-loc))
 
     ;; Useful to have these keybindings for .cabal files, too.
     (with-eval-after-load 'haskell-cabal-mode-map
@@ -6330,8 +6317,8 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :config
   (progn
     (setq hindent-style dotemacs-haskell-enable-hindent-style)
-    (evil-leader/set-key-for-mode 'haskell-mode
-      "mF" 'hindent/reformat-decl)))
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
+      "F" 'hindent/reformat-decl)))
 
 (use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
   :ensure t
@@ -6380,16 +6367,16 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :config
   (progn
     (dotemacs-declare-prefix-for-mode 'haskell-mode "mm" "haskell/ghc-mod")
-    (evil-leader/set-key-for-mode 'haskell-mode
-      "mmt" 'ghc-insert-template-or-signature
-      "mmu" 'ghc-initial-code-from-signature
-      "mma" 'ghc-auto
-      "mmf" 'ghc-refine
-      "mme" 'ghc-expand-th
-      "mmn" 'ghc-goto-next-hole
-      "mmp" 'ghc-goto-prev-hole
-      "mm>"  'ghc-make-indent-deeper
-      "mm<"  'ghc-make-indent-shallower)))
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
+      "mt" 'ghc-insert-template-or-signature
+      "mu" 'ghc-initial-code-from-signature
+      "ma" 'ghc-auto
+      "mf" 'ghc-refine
+      "me" 'ghc-expand-th
+      "mn" 'ghc-goto-next-hole
+      "mp" 'ghc-goto-prev-hole
+      "m>"  'ghc-make-indent-deeper
+      "m<"  'ghc-make-indent-shallower)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-config
@@ -6482,7 +6469,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
 (use-package go-rename
   :disabled t
   :init
-  (evil-leader/set-key-for-mode 'go-mode "mrn" 'go-rename))
+  (dotemacs-set-leader-keys-for-major-mode 'go-mode "rn" 'go-rename))
 
 (dotemacs|do-after-display-system-init
  (when (memq window-system '(mac ns x))
@@ -6496,21 +6483,21 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (add-hook 'before-save-hook 'gofmt-before-save)
 
-    (evil-leader/set-key-for-mode 'go-mode
-      "mhh" 'godoc-at-point
-      "mig" 'go-goto-imports
-      "mia" 'go-import-add
-      "mir" 'go-remove-unused-imports
-      "meb" 'go-play-buffer
-      "mer" 'go-play-region
-      "med" 'go-download-play
-      "mxx" 'dotemacs/go-run-main
-      "mga" 'ff-find-other-file
-      "mgg" 'godef-jump
-      "mtt" 'dotemacs/go-run-test-current-function
-      "mts" 'dotemacs/go-run-test-current-suite
-      "mtp" 'dotemacs/go-run-package-tests
-      "mtP" 'dotemacs/go-run-package-tests-nested)))
+    (dotemacs-set-leader-keys-for-major-mode 'go-mode
+      "hh" 'godoc-at-point
+      "ig" 'go-goto-imports
+      "ia" 'go-import-add
+      "ir" 'go-remove-unused-imports
+      "eb" 'go-play-buffer
+      "er" 'go-play-region
+      "ed" 'go-download-play
+      "xx" 'dotemacs/go-run-main
+      "ga" 'ff-find-other-file
+      "gg" 'godef-jump
+      "tt" 'dotemacs/go-run-test-current-function
+      "ts" 'dotemacs/go-run-test-current-suite
+      "tp" 'dotemacs/go-run-package-tests
+      "tP" 'dotemacs/go-run-package-tests-nested)))
 
 (use-package go-eldoc
   :disabled t
@@ -6552,12 +6539,12 @@ Otherwise use Enh Ruby Mode, which is the default.")
   (progn
     (require 'compile)
     (c-toggle-auto-newline 1)
-    (evil-leader/set-key-for-mode 'c-mode
-      "mga" 'projectile-find-other-file
-      "mgA" 'projectile-find-other-file-other-window)
-    (evil-leader/set-key-for-mode 'c++-mode
-      "mga" 'projectile-find-other-file
-      "mgA" 'projectile-find-other-file-other-window)))
+    (dotemacs-set-leader-keys-for-major-mode 'c-mode
+      "ga" 'projectile-find-other-file
+      "gA" 'projectile-find-other-file-other-window)
+    (dotemacs-set-leader-keys-for-major-mode 'c++-mode
+      "ga" 'projectile-find-other-file
+      "gA" 'projectile-find-other-file-other-window)))
 
 (use-package clang-format
   :ensure t
@@ -6619,8 +6606,8 @@ Otherwise use Enh Ruby Mode, which is the default.")
 (dotemacs-use-package-add-hook srefactor
   :post-init
   (progn
-    (evil-leader/set-key-for-mode 'c-mode "mr" 'srefactor-refactor-at-point)
-    (evil-leader/set-key-for-mode 'c++-mode "mr" 'srefactor-refactor-at-point)
+    (dotemacs-set-leader-keys-for-major-mode 'c-mode "r" 'srefactor-refactor-at-point)
+    (dotemacs-set-leader-keys-for-major-mode 'c++-mode "r" 'srefactor-refactor-at-point)
     (dotemacs/add-to-hooks 'dotemacs-lazy-load-srefactor '(c-mode-hook c++-mode-hook)) ))
 
 (dotemacs-use-package-add-hook stickyfunc-enhance
@@ -6632,9 +6619,9 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :post-init
   (progn
     (add-hook 'c++-mode-hook 'ycmd-mode)
-    (evil-leader/set-key-for-mode 'c++-mode
-      "mgg" 'ycmd-goto
-      "mgG" 'ycmd-goto-imprecise)))
+    (dotemacs-set-leader-keys-for-major-mode 'c++-mode
+      "gg" 'ycmd-goto
+      "gG" 'ycmd-goto-imprecise)))
 
 (dotemacs-use-package-add-hook company-ycmd
   :post-init
@@ -6701,8 +6688,8 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :init
   (add-hook 'clojure-mode-hook (lambda () (require 'align-cljlet)))
   :config
-  (evil-leader/set-key-for-mode 'clojure-mode
-    "mfl" 'align-cljlet))
+  (dotemacs-set-leader-keys-for-major-mode 'clojure-mode
+    "fl" 'align-cljlet))
 
 (use-package cider
   :defer t
@@ -6804,77 +6791,77 @@ If called with a prefix argument, uses the other-window instead."
     ;;       but the problem is that it uses clojure-mode as its major-mode
 
     (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
-      (evil-leader/set-key-for-mode m
-        "mhh" 'cider-doc
-        "mhg" 'cider-grimoire
-        "mhj" 'cider-javadoc
+      (dotemacs-set-leader-keys-for-major-mode m
+        "hh" 'cider-doc
+        "hg" 'cider-grimoire
+        "hj" 'cider-javadoc
 
-        "meb" 'cider-eval-buffer
-        "mee" 'cider-eval-last-sexp
-        "mef" 'cider-eval-defun-at-point
-        "mer" 'cider-eval-region
-        "mew" 'cider-eval-last-sexp-and-replace
+        "eb" 'cider-eval-buffer
+        "ee" 'cider-eval-last-sexp
+        "ef" 'cider-eval-defun-at-point
+        "er" 'cider-eval-region
+        "ew" 'cider-eval-last-sexp-and-replace
 
-        "mfb" 'cider-format-buffer
+        "fb" 'cider-format-buffer
 
-        "mgb" 'cider-jump-back
-        "mge" 'cider-jump-to-compilation-error
-        "mgg" 'cider-find-var
-        "mgr" 'cider-jump-to-resource
+        "gb" 'cider-jump-back
+        "ge" 'cider-jump-to-compilation-error
+        "gg" 'cider-find-var
+        "gr" 'cider-jump-to-resource
 
-        "msb" 'cider-load-buffer
-        "msB" 'dotemacs-cider-send-buffer-in-repl-and-focus
-        "msc" 'cider-connect
-        "mse" 'dotemacs-cider-send-last-sexp-to-repl
-        "msE" 'dotemacs-cider-send-last-sexp-to-repl-focus
-        "msf" 'dotemacs-cider-send-function-to-repl
-        "msF" 'dotemacs-cider-send-function-to-repl-focus
-        "msi" 'cider-jack-in
-        "msI" 'cider-jack-in-clojurescript
-        "msn" 'dotemacs-cider-send-ns-form-to-repl
-        "msN" 'dotemacs-cider-send-ns-form-to-repl-focus
-        "msq" 'cider-quit
-        "msr" 'dotemacs-cider-send-region-to-repl
-        "msR" 'dotemacs-cider-send-region-to-repl-focus
-        "mss" 'cider-switch-to-repl-buffer
-        "msx" 'cider-refresh
-        "mTf" 'dotemacs-cider-toggle-repl-font-locking
-        "mTp" 'dotemacs-cider-toggle-repl-pretty-printing
+        "sb" 'cider-load-buffer
+        "sB" 'dotemacs-cider-send-buffer-in-repl-and-focus
+        "sc" 'cider-connect
+        "se" 'dotemacs-cider-send-last-sexp-to-repl
+        "sE" 'dotemacs-cider-send-last-sexp-to-repl-focus
+        "sf" 'dotemacs-cider-send-function-to-repl
+        "sF" 'dotemacs-cider-send-function-to-repl-focus
+        "si" 'cider-jack-in
+        "sI" 'cider-jack-in-clojurescript
+        "sn" 'dotemacs-cider-send-ns-form-to-repl
+        "sN" 'dotemacs-cider-send-ns-form-to-repl-focus
+        "sq" 'cider-quit
+        "sr" 'dotemacs-cider-send-region-to-repl
+        "sR" 'dotemacs-cider-send-region-to-repl-focus
+        "ss" 'cider-switch-to-repl-buffer
+        "sx" 'cider-refresh
+        "Tf" 'dotemacs-cider-toggle-repl-font-locking
+        "Tp" 'dotemacs-cider-toggle-repl-pretty-printing
 
-        "mta" 'dotemacs-cider-test-run-all-tests
-        "mtr" 'dotemacs-cider-test-rerun-tests
-        "mtt" 'dotemacs-cider-test-run-focused-test
+        "ta" 'dotemacs-cider-test-run-all-tests
+        "tr" 'dotemacs-cider-test-rerun-tests
+        "tt" 'dotemacs-cider-test-run-focused-test
 
-        "mdb" 'cider-debug-defun-at-point
-        "mde" 'dotemacs-cider-display-error-buffer
-        "mdi" 'cider-inspect))
+        "db" 'cider-debug-defun-at-point
+        "de" 'dotemacs-cider-display-error-buffer
+        "di" 'cider-inspect))
 
-    (evil-leader/set-key-for-mode 'cider-repl-mode
-      "mhh" 'cider-doc
-      "mhg" 'cider-grimoire
-      "mhj" 'cider-javadoc
+    (dotemacs-set-leader-keys-for-major-mode 'cider-repl-mode
+      "hh" 'cider-doc
+      "hg" 'cider-grimoire
+      "hj" 'cider-javadoc
 
-      "mee" 'cider-eval-last-sexp
-      "mef" 'cider-eval-defun-at-point
-      "mer" 'cider-eval-region
-      "mew" 'cider-eval-last-sexp-and-replace
+      "ee" 'cider-eval-last-sexp
+      "ef" 'cider-eval-defun-at-point
+      "er" 'cider-eval-region
+      "ew" 'cider-eval-last-sexp-and-replace
 
-      "mgb" 'cider-jump-back
-      "mge" 'cider-jump-to-compilation-error
-      "mgg" 'cider-find-var
-      "mgr" 'cider-jump-to-resource
-      "msc" 'cider-repl-clear-buffer
+      "gb" 'cider-jump-back
+      "ge" 'cider-jump-to-compilation-error
+      "gg" 'cider-find-var
+      "gr" 'cider-jump-to-resource
+      "sc" 'cider-repl-clear-buffer
 
-      "msn" 'cider-repl-set-ns
-      "msq" 'cider-quit
-      "mss" 'cider-switch-to-last-clojure-buffer
-      "msx" 'cider-refresh
-      "mTf" 'dotemacs-cider-toggle-repl-font-locking
-      "mTp" 'dotemacs-cider-toggle-repl-pretty-printing
+      "sn" 'cider-repl-set-ns
+      "sq" 'cider-quit
+      "ss" 'cider-switch-to-last-clojure-buffer
+      "sx" 'cider-refresh
+      "Tf" 'dotemacs-cider-toggle-repl-font-locking
+      "Tp" 'dotemacs-cider-toggle-repl-pretty-printing
 
-      "mdb" 'cider-debug-defun-at-point
-      "mde" 'dotemacs-cider-display-error-buffer
-      "mdi" 'cider-inspect)
+      "db" 'cider-debug-defun-at-point
+      "de" 'dotemacs-cider-display-error-buffer
+      "di" 'cider-inspect)
 
     (evil-define-key 'normal cider-repl-mode-map
       "C-j" 'cider-repl-next-input
@@ -6886,7 +6873,6 @@ If called with a prefix argument, uses the other-window instead."
   (defadvice cider-jump-to-var (before add-evil-jump activate)
     (evil-set-jump)))
 
-
 (use-package clj-refactor
   :defer t
   :ensure t
@@ -6897,73 +6883,73 @@ If called with a prefix argument, uses the other-window instead."
     (cljr-add-keybindings-with-prefix "C-c C-f")
 
     (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
-      (evil-leader/set-key-for-mode m
-        "mr?"  'cljr-describe-refactoring
-        "mrad" 'cljr-add-declaration
-        "mrai" 'cljr-add-import-to-ns
-        "mram" 'cljr-add-missing-libspec
-        "mrap" 'cljr-add-project-dependency
-        "mrar" 'cljr-add-require-to-ns
-        "mras" 'cljr-add-stubs
-        "mrau" 'cljr-add-use-to-ns
-        "mrcc" 'cljr-cycle-coll
-        "mrci" 'cljr-cycle-if
-        "mrcn" 'cljr-clean-ns
-        "mrcp" 'cljr-cycle-privacy
-        "mrdk" 'cljr-destructure-keys
-        "mrec" 'cljr-extract-constant
-        "mred" 'cljr-extract-def
-        "mref" 'cljr-extract-function
-        "mrel" 'cljr-expand-let
-        "mrfe" 'cljr-create-fn-from-example
-        "mrfu" 'cljr-find-usages
-        "mrhd" 'cljr-hotload-dependency
-        "mril" 'cljr-introduce-let
-        "mris" 'cljr-inline-symbol
-        "mrmf" 'cljr-move-form
-        "mrml" 'cljr-move-to-let
-        "mrpc" 'cljr-project-clean
-        "mrpf" 'cljr-promote-function
-        "mrrd" 'cljr-remove-debug-fns
-        "mrrf" 'cljr-rename-file-or-dir
-        "mrrl" 'cljr-remove-let
-        "mrrr" 'cljr-remove-unused-requires
-        "mrrs" 'cljr-rename-symbol
-        "mrru" 'cljr-replace-use
-        "mrsc" 'cljr-show-changelog
-        "mrsn" 'cljr-sort-ns
-        "mrsp" 'cljr-sort-project-dependencies
-        "mrsr" 'cljr-stop-referring
-        "mrtf" 'cljr-thread-first-all
-        "mrth" 'cljr-thread
-        "mrtl" 'cljr-thread-last-all
-        "mrua" 'cljr-unwind-all
-        "mrup" 'cljr-update-project-dependencies
-        "mruw" 'cljr-unwind))
+      (dotemacs-set-leader-keys-for-major-mode m
+        "r?"  'cljr-describe-refactoring
+        "rad" 'cljr-add-declaration
+        "rai" 'cljr-add-import-to-ns
+        "ram" 'cljr-add-missing-libspec
+        "rap" 'cljr-add-project-dependency
+        "rar" 'cljr-add-require-to-ns
+        "ras" 'cljr-add-stubs
+        "rau" 'cljr-add-use-to-ns
+        "rcc" 'cljr-cycle-coll
+        "rci" 'cljr-cycle-if
+        "rcn" 'cljr-clean-ns
+        "rcp" 'cljr-cycle-privacy
+        "rdk" 'cljr-destructure-keys
+        "rec" 'cljr-extract-constant
+        "red" 'cljr-extract-def
+        "ref" 'cljr-extract-function
+        "rel" 'cljr-expand-let
+        "rfe" 'cljr-create-fn-from-example
+        "rfu" 'cljr-find-usages
+        "rhd" 'cljr-hotload-dependency
+        "ril" 'cljr-introduce-let
+        "ris" 'cljr-inline-symbol
+        "rmf" 'cljr-move-form
+        "rml" 'cljr-move-to-let
+        "rpc" 'cljr-project-clean
+        "rpf" 'cljr-promote-function
+        "rrd" 'cljr-remove-debug-fns
+        "rrf" 'cljr-rename-file-or-dir
+        "rrl" 'cljr-remove-let
+        "rrr" 'cljr-remove-unused-requires
+        "rrs" 'cljr-rename-symbol
+        "rru" 'cljr-replace-use
+        "rsc" 'cljr-show-changelog
+        "rsn" 'cljr-sort-ns
+        "rsp" 'cljr-sort-project-dependencies
+        "rsr" 'cljr-stop-referring
+        "rtf" 'cljr-thread-first-all
+        "rth" 'cljr-thread
+        "rtl" 'cljr-thread-last-all
+        "rua" 'cljr-unwind-all
+        "rup" 'cljr-update-project-dependencies
+        "ruw" 'cljr-unwind))
 
-    (evil-leader/set-key-for-mode 'cider-repl-mode
-      "mr?"  'cljr-describe-refactoring
-      "mrap" 'cljr-add-project-dependency
-      "mras" 'cljr-add-stubs
-      "mrcc" 'cljr-cycle-coll
-      "mrci" 'cljr-cycle-if
-      "mrcp" 'cljr-cycle-privacy
-      "mrdk" 'cljr-destructure-keys
-      "mrel" 'cljr-expand-let
-      "mrfu" 'cljr-find-usages
-      "mrhd" 'cljr-hotload-dependency
-      "mril" 'cljr-introduce-let
-      "mrml" 'cljr-move-to-let
-      "mrpc" 'cljr-project-clean
-      "mrrl" 'cljr-remove-let
-      "mrsp" 'cljr-sort-project-dependencies
-      "mrsc" 'cljr-show-changelog
-      "mrtf" 'cljr-thread-first-all
-      "mrth" 'cljr-thread
-      "mrtl" 'cljr-thread-last-all
-      "mrua" 'cljr-unwind-all
-      "mrup" 'cljr-update-project-dependencies
-      "mruw" 'cljr-unwind)))
+    (dotemacs-set-leader-keys-for-major-mode 'cider-repl-mode
+      "r?"  'cljr-describe-refactoring
+      "rap" 'cljr-add-project-dependency
+      "ras" 'cljr-add-stubs
+      "rcc" 'cljr-cycle-coll
+      "rci" 'cljr-cycle-if
+      "rcp" 'cljr-cycle-privacy
+      "rdk" 'cljr-destructure-keys
+      "rel" 'cljr-expand-let
+      "rfu" 'cljr-find-usages
+      "rhd" 'cljr-hotload-dependency
+      "ril" 'cljr-introduce-let
+      "rml" 'cljr-move-to-let
+      "rpc" 'cljr-project-clean
+      "rrl" 'cljr-remove-let
+      "rsp" 'cljr-sort-project-dependencies
+      "rsc" 'cljr-show-changelog
+      "rtf" 'cljr-thread-first-all
+      "rth" 'cljr-thread
+      "rtl" 'cljr-thread-last-all
+      "rua" 'cljr-unwind-all
+      "rup" 'cljr-update-project-dependencies
+      "ruw" 'cljr-unwind)))
 
 (use-package clojure-mode
   :defer t
@@ -6983,8 +6969,8 @@ If called with a prefix argument, uses the other-window instead."
                (if clojure-defun-style-default-indent "ON" "OFF")))
 
     (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
-      (evil-leader/set-key-for-mode m
-        "mTi" 'dotemacs-clojure-mode-toggle-default-indent-style))
+      (dotemacs-set-leader-keys-for-major-mode m
+        "Ti" 'dotemacs-clojure-mode-toggle-default-indent-style))
 
     (when dotemacs-clojure-enable-fancify-symbols
       (dolist (m '(clojure-mode clojurescript-mode clojurec-mode clojurex-mode))
@@ -7033,9 +7019,9 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     ;; (dotemacs//init-ocaml-opam)
-    (evil-leader/set-key-for-mode 'tuareg-mode
-      "mga" 'tuareg-find-alternate-file
-      "mcc" 'compile)
+    (dotemacs-set-leader-keys-for-major-mode 'tuareg-mode
+      "ga" 'tuareg-find-alternate-file
+      "cc" 'compile)
     ;; Make OCaml-generated files invisible to filename completion
     (dolist (ext '(".cmo" ".cmx" ".cma" ".cmxa" ".cmi" ".cmxs" ".cmt" ".annot"))
       (add-to-list 'completion-ignored-extensions ext)))
@@ -7078,11 +7064,11 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
-    (evil-leader/set-key-for-mode 'purescript-mode
-      "mi="  'purescript-mode-format-imports
-      "mi`"  'purescript-navigate-imports-return
-      "mia"  'purescript-align-imports
-      "min"  'purescript-navigate-imports)))
+    (dotemacs-set-leader-keys-for-major-mode 'purescript-mode
+      "i="  'purescript-mode-format-imports
+      "i`"  'purescript-navigate-imports-return
+      "ia"  'purescript-align-imports
+      "in"  'purescript-navigate-imports)))
 
 (with-eval-after-load 'flycheck
   (flycheck-define-checker purs-check
@@ -7114,11 +7100,11 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (add-hook 'purescript-mode-hook 'inferior-psci-mode)
-    (evil-leader/set-key-for-mode 'purescript-mode
-      "msb" 'psci/load-current-file!
-      "msi" 'psci
-      "msm" 'psci/load-module!
-      "msp" 'psci/load-project-modules!)))
+    (dotemacs-set-leader-keys-for-major-mode 'purescript-mode
+      "sb" 'psci/load-current-file!
+      "si" 'psci
+      "sm" 'psci/load-module!
+      "sp" 'psci/load-project-modules!)))
 
 ;;; React
 (dotemacs-defvar-company-backends react-mode)
@@ -7180,7 +7166,7 @@ If called with a prefix argument, uses the other-window instead."
 
 (dotemacs-use-package-add-hook web-beautify
   :post-init
-  (evil-leader/set-key-for-mode 'react-mode  "m=" 'web-beautify-js))
+  (dotemacs-set-leader-keys-for-major-mode 'react-mode  "=" 'web-beautify-js))
 
 (dotemacs-use-package-add-hook web-mode
   :post-init
@@ -7253,30 +7239,30 @@ If called with a prefix argument, uses the other-window instead."
       (run-elm-interactive)
       (evil-insert-state))
 
-    (evil-leader/set-key-for-mode 'elm-mode
+    (dotemacs-set-leader-keys-for-major-mode 'elm-mode
       ;; make
-      "mcb" 'elm-compile-buffer
-      "mcB" 'dotemacs/elm-compile-buffer-output
-      "mcm" 'elm-compile-main
+      "cb" 'elm-compile-buffer
+      "cB" 'dotemacs/elm-compile-buffer-output
+      "cm" 'elm-compile-main
 
       ;; oracle
-      "mht" 'elm-oracle-type-at-point
+      "ht" 'elm-oracle-type-at-point
 
       ;; repl
-      "msi" 'elm-repl-load
-      "msf" 'push-decl-elm-repl
-      "msF" 'dotemacs/push-decl-elm-repl-focus
-      "msr" 'push-elm-repl
-      "msR" 'dotemacs/push-elm-repl-focus
+      "si" 'elm-repl-load
+      "sf" 'push-decl-elm-repl
+      "sF" 'dotemacs/push-decl-elm-repl-focus
+      "sr" 'push-elm-repl
+      "sR" 'dotemacs/push-elm-repl-focus
 
       ;; reactor
-      "mRn" 'elm-preview-buffer
-      "mRm" 'elm-preview-main
+      "Rn" 'elm-preview-buffer
+      "Rm" 'elm-preview-main
 
       ;; package
-      "mpi" 'elm-import
-      "mpc" 'elm-package-catalog
-      "mpd" 'elm-documentation-lookup)
+      "pi" 'elm-import
+      "pc" 'elm-package-catalog
+      "pd" 'elm-documentation-lookup)
 
     (evilified-state-evilify elm-package-mode elm-package-mode-map
       "g" 'elm-package-refresh
@@ -7481,10 +7467,10 @@ If called with a prefix argument, uses the other-window instead."
 
     (defun dotemacs-js-doc-set-key-bindings (mode)
       "Setup the key bindings for `js2-doc' for the given MODE."
-      (evil-leader/set-key-for-mode mode "mrdb" 'js-doc-insert-file-doc)
-      (evil-leader/set-key-for-mode mode "mrdf" 'js-doc-insert-function-doc)
-      (evil-leader/set-key-for-mode mode "mrdt" 'js-doc-insert-tag)
-      (evil-leader/set-key-for-mode mode "mrdh" 'js-doc-describe-tag))
+      (dotemacs-set-leader-keys-for-major-mode mode "rdb" 'js-doc-insert-file-doc)
+      (dotemacs-set-leader-keys-for-major-mode mode "rdf" 'js-doc-insert-function-doc)
+      (dotemacs-set-leader-keys-for-major-mode mode "rdt" 'js-doc-insert-tag)
+      (dotemacs-set-leader-keys-for-major-mode mode "rdh" 'js-doc-describe-tag))
     (dotemacs-js-doc-set-key-bindings 'js2-mode)))
 
 (use-package js2-mode                   ; Javascript editing
@@ -7521,13 +7507,13 @@ If called with a prefix argument, uses the other-window instead."
     (setq js2-global-externs '("__dirname" "_" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "sinon" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
 
     (dotemacs-declare-prefix-for-mode 'js2-mode "mz" "folding")
-    (evil-leader/set-key-for-mode 'js2-mode "mw" 'js2-mode-toggle-warnings-and-errors)
-    (evil-leader/set-key-for-mode 'js2-mode "mzc" 'js2-mode-hide-element)
-    (evil-leader/set-key-for-mode 'js2-mode "mzo" 'js2-mode-show-element)
-    (evil-leader/set-key-for-mode 'js2-mode "mzr" 'js2-mode-show-all)
-    (evil-leader/set-key-for-mode 'js2-mode "mze" 'js2-mode-toggle-element)
-    (evil-leader/set-key-for-mode 'js2-mode "mzF" 'js2-mode-toggle-hide-functions)
-    (evil-leader/set-key-for-mode 'js2-mode "mzC" 'js2-mode-toggle-hide-comments)))
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "w" 'js2-mode-toggle-warnings-and-errors)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zc" 'js2-mode-hide-element)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zo" 'js2-mode-show-element)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zr" 'js2-mode-show-all)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "ze" 'js2-mode-toggle-element)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zF" 'js2-mode-toggle-hide-functions)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zC" 'js2-mode-toggle-hide-comments)))
 
 (use-package evil-matchit-js2
   :defer t
@@ -7546,61 +7532,61 @@ If called with a prefix argument, uses the other-window instead."
 
     (defun dotemacs-js2-refactor-set-key-bindings (mode)
       (dotemacs-declare-prefix-for-mode 'js2-mode "mr3" "ternary")
-      (evil-leader/set-key-for-mode 'js2-mode "mr3i" 'js2r-ternary-to-if)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "r3i" 'js2r-ternary-to-if)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mra" "add/args")
-      (evil-leader/set-key-for-mode 'js2-mode "mrag" 'js2r-add-to-globals-annotation)
-      (evil-leader/set-key-for-mode 'js2-mode "mrao" 'js2r-arguments-to-object)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rag" 'js2r-add-to-globals-annotation)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rao" 'js2r-arguments-to-object)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrb" "barf")
-      (evil-leader/set-key-for-mode 'js2-mode "mrba" 'js2r-forward-barf)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rba" 'js2r-forward-barf)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrc" "contract")
-      (evil-leader/set-key-for-mode 'js2-mode "mrca" 'js2r-contract-array)
-      (evil-leader/set-key-for-mode 'js2-mode "mrco" 'js2r-contract-object)
-      (evil-leader/set-key-for-mode 'js2-mode "mrcu" 'js2r-contract-function)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rca" 'js2r-contract-array)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rco" 'js2r-contract-object)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rcu" 'js2r-contract-function)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mre" "expand/extract")
-      (evil-leader/set-key-for-mode 'js2-mode "mrea" 'js2r-expand-array)
-      (evil-leader/set-key-for-mode 'js2-mode "mref" 'js2r-extract-function)
-      (evil-leader/set-key-for-mode 'js2-mode "mrem" 'js2r-extract-method)
-      (evil-leader/set-key-for-mode 'js2-mode "mreo" 'js2r-expand-object)
-      (evil-leader/set-key-for-mode 'js2-mode "mreu" 'js2r-expand-function)
-      (evil-leader/set-key-for-mode 'js2-mode "mrev" 'js2r-extract-var)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rea" 'js2r-expand-array)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "ref" 'js2r-extract-function)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rem" 'js2r-extract-method)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "reo" 'js2r-expand-object)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "reu" 'js2r-expand-function)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rev" 'js2r-extract-var)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mri" "inline/inject/introduct")
-      (evil-leader/set-key-for-mode 'js2-mode "mrig" 'js2r-inject-global-in-iife)
-      (evil-leader/set-key-for-mode 'js2-mode "mrip" 'js2r-introduce-parameter)
-      (evil-leader/set-key-for-mode 'js2-mode "mriv" 'js2r-inline-var)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rig" 'js2r-inject-global-in-iife)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rip" 'js2r-introduce-parameter)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "riv" 'js2r-inline-var)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrl" "localize/log")
-      (evil-leader/set-key-for-mode 'js2-mode "mrlp" 'js2r-localize-parameter)
-      (evil-leader/set-key-for-mode 'js2-mode "mrlt" 'js2r-log-this)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rlp" 'js2r-localize-parameter)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rlt" 'js2r-log-this)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrr" "rename")
-      (evil-leader/set-key-for-mode 'js2-mode "mrrv" 'js2r-rename-var)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rrv" 'js2r-rename-var)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrs" "split/slurp")
-      (evil-leader/set-key-for-mode 'js2-mode "mrsl" 'js2r-forward-slurp)
-      (evil-leader/set-key-for-mode 'js2-mode "mrss" 'js2r-split-string)
-      (evil-leader/set-key-for-mode 'js2-mode "mrsv" 'js2r-split-var-declaration)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rsl" 'js2r-forward-slurp)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rss" 'js2r-split-string)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rsv" 'js2r-split-var-declaration)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrt" "toggle")
-      (evil-leader/set-key-for-mode 'js2-mode "mrtf" 'js2r-toggle-function-expression-and-declaration)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rtf" 'js2r-toggle-function-expression-and-declaration)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mru" "unwrap")
-      (evil-leader/set-key-for-mode 'js2-mode "mruw" 'js2r-unwrap)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "ruw" 'js2r-unwrap)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrv" "var")
-      (evil-leader/set-key-for-mode 'js2-mode "mrvt" 'js2r-var-to-this)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rvt" 'js2r-var-to-this)
 
       (dotemacs-declare-prefix-for-mode 'js2-mode "mrw" "wrap")
-      (evil-leader/set-key-for-mode 'js2-mode "mrwi" 'js2r-wrap-buffer-in-iife)
-      (evil-leader/set-key-for-mode 'js2-mode "mrwl" 'js2r-wrap-in-for-loop)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rwi" 'js2r-wrap-buffer-in-iife)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rwl" 'js2r-wrap-in-for-loop)
 
-      (evil-leader/set-key-for-mode 'js2-mode "mk" 'js2r-kill)
-      (evil-leader/set-key-for-mode 'js2-mode "xmj" 'js2r-move-line-down)
-      (evil-leader/set-key-for-mode 'js2-mode "xmk" 'js2r-move-line-up))
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "k" 'js2r-kill)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "mj" 'js2r-move-line-down)
+      (dotemacs-set-leader-keys-for-major-mode 'js2-mode "mk" 'js2r-move-line-up))
 
     (dotemacs-js2-refactor-set-key-bindings 'js2-mode)))
 
@@ -7612,8 +7598,8 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :ensure t
   :config
-  (evil-leader/set-key-for-mode 'json-mode
-    "mhp" 'jsons-print-path))
+  (dotemacs-set-leader-keys-for-major-mode 'json-mode
+    "hp" 'jsons-print-path))
 
 (use-package js2-imenu-extras
   :ensure js2-mode
@@ -7637,22 +7623,22 @@ If called with a prefix argument, uses the other-window instead."
   :init (add-hook 'js2-mode-hook 'tern-mode)
   :config
   (progn
-    (evil-leader/set-key-for-mode 'js2-mode "mrrV" 'tern-rename-variable)
-    (evil-leader/set-key-for-mode 'js2-mode "mhd" 'tern-get-docs)
-    (evil-leader/set-key-for-mode 'js2-mode "mgg" 'tern-find-definition)
-    (evil-leader/set-key-for-mode 'js2-mode "mgG" 'tern-find-definition-by-name)
-    (evil-leader/set-key-for-mode 'js2-mode (kbd "m C-g") 'tern-pop-find-definition)
-    (evil-leader/set-key-for-mode 'js2-mode "mht" 'tern-get-type)))
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rrV" 'tern-rename-variable)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "hd" 'tern-get-docs)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "gg" 'tern-find-definition)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "gG" 'tern-find-definition-by-name)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode (kbd "C-g") 'tern-pop-find-definition)
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode "ht" 'tern-get-type)))
 
 (use-package web-beautify
   :defer t
   :ensure t
   :init
   (progn
-    (evil-leader/set-key-for-mode 'js2-mode  "m=" 'web-beautify-js)
-    (evil-leader/set-key-for-mode 'json-mode "m=" 'web-beautify-js)
-    (evil-leader/set-key-for-mode 'web-mode  "m=" 'web-beautify-html)
-    (evil-leader/set-key-for-mode 'css-mode  "m=" 'web-beautify-css)))
+    (dotemacs-set-leader-keys-for-major-mode 'js2-mode  "=" 'web-beautify-js)
+    (dotemacs-set-leader-keys-for-major-mode 'json-mode "=" 'web-beautify-js)
+    (dotemacs-set-leader-keys-for-major-mode 'web-mode  "=" 'web-beautify-html)
+    (dotemacs-set-leader-keys-for-major-mode 'css-mode  "=" 'web-beautify-css)))
 
 
 ;;; Web languages
@@ -7710,9 +7696,9 @@ If called with a prefix argument, uses the other-window instead."
       (while (not (looking-at "}"))
         (join-line -1)))
 
-    (evil-leader/set-key-for-mode 'css-mode
-      "mzc" 'css-contract-statement
-      "mzo" 'css-expand-statement))
+    (dotemacs-set-leader-keys-for-major-mode 'css-mode
+      "zc" 'css-contract-statement
+      "zo" 'css-expand-statement))
   :config
   (progn
     ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
@@ -7744,7 +7730,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (dolist (mode '(css-mode scss-mode))
-    (evil-leader/set-key-for-mode mode "mgh" 'helm-css-scss)))
+    (dotemacs-set-leader-keys-for-major-mode mode "gh" 'helm-css-scss)))
 
 (dotemacs-use-package-add-hook rainbow-delimiters
   :post-init
@@ -7779,19 +7765,19 @@ If called with a prefix argument, uses the other-window instead."
         ;     (flycheck-select-checker 'javascript-eslint)))
         ))
 
-    (evil-leader/set-key-for-mode 'web-mode
-      "meh" 'web-mode-dom-errors-show
-      "mgb" 'web-mode-element-beginning
-      "mgc" 'web-mode-element-child
-      "mgp" 'web-mode-element-parent
-      "mgs" 'web-mode-element-sibling-next
-      "mhp" 'web-mode-dom-xpath
-      "mrc" 'web-mode-element-clone
-      "mrd" 'web-mode-element-vanish
-      "mrk" 'web-mode-element-kill
-      "mrr" 'web-mode-element-rename
-      "mrw" 'web-mode-element-wrap
-      "mz" 'web-mode-fold-or-unfold
+    (dotemacs-set-leader-keys-for-major-mode 'web-mode
+      "eh" 'web-mode-dom-errors-show
+      "gb" 'web-mode-element-beginning
+      "gc" 'web-mode-element-child
+      "gp" 'web-mode-element-parent
+      "gs" 'web-mode-element-sibling-next
+      "hp" 'web-mode-dom-xpath
+      "rc" 'web-mode-element-clone
+      "rd" 'web-mode-element-vanish
+      "rk" 'web-mode-element-kill
+      "rr" 'web-mode-element-rename
+      "rw" 'web-mode-element-wrap
+      "z" 'web-mode-fold-or-unfold
       ;; TODO element close would be nice but broken with evil.
       )
 
@@ -7966,11 +7952,11 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (setq lua-indent-level 2
           lua-indent-string-contents t)
-    (evil-leader/set-key-for-mode 'lua-mode "md" 'lua-search-documentation)
-    (evil-leader/set-key-for-mode 'lua-mode "msb" 'lua-send-buffer)
-    (evil-leader/set-key-for-mode 'lua-mode "msf" 'lua-send-defun)
-    (evil-leader/set-key-for-mode 'lua-mode "msl" 'lua-send-current-line)
-    (evil-leader/set-key-for-mode 'lua-mode "msr" 'lua-send-region)))
+    (dotemacs-set-leader-keys-for-major-mode 'lua-mode "d" 'lua-search-documentation)
+    (dotemacs-set-leader-keys-for-major-mode 'lua-mode "sb" 'lua-send-buffer)
+    (dotemacs-set-leader-keys-for-major-mode 'lua-mode "sf" 'lua-send-defun)
+    (dotemacs-set-leader-keys-for-major-mode 'lua-mode "sl" 'lua-send-current-line)
+    (dotemacs-set-leader-keys-for-major-mode 'lua-mode "sr" 'lua-send-region)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -8096,31 +8082,31 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :config
   (progn
-    (evil-leader/set-key-for-mode 'racket-mode
+    (dotemacs-set-leader-keys-for-major-mode 'racket-mode
       ;; navigation
-      "mg`" 'racket-unvisit
-      "mgg" 'racket-visit-definition
-      "mgm" 'racket-visit-module
-      "mgr" 'racket-open-require-path
+      "g`" 'racket-unvisit
+      "gg" 'racket-visit-definition
+      "gm" 'racket-visit-module
+      "gr" 'racket-open-require-path
       ;; doc
-      "mhd" 'racket-describe
-      "mhh" 'racket-doc
+      "hd" 'racket-describe
+      "hh" 'racket-doc
       ;; insert
-      "mil" 'racket-insert-lambda
+      "il" 'racket-insert-lambda
       ;; REPL
-      "msb" 'racket-run
-      "msB" 'dotemacs-racket-run-and-switch-to-repl
-      "mse" 'racket-send-last-sexp
-      "msE" 'dotemacs-racket-send-last-sexp-focus
-      "msf" 'racket-send-definition
-      "msF" 'dotemacs-racket-send-definition-focus
-      "msi" 'racket-repl
-      "msr" 'racket-send-region
-      "msR" 'dotemacs-racket-send-region-focus
-      "mss" 'racket-repl
+      "sb" 'racket-run
+      "sB" 'dotemacs-racket-run-and-switch-to-repl
+      "se" 'racket-send-last-sexp
+      "sE" 'dotemacs-racket-send-last-sexp-focus
+      "sf" 'racket-send-definition
+      "sF" 'dotemacs-racket-send-definition-focus
+      "si" 'racket-repl
+      "sr" 'racket-send-region
+      "sR" 'dotemacs-racket-send-region-focus
+      "ss" 'racket-repl
       ;; Tests
-      "mtb" 'racket-test
-      "mtB" 'dotemacs-racket-test-with-coverage)
+      "tb" 'racket-test
+      "tB" 'dotemacs-racket-test-with-coverage)
     (define-key racket-mode-map (kbd "H-r") 'racket-run)
     ;; remove racket auto-insert of closing delimiter
     ;; see https://github.com/greghendershott/racket-mode/issues/140
@@ -8209,58 +8195,58 @@ If called with a prefix argument, uses the other-window instead."
       (kbd "R") 'eclim-project-rename
       (kbd "q") 'eclim-quit-window)
 
-    (evil-leader/set-key-for-mode 'java-mode
-      "mea" 'eclim-problems-show-all
-      "meb" 'eclim-problems
-      "mec" 'eclim-problems-correct
-      "mee" 'eclim-problems-show-errors
-      "mef" 'eclim-problems-toggle-filefilter
-      "men" 'eclim-problems-next-same-window
-      "meo" 'eclim-problems-open
-      "mep" 'eclim-problems-previous-same-window
-      "mew" 'eclim-problems-show-warnings
+    (dotemacs-set-leader-keys-for-major-mode 'java-mode
+      "ea" 'eclim-problems-show-all
+      "eb" 'eclim-problems
+      "ec" 'eclim-problems-correct
+      "ee" 'eclim-problems-show-errors
+      "ef" 'eclim-problems-toggle-filefilter
+      "en" 'eclim-problems-next-same-window
+      "eo" 'eclim-problems-open
+      "ep" 'eclim-problems-previous-same-window
+      "ew" 'eclim-problems-show-warnings
 
-      "mff" 'eclim-java-find-generic
+      "ff" 'eclim-java-find-generic
 
-      "mgg" 'eclim-java-find-declaration
-      "mgt" 'eclim-java-find-type
+      "gg" 'eclim-java-find-declaration
+      "gt" 'eclim-java-find-type
 
-      "mrc" 'eclim-java-constructor
-      "mrg" 'eclim-java-generate-getter-and-setter
-      "mrf" 'eclim-java-format
-      "mri" 'eclim-java-import-organize
-      "mrj" 'eclim-java-implement
-      "mrr" 'eclim-java-refactor-rename-symbol-at-point
+      "rc" 'eclim-java-constructor
+      "rg" 'eclim-java-generate-getter-and-setter
+      "rf" 'eclim-java-format
+      "ri" 'eclim-java-import-organize
+      "rj" 'eclim-java-implement
+      "rr" 'eclim-java-refactor-rename-symbol-at-point
 
-      "mhc" 'eclim-java-call-hierarchy
-      "mhh" 'eclim-java-show-documentation-for-current-element
-      "mhi" 'eclim-java-hierarchy
-      "mhu" 'eclim-java-find-references
+      "hc" 'eclim-java-call-hierarchy
+      "hh" 'eclim-java-show-documentation-for-current-element
+      "hi" 'eclim-java-hierarchy
+      "hu" 'eclim-java-find-references
 
-      "mmi" 'dotemacs-java-maven-clean-install
-      "mmI" 'dotemacs-java-maven-install
-      "mmp" 'eclim-maven-lifecycle-phases
-      "mmr" 'eclim-maven-run
-      "mmR" 'eclim-maven-lifecycle-phase-run
-      "mmt" 'dotemacs-java-maven-test
+      "mi" 'dotemacs-java-maven-clean-install
+      "mI" 'dotemacs-java-maven-install
+      "mp" 'eclim-maven-lifecycle-phases
+      "mr" 'eclim-maven-run
+      "mR" 'eclim-maven-lifecycle-phase-run
+      "mt" 'dotemacs-java-maven-test
 
-      "maa" 'eclim-ant-run
-      "mac" 'eclim-ant-clear-cache
-      "mar" 'eclim-ant-run
-      "mav" 'eclim-ant-validate
+      "aa" 'eclim-ant-run
+      "ac" 'eclim-ant-clear-cache
+      "ar" 'eclim-ant-run
+      "av" 'eclim-ant-validate
 
-      "mpb" 'eclim-project-build
-      "mpc" 'eclim-project-create
-      "mpd" 'eclim-project-delete
-      "mpg" 'eclim-project-goto
-      "mpi" 'eclim-project-import
-      "mpj" 'eclim-project-info-mode
-      "mpk" 'eclim-project-close
-      "mpo" 'eclim-project-open
-      "mpp" 'eclim-project-mode
-      "mpu" 'eclim-project-update
+      "pb" 'eclim-project-build
+      "pc" 'eclim-project-create
+      "pd" 'eclim-project-delete
+      "pg" 'eclim-project-goto
+      "pi" 'eclim-project-import
+      "pj" 'eclim-project-info-mode
+      "pk" 'eclim-project-close
+      "po" 'eclim-project-open
+      "pp" 'eclim-project-mode
+      "pu" 'eclim-project-update
 
-      "mtt" 'eclim-run-junit)))
+      "tt" 'eclim-run-junit)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -8341,11 +8327,11 @@ If called with a prefix argument, uses the other-window instead."
       (interactive)
       (restclient-http-send-current t t))
 
-    (evil-leader/set-key-for-mode 'restclient-mode
-      "ms" 'restclient-http-send-current-stay-in-window
-      "mS" 'restclient-http-send-current
-      "mr" 'restclient-http-send-current-raw-stay-in-window
-      "mR" 'restclient-http-send-current-raw
+    (dotemacs-set-leader-keys-for-major-mode 'restclient-mode
+      "s" 'restclient-http-send-current-stay-in-window
+      "S" 'restclient-http-send-current
+      "r" 'restclient-http-send-current-raw-stay-in-window
+      "R" 'restclient-http-send-current-raw
       )))
 
 (when (eq dotemacs-completion-engine 'company)
@@ -8393,36 +8379,36 @@ If called with a prefix argument, uses the other-window instead."
           ;; the focus of SQLi is handled by dotemacs conventions
           sql-pop-to-buffer-after-send-region nil)
 
-    (evil-leader/set-key-for-mode 'sql-mode
+    (dotemacs-set-leader-keys-for-major-mode 'sql-mode
       ;; sqli buffer
-      "mbb" 'sql-show-sqli-buffer
-      "mbs" 'sql-set-sqli-buffer
+      "bb" 'sql-show-sqli-buffer
+      "bs" 'sql-set-sqli-buffer
 
       ;; dialects
-      "mhk" 'dotemacs-sql-highlight
+      "hk" 'dotemacs-sql-highlight
 
       ;; interactivity
-      "msb" 'sql-send-buffer
-      "msB" 'dotemacs-sql-send-buffer-and-focus
-      "msi" 'dotemacs-sql-start
+      "sb" 'sql-send-buffer
+      "sB" 'dotemacs-sql-send-buffer-and-focus
+      "si" 'dotemacs-sql-start
       ;; paragraph gets "f" here because they can be assimilated to functions.
       ;; If you separate your commands in a SQL file, this key will send the
       ;; command under the point, which is what you probably want.
-      "msf" 'sql-send-paragraph
-      "msF" 'dotemacs-sql-send-paragraph-and-focus
-      "msq" 'sql-send-string
-      "msQ" 'dotemacs-sql-send-string-and-focus
-      "msr" 'sql-send-region
-      "msR" 'dotemacs-sql-send-region-and-focus
+      "sf" 'sql-send-paragraph
+      "sF" 'dotemacs-sql-send-paragraph-and-focus
+      "sq" 'sql-send-string
+      "sQ" 'dotemacs-sql-send-string-and-focus
+      "sr" 'sql-send-region
+      "sR" 'dotemacs-sql-send-region-and-focus
 
       ;; listing
-      "mla" 'sql-list-all
-      "mlt" 'sql-list-table)
+      "la" 'sql-list-all
+      "lt" 'sql-list-table)
 
-    (evil-leader/set-key-for-mode 'sql-interactive-mode
+    (dotemacs-set-leader-keys-for-major-mode 'sql-interactive-mode
       ;; sqli buffer
-      "mbr" 'sql-rename-buffer
-      "mbS" 'sql-save-connection)
+      "br" 'sql-rename-buffer
+      "bS" 'sql-save-connection)
 
     (add-hook 'sql-interactive-mode-hook
               (lambda () (toggle-truncate-lines t)))))
@@ -8447,21 +8433,21 @@ If called with a prefix argument, uses the other-window instead."
   (when (fboundp mode)
     (let ((hook (intern (concat (symbol-name mode) "-hook"))))
       (add-hook hook 'helm-gtags-mode))
-    (evil-leader/set-key-for-mode mode
-      "mgc" 'helm-gtags-create-tags
-      "mgd" 'helm-gtags-find-tag
-      "mgf" 'helm-gtags-select-path
-      "mgg" 'helm-gtags-dwim
-      "mgG" 'helm-gtags-dwim-other-window
-      "mgi" 'helm-gtags-tags-in-this-function
-      "mgl" 'helm-gtags-parse-file
-      "mgn" 'helm-gtags-next-history
-      "mgp" 'helm-gtags-previous-history
-      "mgr" 'helm-gtags-find-rtag
-      "mgR" 'helm-gtags-resume
-      "mgs" 'helm-gtags-select
-      "mgS" 'helm-gtags-show-stack
-      "mgu" 'helm-gtags-update-tags)))
+    (dotemacs-set-leader-keys-for-major-mode mode
+      "gc" 'helm-gtags-create-tags
+      "gd" 'helm-gtags-find-tag
+      "gf" 'helm-gtags-select-path
+      "gg" 'helm-gtags-dwim
+      "gG" 'helm-gtags-dwim-other-window
+      "gi" 'helm-gtags-tags-in-this-function
+      "gl" 'helm-gtags-parse-file
+      "gn" 'helm-gtags-next-history
+      "gp" 'helm-gtags-previous-history
+      "gr" 'helm-gtags-find-rtag
+      "gR" 'helm-gtags-resume
+      "gs" 'helm-gtags-select
+      "gS" 'helm-gtags-show-stack
+      "gu" 'helm-gtags-update-tags)))
 
 (defun dotemacs-ggtags-enable-eldoc (mode)
   (add-hook (intern (concat (symbol-name mode) "-hook"))
@@ -8540,7 +8526,7 @@ If called with a prefix argument, uses the other-window instead."
         (setq diff-hl-side 'left)
         (diff-hl-margin-mode)))
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "gdg" 'diff-hl-diff-goto-hunk
       "gdn" 'diff-hl-next-hunk
       "gdN" 'diff-hl-previous-hunk
@@ -8555,7 +8541,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "gm" 'git-messenger:popup-message)
   :config
   (define-key git-messenger-map [escape] 'git-messenger:popup-close))
@@ -8583,7 +8569,7 @@ If called with a prefix argument, uses the other-window instead."
       "u" 'git-rebase-undo
       "y" 'git-rebase-insert)
 
-    (evil-leader/set-key-for-mode 'git-rebase-mode
+    (dotemacs-set-leader-keys-for-major-mode 'git-rebase-mode
       "mcc" 'git-rebase-server-edit
       "mk" 'git-rebase-abort)))
 
@@ -8592,7 +8578,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :commands dotemacs-time-machine-micro-state
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "gt" 'dotemacs-time-machine-micro-state)
   :config
   (progn
@@ -8628,7 +8614,7 @@ If called with a prefix argument, uses the other-window instead."
       "K" 'gist-kill-current
       "o" 'gist-browse-current-url)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ggb" 'gist-buffer
       "ggB" 'gist-buffer-private
       "ggl" 'gist-list
@@ -8639,14 +8625,14 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :ensure t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "gho" 'github-browse-file))
 
 (use-package github-clone
   :defer t
   :ensure t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
    "gh C-c" 'github-clone))
 
 (use-package git-link
@@ -8654,7 +8640,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ghl" 'git-link
       "ghL" 'dotemacs-git-link-copy-url-only
       "ghc" 'git-link-commit
@@ -8736,7 +8722,7 @@ If called with a prefix argument, uses the other-window instead."
     (with-eval-after-load 'projectile
       (dotemacs-magit-set-repo-dirs-from-projectile))
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "gb" 'dotemacs-git-blame-micro-state
       "gc" 'magit-commit
       "gC" 'magit-checkout
@@ -9047,7 +9033,7 @@ If called with a prefix argument, uses the other-window instead."
       (kbd "RET") 'helm-grep-mode-jump-other-window
       (kbd "q") 'quit-window)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       ;; helm-ag marks
       "s`"  'helm-ag-pop-stack
       ;; opened buffers scope
@@ -9099,7 +9085,7 @@ If called with a prefix argument, uses the other-window instead."
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
 
-    (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) evil-leader--default-map)
+    (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) dotemacs-default-map)
     (evilified-state-evilify helm-ag-mode helm-ag-mode-map
       (kbd "RET") 'helm-ag-mode-jump-other-window
       (kbd "q") 'quit-window))
@@ -9401,14 +9387,14 @@ If called with a prefix argument, uses the other-window instead."
             "elc"))
 
     (unless (boundp 'dotemacs-use-helm-projectile)
-      (evil-leader/set-key
+      (dotemacs-set-leader-keys
         "pb" 'projectile-switch-to-buffer
         "pd" 'projectile-find-dir
         "pf" 'projectile-find-file
         "ph" 'helm-projectile
         "pr" 'projectile-recentf
         "ps" 'projectile-switch-project))
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "p!" 'projectile-run-shell-command-in-root
       "p&" 'projectile-run-async-shell-command-in-root
       "pa" 'projectile-toggle-between-implementation-and-test
@@ -9468,7 +9454,7 @@ If called with a prefix argument, uses the other-window instead."
     (defalias 'dotemacs-helm-project-do-grep 'helm-projectile-grep)
     (defalias 'dotemacs-helm-project-do-grep-region-or-symbol 'helm-projectile-grep)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "pb"  'helm-projectile-switch-to-buffer
       "pd"  'helm-projectile-find-dir
       "pf"  'helm-projectile-find-file
@@ -9574,7 +9560,7 @@ If called with a prefix argument, uses the other-window instead."
       (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
 
     ;; neo-global--select-window
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "fn" 'neotree-show
       "fN" 'neotree-hide
       "ft" 'neotree-toggle
@@ -9711,20 +9697,20 @@ If called with a prefix argument, uses the other-window instead."
 (use-package jabber        ;; Jabber (XMPP) client for Emacs
   :defer t
   :ensure t
-  :init (evil-leader/set-key "aj" 'jabber-connect-all)
-  :config (evil-leader/set-key-for-mode 'jabber-roster-mode
-            "ma" 'jabber-send-presence
-            "mb" 'jabber-get-browse
-            "md" 'jabber-disconnect
-            "me" 'jabber-roster-edit-action-at-point
-            "mg" 'jabber-display-roster
-            "mi" 'jabber-get-disco-items
-            "mj" 'jabber-muc-join
-            "mo" 'jabber-roster-toggle-offline-display
-            "mq" 'bury-buffer
-            "ms" 'jabber-send-subscription-request
-            "mv" 'jabber-get-version
-            "m RET" 'jabber-roster-ret-action-at-point))
+  :init (dotemacs-set-leader-keys "aj" 'jabber-connect-all)
+  :config (dotemacs-set-leader-keys-for-major-mode 'jabber-roster-mode
+            "a" 'jabber-send-presence
+            "b" 'jabber-get-browse
+            "d" 'jabber-disconnect
+            "e" 'jabber-roster-edit-action-at-point
+            "g" 'jabber-display-roster
+            "i" 'jabber-get-disco-items
+            "j" 'jabber-muc-join
+            "o" 'jabber-roster-toggle-offline-display
+            "q" 'bury-buffer
+            "s" 'jabber-send-subscription-request
+            "v" 'jabber-get-version
+            "RET" 'jabber-roster-ret-action-at-point))
 
 
 ;;; Org Mode
@@ -9757,105 +9743,105 @@ If called with a prefix argument, uses the other-window instead."
       `(defun ,fname () (interactive)
               (org-emphasize ,char)))
 
-    (evil-leader/set-key-for-mode 'org-mode
-      "m'" 'org-edit-special
-      "mc" 'org-capture
-      "md" 'org-deadline
-      "me" 'org-export-dispatch
-      "mf" 'org-set-effort
-      "mP" 'org-set-property
+    (dotemacs-set-leader-keys-for-major-mode 'org-mode
+      "'" 'org-edit-special
+      "c" 'org-capture
+      "d" 'org-deadline
+      "e" 'org-export-dispatch
+      "f" 'org-set-effort
+      "P" 'org-set-property
 
-      "ma" 'org-agenda
-      "mb" 'org-tree-to-indirect-buffer
-      "mA" 'org-archive-subtree
-      "ml" 'org-open-at-point
-      "mT" 'org-show-todo-tree
+      "a" 'org-agenda
+      "b" 'org-tree-to-indirect-buffer
+      "A" 'org-archive-subtree
+      "l" 'org-open-at-point
+      "T" 'org-show-todo-tree
 
-      "m." 'org-time-stamp
+      "." 'org-time-stamp
 
       ;; headings
-      "mhi" 'org-insert-heading-after-current
-      "mhI" 'org-insert-heading
+      "hi" 'org-insert-heading-after-current
+      "hI" 'org-insert-heading
 
       ;; More cycling options (timestamps, headlines, items, properties)
-      "mL" 'org-shiftright
-      "mH" 'org-shiftleft
-      "mJ" 'org-shiftdown
-      "mK" 'org-shiftup
+      "L" 'org-shiftright
+      "H" 'org-shiftleft
+      "J" 'org-shiftdown
+      "K" 'org-shiftup
 
       ;; Change between TODO sets
-      "m C-S-l" 'org-shiftcontrolright
-      "m C-S-h" 'org-shiftcontrolleft
-      "m C-S-j" 'org-shiftcontroldown
-      "m C-S-k" 'org-shiftcontrolup
+      "C-S-l" 'org-shiftcontrolright
+      "C-S-h" 'org-shiftcontrolleft
+      "C-S-j" 'org-shiftcontroldown
+      "C-S-k" 'org-shiftcontrolup
 
       ;; Subtree editing
-      "mSl" 'org-demote-subtree
-      "mSh" 'org-promote-subtree
-      "mSj" 'org-move-subtree-down
-      "mSk" 'org-move-subtree-up
+      "Sl" 'org-demote-subtree
+      "Sh" 'org-promote-subtree
+      "Sj" 'org-move-subtree-down
+      "Sk" 'org-move-subtree-up
 
       ;; tables
-      "mta" 'org-table-align
-      "mtb" 'org-table-blank-field
-      "mtc" 'org-table-convert
-      "mtdc" 'org-table-delete-column
-      "mtdr" 'org-table-kill-row
-      "mte" 'org-table-eval-formula
-      "mtE" 'org-table-export
-      "mth" 'org-table-previous-field
-      "mtH" 'org-table-move-column-left
-      "mtic" 'org-table-insert-column
-      "mtih" 'org-table-insert-hline
-      "mtiH" 'org-table-hline-and-move
-      "mtir" 'org-table-insert-row
-      "mtI" 'org-table-import
-      "mtj" 'org-table-next-row
-      "mtJ" 'org-table-move-row-down
-      "mtK" 'org-table-move-row-up
-      "mtl" 'org-table-next-field
-      "mtL" 'org-table-move-column-right
-      "mtn" 'org-table-create
-      "mtN" 'org-table-create-with-table.el
-      "mtr" 'org-table-recalculate
-      "mts" 'org-table-sort-lines
-      "mttf" 'org-table-toggle-formula-debugger
-      "mtto" 'org-table-toggle-coordinate-overlays
-      "mtw" 'org-table-wrap-region
+      "ta" 'org-table-align
+      "tb" 'org-table-blank-field
+      "tc" 'org-table-convert
+      "tdc" 'org-table-delete-column
+      "tdr" 'org-table-kill-row
+      "te" 'org-table-eval-formula
+      "tE" 'org-table-export
+      "th" 'org-table-previous-field
+      "tH" 'org-table-move-column-left
+      "tic" 'org-table-insert-column
+      "tih" 'org-table-insert-hline
+      "tiH" 'org-table-hline-and-move
+      "tir" 'org-table-insert-row
+      "tI" 'org-table-import
+      "tj" 'org-table-next-row
+      "tJ" 'org-table-move-row-down
+      "tK" 'org-table-move-row-up
+      "tl" 'org-table-next-field
+      "tL" 'org-table-move-column-right
+      "tn" 'org-table-create
+      "tN" 'org-table-create-with-table.el
+      "tr" 'org-table-recalculate
+      "ts" 'org-table-sort-lines
+      "ttf" 'org-table-toggle-formula-debugger
+      "tto" 'org-table-toggle-coordinate-overlays
+      "tw" 'org-table-wrap-region
 
       ;; Multi-purpose keys
       (if dotemacs-major-mode-leader-key
           (concat "m" dotemacs-major-mode-leader-key)
-        "m,") 'org-ctrl-c-ctrl-c
-        "m*" 'org-ctrl-c-star
-        "m RET" 'org-ctrl-c-ret
-        "m-" 'org-ctrl-c-minus
-        "m^" 'org-sort
-        "m/" 'org-sparse-tree
+        ",") 'org-ctrl-c-ctrl-c
+        "*" 'org-ctrl-c-star
+        " RET" 'org-ctrl-c-ret
+        "-" 'org-ctrl-c-minus
+        "^" 'org-sort
+        "/" 'org-sparse-tree
 
-        "mI" 'org-clock-in
-        "mn" 'org-narrow-to-subtree
-        "mN" 'widen
-        "mO" 'org-clock-out
-        "mq" 'org-clock-cancel
-        "mR" 'org-refile
-        "ms" 'org-schedule
+        "I" 'org-clock-in
+        "n" 'org-narrow-to-subtree
+        "N" 'widen
+        "O" 'org-clock-out
+        "q" 'org-clock-cancel
+        "R" 'org-refile
+        "s" 'org-schedule
 
         ;; insertion of common elements
-        "mil" 'org-insert-link
-        "mif" 'org-footnote-new
-        "mik" 'dotemacs-insert-keybinding-org
+        "il" 'org-insert-link
+        "if" 'org-footnote-new
+        "ik" 'dotemacs-insert-keybinding-org
 
         ;; images and other link types have no commands in org mode-line
         ;; could be inserted using yasnippet?
         ;; region manipulation
-        "mxb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
-        "mxc" (dotemacs-org-emphasize dotemacs-org-code ?~)
-        "mxi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
-        "mxr" (dotemacs-org-emphasize dotemacs-org-clear ? )
-        "mxs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
-        "mxu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
-        "mxv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
+        "xb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
+        "xc" (dotemacs-org-emphasize dotemacs-org-code ?~)
+        "xi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
+        "xr" (dotemacs-org-emphasize dotemacs-org-clear ? )
+        "xs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
+        "xu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
+        "xv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
 
     (require 'ox-md)
     (require 'ox-ascii)
@@ -9870,7 +9856,7 @@ If called with a prefix argument, uses the other-window instead."
        (define-key org-agenda-mode-map
          (kbd "RET") 'org-agenda-show-and-scroll-up)
        (define-key org-agenda-mode-map
-         (kbd "SPC") evil-leader--default-map))
+         (kbd "SPC") dotemacs-default-map))
 
       (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
       (define-key org-agenda-mode-map "k" 'org-agenda-previous-line))
@@ -9878,7 +9864,7 @@ If called with a prefix argument, uses the other-window instead."
     ;; Add global evil-leader mappings. Used to access org-agenda
     ;; functionalities – and a few others commands – from any other mode.
     (dotemacs-declare-prefix "ao" "org")
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       ;; org-agenda
       "ao#" 'org-agenda-list-stuck-projects
       "ao/" 'org-occur-in-agenda-files
@@ -9949,7 +9935,7 @@ If called with a prefix argument, uses the other-window instead."
     ;; Open links and files with RET in normal state
     (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "Cc" 'org-capture)))
 
 (use-package org-bullets
@@ -9965,11 +9951,11 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "Ct"  'ort/capture-todo
       "CT"  'ort/capture-checkitem)
-    (evil-leader/set-key-for-mode 'org-mode
-      "mgt" 'ort/goto-todos)))
+    (dotemacs-set-leader-keys-for-major-mode 'org-mode
+      "gt" 'ort/goto-todos)))
 
 
 (dotemacs-use-package-add-hook persp-mode
@@ -9982,8 +9968,8 @@ If called with a prefix argument, uses the other-window instead."
 (use-package gnuplot
   :defer t
   :ensure t
-  :init (evil-leader/set-key-for-mode 'org-mode
-          "mtp" 'org-plot/gnuplot))
+  :init (dotemacs-set-leader-keys-for-major-mode 'org-mode
+          "tp" 'org-plot/gnuplot))
 
 (use-package evil-org
   :load-path "extensions/"
@@ -9992,8 +9978,8 @@ If called with a prefix argument, uses the other-window instead."
   (add-hook 'org-mode-hook 'evil-org-mode)
   :config
   (progn
-    (evil-leader/set-key-for-mode 'org-mode
-      "mC" 'evil-org-recompute-clocks)
+    (dotemacs-set-leader-keys-for-major-mode 'org-mode
+      "C" 'evil-org-recompute-clocks)
     (evil-define-key 'normal evil-org-mode-map
       "O" 'evil-open-above)
     (dotemacs-diminish evil-org-mode " ⓔ" " e")))
@@ -10012,10 +9998,10 @@ If called with a prefix argument, uses the other-window instead."
   :commands (org-mime-htmlize org-mime-org-buffer-htmlize)
   :init
   (progn
-    (evil-leader/set-key-for-mode 'message-mode
-      "mM" 'org-mime-htmlize)
-    (evil-leader/set-key-for-mode 'org-mode
-      "mm" 'org-mime-org-buffer-htmlize)))
+    (dotemacs-set-leader-keys-for-major-mode 'message-mode
+      "M" 'org-mime-htmlize)
+    (dotemacs-set-leader-keys-for-major-mode 'org-mode
+      "m" 'org-mime-org-buffer-htmlize)))
 
 (use-package org-pomodoro
   :defer t
@@ -10024,8 +10010,8 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (when (dotemacs/system-is-mac)
       (setq org-pomodoro-audio-player "/usr/bin/afplay"))
-    (evil-leader/set-key-for-mode 'org-mode
-      "mp" 'org-pomodoro)))
+    (dotemacs-set-leader-keys-for-major-mode 'org-mode
+      "p" 'org-pomodoro)))
 
 (use-package org-present
   :defer t
@@ -10104,13 +10090,13 @@ If called with a prefix argument, uses the other-window instead."
   (progn
     (setq helm-descbinds-window-style 'split)
     (add-hook 'helm-mode-hook 'helm-descbinds-mode)
-    (evil-leader/set-key "?" 'helm-descbinds)))
+    (dotemacs-set-leader-keys "?" 'helm-descbinds)))
 
 (use-package helm-make
   :ensure t
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
    "cc" 'helm-make-projectile
    "cm" 'helm-make))
 
@@ -10130,7 +10116,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "dh" 'helm-dash-at-point
       "dH" 'helm-dash))
   :config
@@ -10151,8 +10137,8 @@ If called with a prefix argument, uses the other-window instead."
          ("C-c h D" . dash-at-point-with-docset))
   :init
   (progn
-    (evil-leader/set-key "dd" 'dash-at-point)
-    (evil-leader/set-key "dD" 'dash-at-point-with-docset))
+    (dotemacs-set-leader-keys "dd" 'dash-at-point)
+    (dotemacs-set-leader-keys "dD" 'dash-at-point-with-docset))
   :config (add-to-list 'dash-at-point-mode-alist
                        '(swift-mode . "ios,swift")))
 
@@ -10161,7 +10147,7 @@ If called with a prefix argument, uses the other-window instead."
   :if (eq system-type 'gnu/linux)
   :defer t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "dd" 'zeal-at-point
     "dD" 'zeal-at-point-set-docset)
   :config
@@ -10180,7 +10166,7 @@ If called with a prefix argument, uses the other-window instead."
       "Display a buffer with available key bindings."
       :evil-leader "tK")
 
-    (evil-leader/set-key "hk" 'which-key-show-top-level)
+    (dotemacs-set-leader-keys "hk" 'which-key-show-top-level)
 
     (let ((new-descriptions
            ;; being higher in this list means the replacement is applied later
@@ -10529,9 +10515,8 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :config
   (progn
-    (evil-leader/set-key-for-mode 'dockerfile-mode
-       "mcb" 'dockerfile-build-buffer
-     )))
+    (dotemacs-set-leader-keys-for-major-mode 'dockerfile-mode
+       "cb" 'dockerfile-build-buffer)))
 
 ;; Terraform
 (use-package terraform-mode
@@ -10549,17 +10534,17 @@ If called with a prefix argument, uses the other-window instead."
   (setq puppet-fontify-variables-in-comments t)
   :init
   (progn
-    (evil-leader/set-key-for-mode 'puppet-mode
-      "m{" 'beginning-of-defun
-      "m}" 'end-of-defun
-      "m$" 'puppet-interpolate
-      "ma" 'puppet-align-block
-      "m'" 'puppet-toggle-string-quotes
-      "m;" 'puppet-clear-string
-      "mj" 'imenu
-      "mc" 'puppet-apply
-      "mv" 'puppet-validate
-      "ml" 'puppet-lint
+    (dotemacs-set-leader-keys-for-major-mode 'puppet-mode
+      "{" 'beginning-of-defun
+      "}" 'end-of-defun
+      "$" 'puppet-interpolate
+      "a" 'puppet-align-block
+      "'" 'puppet-toggle-string-quotes
+      ";" 'puppet-clear-string
+      "j" 'imenu
+      "c" 'puppet-apply
+      "v" 'puppet-validate
+      "l" 'puppet-lint
     )))
 
 (when (eq dotemacs-completion-engine 'company)
@@ -10583,20 +10568,20 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (setq ledger-post-amount-alignment-column 62)
-    (evil-leader/set-key-for-mode 'ledger-mode
-      "mhd"   'ledger-delete-current-transaction
-      "ma"    'ledger-add-transaction
-      "mb"    'ledger-post-edit-amount
-      "mc"    'ledger-toggle-current
-      "mC"    'ledger-mode-clean-buffer
-      "ml"    'ledger-display-ledger-stats
-      "mp"    'ledger-display-balance-at-point
-      "mq"    'ledger-post-align-xact
-      "mr"    'ledger-reconcile
-      "mR"    'ledger-report
-      "mt"    'ledger-insert-effective-date
-      "my"    'ledger-set-year
-      "m RET" 'ledger-set-month)
+    (dotemacs-set-leader-keys-for-major-mode 'ledger-mode
+      "hd"   'ledger-delete-current-transaction
+      "a"    'ledger-add-transaction
+      "b"    'ledger-post-edit-amount
+      "c"    'ledger-toggle-current
+      "C"    'ledger-mode-clean-buffer
+      "l"    'ledger-display-ledger-stats
+      "p"    'ledger-display-balance-at-point
+      "q"    'ledger-post-align-xact
+      "r"    'ledger-reconcile
+      "R"    'ledger-report
+      "t"    'ledger-insert-effective-date
+      "y"    'ledger-set-year
+      "RET" 'ledger-set-month)
     (evilified-state-evilify ledger-report-mode ledger-report-mode-map)))
 
 (dotemacs-use-package-add-hook flycheck
@@ -10644,7 +10629,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "aw" 'sunshine-forecast
       "aW" 'sunshine-quick-forecast)
 
@@ -10681,7 +10666,7 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (dotemacs-declare-prefix "il" "lorem ipsum")
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ill" 'lorem-ipsum-insert-list
       "ilp" 'lorem-ipsum-insert-paragraphs
       "ils" 'lorem-ipsum-insert-sentences)))
@@ -10695,7 +10680,7 @@ If called with a prefix argument, uses the other-window instead."
              google-translate-query-translate-reverse
              google-translate-at-point-reverse)
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "xgQ" 'google-translate-query-translate-reverse
     "xgq" 'google-translate-query-translate
     "xgT" 'google-translate-at-point-reverse
@@ -10715,7 +10700,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :defines search-engine-alist
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "a/" 'dotemacs-search-engine-select)
   (setq search-engine-alist
         '((amazon
@@ -10785,8 +10770,8 @@ If called with a prefix argument, uses the other-window instead."
              emoji-cheat-sheet-plus-display-mode)
   :init
   (progn
-    (evil-leader/set-key "aE" 'emoji-cheat-sheet-plus-buffer)
-    (evil-leader/set-key "ie" 'emoji-cheat-sheet-plus-insert)
+    (dotemacs-set-leader-keys "aE" 'emoji-cheat-sheet-plus-buffer)
+    (dotemacs-set-leader-keys "ie" 'emoji-cheat-sheet-plus-insert)
     (evilified-state-evilify emoji-cheat-sheet-plus-buffer-mode
       emoji-cheat-sheet-plus-buffer-mode-map
       "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
@@ -10815,7 +10800,7 @@ If called with a prefix argument, uses the other-window instead."
       (evil-insert-state)
       (spray-mode t)
       (internal-show-cursor (selected-window) nil))
-    (evil-leader/set-key "asr" 'dotemacs-start-spray)
+    (dotemacs-set-leader-keys "asr" 'dotemacs-start-spray)
 
     (defadvice spray-quit (after dotemacs-quit-spray activate)
       "Correctly quit spray."
@@ -10835,7 +10820,7 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (dotemacs-declare-prefix "V" "vagrant")
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "VD" 'vagrant-destroy
       "Ve" 'vagrant-edit
       "VH" 'vagrant-halt
@@ -10856,7 +10841,7 @@ If called with a prefix argument, uses the other-window instead."
       (unless dotemacs--vagrant-tramp-loaded
         (vagrant-tramp-add-method)
         (setq dotemacs--vagrant-tramp-loaded t)))
-    (evil-leader/set-key "Vt" 'vagrant-tramp-term)))
+    (dotemacs-set-leader-keys "Vt" 'vagrant-tramp-term)))
 
 
 ;; Pandoc
@@ -10873,7 +10858,7 @@ If called with a prefix argument, uses the other-window instead."
     (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings))
   :init
   (progn
-    (evil-leader/set-key "P/" 'dotemacs-run-pandoc)))
+    (dotemacs-set-leader-keys "P/" 'dotemacs-run-pandoc)))
 
 ; As there’s not, yet, an EPUB reader for Emacs, you can still set up Emacs to
 ; be able to open .epub files to see what’s inside them, since they are, after
@@ -10932,7 +10917,7 @@ If called with a prefix argument, uses the other-window instead."
       (define-key evil-motion-state-map (kbd "#")
         'dotemacs-enter-ahs-backward))
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "sh" 'dotemacs-symbol-highlight
       "sH" 'dotemacs-goto-last-searched-ahs-symbol)
 
@@ -11005,7 +10990,7 @@ If called with a prefix argument, uses the other-window instead."
   :ensure t
   :defer t
   :config
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "h>" 'helm-nixos-options))
 
 (when (eq dotemacs-completion-engine 'company)
@@ -11038,18 +11023,18 @@ If called with a prefix argument, uses the other-window instead."
     ;; functions are defined.
 
     ;; See /doc/CONVENTIONS.md#plain-text-markup-languages
-    (evil-leader/set-key-for-mode 'adoc-mode
-      "mh1" 'tempo-template-adoc-title-1
+    (dotemacs-set-leader-keys-for-major-mode 'adoc-mode
+      "h1" 'tempo-template-adoc-title-1
       ;; Alternative method of inserting top-level heading
-      "mhI" 'tempo-template-adoc-title-1
-      "mh2" 'tempo-template-adoc-title-2
+      "hI" 'tempo-template-adoc-title-1
+      "h2" 'tempo-template-adoc-title-2
       ;; Alternative method of inserting the most usual heading
-      "mhi" 'tempo-template-adoc-title-2
-      "mh3" 'tempo-template-adoc-title-3
-      "mh4" 'tempo-template-adoc-title-4
-      "mh5" 'tempo-template-adoc-title-5
-      "mxb" 'tempo-template-adoc-strong
-      "mxi" 'tempo-template-adoc-emphasis)
+      "hi" 'tempo-template-adoc-title-2
+      "h3" 'tempo-template-adoc-title-3
+      "h4" 'tempo-template-adoc-title-4
+      "h5" 'tempo-template-adoc-title-5
+      "xb" 'tempo-template-adoc-strong
+      "xi" 'tempo-template-adoc-emphasis)
     ;; yes, exactly like that. To "promote" title is to INCREASE its size.
     ;; `adoc-denote' does the opposite: increases its LEVEL,
     ;; which DECREASES its size.
@@ -11100,7 +11085,7 @@ If called with a prefix argument, uses the other-window instead."
     (when (member dotemacs-highlight-delimiters '(all current))
       (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
     (setq hl-paren-delay 0.2)
-    (evil-leader/set-key "tCp" 'highlight-parentheses-mode)
+    (dotemacs-set-leader-keys "tCp" 'highlight-parentheses-mode)
     (setq hl-paren-colors '("Springgreen3"
                             "IndianRed1"
                             "IndianRed3"
@@ -11137,7 +11122,7 @@ If called with a prefix argument, uses the other-window instead."
   :defer t
   :init
   (progn
-    (evil-leader/set-key "tCd" 'rainbow-delimiters-mode)
+    (dotemacs-set-leader-keys "tCd" 'rainbow-delimiters-mode)
 
     (when (member dotemacs-highlight-delimiters '(any all))
       (dolist (hook '(text-mode-hook prog-mode-hook))
@@ -11189,8 +11174,8 @@ If called with a prefix argument, uses the other-window instead."
   :config
   (progn
     ;; key bindings
-    (evil-leader/set-key "Cis" 'colors/start-change-color-saturation)
-    (evil-leader/set-key "Cil" 'colors/start-change-color-lightness)))
+    (dotemacs-set-leader-keys "Cis" 'colors/start-change-color-saturation)
+    (dotemacs-set-leader-keys "Cil" 'colors/start-change-color-lightness)))
 
 (use-package rainbow-mode               ; Fontify color values in code
   :commands rainbow-mode
@@ -11198,7 +11183,7 @@ If called with a prefix argument, uses the other-window instead."
   :bind (("C-c t r" . rainbow-mode))
   :init
   (progn
-    (evil-leader/set-key "tCc" 'rainbow-mode)
+    (dotemacs-set-leader-keys "tCc" 'rainbow-mode)
     (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
       (add-hook hook #'rainbow-mode)))
   :config
@@ -11267,7 +11252,7 @@ If called with a prefix argument, uses the other-window instead."
           sp-show-pair-from-inside t
           sp-cancel-autoskip-on-backward-movement nil)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
      "J"  'sp-split-sexp
      "jj" 'sp-newline))
   :config
@@ -11404,7 +11389,7 @@ If called with a prefix argument, uses the other-window instead."
       "j" 'flycheck-error-list-next-error
       "k" 'flycheck-error-list-previous-error)
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "ec" 'flycheck-clear
       "eh" 'flycheck-describe-checker
       "el" 'dotemacs-toggle-flycheck-error-list
@@ -11533,7 +11518,7 @@ If the error list is visible, hide it.  Otherwise, show it."
   :defer t
   :ensure t
   :init
-  (evil-leader/set-key
+  (dotemacs-set-leader-keys
     "xwd" 'define-word-at-point))
 
 (use-package auto-dictionary
@@ -11577,7 +11562,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       :documentation "Enable automatic spell checking."
       :evil-leader "tS")
 
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "Sb" 'flyspell-buffer
       "Sd" 'spell-checing/change-dictionary
       "Sn" 'flyspell-goto-next-error))
@@ -11591,12 +11576,12 @@ If the error list is visible, hide it.  Otherwise, show it."
 (use-package helm-flycheck
   :ensure t
   :commands helm-flycheck
-  :init (evil-leader/set-key "ef" 'helm-flycheck))
+  :init (dotemacs-set-leader-keys "ef" 'helm-flycheck))
 
 (use-package helm-flyspell
   :ensure t
   :commands helm-flyspell-correct
-  :init (evil-leader/set-key "Sc" 'helm-flyspell-correct))
+  :init (dotemacs-set-leader-keys "Sc" 'helm-flyspell-correct))
 
 
 ;;; Skeletons, completion and expansion
@@ -11882,7 +11867,7 @@ If the error list is visible, hide it.  Otherwise, show it."
           (or dotemacs-ac-private-snippets-directory
               (concat dotemacs-private-dir "snippets/")))
     (dotemacs-declare-prefix "iS" "auto-yasnippet")
-    (evil-leader/set-key
+    (dotemacs-set-leader-keys
       "iSc" 'aya-create
       "iSe" 'dotemacs-auto-yasnippet-expand
       "iSw" 'aya-persist-snippet)))
@@ -11898,7 +11883,7 @@ If the error list is visible, hide it.  Otherwise, show it."
       (dotemacs-load-yasnippet)
       (require 'helm-c-yasnippet)
       (call-interactively 'helm-yas-complete))
-    (evil-leader/set-key "is" 'dotemacs-helm-yas)
+    (dotemacs-set-leader-keys "is" 'dotemacs-helm-yas)
     (setq helm-c-yas-space-match-any-greedy t)))
 
 
