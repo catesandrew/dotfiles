@@ -5335,6 +5335,9 @@ point. Requires smartparens because all movement is done using
                    (reusable-frames . visible)
                    (window-height   . 0.4)))))
 
+(defvar scala-enable-eldoc-mode nil
+  "If non nil then eldoc-mode is enabled in the scala layer")
+
 (use-package ensime                     ; Scala interaction mode
   :ensure t
   :commands (ensime-mode)
