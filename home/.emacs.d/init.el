@@ -9432,6 +9432,12 @@ If called with a prefix argument, uses the other-window instead."
     (projectile-global-mode)
     (dotemacs-hide-lighter projectile-mode)))
 
+(use-package help-fns+
+  :commands (describe-keymap)
+  :ensure t
+  :init
+  (dotemacs-set-leader-keys "hK" 'describe-keymap))
+
 (use-package helm-projectile
   :ensure t
   :defer t
