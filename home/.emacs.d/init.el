@@ -746,6 +746,11 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 (prefer-coding-system 'utf-8) ; with sugar on top
 
+;; silence ad-handle-definition about advised functions getting redefined
+(setq ad-redefinition-action 'accept)
+;; this is for a smoother UX at startup (i.e. less graphical glitches)
+(hidden-mode-line-mode)
+
 ;; Get rid of tool bar, menu bar and scroll bars.  On OS X we preserve the menu
 ;; bar, since the top menu bar is always visible anyway, and we'd just empty it
 ;; which is rather pointless.
@@ -792,6 +797,12 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ; (dotemacs-load-or-install-package 'dash t)
 (dotemacs-load-or-install-package 's t)
 ;; (dotemacs-load-or-install-package 'f t)
+(setq-default ;; evil-want-C-u-scroll t
+              ;; evil-want-C-w-in-emacs-state t
+              ;; `evil-want-C-i-jump' is set to nil to avoid `TAB' being
+              ;; overlapped in terminal mode. The GUI specific `<C-i>' is used
+              ;; instead (defined in the init of `evil-jumper' package).
+              evil-want-C-i-jump nil)
 (setq evil-want-Y-yank-to-eol dotemacs-remap-Y-to-y$
       evil-ex-substitute-global dotemacs-ex-substitute-global)
 (dotemacs-load-or-install-package 'evil t)
@@ -980,30 +991,16 @@ environment, otherwise it is strongly recommended to let it set to t.")
     (evil-mode 1))
   :config
   (progn
-    ; c-k/c-j for page down/up
-    ;
-    ; One thing that surprised me considering how complete Evil is, is the lack
-    ; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
-    ; pretty important in Emacs (it's the shortcut to give a numeric parameter to
-    ; other commands). I've in fact these mapped on my .vimrc to c-k/c-j
-    ; (because I think they're more consistent with Vim's j/k movement keys) so
-    ; that's how I mapped them in Emacs:
-    (define-key evil-normal-state-map (kbd "C-k") 'evil-scroll-up)
-    (define-key evil-normal-state-map (kbd "C-j") 'evil-scroll-down)
-    (define-key evil-motion-state-map "j" 'evil-next-visual-line)
-    (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
-
-    (global-set-key (kbd "C-w") 'evil-window-map)
-    (define-key evil-normal-state-map (kbd "C-w h") 'evil-window-left)
-    (define-key evil-normal-state-map (kbd "C-w j") 'evil-window-down)
-    (define-key evil-normal-state-map (kbd "C-w k") 'evil-window-up)
-    (define-key evil-normal-state-map (kbd "C-w l") 'evil-window-right)
-    (define-key evil-normal-state-map (kbd "C-w d") 'elscreen-kill)
-
-    ;; evil ex-command key
-    ;; (define-key evil-normal-state-map (kbd dotemacs-command-key) 'evil-ex)
-    ;; (define-key evil-visual-state-map (kbd dotemacs-command-key) 'evil-ex)
-    ;; (define-key evil-motion-state-map (kbd dotemacs-command-key) 'evil-ex)
+    ;; c-k/c-j for page down/up
+    ;;
+    ;; One thing that surprised me considering how complete Evil is, is the lack
+    ;; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
+    ;; pretty important in Emacs (it's the shortcut to give a numeric parameter
+    ;; to other commands). I've in fact these mapped on my .vimrc to c-k/c-j
+    ;; (because I think they're more consistent with Vim's j/k movement keys) so
+    ;; that's how I mapped them in Emacs:
+    (define-key evil-motion-state-map (kbd "C-k") 'evil-scroll-up)
+    (define-key evil-motion-state-map (kbd "C-j") 'evil-scroll-down)
 
     ;; bind function keys
 
@@ -1129,11 +1126,12 @@ Example: (evil-map visual \"<\" \"<gv\")"
              (evil-select-paren ,start-regex ,end-regex beg end type count t))
            (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
            (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
-           (push (cons (string-to-char ,key)
-                       (if ,end
-                           (cons ,start ,end)
-                         ,start))
-                 evil-surround-pairs-alist))))
+           (with-eval-after-load 'evil-surround
+             (push (cons (string-to-char ,key)
+                         (if ,end
+                             (cons ,start ,end)
+                           ,start))
+                   evil-surround-pairs-alist)))))
 
       (dotemacs-define-text-object "$" "dollar" "$" "$")
       (dotemacs-define-text-object "*" "star" "*" "*")
@@ -1458,14 +1456,14 @@ the user activate the completion manually."
   (ad-disable-advice 'isearch-repeat 'after 'isearch-smooth-scroll)
   (ad-activate 'isearch-repeat))
 
-
 (use-package bind-map
-  :ensure t
   :init
   (bind-map dotemacs-default-map
     :prefix-cmd dotemacs-cmds
     :keys (dotemacs-emacs-leader-key)
-    :evil-keys (dotemacs-leader-key)))
+    :evil-keys (dotemacs-leader-key)
+    :override-minor-modes t
+    :override-mode-name dotemacs-leader-override-mode))
 
 (use-package diminish
   :ensure t
@@ -1514,8 +1512,6 @@ the user activate the completion manually."
 (setq ring-bell-function #'ignore
       ;; no welcome buffer
       inhibit-startup-screen t
-      ;; silence ad-handle-definition about advised functions getting redefined
-      ad-redefinition-action 'accept
       visible-bell nil
       initial-scratch-message nil)
 
@@ -3369,39 +3365,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (`all (add-hook 'before-save-hook 'whitespace-cleanup))
   (`trailing (add-hook 'before-save-hook 'delete-trailing-whitespace)))
 
-;; Thanks to `editorconfig-emacs' for many of these
-(defvar dotemacs--indent-variable-alist
-  '(((awk-mode c-mode c++-mode java-mode groovy-mode
-      idl-mode java-mode objc-mode pike-mode) . c-basic-offset)
-    (python-mode . python-indent-offset)
-    (cmake-mode . cmake-tab-width)
-    (coffee-mode . coffee-tab-width)
-    (cperl-mode . cperl-indent-level)
-    (css-mode . css-indent-offset)
-    (elixir-mode . elixir-smie-indent-basic)
-    ((emacs-lisp-mode lisp-mode) . lisp-indent-offset)
-    (enh-ruby-mode . enh-ruby-indent-level)
-    (erlang-mode . erlang-indent-level)
-    ((js-mode json-mode) . js-indent-level)
-    (js2-mode . js2-basic-offset)
-    (js3-mode . js3-indent-level)
-    (latex-mode . (LaTeX-indent-level tex-indent-basic))
-    (livescript-mode . livescript-tab-width)
-    (mustache-mode . mustache-basic-offset)
-    (nxml-mode . nxml-child-indent)
-    (perl-mode . perl-indent-level)
-    (puppet-mode . puppet-indent-level)
-    (ruby-mode . ruby-indent-level)
-    (scala-mode . scala-indent:step)
-    (sgml-mode . sgml-basic-offset)
-    (sh-mode . sh-basic-offset)
-    (web-mode . web-mode-markup-indent-offset)
-    (yaml-mode . yaml-indent-offset))
-  "An alist where each key is either a symbol corresponding
-to a major mode, a list of such symbols, or the symbol t,
-acting as default. The values are either integers, symbols
-or lists of these.")
-
 ;; enable electric indent
 (setq electric-indent-mode 1)
 
@@ -4070,39 +4033,6 @@ It will toggle the overlay under point or create an overlay of one character."
   :init
   (progn
     (global-evil-surround-mode 1)
-    (defun dotemacs-surround-add-pair (trigger begin-or-fun &optional end)
-      "Add a surround pair.
-If `end' is nil `begin-or-fun' will be treated as a fun."
-      (push (cons (if (stringp trigger)
-                    (string-to-char trigger)
-                    trigger)
-                  (if end
-                    (cons begin-or-fun end)
-                    begin-or-fun))
-            evil-surround-pairs-alist))
-
-    (dotemacs/add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "`" "`"  "'"))
-                  '(emacs-lisp-mode-hook lisp-mode-hook))
-
-    (dotemacs/add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "~" "```"  "```"))
-                  '(markdown-mode-hook))
-
-    (add-hook 'LaTeX-mode-hook (lambda ()
-                                 (dotemacs-surround-add-pair "~" "\\texttt{" "}")
-                                 (dotemacs-surround-add-pair "=" "\\verb=" "=")
-                                 (dotemacs-surround-add-pair "/" "\\emph{" "}")
-                                 (dotemacs-surround-add-pair "*" "\\textbf{" "}")
-                                 (dotemacs-surround-add-pair "P" "\\(" "\\)")))
-    (dotemacs/add-to-hooks (lambda ()
-                    (dotemacs-surround-add-pair "c" ":class:`" "`")
-                    (dotemacs-surround-add-pair "f" ":func:`" "`")
-                    (dotemacs-surround-add-pair "m" ":meth:`" "`")
-                    (dotemacs-surround-add-pair "a" ":attr:`" "`")
-                    (dotemacs-surround-add-pair "e" ":exc:`" "`"))
-                  '(rst-mode-hook python-mode-hook))
-
     ;; `s' for surround instead of `substitute'
     ;; see motivation for this change in the documentation
     (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
@@ -4143,10 +4073,9 @@ If `end' is nil `begin-or-fun' will be treated as a fun."
       'evil-visualstar/begin-search-backward)))
 
 (use-package evil-evilified-state
-  :load-path "/config"
-  :config
-  (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
-    dotemacs-default-map))
+  :load-path "/config")
+(define-key evil-evilified-state-map (kbd dotemacs-leader-key)
+  dotemacs-default-map)
 
 
 ;;; Customization, init file and package management

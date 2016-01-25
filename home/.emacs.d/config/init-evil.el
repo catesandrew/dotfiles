@@ -26,8 +26,6 @@
 (defun evil-insert-state-cursor-hide ()
   (setq evil-insert-state-cursor '((hbar . 0))))
 
-
-
 (defun dotemacs-evil-smart-doc-lookup ()
   "Version of `evil-lookup' that attempts to use
   the mode specific goto-definition binding,
