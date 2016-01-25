@@ -982,6 +982,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
 
+
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
     ; (setq evil-search-module 'evil-search)
@@ -9435,7 +9436,7 @@ If called with a prefix argument, uses the other-window instead."
   :commands (describe-keymap)
   :ensure t
   :init
-  (dotemacs-set-leader-keys "hK" 'describe-keymap))
+  (dotemacs-set-leader-keys "hdK" 'describe-keymap))
 
 (use-package helm-projectile
   :ensure t
