@@ -1,16 +1,5 @@
-;; auto-indent on RET
-(define-key global-map (kbd "RET") 'newline-and-indent)
-
 ;; improve delete-other-windows
 (define-key global-map (kbd "C-x 1") 'dotemacs/toggle-maximize-buffer)
-
-;; replace `dired-goto-file' with `helm-find-files', since `helm-find-files'
-;; can do the same thing and with fuzzy matching and other features.
-(with-eval-after-load 'dired
-  (evil-define-key 'normal dired-mode-map "J" 'dotemacs-helm-find-files)
-  (define-key dired-mode-map "j" 'dotemacs-helm-find-files)
-  (evil-define-key 'normal dired-mode-map (kbd dotemacs-leader-key)
-    dotemacs-default-map))
 
 ;; alternate binding to search next occurrence with isearch without
 ;; exiting isearch

@@ -1528,11 +1528,11 @@ the user activate the completion manually."
     ;; lighter
     (push '(fci-mode "") minor-mode-alist)
     (dotemacs-add-toggle fill-column-indicator
-                          :status fci-mode
-                          :on (turn-on-fci-mode)
-                          :off (turn-off-fci-mode)
-                          :documentation "Display the fill column indicator."
-                          :evil-leader "tf"))
+      :status fci-mode
+      :on (turn-on-fci-mode)
+      :off (turn-off-fci-mode)
+      :documentation "Display the fill column indicator."
+      :evil-leader "tf"))
   :config (dotemacs-hide-lighter fci-mode))
 
 (use-package zoom-frm
@@ -3428,17 +3428,17 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
               (default-value 'evil-cjk-word-separating-categories))))
     (add-hook 'subword-mode-hook 'dotemacs-subword-enable-camel-case)
     (dotemacs-add-toggle camel-case-motion
-                          :status subword-mode
-                          :on (subword-mode +1)
-                          :off (subword-mode -1)
-                          :documentation "Toggle camelCase motions"
-                          :evil-leader "tc")
+      :status subword-mode
+      :on (subword-mode +1)
+      :off (subword-mode -1)
+      :documentation "Toggle camelCase motions"
+      :evil-leader "tc")
     (dotemacs-add-toggle camel-case-motion-globally
-                          :status subword-mode
-                          :on (global-subword-mode +1)
-                          :off (global-subword-mode -1)
-                          :documentation "Globally toggle camelCase motions"
-                          :evil-leader "t C-c"))
+      :status subword-mode
+      :on (global-subword-mode +1)
+      :off (global-subword-mode -1)
+      :documentation "Globally toggle camelCase motions"
+      :evil-leader "t C-c"))
   :config
   (dotemacs-diminish subword-mode " ⓒ" " c"))
 
@@ -3597,17 +3597,17 @@ Disable the highlighting of overlong lines."
   :init
   (progn
     (dotemacs-add-toggle whitespace
-                         :status whitespace-mode
-                         :on (whitespace-mode)
-                         :off (whitespace-mode -1)
-                         :documentation "Display whitespace."
-                         :evil-leader "tw")
+      :status whitespace-mode
+      :on (whitespace-mode)
+      :off (whitespace-mode -1)
+      :documentation "Display whitespace."
+      :evil-leader "tw")
     (dotemacs-add-toggle whitespace-globally
-                         :status global-whitespace-mode
-                         :on (global-whitespace-mode)
-                         :off (global-whitespace-mode -1)
-                         :documentation "Display whitespace globally"
-                         :evil-leader "t C-w")
+      :status global-whitespace-mode
+      :on (global-whitespace-mode)
+      :off (global-whitespace-mode -1)
+      :documentation "Display whitespace globally"
+      :evil-leader "t C-w")
 
     (defun dotemacs-set-whitespace-style-for-diff ()
       "Whitespace configuration for `diff-mode'"
@@ -3819,7 +3819,7 @@ It will toggle the overlay under point or create an overlay of one character."
   :config
   ;; activate leader in iedit and iedit-insert states
   (define-key evil-iedit-state-map
-    (kbd evil-leader/leader) dotemacs-default-map))
+    (kbd dotemacs-leader-key) dotemacs-default-map))
 
 (use-package evil-jumper
   :ensure t
@@ -9100,7 +9100,7 @@ If called with a prefix argument, uses the other-window instead."
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
 
-    (evil-define-key 'normal helm-ag-map (kbd evil-leader/leader) dotemacs-default-map)
+  (evil-define-key 'normal helm-ag-map (kbd dotemacs-leader-key) dotemacs-default-map)
     (evilified-state-evilify helm-ag-mode helm-ag-mode-map
       (kbd "RET") 'helm-ag-mode-jump-other-window
       (kbd "q") 'quit-window))
@@ -11108,17 +11108,17 @@ If called with a prefix argument, uses the other-window instead."
   :init
   (progn
     (dotemacs-add-toggle highlight-indentation
-                          :status highlight-indentation-mode
-                          :on (highlight-indentation-mode)
-                          :off (highlight-indentation-mode -1)
-                          :documentation "Highlight indentation levels."
-                          :evil-leader "thi")
+      :status highlight-indentation-mode
+      :on (highlight-indentation-mode)
+      :off (highlight-indentation-mode -1)
+      :documentation "Highlight indentation levels."
+      :evil-leader "thi")
     (dotemacs-add-toggle highlight-indentation-current-column
-                          :status highlight-indentation-current-column-mode
-                          :on (highlight-indentation-current-column-mode)
-                          :off (highlight-indentation-current-column-mode -1)
-                          :documentation "Highlight indentation level at point."
-                          :evil-leader "thc"))
+      :status highlight-indentation-current-column-mode
+      :on (highlight-indentation-current-column-mode)
+      :off (highlight-indentation-current-column-mode -1)
+      :documentation "Highlight indentation level at point."
+      :evil-leader "thc"))
   :config
   (progn
     (dotemacs-diminish highlight-indentation-mode " ⓗ" " h")
@@ -11205,11 +11205,11 @@ If called with a prefix argument, uses the other-window instead."
                                                   font-lock-variable-name-face))
 
     (dotemacs-add-toggle rainbow-identifier-globally
-                         :status rainbow-identifiers-mode
-                         :on (rainbow-identifiers-mode)
-                         :off (rainbow-identifiers-mode -1)
-                         :documentation "Colorize identifiers globally."
-                         :evil-leader "tCi")
+      :status rainbow-identifiers-mode
+      :on (rainbow-identifiers-mode)
+      :off (rainbow-identifiers-mode -1)
+      :documentation "Colorize identifiers globally."
+      :evil-leader "tCi")
 
     (add-hook 'prog-mode-hook 'rainbow-identifiers-mode))
   (colors//tweak-theme-colors dotemacs--cur-theme)
@@ -11880,11 +11880,11 @@ If the error list is visible, hide it.  Otherwise, show it."
                                                       org-mode-hook))
 
     (dotemacs-add-toggle yasnippet
-                         :status yas-minor-mode
-                         :on (yas-minor-mode)
-                         :off (yas-minor-mode -1)
-                         :documentation "Enable snippets"
-                         :evil-leader "ty")
+      :status yas-minor-mode
+      :on (yas-minor-mode)
+      :off (yas-minor-mode -1)
+      :documentation "Enable snippets"
+      :evil-leader "ty")
 
     (dotemacs/add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
                                                            shell-mode-hook
