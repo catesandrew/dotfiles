@@ -9815,38 +9815,36 @@ If called with a prefix argument, uses the other-window instead."
       "tw" 'org-table-wrap-region
 
       ;; Multi-purpose keys
-      (if dotemacs-major-mode-leader-key
-          (concat "m" dotemacs-major-mode-leader-key)
-        ",") 'org-ctrl-c-ctrl-c
-        "*" 'org-ctrl-c-star
-        " RET" 'org-ctrl-c-ret
-        "-" 'org-ctrl-c-minus
-        "^" 'org-sort
-        "/" 'org-sparse-tree
+      (or dotemacs-major-mode-leader-key ",") 'org-ctrl-c-ctrl-c
+      "*" 'org-ctrl-c-star
+      " RET" 'org-ctrl-c-ret
+      "-" 'org-ctrl-c-minus
+      "^" 'org-sort
+      "/" 'org-sparse-tree
 
-        "I" 'org-clock-in
-        "n" 'org-narrow-to-subtree
-        "N" 'widen
-        "O" 'org-clock-out
-        "q" 'org-clock-cancel
-        "R" 'org-refile
-        "s" 'org-schedule
+      "I" 'org-clock-in
+      "n" 'org-narrow-to-subtree
+      "N" 'widen
+      "O" 'org-clock-out
+      "q" 'org-clock-cancel
+      "R" 'org-refile
+      "s" 'org-schedule
 
-        ;; insertion of common elements
-        "il" 'org-insert-link
-        "if" 'org-footnote-new
-        "ik" 'dotemacs-insert-keybinding-org
+      ;; insertion of common elements
+      "il" 'org-insert-link
+      "if" 'org-footnote-new
+      "ik" 'dotemacs-insert-keybinding-org
 
-        ;; images and other link types have no commands in org mode-line
-        ;; could be inserted using yasnippet?
-        ;; region manipulation
-        "xb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
-        "xc" (dotemacs-org-emphasize dotemacs-org-code ?~)
-        "xi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
-        "xr" (dotemacs-org-emphasize dotemacs-org-clear ? )
-        "xs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
-        "xu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
-        "xv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
+      ;; images and other link types have no commands in org mode-line
+      ;; could be inserted using yasnippet?
+      ;; region manipulation
+      "xb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
+      "xc" (dotemacs-org-emphasize dotemacs-org-code ?~)
+      "xi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
+      "xr" (dotemacs-org-emphasize dotemacs-org-clear ? )
+      "xs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
+      "xu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
+      "xv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
 
     (require 'ox-md)
     (require 'ox-ascii)
