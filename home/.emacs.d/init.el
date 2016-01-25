@@ -8924,9 +8924,8 @@ If called with a prefix argument, uses the other-window instead."
 
     (with-eval-after-load 'magit
       (require 'evil-magit)
-      ;; (evil-define-key 'motion magit-mode-map
-      ;;   (kbd dotemacs-leader-key) dotemacs-default-map)
-      )))
+      (evil-define-key 'motion magit-mode-map
+        (kbd dotemacs-leader-key) dotemacs-default-map))))
 
 (use-package magit-gitflow
   :ensure t
