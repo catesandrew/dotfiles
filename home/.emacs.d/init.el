@@ -5337,7 +5337,7 @@ point. Requires smartparens because all movement is done using
                    (reusable-frames . visible)
                    (window-height   . 0.4)))))
 
-(defvar scala-enable-eldoc-mode nil
+(defvar scala-enable-eldoc nil
   "If non nil then eldoc-mode is enabled in the scala layer")
 
 (use-package ensime                     ; Scala interaction mode
@@ -7240,16 +7240,16 @@ If called with a prefix argument, uses the other-window instead."
       (let* ((fname (format "%s.js" (downcase (file-name-base (buffer-file-name))))))
         (elm-compile--file (elm--buffer-local-file-name) fname)))
 
-    (defun dotemacs/push-decl-elm-repl-focus ()
+    (defun dotemacs/elm-repl-push-decl-focus ()
       "Send current function to the REPL and focus it in insert state."
       (interactive)
-      (push-decl-elm-repl)
+      (elm-repl-push-decl)
       (run-elm-interactive)
       (evil-insert-state))
 
-    (defun dotemacs/push-elm-repl-focus ()
+    (defun dotemacs/elm-repl-push-focus ()
       "Send current region to the REPL and focus it in insert state."
-      (push-elm-repl)
+      (elm-repl-push)
       (run-elm-interactive)
       (evil-insert-state))
 
@@ -7264,10 +7264,10 @@ If called with a prefix argument, uses the other-window instead."
 
       ;; repl
       "si" 'elm-repl-load
-      "sf" 'push-decl-elm-repl
-      "sF" 'dotemacs/push-decl-elm-repl-focus
-      "sr" 'push-elm-repl
-      "sR" 'dotemacs/push-elm-repl-focus
+      "sf" 'elm-repl-push-decl
+      "sF" 'dotemacs/elm-repl-push-decl
+      "sr" 'elm-repl-push
+      "sR" 'dotemacs/elm-repl-push-focus
 
       ;; reactor
       "Rn" 'elm-preview-buffer
