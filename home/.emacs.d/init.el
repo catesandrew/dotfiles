@@ -3828,10 +3828,10 @@ It will toggle the overlay under point or create an overlay of one character."
 
 (use-package evil-lisp-state
   :ensure t
-  :init
-  (progn
-    (setq evil-lisp-state-global t)
-    (setq evil-lisp-state-leader-prefix "k")))
+  :init (setq evil-lisp-state-global t
+              ;; work-around to be removed when the fix is available in MELPA
+              evil-lisp-state-leader (concat dotemacs-leader-key " k"))
+  :config (evil-lisp-state-leader (concat dotemacs-leader-key " k")))
 
 (use-package evil-mc
   :ensure t
