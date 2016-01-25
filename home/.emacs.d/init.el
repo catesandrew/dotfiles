@@ -10207,26 +10207,13 @@ If called with a prefix argument, uses the other-window instead."
          (concat leader-key " m")    "major mode commands"
          (concat leader-key " " dotemacs-command-key) "helm M-x"))
 
-      (if (fboundp 'which-key-declare-prefixes)
-          (which-key-declare-prefixes
-            dotemacs-leader-key '("root" . "dotemacs root")
-            dotemacs-emacs-leader-key '("root" . "dotemacs root")
-            (concat dotemacs-leader-key " m")
-            '("major-mode-cmd" . "Major mode commands")
-            (concat dotemacs-emacs-leader-key " m")
-            '("major-mode-cmd" . "Major mode commands"))
-
-       ;; no need to use this after everyone updates which-key
-       (setq which-key-prefix-title-alist
-             `((,(listify-key-sequence
-                  (kbd (concat dotemacs-leader-key " m"))) . "Major mode commands")
-               (,(listify-key-sequence
-                  (kbd (concat dotemacs-emacs-leader-key " m"))) . "Major mode commands")
-               (,(listify-key-sequence
-                  (kbd dotemacs-leader-key)) . "dotemacs root")
-               (,(listify-key-sequence
-                  (kbd dotemacs-emacs-leader-key)) . "dotemacs root")))
-       (nconc which-key-prefix-title-alist dotemacs-prefix-titles))
+      (which-key-declare-prefixes
+        dotemacs-leader-key '("root" . "dotemacs root")
+        dotemacs-emacs-leader-key '("root" . "dotemacs root")
+        (concat dotemacs-leader-key " m")
+        '("major-mode-cmd" . "Major mode commands")
+        (concat dotemacs-emacs-leader-key " m")
+        '("major-mode-cmd" . "Major mode commands"))
 
       ;; disable special key handling for dotemacs, since it can be
       ;; disorienting if you don't understand it
