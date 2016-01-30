@@ -121,6 +121,7 @@ function iterm2_preexec_hook() {
 }
 
 # https://github.com/rcaloras/bash-preexec
+# TODO: Migrate to brew `bash-preexec`
 if [ -z "$INSIDE_EMACS" ]; then
     if [[ -n "$BASH_VERSION" ]]; then
         source "${BASH_IT}/lib/bash-preexec.sh"
