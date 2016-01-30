@@ -18,9 +18,6 @@ node_prepend_path() {
   fi
 }
 
-# Make sure the global npm prefix is on the path
-[[ `which npm` ]] && pathmunge $(npm config get prefix)/bin
-
 # Strip other version from PATH
 PATH="$(node_strip_path "$PATH" "/.bin")"
 
@@ -31,4 +28,6 @@ PATH="$(node_prepend_path "$PATH" "./node_modules/.bin")"
 
 # tells npm to compile and install all your native addons in parallel and not
 # sequentially. This greatly increases installation times.
-[[ `which npm` ]] && export JOBS=max
+if hash npm 2>/dev/null; then
+    export JOBS=max
+fi

@@ -1,19 +1,3 @@
-# Helper function loading various enable-able files
-function _load_bash_it_files() {
-  subdirectory="$1"
-  if [ ! -d "${BASH_IT}/${subdirectory}" ]
-  then
-    continue
-  fi
-  FILES="${BASH_IT}/${subdirectory}/*.bash"
-  for bash_config_file in $FILES
-  do
-    if [ -e "${bash_config_file}" ]; then
-      source $bash_config_file
-    fi
-  done
-}
-
 # posfind: search the directory frontmost in the Finder
 function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
 

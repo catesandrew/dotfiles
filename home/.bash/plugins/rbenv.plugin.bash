@@ -5,6 +5,7 @@ about-plugin 'load rbenv, if you are using it'
 if brew_contains_element "rbenv"; then
     # export RBENV_ROOT="$__dot_brew_home/var/rbenv"
     export RBENV_ROOT="$HOME/.rbenv"
+    export RBENV_HOME="$__dot_brew_home/opt/rbenv"
 else
     export RBENV_ROOT="$HOME/.rbenv"
 fi

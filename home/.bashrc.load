@@ -204,53 +204,29 @@ elif [ "$__dot_system_type" == "Linux" ]; then
     }
 fi
 
-if brew_contains_element "go"; then
-    # export GOROOT=$(brew --prefix go)
-    export GOROOT="$__dot_brew_home/opt/go"
-    export GO_PATH="$__dot_brew_home/go"
-fi
+# Helper function loading various enable-able files
+function _load_bash_it_files() {
+  subdirectory="$1"
+  if [ ! -d "${BASH_IT}/${subdirectory}" ]; then
+    continue
+  fi
+  FILES="${BASH_IT}/${subdirectory}/*.bash"
+  for bash_config_file in $FILES; do
+    if [ -e "${bash_config_file}" ]; then
+        source $bash_config_file
+        # mytime="$(time (source $bash_config_file) 2>&1 1>/dev/null )"
+        # echo "${bash_config_file}: ${mytime}"
+    fi
+  done
+}
 
-if cask_contains_element "packer" || \
-    hash packer 2>/dev/null; then
-    export PACKER_CACHE_DIR="${HOME}/.packer_cache"
-fi
-
-# Node Version Manager
-if brew_contains_element "nvm"; then
-    # export NVM_TARGET="$(brew --prefix nvm)"
-    export NVM_TARGET="$__dot_brew_home/opt/nvm"
-    export NVM_DIR="$__dot_brew_home/nvm"
-    # Load NVM into a shell session *as a function*
-    [[ -s "$NVM_TARGET/nvm.sh" ]] && \
-        . "$NVM_TARGET/nvm.sh"
-fi
-
-if brew_contains_element "pyenv"; then
-    # export PYENV_HOME="$(brew --prefix pyenv)"
-    export PYENV_HOME="$__dot_brew_home/opt/pyenv"
-fi
-
-if brew_contains_element "rbenv"; then
-    export RBENV_HOME="$__dot_brew_home/opt/rbenv"
-fi
-
-# fasd
-fasd_cache="$HOME/.fasd-init-bash"
-if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
-  fasd --init posix-alias posix-hook bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
-fi
-. "$fasd_cache"
-unset fasd_cache
-
-# Load enabled aliases, completion, plugins
-for file_type in "aliases" "completion" "plugins"
-do
+# Load enabled plugins, aliases, and completion
+for file_type in "plugins" "aliases" "completion"; do
   _load_bash_it_files $file_type
 done
 
 # Load custom aliases, completion, plugins
-for file_type in "aliases" "completion" "plugins"
-do
+for file_type in "plugins" "aliases" "completion"; do
   if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
     source "${BASH_IT}/${file_type}/custom.${file_type}.bash"
   fi
@@ -266,9 +242,6 @@ PREVIEW="less"
 [ -s /usr/bin/gloobus-preview ] && PREVIEW="gloobus-preview"
 [ -s /Applications/Preview.app ] && PREVIEW="/Applications/Preview.app"
 export PREVIEW
-
-# Setting ag as the default source for fzf
-export FZF_DEFAULT_COMMAND='ag -l -g ""'
 
 # TODO: Add preexec to time machine node_modules folders
 function title {

@@ -1,0 +1,110 @@
+#! bash
+# bash completion for the `rails` command and rails scripts.
+#
+# Copyright (c) 2008-2010 Daniel Luz <dev at mernen dot com>.
+# Distributed under the MIT license.
+# http://mernen.com/projects/completion-ruby
+#
+# To use, source this file on bash:
+#   . completion-rails
+
+__rails() {
+  local cur=$2
+  local prev=$3
+  COMPREPLY=()
+
+  case $prev in
+  -r | --ruby)
+    # leave it to complete the path to a binary
+    return;;
+  -d | --database)
+    local dbs="mysql oracle postgresql sqlite2 sqlite3 frontbase ibm_db"
+    COMPREPLY=($(compgen -W "$dbs" -- "$cur"))
+    return;;
+  esac
+
+  if [[ $cur == -* ]]; then
+    local options="
+      -r --ruby -d --database -f --freeze -v --version -h --help -p --pretend
+      --force -s --skip -q --quiet -t --backtrace -c --svn -g --git"
+    COMPREPLY=($(compgen -W "$options" -- "$cur"))
+  fi
+}
+
+__rails_script_server() {
+  local cur=$2
+  local prev=$3
+  COMPREPLY=()
+
+  case $prev in
+  -e | --environment)
+    __rails_complete_environments "$cur"
+    return;;
+  *)
+    if [[ $cur == -* ]]; then
+      local options="
+        -p --port -b --binding -d --daemon -u --debugger -e --environment"
+      COMPREPLY=($(compgen -W "$options" -- "$cur"))
+    fi
+  esac
+}
+
+__rails_script_console() {
+  local cur=$2
+  local prev=$3
+  COMPREPLY=()
+  if [[ $cur == -* ]]; then
+    local options="-s --sandbox --irb --debugger"
+    COMPREPLY=($(compgen -W "$options" -- "$cur"))
+  elif [[ $prev == --irb ]]; then
+    COMPREPLY=($(compgen -A command -- "$cur"))
+  else
+    __rails_complete_environments "$cur"
+  fi
+}
+
+__rails_script_generate() {
+  local cur=$2
+  local prev=$3
+  COMPREPLY=()
+  if [[ $cur == -* ]]; then
+    local options="
+      -v --version -h --help -p --pretend -f --force -s --skip
+      -q --quiet -t --backtrace -c --svn -g --git"
+    COMPREPLY=($(compgen -W "$options" -- "$cur"))
+  elif [[ $(__rails_get_command) == "" ]]; then
+    __rails_complete_generators "$cur"
+  fi
+}
+
+# returns the first non-option argument
+__rails_get_command() {
+  local i
+  for ((i=1; i < $COMP_CWORD; ++i)); do
+    local arg=${COMP_WORDS[$i]}
+
+    if [[ $arg != -* ]]; then
+      echo $arg
+      return
+    fi
+  done
+}
+
+__rails_complete_environments() {
+  # hardcoded list of environments... for now?
+  local environments="development test production"
+  COMPREPLY=($(compgen -W "$environments" -- "$1"))
+}
+
+__rails_complete_generators() {
+  local generators="
+    controller integration_test mailer migration model observer
+    plugin resource scaffold session_migration"
+  COMPREPLY=($(compgen -W "$generators" -- "$1"))
+}
+
+complete -F __rails -o default rails
+complete -F __rails_script_server -o default script/server ./script/server
+complete -F __rails_script_console -o default script/console ./script/console
+complete -F __rails_script_generate -o default script/generate ./script/generate
+# vim: ai ft=sh sw=2 sts=2 et

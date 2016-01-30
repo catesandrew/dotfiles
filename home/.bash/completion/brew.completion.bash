@@ -1,14 +1,16 @@
-if [ $(uname) = "Darwin" ]; then
-    if which brew >/dev/null 2>&1; then
-        if [ -f ${BREW_HOME}/etc/bash_completion ]; then
-            . ${BREW_HOME}/etc/bash_completion
+#!/bin/bash
+
+if [ "$__dot_system_type" == "Darwin" ]; then
+    if brew_contains_element "bash-completion"; then
+        BASH_COMP_TARGET="$__dot_brew_home/etc/bash_completion"
+
+        if [ -f "$BASH_COMP_TARGET" ]; then
+            . "$BASH_COMP_TARGET"
         fi
 
-        if [ -f ${BREW_HOME}/Library/Contributions/brew_bash_completion.sh ]; then
-            . ${BREW_HOME}/Library/Contributions/brew_bash_completion.sh
-        fi
+        unset BASH_COMP_TARGET
     fi
-elif [ $(uname) = "Linux" ]; then
+elif [ "$__dot_system_type" == "Linux" ]; then
     if ! shopt -oq posix; then
         if [ -f /usr/share/bash-completion/bash_completion ]; then
             . /usr/share/bash-completion/bash_completion
@@ -17,4 +19,3 @@ elif [ $(uname) = "Linux" ]; then
         fi
     fi
 fi
-
