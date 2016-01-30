@@ -97,24 +97,44 @@ source "${BASH_IT}/themes/colors.theme.bash"
 source "${BASH_IT}/themes/base.theme.bash"
 
 function title {
-  echo -n # no op
+  true # no op
+}
+
+# Default do-nothing implementation of preexec.
+function preexec () {
+    true
+}
+
+# Default do-nothing implementation of precmd.
+function precmd () {
+    true
+}
+
+function iterm2_preexec_hook() {
+    source "${BASH_IT}/lib/iterm2-preexec.sh"
+
+    preexec_functions+=(iterm2_preexec_invoke_cmd)
+
+    # This is necessary so the first command line will have a hostname and current directory.
+    iterm2_print_state_data
+    iterm2_print_version_number
 }
 
 # https://github.com/rcaloras/bash-preexec
 if [ -z "$INSIDE_EMACS" ]; then
-    if [ "${TERM_PROGRAM:-""}" != "" ]; then
-        if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
-            source "${BASH_IT}/lib/iterm2-preexec.sh"
-            function title {
-                echo -ne "\033]0;"$*"\007"
-            }
-        else
-            source "${BASH_IT}/lib/bash-preexec.sh"
-        fi
-    elif [ -n "$SESSION_TYPE" ]; then
-        source "${BASH_IT}/lib/iterm2-preexec.sh"
-    else
+    if [[ -n "$BASH_VERSION" ]]; then
         source "${BASH_IT}/lib/bash-preexec.sh"
+
+        if [ "${TERM_PROGRAM:-""}" != "" ]; then
+            if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
+                iterm2_preexec_hook
+                function title {
+                    echo -ne "\033]0;"$*"\007"
+                }
+            fi
+        elif [ -n "$SESSION_TYPE" ]; then
+            iterm2_preexec_hook
+        fi
     fi
 fi
 

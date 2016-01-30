@@ -106,11 +106,6 @@ cdf() {
     fi
 }
 
-function preexec_invoke_cmd () {
-    precmd
-    preexec_interactive_mode="yes"
-}
-
 # Notes:
 #  - tsort requires as input a stream of pairs (a, b) where package a depends
 #    on package b. If package a has k > 1 dependencies, we should have k lines

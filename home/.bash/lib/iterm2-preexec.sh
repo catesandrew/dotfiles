@@ -19,27 +19,10 @@
 orig_ps1="$PS1"
 prev_ps1="$PS1"
 
-# This variable describes whether we are currently in "interactive mode";
-# i.e. whether this shell has just executed a prompt and is waiting for user
-# input.  It documents whether the current command invoked by the trace hook is
-# run interactively by the user; it's set immediately after the prompt hook,
-# and unset as soon as the trace hook is run.
-preexec_interactive_mode=""
-
 # tmux and screen are not supported; even using the tmux hack to get escape
 # codes passed through, ncurses interferes and the cursor isn't in the right
 # place at the time it's passed through.
 if ( [ x"$TERM" != xscreen ] ); then
-  # Default do-nothing implementation of preexec.
-  function preexec () {
-      true
-  }
-
-  # Default do-nothing implementation of precmd.
-  function precmd () {
-      true
-  }
-
   # This function is installed as the PROMPT_COMMAND; it is invoked before each
   # interactive prompt display.  It sets a variable to indicate that the prompt
   # was just displayed, to allow the DEBUG trap, below, to know that the next
@@ -58,7 +41,7 @@ if ( [ x"$TERM" != xscreen ] ); then
       # and have iterm2_prompt_prefix set a global variable that tells precmd not to
       # output anything and have iterm2_prompt_suffix reset that variable.
       # Unfortunately, command substitutions run in subshells and can't
-      # communicate to the outside world. 
+      # communicate to the outside world.
       # Instead, we have this workaround. We save the original value of PS1 in
       # $orig_ps1. Then each time this function is run (it's called from
       # PROMPT_COMMAND just before the prompt is shown) it will change PS1 to a
@@ -83,99 +66,6 @@ if ( [ x"$TERM" != xscreen ] ); then
       # Save the value we just set PS1 to so if the user changes PS1 we'll know and we can update orig_ps1.
       export prev_ps1="$PS1"
       sh -c "exit $s"
-
-      # This must be the last line in this function, or else
-      # iterm2_preexec_invoke_exec will do its thing at the wrong time.
-      preexec_interactive_mode="yes";
-  }
-
-  # This function is installed as the DEBUG trap.  It is invoked before each
-  # interactive prompt display.  Its purpose is to inspect the current
-  # environment to attempt to detect if the current command is being invoked
-  # interactively, and invoke 'preexec' if so.
-  function iterm2_preexec_invoke_exec () {
-      if [ ! -t 1 ]
-      then
-          # We're in a piped subshell (STDOUT is not a TTY) like
-          #   (echo -n A; sleep 1; echo -n B) | wc -c
-          # ...which should return "2".
-          return
-      fi
-      if [[ -n "$COMP_LINE" ]]
-      then
-          # We're in the middle of a completer.  This obviously can't be
-          # an interactively issued command.
-          return
-      fi
-      if [[ -z "$preexec_interactive_mode" ]]
-      then
-          # We're doing something related to displaying the prompt.  Let the
-          # prompt set the title instead of me.
-          return
-      else
-          # If we're in a subshell, then the prompt won't be re-displayed to put
-          # us back into interactive mode, so let's not set the variable back.
-          # In other words, if you have a subshell like
-          #   (sleep 1; sleep 2)
-          # You want to see the 'sleep 2' as a set_command_title as well.
-          if [[ 0 -eq "$BASH_SUBSHELL" ]]
-          then
-              preexec_interactive_mode=""
-          fi
-      fi
-      if [[ "iterm2_preexec_invoke_cmd" == "$BASH_COMMAND" ]]
-      then
-          # Sadly, there's no cleaner way to detect two prompts being displayed
-          # one after another.  This makes it important that PROMPT_COMMAND
-          # remain set _exactly_ as below in iterm2_preexec_install.  Let's switch back
-          # out of interactive mode and not trace any of the commands run in
-          # precmd.
-
-          # Given their buggy interaction between BASH_COMMAND and debug traps,
-          # versions of bash prior to 3.1 can't detect this at all.
-          preexec_interactive_mode=""
-          return
-      fi
-
-      # In more recent versions of bash, this could be set via the "BASH_COMMAND"
-      # variable, but using history here is better in some ways: for example, "ps
-      # auxf | less" will show up with both sides of the pipe if we use history,
-      # but only as "ps auxf" if not.
-      hist_ent="$(history 1)";
-      local prev_hist_ent="${last_hist_ent}";
-      last_hist_ent="${hist_ent}";
-      if [[ "${prev_hist_ent}" != "${hist_ent}" ]]; then
-          local this_command="$(echo "${hist_ent}" | sed -e "s/^[ ]*[0-9]*[ ]*//g")";
-      else
-          local this_command="";
-      fi;
-
-      # If none of the previous checks have earlied out of this function, then
-      # the command is in fact interactive and we should invoke the user's
-      # preexec hook with the running command as an argument.
-      preexec "$this_command";
-  }
-
-  # Execute this to set up preexec and precmd execution.
-  function iterm2_preexec_install () {
-
-      # *BOTH* of these options need to be set for the DEBUG trap to be invoked
-      # in ( ) subshells.  This smells like a bug in bash to me.  The null stackederr
-      # redirections are to quiet errors on bash2.05 (i.e. OSX's default shell)
-      # where the options can't be set, and it's impossible to inherit the trap
-      # into subshells.
-
-      set -o functrace > /dev/null 2>&1
-      shopt -s extdebug > /dev/null 2>&1
-
-      # Finally, install the actual traps.
-      if ( [ x"$PROMPT_COMMAND" = x ]); then
-        PROMPT_COMMAND="iterm2_preexec_invoke_cmd";
-      else
-        # If there's a trailing semicolon folowed by spaces, remove it (issue 3358).
-        PROMPT_COMMAND="$(echo -n $PROMPT_COMMAND | sed -e 's/; *$//'); iterm2_preexec_invoke_cmd";
-      fi
-      trap 'iterm2_preexec_invoke_exec' DEBUG;
   }
 
   # -- begin iTerm2 customization
@@ -249,9 +139,9 @@ if ( [ x"$TERM" != xscreen ] ); then
   if [ -z "$iterm2_hostname" ]; then
     iterm2_hostname=$(hostname -f)
   fi
-  iterm2_preexec_install
+  # iterm2_preexec_install
 
   # This is necessary so the first command line will have a hostname and current directory.
-  iterm2_print_state_data
-  iterm2_print_version_number
+  # iterm2_print_state_data
+  # iterm2_print_version_number
 fi
