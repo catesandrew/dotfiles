@@ -200,7 +200,7 @@ Emacs."
   :group 'dotemacs)
 
 ;; major-mode-leader to 0x00A0 (NO_BREAK_SPACE)
-(defcustom dotemacs-major-mode-leader-key " "
+(defcustom dotemacs-major-mode-leader-key "\\"
   "Major mode leader key is a shortcut key which is the equivalent of
 pressing `<leader> m`. Set it to `nil` to disable it."
   :group 'dotemacs)
