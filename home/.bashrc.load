@@ -96,50 +96,6 @@ fi
 source "${BASH_IT}/themes/colors.theme.bash"
 source "${BASH_IT}/themes/base.theme.bash"
 
-function title {
-  true # no op
-}
-
-# Default do-nothing implementation of preexec.
-function preexec () {
-    true
-}
-
-# Default do-nothing implementation of precmd.
-function precmd () {
-    true
-}
-
-function iterm2_preexec_hook() {
-    source "${BASH_IT}/lib/iterm2-preexec.sh"
-
-    preexec_functions+=(iterm2_preexec_invoke_cmd)
-
-    # This is necessary so the first command line will have a hostname and current directory.
-    iterm2_print_state_data
-    iterm2_print_version_number
-}
-
-# https://github.com/rcaloras/bash-preexec
-# TODO: Migrate to brew `bash-preexec`
-if [ -z "$INSIDE_EMACS" ]; then
-    if [[ -n "$BASH_VERSION" ]]; then
-        source "${BASH_IT}/lib/bash-preexec.sh"
-        source "${BASH_IT}/lib/bashhub-preexec.sh"
-
-        if [ "${TERM_PROGRAM:-""}" != "" ]; then
-            if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
-                iterm2_preexec_hook
-                function title {
-                    echo -ne "\033]0;"$*"\007"
-                }
-            fi
-        elif [ -n "$SESSION_TYPE" ]; then
-            iterm2_preexec_hook
-        fi
-    fi
-fi
-
 # library
 LIB="${BASH_IT}/lib/*.bash"
 for config_file in $LIB
@@ -279,5 +235,50 @@ PREVIEW="less"
 
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -l -g ""'
+
+function title {
+  true # no op
+}
+
+# Default do-nothing implementation of preexec.
+function preexec () {
+    true
+}
+
+# Default do-nothing implementation of precmd.
+function precmd () {
+    true
+}
+
+function iterm2_preexec_hook() {
+    source "${BASH_IT}/lib/iterm2-preexec.sh"
+
+    preexec_functions+=(iterm2_preexec_invoke_cmd)
+
+    # This is necessary so the first command line will have a hostname and current directory.
+    iterm2_print_state_data
+    iterm2_print_version_number
+}
+
+# https://github.com/rcaloras/bash-preexec
+# TODO: Migrate to brew `bash-preexec`
+if [ -z "$INSIDE_EMACS" ]; then
+    if [[ -n "$BASH_VERSION" ]]; then
+        source "${BASH_IT}/lib/bash-preexec.sh"
+        source "${BASH_IT}/lib/bashhub-preexec.sh"
+
+        if [ "${TERM_PROGRAM:-""}" != "" ]; then
+            if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
+                iterm2_preexec_hook
+                function title {
+                    echo -ne "\033]0;"$*"\007"
+                }
+            fi
+        elif [ -n "$SESSION_TYPE" ]; then
+            iterm2_preexec_hook
+        fi
+    fi
+fi
+
 
 . ${BASH_IT}/custom.sh
