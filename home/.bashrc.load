@@ -125,6 +125,7 @@ function iterm2_preexec_hook() {
 if [ -z "$INSIDE_EMACS" ]; then
     if [[ -n "$BASH_VERSION" ]]; then
         source "${BASH_IT}/lib/bash-preexec.sh"
+        source "${BASH_IT}/lib/bashhub-preexec.sh"
 
         if [ "${TERM_PROGRAM:-""}" != "" ]; then
             if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
