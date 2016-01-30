@@ -128,9 +128,9 @@ function brew_reinstall () {
 # Max length of PWD to display
 MAX_PWD_LENGTH=24
 
+# TODO: Unused, use version from theme base
 # Displays last X characters of pwd
 function limited_pwd() {
-
     # Replace $HOME with ~ if possible
     RELATIVE_PWD=${PWD/#$HOME/\~}
 
@@ -176,31 +176,7 @@ function geticon() {
   fi
 }
 
-# http://stackoverflow.com/questions/1378274
-# A bad-arse SysOps guy once taught me the Three-Fingered Claw technique:
-yell() { echo "$0: $*" >&2; }
-die() { yell "$*"; exit 111; }
-try() { "$@" || die "cannot $*"; }
-asuser() { sudo su - "$1" -c "${*:2}"; }
-
 # Example usage:
 # try apt-fast upgrade -y
 # try asuser vagrant "echo 'uname -a' >> ~/.profile"
 
-if ! type pathmunge > /dev/null 2>&1
-then
-  function pathmunge () {
-    about 'prevent duplicate directories in you PATH variable'
-    group 'lib helpers'
-    example 'pathmunge /path/to/dir is equivalent to PATH=/path/to/dir:$PATH'
-    example 'pathmunge /path/to/dir after is equivalent to PATH=$PATH:/path/to/dir'
-
-    if ! [[ $PATH =~ (^|:)$1($|:) ]] ; then
-      if [ "$2" = "after" ] ; then
-        export PATH=$PATH:$1
-      else
-        export PATH=$1:$PATH
-      fi
-    fi
-  }
-fi

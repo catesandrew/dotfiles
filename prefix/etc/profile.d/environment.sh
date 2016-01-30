@@ -3,15 +3,6 @@ if ! [ -d "$BREW_HOME" ]; then
         BREW_HOME="`brew --prefix`"
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
-
-        # Cask installation
-        if ! [ -d "$CASK_HOME" ]; then
-            if [ x"" != x"$(brew ls --versions cask)"  ]; then
-                CASK_HOME="`brew --prefix cask`"
-                export CASK_HOME
-                launchctl setenv CASK_HOME "$CASK_HOME"
-            fi
-        fi
     fi
 fi
 

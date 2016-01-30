@@ -90,3 +90,43 @@ formula_exists() {
     e_warning "Missing formula: $1"
     return 1
 }
+
+#
+# Checks if an element is present in an array.
+#
+# @param The element to check if present
+# @param the array to check in
+# @return 0 if present 1 otherwise
+contains_element() {
+  # http://stackoverflow.com/questions/3685970
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+# http://stackoverflow.com/questions/1378274
+# A bad-arse SysOps guy once taught me the Three-Fingered Claw technique:
+yell() { echo "$0: $*" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "cannot $*"; }
+asuser() { sudo su - "$1" -c "${*:2}"; }
+
+#
+# prevent duplicate directories in you PATH variable
+#
+# @example
+# pathmunge /path/to/dir is equivalent to PATH=/path/to/dir:$PATH
+# pathmunge /path/to/dir after is equivalent to PATH=$PATH:/path/to/dir
+#
+# if ! type pathmunge > /dev/null 2>&1
+# then
+function pathmunge () {
+  if ! [[ $PATH =~ (^|:)$1($|:) ]] ; then
+    if [ "$2" = "after" ] ; then
+      export PATH=$PATH:$1
+    else
+      export PATH=$1:$PATH
+    fi
+  fi
+}
+# fi

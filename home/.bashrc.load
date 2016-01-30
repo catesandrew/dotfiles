@@ -2,8 +2,63 @@ if [[ "$TERM" == "dumb" ]]; then
   exit 0 # dont kill rest of script
 fi
 
+# Path to the bash it configuration
+export BASH_IT=$HOME/.bash
+export DFM_REPO="${HOME}/.dotfiles"
+
+# No dependency, simple and useful utilities
+. "${BASH_IT}/lib/utils.sh"
+
+__dot_system_type=$(uname)
+__dot_brew_home=""
+declare -a __dot_brew_list="()"
+declare -a __dot_brew_taps="()"
+declare -a __dot_cask_list="()"
+
+if [ "$__dot_system_type" == "Darwin" ]; then
+    if hash brew 2>/dev/null; then
+        __dot_brew_home="$(brew --prefix)"
+        export BREW_HOME=$__dot_brew_home
+
+        __dot_brew_list="$(brew list | sed 's/:.*//')"
+        __dot_brew_list=($__dot_brew_list)
+        __dot_brew_taps=($(brew tap | sed 's/:.*//'))
+
+        if contains_element "caskroom/cask" "${__dot_brew_taps[@]}"; then
+            export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
+            __dot_cask_list=($(brew cask list --caskroom=/usr/local/caskroom | sed 's/:.*//'))
+        fi
+    fi
+elif [ "$__dot_system_type" == "Linux" ]; then
+    true
+fi
+
+# echo "Found ${#__dot_brew_list[@]} installed formulas"
+# echo "Found ${#__dot_brew_taps[@]} taps"
+# echo "Found ${#__dot_cask_list[@]} installed applications"
+
+# Checks if an item is installed in homebrew.
+#
+# @param The element to check if present
+# @return 0 if present 1 otherwise
+brew_contains_element() {
+  # http://stackoverflow.com/questions/3685970
+  local e && e=$(contains_element "$1" "${__dot_brew_list[@]}")
+  return $e
+}
+
+brew_contains_tap() {
+  local e && e=$(contains_element "$1" "${__dot_brew_taps[@]}")
+  return $e
+}
+
+cask_contains_element() {
+  local e && e=$(contains_element "$1" "${__dot_cask_list[@]}")
+  return $e
+}
+
+# detect ssh or not, but no bother in emacs term
 if [ -z "$INSIDE_EMACS" ]; then
-  # detect ssh or not
   # http://unix.stackexchange.com/questions/9605/
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     export SESSION_TYPE=remote/ssh
@@ -14,12 +69,6 @@ if [ -z "$INSIDE_EMACS" ]; then
   fi
 fi
 
-# Path to the bash it configuration
-export BASH_IT=$HOME/.bash
-
-. "${BASH_IT}/lib/utils.sh"
-
-export DFM_REPO="${HOME}/.dotfiles"
 
 # Set mveditor/MacVim as EDITOR.
 if [ -f "${BASH_IT}/mveditor.sh" ]; then
@@ -93,74 +142,55 @@ else
 fi
 
 # Load colors first so they can be use in base theme
-source "${BASH_IT}/themes/colors.theme.bash"
-source "${BASH_IT}/themes/base.theme.bash"
+. "${BASH_IT}/themes/colors.theme.bash"
+. "${BASH_IT}/themes/base.theme.bash"
 
 # library
-LIB="${BASH_IT}/lib/*.bash"
-for config_file in $LIB
+lib="${BASH_IT}/lib/*.bash"
+for config_file in $lib
 do
-  source $config_file
+  . "$config_file"
 done
-unset LIB
+unset config_file
+unset lib
 
-if [ $(uname) = "Darwin" ]; then
+pathmunge "/usr/local/sbin"
+pathmunge "/usr/local/bin"
 
+if [ "$__dot_system_type" == "Darwin" ]; then
     export CHEATCOLORS=true
     export HTML_TIDY=$HOME/.tidyrc
     export TLSOURCE=en TLTARGET=es
-    export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
-
     export PERL_LOCAL_LIB_ROOT="${HOME}/perl5:$PERL_LOCAL_LIB_ROOT";
     export PERL_MB_OPT="--install_base "${HOME}/perl5"";
     export PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5";
     export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
-    pathmunge "/usr/local/sbin"
-    pathmunge "/usr/local/bin"
+
     pathmunge "${HOME}/.cabal/bin"
     pathmunge "${HOME}/.bin"
 
-    if hash brew 2>/dev/null; then
-        if ! [ -d "$BREW_HOME" ]; then
-            export BREW_HOME="`brew --prefix`"
-        fi
-
-        # Cask installation
-        if [ ! -h "${HOME}/.cask" ]; then
-            if [ x"" != x"$(brew ls --versions cask)"  ]; then
-                CASK_HOME="`brew --prefix cask`"
-                ln -s "${CASK_HOME}" "${HOME}/.cask"
-            fi
-        fi
-
-        if [ x"" != x"$(brew ls --versions openconnect)" ]; then
-            export VPNC_SCRIPT=$BREW_HOME/etc/vpnc-script
-        fi
-
-        if brew cask info vagrant 1>/dev/null 2>&1; then
-            export VAGRANT_CHECKPOINT_DISABLE=1
-            export VAGRANT_HOME=~/.vagrant.d
-            export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
-            # Time Machine ignore this directory
-            export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
-        fi
+    if brew_contains_element "openconnect"; then
+        export VPNC_SCRIPT="$__dot_brew_home/etc/vpnc-script"
     fi
 
-
-elif [ $(uname) = "Linux" ]; then
-    pathmunge "/usr/local/sbin"
-    pathmunge "/usr/local/bin"
+    if cask_contains_element "vagrant"; then
+        export VAGRANT_CHECKPOINT_DISABLE=1
+        export VAGRANT_HOME="$HOME/.vagrant.d"
+        export VAGRANT_DOTFILE_PATH=".vagrant-$(hostname)"
+        # Time Machine ignore this directory
+        export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
+    fi
+elif [ "$__dot_system_type" == "Linux" ]; then
     pathmunge "/usr/local/linuxbrew/bin"
     pathmunge "${HOME}/.cabal/bin"
     pathmunge "${HOME}/.bin"
-    if hash brew 2>/dev/null; then
+
+    # if [ ${#__dot_brew_list[@]} -gt 0 ]; then
+    if [ -n "$__dot_brew_home" ]; then
         # Fix checks for gcc compiler when not present when `--env=inherit` specified
-        export BREW_HOME="`brew --prefix`"
-        export HOMEBREW_TEMP="${BREW_HOME}/tmp"
-        export MANPATH="${BREW_HOME}/share/man:$MANPATH"
-        export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
-    else
-        echo "linuxbrew not installed, please consider installing it."
+        export HOMEBREW_TEMP="${__dot_brew_home}/tmp"
+        export MANPATH="${__dot_brew_home}/share/man:$MANPATH"
+        export INFOPATH="${__dot_brew_home}/share/info:$INFOPATH"
     fi
 
     dpkg -s vagrant &>/dev/null || {
@@ -174,30 +204,34 @@ elif [ $(uname) = "Linux" ]; then
     }
 fi
 
-if hash brew 2>/dev/null; then
-    if [ x"" != x"$(brew ls --versions go)"  ]; then
-        export GOROOT=$(brew --prefix go)
-        export GOPATH=/usr/local/go
-    fi
+if brew_contains_element "go"; then
+    # export GOROOT=$(brew --prefix go)
+    export GOROOT="$__dot_brew_home/opt/go"
+    export GO_PATH="$__dot_brew_home/go"
 fi
 
-if hash packer 2>/dev/null; then
+if cask_contains_element "packer" || \
+    hash packer 2>/dev/null; then
     export PACKER_CACHE_DIR="${HOME}/.packer_cache"
 fi
 
 # Node Version Manager
-if hash brew 2>/dev/null; then
-    if [ x"" != x"$(brew ls --versions nvm)" ]; then
-        export NVM_TARGET="$(brew --prefix nvm)"
-        export NVM_DIR="/usr/local/nvm"
-        [[ -s "$NVM_TARGET/nvm.sh" ]] && source "$NVM_TARGET/nvm.sh" # Load NVM into a shell session *as a function*
-    fi
+if brew_contains_element "nvm"; then
+    # export NVM_TARGET="$(brew --prefix nvm)"
+    export NVM_TARGET="$__dot_brew_home/opt/nvm"
+    export NVM_DIR="$__dot_brew_home/nvm"
+    # Load NVM into a shell session *as a function*
+    [[ -s "$NVM_TARGET/nvm.sh" ]] && \
+        . "$NVM_TARGET/nvm.sh"
 fi
 
-if hash brew 2>/dev/null; then
-    if [ x"" != x"$(brew ls --versions pyenv)" ]; then
-        export PYENV_ROOT="$(brew --prefix pyenv)"
-    fi
+if brew_contains_element "pyenv"; then
+    # export PYENV_HOME="$(brew --prefix pyenv)"
+    export PYENV_HOME="$__dot_brew_home/opt/pyenv"
+fi
+
+if brew_contains_element "rbenv"; then
+    export RBENV_HOME="$__dot_brew_home/opt/rbenv"
 fi
 
 # fasd
@@ -205,7 +239,7 @@ fasd_cache="$HOME/.fasd-init-bash"
 if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
   fasd --init posix-alias posix-hook bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
 fi
-source "$fasd_cache"
+. "$fasd_cache"
 unset fasd_cache
 
 # Load enabled aliases, completion, plugins
@@ -217,13 +251,12 @@ done
 # Load custom aliases, completion, plugins
 for file_type in "aliases" "completion" "plugins"
 do
-  if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]
-  then
+  if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
     source "${BASH_IT}/${file_type}/custom.${file_type}.bash"
   fi
 done
+unset file_type
 
-unset config_file
 if [[ $PROMPT ]]; then
     export PS1="\["$PROMPT"\]"
 fi
@@ -232,10 +265,12 @@ fi
 PREVIEW="less"
 [ -s /usr/bin/gloobus-preview ] && PREVIEW="gloobus-preview"
 [ -s /Applications/Preview.app ] && PREVIEW="/Applications/Preview.app"
+export PREVIEW
 
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -l -g ""'
 
+# TODO: Add preexec to time machine node_modules folders
 function title {
   true # no op
 }
@@ -251,7 +286,7 @@ function precmd () {
 }
 
 function iterm2_preexec_hook() {
-    source "${BASH_IT}/lib/iterm2-preexec.sh"
+    . "${BASH_IT}/lib/iterm2-preexec.sh"
 
     preexec_functions+=(iterm2_preexec_invoke_cmd)
 
@@ -264,8 +299,8 @@ function iterm2_preexec_hook() {
 # TODO: Migrate to brew `bash-preexec`
 if [ -z "$INSIDE_EMACS" ]; then
     if [[ -n "$BASH_VERSION" ]]; then
-        source "${BASH_IT}/lib/bash-preexec.sh"
-        source "${BASH_IT}/lib/bashhub-preexec.sh"
+        . "${BASH_IT}/lib/bash-preexec.sh"
+        . "${BASH_IT}/lib/bashhub-preexec.sh"
 
         if [ "${TERM_PROGRAM:-""}" != "" ]; then
             if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
@@ -279,6 +314,5 @@ if [ -z "$INSIDE_EMACS" ]; then
         fi
     fi
 fi
-
 
 . ${BASH_IT}/custom.sh
