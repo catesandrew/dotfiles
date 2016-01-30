@@ -1,28 +1,25 @@
-if [[ "$TERM" != "dumb"   ]]; then
+if [[ "$TERM" == "dumb" ]]; then
+  exit 0 # dont kill rest of script
+fi
 
-# detect ssh or not
-# http://unix.stackexchange.com/questions/9605/
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-  export SESSION_TYPE=remote/ssh
-else
-  case $(ps -o comm= -p $PPID) in
-    sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
-  esac
+if [ -z "$INSIDE_EMACS" ]; then
+  # detect ssh or not
+  # http://unix.stackexchange.com/questions/9605/
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    export SESSION_TYPE=remote/ssh
+  else
+    case $(ps -o comm= -p $PPID) in
+      sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
+    esac
+  fi
 fi
 
 # Path to the bash it configuration
 export BASH_IT=$HOME/.bash
 
-source "${BASH_IT}/lib/utils.sh"
+. "${BASH_IT}/lib/utils.sh"
 
 export DFM_REPO="${HOME}/.dotfiles"
-
-# Lock and load a custom theme file location /.bash/themes/
-# export BASH_IT_THEME='powerline-multiline'
-export BASH_IT_THEME='oh-my-git'
-export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
-export THEME_BATTERY_PERCENTAGE_CHECK=false
-export THEME_CLOCK_CHECK=false
 
 # Set mveditor/MacVim as EDITOR.
 if [ -f "${BASH_IT}/mveditor.sh" ]; then
@@ -82,9 +79,44 @@ source "${BASH_IT}/lib/composure.sh"
 # support 'plumbing' metadata
 cite _about _param _example _group _author _version
 
+export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
+export THEME_BATTERY_PERCENTAGE_CHECK=false
+export THEME_CLOCK_CHECK=false
+
+if [ -z "$INSIDE_EMACS" ]; then
+  # Lock and load a custom theme file location /.bash/themes/
+  # export BASH_IT_THEME='powerline-multiline'
+  export BASH_IT_THEME='oh-my-git'
+else
+  unset PROMPT_COMMAND
+  export BASH_IT_THEME='pure'
+fi
+
 # Load colors first so they can be use in base theme
 source "${BASH_IT}/themes/colors.theme.bash"
 source "${BASH_IT}/themes/base.theme.bash"
+
+function title {
+  echo -n # no op
+}
+
+# https://github.com/rcaloras/bash-preexec
+if [ -z "$INSIDE_EMACS" ]; then
+    if [ "${TERM_PROGRAM:-""}" != "" ]; then
+        if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
+            source "${BASH_IT}/lib/iterm2-preexec.sh"
+            function title {
+                echo -ne "\033]0;"$*"\007"
+            }
+        else
+            source "${BASH_IT}/lib/bash-preexec.sh"
+        fi
+    elif [ -n "$SESSION_TYPE" ]; then
+        source "${BASH_IT}/lib/iterm2-preexec.sh"
+    else
+        source "${BASH_IT}/lib/bash-preexec.sh"
+    fi
+fi
 
 # library
 LIB="${BASH_IT}/lib/*.bash"
@@ -92,15 +124,13 @@ for config_file in $LIB
 do
   source $config_file
 done
+unset LIB
 
 if [ $(uname) = "Darwin" ]; then
 
     export CHEATCOLORS=true
     export HTML_TIDY=$HOME/.tidyrc
     export TLSOURCE=en TLTARGET=es
-    export LC_CTYPE="utf-8"
-    export LC_ALL=en_US.UTF-8
-    export LANG=en_US.UTF-8
     export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
 
     export PERL_LOCAL_LIB_ROOT="${HOME}/perl5:$PERL_LOCAL_LIB_ROOT";
@@ -111,7 +141,6 @@ if [ $(uname) = "Darwin" ]; then
     pathmunge "/usr/local/bin"
     pathmunge "${HOME}/.cabal/bin"
     pathmunge "${HOME}/.bin"
-
 
     if hash brew 2>/dev/null; then
         if ! [ -d "$BREW_HOME" ]; then
@@ -229,12 +258,4 @@ PREVIEW="less"
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -l -g ""'
 
-# If you're running fzf in a large git repository, git ls-tree can boost up the speed of the traversal.
-# export FZF_DEFAULT_COMMAND='
-#   (git ls-tree -r --name-only HEAD ||
-#    find * -name ".*" -prune -o -type f -print -o -type l -print) 2> /dev/null'
-
-# Custom (Machine-Specific) Startup #
 . ${BASH_IT}/custom.sh
-
-fi
