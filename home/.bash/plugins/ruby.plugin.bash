@@ -3,8 +3,11 @@ about-plugin 'ruby and rubygems specific functions and settings'
 
 # Make commands installed with 'gem install --user-install' available
 # ~/.gem/ruby/${RUBY_VERSION}/bin/
-if which ruby >/dev/null && which gem >/dev/null; then
-  pathmunge "$(ruby -e 'print Gem.user_dir')/bin" after
+
+if hash ruby 2>/dev/null; then
+    if hash gem 2>/dev/null; then
+        pathmunge "$(ruby -e 'print Gem.user_dir')/bin" after
+    fi
 fi
 
 function remove_gem {

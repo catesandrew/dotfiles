@@ -2,6 +2,10 @@ if [[ "$TERM" == "dumb" ]]; then
   exit 0 # dont kill rest of script
 fi
 
+if hash gdate 2>/dev/null; then
+    tic=$(($(gdate +%s%N)/1000000))
+fi
+
 # Path to the bash it configuration
 export BASH_IT=$HOME/.bash
 export DFM_REPO="${HOME}/.dotfiles"
@@ -221,12 +225,12 @@ function _load_bash_it_files() {
 }
 
 # Load enabled plugins, aliases, and completion
-for file_type in "plugins" "aliases" "completion"; do
+for file_type in "plugins" "completion" "aliases"; do
   _load_bash_it_files $file_type
 done
 
 # Load custom aliases, completion, plugins
-for file_type in "plugins" "aliases" "completion"; do
+for file_type in "plugins" "completion" "aliases"; do
   if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
     source "${BASH_IT}/${file_type}/custom.${file_type}.bash"
   fi
@@ -289,3 +293,13 @@ if [ -z "$INSIDE_EMACS" ]; then
 fi
 
 . ${BASH_IT}/custom.sh
+
+if hash gdate 2>/dev/null; then
+    toc=$(($(gdate +%s%N)/1000000))
+    delta=$(($toc - $tic))
+    LC_NUMERIC=C LC_COLLATE=C
+    printf 'Bash loaded in %g secs\n' $(bc <<< "scale=3; ${delta}/1000")
+    unset tic toc delta
+else
+    echo "Bash loaded in $SECONDS secs"
+fi

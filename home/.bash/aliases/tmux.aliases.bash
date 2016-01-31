@@ -12,3 +12,6 @@ alias txa='tmux a -t'
 
 alias txc="clear && tmux clear-history"
 alias txk="tmux kill-session -t"
+
+# make sure that tmux is launched in 256 color mode
+alias tmux="TERM=xterm-256color tmux"

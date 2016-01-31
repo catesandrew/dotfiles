@@ -252,18 +252,18 @@ ftpane () {
 # Since z is not very optimal located on a qwerty keyboard I have these aliased
 # as j and jj
 
-j() {
-  if [[ -z "$*" ]]; then
-    cd "$(_j -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
-  else
-    _last_j_args="$@"
-    _j "$@"
-  fi
-}
-
-jj() {
-  cd "$(_j -l 2>&1 | sed 's/^[0-9,.]* *//' | fzf -q $_last_j_args)"
-}
+# j() {
+#   if [[ -z "$*" ]]; then
+#     cd "$(_j -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
+#   else
+#     _last_j_args="$@"
+#     _j "$@"
+#   fi
+# }
+#
+# jj() {
+#   cd "$(_j -l 2>&1 | sed 's/^[0-9,.]* *//' | fzf -q $_last_j_args)"
+# }
 
 
 ### Google Chrome (OS X)
@@ -309,7 +309,7 @@ c() {
 #   local selected
 #   if selected=$(locate / | fzf -q "$LBUFFER"); then
 #     LBUFFER=$selected
-#   fi  
+#   fi
 #   zle redisplay
 # }
 # zle     -N    fzf-locate-widget

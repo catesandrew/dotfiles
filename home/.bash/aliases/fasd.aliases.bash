@@ -1,12 +1,36 @@
 cite 'about-alias'
 about-alias 'fasd abbreviations'
 
+if ! brew_contains_element "fasd" && \
+    ! hash fasd 2>/dev/null; then
+    exit 0
+fi
+
 # Fasd can mimic v's behavior by this alias:
 alias v='f -t -e vim -b viminfo'
-alias m='f -e emacsclient' # quick opening files with emacs client
 alias o='a -e open' # quick opening files with open
+alias a='fasd -a'
+alias s='fasd -si'
+alias sd='fasd -sid'
+alias sf='fasd -sif'
+alias d='fasd -d'
+alias f='fasd -f'
 
-_fasd_bash_hook_cmd_complete v m o
+# function to execute built-in cd
+fasd_cd() {
+  if [ $# -le 1 ]; then
+    fasd "$@"
+  else
+    local _fasd_ret="$(fasd -e 'printf %s' "$@")"
+    [ -z "$_fasd_ret" ] && return
+    [ -d "$_fasd_ret" ] && cd "$_fasd_ret" || printf %s\n "$_fasd_ret"
+  fi
+}
+alias z='fasd_cd -d'
+alias zz='fasd_cd -d -i'
+
+# enable bash command mode completion
+_fasd_bash_hook_cmd_complete fasd v o a s sd sf d f z zz
 
 # Jumping around the filesystem
 
