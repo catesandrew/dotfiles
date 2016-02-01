@@ -1,15 +1,33 @@
 #!/bin/bash
 
-# inputrc
+## Specify vi editing mode
+set -o vi
 
-# Use case-insensitive TAB autocompletion
+# I hate noise
+set bell-style visible
+
+# Use case-insensitive TAB autocompletion. If set to On, readline performs
+# filename matching and completion in a case-insensitive fashion.
 set completion-ignore-case on
 
-# Auto list tab completions (use instead of TAB-cycling)
+# Auto list tab completions (use instead of TAB-cycling). This alters the
+# default behavior of the completion functions. If set to on, words which have
+# more than one possible completion cause the matches to be listed immediately
+# instead of ringing the bell.
 set show-all-if-ambiguous on
+
+# If set to on, tilde expansion is performed when readline attempts word
+# completion.
+set expand-tilde on
+
+# If  set to on, a character denoting a file's type as reported by stat(2) is
+# appended to the filename when listing possible completions.
+set visible-stats on
+set colored-stats on
 
 # Make TAB cycle through possible completions
 # "\t": menu-complete
+
 # Make SHIFT-TAB reverse cycle through possible completions
 # "\e[Z": "\e-1\C-i"
 
@@ -17,3 +35,20 @@ set show-all-if-ambiguous on
 # through commands (i.e. more intelligent Up/Down-arrow behavior)
 "\e[B": history-search-forward
 "\e[A": history-search-backward
+
+# default unix-word-rubout. This makes it so when you have your cursor (|)
+# positioned here foo/bar/test.txt| and hit C-w, it just deletes up to the
+# first / character. This makes fixing thinigs a bit easier. It also works
+# within a path.
+"\C-w": unix-filename-rubout
+"": unix-filename-rubout
+
+# You may also want to set mark-symlinked-directories as -- by default -- bash
+# doesn't put a / after symlinks when doing autocomplete. This fixes that.
+set mark-symlinked-directories on
+
+# You can also bind a key to glob-expand-word which will take a bash glob --
+# say * -- and replace the glob with all the files that match that glob.
+"\C-x*": glob-expand-word
+
+# set bind-tty-special-chars on

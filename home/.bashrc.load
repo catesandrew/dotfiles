@@ -1,5 +1,20 @@
+#!/bin/bash
+
+# handle the case when remote editing files through emacs
 if [[ "$TERM" == "dumb" ]]; then
   exit 0 # dont kill rest of script
+fi
+
+# [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
+
+# TODO: Verify inputrc is being read, if not, load it.
+# bind -f ~/.inputrc
+
+# While `mvim` is running it keeps calling my login shell, do not know why, till
+# then, lets just disable it the best way we know how to. If MYVIMRC environment
+# variable does not work, there is also VIMRUNTIME to check for.
+if [ -n "$MYVIMRC" ]; then
+  exit 0
 fi
 
 if hash gdate 2>/dev/null; then
@@ -20,6 +35,8 @@ declare -a __dot_brew_taps="()"
 declare -a __dot_cask_list="()"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
+    ulimit -n 65536 65536
+
     if hash brew 2>/dev/null; then
         __dot_brew_home="$(brew --prefix)"
         export BREW_HOME=$__dot_brew_home

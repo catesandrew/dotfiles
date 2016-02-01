@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
 # few annoyances:
@@ -42,17 +44,6 @@ bind -m vi-insert "\C-l":clear-screen
 ## Emacs bindings
 # Meta-V: go back to vi editing
 bind -m emacs '"\ev": vi-editing-mode'
-
-## Specify vi editing mode
-set -o vi
-
-# I hate noise
-set bell-style visible
-
-# Let me have core dumps
-#ulimit -c unlimited
-# ulimit -n 4096
-ulimit -n 65536 65536
 
 if [ -f "${HOME}/.bashrc" ]; then
   source "${HOME}/.bashrc"
