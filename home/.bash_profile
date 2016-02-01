@@ -49,5 +49,5 @@ bind -m vi-insert "\C-l":clear-screen
 bind -m emacs '"\ev": vi-editing-mode'
 
 if [ -f "${HOME}/.bashrc" ]; then
-  source "${HOME}/.bashrc"
+  . "${HOME}/.bashrc"
 fi

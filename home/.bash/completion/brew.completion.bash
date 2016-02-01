@@ -5,6 +5,9 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         BASH_COMP_TARGET="$__dot_brew_home/etc/bash_completion"
 
         if [ -f "$BASH_COMP_TARGET" ]; then
+          if [ ${BASH_VERSINFO[0]} -lt 4 ]; then
+            . "$BASH_COMP_TARGET"
+          fi
             if [ ${BASH_VERSINFO[0]} -lt 4 ]; then
                 . "$BASH_COMP_TARGET"
             fi
