@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://github.com/netj/dotfiles/blob/master/.inputrc
 
 ## Specify vi editing mode
 set -o vi
@@ -29,6 +30,7 @@ set colored-stats on
 # "\t": menu-complete
 
 # Make SHIFT-TAB reverse cycle through possible completions
+# Only supported in bash > 4.0
 # "\e[Z": "\e-1\C-i"
 
 # Use the string that has already been typed as the prefix for searching
@@ -38,6 +40,13 @@ set colored-stats on
 "\e[A": history-search-backward
 "\e[C": forward-char
 "\e[D": backward-char
+
+# incremental history search, both reverse and forward with Ctrl-r/]
+# - often, Ctrl-s (default for forward search) is usually masked by tty's
+#   STOP moreover, things like "\e\C-r" reset the isearch keyword so,
+#   overriding Ctrl-] (default character-search) seems to be the best choice
+# "\C-r": reverse-search-history
+"\C-]": forward-search-history
 
 # default unix-word-rubout. This makes it so when you have your cursor (|)
 # positioned here foo/bar/test.txt| and hit C-w, it just deletes up to the

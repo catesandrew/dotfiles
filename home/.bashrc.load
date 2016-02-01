@@ -17,6 +17,18 @@ if [ -n "$MYVIMRC" ]; then
   exit 0
 fi
 
+# exec into bash >= 4, when available (for login shells)
+if [[ $0 = -bash ]] && shopt -qp login_shell && [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
+    newVersion=$(bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
+    if [[ $newVersion > $BASH_VERSION ]]; then
+        echo "Found Bash v$newVersion"
+        # and try preserving all the invocation options
+        exec -l bash -l${-//[chimBH]/} # "$@"
+    fi
+    unset newVersion
+    #exec bash -$- "${@:-$BASH_EXECUTION_STRING}" # for non-interactive
+fi
+
 if hash gdate 2>/dev/null; then
     tic=$(($(gdate +%s%N)/1000000))
 fi

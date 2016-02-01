@@ -5,9 +5,19 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         BASH_COMP_TARGET="$__dot_brew_home/etc/bash_completion"
 
         if [ -f "$BASH_COMP_TARGET" ]; then
-            . "$BASH_COMP_TARGET"
+            if [ ${BASH_VERSINFO[0]} -lt 4 ]; then
+                . "$BASH_COMP_TARGET"
+            fi
         fi
+        unset BASH_COMP_TARGET
+    elif brew_contains_element "bash-completion2"; then
+        BASH_COMP_TARGET="$__dot_brew_home/share/bash-completion/bash_completion"
 
+        if [ -f "$BASH_COMP_TARGET" ]; then
+            if [ ${BASH_VERSINFO[0]} -gt 3 ]; then
+                . "$BASH_COMP_TARGET"
+            fi
+        fi
         unset BASH_COMP_TARGET
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then

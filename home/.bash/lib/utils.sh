@@ -83,12 +83,23 @@ contains_element() {
   return 1
 }
 
-# http://stackoverflow.com/questions/1378274
-# A bad-arse SysOps guy once taught me the Three-Fingered Claw technique:
-yell() { echo "$0: $*" >&2; }
-die() { yell "$*"; exit 111; }
-try() { "$@" || die "cannot $*"; }
-asuser() { sudo su - "$1" -c "${*:2}"; }
+#
+# Add directory paths to end of PATH. From fink's init.sh
+# ex: append_path /home/rmt/bin
+path_append() {
+  if ! eval test -z "\"\${PATH##*:$1:*}\"" -o -z "\"\${PATH%%*:$1}\"" -o -z "\"\${PATH##$1:*}\"" -o -z "\"\${PATH##$1}\"" ; then
+    eval "PATH=\$PATH:$1"
+  fi
+}
+
+#
+# Add to front of path. From fink's init.sh
+# ex: prepend_path /home/rmt/bin
+path_prepend() {
+  if ! eval test -z "\"\${PATH##*:$1:*}\"" -o -z "\"\${PATH%%*:$1}\"" -o -z "\"\${PATH##$1:*}\"" -o -z "\"\${PATH##$1}\"" ; then
+    eval "PATH=$1:\$PATH"
+  fi
+}
 
 #
 # prevent duplicate directories in you PATH variable

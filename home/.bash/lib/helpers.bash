@@ -163,4 +163,3 @@ function geticon() {
 # Example usage:
 # try apt-fast upgrade -y
 # try asuser vagrant "echo 'uname -a' >> ~/.profile"
-
