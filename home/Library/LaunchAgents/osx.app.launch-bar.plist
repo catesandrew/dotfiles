@@ -8,7 +8,7 @@
 	<string>osx.app.launch-bar</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/bin/sh</string>
+		<string>/bin/bash</string>
 		<string>-c</string>
 		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/LaunchBar.app/Contents/MacOS/LaunchBar</string>
 	</array>

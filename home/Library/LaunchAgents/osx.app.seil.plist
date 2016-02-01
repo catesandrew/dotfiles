@@ -2,17 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Disabled</key>
+	<true/>
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
 	<string>osx.app.seil</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>sh</string>
-      <string>-c</string>
-      <string>sleep 10 &amp;&amp; /Applications/Seil.app/Contents/MacOS/Seil</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>sh</string>
+		<string>-c</string>
+		<string>sleep 10 &amp;&amp; /Applications/Seil.app/Contents/MacOS/Seil</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>

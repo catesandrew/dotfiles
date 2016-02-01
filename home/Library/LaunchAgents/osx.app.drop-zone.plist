@@ -10,10 +10,9 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile
-        /Applications/Dropzone\ 3.app/Contents/MacOS/Dropzone\ 3</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; Applications/Dropzone\ 3.app/Contents/MacOS/Dropzone\ 3</string>
 	</array>
 	<key>RunAtLoad</key>
-    <true/>
+	<true/>
 </dict>
 </plist>
