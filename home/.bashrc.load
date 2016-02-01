@@ -8,7 +8,7 @@ fi
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
 
 # TODO: Verify inputrc is being read, if not, load it.
-# bind -f ~/.inputrc
+# bind -f "$HOME/.inputrc"
 
 # While `mvim` is running it keeps calling my login shell, do not know why, till
 # then, lets just disable it the best way we know how to. If MYVIMRC environment

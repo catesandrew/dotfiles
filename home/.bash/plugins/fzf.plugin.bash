@@ -5,18 +5,7 @@ if brew_contains_element "fzf"; then
     export FZF_TARGET="$__dot_brew_home/opt/fzf"
 
     # Auto-completion
-    # [[ $- == *i* ]] && source "${FZF_TARGET}/shell/completion.bash" 2> /dev/null
-
-    # lazy load fzf into a shell session *as a function*
-    fzf() {
-        . "${FZF_TARGET}/shell/completion.bash"
-        fzf "$@"
-    }
-
-    fzf-tmux() {
-        . "${FZF_TARGET}/shell/completion.bash"
-        fzf-tmux "$@"
-    }
+    [[ $- == *i* ]] && source "${FZF_TARGET}/shell/completion.bash" 2> /dev/null
 
     # Key bindings
     . "${FZF_TARGET}/shell/key-bindings.bash"
