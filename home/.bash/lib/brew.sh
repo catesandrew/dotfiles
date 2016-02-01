@@ -1,7 +1,28 @@
 #!/bin/bash
 
-run_brew() {
+# Test whether a Homebrew formula is already installed
+# $1 - formula name (may include options)
+formula_exists() {
+    if $(brew list $1 >/dev/null); then
+        printf "%s already installed.\n" "$1"
+        return 0
+    fi
 
+    e_warning "Missing formula: $1"
+    return 1
+}
+
+# Test whether a command exists
+# $1 - cmd to test
+type_exists() {
+    if [ $(type -P $1) ]; then
+      return 0
+    fi
+    return 1
+}
+
+
+run_brew() {
     # Check for Homebrew
     if type_exists 'brew'; then
         e_header "Updating Homebrew..."

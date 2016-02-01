@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# TODO: rewrite these and put into .inputrc
+# http://unix.stackexchange.com/questions/76566
+
 # http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
 # For those who want to use Vi bindings in bash, this corrects a
 # few annoyances:

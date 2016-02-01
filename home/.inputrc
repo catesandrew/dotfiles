@@ -33,8 +33,11 @@ set colored-stats on
 
 # Use the string that has already been typed as the prefix for searching
 # through commands (i.e. more intelligent Up/Down-arrow behavior)
+# http://codeinthehole.com/writing/the-most-important-command-line-tip-incremental-history-searching-with-inputrc/
 "\e[B": history-search-forward
 "\e[A": history-search-backward
+"\e[C": forward-char
+"\e[D": backward-char
 
 # default unix-word-rubout. This makes it so when you have your cursor (|)
 # positioned here foo/bar/test.txt| and hit C-w, it just deletes up to the
@@ -52,3 +55,5 @@ set mark-symlinked-directories on
 "\C-x*": glob-expand-word
 
 # set bind-tty-special-chars on
+
+$include $HOME/.inputrc.local
