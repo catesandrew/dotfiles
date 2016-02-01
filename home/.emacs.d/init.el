@@ -1186,27 +1186,6 @@ Example: (evil-map visual \"<\" \"<gv\")"
 ;;; Terminal emulation and shells
 (dotemacs-defvar-company-backends eshell-mode)
 
-;;; Setup environment variables from the user's shell.
-(use-package exec-path-from-shell
-  :ensure t
-  :init
-  (progn
-    (when (string-match-p "/zsh$" (getenv "SHELL"))
-      ;; Use a non-interactive shell. We use a login shell, even though we have
-      ;; our paths setup in .zshenv. However, OS X adds global settings to the
-      ;; login profile. Notably, this affects /usr/texbin from MacTeX
-      (setq exec-path-from-shell-arguments '("-l")))
-
-    (dotemacs|do-after-display-system-init
-     (when (memq window-system '(mac ns x))
-       (exec-path-from-shell-initialize)))
-
-    (setq user-mail-address (getenv "EMAIL")))
-  :config
-  (progn
-    (dolist (var '("EMAIL" "PYTHONPATH" "INFOPATH"))
-      (add-to-list 'exec-path-from-shell-variables var))))
-
 (use-package init-eshell
   :load-path "config/")
 
@@ -6504,11 +6483,6 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :disabled t
   :init
   (dotemacs-set-leader-keys-for-major-mode 'go-mode "rn" 'go-rename))
-
-(dotemacs|do-after-display-system-init
- (when (memq window-system '(mac ns x))
-   (exec-path-from-shell-copy-env "GOPATH")
-   (exec-path-from-shell-copy-env "GO15VENDOREXPERIMENT")))
 
 (use-package go-mode
   :ensure t
