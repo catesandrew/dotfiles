@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# handle the case when remote editing files through emacs
-if [[ "$TERM" == "dumb" ]]; then
-  exit 0 # dont kill rest of script
-fi
+# handle the case when editing remote files through emacs
+if [[ "$TERM" != "dumb" ]]; then
 
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
 
@@ -332,4 +330,6 @@ if hash gdate 2>/dev/null; then
     unset tic toc delta
 else
     echo "Bash loaded in $SECONDS secs"
+fi
+
 fi
