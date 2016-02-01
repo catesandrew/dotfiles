@@ -1,12 +1,6 @@
 #!/bin/bash
 # https://github.com/netj/dotfiles/blob/master/.inputrc
 
-## Specify vi editing mode
-set -o vi
-
-# I hate noise
-set bell-style visible
-
 # Use case-insensitive TAB autocompletion. If set to On, readline performs
 # filename matching and completion in a case-insensitive fashion.
 set completion-ignore-case on

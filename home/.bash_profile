@@ -44,6 +44,12 @@ bind -m vi-insert '\C-d: delete-char'
 # Ctrl-L: clear screen
 bind -m vi-insert "\C-l":clear-screen
 
+## Specify vi editing mode
+set -o vi
+
+# I hate noise
+set bell-style visible
+
 ## Emacs bindings
 # Meta-V: go back to vi editing
 bind -m emacs '"\ev": vi-editing-mode'
