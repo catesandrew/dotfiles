@@ -1,3 +1,6 @@
+;;; Stylus
+(require 'module-global)
+
 (defvar dotemacs-stylus-command-args nil
   "Additional list of arguments to pass into the stylus command.")
 
@@ -55,4 +58,16 @@
     (unless (process-status "httpd")
       (httpd-start))))
 
-(provide 'init-stylus)
+(use-package stylus-mode
+  :ensure t
+  :defer t
+  :mode ("\\.styl$" . stylus-mode)
+  :init
+  (progn
+    (setq dotemacs-stylus-mode-hook #'dotemacs-stylus-mode-defaults)
+    (add-hook 'stylus-mode-hook
+              (lambda ()
+                (run-hooks #'dotemacs-stylus-mode-hook)))))
+
+(provide 'module-stylus)
+;;; module-stylus.el ends here
