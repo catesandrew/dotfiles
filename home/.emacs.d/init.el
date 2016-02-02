@@ -435,6 +435,9 @@ prompts and the prompt is made read-only"
   "If non nil defines the Ruby version manager (i.e. rbenv, rvm)"
   :group 'dotemacs-ruby)
 
+(defvar ruby-use-ruby-test nil
+  "If non-nil, use `ruby-test-mode' package instead of `rspec-mode'.")
+
 (defcustom dotemacs-ruby-enable-ruby-on-rails-support nil
   "If non nil we'll load support for Rails (haml, features, navigation)"
   :group 'dotemacs-ruby)
@@ -5855,8 +5858,11 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :defer t
   :if (eq dotemacs-ruby-version-manager 'rvm)
   :init (rvm-use-default)
-  :config (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
-            (add-hook hook (lambda () (rvm-activate-corresponding-ruby)))))
+  :config
+  (progn
+    (setq rspec-use-rvm t)
+    (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+      (add-hook hook (lambda () (rvm-activate-corresponding-ruby))))))
 
 (use-package enh-ruby-mode
   :if (when ruby-enable-enh-ruby-mode)
@@ -6039,20 +6045,23 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :if (when dotemacs-ruby-enable-ruby-on-rails-support)
   :defer t)
 
-(use-package ruby-test-mode
+(use-package rspec-mode
   :defer t
   :ensure t
+  :if (unless ruby-use-ruby-test)
   :init (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
-          (add-hook hook 'ruby-test-mode))
+          (add-hook hook 'rspec-mode))
   :config
   (progn
-    (dotemacs-hide-lighter ruby-test-mode)
+    (dotemacs-hide-lighter rspec-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-declare-prefix-for-mode mode "mt" "ruby/test")
       (dotemacs-set-leader-keys-for-major-mode mode
-        "tb" 'ruby-test-run)
-      (dotemacs-set-leader-keys-for-major-mode mode
-        "tt" 'ruby-test-run-at-point))))
+        "ta" 'rspec-verify-all
+        "tc" 'rspec-verify-matching
+        "tf" 'rspec-run-last-failed
+        "tr" 'rspec-rerun
+        "tt" 'rspec-verify-single))))
 
 (use-package rubocop
   :defer t
@@ -6064,12 +6073,27 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-declare-prefix-for-mode mode "mrr" "ruby/RuboCop")
       (dotemacs-set-leader-keys-for-major-mode mode
-                                                "rrd" 'rubocop-check-directory
-                                                "rrD" 'rubocop-autocorrect-directory
-                                                "rrf" 'rubocop-check-current-file
-                                                "rrF" 'rubocop-autocorrect-current-file
-                                                "rrp" 'rubocop-check-project
-                                                "rrP" 'rubocop-autocorrect-project))))
+        "rrd" 'rubocop-check-directory
+        "rrD" 'rubocop-autocorrect-directory
+        "rrf" 'rubocop-check-current-file
+        "rrF" 'rubocop-autocorrect-current-file
+        "rrp" 'rubocop-check-project
+        "rrP" 'rubocop-autocorrect-project))))
+
+(use-package ruby-test-mode)
+  :defer t
+  :if ruby-use-ruby-test
+  :ensure t
+  :init (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+          (add-hook hook 'ruby-test-mode))
+  :config
+  (progn
+    (dotemacs-hide-lighter ruby-test-mode)
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (dotemacs-declare-prefix-for-mode mode "mt" "ruby/test")
+      (evil-leader/set-key-for-mode mode "mtb" 'ruby-test-run)
+      (evil-leader/set-key-for-mode mode "mtt" 'ruby-test-run-at-point)))
+
 
 
 (use-package inf-ruby                   ; Ruby REPL
