@@ -1,3 +1,6 @@
+;;; Rust
+(require 'module-global)
+
 ;; http://doc.crates.io/guide.html
 (defun dotemacs-rust-cargo-build ()
   (interactive)

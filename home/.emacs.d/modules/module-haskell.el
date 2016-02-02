@@ -1,4 +1,5 @@
 ;;; Haskell
+(require 'module-global)
 
 ;; This Haskell setup needs:
 ;;

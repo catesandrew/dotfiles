@@ -1,4 +1,6 @@
-;; ruby settings
+;;; Ruby
+(require 'module-global)
+
 (defgroup dotemacs-ruby nil
   "Configuration options for ruby."
   :group 'dotemacs

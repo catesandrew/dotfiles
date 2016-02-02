@@ -1,3 +1,6 @@
+;;; Go
+(require 'module-global)
+
 (defun load-gopath-file(gopath name)
   "Search for NAME file in all paths referenced in GOPATH."
   (let* ((sep (if (dotemacs/system-is-mswindows) ";" ":"))
