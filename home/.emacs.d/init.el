@@ -828,20 +828,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
        (when (> (time-to-number-of-days time-since-build) 7)
          (lwarn 'emacs :warning "Your Emacs build is more than a week old!"))))))
 
-(use-package init-util              ; Personal OS X tools
-  :load-path "config/"
-  :defer t
-  :commands(my-recompile-init
-            my-window-killer
-            my-minibuffer-keyboard-quit
-            my-set-transparency
-            my-google
-            my-copy-file-name-to-clipboard
-            my-goto-scratch-buffer
-            my-insert-last-kbd-macro
-            my-buffer-to-unix-format
-            my-buffer-to-dos-format))
-
 
 ;;; Key Binding Init
 
