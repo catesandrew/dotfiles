@@ -6052,6 +6052,17 @@ Otherwise use Enh Ruby Mode, which is the default.")
       (dotemacs-set-leader-keys-for-major-mode mode "tb" 'ruby-test-run)
       (dotemacs-set-leader-keys-for-major-mode mode "tt" 'ruby-test-run-at-point))))
 
+(use-package rubocop
+  :defer t
+  :ensure t
+  :init (add-hook 'enh-ruby-mode-hook 'rubocop-mode)
+  :config
+  (progn
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraD" 'rubocop-autocorrect-directory)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraP" 'rubocop-autocorrect-project)
+    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraF" 'rubocop-autocorrect-current-file)
+    ))
+
 (use-package inf-ruby                   ; Ruby REPL
   :ensure t
   :defer t
