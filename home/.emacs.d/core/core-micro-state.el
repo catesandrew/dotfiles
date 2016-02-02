@@ -35,6 +35,14 @@ Characters enclosed in `[]' will have this face applied to them."
                         :bold t)))
 (dotemacs-defface-micro-state-faces)
 
+;; http://stackoverflow.com/questions/11847547/emacs-regexp-count-occurrences
+(defun how-many-str (regexp str)
+  (loop with start = 0
+        for count from 0
+        while (string-match regexp str start)
+        do (setq start (match-end 0))
+        finally return count))
+
 (defun dotemacs-micro-state-set-minibuffer-height (str)
   "Set the max mini windows size given a string STR."
   (let ((line-count (1+ (how-many-str "\n" str))))

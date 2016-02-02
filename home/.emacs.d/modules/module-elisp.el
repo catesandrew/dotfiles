@@ -5,6 +5,13 @@
 (dotemacs-defvar-company-backends emacs-lisp-mode)
 (dotemacs-defvar-company-backends ielm-mode)
 
+(defun dotemacs-ert-run-tests-buffer ()
+  "Run all the tests in the current buffer."
+  (interactive)
+  (save-buffer)
+  (load-file (buffer-file-name))
+  (ert t))
+
 (use-package helm-elisp                 ; Helm commands for Emacs Lisp
   :ensure helm
   :bind (("C-c f l" . helm-locate-library)
@@ -189,6 +196,11 @@
       "Ret" 'rxt-toggle-elisp-rx
       "Rt"  'rxt-toggle-elisp-rx
       "Rh"  'rxt-fontify-regexp-at-point)))
+
+(use-package visual-regexp              ; Regexp replace with in-buffer display
+  :ensure t
+  :bind (("C-c r" . vr/query-replace)
+         ("C-c R" . vr/replace)))
 
 (use-package visual-regexp-steroids
   :defer t)

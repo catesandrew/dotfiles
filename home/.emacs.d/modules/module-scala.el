@@ -112,6 +112,10 @@ point to the position of the join."
          (insert ".")
          (company-complete))))
 
+(defun current-line ()
+  "Return the line at point as a string."
+  (buffer-substring (line-beginning-position) (line-end-position)))
+
 ;;; Flyspell
 (defun scala/flyspell-verify ()
   "Prevent common flyspell false positives in scala-mode."
@@ -146,11 +150,6 @@ point to the position of the join."
       "Keep trailing-whitespace when indenting."
       (noflet ((scala-lib:delete-trailing-whitespace ()))
               ad-do-it))))
-
-(use-package flycheck-ensime
-  :load-path "config/"
-  :defer t
-  :commands ())
 
 (use-package sbt-mode                   ; Scala build tool
   :ensure t

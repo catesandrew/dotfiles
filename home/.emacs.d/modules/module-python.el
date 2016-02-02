@@ -12,6 +12,11 @@
 (defvar python-test-runner 'nose
   "Test runner to use. Possible values are `nose' or `pytest'.")
 
+(defun dotemacs/comint-clear-buffer ()
+  (interactive)
+  (let ((comint-buffer-maximum-size 0))
+    (comint-truncate-buffer)))
+
 (defun annotate-pdb ()
   "Highlight break point lines."
   (interactive)

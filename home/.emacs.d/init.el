@@ -2,24 +2,6 @@
 
 ;;; Commentary:
 
-;; User key prefixes:
-;;
-;; - C-c A: Align
-;; - C-c a: Ag
-;; - C-c d: Data stuff
-;; - C-c e: Edit commands, general and mode specific
-;; - C-c f: Files
-;; - C-c h: Helm/Help and documentation
-;; - C-c j: Jumping and navigation
-;; - c-c l: List things
-;; - C-c m: Multiple cursors
-;; - C-c s: Symbol commands
-;; - C-c t: Skeletons and templates
-;; - C-c u: Miscellaneous utilities, including minor modes
-;; - C-c v: Version control
-;; - C-c w: Web stuff
-;; - C-x x: Perspective
-
 ;; Without this comment emacs25 adds (package-initialize) here
 ;; (package-initialize)
 
@@ -708,7 +690,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
   ;; optimization, no need to activate all the packages so early
   ;; http://stackoverflow.com/questions/11127109/
   (setq package-enable-at-startup nil)
-  (package-initialize)) ;; noactivate
+  (package-initialize)) ;; inactivate
 
 
 ;;; Initialization
@@ -753,14 +735,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
  (kill-buffer (get-buffer dotemacs-buffer-name))
  (dotemacs-buffer/goto-buffer))
 (setq initial-buffer-choice (lambda () (get-buffer dotemacs-buffer-name)))
-
-;; fringes
-(dotemacs|do-after-display-system-init
-  (when (display-graphic-p)
-    (custom-set-variables
-      '(fringe-mode (quote (4 . 4)) nil (fringe)))
-    (setq-default fringe-indicator-alist
-                  '((truncation . nil) (continuation . nil)))))
 
 ;; mandatory dependencies
 ; (dotemacs-load-or-install-package 'dash t)
@@ -813,7 +787,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; Disable case insensitivity for filename autocompletion in shell-mode
 (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
 
-(require 'init-funcs)
+(use-package module-utils)
 
 (when (and (dotemacs/system-is-mac) (version< emacs-version "25"))
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
@@ -895,500 +869,22 @@ environment, otherwise it is strongly recommended to let it set to t.")
         colors/key-binding-prefixes))
 
 
-;;; Evil Core
-
-(use-package init-evil
-  :ensure evil
-  :load-path "config/")
-
-(use-package evil
-  :ensure t
-  :init
-  (progn
-    (defvar dotemacs-evil-cursors '(("normal" "DarkGoldenrod2" box)
-                                    ("insert" "chartreuse3" (bar . 2))
-                                    ("emacs" "SkyBlue2" box)
-                                    ("hybrid" "SkyBlue2" (bar . 2))
-                                    ("replace" "chocolate" (hbar . 2))
-                                    ("evilified" "LightGoldenrod3" box)
-                                    ("visual" "gray" (hbar . 2))
-                                    ("motion" "plum3" box)
-                                    ("lisp" "HotPink1" box)
-                                    ("iedit" "firebrick1" box)
-                                    ("iedit-insert" "firebrick1" (bar . 2)))
-      "Colors assigned to evil states with cursor definitions.")
-
-    (loop for (state color cursor) in dotemacs-evil-cursors
-          do
-          (eval `(defface ,(intern (format "dotemacs-%s-face" state))
-                   `((t (:background ,color
-                                     :foreground ,(face-background 'mode-line)
-                                     :box ,(face-attribute 'mode-line :box)
-                                     :inherit 'mode-line)))
-                   (format "%s state face." state)
-                   :group 'dotemacs))
-          (eval `(setq ,(intern (format "evil-%s-state-cursor" state))
-                       (list (when dotemacs-colorize-cursor-according-to-state color)
-                             cursor))))
-
-    ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
-    (setq evil-want-fine-undo t)
-
-    ;; put back refresh of the cursor on post-command-hook see status of:
-    ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
-    ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
-
-    ; Don't move back the cursor one position when exiting insert mode
-    (setq evil-move-cursor-back nil)
-    ; (setq evil-search-module 'evil-search)
-    ; (setq evil-magic 'very-magic)
-
-    (evil-mode 1))
-  :config
-  (progn
-    ;; c-k/c-j for page down/up
-    ;;
-    ;; One thing that surprised me considering how complete Evil is, is the lack
-    ;; of Vim's Control-d/Control-u for page down/up. Probably because C-u is
-    ;; pretty important in Emacs (it's the shortcut to give a numeric parameter
-    ;; to other commands). I've in fact these mapped on my .vimrc to c-k/c-j
-    ;; (because I think they're more consistent with Vim's j/k movement keys) so
-    ;; that's how I mapped them in Emacs:
-    (define-key evil-motion-state-map (kbd "C-k") 'evil-scroll-up)
-    (define-key evil-motion-state-map (kbd "C-j") 'evil-scroll-down)
-
-    ;; bind function keys
-
-    ;; bind evil-jump-forward for GUI only.
-    (define-key evil-motion-state-map [C-i] 'evil-jump-forward)
-
-    ;; Make the current definition and/or comment visible.
-    (define-key evil-normal-state-map "zf" 'reposition-window)
-    ;; toggle maximize buffer
-    (define-key evil-window-map (kbd "o") 'dotemacs-toggle-maximize-buffer)
-    (define-key evil-window-map (kbd "C-o") 'dotemacs-toggle-maximize-buffer)
-    ;; make cursor keys work
-    (define-key evil-window-map (kbd "<left>") 'evil-window-left)
-    (define-key evil-window-map (kbd "<right>") 'evil-window-right)
-    (define-key evil-window-map (kbd "<up>") 'evil-window-up)
-    (define-key evil-window-map (kbd "<down>") 'evil-window-down)
-    (dotemacs-set-leader-keys "re" 'evil-show-registers)
-    (define-key evil-visual-state-map (kbd "<escape>") 'keyboard-quit)
-    ;; motions keys for help buffers
-    (evil-define-key 'motion help-mode-map (kbd "<tab>") 'forward-button)
-    (evil-define-key 'motion help-mode-map (kbd "S-<tab>") 'backward-button)
-    (evil-define-key 'motion help-mode-map (kbd "]") 'help-go-forward)
-    (evil-define-key 'motion help-mode-map (kbd "gf") 'help-go-forward)
-    (evil-define-key 'motion help-mode-map (kbd "[") 'help-go-back)
-    (evil-define-key 'motion help-mode-map (kbd "gb") 'help-go-back)
-    (evil-define-key 'motion help-mode-map (kbd "gh") 'help-follow-symbol)
-
-    ;; replace `dired-goto-file' with `helm-find-files', since `helm-find-files'
-    ;; can do the same thing and with fuzzy matching and other features.
-    (with-eval-after-load 'dired
-      (evil-define-key 'normal dired-mode-map "J" 'dotemacs-helm-find-files)
-      (define-key dired-mode-map "j" 'dotemacs-helm-find-files)
-      (evil-define-key 'normal dired-mode-map (kbd dotemacs-leader-key)
-        dotemacs-default-map))
-
-    ;; It's better that the default value is too small than too big
-    (setq-default evil-shift-width 2)
-
-    ;; After major mode has changed, reset evil-shift-width
-    (add-hook 'after-change-major-mode-hook 'dotemacs-set-evil-shift-width 'append)
-
-    (defmacro evil-map (state key seq)
-      "Map for a given STATE a KEY to a sequence SEQ of keys.
-
-Can handle recursive definition only if KEY is the first key of SEQ.
-Example: (evil-map visual \"<\" \"<gv\")"
-      (let ((map (intern (format "evil-%S-state-map" state))))
-        `(define-key ,map ,key
-           (lambda ()
-             (interactive)
-             ,(if (string-equal key (substring seq 0 1))
-                  `(progn
-                     (call-interactively ',(lookup-key evil-normal-state-map key))
-                     (execute-kbd-macro ,(substring seq 1)))
-                (execute-kbd-macro ,seq))))))
-    ;; Keep the region active when shifting
-    (evil-map visual "<" "<gv")
-    (evil-map visual ">" ">gv")
-
-    (define-key evil-normal-state-map (kbd "K") 'dotemacs-evil-smart-doc-lookup)
-
-    (define-key evil-normal-state-map
-      (kbd "gd") 'dotemacs-evil-smart-goto-definition)
-
-    (dotemacs-define-micro-state scroll
-      :doc "[,] page up [.] page down [<] half page up [>] half page down"
-      :execute-binding-on-enter t
-      :evil-leader "n." "n," "n<" "n>"
-      :bindings
-      ;; page
-      ("," evil-scroll-page-up)
-      ("." evil-scroll-page-down)
-      ;; half page
-      ("<" dotemacs-scroll-half-page-up)
-      (">" dotemacs-scroll-half-page-down))
-
-    ; support for auto-indentation inhibition on universal argument
-    (dotemacs-advise-commands
-     "handle-indent" (evil-paste-before evil-paste-after) around
-     "Handle the universal prefix argument for auto-indentation."
-     (let ((prefix (ad-get-arg 0)))
-       (ad-set-arg 0 (unless (equal '(4) prefix) prefix))
-       ad-do-it
-       (ad-set-arg 0 prefix)))
-
-    ; pasting micro-state
-    (dotemacs-advise-commands
-     "paste-micro-state"
-     (evil-paste-before evil-paste-after evil-visual-paste) after
-     "Initate the paste micro-state."
-     (unless (or (evil-ex-p)
-                 (eq 'evil-paste-from-register this-command))
-       (dotemacs-paste-micro-state)))
-
-    (dotemacs-define-micro-state paste
-      :doc (dotemacs-paste-ms-doc)
-      :use-minibuffer t
-      :bindings
-      ("p" evil-paste-pop)
-      ("P" evil-paste-pop-next))
-
-    (unless dotemacs-enable-paste-micro-state
-      (ad-disable-advice 'evil-paste-before 'after
-                         'evil-paste-before-paste-micro-state)
-      (ad-activate 'evil-paste-before)
-      (ad-disable-advice 'evil-paste-after 'after
-                         'evil-paste-after-paste-micro-state)
-      (ad-activate 'evil-paste-after)
-      (ad-disable-advice 'evil-visual-paste 'after
-                         'evil-visual-paste-paste-micro-state)
-      (ad-activate 'evil-visual-paste))
-
-    ;; define text objects
-    (defmacro dotemacs-define-text-object (key name start end)
-      (let ((inner-name (make-symbol (concat "evil-inner-" name)))
-            (outer-name (make-symbol (concat "evil-outer-" name)))
-            (start-regex (regexp-opt (list start)))
-            (end-regex (regexp-opt (list end))))
-        `(progn
-           (evil-define-text-object ,inner-name (count &optional beg end type)
-             (evil-select-paren ,start-regex ,end-regex beg end type count nil))
-           (evil-define-text-object ,outer-name (count &optional beg end type)
-             (evil-select-paren ,start-regex ,end-regex beg end type count t))
-           (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
-           (define-key evil-outer-text-objects-map ,key (quote ,outer-name))
-           (with-eval-after-load 'evil-surround
-             (push (cons (string-to-char ,key)
-                         (if ,end
-                             (cons ,start ,end)
-                           ,start))
-                   evil-surround-pairs-alist)))))
-
-      (dotemacs-define-text-object "$" "dollar" "$" "$")
-      (dotemacs-define-text-object "*" "star" "*" "*")
-      (dotemacs-define-text-object "8" "block-star" "/*" "*/")
-      (dotemacs-define-text-object "|" "bar" "|" "|")
-      (dotemacs-define-text-object "%" "percent" "%" "%")
-      (dotemacs-define-text-object "/" "slash" "/" "/")
-      (dotemacs-define-text-object "_" "underscore" "_" "_")
-      (dotemacs-define-text-object "-" "hyphen" "-" "-")
-      (dotemacs-define-text-object "~" "tilde" "~" "~")
-      (dotemacs-define-text-object "=" "equal" "=" "=")
-
-      (evil-define-text-object evil-pasted (count &rest args)
-        (list (save-excursion (evil-goto-mark ?\[) (point))
-              (save-excursion (evil-goto-mark ?\]) (point))))
-      (define-key evil-inner-text-objects-map "P" 'evil-pasted)
-
-      ;; define text-object for entire buffer
-      (evil-define-text-object evil-inner-buffer (count &optional beg end type)
-        (evil-select-paren "\\`" "\\'" beg end type count nil))
-      (define-key evil-inner-text-objects-map "g" 'evil-inner-buffer)
-
-      ;; support smart 1parens-strict-mode
-      (with-eval-after-load 'smartparens
-        (defadvice evil-delete-backward-char-and-join
-            (around dotemacs-evil-delete-backward-char-and-join activate)
-          (if (bound-and-true-p smartparens-strict-mode)
-              (call-interactively 'sp-backward-delete-char)
-            ad-do-it)))
-
-      ;; Define history commands for comint
-      (evil-define-key 'insert comint-mode-map
-        (kbd "C-k") 'comint-next-input
-        (kbd "C-j") 'comint-previous-input)
-      (evil-define-key 'normal comint-mode-map
-        (kbd "C-k") 'comint-next-input
-        (kbd "C-j") 'comint-previous-input)))
+;;; Evil
+(use-package module-evil)
 
 
 ;;; Shell
-
-;; Emacs built-in variables
-
-;; move point to the end of buffer on new output
-(setq comint-move-point-for-output t)
-
-;; Add shell buffers to useful buffers list
-(push "\\*\\(ansi-term\\|eshell\\|shell\\|terminal\.\+\\)\\*" dotemacs-useful-buffers-regexp)
-
-;; Variables
-
-;;; Terminal emulation and shells
-(dotemacs-defvar-company-backends eshell-mode)
-
-(use-package init-eshell
-  :load-path "config/")
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :pre-init
-    (dotemacs-use-package-add-hook eshell
-      :post-init
-      (progn
-        (push 'company-capf company-backends-eshell-mode)
-        (dotemacs-add-company-hook eshell-mode))
-      :post-config
-      (progn
-        (defun dotemacs-toggle-shell-auto-completion-based-on-path ()
-          "Deactivates automatic completion on remote paths.
-Retrieving completions for Eshell blocks Emacs. Over remote
-connections the delay is often annoying, so it's better to let
-the user activate the completion manually."
-          (if (file-remote-p default-directory)
-              (setq-local company-idle-delay nil)
-            (setq-local company-idle-delay 0.2)))
-        (add-hook 'eshell-directory-change-hook
-                  'dotemacs-toggle-shell-auto-completion-based-on-path)
-
-        ;; The default frontend screws everything up in short windows like
-        ;; terminal often are
-        (defun dotemacs-eshell-switch-company-frontend ()
-          "Sets the company frontend to `company-preview-frontend' in e-shell mode."
-          (setq-local company-frontends '(company-preview-frontend)))
-        (add-hook 'eshell-mode-hook
-                  'dotemacs-eshell-switch-company-frontend)))))
-
-(use-package eshell
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-register-repl 'eshell 'eshell)
-    (setq eshell-cmpl-cycle-completions nil
-          ;; auto truncate after 20k lines
-          eshell-buffer-maximum-lines 20000
-          ;; history size
-          eshell-history-size 350
-          ;; buffer shorthand -> echo foo > #'buffer
-          eshell-buffer-shorthand t
-          ;; my prompt is easy enough to see
-          eshell-highlight-prompt nil
-          ;; treat 'echo' like shell echo
-          eshell-plain-echo-behavior t)
-
-    (when dotemacs-shell-protect-eshell-prompt
-      (add-hook 'eshell-after-prompt-hook 'dotemacs-protect-eshell-prompt))
-
-    (autoload 'eshell-delchar-or-maybe-eof "em-rebind")
-
-    (add-hook 'eshell-mode-hook 'dotemacs-init-eshell))
-  :config
-  (progn
-    (require 'esh-opt)
-
-    ;; quick commands
-    (defalias 'e 'find-file-other-window)
-    (defalias 'd 'dired)
-    (setenv "PAGER" "cat")
-
-    ;; support `em-smart'
-    (when dotemacs-shell-enable-smart-eshell
-      (require 'em-smart)
-      (setq eshell-where-to-jump 'begin
-            eshell-review-quick-commands nil
-            eshell-smart-space-goes-to-end t)
-      (add-hook 'eshell-mode-hook 'eshell-smart-initialize))
-
-    ;; Visual commands
-    (require 'em-term)
-    (mapc (lambda (x) (push x eshell-visual-commands))
-          '("el" "elinks" "htop" "less" "ssh" "tmux" "top"))
-
-    ;; automatically truncate buffer after output
-    (when (boundp 'eshell-output-filter-functions)
-      (push 'eshell-truncate-buffer eshell-output-filter-functions))
-
-    ;; These don't work well in normal state due to evil/emacs cursor
-    ;; incompatibility
-    (evil-define-key 'insert eshell-mode-map
-      (kbd "C-k") 'eshell-previous-matching-input-from-input
-      (kbd "C-j") 'eshell-next-matching-input-from-input)))
-
-(use-package eshell-z
-  :defer t
-  :ensure t
-  :init
-  (with-eval-after-load 'eshell
-    (require 'eshell-z)))
-
-(use-package esh-help
-  :defer t
-  :ensure t
-  :init (add-hook 'eshell-mode-hook 'eldoc-mode)
-  :config (setup-esh-help-eldoc))
-
-(use-package eshell-prompt-extras
-  :ensure t
-  :commands epe-theme-lambda
-  :init
-  (setq eshell-highlight-prompt nil
-        eshell-prompt-function 'epe-theme-lambda))
-
-(use-package multi-term
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-register-repl 'multi-term 'multi-term)
-    (dotemacs-set-leader-keys "ast" 'shell-pop-multi-term))
-  :config
-  (progn
-    (add-to-list 'term-bind-key-alist '("<tab>" . term-send-tab))
-    ;; multi-term commands to create terminals and move through them.
-    (dotemacs-set-leader-keys-for-major-mode 'term-mode "c" 'multi-term)
-    (dotemacs-set-leader-keys-for-major-mode 'term-mode "p" 'multi-term-prev)
-    (dotemacs-set-leader-keys-for-major-mode 'term-mode "n" 'multi-term-next)
-    (dotemacs-set-leader-keys "p$t" 'projectile-multi-term-in-root)))
 
 (use-package comint
   :init
   (setq comint-prompt-read-only t))
 
-(use-package xterm-color
-  :ensure t
-  :init
-  (progn
-    ;; Comint and Shell
-    (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
-    (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions))
-    (setq font-lock-unfontify-region-function 'xterm-color-unfontify-region)
-    (with-eval-after-load 'esh-mode
-      (add-hook 'eshell-mode-hook (lambda () (setq xterm-color-preserve-properties t)))
-      (add-hook 'eshell-preoutput-filter-functions 'xterm-color-filter)
-      (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))))
-
-(use-package shell                      ; Dump shell in Emacs
-  :init
-  (dotemacs-register-repl 'shell 'shell)
-  (add-hook 'shell-mode-hook 'shell-comint-input-sender-hook))
-
-(use-package shell-pop
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq shell-pop-window-position dotemacs-shell-default-position
-          shell-pop-window-height   dotemacs-shell-default-height
-          shell-pop-term-shell      dotemacs-shell-default-term-shell
-          shell-pop-full-span t)
-    (defmacro make-shell-pop-command (type &optional shell)
-      (let* ((name (symbol-name type)))
-        `(defun ,(intern (concat "shell-pop-" name)) (index)
-           (interactive "P")
-           (require 'shell-pop)
-           (shell-pop--set-shell-type
-            'shell-pop-shell-type
-            (backquote (,name
-                        ,(concat "*" name "*")
-                        (lambda nil (funcall ',type ,shell)))))
-           (shell-pop index))))
-    (make-shell-pop-command eshell)
-    (make-shell-pop-command shell)
-    (make-shell-pop-command term shell-pop-term-shell)
-    (make-shell-pop-command multiterm)
-    (make-shell-pop-command ansi-term shell-pop-term-shell)
-
-    (add-hook 'term-mode-hook 'ansi-term-handle-close)
-    (add-hook 'term-mode-hook (lambda () (linum-mode -1)))
-
-    (dotemacs-set-leader-keys
-      "'"   'dotemacs-default-pop-shell
-      "ase" 'shell-pop-eshell
-      "asi" 'shell-pop-shell
-      "asm" 'shell-pop-multiterm
-      "ast" 'shell-pop-ansi-term
-      "asT" 'shell-pop-term)))
-
-(use-package term
-  :init
-  (progn
-    (dotemacs-register-repl 'term 'term)
-    (dotemacs-register-repl 'term 'ansi-term)
-    (defun term-send-tab ()
-      "Send tab in term mode."
-      (interactive)
-      (term-send-raw-string "\t"))
-
-    ;; hack to fix pasting issue, the paste micro-state won't
-    ;; work in term
-    (evil-define-key 'normal term-raw-map "p" 'term-paste)
-    (evil-define-key 'insert term-raw-map (kbd "C-c C-d") 'term-send-eof)
-    (evil-define-key 'insert term-raw-map (kbd "C-c C-z") 'term-stop-subjob)
-    (evil-define-key 'insert term-raw-map (kbd "<tab>") 'term-send-tab)
-
-    (evil-define-key 'insert term-raw-map
-      (kbd "C-k") 'term-send-up
-      (kbd "C-j") 'term-send-down)
-    (evil-define-key 'normal term-raw-map
-      (kbd "C-k") 'term-send-up
-      (kbd "C-j") 'term-send-down)))
-
-(dotemacs-use-package-add-hook smooth-scrolling
-  :post-init
-  (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
-                          '(eshell-mode-hook
-                            comint-mode-hook
-                            term-mode-hook)))
-
-(dotemacs-use-package-add-hook magit
-  :post-init
-  (defalias 's 'magit-status))
+(use-package module-eshell)
+(use-package module-shell)
 
 
 ;;; User interface
-
-(defun dotemacs//unset-scroll-margin ()
-  "Set `scroll-margin` to zero."
-  (setq-local scroll-margin 0))
-
-(use-package smooth-scrolling
-  :ensure t
-  :defer t
-  :if dotemacs-smooth-scrolling
-  :init (setq smooth-scroll-margin 5
-              scroll-conservatively 101
-              scroll-preserve-screen-position t
-              auto-window-vscroll nil)
-  :config
-  (progn
-    (setq scroll-margin 5)
-    ;; add hooks here only for emacs built-in packages
-    (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
-                            '(messages-buffer-mode-hook))))
-
-(unless dotemacs-smooth-scrolling
-  ;; deactivate smooth-scrolling advices
-  (ad-disable-advice 'previous-line 'after 'smooth-scroll-down)
-  (ad-activate 'previous-line)
-  (ad-disable-advice 'next-line 'after 'smooth-scroll-up)
-  (ad-activate 'next-line)
-  (ad-disable-advice 'isearch-repeat 'after 'isearch-smooth-scroll)
-  (ad-activate 'isearch-repeat))
+(use-package module-smooth-scrolling)
 
 (use-package bind-map
   :init
@@ -1428,11 +924,6 @@ the user activate the completion manually."
 (setq line-number-mode t)
 ;; Show column number in mode line
 (setq column-number-mode t)
-(when dotemacs-line-numbers
-  (add-hook 'text-mode-hook 'linum-mode))
-
-;; line number
-(setq linum-format "%4d")
 
 ;; No blinking and beeping, no startup screen, no scratch message and short
 ;; Yes/No questions.
@@ -1477,1196 +968,28 @@ the user activate the completion manually."
                        unicode-fonts-use-prepend t)
                  (unicode-fonts-setup)))
 
-(custom-set-faces
- '(linum ((t (:height 0.9 :family "Bebas Neue")))))
-
-(use-package linum-relative
-  :ensure t
-  :commands (linum-relative-toggle linum-relative-on)
-  :init
-  (progn
-    (when (eq dotemacs-line-numbers 'relative)
-      (linum-relative-on))
-    (dotemacs-set-leader-keys "tr" 'linum-relative-toggle))
-  :config
-  (progn
-    (setq linum-relative-current-symbol "→")))
-
-(use-package fill-column-indicator
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq fci-rule-width 1)
-    (setq fci-rule-color "#D0BF8F")
-    ;; manually register the minor mode since it does not define any
-    ;; lighter
-    (push '(fci-mode "") minor-mode-alist)
-    (dotemacs-add-toggle fill-column-indicator
-      :status fci-mode
-      :on (turn-on-fci-mode)
-      :off (turn-off-fci-mode)
-      :documentation "Display the fill column indicator."
-      :evil-leader "tf"))
-  :config (dotemacs-hide-lighter fci-mode))
-
-(use-package zoom-frm
-  :commands (zoom-frm-unzoom
-             zoom-frm-out
-             zoom-frm-in)
-  :ensure t
-  :init
-  (progn
-    (dotemacs-define-micro-state zoom-frm
-      :doc "[+/=] zoom frame in [-] zoom frame out [0] reset zoom [q]uit"
-      :evil-leader "zf"
-      :use-minibuffer t
-      :bindings
-      ("+" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
-      ("=" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
-      ("-" dotemacs-zoom-frm-out :post (dotemacs-zoom-frm-powerline-reset))
-      ("0" dotemacs-zoom-frm-unzoom :post (dotemacs-zoom-frm-powerline-reset))
-      ("q" nil :exit t))
-
-    (defun dotemacs-zoom-frm-powerline-reset ()
-      (when (fboundp 'powerline-reset)
-        (setq-default powerline-height (dotemacs-compute-powerline-height))
-        (powerline-reset)))
-
-    (defun dotemacs-zoom-frm-do (arg)
-      "Perform a zoom action depending on ARG value."
-      (let ((zoom-action (cond ((eq arg 0) 'zoom-frm-unzoom)
-                               ((< arg 0) 'zoom-frm-out)
-                               ((> arg 0) 'zoom-frm-in)))
-            (fm (cdr (assoc 'fullscreen (frame-parameters))))
-            (fwp (* (frame-char-width) (frame-width)))
-            (fhp (* (frame-char-height) (frame-height))))
-        (when (equal fm 'maximized)
-          (toggle-frame-maximized))
-        (funcall zoom-action)
-        (set-frame-size nil fwp fhp t)
-        (when (equal fm 'maximized)
-          (toggle-frame-maximized))))
-
-    (defun dotemacs-zoom-frm-in ()
-      "zoom in frame, but keep the same pixel size"
-      (interactive)
-      (dotemacs-zoom-frm-do 1))
-
-    (defun dotemacs-zoom-frm-out ()
-      "zoom out frame, but keep the same pixel size"
-      (interactive)
-      (dotemacs-zoom-frm-do -1))
-
-    (defun dotemacs-zoom-frm-unzoom ()
-      "Unzoom current frame, keeping the same pixel size"
-      (interactive)
-      (dotemacs-zoom-frm-do 0))
-
-    ;; Font size, either with ctrl + mouse wheel
-    (global-set-key (kbd "<C-wheel-up>") 'dotemacs-zoom-frm-in)
-    (global-set-key (kbd "<C-wheel-down>") 'dotemacs-zoom-frm-out)))
-
-(bind-key "C-c u v" #'variable-pitch-mode)
-
 
 ;;; Perspective
-
-(defvar dotemacs-layouts-directory
-  (expand-file-name (concat dotemacs-cache-directory "layouts/"))
-  "Save layouts in this directory.")
-
-(defvar layouts-enable-autosave nil
-  "If true, saves perspectives to file per `layouts-autosave-delay'")
-
-(defvar layouts-autosave-delay 900
-  "Delay in seconds between each layouts auto-save.")
-
-(use-package init-perspective
-  :load-path "config/")
-
-(use-package persp-mode
-  :diminish persp-mode
-  :ensure t
-  :init
-  (progn
-    (setq persp-auto-resume-time (if dotemacs-auto-resume-layouts 1 -1)
-          persp-nil-name dotemacs-default-layout-name
-          persp-reset-windows-on-nil-window-conf nil
-          persp-set-last-persp-for-new-frames nil
-          persp-save-dir dotemacs-layouts-directory)
-
-    ;; always activate persp-mode
-    (persp-mode)
-
-    (defvar dotemacs--layouts-ms-doc-toggle 0
-      "Display a short doc when nil, full doc otherwise.")
-
-    (defvar dotemacs--last-selected-layout persp-nil-name
-      "Previously selected layout.")
-
-    (defvar dotemacs--custom-layout-alist nil
-      "List of custom layouts with their bound keys.
- Do not modify directly, use provided `dotemacs-define-custom-layout'")
-
-    (defvar dotemacs--layouts-autosave-timer nil
-      "Timer for layouts auto-save.")
-
-    (defun dotemacs/jump-to-last-layout ()
-      "Open the previously selected layout, if it exists."
-      (interactive)
-      (unless (eq 'non-existent
-                  (gethash dotemacs--last-selected-layout
-                           *persp-hash* 'non-existent))
-        (persp-switch dotemacs--last-selected-layout)))
-
-    ;; Perspectives micro-state -------------------------------------------
-
-    (defun dotemacs//layouts-ms-toggle-doc ()
-      "Toggle the full documenation for the layouts micro-state."
-      (interactive)
-      (setq dotemacs--layouts-ms-doc-toggle
-            (logxor dotemacs--layouts-ms-doc-toggle 1)))
-
-    (defun dotemacs//layout-format-name (name pos)
-      "Format the layout name given by NAME for display in mode-line."
-      (let* ((layout-name (if (file-directory-p name)
-                              (file-name-nondirectory (directory-file-name name))
-                            name))
-             (string-name (format "%s" layout-name))
-             (current (equal name (dotemacs//current-layout-name)))
-             (caption (concat (number-to-string (if (eq 9 pos) 0 (1+ pos)))
-                              ":" string-name)))
-        (if current
-            (concat (when current "[") caption (when current "]"))
-          caption)))
-
-    (defvar dotemacs--layouts-ms-documentation
-        "
-  [?]                  toggle this help
-  [0,9]                go to nth layout
-  [tab]                last layout
-  [a]                  add a buffer from another layout
-  [A]                  add all buffers from another layout
-  [b]                  select a buffer of the current layout
-  [c]                  close layout (buffers are not closed)
-  [C]                  close other layout(s) (buffers are not closed)
-  [h]                  go to default layout
-  [l]                  jump to a layout
-  [L]                  load saved layouts
-  [n] or [C-l]         next layout
-  [N] or [p] or [C-h]  previous layout
-  [o]                  custom layouts
-  [r]                  remove current buffer from layout
-  [R]                  rename or create layout
-  [s]                  save all layouts
-  [S]                  save layouts by names
-  [t]                  show a buffer without adding it to current layout
-  [w]                  workspaces micro-state
-  [x]                  kill layout and its buffers
-  [X]                  kill other layout(s) and their buffers")
-
-     (defun dotemacs//layouts-ms-doc ()
-       "Return the docstring for the layouts micro-state."
-       (let* ((persp-list (or (persp-names-current-frame-fast-ordered)
-                              (list persp-nil-name)))
-              (formatted-persp-list
-               (concat
-                (mapconcat
-                 (lambda (persp)
-                   (dotemacs//layout-format-name
-                    persp (position persp persp-list))) persp-list " | "))))
-         (concat formatted-persp-list
-                 (when (equal 1 dotemacs--layouts-ms-doc-toggle)
-                   dotemacs--layouts-ms-documentation))))
-
-     (dotemacs-define-micro-state layouts
-       :doc (dotemacs//layouts-ms-doc)
-       :use-minibuffer t
-       :evil-leader "l"
-       :bindings
-       ;; need to exit in case number doesn't exist
-       ("?" dotemacs//layouts-ms-toggle-doc)
-       ("1" dotemacs/persp-switch-to-1 :exit t)
-       ("2" dotemacs/persp-switch-to-2 :exit t)
-       ("3" dotemacs/persp-switch-to-3 :exit t)
-       ("4" dotemacs/persp-switch-to-4 :exit t)
-       ("5" dotemacs/persp-switch-to-5 :exit t)
-       ("6" dotemacs/persp-switch-to-6 :exit t)
-       ("7" dotemacs/persp-switch-to-7 :exit t)
-       ("8" dotemacs/persp-switch-to-8 :exit t)
-       ("9" dotemacs/persp-switch-to-9 :exit t)
-       ("0" dotemacs/persp-switch-to-0 :exit t)
-       ("<tab>" dotemacs/jump-to-last-layout)
-       ("<return>" nil :exit t)
-       ("C-h" persp-prev)
-       ("C-l" persp-next)
-       ("a" persp-add-buffer :exit t)
-       ("A" persp-import-buffers :exit t)
-       ("b" dotemacs/persp-helm-mini :exit t)
-       ("c" dotemacs/layouts-ms-close)
-       ("C" dotemacs/layouts-ms-close-other :exit t)
-       ("h" dotemacs/layout-goto-default :exit t)
-       ("l" dotemacs/helm-perspectives :exit t)
-       ("L" persp-load-state-from-file :exit t)
-       ("n" persp-next)
-       ("N" persp-prev)
-       ("o" dotemacs/select-custom-layout :exit t)
-       ("p" persp-prev)
-       ("r" persp-remove-buffer :exit t)
-       ("R" dotemacs/layouts-ms-rename :exit t)
-       ("s" persp-save-state-to-file :exit t)
-       ("S" persp-save-to-file-by-names :exit t)
-       ("t" persp-temporarily-display-buffer :exit t)
-       ("w" dotemacs/layout-workspaces-micro-state :exit t)
-       ("x" dotemacs/layouts-ms-kill)
-       ("X" dotemacs/layouts-ms-kill-other :exit t))
-
-     (defun dotemacs/layout-switch-by-pos (pos)
-       "Switch to perspective of position POS."
-       (let ((persp-to-switch
-              (nth pos (persp-names-current-frame-fast-ordered))))
-         (if persp-to-switch
-             (persp-switch persp-to-switch)
-           (when (y-or-n-p
-                  (concat "Perspective in this position doesn't exist.\n"
-                          "Do you want to create one? "))
-             (let ((persp-reset-windows-on-nil-window-conf t))
-               (persp-switch nil)
-               (dotemacs-home))))))
-
-     ;; Define all `dotemacs/persp-switch-to-X' functions
-     (dolist (i (number-sequence 9 0 -1))
-       (eval `(defun ,(intern (format "dotemacs/persp-switch-to-%s" i)) nil
-                ,(format "Switch to layout %s." i)
-                (interactive)
-                (dotemacs/layout-switch-by-pos ,(if (eq 0 i) 9 (1- i)))
-                (dotemacs-layouts-micro-state))))
-
-     (defun dotemacs/layout-goto-default ()
-       "Go to `dotemacs-default-layout-name` layout"
-       (interactive)
-       (when dotemacs-default-layout-name
-         (persp-switch dotemacs-default-layout-name)))
-
-     (defun dotemacs/layouts-ms-rename ()
-       "Rename a layout and get back to the perspectives micro-state."
-       (interactive)
-       (call-interactively 'persp-rename)
-       (dotemacs-layouts-micro-state))
-
-     (defun dotemacs/layouts-ms-close ()
-       "Kill current perspective"
-       (interactive)
-       (persp-kill-without-buffers (dotemacs//current-layout-name)))
-
-     (defun dotemacs/layouts-ms-close-other ()
-       (interactive)
-       (call-interactively 'dotemacs/helm-persp-close)
-       (dotemacs-layouts-micro-state))
-
-     (defun dotemacs/layouts-ms-kill ()
-       "Kill current perspective"
-       (interactive)
-       (persp-kill (dotemacs//current-layout-name)))
-
-     (defun dotemacs/layouts-ms-kill-other ()
-       (interactive)
-       (call-interactively 'dotemacs/helm-persp-kill)
-       (dotemacs-layouts-micro-state))
-
-     (defun dotemacs/layouts-ms-last ()
-       "Switch to the last active perspective"
-       (interactive)
-       (persp-switch persp-last-persp-name))
-
-     ;; Custom perspectives micro-state -------------------------------------
-
-     (defun dotemacs//custom-layout-func-name (name)
-       "Return the name of the custom-perspective function for NAME."
-       (intern (concat "dotemacs/custom-perspective-" name)))
-
-     (defmacro dotemacs-define-custom-layout (name &rest props)
-       "Define a custom-perspective called NAME.
-
-FUNC is a FUNCTION defined using NAME and the result of
-`dotemacs//custom-layout-func-name', it takes care of
-creating the perspective NAME and executing the expressions given
-in the :body property to this macro.
-
-NAME is a STRING.
-
-Available PROPS:
-
-`:binding STRING'
-   Key to be bound to the function FUNC
-
-`:body EXPRESSIONS'
-  One or several EXPRESSIONS that are going to be evaluated after
-  we change into the perspective NAME."
-      (declare (indent 1))
-      (let* ((func (dotemacs//custom-layout-func-name name))
-             (binding (car (dotemacs-mplist-get props :binding)))
-             (body (dotemacs-mplist-get props :body))
-             (already-defined? (cdr (assoc binding
-                                           dotemacs--custom-layout-alist))))
-        `(progn
-           (defun ,func ()
-             ,(format "Open custom perspective %s" name)
-             (interactive)
-             (let ((initialize (not (gethash ,name *persp-hash*))))
-               (persp-switch ,name)
-               (when initialize
-                 (delete-other-windows)
-                 ,@body)))
-           ;; Check for Clashes
-           (if ,already-defined?
-               (unless (equal ,already-defined? ,name)
-                 (warn "Replacing existing binding \"%s\" for %s with %s"
-                       ,binding ,already-defined? ,name )
-                 (push '(,binding . ,name) dotemacs--custom-layout-alist))
-             (push '(,binding . ,name) dotemacs--custom-layout-alist)))))
-
-    (dotemacs-define-custom-layout "@Dotemacs"
-      :binding "e"
-      :body
-      (dotemacs/find-dotfile))
-
-    (defun dotemacs/select-custom-layout ()
-      "Update the custom-perspectives microstate and then activate it."
-      (interactive)
-      (dotemacs//update-custom-layouts)
-      (dotemacs-custom-layouts-micro-state))
-
-    (defun dotemacs//custom-layouts-ms-documentation ()
-      "Return the docstring for the custom perspectives micro-state."
-      (if dotemacs--custom-layout-alist
-          (mapconcat (lambda (custom-persp)
-                       (format "[%s] %s"
-                               (car custom-persp) (cdr custom-persp)))
-                     dotemacs--custom-layout-alist " ")
-        (warn (format "`dotemacs--custom-layout-alist' variable is empty" ))))
-
-    (defun dotemacs//update-custom-layouts ()
-      "Ensure the custom-perspectives micro-state is updated.
-Takes each element in the list `dotemacs--custom-layout-alist'
-format so they are supported by the
-`dotemacs-custom-layouts-micro-state' macro."
-      (let (bindings)
-        (dolist (custom-persp dotemacs--custom-layout-alist bindings)
-          (let* ((binding (car custom-persp))
-                 (name (cdr custom-persp))
-                 (func-name (dotemacs//custom-layout-func-name name)))
-            (push (list binding func-name) bindings)))
-        (eval `(dotemacs-define-micro-state custom-layouts
-                 :doc (dotemacs//custom-layouts-ms-documentation)
-                 :use-minibuffer t
-                 :bindings
-                 ,@bindings))))
-    )
-  :config
-  (progn
-    (defadvice persp-activate (before dotemacs//save-toggle-layout activate)
-      (setq dotemacs--last-selected-layout persp-last-persp-name))
-    (add-hook 'persp-mode-hook 'dotemacs//layout-autosave)
-    ;; By default, persp mode wont affect either helm or ido
-    (remove-hook 'ido-make-buffer-list-hook 'persp-restrict-ido-buffers)))
-
-(dotemacs-use-package-add-hook spaceline-config
-  :post-init
-  (setq spaceline-display-default-perspective
-        dotemacs-display-default-layout))
-
-(dotemacs-use-package-add-hook eyebrowse
-  :post-init
-  (add-hook 'persp-before-switch-functions #'dotemacs/update-eyebrowse-for-perspective)
-  (add-hook 'eyebrowse-post-window-switch-hook #'dotemacs/save-eyebrowse-for-perspective)
-  (add-hook 'persp-activated-hook #'dotemacs/load-eyebrowse-for-perspective))
-
-(dotemacs-use-package-add-hook helm
-  :post-init
-  (dotemacs-set-leader-keys
-    "pl" 'dotemacs/helm-persp-switch-project))
-
-(dotemacs-use-package-add-hook swiper
-  :post-init
-  (dotemacs-set-leader-keys
-    "pl" 'dotemacs/ivy-persp-switch-project))
+(use-package module-perspective)
 
 
-;;; Processes and commands
-(use-package proced                     ; Edit system processes
-  ;; Proced isn't available on OS X
-  :if (not (eq system-type 'darwin))
-  :bind ("C-x p" . proced))
-
-(use-package firestarter                ; Run commands after save
-  :ensure t
-  :init (firestarter-mode)
-  :config (progn (setq firestarter-default-type 'failure)
-                 (dotemacs-load-private-file "firestarter-safe-values.el"
-                                              'noerror))
-
-  ;; Remove space from firestarter lighter
-  :diminish firestarter-mode)
-
-(use-package init-firestarter
-  :load-path "config/"
-  :commands (dotemacs-firestarter-mode-line)
-  :init (with-eval-after-load 'firestarter
-          (setq firestarter-lighter
-                '(:eval (dotemacs-firestarter-mode-line)))))
-
-(defvar eyebrowse-display-help t
-  "If non-nil additional help is displayed when selecting a workspace.")
-
-(dotemacs-declare-prefix "W" "workspaces")
-
-(use-package eyebrowse
-  :ensure t
-  :defer t
-  :diminish eyebrowse-mode
-  :init
-  (progn
-    (setq eyebrowse-new-workspace #'dotemacs-home
-          eyebrowse-wrap-around t)
-    (eyebrowse-mode)
-
-    ;; vim-style tab switching
-    (define-key evil-motion-state-map "gt" 'eyebrowse-next-window-config)
-    (define-key evil-motion-state-map "gT" 'eyebrowse-prev-window-config)
-
-    (defun dotemacs/workspaces-ms-rename ()
-      "Rename a workspace and get back to micro-state."
-      (interactive)
-      (eyebrowse-rename-window-config (eyebrowse--get 'current-slot))
-      (dotemacs-workspaces-micro-state))
-
-    (defun dotemacs//workspaces-ms-get-slot-name (window-config)
-      "Return the name for the given window-config"
-      (let ((slot (car window-config))
-            (caption (eyebrowse-format-slot window-config)))
-        (if (= slot current-slot)
-            (format "[%s]" caption)
-          caption)))
-
-    (defun dotemacs//workspaces-ms-get-window-configs ()
-      "Return the list of window configs. Depends on value of
-`eyebrowse-place-zero-at-the-end'."
-      (--sort (if (eq (car other) 0)
-                  t
-                (< (car it) (car other)))
-              (eyebrowse--get 'window-configs)))
-
-    (defun dotemacs//workspaces-ms-documentation ()
-      "Return the docstring for the workspaces micro-state."
-      (let* ((current-slot (eyebrowse--get 'current-slot))
-             (window-configs (dotemacs//workspaces-ms-get-window-configs)))
-        (concat
-         "<" (if window-configs
-                 (concat
-                  (mapconcat 'dotemacs//workspaces-ms-get-slot-name
-                             window-configs "> <") ">")
-               (when eyebrowse-display-help
-                 (concat
-                  "\n[0-9] to create/switch to a workspace, "
-                  "[n] next, [p/N] previous, [TAB] back and forth, [c] close, "
-                  "[r] rename"))))))
-
-    (dotemacs-define-micro-state workspaces
-      :doc (dotemacs//workspaces-ms-documentation)
-      :use-minibuffer t
-      :evil-leader "W"
-      :bindings
-      ("0" eyebrowse-switch-to-window-config-0)
-      ("1" eyebrowse-switch-to-window-config-1)
-      ("2" eyebrowse-switch-to-window-config-2)
-      ("3" eyebrowse-switch-to-window-config-3)
-      ("4" eyebrowse-switch-to-window-config-4)
-      ("5" eyebrowse-switch-to-window-config-5)
-      ("6" eyebrowse-switch-to-window-config-6)
-      ("7" eyebrowse-switch-to-window-config-7)
-      ("8" eyebrowse-switch-to-window-config-8)
-      ("9" eyebrowse-switch-to-window-config-9)
-      ("<tab>" eyebrowse-last-window-config)
-      ("C-i" eyebrowse-last-window-config)
-      ("c" eyebrowse-close-window-config)
-      ("h" eyebrowse-prev-window-config)
-      ("l" eyebrowse-next-window-config)
-      ("n" eyebrowse-next-window-config)
-      ("N" eyebrowse-prev-window-config)
-      ("p" eyebrowse-prev-window-config)
-      ("r" dotemacs/workspaces-ms-rename :exit t)
-      ("w" eyebrowse-switch-to-window-config :exit t))
-
-    (defun dotemacs-eyebrowse-switch ()
-      "Hook eyebrowse to projectile and neotree."
-      (interactive)
-      (when (projectile-project-p)
-        (message "eyebrowse switching to: %s" (projectile-project-root))
-        (when (fboundp 'neotree-dir)
-          (if (neo-global--window-exists-p)
-              (neotree-dir (projectile-project-root))
-            (progn
-              (neotree-dir (projectile-project-root))
-              (neotree-hide)
-              (let ((origin-buffer-file-name (buffer-file-name)))
-                (neotree-find (projectile-project-root))
-                (neotree-find origin-buffer-file-name))
-              (neotree-hide))))))
-    (with-eval-after-load 'projectile
-      (add-hook 'eyebrowse-post-window-switch-hook 'dotemacs-eyebrowse-switch))))
+;;; Eyebrowse
+(use-package module-eyebrowse)
 
 
-;;; Minibuffer and Helm
-
-;; Display current keystrokes almost immediately in mini buffer
-(setq echo-keystrokes 0.02)
-
-;; escape minibuffer
-(define-key minibuffer-local-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'my-minibuffer-keyboard-quit)
-(define-key minibuffer-local-map (kbd "C-w") 'backward-kill-word)
-
-;; have no use for these default bindings
-(global-unset-key (kbd "C-x m"))
-
-;; Helm: Unite/CtrlP style fuzzy file/buffer/anything searcher on steroids
-;;
-;; Helm does the same thing as Unite/CtrlP on Vim and does it really well. You
-;; can also enable Helm to manage the command buffer, which is pretty awesome
-;; with: (helm-mode 1)
-(use-package init-helm
-  :load-path "config/")
-
-(use-package helm-flx
-  :ensure t
-  :defer t)
-
-(dotemacs-use-package-add-hook helm
-  :pre-config
-  (progn
-    ;; Disable for helm-find-files until performance issues are sorted
-    ;; https://github.com/PythonNut/helm-flx/issues/9
-    (setq helm-flx-for-helm-find-files nil)
-    (helm-flx-mode)))
-
-(use-package helm
-  :ensure t
-  :defer 1
-  :commands dotemacs-helm-find-files
-  :init
-  (progn
-    (with-eval-after-load 'helm-config
-                          (warn "`helm-config' loaded! Get rid of it ASAP!"))
-
-    ;; NOTE: Apple OS X users also need a version of grep that accepts --exclude-dir
-    ;; brew tap homebrew/dupes
-    ;; brew install homebrew/dupes/grep
-    (when-let (gnu-grep (and (eq system-type 'darwin)
-                             (executable-find "ggrep")))
-              (setq helm-grep-default gnu-grep)
-              (setq helm-grep-default-command (concat gnu-grep " --color=never -a -d skip %e -n%cH -e %p %f"))
-              (setq helm-grep-default-recurse-command (concat gnu-grep " --color=never -a -d recurse %e -n%cH -e %p %f")))
-
-    ;; https://github.com/syl20bnr/spacemacs/issues/1544
-    ;; Vim users are used to CtrlP plugin.
-    (setq helm-for-files-preferred-list '(helm-source-buffers-list
-                                          helm-source-buffer-not-found
-                                          helm-source-ls-git
-                                          helm-source-ls-git-buffers
-                                          helm-source-projectile-projects
-                                          helm-source-projectile-files-list
-                                          helm-source-recentf
-                                          helm-source-bookmarks
-                                          helm-source-file-cache
-                                          helm-source-files-in-current-dir))
-    ;; (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
-
-    (setq helm-prevent-escaping-from-minibuffer t
-          helm-bookmark-show-location t
-          helm-display-header-line nil
-          helm-split-window-in-side-p t
-          helm-always-two-windows t
-          helm-echo-input-in-header-line t
-          helm-imenu-execute-action-at-once-if-one nil
-          helm-org-format-outline-path t)
-
-    ;; hide minibuffer in Helm session, since we use the header line already
-    (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
-
-    ;; fuzzy matching setting
-    (setq helm-M-x-fuzzy-match t
-          helm-apropos-fuzzy-match t
-          helm-file-cache-fuzzy-match t
-          helm-imenu-fuzzy-match t
-          helm-lisp-fuzzy-completion t
-          helm-recentf-fuzzy-match t
-          helm-semantic-fuzzy-match t
-          helm-buffers-fuzzy-matching t)
-
-    ;; Use helm to provide :ls, unless ibuffer is used
-    ;; (unless 'ibuffer
-    ;;   (evil-ex-define-cmd "buffers" 'helm-buffers-list))
-
-    ;; use helm by default for M-x
-    (global-set-key (kbd "M-x") 'helm-M-x)
-
-    (dotemacs-set-leader-keys
-      "<f1>" 'helm-apropos
-      "bb"   'helm-mini
-      "Cl"   'helm-colors
-      "ff"   'dotemacs-helm-find-files
-      "fF"   'helm-find-files
-      "fL"   'helm-locate
-      "fm"   'dotemacs-helm-multi-files
-      "fr"   'helm-recentf
-      "hb"   'helm-filtered-bookmarks
-      "hdF"  'dotemacs/helm-faces
-      "hi"   'helm-info-at-point
-      "hl"   'helm-resume
-      "hm"   'helm-man-woman
-      "iu"   'helm-ucs
-      "ry"   'helm-show-kill-ring
-      "rr"   'helm-register
-      "rm"   'helm-all-mark-rings
-      "sL"   'dotemacs-last-search-buffer
-      "sl"   'dotemacs-jump-in-buffer)
-
-    ;; search with grep
-    (dotemacs-set-leader-keys
-      "sgb"  'dotemacs-helm-buffers-do-grep
-      "sgB"  'dotemacs-helm-buffers-do-grep-region-or-symbol
-      "sgf"  'dotemacs-helm-files-do-grep
-      "sgF"  'dotemacs-helm-files-do-grep-region-or-symbol
-      "sgg"  'dotemacs-helm-file-do-grep
-      "sgG"  'dotemacs-helm-file-do-grep-region-or-symbol)
-
-    ;; define the key binding at the very end in order to allow the user
-    ;; to overwrite any key binding
-    (add-hook 'emacs-startup-hook
-              (lambda ()
-                (dotemacs-set-leader-keys dotemacs-command-key 'helm-M-x)))
-
-    ;; Hide the cursor in helm buffers.
-    (add-hook 'helm-after-initialize-hook 'dotemacs//hide-cursor-in-helm-buffer)
-
-    ;; this or any specialized case of Helm buffer must be added AFTER
-    ;; `dotemacs-helm-display-buffer-regexp'. Otherwise,
-    ;; `dotemacs-helm-display-buffer-regexp' will be used before
-    ;; `dotemacs-helm-display-help-buffer-regexp' and display
-    ;; configuration for normal Helm buffer is applied for helm help
-    ;; buffer, making the help buffer unable to be displayed.
-    (setq helm-display-function 'dotemacs-display-helm-window)
-
-    ;; Prepare necessary settings to make Helm display properly.
-    (add-hook 'helm-after-initialize-hook 'dotemacs-helm-prepare-display)
-
-    ;;  Restore popwin-mode after a Helm session finishes.
-    (add-hook 'helm-cleanup-hook 'dotemacs-restore-previous-display-config)
-
-    ;; Add minibuffer history with `helm-minibuffer-history'
-    (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
-
-    ;; Cleanup some helm related states when quitting.
-    (add-hook 'helm-cleanup-hook 'dotemacs-helm-cleanup)
-
-    (defface dotemacs-helm-navigation-ms-face
-      `((t :background ,(face-attribute 'error :foreground) :foreground "black"))
-      "Face for helm heder when helm micro-state is activated."
-      :group 'dotemacs))
-  :config
-  (progn
-    (helm-mode +1)
-
-    (when (and dotemacs-helm-resize
-               (or (eq dotemacs-helm-position 'bottom)
-                   (eq dotemacs-helm-position 'top)))
-      (setq helm-autoresize-min-height 10)
-      (helm-autoresize-mode 1))
-
-    ;; from https://www.reddit.com/r/emacs/comments/2z7nbv/lean_helm_window/
-    (defvar helm-source-header-default-background
-      (face-attribute 'helm-source-header :background))
-    (defvar helm-source-header-default-foreground
-      (face-attribute 'helm-source-header :foreground))
-    (defvar helm-source-header-default-box
-      (face-attribute 'helm-source-header :box))
-    (defvar helm-source-header-default-height
-      (face-attribute 'helm-source-header :height) )
-
-    ;; Hide the `helm' header is there is only one source.
-    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
-
-    ;; helm-locate uses es (from everything on windows, which doesnt like fuzzy)
-    (helm-locate-set-command)
-    (setq helm-locate-fuzzy-match (string-match "locate" helm-locate-command))
-
-    ;; Set the face of diretories for `.' and `..'
-    (add-hook 'helm-find-files-before-init-hook 'dotemacs-set-dotted-directory)
-
-    ;; alter helm-bookmark key bindings to be simpler
-    (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
-
-    ;; helm navigation on hjkl
-    (dotemacs-helm-hjkl-navigation (member dotemacs-editing-style '(vim hybrid)))
-
-    ;; Define functions to pick actions
-    (dotimes (n 10)
-      (let ((func (intern (format "dotemacs/helm-action-%d" n)))
-            (doc (format "Select helm action #%d" n)))
-        (eval `(defun ,func ()
-                 ,doc
-                 (intern)
-                 (helm-select-nth-action ,(1- n))))))
-
-    (dotemacs-define-micro-state helm-navigation
-      :persistent t
-      :disable-evil-leader t
-      :define-key (helm-map . "M-SPC") (helm-map . "s-M-SPC")
-      :on-enter (dotemacs-helm-navigation-ms-on-enter)
-      :on-exit  (dotemacs-helm-navigation-ms-on-exit)
-      :bindings
-      ("1" dotemacs/helm-action-1 :exit t)
-      ("2" dotemacs/helm-action-2 :exit t)
-      ("3" dotemacs/helm-action-3 :exit t)
-      ("4" dotemacs/helm-action-4 :exit t)
-      ("5" dotemacs/helm-action-5 :exit t)
-      ("6" dotemacs/helm-action-6 :exit t)
-      ("7" dotemacs/helm-action-7 :exit t)
-      ("8" dotemacs/helm-action-8 :exit t)
-      ("9" dotemacs/helm-action-9 :exit t)
-      ("0" dotemacs/helm-action-10 :exit t)
-      ("<tab>" helm-select-action :exit t)
-      ("C-i" helm-select-action :exit t)
-      ("<RET>" helm-maybe-exit-minibuffer :exit t)
-      ("?" nil :doc (dotemacs-helm-navigation-ms-full-doc))
-      ("a" helm-select-action :post (dotemacs-helm-navigation-ms-set-face))
-      ("e" dotemacs-helm-edit)
-      ("g" helm-beginning-of-buffer)
-      ("G" helm-end-of-buffer)
-      ("h" helm-previous-source)
-      ("j" helm-next-line)
-      ("k" helm-previous-line)
-      ("l" helm-next-source)
-      ("q" nil :exit t)
-      ("t" helm-toggle-visible-mark)
-      ("T" helm-toggle-all-marks)
-      ("v" helm-execute-persistent-action))
-
-    ;; Swap default TAB and C-z commands.
-    ;; For GUI.
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    (define-key helm-find-files-map
-      (kbd "S-<tab>") 'helm-find-files-up-one-level)
-    (define-key helm-find-files-map
-      (kbd "<backtab>") 'helm-find-files-up-one-level)
-    ;; For terminal.
-    (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-    (define-key helm-find-files-map
-      (kbd "S-TAB") 'helm-find-files-up-one-level)
-    (define-key helm-map (kbd "C-z") 'helm-select-action)
-
-    (with-eval-after-load 'helm-mode ; required
-      (dotemacs-hide-lighter helm-mode))))
-
-(use-package helm-ls-git
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (require 'helm-ls-git))
-  :config
-  (progn
-    (setq helm-ls-git-show-abs-or-relative 'relative) ))
-
-(use-package helm-swoop
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'helm
-    (setq helm-swoop-split-with-multiple-windows t
-          helm-swoop-use-line-number-face t
-          helm-swoop-split-direction 'split-window-vertically
-          helm-swoop-speed-or-color t
-          helm-swoop-split-window-function 'helm-default-display-buffer
-          helm-swoop-pre-input-function (lambda () ""))
-
-    (defun dotemacs-helm-swoop-region-or-symbol ()
-      "Call `helm-swoop' with default input."
-      (interactive)
-      (let ((helm-swoop-pre-input-function
-             (lambda ()
-               (if (region-active-p)
-                   (buffer-substring-no-properties (region-beginning)
-                                                   (region-end))
-                 (let ((thing (thing-at-point 'symbol t)))
-                   (if thing thing ""))))))
-        (call-interactively 'helm-swoop)))
-
-    (dotemacs-set-leader-keys
-      "ss"    'helm-swoop
-      "sS"    'dotemacs-helm-swoop-region-or-symbol
-      "s C-s" 'helm-multi-swoop-all)
-    (defadvice helm-swoop (before add-evil-jump activate)
-      (evil-set-jump))))
-
-(use-package helm-misc                  ; Misc helm commands
-  :ensure helm
-  :bind (([remap switch-to-buffer] . helm-mini)))
-
-(use-package helm-themes
-  :ensure helm
-  :defer t
-  :init
-  (dotemacs-set-leader-keys
-    "Th" 'helm-themes))
-
-(use-package helm-command               ; M-x in Helm
-  :ensure helm
-  :bind (([remap execute-extended-command] . helm-M-x)))
-
-(use-package helm-eval                  ; Evaluate expressions with Helm
-  :ensure helm
-  :bind (("C-c h M-:" . helm-eval-expression-with-eldoc)
-         ("C-c h *"   . helm-calcul-expression)))
-
-(use-package helm-color                 ; Input colors with Helm
-  :ensure helm
-  :bind (("C-c h c" . helm-colors)))
-
-(use-package helm-unicode               ; Unicode input with Helm
-  :ensure t
-  :bind ("C-c h 8" . helm-unicode))
-
-(use-package helm-mode-manager
-  :ensure t
-  :defer t
-  :init
-  (dotemacs-set-leader-keys
-    "hM"    'helm-switch-major-mode
-    ;; "hm"    'helm-disable-minor-mode
-    "h C-m" 'helm-enable-minor-mode))
+;;; Helm
+(use-package module-helm)
 
 
 ;;; Buffer, Windows and Frames
-(setq truncate-partial-width-windows nil ; Make side by side buffers function
-                                         ; the same as the main window.
-      frame-resize-pixelwise t           ; Resize by pixels
-      frame-title-format
-      '(:eval (if (buffer-file-name)
-                  (abbreviate-file-name (buffer-file-name)) "%b")))
+(use-package module-fringe)
+(use-package module-frame)
+(use-package module-buffer)
+(use-package module-ibuffer)
+(use-package module-window)
+(use-package module-desktop)
+(use-package module-popwin)
 
-(use-package buffer-move
-  :defer t
-  :init
-  (dotemacs-set-leader-keys
-    "bmh" 'buf-move-left
-    "bmj" 'buf-move-down
-    "bmk" 'buf-move-up
-    "bml" 'buf-move-right))
-
-(defvar dotemacs//frame-width nil)
-(defvar dotemacs//frame-height nil)
-
-(use-package frame
-  :bind (("C-c u F" . toggle-frame-fullscreen))
-  :init
-  (progn
-    (defun dotemacs-set-frame-size ()
-      (when (display-graphic-p)
-        ;; for the height, subtract 60 pixels from the screen height (for
-        ;; panels, menubars and whatnot), then divide by the height of a char to
-        ;; get the height we want.
-        ;; use 120 char wide window for largeish displays and smaller 90 column
-        ;; windows for smaller displays.
-        (let* ((fwp (if (> (x-display-pixel-width) 1680) 120 90))
-               (fhp (/ (- (x-display-pixel-height) 60)
-                       (frame-char-height))))
-          (setq dotemacs//frame-width fwp)
-          (setq dotemacs//frame-height fhp)
-          (add-to-list 'initial-frame-alist `(width . ,dotemacs//frame-width))
-          (add-to-list 'initial-frame-alist `(height . ,dotemacs//frame-height))
-          (add-to-list 'default-frame-alist `(height . ,dotemacs//frame-height))
-          (add-to-list 'default-frame-alist `(width  . ,dotemacs//frame-width))
-          (set-frame-height (selected-frame) fhp)
-          (set-frame-width (selected-frame) fwp))))
-
-    (dotemacs|do-after-display-system-init
-      (dotemacs-set-frame-size))
-
-    ;; Kill `suspend-frame'
-    (global-set-key (kbd "C-z") nil)
-    (global-set-key (kbd "C-x C-z") nil)))
-
-(use-package init-buffers          ; Personal buffer tools
-  :load-path "config/"
-  :config
-  (progn
-      (add-hook 'kill-buffer-query-functions
-                #'dotemacs-do-not-kill-important-buffers)
-      ;; Autosave buffers when focus is lost, see
-      ;; http://emacsredux.com/blog/2014/03/22/a-peek-at-emacs-24-dot-4-focus-hooks/
-      (add-hook 'focus-out-hook #'dotemacs-force-save-some-buffers)))
-
-(use-package uniquify                   ; Make buffer names unique
-  ;; When having windows with repeated filenames, uniquify them
-  ;; by the folder they are in rather those annoying <2>,<3>,.. etc
-  :config (setq uniquify-buffer-name-style 'post-forward-angle-brackets
-                uniquify-separator "/"
-                uniquify-ignore-buffers-re "^\\*" ; leave special buffers alone
-                uniquify-after-kill-buffer-p t))
-
-(use-package helm-buffers
-  :ensure helm
-  :defer t
-  :config (setq helm-buffers-fuzzy-matching t))
-
-(use-package ibuffer                    ; Better buffer list
-  :bind (([remap list-buffers] . ibuffer))
-  ;; Show VC Status in ibuffer
-  :init
-  (progn
-    (dotemacs-set-leader-keys "bB" 'ibuffer)
-
-    (global-set-key (kbd "C-x C-b") 'ibuffer)
-    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
-
-    (setq ibuffer-expert t
-          ibuffer-show-empty-filter-groups nil)
-    ;; Use ibuffer to provide :ls
-    (evil-ex-define-cmd "buffers" 'ibuffer))
-  :config
-  (progn
-
-    ;; Since we could override `,` with <leader>, let's make `;` do that
-    ;; functionality
-    (when (equal dotemacs-leader-key ",")
-      (define-key ibuffer-mode-map
-        (kbd ";") 'ibuffer-toggle-sorting-mode)
-      (define-key ibuffer-mode-map
-        (kbd ",") nil))
-    (evilified-state-evilify-map ibuffer-mode-map
-      :mode ibuffer-mode)))
-
-(use-package ibuffer-vc                 ; Group buffers by VC project and status
-  :ensure t
-  :defer t
-  :init (add-hook 'ibuffer-hook
-                  (lambda ()
-                    (ibuffer-vc-set-filter-groups-by-vc-root)
-                    (unless (eq ibuffer-sorting-mode 'alphabetic)
-                      (ibuffer-do-sort-by-alphabetic)))))
-
-(use-package ibuffer-projectile         ; Group buffers by Projectile project
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-projects)))
-
-(use-package init-window
-  :load-path "config/"
-  :defer t
-  :bind ("C-c q" . dotemacs-quit-bottom-side-windows))
-
-(use-package windmove                   ; Move between windows with Shift+Arrow
-  :bind (("S-<left>"  . windmove-left)
-         ("S-<right>" . windmove-right)
-         ("S-<up>"    . windmove-up)
-         ("S-<down>"  . windmove-down)))
-
-(use-package winner                     ; Undo and redo window configurations
-  :ensure t
-  :init
-  (progn
-    ;; activate winner mode use to undo and redo windows layout
-    (winner-mode t))
-  :config
-  (progn
-    (setq dotemacs-winner-boring-buffers '("*Completions*"
-                                           "*Compile-Log*"
-                                           "*inferior-lisp*"
-                                           "*Fuzzy Completions*"
-                                           "*Apropos*"
-                                           "*Help*"
-                                           "*cvs*"
-                                           "*Buffer List*"
-                                           "*Ibuffer*"
-                                           "*esh command on file*"
-                                            ))
-    (setq winner-boring-buffers
-          (append winner-boring-buffers dotemacs-winner-boring-buffers))))
-
-(use-package window-numbering
-  :ensure t
-  :config
-  (progn
-    (setq window-numbering-auto-assign-0-to-minibuffer nil)
-    (dotemacs-set-leader-keys
-      "0" 'select-window-0
-      "1" 'select-window-1
-      "2" 'select-window-2
-      "3" 'select-window-3
-      "4" 'select-window-4
-      "5" 'select-window-5
-      "6" 'select-window-6
-      "7" 'select-window-7
-      "8" 'select-window-8
-      "9" 'select-window-9)
-    (window-numbering-mode 1))
-
-  (defun dotemacs-window-numbering-assign (windows)
-    "Custom number assignment for special buffers."
-    (mapc (lambda (w)
-            (when (and (boundp 'neo-global--window)
-                       (eq w neo-global--window))
-              (window-numbering-assign w 0)))
-          windows))
-  (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign)
-  (add-hook 'neo-after-create-hook '(lambda (w) (window-numbering-update))))
-
-(use-package ediff-wind
-  :defer t
-  :config
-  (progn
-    ;;revert windows on exit - needs winner mode
-    (when (fboundp 'winner-undo)
-      (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
-
-    ;; Prevent Ediff from spamming the frame
-    (setq ediff-diff-options "-w"
-            ediff-window-setup-function #'ediff-setup-windows-plain
-            ediff-split-window-function #'split-window-horizontally)))
-
-;; http://stackoverflow.com/a/4485083/740527
-(use-package init-desktop
-  :load-path "config/")
-
-(use-package desktop                    ; Save buffers, windows and frames
-  :defer t
-  :init
-  (setq desktop-dirname (concat dotemacs-cache-directory "desktop/")
-        desktop-base-file-name (concat "emacs_" emacs-version-short
-                                       ".desktop")
-        desktop-base-lock-name (concat "emacs_" emacs-version-short
-                                       ".desktop.lock")
-        desktop-path (list desktop-dirname)
-        desktop-load-locked-desktop nil
-        ;; Fix the frameset warning at startup
-        desktop-restore-frames nil
-        ;; Save desktops a minute after Emacs was idle.
-        desktop-auto-save-timeout 60)
-  (desktop-save-mode 0)
-  :config
-  (progn
-    ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-sessions.el
-    ;; Save a bunch of variables to the desktop file.
-    ;; For lists, specify the length of the maximal saved data too.
-    (setq desktop-globals-to-save
-          (append '((comint-input-ring . 50)
-                    desktop-missing-file-warning
-                    (dired-regexp-history . 20)
-                    (extended-command-history . 30)
-                    (face-name-history . 20)
-                    (file-name-history . 100)
-                    (ido-buffer-history . 100)
-                    (ido-last-directory-list . 100)
-                    (ido-work-directory-list . 100)
-                    (ido-work-file-list . 100)
-                    (magit-read-rev-history . 50)
-                    (minibuffer-history . 50)
-                    (org-refile-history . 50)
-                    (org-tags-history . 50)
-                    (query-replace-history . 60)
-                    (read-expression-history . 60)
-                    (regexp-history . 60)
-                    (regexp-search-ring . 20)
-                    register-alist
-                    (search-ring . 20)
-                    (shell-command-history . 50)
-                    tags-file-name
-                    tags-table-list)))
-
-    ;; Don't save .gpg files. Restoring those files in emacsclients causes
-    ;; a problem as the password prompt appears before the frame is loaded.
-    (setq desktop-files-not-to-save
-          (concat "\\(^/[^/:]*:\\|(ftp)$\\)" ; original value
-                  "\\|\\(\\.gpg$\\)"
-                  "\\|\\(\\.plstore$\\)"
-                  "\\|\\(\\.desktop$\\)"
-                  "COMMIT_EDITMSG\\'"
-                  ;; If backup files with names like "file.sv.20150619_1641.bkp"
-                  ;; are saved to the desktop file, emacsclient crashes at launch
-                  ;; Need to debug why that's the case. But for now, simply not
-                  ;; saving the .bkp files to the desktop file is a workable
-                  ;; solution -- Fri Jun 19 16:45:50 EDT 2015 - kmodi
-                  "\\|\\(\\.bkp$\\)"
-                  "\\|\\(\\TAGS$\\)"))
-
-    ;; Don't save the eww buffers
-    (setq desktop-buffers-not-to-save (concat desktop-buffers-not-to-save
-                                              "\\|\\(^eww\\(<[0-9]+>\\)*$\\)"))
-
-    (dolist (mode '(magit-mode magit-log-mode))
-      (add-to-list 'desktop-modes-not-to-save mode))))
-
-(dotemacs-use-package-add-hook ignoramus
-  :post-config
-  (setq desktop-files-not-to-save (concat desktop-files-not-to-save
-                                         ignoramus-boring-file-regexp)))
-
-(use-package writeroom-mode             ; Distraction-free editing
-  :ensure t
-  :bind (("C-c u r" . writeroom-mode)))
-
-(setq editorconfig-packages '(editorconfig))
-(use-package editorconfig
-  :defer t
-  :ensure t
-  :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
-
-(use-package popwin
-  :ensure t
-  :config
-  (progn
-    (popwin-mode 1)
-    (dotemacs-set-leader-keys "wpm" 'popwin:messages)
-    (dotemacs-set-leader-keys "wpp" 'popwin:close-popup-window)
-
-    ;; don't use default value but manage it ourselves
-    (setq popwin:special-display-config nil)
-
-    ;; buffers that we manage
-    (push '("*Help*"                 :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
-    (push '("*compilation*"          :dedicated t :position bottom :stick t :noselect t   :height 0.4) popwin:special-display-config)
-    (push '("*Shell Command Output*" :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '("*Async Shell Command*"  :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '(" *undo-tree*"           :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
-    (push '("*ert*"                  :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '("*grep*"                 :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '("*nosetests*"            :dedicated t :position bottom :stick t :noselect nil            ) popwin:special-display-config)
-    (push '("^\\*WoMan.+\\*$" :regexp t           :position bottom                                   ) popwin:special-display-config)
-    (push '("^\\*Flycheck.+\\*$" :regexp t
-                                     :dedicated t :position bottom :stick t :noselect t              ) popwin:special-display-config)
-      ;; Pin the weather forecast to the bottom window
-    (push '("*Sunshine*"             :dedicated t :position bottom                                   ) popwin:special-display-config)
-    ;; add cider error to popwin special buffers
-    (push '("*cider-error*"          :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
-    ;; add cider-doc to popwin
-    (push '("*cider-doc*"            :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
-    (push '("*elm*" :tail t :noselect t) popwin:special-display-config)
-    (push '("*elm-make*" :tail t :noselect t) popwin:special-display-config)
-
-    (defun dotemacs-remove-popwin-display-config (str)
-      "Removes the popwin display configurations that matches the passed STR"
-      (setq popwin:special-display-config
-            (-remove (lambda (x) (if (and (listp x) (stringp (car x)))
-                                     (string-match str (car x))))
-                     popwin:special-display-config)))))
 
 ;;; File handling
 
@@ -2711,28 +1034,41 @@ format so they are supported by the
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function))
 (add-hook 'server-visit-hook 'server-remove-kill-buffer-hook)
 
+
+;;; Files
+(use-package module-file            ; Personal file tools
+  :defer t
+  :commands (dotemacs-create-non-existent-directory
+             dotemacs-recompile-packages)
+  :init
+  (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
+  :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
+         ("C-c f i" . dotemacs-open-in-intellij)
+         ("C-c f o" . dotemacs-launch-dwim)
+         ("C-c f R" . dotemacs-rename-file-and-buffer)
+         ("C-c f w" . dotemacs-copy-filename-as-kill)
+         ("C-c f u" . dotemacs-find-user-init-file-other-window)
+         ("C-c w ." . dotemacs-browse-feature-url))
+  :config
+  (progn
+    (add-hook 'find-file-hook
+              (lambda ()
+                (unless (eq major-mode 'org-mode)
+                  (setq show-trailing-whitespace t))))
+    (add-hook 'find-file-hook #'visual-line-mode)
+    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file)))
+
+;; Additional bindings for built-ins
+(bind-key "C-c f v d" #'add-dir-local-variable)
+(bind-key "C-c f v l" #'add-file-local-variable)
+(bind-key "C-c f v p" #'add-file-local-variable-prop-line)
+
 (use-package files
   ;; Revert the current buffer (re-read the contents from disk). Burying
   ;; a buffer (removing it from the current window and sending it to the bottom
   ;; of the stack) is very common for dismissing buffers.
   :bind (("C-c e u" . revert-buffer)
          ("C-c e y" . bury-buffer)))
-
-(use-package tramp                      ; Access remote files
-  :defer t
-  :init
-  (progn
-    (setq tramp-ssh-controlmaster-options
-      (concat
-        "-o ControlPath=~/.ssh/conn-%%r@%%h:%%p"))
-    (setq tramp-default-method "ssh"
-          vc-ignore-dir-regexp
-          (format "\\(%s\\)\\|\\(%s\\)"
-                  vc-ignore-dir-regexp
-                  tramp-file-name-regexp)))
-  :config
-  ;; Store auto-save files locally
-  (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
 
 (use-package open-junk-file
   :ensure t
@@ -2781,207 +1117,18 @@ format so they are supported by the
     (setq recentf-exclude (append recentf-exclude
                                   (list ignoramus-boring-file-regexp)))))
 
-(use-package ignoramus                  ; Ignore uninteresting files everywhere
-  :ensure t
-  :config
-  (progn
-    (defun dotemacs//ignoramus-setup (fcn)
-      (funcall fcn)
-      ;; neotree
-      (setq neo-hidden-regexp-list (list ignoramus-boring-file-regexp))
-
-      ;; helm-grep
-      (with-eval-after-load 'helm-grep
-        (setq helm-grep-ignored-files (cons ".#*" (delq nil (mapcar #'(lambda (pat)
-                                                                        (concat "*" pat)) ignoramus-file-basename-endings))))
-        (setq helm-grep-ignored-directories ignoramus-file-basename-exact-names))
-
-      ;; according to what projectile expects
-      ;; (setq projectile-globally-ignored-file-extensions (mapcar #'(lambda (ext)
-      ;;                                                               (replace-regexp-in-string "\\`\\." "" ext))
-      ;;                                                           ignoramus-file-basename-endings))
-      (setq projectile-ignored-file-extensions (mapcar #'(lambda (ext)
-                                                           (replace-regexp-in-string "\\`\\." "" ext))
-                                                       ignoramus-file-basename-endings))
-      ;; (setq projectile-globally-ignored-files ignoramus-file-basename-exact-names)
-      (setq projectile-ignored-files ignoramus-file-basename-exact-names)
-      ;; (setq projectile-globally-ignored-directories ignoramus-file-basename-exact-names)
-      (setq projectile-ignored-directories ignoramus-file-basename-exact-names))
-
-    (advice-add 'ignoramus-setup
-                :around 'dotemacs//ignoramus-setup)
-
-    (dolist (name '(
-                    "pids"
-                    ".grunt"
-                    ".cache"
-                    ".lock-wscript"
-                    ".cask"
-                    ".vagrant"
-                    ".DS_Store"
-                    "lib-cov"
-                    "coverage"
-                    ".builds"
-                    ".bzr"
-                    ".cdv"
-                    ".classpath"
-                    ".coverage"
-                    ".git"
-                    ".hg"
-                    ".idea"
-                    ".ido.last"
-                    ".netrwhist"
-                    ".pc"
-                    ".project"
-                    ".projectile"
-                    ".puppet-bak"
-                    ".rspec"
-                    ".sass-cache"
-                    ".scala_dependencies"
-                    ".svn"
-                    "_darcs"
-                    "auto-save-list"
-                    "bower_components"
-                    "node_modules"
-                    ".cache"
-                    ".sx"
-                    "elpa"
-                    ".tox"
-                    "virtualenv"))
-
-      ;; Ignore some additional directories
-      (add-to-list 'ignoramus-file-basename-exact-names name))
-
-    (dolist (name '(
-                    ".tern-port"
-                    ".png"
-                    ".jpg"
-                    ".jpeg"
-                    ".gif"
-                    "-autoloads.el"
-                    ".class"
-                    ".elc"
-                    ".min.js"
-                    "-min.js"
-                    ".min.css"
-                    "-min.css"
-                    ".pyc"
-                    ".pyd"
-                    ".pyo"
-                    ".rbc"
-                    ".sassc"
-                    ".suo"
-                    ".swo"
-                    ".venv"
-                    ".swp"
-                    ".psd"
-                    ".ai"
-                    ".pdf"
-                    ".mov"
-                    ".aep"
-                    ".dmg"
-                    ".zip"
-                    ".gz"
-                    ".bmp"
-                    ".7z"
-                    ".jar"
-                    ".rar"
-                    ".zip"
-                    ".gz"
-                    ".bzip"
-                    ".bz2"
-                    ".xz"
-                    ".lzma"
-                    ".cab"
-                    ".iso"
-                    ".tar"
-                    ".dmg"
-                    ".xpi"
-                    ".gem"
-                    ".egg"
-                    ".deb"
-                    ".rpm"
-                    ".msi"
-                    ".msm"
-                    ".msp"
-                    ".pid"
-                    ".seed"))
-
-      ;; Ignore some additional filename endings
-      (add-to-list 'ignoramus-file-basename-endings name))
-
-    (dolist (name '(
-                    "\\`\\.flycheck.*\\'"
-                    "\\`.*_flymake\\..*'"
-                    ))
-
-      ;; Ignore some additional filename endings
-      (add-to-list 'ignoramus-file-basename-regexps name))
-
-    (ignoramus-setup)))
-
-(use-package hardhat ; Protect user-writable files
-  :ensure t
-  :init (global-hardhat-mode)
-  (setq hardhat-buffer-protected-functions '(hardhat-protected-by-ignoramus))
-  :config (setq hardhat-mode-lighter "🔒"))
-
-(use-package tramp                      ; Access remote files
-  :defer t
-  :config
-  ;; Store auto-save files locally
-  (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
-
-(use-package bookmark                   ; Bookmarks for Emacs buffers
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq bookmark-save-flag 1 ;; autosave each change
-          ;; Store auto-save files locally
-          bookmark-default-file (concat dotemacs-cache-directory "bookmarks")
-          url-configuration-directory (concat dotemacs-cache-directory "url")
-          eshell-directory-name (concat dotemacs-cache-directory "eshell" )
-          tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))))
-
-(use-package restart-emacs
-  :defer t
-  :init
-  (dotemacs-set-leader-keys "qr" 'dotemacs/restart-emacs)
-  (defun dotemacs/restart-emacs ()
-    (interactive)
-    (setq dotemacs-really-kill-emacs t)
-    (restart-emacs)))
-
-(use-package savehist                   ; Save minibuffer history
-  :init
-  (progn
-    ;; Minibuffer history
-    (setq savehist-file (concat dotemacs-cache-directory "savehist")
-          enable-recursive-minibuffers t ; Allow commands in minibuffers
-          history-length 1000
-          savehist-additional-variables '(search
-                                          ring
-                                          mark-ring
-                                          global-mark-ring
-                                          search-ring
-                                          regexp-search-ring
-                                          extended-command-history)
-          savehist-autosave-interval 180)
-    (savehist-mode t)))
-
-;; move cursor to the last position upon open
-(use-package saveplace                  ; Save point position in files
-  :init
-  (progn
-    (if (fboundp 'save-place-mode)
-        ;; Emacs 25 has a proper mode for `save-place'
-        (save-place-mode)
-      (setq save-place t))
-    ;; Save point position between sessions
-    (setq save-place-file (concat dotemacs-cache-directory "places"))))
+(use-package module-ignoramus)
 
 (setq view-read-only t)                 ; View read-only files
+
+
+;;; todo
+
+(setq editorconfig-packages '(editorconfig))
+(use-package editorconfig
+  :defer t
+  :ensure t
+  :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
 
 (use-package autorevert                 ; Auto-revert buffers of changed files
   :if (not noninteractive)
@@ -3007,80 +1154,6 @@ format so they are supported by the
 (use-package launch                     ; Open files in external programs
   :ensure t
   :defer t)
-
-(use-package init-files            ; Personal file tools
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-create-non-existent-directory
-             dotemacs-recompile-packages)
-  :init
-  (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
-  :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
-         ("C-c f i" . dotemacs-open-in-intellij)
-         ("C-c f o" . dotemacs-launch-dwim)
-         ("C-c f R" . dotemacs-rename-file-and-buffer)
-         ("C-c f w" . dotemacs-copy-filename-as-kill)
-         ("C-c f u" . dotemacs-find-user-init-file-other-window)
-         ("C-c w ." . dotemacs-browse-feature-url))
-  :config
-  (progn
-    (add-hook 'find-file-hook
-              (lambda ()
-                (unless (eq major-mode 'org-mode)
-                  (setq show-trailing-whitespace t))))
-    (add-hook 'find-file-hook #'visual-line-mode)
-    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file)))
-
-(use-package fasd
-  :ensure t
-  :init
-  (progn
-    (global-fasd-mode 1)
-
-    (defun fasd-find-file-only ()
-      (interactive)
-      (fasd-find-file -1))
-
-    (defun fasd-find-directory-only ()
-      (interactive)
-      (fasd-find-file 1))
-
-    (dotemacs-declare-prefix "fa" "fasd-find")
-    (dotemacs-set-leader-keys "fad" 'fasd-find-directory-only)
-    (dotemacs-set-leader-keys "faf" 'fasd-find-file-only)
-    (dotemacs-set-leader-keys "fas" 'fasd-find-file)
-
-    ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
-    (setq fasd-completing-read-function 'nil)))
-
-(use-package ranger
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-set-leader-keys
-      "ar" 'ranger
-      "ad" 'deer)
-
-    ;; set up image-dired to allow picture resize
-    (setq image-dired-dir (concat dotemacs-cache-directory "image-dir"))
-    (unless (file-directory-p image-dired-dir)
-      (make-directory image-dired-dir))
-
-    (setq ranger-show-literal nil
-          ranger-preview-file t
-          ranger-width-parents 0.15
-          ranger-width-preview 0.65
-          ranger-show-preview t
-          ranger-parent-depth 1
-          ranger-max-preview-size 10))
- :config
- (define-key ranger-mode-map (kbd "-") 'ranger-up-directory))
-
-;; Additional bindings for built-ins
-(bind-key "C-c f v d" #'add-dir-local-variable)
-(bind-key "C-c f v l" #'add-file-local-variable)
-(bind-key "C-c f v p" #'add-file-local-variable-prop-line)
 
 
 ;;; Navigation and scrolling
@@ -3163,85 +1236,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     (dotimes (i 10)
       (when (= p (point)) ad-do-it))))
 
-(use-package avy                   ; Jump to characters in buffers
-  :ensure t
-  :commands (dotemacs-avy-open-url)
-  :init
-  (progn
-    (setq avy-all-windows 'all-frames)
-    (setq avy-background t)
-    (dotemacs-set-leader-keys
-      "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
-      "y" 'avy-goto-line ; 'avy-goto-char-2
-      "xo" 'dotemacs-avy-open-url
-    ))
-  :config
-  (progn
-    (defun dotemacs-avy-goto-url()
-      "Use avy to go to an URL in the buffer."
-      (interactive)
-      (avy--generic-jump "https?://" nil 'pre))
-    (defun dotemacs-avy-open-url ()
-      "Use avy to select an URL in the buffer and open it."
-      (interactive)
-      (save-excursion
-        (dotemacs-avy-goto-url)
-        (browse-url-at-point)))
-    (dotemacs-set-leader-keys "`" 'avy-pop-mark)))
-
-(use-package ace-jump-helm-line
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'helm
-    (define-key helm-map (kbd "C-q") 'ace-jump-helm-line)))
-
-(use-package ace-link                   ; Fast link jumping
-  :commands dotemacs-ace-buffer-links
-  :init
-  (progn
-    (define-key dotemacs-buffer-mode-map "o" 'dotemacs-ace-buffer-links)
-    (with-eval-after-load 'info
-      (define-key Info-mode-map "o" 'ace-link-info))
-    (with-eval-after-load 'help-mode
-      (defvar help-mode-map)  ; Silence the byte compiler
-      (define-key help-mode-map "o" 'ace-link-help))
-    (with-eval-after-load 'eww
-      (define-key eww-link-keymap "o" 'ace-link-eww)
-      (define-key eww-mode-map "o" 'ace-link-eww)))
-  :config
-  (progn
-    (defvar dotemacs--link-pattern "~?/.+\\|\s\\[")
-    (defun dotemacs-collect-buffer-links ()
-      (let ((end (window-end))
-            points)
-        (save-excursion
-          (goto-char (window-start))
-          (while (re-search-forward dotemacs--link-pattern end t)
-            (push (+ (match-beginning 0) 1) points))
-          (nreverse points))))
-    (defun dotemacs-ace-buffer-links ()
-      "Ace jump to links in `emacs' buffer."
-      (interactive)
-      (let ((res (avy--with-avy-keys dotemacs-ace-buffer-links
-                    (avy--process
-                        (dotemacs-collect-buffer-links)
-                        #'avy--overlay-pre))))
-            (when res
-              (goto-char (1+ res))
-              (widget-button-press (point)))))))
-
-(use-package ace-window                 ; Fast window switching
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs-set-leader-keys
-      "bM"  'ace-swap-window
-      "wC"  'ace-delete-window
-      "w <SPC>"  'ace-window)
-    ;; set ace-window keys to home-row
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
+(use-package module-jumping)
 
 (use-package page-break-lines           ; Turn page breaks into lines
   :ensure t
@@ -3256,16 +1251,12 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
           (add-hook hook #'outline-minor-mode))
   :diminish (outline-minor-mode . "📑"))
 
-; (use-package nlinum                     ; Line numbers in display margin
-;   :ensure t
-;   :bind (("C-c u l" . nlinum-mode)))
-
 (use-package helm-imenu
   :ensure helm
   :bind (("C-c i" . helm-imenu-in-all-buffers)))
 
 
-;;; Basic editing
+;;; Buffer Editing
 
 ;; Show active region
 (transient-mark-mode 1)
@@ -3343,8 +1334,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (< (buffer-size other-buffer) (* 1 1024 1024)))
 (setq dabbrev-friend-buffer-function 'sanityinc/dabbrev-friend-buffer)
 
-(use-package init-simple           ; Personal editing helpers
-  :load-path "config/"
+(use-package module-buffer-editing           ; Personal editing helpers
   :bind (([remap kill-whole-line]        . dotemacs-smart-kill-whole-line)
          ([remap move-beginning-of-line] . dotemacs-back-to-indentation-or-beginning-of-line)
          ("C-<backspace>"                . dotemacs-smart-backward-kill-line)
@@ -3430,20 +1420,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;;https://www.masteringemacs.org/article/re-builder-interactive-regexp-builder
 (setq reb-re-syntax 'string) ;; fix backslash madness
 
-(use-package visual-regexp              ; Regexp replace with in-buffer display
-  :ensure t
-  :bind (("C-c r" . vr/query-replace)
-         ("C-c R" . vr/replace)))
-
 (use-package zop-to-char
   :ensure t
   :bind (("M-z" . zop-to-char)
          ("M-Z" . zop-up-to-char)))
-
-(use-package easy-kill                  ; Easy killing and marking on C-w
-  :ensure t
-  :bind (([remap kill-ring-save] . easy-kill)
-         ([remap mark-sexp]      . easy-mark)))
 
 (use-package align                      ; Align text in buffers
   :bind (("C-c e a" . align)
@@ -3549,646 +1529,36 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (bind-key [remap just-one-space] #'cycle-spacing)
 
 
-;;; Highlights and fontification
-(defun dotemacs-whitespace-style-no-long-lines ()
-  "Configure `whitespace-mode' for Org.
-
-Disable the highlighting of overlong lines."
-  (setq-local whitespace-style (-difference whitespace-style
-                                            '(lines lines-tail))))
-
-(defun dotemacs-whitespace-mode-local ()
-  "Enable `whitespace-mode' after local variables where set up."
-  (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
-;; Trailing whitespace
-;; I don’t want to leave trailing whitespace in files I touch, so set
-;; up a hook that automatically deletes trailing whitespace after
-;; every line when saving a file:
-; (add-hook 'write-file-hooks 'delete-trailing-whitespace)
-
-(use-package whitespace                 ; Highlight bad whitespace
-  :ensure t
-  :bind (("C-c u w w" . whitespace-mode))
-  :init
-  (progn
-    (dotemacs-add-toggle whitespace
-      :status whitespace-mode
-      :on (whitespace-mode)
-      :off (whitespace-mode -1)
-      :documentation "Display whitespace."
-      :evil-leader "tw")
-    (dotemacs-add-toggle whitespace-globally
-      :status global-whitespace-mode
-      :on (global-whitespace-mode)
-      :off (global-whitespace-mode -1)
-      :documentation "Display whitespace globally"
-      :evil-leader "t C-w")
-
-    (defun dotemacs-set-whitespace-style-for-diff ()
-      "Whitespace configuration for `diff-mode'"
-      (setq-local whitespace-style '(face
-                                     tabs
-                                     tab-mark
-                                     spaces
-                                     space-mark
-                                     trailing
-                                     indentation::space
-                                     indentation::tab
-                                     newline
-                                     newline-mark)))
-
-    (defun dotemacs-set-whitespace-style-for-others ()
-      "Whitespace configuration for `prog-mode, `text-mode, `conf-mode'"
-      ;; Highlight tabs, empty lines at beg/end, trailing whitespaces and overlong
-      ;; portions of lines via faces.  Also indicate tabs via characters
-      (setq-local whitespace-style '(face
-                                     indentation
-                                     space-after-tab
-                                     space-before-tab
-                                     tab-mark
-                                     empty
-                                     trailing
-                                     lines-tail))
-
-      ; Use `fill-column' for overlong lines
-      (setq-local whitespace-line-column nil))
-
-    (add-hook 'diff-mode-hook #'whitespace-mode)
-    (add-hook 'diff-mode-hook #'dotemacs-set-whitespace-style-for-diff)
-
-    (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-      (progn
-        (add-hook hook #'dotemacs-whitespace-mode-local)
-        (add-hook hook #'dotemacs-set-whitespace-style-for-others))))
-  :config
-  (progn
-    (set-face-attribute 'whitespace-space nil
-                        :background nil
-                        :foreground (face-attribute 'font-lock-warning-face :foreground))
-    (set-face-attribute 'whitespace-tab nil
-                        :background nil)
-    (set-face-attribute 'whitespace-indentation nil
-                        :background nil)
-    (dotemacs-diminish whitespace-mode " ⓦ" " w")
-    (dotemacs-diminish global-whitespace-mode " Ⓦ" " W")))
-
-(use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
-  :ensure t
-  :bind (("C-c u w c" . whitespace-cleanup-mode)
-         ("C-c e w" . whitespace-cleanup))
-  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-          (add-hook hook #'whitespace-cleanup-mode))
-  :diminish (whitespace-cleanup-mode . "⌫"))
-
-(use-package ws-butler
-  :if (eq 'changed dotemacs-whitespace-cleanup)
-  :ensure t
-  :config
-  (progn
-    (ws-butler-global-mode 1)
-    (dotemacs-hide-lighter ws-butler-mode)))
-
-(use-package hungry-delete
-  :defer t
-  :init
-  (dotemacs-add-toggle hungry-delete
-    :status hungry-delete-mode
-    :on (hungry-delete-mode)
-    :off (hungry-delete-mode -1)
-    :documentation "Delete consecutive horizontal whitespace with a single key."
-    :evil-leader "td")
-  :config
-  (progn
-    (setq-default hungry-delete-chars-to-skip " \t\f\v") ; only horizontal whitespace
-    (define-key hungry-delete-mode-map (kbd "DEL") 'hungry-delete-backward)
-    (define-key hungry-delete-mode-map (kbd "S-DEL") 'delete-backward-char)))
-
-(use-package hl-line                    ; Highlight the current line
-  :init (global-hl-line-mode 1))
-
-(use-package indent-guide
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq indent-guide-delay 0.3)
-    (dotemacs-add-toggle indent-guide
-      :status indent-guide-mode
-      :on (indent-guide-mode)
-      :off (indent-guide-mode -1)
-      :documentation
-      "Highlight indentation level at point. (alternative to highlight-indentation)."
-      :evil-leader "ti")
-    (dotemacs-add-toggle indent-guide-globally
-      :status indent-guide-mode
-      :on (indent-guide-global-mode)
-      :off (indent-guide-global-mode -1)
-      :documentation
-      "Highlight indentation level at point globally. (alternative to highlight-indentation)."
-      :evil-leader "t C-i"))
-  :config
-  (dotemacs-diminish indent-guide-mode " ⓘ" " i"))
-
-(use-package hl-anything ;; Highlight things at point, selections, enclosing parentheses
-  :disabled t
-  :init
-  (progn
-    (hl-highlight-mode)
-    (setq-default hl-highlight-save-file (concat dotemacs-cache-directory ".hl-save"))
-    (dotemacs-set-leader-keys
-      "hc"  'hl-unhighlight-all-local
-      "hC"  'hl-unhighlight-all-global
-      "hh"  'hl-highlight-thingatpt-local
-      "hH"  'hl-highlight-thingatpt-global
-      "hn"  'hl-find-next-thing
-      "hN"  'hl-find-prev-thing
-      "hr"  'hl-restore-highlights
-      "hs"  'hl-save-highlights))
-  :config (dotemacs-hide-lighter hl-highlight-mode))
-
-(use-package hi-lock                    ; Custom regexp highlights
-  :init (global-hi-lock-mode)
-  :diminish hi-lock-mode)
+;;; Whitespace
+(use-package module-whitespace)
 
 
 ;;; Evil
-
-(use-package evil-snipe
-  :diminish evil-snipe-local-mode
-  :ensure t
-  :init
-  (setq evil-snipe-scope 'whole-buffer
-        evil-snipe-enable-highlight t
-        evil-snipe-enable-incremental-highlight t
-        evil-snipe-auto-disable-substitute t
-        evil-snipe-show-prompt nil
-        evil-snipe-smart-case t)
-  :config
-  (progn
-    (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
-        (progn
-          (setq evil-snipe-repeat-scope 'whole-buffer)
-          (evil-snipe-override-mode 1))
-      (evil-snipe-mode 1))))
-
-(dotemacs-use-package-add-hook magit
-  :post-init
-  (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
-      (progn
-        (add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode)
-        (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-override-mode))
-    (add-hook 'magit-mode-hook 'turn-off-evil-snipe-mode)
-    (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-mode)))
-
-(use-package evil-args
-  :ensure t
-  :init
-  (progn
-    ;; bind evil-args text objects
-    (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
-    (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)))
-
-(use-package evil-escape
-  :disabled t
-  :init (evil-escape-mode)
-  :config
-  (dotemacs-hide-lighter evil-escape-mode))
-
-(use-package evil-exchange
-  :ensure t
-  :init (evil-exchange-install))
-
-(use-package iedit
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq iedit-current-symbol-default t
-          iedit-only-at-symbol-boundaries t
-          iedit-toggle-key-default nil))
-  :config
-  (progn
-    (defun iedit-toggle-selection ()
-      "Override default iedit function to be able to add arbitrary overlays.
-
-It will toggle the overlay under point or create an overlay of one character."
-      (interactive)
-      (iedit-barf-if-buffering)
-      (let ((ov (iedit-find-current-occurrence-overlay)))
-        (if ov
-            (iedit-restrict-region (overlay-start ov) (overlay-end ov) t)
-          (save-excursion
-            (push (iedit-make-occurrence-overlay (point) (1+ (point)))
-                  iedit-occurrences-overlays))
-          (setq iedit-mode
-                (propertize
-                 (concat " Iedit:" (number-to-string
-                                    (length iedit-occurrences-overlays)))
-                 'face 'font-lock-warning-face))
-          (force-mode-line-update))))))
-
-(use-package evil-iedit-state
-  :ensure t
-  :commands (evil-iedit-state evil-iedit-state/iedit-mode)
-  :init (dotemacs-set-leader-keys "se" 'evil-iedit-state/iedit-mode)
-  :config
-  ;; activate leader in iedit and iedit-insert states
-  (define-key evil-iedit-state-map
-    (kbd dotemacs-leader-key) dotemacs-default-map))
-
-(use-package evil-jumper
-  :ensure t
-  :init
-  (progn
-    (setq evil-jumper-post-jump-hook 'recenter
-          evil-jumper-auto-save-interval 600)
-    (evil-jumper-mode t)))
-
-(use-package evil-lisp-state
-  :ensure t
-  :init (setq evil-lisp-state-global t
-              ;; work-around to be removed when the fix is available in MELPA
-              evil-lisp-state-leader (concat dotemacs-leader-key " k"))
-  :config (evil-lisp-state-leader (concat dotemacs-leader-key " k")))
-
-(use-package evil-mc
-  :ensure t
-  :defer t)
-
-; TODO: Add switch between evil-commentary and evil-nerd-commenter
-(use-package evil-commentary
-  :diminish evil-commentary-mode
-  :ensure t
-  :init
-  (progn
-    (evil-commentary-mode)
-    (dotemacs-set-leader-keys ";" 'evil-commentary)))
-
-(use-package evil-nerd-commenter
-  :disabled t
-  :ensure t
-  :commands (evilnc-comment-operator)
-  :init
-  (progn
-    ;; double all the commenting functions so that the inverse operations
-    ;; can be called without setting a flag
-    (defun dotemacs/comment-or-uncomment-lines-inverse (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line t))
-        (evilnc-comment-or-uncomment-lines arg)))
-
-    (defun dotemacs/comment-or-uncomment-lines (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line nil))
-        (evilnc-comment-or-uncomment-lines arg)))
-
-    (defun dotemacs/copy-and-comment-lines-inverse (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line t))
-        (evilnc-copy-and-comment-lines arg)))
-
-    (defun dotemacs/copy-and-comment-lines (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line nil))
-        (evilnc-copy-and-comment-lines arg)))
-
-    (defun dotemacs/quick-comment-or-uncomment-to-the-line-inverse
-        (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line t))
-        (evilnc-comment-or-uncomment-to-the-line arg)))
-
-    (defun dotemacs/quick-comment-or-uncomment-to-the-line (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line nil))
-        (evilnc-comment-or-uncomment-to-the-line arg)))
-
-    (defun dotemacs/comment-or-uncomment-paragraphs-inverse (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line t))
-        (evilnc-comment-or-uncomment-paragraphs arg)))
-
-    (defun dotemacs/comment-or-uncomment-paragraphs (&optional arg)
-      (interactive "p")
-      (let ((evilnc-invert-comment-line-by-line nil))
-        (evilnc-comment-or-uncomment-paragraphs arg)))
-
-    (define-key evil-normal-state-map "gc" 'evilnc-comment-operator)
-    (define-key evil-normal-state-map "gy" 'dotemacs/copy-and-comment-lines)
-
-    (dotemacs-set-leader-keys
-      ";"  'evilnc-comment-operator
-      "cl" 'dotemacs/comment-or-uncomment-lines
-      "cL" 'dotemacs/comment-or-uncomment-lines-inverse
-      "cp" 'dotemacs/comment-or-uncomment-paragraphs
-      "cP" 'dotemacs/comment-or-uncomment-paragraphs-inverse
-      "ct" 'dotemacs/quick-comment-or-uncomment-to-the-line
-      "cT" 'dotemacs/quick-comment-or-uncomment-to-the-line-inverse
-      "cy" 'dotemacs/copy-and-comment-lines
-      "cY" 'dotemacs/copy-and-comment-lines-inverse)))
-
-(use-package evil-matchit
-  :ensure t
-  :init
-  (dolist (hook '(LaTeX-mode-hook mustache-mode-hook handlebars-mode-hook ruby-mode-hook))
-    (add-hook hook 'turn-on-evil-matchit-mode)))
-
-(use-package evil-indent-plus
-  :ensure t
-  :init
-  (evil-indent-plus-default-bindings))
-
-(use-package evil-numbers
-  :ensure t
-  :config
-  (progn
-    (defun dotemacs-evil-numbers-micro-state-doc ()
-      "Display a short documentation in the mini buffer."
-      (dotemacs/echo "+/= to increase the value or - to decrease it"))
-
-    (defun dotemacs-evil-numbers-micro-state-overlay-map ()
-      "Set a temporary overlay map to easily increase or decrease a number"
-      (set-temporary-overlay-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map (kbd "+") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "=") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "-") 'dotemacs-evil-numbers-decrease)
-         map) t)
-      (dotemacs-evil-numbers-micro-state-doc))
-
-    (defun dotemacs-evil-numbers-increase (amount &optional no-region)
-      "Increase number at point."
-      (interactive "p*")
-      (evil-numbers/inc-at-pt amount no-region)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-    (defun dotemacs-evil-numbers-decrease (amount)
-      "Decrease number at point."
-      (interactive "p*")
-      (evil-numbers/dec-at-pt amount)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-
-    (dotemacs-set-leader-keys "n+" 'dotemacs-evil-numbers-increase)
-    (dotemacs-set-leader-keys "n=" 'dotemacs-evil-numbers-increase)
-    (dotemacs-set-leader-keys "n-" 'dotemacs-evil-numbers-decrease)))
-
-(use-package evil-search-highlight-persist
-  :ensure t
-  :init
-  (progn
-    (defun dotemacs-turn-on-search-highlight-persist ()
-      "Enable search-highlight-persist in the current buffer."
-      (interactive)
-      (evil-search-highlight-persist 1))
-
-    (defun dotemacs-turn-off-search-highlight-persist ()
-      "Disable evil-search-highlight-persist in the current buffer."
-      (interactive)
-      (evil-search-highlight-persist -1))
-
-    (global-evil-search-highlight-persist)
-    (dotemacs-set-leader-keys "/" 'evil-search-highlight-persist-remove-all)
-    ;; (dotemacs-set-leader-keys "sc" 'evil-search-highlight-persist-remove-all)
-    (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
-
-    (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
-    (evil-ex-define-cmd "hl[search]" 'dotemacs-turn-on-search-highlight-persist)
-    (define-key evil-ex-map "nohl" 'dotemacs-turn-off-search-highlight-persist)
-    (define-key evil-ex-map "hl" 'dotemacs-turn-on-search-highlight-persist)
-
-    (defun dotemacs-adaptive-evil-highlight-persist-face ()
-      (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
-                          :inherit 'region
-                          :background nil
-                          :foreground nil))
-    (dotemacs-adaptive-evil-highlight-persist-face)))
-
-(use-package evil-surround
-  :ensure t
-  :init
-  (progn
-    (global-evil-surround-mode 1)
-    ;; `s' for surround instead of `substitute'
-    ;; see motivation for this change in the documentation
-    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
-    (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute)))
-
-(use-package evil-terminal-cursor-changer
-  :ensure t
-  :init
-  (progn
-    (dotemacs|do-after-display-system-init
-      (unless (display-graphic-p)
-        (setq evil-visual-state-cursor 'box ; █
-              evil-insert-state-cursor 'bar ; ⎸
-              evil-emacs-state-cursor 'hbar ; _
-        )))))
-
-(use-package evil-tutor
-  :disabled t
-  :ensure t
-  :defer t
-  :commands (evil-tutor-start
-             evil-tutor-resume)
-  :init
-  (progn
-    (setq evil-tutor-working-directory
-          (concat dotemacs-cache-directory ".tutor/"))
-    (dotemacs-set-leader-keys "hT" 'evil-tutor-start)))
-
-(use-package evil-visualstar
-  :ensure t
-  :commands (evil-visualstar/begin-search-forward
-             evil-visualstar/begin-search-backward)
-  :init
-  (progn
-    (define-key evil-visual-state-map (kbd "*")
-      'evil-visualstar/begin-search-forward)
-    (define-key evil-visual-state-map (kbd "#")
-      'evil-visualstar/begin-search-backward)))
-
-(use-package evil-evilified-state
-  :load-path "/config")
+(use-package module-evil-packages)
+(use-package evil-evilified-state :load-path "evil/")
 (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
   dotemacs-default-map)
 
 
-;;; Customization, init file and package management
-(use-package cus-edit
-  :defer t
-  :init (load dotemacs-custom-file 'no-error 'no-message)
-  :config
-  (setq custom-buffer-done-kill nil            ; Kill when existing
-        custom-buffer-verbose-help nil         ; Remove redundant help text
-        ;; Show me the real variable name
-        custom-unlispify-tag-names nil
-        custom-unlispify-menu-entries nil))
-
-(use-package paradox                    ; Better package menu
-  :ensure t
-  :bind (("C-c l p" . paradox-list-packages)
-         ("C-c l P" . package-list-packages-no-fetch))
-  :commands paradox-list-packages
-  :init
-  (progn
-    (setq paradox-execute-asynchronously nil)
-    (defun dotemacs-paradox-list-packages ()
-      "Load depdendencies for auth and open the package list."
-      (interactive)
-      (require 'epa-file)
-      (require 'auth-source)
-      (when (and (not (boundp 'paradox-github-token))
-                 (file-exists-p "~/.authinfo.gpg"))
-        (let ((authinfo-result (car (auth-source-search
-                                     :max 1
-                                     :host "github.com"
-                                     :port "paradox"
-                                     :user "paradox"
-                                     :require '(:secret)))))
-          (let ((paradox-token (plist-get authinfo-result :secret)))
-            (setq paradox-github-token (if (functionp paradox-token)
-                                           (funcall paradox-token)
-                                         paradox-token)))))
-      (paradox-list-packages nil))
-
-    (evilified-state-evilify paradox-menu-mode paradox-menu-mode-map
-      "H" 'paradox-menu-quick-help
-      "J" 'paradox-next-describe
-      "K" 'paradox-previous-describe
-      "L" 'paradox-menu-view-commit-list
-      "o" 'paradox-menu-visit-homepage)
-    (dotemacs-set-leader-keys
-      "aP" 'dotemacs-paradox-list-packages)))
-
-(use-package bug-hunter                 ; Search init file for bugs
-  :ensure t)
-
-(use-package server                     ; The server of `emacsclient'
-  :defer t
-  :disabled t
-  :init (server-mode)
-  :diminish server-buffer-clients)
+;;; EMacs
+(use-package module-emacs) ; Customization, init file and package management
 
 
-;;; OS X support
-(use-package ns-win                     ; OS X window support
-  :defer t
-  :if (eq system-type 'darwin)
-  :init
-  (progn
-    ;; Use the OS X Emoji font for Emoticons
-    (set-fontset-font "fontset-default"
-                      '(#x1F600 . #x1F64F)
-                      (font-spec :name "Apple Color Emoji") nil 'prepend)
-
-    (dotemacs-set-leader-keys "bf" 'reveal-in-osx-finder)
-
-    ;; this is only applicable to GUI mode
-    (dotemacs|do-after-display-system-init
-      (when (display-graphic-p)
-        (global-set-key (kbd "M-=") 'dotemacs-scale-up-font)
-        (global-set-key (kbd "M--") 'dotemacs-scale-down-font)
-        (global-set-key (kbd "M-0") 'dotemacs-reset-font-size)
-        (global-set-key (kbd "M-n") 'new-frame)
-        (global-set-key (kbd "M-v") 'yank)
-        (global-set-key (kbd "M-c") 'evil-yank) ; kill-ring-save
-        (global-set-key (kbd "M-X") 'kill-region)
-        (global-set-key (kbd "M-z") 'undo-tree-undo)
-        (global-set-key (kbd "M-Z") 'undo-tree-redo)
-        (global-set-key (kbd "M-s") 'save-buffer))))
-  :config
-  (dotemacs|do-after-display-system-init
-    (when (display-graphic-p)
-      (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
-                                            ; workspace
-            mac-control-modifier 'control   ; Make control to Control
-            mac-option-modifier 'super      ; Make option do Super (`s` is for super)
-            mac-command-modifier 'meta      ; Option is simply the natural Meta
-                                            ; But command is a lot easier to hit.
-                                            ; (`M` is for meta)
-            mac-right-command-modifier 'left
-            mac-right-option-modifier 'none ; Keep right option for accented input
-            mac-function-modifier 'hyper    ; Just in case we ever need these
-                                            ; keys. (`H` is for hyper)
-            ))))
-
-(use-package init-macosx              ; Personal OS X tools
-  :if (eq system-type 'darwin)
-  :load-path "config/")
-
-(use-package osx-trash                  ; Trash support for OS X
-  :if (eq system-type 'darwin)
-  :ensure t
-  :init (osx-trash-setup))
-
-(use-package pbcopy
-  :if (and (eq system-type 'darwin) (not (display-graphic-p)))
-  :ensure t
-  :init (turn-on-pbcopy))
-
-(use-package launchctl
-  :if (eq system-type 'darwin)
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (add-to-list 'auto-mode-alist '("\\.plist$" . nxml-mode))
-    (dotemacs-set-leader-keys "al" 'launchctl))
-  :config
-  (progn
-    (evilified-state-evilify launchctl-mode launchctl-mode-map
-      (kbd "q") 'quit-window
-      (kbd "s") 'tabulated-list-sort
-      (kbd "g") 'launchctl-refresh
-      (kbd "n") 'launchctl-new
-      (kbd "e") 'launchctl-edit
-      (kbd "v") 'launchctl-view
-      (kbd "l") 'launchctl-load
-      (kbd "u") 'launchctl-unload
-      (kbd "r") 'launchctl-reload
-      (kbd "S") 'launchctl-start
-      (kbd "K") 'launchctl-stop
-      (kbd "R") 'launchctl-restart
-      (kbd "D") 'launchctl-remove
-      (kbd "d") 'launchctl-disable
-      (kbd "E") 'launchctl-enable
-      (kbd "i") 'launchctl-info
-      (kbd "f") 'launchctl-filter
-      (kbd "=") 'launchctl-setenv
-      (kbd "#") 'launchctl-unsetenv
-      (kbd "h") 'launchctl-help)))
-
-(use-package reveal-in-osx-finder           ; Reveal current buffer in finder
-  :if (eq system-type 'darwin)
-  :ensure t
-  :commands reveal-in-osx-finder)
-
-(when (eq system-type 'darwin)
-  (dotemacs-use-package-add-hook helm
-    ;; Use `mdfind' instead of `locate'.
-    :pre-init
-    ;; Disable fuzzy matchting to make mdfind work with helm-locate
-    ;; https://github.com/emacs-helm/helm/issues/799
-    (setq helm-locate-fuzzy-match nil)
-    (setq helm-locate-command "mdfind -name %s %s")))
-
-(use-package tildify
-  :bind (("C-c e t" . tildify-region))
-  :init (dolist (hook '(markdown-mode-hook
-                        latex-mode-hook
-                        rst-mode-hook))
-          (add-hook hook #'tildify-mode))
-  ;; Use the right space for LaTeX
-  :config (add-hook 'LaTeX-mode-hook
-                    (lambda () (setq-local tildify-space-string "~"))))
+;;; OSX support
+(use-package module-osx              ; Personal OS X tools
+  :if (eq system-type 'darwin))
 
 
 ;;; Bindings
-(use-package init-bindings
-  :load-path "config/"
+(use-package module-key-bindings
   :config (dotemacs-toggle-transparency-core))
 
 
 ;;; Text editing
+
+(use-package writeroom-mode             ; Distraction-free editing
+  :ensure t
+  :bind (("C-c u r" . writeroom-mode)))
 
 (use-package typo
   :ensure t
@@ -4198,1547 +1568,6 @@ It will toggle the overlay under point or create an overlay of one character."
             (add-hook hook 'typo-mode)))
   :diminish (typo-mode . "𝕿"))
 
-
-;;; Markup Languages
-
-(use-package module-latex)
-(use-package module-markdown)
-
-;; Other markup languages
-
-(use-package rst                        ; ReStructuredText
-  :defer t
-  :config
-  ;; Indent with 3 spaces after all kinds of literal blocks
-  (setq rst-indent-literal-minimized 3
-        rst-indent-literal-normal 3)
-
-  (bind-key "C-=" nil rst-mode-map)
-  ;; For similarity with AUCTeX
-  (bind-key "C-c C-j" #'rst-insert-list rst-mode-map)
-  ;; …and with Markdown Mode
-  (bind-key "M-RET" #'rst-insert-list rst-mode-map))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'rst-mode))
-
-(use-package mustache-mode              ; Mustache mode
-  :ensure t
-  :defer t
-  :mode (("\\.mustache$" . mustache-mode)))
-
-(use-package handlebars-mode
-  :ensure t
-  :mode (("\\.hbs$" . handlebars-mode)
-         ("\\.handlebars$" . handlebars-mode))
-  :init
-  (progn
-    (with-eval-after-load 'flycheck
-      (when-let (handlebars (executable-find "handlebars"))
-                (setq flycheck-handlebars-executable handlebars)))))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'handlebars-mode))
-
-(use-package jira-markup-mode           ; Jira markup
-  :ensure t
-  :defer t)
-
-(use-package graphviz-dot-mode          ; Graphviz
-  :ensure t
-  :defer t
-  :config
-  (setq graphviz-dot-indent-width 4))
-
-(use-package systemd                    ; Mode for systemd unit files
-  :ensure t
-  :defer t)
-
-
-;;; Programming Languages, Utils
-
-(use-package module-prog-head
-  :defer t
-  :init
-  (progn
-    ;; Highlight and allow to open http link at point in programming buffers
-    ;; goto-address-prog-mode only highlights links in strings and comments
-    (add-hook 'prog-mode-hook 'goto-address-prog-mode)
-    ;; Highlight and follow bug references in comments and strings
-    (add-hook 'prog-mode-hook 'bug-reference-prog-mode)
-
-    (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (run-hooks #'dotemacs-prog-mode-hook)))))
-
-(use-package module-compile          ; Personal helpers for compilation
-  :commands (dotemacs-colorize-compilation-buffer)
-  ;; Colorize output of Compilation Mode, see
-  ;; http://stackoverflow.com/a/3072831/355252
-  :init (add-hook 'compilation-filter-hook
-                  #'dotemacs-colorize-compilation-buffer))
-
-;; Programming Languages
-(use-package module-elisp)
-(use-package module-scala)
-(use-package module-python)
-(use-package module-ruby)
-(use-package module-rust)
-(use-package module-haskell)
-(use-package module-go)
-(use-package module-c-c++)
-(use-package module-clojure)
-(use-package module-ocaml)
-(use-package module-purescript)
-(use-package module-react)
-(use-package module-elm)
-(use-package module-javascript)
-(use-package module-web)
-(use-package module-lua)
-(use-package module-php)
-(use-package module-stylus)
-(use-package module-skewer)
-(use-package module-racket)
-(use-package module-java)
-(use-package module-restclient)
-(use-package module-prog-tail)
-
-
-;;; Misc programming languages
-(use-package sh-script                  ; Shell scripts
-  :defer t
-  :init
-  (progn
-    ;; Use two spaces in shell scripts.
-    (setq sh-indentation 2
-          sh-basic-offset 2)
-
-    ;; Use sh-mode when opening `.zsh' files, and when opening Prezto runcoms.
-    (dolist (pattern '("\\.zsh\\'"
-                       "zlogin\\'"
-                       "zlogout\\'"
-                       "zpreztorc\\'"
-                       "zprofile\\'"
-                       "zshenv\\'"
-                       "zshrc\\'"))
-      (add-to-list 'auto-mode-alist (cons pattern 'sh-mode)))
-
-    (defun dotemacs//setup-shell ()
-      (when (and buffer-file-name
-                 (string-match-p "\\.zsh\\'" buffer-file-name))
-        (sh-set-shell "zsh")))
-    (add-hook 'sh-mode-hook 'dotemacs//setup-shell)))
-
-(use-package nxml-mode                  ; XML editing
-  :defer t
-  ;; Complete closing tags, and insert XML declarations into empty files
-  :config (setq nxml-slash-auto-complete-flag t
-                nxml-auto-insert-xml-declaration-flag t))
-
-(use-package cmake-mode                 ; CMake files
-  :ensure t
-  :defer t)
-
-(use-package thrift                     ; Thrift interface files
-  :ensure t
-  :defer t
-  :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
-
-(use-package swift-mode                 ; Swift sources
-  :ensure t
-  :defer t
-  :config (with-eval-after-load 'flycheck
-            (add-to-list 'flycheck-checkers 'swift)))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dolist (mode '(swift-mode sh-mode))
-    (dotemacs/add-flycheck-hook mode)))
-
-
-;; Databases
-
-(use-package module-sql)
-
-
-;; Source Code Metadata
-;; e.g. etags, ebrowse, exuberant ctags, cscope, GNU Global and GTags
-
-(use-package module-gtags)
-
-
-;;; Version control
-
-(use-package vc-hooks                   ; Simple version control
-  :defer t
-  :config
-  ;; Always follow symlinks to files in VCS repos
-  (setq vc-follow-symlinks t))
-
-(use-package diff-mode
-  :defer t
-  :ensure t
-  :config
-  (evilified-state-evilify diff-mode diff-mode-map
-    "j" 'diff-hunk-next
-    "k" 'diff-hunk-prev))
-
-(dotemacs-declare-prefix "gd" "diff")
-(use-package diff-hl                    ; Highlight hunks in fringe
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq diff-hl-side 'right)
-    ;; Highlight changes to the current file in the fringe
-    (global-diff-hl-mode)
-    ;; Highlight changed files in the fringe of Dired
-    (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-
-    ;; Fall back to the display margin, if the fringe is unavailable
-    (dotemacs|do-after-display-system-init
-      (unless (display-graphic-p)
-        (setq diff-hl-side 'left)
-        (diff-hl-margin-mode)))
-
-    (dotemacs-set-leader-keys
-      "gdg" 'diff-hl-diff-goto-hunk
-      "gdn" 'diff-hl-next-hunk
-      "gdN" 'diff-hl-previous-hunk
-      "gdr" 'diff-hl-revert-hunk)))
-
-(use-package module-git)
-(use-package module-github)
-(use-package module-magit)
-
-
-;;; Search
-
-(use-package helm-regex                 ; Helm regex tools
-  :ensure helm
-  :bind (([remap occur] . helm-occur)
-         ("C-c e o"     . helm-multi-occur)))
-
-(use-package init-rgrep
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs-rgrep-quit-window
-             dotemacs-rgrep-goto-file-and-close-rgrep))
-
-(use-package grep
-  :defer t
-  :config
-  (progn
-    ;; Add custom keybindings
-    (define-key grep-mode-map "q" #'dotemacs-rgrep-quit-window)
-    (define-key grep-mode-map (kbd "C-<return>") #'dotemacs-rgrep-goto-file-and-close-rgrep)
-
-    (when-let (gnu-find (and (eq system-type 'darwin)
-                             (executable-find "gfind")))
-      (setq find-program gnu-find))
-
-    (when-let (gnu-xargs (and (eq system-type 'darwin)
-                              (executable-find "gxargs")))
-      (setq xargs-program gnu-xargs))))
-
-(use-package locate                     ; Search files on the system
-  :defer t
-  :config
-  ;; Use mdfind as locate substitute on OS X, to utilize the Spotlight database
-  (when-let (mdfind (and (eq system-type 'darwin) (executable-find "mdfind")))
-    (setq locate-command mdfind)))
-
-(use-package ag                         ; Search code in files/projects
-  :ensure t
-  :config
-  ; (add-hook 'ag-mode-hook (lambda () (toggle-truncate-lines t)))
-  (setq ag-reuse-buffers t            ; Don't spam buffer list with ag buffers
-        ag-highlight-search t         ; A little fanciness
-
-        ;; Use Projectile to find the project root
-        ag-project-root-function (lambda (d) (let ((default-directory d))
-                                               (projectile-project-root)))))
-
-(use-package wgrep                      ; Edit grep/occur/ag results in-place
-  :ensure t
-  :defer t
-  :config
-  (progn
-    ;; Add custom keybindings
-    (define-key grep-mode-map (kbd "C-x C-s") #'wgrep-save-all-buffers)
-    ;; Use same keybinding as occur
-    (setq wgrep-enable-key "e")))
-
-(use-package wgrep-ag                   ; Wgrep for ag
-  :ensure t
-  :defer t)
-
-(use-package helm-ag
-  :ensure t
-  :defer t
-  :init
-  (progn
-    ;; This overrides the default C-s action in helm-projectile-switch-project
-    ;; to search using ag/pt/whatever instead of just grep
-    (with-eval-after-load 'helm-projectile
-      (defun dotemacs-helm-project-smart-do-search-in-dir (dir)
-        (interactive)
-        (let ((default-directory dir))
-          (dotemacs-helm-project-smart-do-search)))
-      (define-key helm-projectile-projects-map
-        (kbd "C-s")
-        (lambda ()
-          (interactive)
-          (helm-exit-and-execute-action 'dotemacs-helm-project-smart-do-search-in-dir))))
-
-    ;; evilify the helm-grep buffer
-    (evilified-state-evilify helm-grep-mode helm-grep-mode-map
-      (kbd "RET") 'helm-grep-mode-jump-other-window
-      (kbd "q") 'quit-window)
-
-    (dotemacs-set-leader-keys
-      ;; helm-ag marks
-      "s`"  'helm-ag-pop-stack
-      ;; opened buffers scope
-      "sb"  'dotemacs-helm-buffers-smart-do-search
-      "sB"  'dotemacs-helm-buffers-smart-do-search-region-or-symbol
-      "sab" 'helm-do-ag-buffers
-      "saB" 'dotemacs-helm-buffers-do-ag-region-or-symbol
-      "skb" 'dotemacs-helm-buffers-do-ack
-      "skB" 'dotemacs-helm-buffers-do-ack-region-or-symbol
-      "stb" 'dotemacs-helm-buffers-do-pt
-      "stB" 'dotemacs-helm-buffers-do-pt-region-or-symbol
-      ;; current file scope
-      "ss"  'dotemacs-helm-file-smart-do-search
-      "sS"  'dotemacs-helm-file-smart-do-search-region-or-symbol
-      "saa" 'helm-ag-this-file
-      "saA" 'dotemacs-helm-file-do-ag-region-or-symbol
-      ;; files scope
-      "sf"  'dotemacs-helm-files-smart-do-search
-      "sF"  'dotemacs-helm-files-smart-do-search-region-or-symbol
-      "saf" 'helm-do-ag
-      "saF" 'dotemacs-helm-files-do-ag-region-or-symbol
-      "skf" 'dotemacs-helm-files-do-ack
-      "skF" 'dotemacs-helm-files-do-ack-region-or-symbol
-      "stf" 'dotemacs-helm-files-do-pt
-      "stF" 'dotemacs-helm-files-do-pt-region-or-symbol
-      ;; current project scope
-      ;; "/"   'dotemacs-helm-project-smart-do-search
-      ;; "*"   'dotemacs-helm-project-smart-do-search-region-or-symbol
-      "sp"  'dotemacs-helm-project-smart-do-search
-      "sP"  'dotemacs-helm-project-smart-do-search-region-or-symbol
-      "sap" 'dotemacs-helm-project-do-ag
-      "saP" 'dotemacs-helm-project-do-ag-region-or-symbol
-      "skp" 'dotemacs-helm-project-do-ack
-      "skP" 'dotemacs-helm-project-do-ack-region-or-symbol
-      "stp" 'dotemacs-helm-project-do-pt
-      "stP" 'dotemacs-helm-project-do-pt-region-or-symbol))
-  :config
-  (progn
-    ;; Use `grep-find-ignored-files' and `grep-find-ignored-directories' as
-    ;; ignore pattern, but does not seem to be working, need to confirm
-    (setq helm-ag-use-grep-ignore-list t)
-
-    ;; example: (helm-ag-ignore-patterns '("*.md" "*.el"))
-    ;; (setq helm-ag-ignore-patterns '(append grep-find-ignored-files
-    ;;                                        grep-find-ignored-directories))
-
-    (setq helm-ag-fuzzy-match t
-          helm-ag-base-command "ag --nocolor --nogroup --hidden"
-          helm-ag-insert-at-point 'symbol
-          helm-ag-source-type 'file-line))
-
-  (evil-define-key 'normal helm-ag-map (kbd dotemacs-leader-key) dotemacs-default-map)
-    (evilified-state-evilify helm-ag-mode helm-ag-mode-map
-      (kbd "RET") 'helm-ag-mode-jump-other-window
-      (kbd "q") 'quit-window))
-
-
-;;; Project management for Interactively Do Things (IDO)
-
-(use-package ido
-  :init
-  (progn
-    (setq ido-enable-flex-matching t ;; enable fuzzy matching
-          ido-use-faces nil       ;; disable ido faces to see flx highlights.
-          ido-enable-prefix nil
-          ido-create-new-buffer 'always
-          ido-use-filename-at-point 'guess
-          ido-save-directory-list-file (concat dotemacs-cache-directory "ido.last")
-          ido-default-file-method 'selected-window
-          ido-auto-merge-work-directories-length 0))
-  :config
-  (progn
-    (ido-mode t)))
-
-(evilified-state-evilify-map package-menu-mode-map
-  :mode package-menu-mode)
-
-(use-package ido-vertical-mode
-  :ensure t
-  :init
-  (progn
-    (ido-vertical-mode t)
-    (defun dotemacs//ido-minibuffer-setup ()
-      "Setup the minibuffer."
-      ;; Since ido is implemented in a while loop where each
-      ;; iteration setup a whole new minibuffer, we have to keep
-      ;; track of any activated ido navigation micro-state and force
-      ;; the reactivation at each iteration.
-      (when dotemacs--ido-navigation-ms-enabled
-        (dotemacs-ido-navigation-micro-state)))
-    (add-hook 'ido-minibuffer-setup-hook 'dotemacs//ido-minibuffer-setup)
-
-    (defun dotemacs//ido-setup ()
-      (when dotemacs--ido-navigation-ms-face-cookie-minibuffer
-        (face-remap-remove-relative
-         dotemacs--ido-navigation-ms-face-cookie-minibuffer))
-      ;; be sure to wipe any previous micro-state flag
-      (setq dotemacs--ido-navigation-ms-enabled nil)
-      ;; overwrite the key bindings for ido vertical mode only
-      (define-key ido-completion-map (kbd "C-<return>") 'ido-select-text)
-      ;; use M-RET in terminal
-      (define-key ido-completion-map "\M-\r" 'ido-select-text)
-      (define-key ido-completion-map (kbd "C-h") 'ido-delete-backward-updir)
-      (define-key ido-completion-map (kbd "C-j") 'ido-next-match)
-      (define-key ido-completion-map (kbd "C-k") 'ido-prev-match)
-      (define-key ido-completion-map (kbd "C-l") 'ido-exit-minibuffer)
-      (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
-      (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)
-      (define-key ido-completion-map (kbd "C-S-h") 'ido-prev-match-dir)
-      (define-key ido-completion-map (kbd "C-S-j") 'next-history-element)
-      (define-key ido-completion-map (kbd "C-S-k") 'previous-history-element)
-      (define-key ido-completion-map (kbd "C-S-l") 'ido-next-match-dir)
-      (define-key ido-completion-map (kbd "C-S-n") 'next-history-element)
-      (define-key ido-completion-map (kbd "C-S-p") 'previous-history-element)
-      ;; ido-other window maps
-      (define-key ido-completion-map (kbd "C-o") 'dotemacs/ido-invoke-in-other-window)
-      (define-key ido-completion-map (kbd "C-s") 'dotemacs/ido-invoke-in-vertical-split)
-      (define-key ido-completion-map (kbd "C-t") 'dotemacs/ido-invoke-in-new-frame)
-      (define-key ido-completion-map (kbd "C-v") 'dotemacs/ido-invoke-in-horizontal-split)
-      ;; more natural navigation keys: up, down to change current item
-      ;; left to go up dir
-      ;; right to open the selected item
-      (define-key ido-completion-map (kbd "<up>") 'ido-prev-match)
-      (define-key ido-completion-map (kbd "<down>") 'ido-next-match)
-      (define-key ido-completion-map (kbd "<left>") 'ido-delete-backward-updir)
-      (define-key ido-completion-map (kbd "<right>") 'ido-exit-minibuffer)
-      ;; initiate micro-state
-      (define-key ido-completion-map (kbd "M-SPC") 'dotemacs-ido-navigation-micro-state)
-      (define-key ido-completion-map (kbd "s-M-SPC") 'dotemacs-ido-navigation-micro-state)
-      )
-    (add-hook 'ido-setup-hook 'dotemacs//ido-setup)
-
-    (defun dotemacs/ido-invoke-in-other-window ()
-      "signals ido mode to switch to (or create) another window after exiting"
-      (interactive)
-      (setq ido-exit-minibuffer-target-window 'other)
-      (ido-exit-minibuffer))
-
-    (defun dotemacs/ido-invoke-in-horizontal-split ()
-      "signals ido mode to split horizontally and switch after exiting"
-      (interactive)
-      (setq ido-exit-minibuffer-target-window 'horizontal)
-      (ido-exit-minibuffer))
-
-    (defun dotemacs/ido-invoke-in-vertical-split ()
-      "signals ido mode to split vertically and switch after exiting"
-      (interactive)
-      (setq ido-exit-minibuffer-target-window 'vertical)
-      (ido-exit-minibuffer))
-
-    (defun dotemacs/ido-invoke-in-new-frame ()
-      "signals ido mode to create a new frame after exiting"
-      (interactive)
-      (setq ido-exit-minibuffer-target-window 'frame)
-      (ido-exit-minibuffer))
-
-    (defadvice ido-read-internal
-        (around ido-read-internal-with-minibuffer-other-window activate)
-      (let* (ido-exit-minibuffer-target-window
-             (this-buffer (current-buffer))
-             (result ad-do-it))
-        (cond
-         ((equal ido-exit-minibuffer-target-window 'other)
-          (if (= 1 (count-windows))
-              (dotemacs/split-window-horizontally-and-switch)
-            (other-window 1)))
-         ((equal ido-exit-minibuffer-target-window 'horizontal)
-          (dotemacs/split-window-horizontally-and-switch))
-
-         ((equal ido-exit-minibuffer-target-window 'vertical)
-          (dotemacs/split-window-vertically-and-switch))
-         ((equal ido-exit-minibuffer-target-window 'frame)
-          (make-frame)))
-        ;; why? Some ido commands, such as textmate.el's
-        ;; textmate-goto-symbol don't switch the current buffer
-        (switch-to-buffer this-buffer)
-        result))
-
-    (defvar dotemacs--ido-navigation-ms-enabled nil
-      "Flag which is non nil when ido navigation micro-state is enabled.")
-
-    (defvar dotemacs--ido-navigation-ms-face-cookie-minibuffer nil
-      "Cookie pointing to the local face remapping.")
-
-    (defface dotemacs-ido-navigation-ms-face
-      `((t :background ,(face-attribute 'error :foreground)
-           :foreground "black"
-           :weight bold))
-      "Face for ido minibuffer prompt when ido micro-state is activated."
-      :group 'dotemacs)
-
-    (defun dotemacs//ido-navigation-ms-set-face ()
-      "Set faces for ido navigation micro-state."
-      (setq dotemacs--ido-navigation-ms-face-cookie-minibuffer
-            (face-remap-add-relative
-             'minibuffer-prompt
-             'dotemacs-ido-navigation-ms-face)))
-
-    (defun dotemacs//ido-navigation-ms-on-enter ()
-      "Initialization of ido micro-state."
-    (setq dotemacs--ido-navigation-ms-enabled t)
-      (dotemacs//ido-navigation-ms-set-face))
-
-    (defun dotemacs//ido-navigation-ms-on-exit ()
-      "Action to perform when exiting ido micro-state."
-      (face-remap-remove-relative
-       dotemacs--ido-navigation-ms-face-cookie-minibuffer))
-
-    (defun dotemacs//ido-navigation-ms-full-doc ()
-      "Full documentation for ido navigation micro-state."
-      "
-[?]          display this help
-[e]          enter dired
-[j] [k]      next/previous match
-[J] [K]      sub/parent directory
-[h]          delete backward or parent directory
-[l]          select match
-[n] [p]      next/previous directory in history
-[o]          open in other window
-[s]          open in a new horizontal split
-[t]          open in other frame
-[v]          open in a new vertical split
-[q]          quit")
-
-    (dotemacs-define-micro-state ido-navigation
-      :persistent t
-      :disable-evil-leader t
-      :on-enter (dotemacs//ido-navigation-ms-on-enter)
-      :on-exit  (dotemacs//ido-navigation-ms-on-exit)
-      :bindings
-      ("?" nil :doc (dotemacs//ido-navigation-ms-full-doc))
-      ("<RET>" ido-exit-minibuffer :exit t)
-      ("<escape>" nil :exit t)
-      ("e" ido-select-text :exit t)
-      ("h" ido-delete-backward-updir)
-      ("j" ido-next-match)
-      ("J" ido-next-match-dir)
-      ("k" ido-prev-match)
-      ("K" ido-prev-match-dir)
-      ("l" ido-exit-minibuffer :exit t)
-      ("n" ido-next-match-dir)
-      ("o" dotemacs/ido-invoke-in-other-window :exit t)
-      ("p" ido-prev-match-dir)
-      ("q" nil :exit t)
-      ("s" dotemacs/ido-invoke-in-vertical-split :exit t)
-      ("t" dotemacs/ido-invoke-in-new-frame :exit t)
-      ("v" dotemacs/ido-invoke-in-horizontal-split :exit t))))
-
-(use-package flx-ido
-  :ensure t
-  :init (flx-ido-mode 1))
-
-
-;;; Project management with Projectile
-
-(use-package projectile
-  :ensure t
-  :defer 1.4
-  :commands (projectile-ack
-             projectile-ag
-             projectile-compile-project
-             projectile-dired
-             projectile-grep
-             projectile-find-dir
-             projectile-find-file
-             projectile-find-tag
-             projectile-find-test-file
-             projectile-invalidate-cache
-             projectile-kill-buffers
-             projectile-multi-occur
-             projectile-project-root
-             projectile-recentf
-             projectile-regenerate-tags
-             projectile-replace
-             projectile-run-async-shell-command-in-root
-             projectile-run-shell-command-in-root
-             projectile-switch-project
-             projectile-switch-to-buffer
-             projectile-vc)
-  :init
-  (progn
-    (defun projectile-find-file-ignored ()
-      "Projectile find file without ignore."
-      (interactive)
-      (let ((projectile-git-command "git ls-files -zco"))
-        (call-interactively 'projectile-find-file)))
-
-    (defun projectile-add-magit-repo-dirs-to-known-projects ()
-      "Add `magit-repo-dirs' to `projectile-known-projects'."
-      (interactive)
-      (--each (mapcar 'cdr (magit-list-repos magit-repo-dirs))
-        (projectile-add-known-project (file-name-as-directory
-                                       (file-truename it)))))
-
-    ;; note for Windows: GNU find or Cygwin find must be in path to enable
-    ;; fast indexing
-    (when (and (dotemacs/system-is-mswindows) (executable-find "find"))
-      (setq projectile-indexing-method 'alien
-            projectile-generic-command "find . -type f"))
-    (setq projectile-sort-order 'recentf
-          projectile-switch-project-action 'projectile-dired
-          projectile-cache-file (concat dotemacs-cache-directory
-                                        "projectile.cache")
-          projectile-known-projects-file (concat dotemacs-cache-directory
-                                                 "projectile-bookmarks.eld")
-          projectile-find-dir-includes-top-level t
-          projectile-require-project-root t
-          projectile-verbose nil)
-
-    (setq projectile-enable-caching nil)
-    (defadvice projectile-mode (before maybe-use-cache activate)
-      (when
-        (--any? (and it (file-remote-p it))
-                (list
-                  (buffer-file-name)
-                   list-buffers-directory
-                   default-directory))
-        (setq-local projectile-enable-caching t)))
-
-    (setq projectile-project-root-files '(
-            ; "rebar.config"       ; Rebar project file
-            "project.clj"        ; Leiningen project file
-            ; "SConstruct"         ; Scons project file
-            "pom.xml"            ; Maven project file
-            ; "build.sbt"          ; SBT project file
-            ; "build.gradle"       ; Gradle project file
-            "Gemfile"            ; Bundler file
-            ; "requirements.txt"   ; Pip file
-            ; "setup.py"           ; Setuptools file
-            ; "tox.ini"            ; Tox file
-            "package.json"       ; npm package file
-            "gulpfile.js"        ; Gulp build file
-            "Gruntfile.js"       ; Grunt project file
-            "bower.json"         ; Bower project file
-            "composer.json"      ; Composer project file
-            "Cargo.toml"         ; Cargo project file
-            ; "mix.exs"            ; Elixir mix project file
-            ))
-
-    (setq projectile-project-root-files-bottom-up '(
-            ".projectile" ; projectile project marker
-            ".git"        ; Git VCS root dir
-            ".hg"         ; Mercurial VCS root dir
-            ; ".fslckout"   ; Fossil VCS root dir
-            ; ".bzr"        ; Bazaar VCS root dir
-            ; "_darcs"      ; Darcs VCS root dir
-            ))
-
-    (setq projectile-globally-ignored-file-suffixes
-          '("class"
-            "elc"))
-
-    (unless (boundp 'dotemacs-use-helm-projectile)
-      (dotemacs-set-leader-keys
-        "pb" 'projectile-switch-to-buffer
-        "pd" 'projectile-find-dir
-        "pf" 'projectile-find-file
-        "ph" 'helm-projectile
-        "pr" 'projectile-recentf
-        "ps" 'projectile-switch-project))
-    (dotemacs-set-leader-keys
-      "p!" 'projectile-run-shell-command-in-root
-      "p&" 'projectile-run-async-shell-command-in-root
-      "pa" 'projectile-toggle-between-implementation-and-test
-      "pc" 'projectile-compile-project
-      "pD" 'projectile-dired
-      "pG" 'projectile-regenerate-tags
-      "pI" 'projectile-invalidate-cache
-      "pk" 'projectile-kill-buffers
-      "po" 'projectile-multi-occur
-      "pR" 'projectile-replace
-      "pT" 'projectile-find-test-file
-      "py" 'projectile-find-tag))
-  :config
-  (progn
-    ; (add-hook 'projectile-after-switch-project-hook 'pyenv-mode-set-local-version)
-    (defun dotemacs//projectile-switch-project-by-name (fcn project-to-switch &optional args)
-      (apply fcn project-to-switch args)
-      (when (projectile-project-p)
-        (message "Switching to project: %s" (projectile-project-root))
-        (when (fboundp 'neotree-dir)
-          (if (neo-global--window-exists-p)
-              (neotree-dir (projectile-project-root))
-            (progn
-              (neotree-dir (projectile-project-root))
-              (neotree-hide)
-              (let ((origin-buffer-file-name (buffer-file-name)))
-                (neotree-find (projectile-project-root))
-                (neotree-find origin-buffer-file-name))
-              (neotree-hide))))))
-    (advice-add 'projectile-switch-project-by-name
-                :around 'dotemacs//projectile-switch-project-by-name)
-
-    ;; Remove dead projects when Emacs is idle
-    (run-with-idle-timer 10 nil 'projectile-cleanup-known-projects)
-    (projectile-global-mode)
-    (dotemacs-hide-lighter projectile-mode)))
-
-(use-package help-fns+
-  :commands (describe-keymap)
-  :ensure t
-  :init
-  (dotemacs-set-leader-keys "hdK" 'describe-keymap))
-
-(use-package helm-projectile
-  :ensure t
-  :defer t
-  :commands (helm-projectile-switch-to-buffer
-             helm-projectile-find-dir
-             helm-projectile-dired-find-dir
-             helm-projectile-recentf
-             helm-projectile-find-file
-             helm-projectile-grep
-             helm-projectile
-             helm-projectile-switch-project)
-  :init
-  (progn
-    (setq projectile-switch-project-action 'helm-projectile)
-
-    (defconst dotemacs-use-helm-projectile t
-      "This variable is only defined if helm-projectile is used.")
-
-    ;; needed for smart search if user's default tool is grep
-    (defalias 'dotemacs-helm-project-do-grep 'helm-projectile-grep)
-    (defalias 'dotemacs-helm-project-do-grep-region-or-symbol 'helm-projectile-grep)
-
-    (dotemacs-set-leader-keys
-      "pb"  'helm-projectile-switch-to-buffer
-      "pd"  'helm-projectile-find-dir
-      "pf"  'helm-projectile-find-file
-      "ph"  'helm-projectile
-      "pp"  'helm-projectile-switch-project
-      "pr"  'helm-projectile-recentf
-      "pv"  'projectile-vc
-      "sgp" 'helm-projectile-grep))
-  :config
-  (with-eval-after-load 'projectile
-    (add-to-list 'helm-projectile-sources-list 'helm-source-projectile-recentf-list)))
-
-
-;;; Project management with NeoTree
-(use-package neotree
-  :ensure t
-  :defer t
-  :commands neo-global--window-exists-p
-  :init
-  (progn
-    (add-to-list 'evil-motion-state-modes 'neotree-mode)
-    (setq neo-window-width 25
-          neo-theme 'nerd
-          neo-create-file-auto-open t
-          neo-banner-message nil
-          neo-show-updir-line nil
-          neo-mode-line-type 'neotree
-          neo-smart-open nil       ; if t, every time when the neotree window is
-                                   ; opened, it will try to find current file
-                                   ; and jump to node.
-
-          neo-dont-be-alone t      ; Don't allow neotree to be the only open
-                                   ; window
-          neo-persist-show nil
-          neo-show-hidden-files nil
-          neo-auto-indent-point t
-          neo-modern-sidebar t
-          neo-vc-integration nil)
-
-    (defun dotemacs-neotree-expand-or-open ()
-      "Collapse a neotree node."
-      (interactive)
-      (let ((node (neo-buffer--get-filename-current-line)))
-        (when node
-          (if (file-directory-p node)
-              (progn
-                (neo-buffer--set-expand node t)
-                (neo-buffer--refresh t)
-                (when neo-auto-indent-point
-                  (next-line)
-                  (neo-point-auto-indent)))
-            (call-interactively 'neotree-enter)))))
-
-    (defun dotemacs-neotree-collapse ()
-      "Collapse a neotree node."
-      (interactive)
-      (let ((node (neo-buffer--get-filename-current-line)))
-        (when node
-          (when (file-directory-p node)
-            (neo-buffer--set-expand node nil)
-            (neo-buffer--refresh t))
-          (when neo-auto-indent-point
-            (neo-point-auto-indent)))))
-
-    (defun dotemacs-neotree-collapse-or-up ()
-      "Collapse an expanded directory node or go to the parent node."
-      (interactive)
-      (let ((node (neo-buffer--get-filename-current-line)))
-        (when node
-          (if (file-directory-p node)
-              (if (neo-buffer--expanded-node-p node)
-                  (dotemacs-neotree-collapse)
-                (neotree-select-up-node))
-            (neotree-select-up-node)))))
-
-    (defun neotree-find-project-root ()
-      (interactive)
-      (if (neo-global--window-exists-p)
-          (neotree-hide)
-        (let ((origin-buffer-file-name (buffer-file-name)))
-          (neotree-find (projectile-project-root))
-          (neotree-find origin-buffer-file-name))))
-
-    (defun dotemacs-neotree-key-bindings ()
-      "Set the key bindings for a neotree buffer."
-      (define-key evil-motion-state-local-map (kbd "TAB") 'neotree-stretch-toggle)
-      (define-key evil-motion-state-local-map (kbd "RET") 'neotree-enter)
-      (define-key evil-motion-state-local-map (kbd "|")   'neotree-enter-vertical-split)
-      (define-key evil-motion-state-local-map (kbd "-")   'neotree-enter-horizontal-split)
-      (define-key evil-motion-state-local-map (kbd "?")   'evil-search-backward)
-      (define-key evil-motion-state-local-map (kbd "c")   'neotree-create-node)
-      (define-key evil-motion-state-local-map (kbd "d")   'neotree-delete-node)
-      (define-key evil-motion-state-local-map (kbd "gr")  'neotree-refresh)
-      (define-key evil-motion-state-local-map (kbd "h")   'dotemacs-neotree-collapse-or-up)
-      (define-key evil-motion-state-local-map (kbd "H")   'neotree-select-previous-sibling-node)
-      (define-key evil-motion-state-local-map (kbd "J")   'neotree-select-down-node)
-      (define-key evil-motion-state-local-map (kbd "K")   'neotree-select-up-node)
-      (define-key evil-motion-state-local-map (kbd "l")   'dotemacs-neotree-expand-or-open)
-      (define-key evil-motion-state-local-map (kbd "L")   'neotree-select-next-sibling-node)
-      (define-key evil-motion-state-local-map (kbd "q")   'neotree-hide)
-      (define-key evil-motion-state-local-map (kbd "r")   'neotree-rename-node)
-      (define-key evil-motion-state-local-map (kbd "R")   'neotree-change-root)
-      (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
-
-    ;; neo-global--select-window
-    (dotemacs-set-leader-keys
-      "fn" 'neotree-show
-      "fN" 'neotree-hide
-      "ft" 'neotree-toggle
-      "pt" 'neotree-find-project-root))
-
-  :config
-  (progn
-    (when neo-persist-show
-      (add-hook 'popwin:before-popup-hook
-                (lambda () (setq neo-persist-show nil)))
-      (add-hook 'popwin:after-popup-hook
-                (lambda () (setq neo-persist-show t))))
-    (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-neotree-key-bindings))))
-
-
-;;; Date and time
-(use-package calendar                   ; Built-in calendar
-  :bind ("C-c u c" . calendar)
-  :config
-  ;; In Europe we start on Monday
-  (setq calendar-week-start-day 1))
-
-(use-package time                       ; Show current time
-  :bind (("C-c u i" . emacs-init-time)
-         ("C-c u t" . display-time-world))
-  :config
-  (setq display-time-world-time-format "%H:%M %Z, %d. %b"
-        display-time-world-list '(("Europe/Berlin"    "Berlin")
-                                  ("Europe/London"    "London")
-                                  ("Europe/Istanbul"  "Istanbul")
-                                  ("America/Winnipeg" "Winnipeg (CA)")
-                                  ("America/New_York" "New York (USA)")
-                                  ("Asia/Tokyo"       "Tokyo (JP)"))))
-
-
-;;; Net & Web
-(use-package browse-url                 ; Browse URLs
-  :bind (("C-c w u" . browse-url)))
-
-(use-package bug-reference              ; Turn bug refs into browsable buttons
-  :defer t
-  :init (progn (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
-               (add-hook 'text-mode-hook #'bug-reference-mode)))
-
-(use-package goto-addr                  ; Make links clickable
-  :defer t
-  :init (progn (add-hook 'prog-mode-hook #'goto-address-prog-mode)
-               (add-hook 'text-mode-hook #'goto-address-mode)))
-
-(use-package eww                        ; Emacs' built-in web browser
-  :bind (("C-c w b" . eww-list-bookmarks)
-         ("C-c w w" . eww)))
-
-(use-package sx                         ; StackExchange client for Emacs
-  :ensure t
-  :bind (("C-c w s" . sx-tab-frontpage)
-         ("C-c w S" . sx-tab-newest)
-         ("C-c w a" . sx-ask)))
-
-(use-package sx-compose
-  :ensure sx
-  :defer t
-  :config
-  (progn
-    ;; Don't fill in SX questions/answers, and use visual lines instead.  Plays
-    ;; more nicely with the website.
-    (add-hook 'sx-compose-mode-hook #'turn-off-auto-fill)
-    (add-hook 'sx-compose-mode-hook #'visual-line-mode)
-    (add-hook 'sx-compose-mode-hook
-              #'dotemacs-whitespace-style-no-long-lines)
-
-    ;; Clean up whitespace before sending questions
-    (add-hook 'sx-compose-before-send-hook
-              (lambda ()
-                (whitespace-cleanup)
-                t))
-
-    (bind-key "M-q" #'ignore sx-compose-mode-map)))
-
-(use-package sx-question-mode
-  :ensure sx
-  :defer t
-  ;; Display questions in the same window
-  :config (setq sx-question-mode-display-buffer-function #'switch-to-buffer))
-
-(use-package sendmail                   ; Send mails from Emacs
-  :defer t
-  :config (setq send-mail-function 'smtpmail-send-it))
-
-(use-package message                    ; Compose mails from Emacs
-  :defer t
-  :config (setq message-send-mail-function 'smtpmail-send-it
-                ;; Don't keep message buffers around
-                message-kill-buffer-on-exit t))
-
-(use-package erc                        ; Powerful IRC client
-  :defer t
-  :config
-  (progn
-    ;; Default server and nick
-    (setq erc-server "chat.freenode.net"
-          erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs")
-          erc-port 7000
-          erc-nick 'dotemacs-erc-nick
-          erc-nick-uniquifier "_"
-          ;; Never open unencrypted ERC connections
-          erc-server-connect-function 'erc-open-tls-stream)
-
-    ;; Spell-check ERC buffers
-    (add-to-list 'erc-modules 'spelling)
-    (erc-update-modules)))
-
-(use-package erc-gitter
-  :quelpa (erc-gitter :fetcher github :repo "jleechpe/erc-gitter")
-  :disabled t
-  :defer t
-  :ensure t
-  :config
-  (add-to-list 'erc-modules 'gitter))
-
-(use-package erc-join                   ; Automatically join channels with ERC
-  :defer t
-  :config
-  ;; Standard channels on Freenode
-  (setq erc-autojoin-channels-alist '(("\\.freenode\\.net" . ("#emacs")))))
-
-(use-package erc-track                  ; Track status of ERC in mode line
-  :defer t
-  :config
-  ;; Switch to newest buffer by default, and don't ask before rebinding the keys
-  (setq erc-track-switch-direction 'newest
-        erc-track-enable-keybindings t))
-
-(use-package jabber        ;; Jabber (XMPP) client for Emacs
-  :defer t
-  :ensure t
-  :init (dotemacs-set-leader-keys "aj" 'jabber-connect-all)
-  :config (dotemacs-set-leader-keys-for-major-mode 'jabber-roster-mode
-            "a" 'jabber-send-presence
-            "b" 'jabber-get-browse
-            "d" 'jabber-disconnect
-            "e" 'jabber-roster-edit-action-at-point
-            "g" 'jabber-display-roster
-            "i" 'jabber-get-disco-items
-            "j" 'jabber-muc-join
-            "o" 'jabber-roster-toggle-offline-display
-            "q" 'bury-buffer
-            "s" 'jabber-send-subscription-request
-            "v" 'jabber-get-version
-            "RET" 'jabber-roster-ret-action-at-point))
-
-
-;;; Org Mode
-(dotemacs-defvar-company-backends org-mode)
-
-(use-package init-org
-  :load-path "config/")
-
-(use-package org-plus-contrib
-  :mode ("\\.org$" . org-mode)
-  :commands (org-clock-out org-occur-in-agenda-files)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    ;; (when (featurep 'org)
-    ;;   (dotemacs-buffer/append
-    ;;    (concat
-    ;;     "Org features were loaded before the `org' layer initialized.\n") t))
-
-    (setq org-replace-disputed-keys t ;; Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
-          org-src-fontify-natively t ;; Fontify org-mode code blocks
-          org-clock-persist-file (concat dotemacs-cache-directory "org-clock-save.el")
-          org-id-locations-file
-          (concat dotemacs-cache-directory ".org-id-locations")
-          org-log-done t
-          org-startup-with-inline-images t
-          org-startup-indented t)
-
-    (with-eval-after-load 'org-indent
-      (dotemacs-hide-lighter org-indent-mode))
-
-    (defmacro dotemacs-org-emphasize (fname char)
-      "Make function for setting the emphasis in org mode"
-      `(defun ,fname () (interactive)
-              (org-emphasize ,char)))
-
-    (dotemacs-set-leader-keys-for-major-mode 'org-mode
-      "'" 'org-edit-special
-      "c" 'org-capture
-      "d" 'org-deadline
-      "e" 'org-export-dispatch
-      "f" 'org-set-effort
-      "P" 'org-set-property
-
-      "a" 'org-agenda
-      "b" 'org-tree-to-indirect-buffer
-      "A" 'org-archive-subtree
-      "l" 'org-open-at-point
-      "T" 'org-show-todo-tree
-
-      "." 'org-time-stamp
-
-      ;; headings
-      "hi" 'org-insert-heading-after-current
-      "hI" 'org-insert-heading
-
-      ;; More cycling options (timestamps, headlines, items, properties)
-      "L" 'org-shiftright
-      "H" 'org-shiftleft
-      "J" 'org-shiftdown
-      "K" 'org-shiftup
-
-      ;; Change between TODO sets
-      "C-S-l" 'org-shiftcontrolright
-      "C-S-h" 'org-shiftcontrolleft
-      "C-S-j" 'org-shiftcontroldown
-      "C-S-k" 'org-shiftcontrolup
-
-      ;; Subtree editing
-      "Sl" 'org-demote-subtree
-      "Sh" 'org-promote-subtree
-      "Sj" 'org-move-subtree-down
-      "Sk" 'org-move-subtree-up
-
-      ;; tables
-      "ta" 'org-table-align
-      "tb" 'org-table-blank-field
-      "tc" 'org-table-convert
-      "tdc" 'org-table-delete-column
-      "tdr" 'org-table-kill-row
-      "te" 'org-table-eval-formula
-      "tE" 'org-table-export
-      "th" 'org-table-previous-field
-      "tH" 'org-table-move-column-left
-      "tic" 'org-table-insert-column
-      "tih" 'org-table-insert-hline
-      "tiH" 'org-table-hline-and-move
-      "tir" 'org-table-insert-row
-      "tI" 'org-table-import
-      "tj" 'org-table-next-row
-      "tJ" 'org-table-move-row-down
-      "tK" 'org-table-move-row-up
-      "tl" 'org-table-next-field
-      "tL" 'org-table-move-column-right
-      "tn" 'org-table-create
-      "tN" 'org-table-create-with-table.el
-      "tr" 'org-table-recalculate
-      "ts" 'org-table-sort-lines
-      "ttf" 'org-table-toggle-formula-debugger
-      "tto" 'org-table-toggle-coordinate-overlays
-      "tw" 'org-table-wrap-region
-
-      ;; Multi-purpose keys
-      (or dotemacs-major-mode-leader-key ",") 'org-ctrl-c-ctrl-c
-      "*" 'org-ctrl-c-star
-      " RET" 'org-ctrl-c-ret
-      "-" 'org-ctrl-c-minus
-      "^" 'org-sort
-      "/" 'org-sparse-tree
-
-      "I" 'org-clock-in
-      "n" 'org-narrow-to-subtree
-      "N" 'widen
-      "O" 'org-clock-out
-      "q" 'org-clock-cancel
-      "R" 'org-refile
-      "s" 'org-schedule
-
-      ;; insertion of common elements
-      "il" 'org-insert-link
-      "if" 'org-footnote-new
-      "ik" 'dotemacs-insert-keybinding-org
-
-      ;; images and other link types have no commands in org mode-line
-      ;; could be inserted using yasnippet?
-      ;; region manipulation
-      "xb" (dotemacs-org-emphasize dotemacs-org-bold ?*)
-      "xc" (dotemacs-org-emphasize dotemacs-org-code ?~)
-      "xi" (dotemacs-org-emphasize dotemacs-org-italic ?/)
-      "xr" (dotemacs-org-emphasize dotemacs-org-clear ? )
-      "xs" (dotemacs-org-emphasize dotemacs-org-strike-through ?+)
-      "xu" (dotemacs-org-emphasize dotemacs-org-underline ?_)
-      "xv" (dotemacs-org-emphasize dotemacs-org-verbose ?=))
-
-    (require 'ox-md)
-    (require 'ox-ascii)
-    (require 'ox-confluence)
-    (require 'ox-html)
-    (require 'org-bullets)
-
-    (with-eval-after-load 'org-agenda
-       ;; Since we could override SPC with <leader>, let's make RET do that
-       ;; functionality
-      (when (equal dotemacs-leader-key "SPC")
-       (define-key org-agenda-mode-map
-         (kbd "RET") 'org-agenda-show-and-scroll-up)
-       (define-key org-agenda-mode-map
-         (kbd "SPC") dotemacs-default-map))
-
-      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
-      (define-key org-agenda-mode-map "k" 'org-agenda-previous-line))
-
-    ;; Add global evil-leader mappings. Used to access org-agenda
-    ;; functionalities – and a few others commands – from any other mode.
-    (dotemacs-declare-prefix "ao" "org")
-    (dotemacs-set-leader-keys
-      ;; org-agenda
-      "ao#" 'org-agenda-list-stuck-projects
-      "ao/" 'org-occur-in-agenda-files
-      "aoa" 'org-agenda-list
-      "aoe" 'org-store-agenda-views
-      "aom" 'org-tags-view
-      "aoo" 'org-agenda
-      "aos" 'org-search-view
-      "aot" 'org-todo-list
-      ;; other
-      "aoO" 'org-clock-out
-      "aoc" 'org-capture
-      "aol" 'org-store-link))
-  :config
-  (progn
-    (unless (file-exists-p org-directory)
-      (make-directory org-directory))
-
-    (setq my-inbox-org-file (concat org-directory "/inbox.org")
-          org-indent-indentation-per-level 2
-          org-use-fast-todo-selection t
-          org-completion-use-ido t
-          org-treat-S-cursor-todo-selection-as-state-change nil
-          org-agenda-files `(,org-directory))
-
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline my-inbox-org-file "INBOX")
-             "* TODO %?\n%U\n%a\n")
-            ("n" "Note" entry (file+headline my-inbox-org-file "NOTES")
-             "* %? :NOTE:\n%U\n%a\n")
-            ("m" "Meeting" entry (file my-inbox-org-file)
-             "* MEETING %? :MEETING:\n%U")
-            ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
-             "* %?\n%U\n")))
-
-    ;; org-mode colors
-    (setq org-todo-keyword-faces
-          '(
-            ("INPR" . (:foreground "yellow" :weight bold))
-            ("DONE" . (:foreground "green" :weight bold))
-            ("IMPEDED" . (:foreground "red" :weight bold))
-            ))
-
-    (setq org-refile-targets '((nil :maxlevel . 9)
-                  (org-agenda-files :maxlevel . 9)))
-
-    (setq org-todo-keywords
-          '((sequence "TODO(t)" "NEXT(n@)" "|" "DONE(d)")
-            (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
-
-    (setq org-todo-state-tags-triggers
-          ' (("CANCELLED" ("CANCELLED" . t))
-             ("WAITING" ("WAITING" . t))
-             ("TODO" ("WAITING") ("CANCELLED"))
-             ("NEXT" ("WAITING") ("CANCELLED"))
-             ("DONE" ("WAITING") ("CANCELLED"))))
-
-    (font-lock-add-keywords
-     'org-mode '(("\\(@@html:<kbd>@@\\) \\(.*\\) \\(@@html:</kbd>@@\\)"
-                  (1 font-lock-comment-face prepend)
-                  (2 font-lock-function-name-face)
-                  (3 font-lock-comment-face prepend))))
-
-    (require 'org-indent)
-    (define-key global-map "\C-cl" 'org-store-link)
-    (define-key global-map "\C-ca" 'org-agenda)
-
-    ;; Open links and files with RET in normal state
-    (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
-
-    (dotemacs-set-leader-keys
-      "Cc" 'org-capture)
-
-    ;; Evilify the calendar tool on C-c .
-    (unless (eq 'emacs dotemacs-editing-style)
-      (define-key org-read-date-minibuffer-local-map (kbd "M-h")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-l")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-k")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-j")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-H")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-month 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-L")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-month 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-K")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-year 1))))
-      (define-key org-read-date-minibuffer-local-map (kbd "M-J")
-        (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-year 1)))))))
-
-(use-package org-agenda
-  :defer t
-  :init
-  (setq org-agenda-restore-windows-after-quit t)
-  :config
-  (evilified-state-evilify-map org-agenda-mode-map
-    :mode org-agenda-mode
-    :bindings
-    "j" 'org-agenda-next-line
-    "k" 'org-agenda-previous-line
-    (kbd "M-j") 'org-agenda-next-item
-    (kbd "M-k") 'org-agenda-previous-item
-    (kbd "M-h") 'org-agenda-earlier
-    (kbd "M-l") 'org-agenda-later
-    (kbd "gd") 'org-agenda-toggle-time-grid
-    (kbd "gr") 'org-agenda-redo))
-
-(use-package org-bullets
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq org-bullets-bullet-list '("✿" "❀" "☢" "☯" "✸" ))
-    (add-hook 'org-mode-hook 'org-bullets-mode)))
-
-(use-package org-repo-todo
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs-set-leader-keys
-      "Ct"  'ort/capture-todo
-      "CT"  'ort/capture-checkitem)
-    (dotemacs-set-leader-keys-for-major-mode 'org-mode
-      "gt" 'ort/goto-todos)))
-
-
-(dotemacs-use-package-add-hook persp-mode
-  :post-init
-  (dotemacs-define-custom-layout "@Org"
-                                  :binding "o"
-                                  :body
-                                  (find-file (first org-agenda-files))))
-
-(use-package gnuplot
-  :defer t
-  :ensure t
-  :init (dotemacs-set-leader-keys-for-major-mode 'org-mode
-          "tp" 'org-plot/gnuplot))
-
-(use-package evil-org
-  :load-path "extensions/"
-  :commands evil-org-mode
-  :init
-  (add-hook 'org-mode-hook 'evil-org-mode)
-  :config
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'org-mode
-      "C" 'evil-org-recompute-clocks)
-    (evil-define-key 'normal evil-org-mode-map
-      "O" 'evil-open-above)
-    (dotemacs-diminish evil-org-mode " ⓔ" " e")))
-
-(dotemacs-use-package-add-hook evil-surround
-  :post-init
-  (defun dotemacs/add-org-surrounds ()
-    (push '(?: . dotemacs//surround-drawer) evil-surround-pairs-alist))
-  (add-hook 'org-mode-hook 'dotemacs/add-org-surrounds)
-  (defun dotemacs//surround-drawer ()
-    (let ((dname (read-from-minibuffer "" "")))
-      (cons (format ":%s:" (or dname "")) ":END:"))))
-
-(use-package org-mime
-  :defer t
-  :commands (org-mime-htmlize org-mime-org-buffer-htmlize)
-  :init
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'message-mode
-      "M" 'org-mime-htmlize)
-    (dotemacs-set-leader-keys-for-major-mode 'org-mode
-      "m" 'org-mime-org-buffer-htmlize)))
-
-(use-package org-pomodoro
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (when (dotemacs/system-is-mac)
-      (setq org-pomodoro-audio-player "/usr/bin/afplay"))
-    (dotemacs-set-leader-keys-for-major-mode 'org-mode
-      "p" 'org-pomodoro)))
-
-(use-package org-present
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (evilified-state-evilify nil org-present-mode-keymap
-      "h" 'org-present-prev
-      "l" 'org-present-next
-      "q" 'org-present-quit)
-    (add-hook 'org-present-mode-hook 'dotemacs-org-present-start)
-    (add-hook 'org-present-mode-quit-hook 'dotemacs-org-present-end)))
-
-(use-package toc-org
-  :ensure t
-  :init
-  (progn
-    (setq toc-org-max-depth 10)
-    (add-hook 'org-mode-hook 'toc-org-enable)))
-
-(use-package htmlize
-  :ensure t
-  :defer t)
-
-(use-package ox-pandoc
-  :defer t
-  :ensure t
-  :init
-  (with-eval-after-load 'org (require 'ox-pandoc)))
-
-(dotemacs-use-package-add-hook emoji-cheat-sheet-plus
-  :post-init
-  (add-hook 'org-mode-hook 'dotemacs-delay-emoji-cheat-sheet-hook))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook org-mode)
-      (push 'company-capf company-backends-org-mode)))
-  (dotemacs-use-package-add-hook company-emoji
-    :post-init
-    (progn
-      (push 'company-emoji company-backends-org-mode))))
-
-
-;;; Online Help
-(use-package find-func                  ; Find function/variable definitions
-  :bind (("C-x F"   . find-function)
-         ("C-x 4 F" . find-function-other-window)
-         ("C-x K"   . find-function-on-key)
-         ("C-x V"   . find-variable)
-         ("C-x 4 V" . find-variable-other-window)))
-
-(use-package info                       ; Info manual viewer
-  :defer t
-  :config
-  ;; Fix the stupid `Info-quoted' face. Courier is an abysmal face, so go back
-  ;; to the default face.
-  (set-face-attribute 'Info-quoted nil :family 'unspecified
-                      :inherit font-lock-type-face))
-
-(use-package helm-info                  ; Helm tools for Info
-  :ensure helm
-  :bind (("C-c h e" . helm-info-emacs)
-         ("C-c h i" . helm-info-at-point)))
-
-(use-package helm-man                   ; Browse manpages with Heml
-  :ensure helm
-  :bind (("C-c h m" . helm-man-woman)))
-
-(use-package helm-descbinds
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq helm-descbinds-window-style 'split)
-    (add-hook 'helm-mode-hook 'helm-descbinds-mode)
-    (dotemacs-set-leader-keys "?" 'helm-descbinds)))
-
-(use-package helm-make
-  :ensure t
-  :defer t
-  :init
-  (dotemacs-set-leader-keys
-   "cc" 'helm-make-projectile
-   "cm" 'helm-make))
-
-(use-package help-mode
-  :config
-  (progn
-    (define-key help-mode-map (kbd "n") 'next-line)
-    (define-key help-mode-map (kbd "p") 'previous-line)
-    (define-key help-mode-map (kbd "j") 'next-line)
-    (define-key help-mode-map (kbd "k") 'previous-line)))
-
-(defvar dash-helm-dash-docset-path ""
-  "Path containing dash docsets.")
-
-(use-package helm-dash
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-set-leader-keys
-      "dh" 'helm-dash-at-point
-      "dH" 'helm-dash))
-  :config
-  (progn
-    (defun dash//activate-package-docsets (path)
-      "Add dash docsets from specified PATH."
-      (setq helm-dash-docsets-path path
-            helm-dash-common-docsets (helm-dash-installed-docsets))
-      (message (format "activated %d docsets from: %s"
-                       (length helm-dash-common-docsets) path)))
-    (dash//activate-package-docsets dash-helm-dash-docset-path)))
-
-(use-package dash-at-point
-  :ensure t
-  :if (eq system-type 'darwin)
-  :defer t
-  :bind (("C-c h d" . dash-at-point)
-         ("C-c h D" . dash-at-point-with-docset))
-  :init
-  (progn
-    (dotemacs-set-leader-keys "dd" 'dash-at-point)
-    (dotemacs-set-leader-keys "dD" 'dash-at-point-with-docset))
-  :config (add-to-list 'dash-at-point-mode-alist
-                       '(swift-mode . "ios,swift")))
-
-(use-package zeal-at-point
-  :ensure t
-  :if (eq system-type 'gnu/linux)
-  :defer t
-  :init
-  (dotemacs-set-leader-keys
-    "dd" 'zeal-at-point
-    "dD" 'zeal-at-point-set-docset)
-  :config
-  ;; This lets users seach in multiple docsets
-  (push '(web-mode . "html,css,javascript") zeal-at-point-mode-alist))
-
-(use-package which-key
-  :ensure t
-  :init
-  (progn
-    (dotemacs-add-toggle which-key
-      :status which-key-mode
-      :on (which-key-mode)
-      :off (which-key-mode -1)
-      :documentation
-      "Display a buffer with available key bindings."
-      :evil-leader "tK")
-
-    (dotemacs-set-leader-keys "hk" 'which-key-show-top-level)
-
-    (let ((new-descriptions
-           ;; being higher in this list means the replacement is applied later
-           '(
-             ("dotemacs/\\(.+\\)" . "\\1")
-             ("dotemacs-\\(.+\\)" . "\\1")
-             ("projectile-\\(.+\\)" . "\\1")
-             ("dotemacs-toggle-\\(.+\\)" . "\\1")
-             ("select-window-\\([0-9]\\)" . "window \\1")
-             ("dotemacs-alternate-buffer" . "last buffer")
-             ("dotemacs-toggle-mode-line-\\(.+\\)" . "\\1")
-             ("avy-goto-word-or-subword-1" . "avy word")
-             ("shell-command" . "shell cmd")
-             ("dotemacs-default-pop-shell" . "open shell")
-             ("dotemacs-helm-project-smart-do-search-region-or-symbol" . "smart search w/input")
-             ("dotemacs-helm-project-smart-do-search" . "smart search")
-             ("evil-search-highlight-persist-remove-all" . "remove srch hlght")
-             ("helm-descbinds" . "show keybindings")
-             ("sp-split-sexp" . "split sexp")
-             ("avy-goto-line" . "avy line")
-             ("universal-argument" . "universal arg")
-             ("er/expand-region" . "expand region")
-             ("helm-apropos" . "apropos")
-             ("evil-lisp-state-\\(.+\\)" . "\\1"))))
-        (dolist (nd new-descriptions)
-          ;; ensure the target matches the whole string
-          (push (cons (concat "\\`" (car nd) "\\'") (cdr nd))
-                which-key-description-replacement-alist)))
-
-      (dolist (leader-key `(,dotemacs-leader-key ,dotemacs-emacs-leader-key))
-        (which-key-add-key-based-replacements
-         (concat leader-key " m")    "major mode commands"
-         (concat leader-key " " dotemacs-command-key) "helm M-x"))
-
-      (which-key-declare-prefixes
-        dotemacs-leader-key '("root" . "dotemacs root")
-        dotemacs-emacs-leader-key '("root" . "dotemacs root")
-        (concat dotemacs-leader-key " m")
-        '("major-mode-cmd" . "Major mode commands")
-        (concat dotemacs-emacs-leader-key " m")
-        '("major-mode-cmd" . "Major mode commands"))
-
-      ;; disable special key handling for dotemacs, since it can be
-      ;; disorienting if you don't understand it
-      (pcase dotemacs-which-key-position
-        (`right (which-key-setup-side-window-right))
-        (`bottom (which-key-setup-side-window-bottom))
-        (`right-then-bottom (which-key-setup-side-window-right-bottom)))
-
-      (setq which-key-special-keys nil
-            which-key-use-C-h-for-paging t
-            which-key-prevent-C-h-from-cycling t
-            which-key-echo-keystrokes 0.02
-            which-key-max-description-length 32
-            which-key-sort-order 'which-key-key-order-alpha
-            which-key-idle-delay dotemacs-which-key-delay
-            which-key-allow-evil-operators t)
-      (which-key-mode)
-      (dotemacs-diminish which-key-mode " Ⓚ" " K")))
-
-
 ;;; Documents
 (use-package doc-view
   :defer t
@@ -5782,730 +1611,6 @@ It will toggle the overlay under point or create an overlay of one character."
             (doc-view-minor-mode))
         ad-do-it))))
 
-
-;;; Dired
-
-(use-package dired-open
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-dired-open-file ()
-      "Hook dired to translate to projectile and neotree."
-      (interactive)
-      (let ((file (ignore-errors (dired-get-file-for-visit))))
-        (when file
-          (find-file (expand-file-name file (projectile-project-root)))
-          (run-hooks 'projectile-find-file-hook)
-          (message "Projectile root found: %s" (projectile-project-root))
-          (when (fboundp 'neotree-dir)
-            (if (neo-global--window-exists-p)
-                (neotree-dir (projectile-project-root))
-              (progn
-                (neotree-dir (projectile-project-root))
-                (neotree-hide)
-                (let ((origin-buffer-file-name (buffer-file-name)))
-                  (neotree-find (projectile-project-root))
-                  (neotree-find origin-buffer-file-name))
-                (neotree-hide)))))))
-    (with-eval-after-load 'projectile
-      (setq dired-open-functions 'dotemacs-dired-open-file))))
-
-(dotemacs-use-package-add-hook dired
-  :post-config
-  (with-eval-after-load 'projectile
-    (evilified-state-evilify dired-mode dired-mode-map
-      (kbd "RET") 'dired-open-file)))
-
-
-;;; Tim Pope
-
-;; vinegar
-; This layer is a port contribution layer for vim-vinegar for emacs.
-;
-; A port of tpope's vinegar.vim
-; [vinegar][https://github.com/tpope/vim-vinegar], simplifying =dired=
-; with a limited number of details and exposing the ~-~ command in all
-; buffers to enter dired.
-;
-; ** Features
-;
-; -  navigation up folders with ~-~ key
-; -  simplify dired buffer to show only file names
-; -  better evil/vim bindings for navigation within dired buffer
-; -  keep only one active dired buffer
-; -  Use dired-k extension to show time / vcs related information in
-;    single bar
-; -  right mouse click moves up directory if in blank space or shows context menu
-
-(defvar vinegar-reuse-dired-buffer nil
-  "If non-nil, reuses one dired buffer for navigation.")
-
-(use-package init-vinegar
-  :load-path "config/"
-  :commands (vinegar/dired-setup))
-
-; (dotemacs|do-after-display-system-init)
-(use-package dired+
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq diredp-hide-details-initially-flag t
-          diredp-hide-details-propagate-flag t
-          ;; use single buffer for all dired navigation
-          ;; disable font themeing from dired+
-          font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
-    (toggle-diredp-find-file-reuse-dir 1)))
-
-(use-package dired                      ; Edit directories
-  :defer t
-  :config
-  (progn
-    (setq dired-auto-revert-buffer t    ; Revert on re-visiting
-          ;; Move files between split panes
-          dired-dwim-target t
-          ;; Better dired flags: `-l' is mandatory, `-a' shows all files, `-h'
-          ;; uses human-readable sizes, and `-F' appends file-type classifiers
-          ;; to file names (for better highlighting)
-          dired-listing-switches "-alhF"
-          dired-ls-F-marks-symlinks t   ; -F marks links with @
-          ;; Inhibit prompts for simple recursive operations
-          dired-recursive-copies 'always)
-
-    (evilified-state-evilify dired-mode dired-mode-map
-      "j"         'vinegar/move-down
-      "k"         'vinegar/move-up
-      "-"         'vinegar/up-directory
-      "0"         'dired-back-to-start-of-files
-      "="         'vinegar/dired-diff
-      (kbd "C-j") 'dired-next-subdir
-      (kbd "C-k") 'dired-prev-subdir
-      "I"         'vinegar/dotfiles-toggle
-      (kbd "~")   '(lambda ()(interactive) (find-alternate-file "~/"))
-      (kbd "RET") (if vinegar-reuse-dired-buffer
-                      'dired-find-alternate-file
-                    'dired-find-file)
-      "f"         'helm-find-files
-      "J"         'dired-goto-file
-      (kbd "C-f") 'find-name-dired
-      "H"         'diredp-dired-recent-dirs
-      "T"         'dired-tree-down
-      "K"         'dired-do-kill-lines
-      "r"         'revert-buffer
-      (kbd "C-r") 'dired-do-redisplay
-      "gg"        'vinegar/back-to-top
-      "G"         'vinegar/jump-to-bottom)
-
-    (when (eq system-type 'darwin)
-      ;; OS X bsdtar is mostly compatible with GNU Tar
-      (setq dired-guess-shell-gnutar "tar"))
-
-    ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
-    ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
-    ;; warnings, when not using `coreutils' version of 'ls' on OS X.
-    ;; We must look for `gls' after `exec-path-from-shell' was initialized to
-    ;; make sure that `gls' is in `exec-path'
-    ;; See brew info coreutils
-    (when-let (gnu-ls (and (eq system-type 'darwin)
-                             (executable-find "gls")))
-      (setq insert-directory-program gnu-ls
-            dired-listing-switches "-aBhl --group-directories-first"))
-
-    (when (or (memq system-type '(gnu gnu/linux))
-              (string= (file-name-nondirectory insert-directory-program) "gls"))
-      ;; If we are on a GNU system or have GNU ls, add some more `ls' switches:
-      ;; `--group-directories-first' lists directories before files, and `-v'
-      ;; sorts numbers in file names naturally, i.e. "image1" goes before
-      ;; "image02"
-      (setq dired-listing-switches
-            (concat dired-listing-switches " --group-directories-first -v")))))
-
-(use-package dired-x                    ; Additional tools for Dired
-  :defer t
-  :init
-  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
-  :config
-  (define-key evil-normal-state-map (kbd "-") 'dired-jump))
-
-;; unimpaired
-
-; This layer ports some of the functionality of tpope's vim-unimpaired
-; [unimpaired][https://github.com/tpope/vim-unimpaired]
-;
-; This plugin provides several pairs of bracket maps using ~[~ to denote
-; previous, and ~]~ as next.
-
-(defun unimpaired/paste-above ()
-  (interactive)
-  (evil-insert-newline-above)
-  (evil-paste-after 1))
-
-(defun unimpaired/paste-below ()
-  (interactive)
-  (evil-insert-newline-below)
-  (evil-paste-after 1))
-
-;; from tpope's unimpaired
-
-(define-key evil-normal-state-map (kbd "[ SPC") (lambda() (interactive)(evil-insert-newline-above) (forward-line)))
-(define-key evil-normal-state-map (kbd "] SPC") (lambda() (interactive)(evil-insert-newline-below) (forward-line -1)))
-
-(define-key evil-normal-state-map (kbd "[ e") 'move-text-up)
-(define-key evil-normal-state-map (kbd "] e") 'move-text-down)
-
-(define-key evil-visual-state-map (kbd "[ e") ":move'<--1")
-(define-key evil-visual-state-map (kbd "] e") ":move'>+1")
-
-;; (define-key evil-visual-state-map (kbd "[ e") 'move-text-up)
-;; (define-key evil-visual-state-map (kbd "] e") 'move-text-down)
-
-(define-key evil-normal-state-map (kbd "[ b") 'dotemacs-previous-useful-buffer)
-(define-key evil-normal-state-map (kbd "] b") 'dotemacs-next-useful-buffer)
-
-(define-key evil-normal-state-map (kbd "] l") 'dotemacs-next-error)
-(define-key evil-normal-state-map (kbd "[ l") 'dotemacs-previous-error)
-
-(define-key evil-normal-state-map (kbd "[ h") 'diff-hl-previous-hunk)
-(define-key evil-normal-state-map (kbd "] h") 'diff-hl-next-hunk)
-
-(define-key evil-normal-state-map (kbd "[ t") (lambda () (interactive)(raise-frame (previous-frame))))
-(define-key evil-normal-state-map (kbd "] t") (lambda () (interactive)(raise-frame (next-frame))))
-
-(define-key evil-normal-state-map (kbd "[ w") 'previous-multiframe-window)
-(define-key evil-normal-state-map (kbd "] w") 'next-multiframe-window)
-
-;; select pasted text
-(define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
-
-;; paste above or below with newline
-(define-key evil-normal-state-map (kbd "[ p") 'unimpaired/paste-above)
-(define-key evil-normal-state-map (kbd "] p") 'unimpaired/paste-below)
-
-
-;;; Config
-
-;; Ansible
-(use-package init-ansible
-  :load-path "config/")
-
-(use-package ansible
-  ;; Tracking here:
-  ;; https://github.com/k1LoW/emacs-ansible/issues/4
-  ;; Ansible wants to hook into yasnippet and load its snippets always
-  :disabled t
-  :defer t
-  :init
-  (progn
-    (with-eval-after-load 'yaml-mode
-      (add-hook 'yaml-mode-hook 'ansible/ansible-maybe-enable))))
-
-(use-package ansible-doc                ; Documentation lookup for Ansible
-  :ensure t
-  :defer t
-  :init (with-eval-after-load 'yaml-mode
-          '(add-hook 'yaml-mode-hook 'ansible/ansible-doc-maybe-enable))
-  :diminish (ansible-doc-mode . "❓"))
-
-;; Docker
-(use-package dockerfile-mode
-  :defer t
-  :ensure t
-  :config
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'dockerfile-mode
-       "cb" 'dockerfile-build-buffer)))
-
-;; Terraform
-(use-package terraform-mode
-  :defer t
-  :ensure t)
-
-;; Puppet
-(dotemacs-defvar-company-backends puppet-mode)
-
-(use-package puppet-mode                ; Puppet manifests
-  :defer t
-  :ensure t
-  :config
-  ;; Fontify variables in Puppet comments
-  (setq puppet-fontify-variables-in-comments t)
-  :init
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'puppet-mode
-      "{" 'beginning-of-defun
-      "}" 'end-of-defun
-      "$" 'puppet-interpolate
-      "a" 'puppet-align-block
-      "'" 'puppet-toggle-string-quotes
-      ";" 'puppet-clear-string
-      "j" 'imenu
-      "c" 'puppet-apply
-      "v" 'puppet-validate
-      "l" 'puppet-lint
-    )))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook puppet-mode))))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'puppet-mode))
-
-
-;;; Finance
-(dotemacs-defvar-company-backends ledger-mode)
-
-(use-package ledger-mode
-  :mode ("\\.\\(ledger\\|ldg\\)\\'" . ledger-mode)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq ledger-post-amount-alignment-column 62)
-    (dotemacs-set-leader-keys-for-major-mode 'ledger-mode
-      "hd"   'ledger-delete-current-transaction
-      "a"    'ledger-add-transaction
-      "b"    'ledger-post-edit-amount
-      "c"    'ledger-toggle-current
-      "C"    'ledger-mode-clean-buffer
-      "l"    'ledger-display-ledger-stats
-      "p"    'ledger-display-balance-at-point
-      "q"    'ledger-post-align-xact
-      "r"    'ledger-reconcile
-      "R"    'ledger-report
-      "t"    'ledger-insert-effective-date
-      "y"    'ledger-set-year
-      "RET" 'ledger-set-month)
-    (evilified-state-evilify ledger-report-mode ledger-report-mode-map)))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'ledger-mode))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (push 'company-capf company-backends-ledger-mode)
-      (dotemacs-add-company-hook ledger-mode))))
-
-
-;; Miscellaneous
-
-(defvar geolocation-enable-osx-location-service-support t
-  "If non nil enable the OS X location service support.")
-
-(defvar geolocation-enable-weather-forecast t
-  "If non nil enable the weather forecast service.")
-
-(defvar geolocation-enable-automatic-theme-changer nil
-  "If non nil enable the automatic change of theme based on the current time.")
-
-(use-package osx-location
-  :if geolocation-enable-osx-location-service-support
-  :ensure t
-  :init
-  (progn
-    (add-hook 'osx-location-changed-hook
-              (lambda ()
-                (setq calendar-latitude osx-location-latitude
-                      calendar-longitude osx-location-longitude)
-                (unless (bound-and-true-p calendar-location-name)
-                  (setq calendar-location-name
-                        (format "%s, %s"
-                                osx-location-latitude
-                                osx-location-longitude)))))
-    (osx-location-watch)))
-
-(use-package sunshine
-  :if geolocation-enable-weather-forecast
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs-set-leader-keys
-      "aw" 'sunshine-forecast
-      "aW" 'sunshine-quick-forecast)
-
-    (evilified-state-evilify sunshine-mode sunshine-mode-map
-      (kbd "q") 'quit-window
-      (kbd "i") 'sunshine-toggle-icons))
-  :config
-  (progn
-    (setq sunshine-appid "bedbfc11dac244208e29f486c82412b6"
-          sunshine-location "Huntington Beach, CA")
-
-    ;; just in case location was not set by user, or on OS X,
-    ;; if wasn't set up automatically, will not work with Emac's
-    ;; default for ;; `calendar-location-name'
-    (when (not (boundp 'sunshine-location))
-      (setq sunshine-location (format "%s, %s"
-                                      calendar-latitude
-                                      calendar-longitude)))))
-
-(use-package theme-changer
-  :if geolocation-enable-automatic-theme-changer
-  :ensure t
-  :config
-  (progn
-    (when (> (length dotemacs-themes) 1)
-      (change-theme (nth 0 dotemacs-themes)
-                    (nth 1 dotemacs-themes)))))
-
-(use-package lorem-ipsum
-  :ensure t
-  :commands (lorem-ipsum-insert-list
-             lorem-ipsum-insert-paragraphs
-             lorem-ipsum-insert-sentences)
-  :init
-  (progn
-    (dotemacs-declare-prefix "il" "lorem ipsum")
-    (dotemacs-set-leader-keys
-      "ill" 'lorem-ipsum-insert-list
-      "ilp" 'lorem-ipsum-insert-paragraphs
-      "ils" 'lorem-ipsum-insert-sentences)))
-
-
-;;; Google Translate
-(use-package google-translate
-  :ensure t
-  :commands (google-translate-query-translate
-             google-translate-at-point
-             google-translate-query-translate-reverse
-             google-translate-at-point-reverse)
-  :init
-  (dotemacs-set-leader-keys
-    "xgQ" 'google-translate-query-translate-reverse
-    "xgq" 'google-translate-query-translate
-    "xgT" 'google-translate-at-point-reverse
-    "xgt" 'google-translate-at-point)
-  :config
-  (progn
-    (require 'google-translate-default-ui)
-    (setq google-translate-enable-ido-completion t)
-    (setq google-translate-show-phonetic t)
-    (setq google-translate-default-source-language "en")
-    (setq google-translate-default-target-language "sp")))
-
-
-;; Search Engine
-(use-package engine-mode
-  :commands (defengine dotemacs-search-engine-select)
-  :ensure t
-  :defines search-engine-alist
-  :init
-  (dotemacs-set-leader-keys
-    "a/" 'dotemacs-search-engine-select)
-  (setq search-engine-alist
-        '((amazon
-           :name "Amazon"
-           :url "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%%3Daps&field-keywords=%s")
-          (duck-duck-go
-           :name "Duck Duck Go"
-           :url "https://duckduckgo.com/?q=%s")
-          (google
-           :name "Google"
-           :url "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
-          (google-images
-           :name "Google Images"
-           :url "http://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
-          (github
-           :name "Github"
-           :url "https://github.com/search?ref=simplesearch&q=%s")
-          (google-maps
-           :name "Google Maps"
-           :url "http://maps.google.com/maps?q=%s")
-          (twitter
-           :name "Twitter"
-           :url "https://twitter.com/search?q=%s")
-          (project-gutenberg
-           :name "Project Gutenberg"
-           :url "http://www.gutenberg.org/ebooks/search.html/?format=html&default_prefix=all&sort_order=&query=%s")
-          (youtube
-           :name "YouTube"
-           :url "http://www.youtube.com/results?aq=f&oq=&search_query=%s")
-          (stack-overflow
-           :name "Stack Overflow"
-           :url "https://stackoverflow.com/search?q=%s")
-          (wikipedia
-           :name "Wikipedia"
-           :url "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s")
-          (wolfram-alpha
-           :name "Wolfram Alpha"
-           :url "http://www.wolframalpha.com/input/?i=%s")))
-  :config
-  (engine-mode t)
-  (mapcar (lambda (engine)
-            (let* ((cur-engine (car engine))
-                   (engine-url (plist-get (cdr engine) :url)))
-              (eval `(defengine ,cur-engine ,engine-url))))
-          search-engine-alist)
-  (defun dotemacs-search-engine-source (engines)
-    "return a source for helm selection"
-    `((name . "Search Engines")
-      (candidates . ,(mapcar (lambda (engine)
-                               (cons (plist-get (cdr engine) :name)
-                                     (intern (format "engine/search-%S"
-                                                     (car engine)))))
-                             engines))
-      (action . (lambda (candidate) (call-interactively candidate)))))
-  (defun dotemacs-search-engine-select ()
-    "set search engine to use"
-    (interactive)
-    (helm :sources (list (dotemacs-search-engine-source
-                          search-engine-alist)))))
-
-
-;; Emoji
-(use-package emoji-cheat-sheet-plus
-  :ensure t
-  :commands (emoji-cheat-sheet-plus-insert
-             emoji-cheat-sheet-plus-buffer
-             emoji-cheat-sheet-plus-display-mode)
-  :init
-  (progn
-    (dotemacs-set-leader-keys "aE" 'emoji-cheat-sheet-plus-buffer)
-    (dotemacs-set-leader-keys "ie" 'emoji-cheat-sheet-plus-insert)
-    (evilified-state-evilify emoji-cheat-sheet-plus-buffer-mode
-      emoji-cheat-sheet-plus-buffer-mode-map
-      "<RET>" 'emoji-cheat-sheet-plus-echo-and-copy)
-    (defun dotemacs-delay-emoji-cheat-sheet-hook ()
-      "Work-around for org buffers."
-      ;; we need to wait for org buffer to be fully loaded before
-      ;; calling the emoji mode.
-      ;; If we directly call the emoji mode at hook runtime then some
-      ;; text properties are not applied correctly.
-      (run-at-time 0.1 nil 'emoji-cheat-sheet-plus-display-mode))))
-
-(use-package company-emoji
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (setq company-emoji-insert-unicode nil))
-
-(use-package spray
-  :commands spray-mode
-  :ensure t
-  :init
-  (progn
-    (defun dotemacs-start-spray ()
-      "Start spray speed reading on current buffer at current point."
-      (interactive)
-      (evil-insert-state)
-      (spray-mode t)
-      (internal-show-cursor (selected-window) nil))
-    (dotemacs-set-leader-keys "asr" 'dotemacs-start-spray)
-
-    (defadvice spray-quit (after dotemacs-quit-spray activate)
-      "Correctly quit spray."
-      (internal-show-cursor (selected-window) t)
-      (evil-normal-state)))
-  :config
-  (progn
-    (define-key spray-mode-map (kbd "h") 'spray-backward-word)
-    (define-key spray-mode-map (kbd "l") 'spray-forward-word)
-    (define-key spray-mode-map (kbd "q") 'spray-quit)))
-
-
-;; Vagrant
-(use-package vagrant
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-declare-prefix "V" "vagrant")
-    (dotemacs-set-leader-keys
-      "VD" 'vagrant-destroy
-      "Ve" 'vagrant-edit
-      "VH" 'vagrant-halt
-      "Vp" 'vagrant-provision
-      "Vr" 'vagrant-resume
-      "Vs" 'vagrant-status
-      "VS" 'vagrant-suspend
-      "VV" 'vagrant-up)))
-
-(use-package vagrant-tramp
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (defvar dotemacs--vagrant-tramp-loaded nil)
-    (defadvice vagrant-tramp-term (before dotemacs-load-vagrant activate)
-      "Lazy load vagrant-tramp."
-      (unless dotemacs--vagrant-tramp-loaded
-        (vagrant-tramp-add-method)
-        (setq dotemacs--vagrant-tramp-loaded t)))
-    (dotemacs-set-leader-keys "Vt" 'vagrant-tramp-term)))
-
-
-;; Pandoc
-(use-package pandoc-mode ; http://joostkremers.github.io/pandoc-mode/
-  :defer t
-  :commands dotemacs-run-pandoc
-  :config
-  (progn
-    (defun dotemacs-run-pandoc ()
-      "Start pandoc for the buffer and open the menu"
-      (interactive)
-      (pandoc-mode)
-      (pandoc-main-hydra/body))
-    (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings))
-  :init
-  (progn
-    (dotemacs-set-leader-keys "P/" 'dotemacs-run-pandoc)))
-
-; As there’s not, yet, an EPUB reader for Emacs, you can still set up Emacs to
-; be able to open .epub files to see what’s inside them, since they are, after
-; all, just ZIP files
-(setq auto-mode-alist
- (append (list '("\\.epub$" . archive-mode)) auto-mode-alist))
-
-(setq auto-coding-alist
- (append (list '("\\.epub$" . no-conversion)) auto-coding-alist))
-
-
-;;; Auto highlight symbol
-(use-package init-auto-highlight-symbol
-  :load-path "config/")
-
-(use-package auto-highlight-symbol
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq ahs-case-fold-search nil
-          ahs-default-range 'ahs-range-whole-buffer
-          ;; by default disable auto-highlight of symbol
-          ;; current symbol can always be highlighted with <leader> s h
-          ahs-idle-timer 0
-          ahs-idle-interval 0.25
-          ahs-inhibit-face-list nil)
-
-    (dotemacs-add-toggle automatic-symbol-highlight
-      :status (timerp ahs-idle-timer)
-      :on (progn
-            (auto-highlight-symbol-mode)
-            (setq ahs-idle-timer
-                  (run-with-idle-timer ahs-idle-interval t
-                                       'ahs-idle-function)))
-      :off (when (timerp ahs-idle-timer)
-             (auto-highlight-symbol-mode)
-             (cancel-timer ahs-idle-timer)
-             (setq ahs-idle-timer 0))
-      :documentation "Automatic highlight of current symbol."
-      :evil-leader "tha")
-
-    (dotemacs/add-to-hooks 'auto-highlight-symbol-mode '(prog-mode-hook
-                                                         markdown-mode-hook)))
-  :config
-  (progn
-    (dotemacs-hide-lighter auto-highlight-symbol-mode)
-
-    (defvar-local dotemacs-last-ahs-highlight-p nil
-      "Info on the last searched highlighted symbol.")
-    (defvar-local dotemacs--ahs-searching-forward t)
-
-    (with-eval-after-load 'evil
-      (define-key evil-motion-state-map (kbd "*")
-        'dotemacs-enter-ahs-forward)
-      (define-key evil-motion-state-map (kbd "#")
-        'dotemacs-enter-ahs-backward))
-
-    (dotemacs-set-leader-keys
-      "sh" 'dotemacs-symbol-highlight
-      "sH" 'dotemacs-goto-last-searched-ahs-symbol)
-
-    ;; micro-state to easily jump from a highlighted symbol to the others
-    (dolist (sym '(ahs-forward
-                   ahs-forward-definition
-                   ahs-backward
-                   ahs-backward-definition
-                   ahs-back-to-start
-                   ahs-change-range))
-      (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
-        (eval `(defadvice ,sym (around ,advice activate)
-                 (dotemacs-ahs-highlight-now-wrapper)
-                 ad-do-it
-                 (dotemacs-ahs-highlight-now-wrapper)
-                 (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))))))
-
-    (dotemacs-define-micro-state symbol-highlight
-      :doc (let* ((i 0)
-                  (overlay-count (length ahs-overlay-list))
-                  (overlay (format "%s" (nth i ahs-overlay-list)))
-                  (current-overlay (format "%s" ahs-current-overlay))
-                  (st (ahs-stat))
-                  (plighter (ahs-current-plugin-prop 'lighter))
-                  (plugin (format " <%s> " (cond ((string= plighter "HS") "D")
-                                                 ((string= plighter "HSA") "B")
-                                                 ((string= plighter "HSD") "F"))))
-                  (propplugin (propertize plugin 'face
-                                          `(:foreground "#ffffff"
-                                                        :background ,(face-attribute
-                                                                      'ahs-plugin-defalt-face :foreground)))))
-             (while (not (string= overlay current-overlay))
-               (setq i (1+ i))
-               (setq overlay (format "%s" (nth i ahs-overlay-list))))
-             (let* ((x/y (format "(%s/%s)" (- overlay-count i) overlay-count))
-                    (propx/y (propertize x/y 'face ahs-plugin-whole-buffer-face))
-                    (hidden (if (< 0 (- overlay-count (nth 4 st))) "*" ""))
-                    (prophidden (propertize hidden 'face '(:weight bold))))
-               (format "%s %s%s [n/N] move [e] edit [r] range [R] reset [d/D] definition [/] find in project [f] find in files [b] find in opened buffers [q] exit"
-                       propplugin propx/y prophidden)))
-      :on-exit (dotemacs-ahs-ms-on-exit)
-      :bindings
-      ("d" ahs-forward-definition)
-      ("D" ahs-backward-definition)
-      ("e" nil
-       :post (evil-iedit-state/iedit-mode)
-       :exit t)
-      ("n" dotemacs-quick-ahs-forward)
-      ("N" dotemacs-quick-ahs-backward)
-      ("R" ahs-back-to-start)
-      ("r" ahs-change-range)
-      ("/" dotemacs-helm-project-smart-do-search-region-or-symbol :exit t)
-      ("b" dotemacs-helm-buffers-smart-do-search-region-or-symbol :exit t)
-      ("f" dotemacs-helm-files-smart-do-search-region-or-symbol :exit t)
-      ("q" nil :exit t))))
-
-
-;; NixOS
-(dotemacs-defvar-company-backends nix-mode)
-
-(use-package nix-mode   ; This layer adds tools for
-  :ensure t             ; better integration of emacs in NixOS.
-  :defer t)
-
-(use-package nixos-options
-  :ensure t
-  :defer t)
-
-(use-package helm-nixos-options
-  :ensure t
-  :defer t
-  :config
-  (dotemacs-set-leader-keys
-    "h>" 'helm-nixos-options))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :pre-init
-    (progn
-      (push 'company-capf company-backends-nix-mode)
-      (dotemacs-add-company-hook nix-mode))))
-
-(use-package company-nixos-options
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (progn
-    (push 'company-nixos-options company-backends-nix-mode)))
-
-
 ;; Asciidoc
 (use-package adoc-mode
   ;; We will NOT default `.txt' files to AsciiDoc mode,
@@ -6541,939 +1646,332 @@ It will toggle the overlay under point or create an overlay of one character."
     (define-key adoc-mode-map (kbd "M-l") 'adoc-promote)))
 
 
-;;; Colors
-(use-package init-colors
-  :load-path "config/")
+;;; Markup Languages
+(use-package module-markup-languages)
+(use-package module-latex)
+(use-package module-markdown)
+(use-package module-pandoc)
 
-(use-package highlight-numbers          ; Fontify number literals
+(use-package graphviz-dot-mode          ; Graphviz
   :ensure t
   :defer t
-  :init
-  (progn
-    (add-hook 'prog-mode-hook #'highlight-numbers-mode)
-    (add-hook 'asm-mode-hook (lambda () (highlight-numbers-mode -1)))))
-
-(use-package highlight-indentation
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (dotemacs-add-toggle highlight-indentation
-      :status highlight-indentation-mode
-      :on (highlight-indentation-mode)
-      :off (highlight-indentation-mode -1)
-      :documentation "Highlight indentation levels."
-      :evil-leader "thi")
-    (dotemacs-add-toggle highlight-indentation-current-column
-      :status highlight-indentation-current-column-mode
-      :on (highlight-indentation-current-column-mode)
-      :off (highlight-indentation-current-column-mode -1)
-      :documentation "Highlight indentation level at point."
-      :evil-leader "thc"))
   :config
-  (progn
-    (dotemacs-diminish highlight-indentation-mode " ⓗ" " h")
-    (dotemacs-diminish highlight-indentation-current-column-mode " ⓗⒸ" " hC")))
+  (setq graphviz-dot-indent-width 4))
 
-(use-package highlight-parentheses
+(use-package systemd                    ; Mode for systemd unit files
+  :ensure t
+  :defer t)
+
+
+;;; Programming Languages, Utils
+(use-package module-programming
+  :init
+  (progn
+    ;; Highlight and allow to open http link at point in programming buffers
+    ;; goto-address-prog-mode only highlights links in strings and comments
+    (add-hook 'prog-mode-hook 'goto-address-prog-mode)
+    ;; Highlight and follow bug references in comments and strings
+    (add-hook 'prog-mode-hook 'bug-reference-prog-mode)
+
+    (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
+    (add-hook 'prog-mode-hook
+              (lambda ()
+                (run-hooks #'dotemacs-prog-mode-hook)))))
+
+(use-package module-compile          ; Personal helpers for compilation
+  :commands (dotemacs-colorize-compilation-buffer)
+  ;; Colorize output of Compilation Mode, see
+  ;; http://stackoverflow.com/a/3072831/355252
+  :init (add-hook 'compilation-filter-hook
+                  #'dotemacs-colorize-compilation-buffer))
+
+;; Programming Languages
+(use-package module-elisp)
+(use-package module-scala)
+(use-package module-python)
+(use-package module-ruby)
+(use-package module-rust)
+(use-package module-haskell)
+(use-package module-go)
+(use-package module-c-c++)
+(use-package module-clojure)
+(use-package module-ocaml)
+(use-package module-purescript)
+(use-package module-react)
+(use-package module-elm)
+(use-package module-javascript)
+(use-package module-web)
+(use-package module-lua)
+(use-package module-php)
+(use-package module-stylus)
+(use-package module-skewer)
+(use-package module-racket)
+(use-package module-java)
+(use-package module-restclient)
+(use-package module-swift)
+(use-package module-shell-script)
+
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (if (version< emacs-version "24.4")
+        (ad-disable-advice 'preceding-sexp 'around 'evil)
+      (advice-remove 'elisp--preceding-sexp 'evil--preceding-sexp))
+
+    ;; but alwayws enable for lisp mode
+    (dotemacs/add-to-hooks 'smartparens-strict-mode '(lisp-mode))
+
+    (defun dotemacs-eval-current-form-sp (&optional arg)
+      "Call `eval-last-sexp' after moving out of one level of
+parentheses. Will exit any strings and/or comments first.
+Requires smartparens because all movement is done using
+`sp-up-sexp'. An optional ARG can be used which is passed to
+`sp-up-sexp' to move out of more than one sexp."
+      (interactive "p")
+      (require 'smartparens)
+      (save-excursion
+        (let ((max 10))
+          (while (and (> max 0)
+                      (sp-point-in-string-or-comment))
+            (decf max)
+            (sp-up-sexp)))
+        (sp-up-sexp arg)
+        (call-interactively 'eval-last-sexp)))
+
+    (defun dotemacs-eval-current-symbol-sp ()
+      "Call `eval-last-sexp' on the symbol underneath the
+point. Requires smartparens because all movement is done using
+`sp-forward-symbol'."
+      (interactive)
+      (require 'smartparens)
+      (save-excursion
+        (sp-forward-symbol)
+        (call-interactively 'eval-last-sexp)))
+
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "ec" 'dotemacs-eval-current-form-sp
+        "es" 'dotemacs-eval-current-symbol-sp))))
+
+;;; Misc programming languages
+(use-package cmake-mode                 ; CMake files
+  :ensure t
+  :defer t)
+
+(use-package thrift                     ; Thrift interface files
+  :ensure t
   :defer t
-  :ensure t
-  :init
-  (progn
-    (when (member dotemacs-highlight-delimiters '(all current))
-      (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
-    (setq hl-paren-delay 0.2)
-    (dotemacs-set-leader-keys "tCp" 'highlight-parentheses-mode)
-    (setq hl-paren-colors '("Springgreen3"
-                            "IndianRed1"
-                            "IndianRed3"
-                            "IndianRed4")))
-  :config
-  (dotemacs-hide-lighter highlight-parentheses-mode)
-  (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold))
+  :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
 
-(use-package highlight-quoted
-  :ensure t
-  :defer t
-  :init (add-hook 'prog-mode-hook #'highlight-quoted-mode))
+
+;; Databases
+(use-package module-sql)
 
-(use-package highlight-symbol           ; Highlighting and commands for symbols
-  :ensure t
-  :defer t
-  :bind
-  (("C-c s %" . highlight-symbol-query-replace)
-   ("C-c s n" . highlight-symbol-next-in-defun)
-   ("C-c s o" . highlight-symbol-occur)
-   ("C-c s p" . highlight-symbol-prev-in-defun))
-  ;; Navigate occurrences of the symbol under point with M-n and M-p, and
-  ;; highlight symbol occurrences
-  :init (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-               (add-hook 'prog-mode-hook #'highlight-symbol-mode))
-  :config
-  (setq highlight-symbol-idle-delay 0.3     ; Highlight almost immediately
-        highlight-symbol-on-navigation-p t) ; Highlight immediately after
-                                        ; navigation
-  :diminish highlight-symbol-mode)
+
+;; Source Code tags, and metadata
+;; e.g. etags, ebrowse, exuberant ctags, cscope, GNU Global and GTags
+(use-package module-gtags)
 
-(use-package rainbow-delimiters         ; Highlight delimiters by depth,  is a "rainbow parentheses"-like
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (dotemacs-set-leader-keys "tCd" 'rainbow-delimiters-mode)
+
+;;; Version control
+(use-package module-version-control)
+(use-package module-git)
+(use-package module-github)
+(use-package module-magit)
 
-    (when (member dotemacs-highlight-delimiters '(any all))
-      (dolist (hook '(text-mode-hook prog-mode-hook))
-        (add-hook hook #'rainbow-delimiters-mode)))))
+
+;;; File Search
+(use-package module-file-search)
 
-;; Currently it supports Scala (scala-mode2), JavaScript (js-mode and js2-mode),
-;; Ruby, Python, Emacs Lisp, Clojure, C, C++, and Java.
-(use-package color-identifiers-mode
-  :ensure t
-  :if (eq dotemacs-colors-engine 'color)
-  :commands color-identifiers-mode
-  :init
-  (progn
-    (dolist (mode '(scala js js2 ruby python emacs-lisp clojure c java))
-      (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-                (lambda ()
-                  (color-identifiers-mode)))))
-  :diminish color-identifiers-mode)
+
+;;; Interactively Do Things (IDO)
+(use-package module-ido)
 
-(use-package rainbow-identifiers
-  :ensure t
-  :if (eq dotemacs-colors-engine 'rainbow)
-  :commands rainbow-identifiers-mode
-  :init
-  (progn
-    (setq rainbow-identifiers-choose-face-function 'rainbow-identifiers-cie-l*a*b*-choose-face
-          rainbow-identifiers-cie-l*a*b*-saturation 100
-          rainbow-identifiers-cie-l*a*b*-lightness 40
-          ;; override theme faces
-          rainbow-identifiers-faces-to-override '(highlight-quoted-symbol
-                                                  font-lock-keyword-face
-                                                  font-lock-function-name-face
-                                                  font-lock-variable-name-face))
+
+;;; Project Management
+(use-package module-projectile)
+(use-package module-neotree)
 
-    (dotemacs-add-toggle rainbow-identifier-globally
-      :status rainbow-identifiers-mode
-      :on (rainbow-identifiers-mode)
-      :off (rainbow-identifiers-mode -1)
-      :documentation "Colorize identifiers globally."
-      :evil-leader "tCi")
+
+;;; IRC and IM
+(use-package module-irc-im)
 
-    (add-hook 'prog-mode-hook 'rainbow-identifiers-mode))
-  (colors//tweak-theme-colors dotemacs--cur-theme)
+
+;;; Outline and TODOs
+(use-package module-org)
 
-  (defadvice dotemacs-post-theme-init (after colors/post-theme-init activate)
-    "Adjust lightness and brightness of rainbow-identifiers on post theme init."
-    (colors//tweak-theme-colors dotemacs--cur-theme))
+
+;;; Online Help
+(use-package module-help)
+(use-package module-which-key)
 
-  :config
-  (progn
-    ;; key bindings
-    (dotemacs-set-leader-keys "Cis" 'colors/start-change-color-saturation)
-    (dotemacs-set-leader-keys "Cil" 'colors/start-change-color-lightness)))
+
+;;; File Navigation
+(use-package module-file-navigation)
+(use-package module-ranger)
+(use-package module-vinegar)
+(use-package module-unimpaired)
 
-(use-package rainbow-mode               ; Fontify color values in code
-  :commands rainbow-mode
-  :ensure t
-  :bind (("C-c t r" . rainbow-mode))
-  :init
-  (progn
-    (dotemacs-set-leader-keys "tCc" 'rainbow-mode)
-    (dolist (hook '(prog-mode-hook sgml-mode-hook css-mode-hook web-mode-hook))
-      (add-hook hook #'rainbow-mode)))
-  :config
-  (dotemacs-hide-lighter rainbow-mode))
+
+;;; Virtual Machine
+(use-package module-virtual-machine)
+(use-package module-ansible)
+(use-package module-puppet)
+(use-package module-vagrant)
+(use-package module-nixos)
+
+
+;;; Finance
+(use-package module-finance)
+
+
+;;; Highlight Symbols, Numbers, Parentheses, etc.
+(use-package module-auto-highlight-symbol)
+(use-package module-highlight)
 
 
 ;;; Paired delimiters
-(use-package elec-pair                  ; Electric pairs
-  :disabled t
-  :init (electric-pair-mode))
-
-(use-package paren                      ; Highlight paired delimiters
-  :ensure t
-  :init
-  (progn
-    (setq show-paren-delay 0)
-    (dotemacs-add-toggle show-paren-mode
-      :status show-paren-mode
-      :on (show-paren-mode)
-      :off (show-paren-mode -1)
-      :documentation "Highlight matching pairs of parentheses."
-      :evil-leader "tCP")
-    (if (eq dotemacs-highlight-delimiters 'all)
-      (show-paren-mode)))
-  :config (setq show-paren-when-point-inside-paren t
-                show-paren-when-point-in-periphery t))
-
-(use-package init-smartparens      ; Personal Smartparens extensions
-  :load-path "config/")
-
-;; Use SmartParens instead of Paredit and Electric Pair
-(use-package smartparens                ; Parenthesis editing and balancing
-  :ensure t
-  :defer t
-  :commands (sp-split-sexp sp-newline)
-  :init
-  (progn
-    (dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
-                                'smartparens-strict-mode
-                              'smartparens-mode)
-                            '(prog-mode-hook))
-
-    (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
-
-    ;; TODO move these hooks into their layers
-    ;; (dolist (hook '(LaTeX-mode-hook web-moode-hook inferior-python-mode-hook))
-    ;;   (add-hook hook #'smartparens-mode))
-
-    (dotemacs-add-toggle smartparens
-      :status smartparens-mode
-      :on (smartparens-mode)
-      :off (smartparens-mode -1)
-      :documentation "Enable smartparens."
-      :evil-leader "tp")
-
-    (dotemacs-add-toggle smartparens-globally
-      :status smartparens-mode
-      :on (smartparens-global-mode)
-      :off (smartparens-global-mode -1)
-      :documentation "Enable smartparens globally."
-      :evil-leader "t C-p")
-
-    (setq sp-show-pair-delay 0.2
-          sp-autoskip-closing-pair 'always ; https://github.com/Fuco1/smartparens/issues/142
-          ; fix paren highlighting in normal mode
-          sp-show-pair-from-inside t
-          sp-cancel-autoskip-on-backward-movement nil)
-
-    (dotemacs-set-leader-keys
-     "J"  'sp-split-sexp
-     "jj" 'sp-newline))
-  :config
-  (progn
-    (require 'smartparens-config)
-    (dotemacs-diminish smartparens-mode " ⓟ" " p")
-
-    (show-smartparens-global-mode +1)
-
-    ;;; Additional pairs for various modes
-    (sp-with-modes '(php-mode)
-      (sp-local-pair "/**" "*/" :post-handlers '(("| " "SPC")
-                                                 (dotemacs-php-handle-docstring "RET")))
-      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
-      (sp-local-pair "(" nil :prefix "\\(\\sw\\|\\s_\\)*"))
-
-    (sp-with-modes '(scala-mode)
-      (sp-local-pair "'" nil :actions nil))
-
-    (sp-with-modes '(text-mode)
-      (sp-local-pair "`" "'" :actions '(insert wrap)))
-
-    (sp-with-modes '(racket-mode)
-      (sp-local-pair "'" nil :actions nil)
-      (sp-local-pair "`" nil :actions nil))
-
-    ;; TODO research sp-local-tag or evil-surround with modes
-    (sp-with-modes '(tex-mode
-                     plain-tex-mode
-                     latex-mode)
-      ; (sp-local-tag "i" "\"<" "\">")
-      (sp-local-pair "$" " $")
-      (sp-local-pair "\\[" " \\]")
-      (sp-local-pair "\\(" " \\)")
-      (sp-local-pair "\\{" " \\}")
-      (sp-local-pair "\\left(" " \\right)")
-      (sp-local-pair "\\left\\{" " \\right\\}"))
-
-    (sp-with-modes 'org-mode
-      (sp-local-pair "*" "*" :actions '(insert wrap) :unless '(sp-point-after-word-p sp-point-at-bol-p) :wrap "C-*" :skip-match 'dotemacs-org-skip-asterisk)
-      (sp-local-pair "_" "_" :unless '(sp-point-after-word-p) :wrap "C-_")
-      (sp-local-pair "/" "/" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "~" "~" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "=" "=" :unless '(sp-point-after-word-p) :post-handlers '(("[d1]" "SPC")))
-      (sp-local-pair "«" "»"))
-
-    (sp-with-modes '(markdown-mode
-                     gfm-mode
-                     rst-mode)
-      ; (sp-local-tag "2" "**" "**")
-      ; (sp-local-tag "s" "```scheme" "```")
-      ; (sp-local-tag "<"  "<_>" "</_>" :transform 'sp-match-sgml-tags)
-      (sp-local-pair "*" "*" :wrap "C-*" :skip-match 'dotemacs-gfm-skip-asterisk)
-      (sp-local-pair "_" "_" :wrap "C-_"))
-
-    (sp-with-modes '(rust-mode)
-      ;; Don't pair lifetime specifiers
-      (sp-local-pair "'" nil :actions nil))
-
-    (sp-with-modes '(malabar-mode c++-mode)
-      (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
-
-    (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
-                                                        ("* ||\n[i]" "RET")))
-    (sp-with-modes '(haskell-mode)
-      (sp-local-pair "'" nil :unless '(dotemacs-after-symbol-p))
-      (sp-local-pair "\\(" nil :actions nil))
-
-    ;; Emacs Lisp
-    (sp-with-modes '(emacs-lisp-mode
-                     inferior-emacs-lisp-mode
-                     lisp-interaction-mode
-                     lisp-mode)
-      (sp-local-pair "'" nil :actions nil)
-      (sp-local-pair "(" nil :bind "M-(")
-      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
-
-    ;; don't create a pair with single quote in minibuffer
-    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-
-    (sp-pair "{" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
-    (sp-pair "[" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
+(use-package module-paired-delimiters)
+(use-package module-smartparens)
 
 
 ;;; Syntax Checking
-(use-package init-syntax-checking
-  :load-path "config/"
-  :defer t
-  :commands (dotemacs/add-flycheck-hook
-             dotemacs-discard-undesired-html-tidy-error
-             dotemacs-flycheck-mode-line-status
-             dotemacs-mode-line-flycheck-info-toggle
-             dotemacs-eslint-set-local-eslint-from-projectile
-             dotemacs-flycheck-executables-updated
-             dotemacs-flycheck-executables-search
-             dotemacs-flycheck-init-react
-             dotemacs-flycheck-init-javascript))
+(use-package module-flycheck)
 
-(use-package flycheck                   ; On-the-fly syntax checking
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq flycheck-standard-error-navigation nil
-          flycheck-completion-system 'ido)
-
-    ;; Each buffer gets its own idle-change-delay because of the
-    ;; buffer-sensitive adjustment above.
-    (make-variable-buffer-local 'flycheck-idle-change-delay)
-
-    (add-hook 'flycheck-after-syntax-check-hook
-              #'dotemacs-adjust-flycheck-automatic-syntax-eagerness)
-
-    (dotemacs-add-toggle syntax-checking
-      :status flycheck-mode
-      :on (flycheck-mode)
-      :off (flycheck-mode -1)
-      :documentation "Enable error and syntax checking."
-      :evil-leader "ts"))
-  :config
-  (progn
-    ;; Make flycheck recognize packages in loadpath
-    ;; i.e (require 'company) will not give an error now
-    (setq flycheck-emacs-lisp-load-path 'inherit)
-
-    (dotemacs-diminish flycheck-mode " ⓢ" " s")
-
-    (evilified-state-evilify-map flycheck-error-list-mode-map
-      :mode flycheck-error-list-mode
-      :bindings
-      "RET" 'flycheck-error-list-goto-error
-      "j" 'flycheck-error-list-next-error
-      "k" 'flycheck-error-list-previous-error)
-
-    (dotemacs-set-leader-keys
-      "ec" 'flycheck-clear
-      "eh" 'flycheck-describe-checker
-      "el" 'dotemacs-toggle-flycheck-error-list
-      ; ; https://github.com/flycheck/flycheck/pull/494
-      ; "el" 'dotemacs-flycheck-pop-to-error-list
-      ; "eL" 'dotemacs-flycheck-hide-list-errors
-      "es" 'flycheck-select-checker
-      "eS" 'flycheck-set-checker-executable
-      "ev" 'flycheck-verify-setup)
-
-    (dotemacs|do-after-display-system-init
-      (unless (display-graphic-p)
-        (setq flycheck-display-errors-function
-              #'flycheck-display-error-messages-unless-error-list
-              flycheck-mode-line
-              '(:eval (dotemacs-flycheck-mode-line-status)))))
-
-    ;; Don't highlight undesired errors from html tidy
-    (add-hook 'flycheck-process-error-functions
-              #'dotemacs-discard-undesired-html-tidy-error)
-
-    ;; Use italic face for checker name
-    (set-face-attribute 'flycheck-error-list-checker-name nil
-                        :inherit 'italic)
-
-    (add-to-list 'display-buffer-alist
-                 `(,(rx bos "*Flycheck errors*" eos)
-                    (display-buffer-reuse-window
-                      display-buffer-in-side-window)
-                    (side            . bottom)
-                    (reusable-frames . visible)
-                    (window-height   . 0.4)))
-
-    ;; toggle flycheck window
-    (defun dotemacs-toggle-flycheck-error-list ()
-      "Toggle flycheck's error list window.
-If the error list is visible, hide it.  Otherwise, show it."
-      (interactive)
-      (-if-let (window (flycheck-get-error-list-window))
-          (quit-window nil window)
-        (flycheck-list-errors)))
-
-    (defun dotemacs-flycheck-pop-to-error-list ()
-      (interactive)
-      (flycheck-list-errors)
-      (pop-to-buffer flycheck-error-list-buffer))
-
-    (defun dotemacs-flycheck-hide-list-errors ()
-      "Hide the error list for the current buffer."
-      (interactive)
-      (let ((buffer (get-buffer flycheck-error-list-buffer)))
-        (when buffer
-          (let ((window (get-buffer-window buffer)))
-            (when window
-              (unless (flycheck-overlays-at (point))
-                (quit-window nil window)))))))
-
-    ;; Custom fringe indicator
-    (when (fboundp 'define-fringe-bitmap)
-      (define-fringe-bitmap 'my-flycheck-fringe-indicator
-        (vector #b00000000
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00011100
-                #b00111110
-                #b00111110
-                #b00111110
-                #b00011100
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00000000
-                #b00000000)))
-
-    (flycheck-define-error-level 'error
-      :overlay-category 'flycheck-error-overlay
-      :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-error)
-    (flycheck-define-error-level 'warning
-      :overlay-category 'flycheck-warning-overlay
-      :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-warning)
-    (flycheck-define-error-level 'info
-      :overlay-category 'flycheck-info-overlay
-      :fringe-bitmap 'my-flycheck-fringe-indicator
-      :fringe-face 'flycheck-fringe-info)))
-
-(use-package flycheck-pos-tip
-  :ensure t
-  :if dotemacs-s-syntax-checking-enable-tooltips
-  :defer t
-  :init
-  (with-eval-after-load 'flycheck
-    (dotemacs|do-after-display-system-init
-     (flycheck-pos-tip-mode))))
-
-(use-package ispell                     ; Spell checking
-  :defer t
-  :config
-  (progn
-    (setq ispell-program-name
-          (or (executable-find "aspell")
-              (executable-find "hunspell"))
-
-          ; ispell-extra-args '("--sug-mode=ultra")
-          ispell-dictionary "en_US"     ; Default dictionnary
-          ispell-silently-savep t       ; Don't ask when saving the private dict
-          ;; Increase the height of the choices window to take our header line
-          ;; into account.
-          ispell-choices-win-default-height 5)
-
-    (unless ispell-program-name
-      (warn "No spell checker available. Install Hunspell or ASpell."))))
-
-(use-package init-spell-checking
-  :load-path "config/"
-  :defer t
-  :commands (spell-checking/add-flyspell-hook
-             spell-checking/change-dictionary))
-
-(use-package define-word
-  :defer t
-  :ensure t
-  :init
-  (dotemacs-set-leader-keys
-    "xwd" 'define-word-at-point))
-
-(use-package auto-dictionary
-  :if spell-checking-enable-auto-dictionary
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (add-hook 'flyspell-mode-hook 'auto-dictionary-mode)
-    ;; Select the buffer local dictionary if it was set, otherwise
-    ;; auto-dictionary will replace it with a guessed one at each activation.
-    ;; https://github.com/nschum/auto-dictionary-mode/issues/5
-    (defun dotemacs//adict-set-local-dictionary ()
-      "Set the local dictionary if not nil."
-      (when (and (fboundp 'adict-change-dictionary)
-                 ispell-local-dictionary)
-        (adict-change-dictionary ispell-local-dictionary)))
-
-    (add-hook 'auto-dictionary-mode-hook
-              'dotemacs//adict-set-local-dictionary 'append)))
-
-(use-package flyspell                   ; On-the-fly spell checking
-  :defer t
-  :init
-  (progn
-    (setq flyspell-use-meta-tab nil
-          flyspell-issue-welcome-flag nil  ;; Make Flyspell less chatty
-          flyspell-issue-message-flag nil)
-    (dolist (mode '(org-mode text-mode message-mode))
-      (spell-checking/add-flyspell-hook mode))
-
-    (dotemacs-add-toggle spelling-checking
-      :status flyspell-mode
-      :on (if (derived-mode-p 'prog-mode)
-              (flyspell-prog-mode)
-            (flyspell-mode))
-      :off (progn
-             (flyspell-mode-off)
-             ;; Also disable auto-dictionary when disabling spell-checking.
-             (when (fboundp 'auto-dictionary-mode) (auto-dictionary-mode -1)))
-      :documentation "Enable automatic spell checking."
-      :evil-leader "tS")
-
-    (dotemacs-set-leader-keys
-      "Sb" 'flyspell-buffer
-      "Sd" 'spell-checing/change-dictionary
-      "Sn" 'flyspell-goto-next-error))
-  :config
-  (progn
-    ;; Undefine mouse buttons which get in the way
-    (define-key flyspell-mouse-map [down-mouse-2] nil)
-    (define-key flyspell-mouse-map [mouse-2] nil)
-    (dotemacs-diminish flyspell-mode " Ⓢ" " S")))
-
-(use-package helm-flycheck
-  :ensure t
-  :commands helm-flycheck
-  :init (dotemacs-set-leader-keys "ef" 'helm-flycheck))
-
-(use-package helm-flyspell
-  :ensure t
-  :commands helm-flyspell-correct
-  :init (dotemacs-set-leader-keys "Sc" 'helm-flyspell-correct))
+
+;;; Spell Checking
+(use-package module-spell-checking)
+(use-package module-flyspell)
 
 
 ;;; Skeletons, completion and expansion
-(use-package init-auto-completions
-  :load-path "config/")
-
-(dotemacs-add-toggle auto-completion
-                     :status
-                      (if (boundp 'auto-completion-front-end)
-                          (if (eq 'company auto-completion-front-end)
-                              company-mode
-                            auto-complete-mode)
-                        ;; default completion hardcoded to be company for now
-                        (setq auto-completion-front-end 'company)
-                        nil)
-                      :on
-                      (progn
-                        (if (eq 'company auto-completion-front-end)
-                            (company-mode)
-                          (auto-complete-mode))
-                        (message "Enabled auto-completion (using %S)."
-                                 auto-completion-front-end))
-                      :off
-                      (progn
-                        (if (eq 'company auto-completion-front-end)
-                            (company-mode -1)
-                          (auto-complete-mode -1))
-                        (message "Disabled auto-completion."))
-                      :documentation "Enable auto-completion."
-                      :evil-leader "ta")
-
-;; In `completion-at-point', do not pop up silly completion buffers for less
-;; than five candidates.  Cycle instead.
-(setq completion-cycle-threshold 5)
-
-;; tell emacs where to read abbrev
-(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
-
-(use-package hippie-exp                 ; Powerful expansion and completion
-  :bind (([remap dabbrev-expand] . hippie-expand))
-  :init
-  :config
-  (progn
-    ;; replace dabbrev-expand
-    (global-set-key (kbd "M-/") 'hippie-expand)
-    (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
-    (setq hippie-expand-try-functions-list '(
-          ;; Try to expand yasnippet snippets based on prefix
-          yas-hippie-try-expand
-          ;; Try to expand word "dynamically", searching the current buffer.
-          try-expand-dabbrev
-          ;; Try to expand word "dynamically", searching all other buffers.
-          try-expand-dabbrev-all-buffers
-          ;; Try to expand word "dynamically", searching the kill ring.
-          try-expand-dabbrev-from-kill
-          ;; Try to complete text as a file name, as many characters as unique.
-          try-complete-file-name-partially
-          ;; Try to complete text as a file name.
-          try-complete-file-name
-          ;; Try to expand word before point according to all abbrev tables.
-          try-expand-all-abbrevs
-          ;; Try to complete the current line to an entire line in the buffer.
-          try-expand-list
-          ;; Try to complete the current line to an entire line in the buffer.
-          try-expand-line
-          ;; Try to complete as an Emacs Lisp symbol, as many characters as
-          ;; unique.
-          try-complete-lisp-symbol-partially
-          ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol))))
-
-(use-package company                    ; Graphical (auto-)completion
-  :ensure t
-  :defer t
-  :if (eq dotemacs-completion-engine 'company)
-  :init
-  (progn
-    (setq company-idle-delay 0.2
-          company-tooltip-align-annotations t
-          ; company-tooltip-limit 10
-          company-minimum-prefix-length 2
-          ;; invert the navigation direction if the the completion popup-isearch-match
-          ;; is displayed on top (happens near the bottom of windows)
-          ; company-tooltip-flip-when-above t
-          company-require-match nil
-          ; company-dabbrev-code-ignore-case t
-          ; company-dabbrev-code-everywhere t
-          company-show-numbers t ;; Easy navigation to candidates with M-<n>
-          company-dabbrev-ignore-case nil
-          company-dabbrev-downcase nil
-          company-frontends '(company-pseudo-tooltip-frontend))
-          (defvar-local company-fci-mode-on-p nil)
-
-    (defun company-turn-off-fci (&rest ignore)
-      (when (boundp 'fci-mode)
-        (setq company-fci-mode-on-p fci-mode)
-        (when fci-mode (fci-mode -1))))
-
-    (defun company-maybe-turn-on-fci (&rest ignore)
-      (when company-fci-mode-on-p (fci-mode 1)))
-
-    (add-hook 'company-completion-started-hook 'company-turn-off-fci)
-    (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
-  :config
-  (progn
-    (dotemacs-diminish company-mode " ⓐ" " a")
-    ;; key bindings
-    (defun dotemacs-company-complete-common-or-cycle-backward ()
-      "Complete common prefix or cycle backward."
-      (interactive)
-      (company-complete-common-or-cycle -1))
-
-    (dotemacs-auto-completion-set-RET-key-behavior 'company)
-    (dotemacs-auto-completion-set-TAB-key-behavior 'company)
-    (dotemacs-auto-completion-setup-key-sequence 'company)
-    (let ((map company-active-map))
-      (define-key map (kbd "C-/") 'company-search-candidates)
-      (define-key map (kbd "C-M-/") 'company-filter-candidates)
-      (define-key map (kbd "C-d") 'company-show-doc-buffer)
-      (define-key map (kbd "C-j") 'company-select-next)
-      (define-key map (kbd "C-k") 'company-select-previous)
-      (define-key map (kbd "C-l") 'company-complete-selection))
-
-    ;; Nicer looking faces
-    (custom-set-faces
-     '(company-tooltip-common
-       ((t (:inherit company-tooltip :weight bold :underline nil))))
-     '(company-tooltip-common-selection
-       ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
-
-    ;; Transformers
-    (defun dotemacs-company-transformer-cancel (candidates)
-      "Cancel completion if prefix is in the list
-`company-mode-completion-cancel-keywords'"
-      (unless (member company-prefix company-mode-completion-cancel-keywords)
-        candidates))
-    (setq company-transformers '(dotemacs-company-transformer-cancel
-                                   company-sort-by-occurrence))))
-
-(use-package company-statistics
-  :ensure t
-  :if (and auto-completion-enable-sort-by-usage
-           (eq dotemacs-completion-engine 'company))
-  :defer t
-  :init
-  (progn
-    (setq company-statistics-file (concat dotemacs-cache-directory
-                                          "company-statistics-cache.el"))
-    (add-hook 'company-mode-hook 'company-statistics-mode)))
-
-(use-package company-quickhelp
-  :defer t
-  :disabled t
-  :init
-  (progn
-    (dotemacs|do-after-display-system-init
-    (when (and auto-completion-enable-help-tooltip
-               (not (version< emacs-version "24.4"))  ;; company-quickhelp from MELPA
-                                                      ;; is not compatible with 24.3 anymore
-               (eq dotemacs-completion-engine 'company)
-               (display-graphic-p))
-      (add-hook 'company-mode-hook 'company-quickhelp-mode)))))
-
-(use-package helm-company
-  :ensure t
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (with-eval-after-load 'company
-    (define-key company-active-map (kbd "C-/") 'helm-company)))
-
-(use-package auto-complete
-  :ensure t
-  :if (eq dotemacs-completion-engine 'auto-complete)
-  :defer t
-  :init
-  (setq ac-auto-start 0
-        ac-delay 0.2
-        ac-quick-help-delay 1.
-        ac-use-fuzzy t
-        ; ac-auto-show-menu t
-        ; ac-quick-help-height 30
-        ; ac-show-menu-immediately-on-auto-complete t
-        ; completion-ignored-extensions '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".aux" ".elf" )
-        ac-fuzzy-enable t
-        ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat")
-        ;; use 'complete when auto-complete is disabled
-        tab-always-indent 'complete
-        ac-dwim t)
-  :config
-  (progn
-    (require 'auto-complete-config)
-    (setq-default ac-sources '(ac-source-abbrev
-                               ac-source-dictionary
-                               ac-source-words-in-same-mode-buffers))
-    (with-eval-after-load 'yasnippet
-      (push 'ac-source-yasnippet ac-sources))
-
-    (add-to-list 'completion-styles 'initials t)
-    (define-key ac-completing-map (kbd "C-j") 'ac-next)
-    (define-key ac-completing-map (kbd "C-k") 'ac-previous)
-    (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous)
-    (dotemacs-diminish auto-complete-mode " ⓐ" " a")))
-
-(use-package ac-ispell
-  :ensure t
-  :defer t
-  :if (eq dotemacs-completion-engine 'auto-complete)
-  :init
-  (progn
-    (setq ac-ispell-requires 4)
-    (with-eval-after-load 'auto-complete
-      (ac-ispell-setup))))
-
-(use-package init-yasnippet
-  :ensure yasnippet
-  :load-path "config/"
-  :commands (dotemacs-load-yasnippet
-             dotemacs-auto-yasnippet-expand
-             dotemacs-force-yasnippet-off))
-
-(use-package yasnippet
-  :ensure t
-  :commands (yas-global-mode yas-minor-mode)
-  :init
-  (progn
-    ;; We don't want undefined variable errors
-    (defvar yas-global-mode nil)
-
-    ;; disable yas minor mode map, use hippie-expand instead
-    (setq yas-minor-mode-map (make-sparse-keymap)
-          ;; stop polluting messages buffer
-          yas-verbosity 0
-          ;; allow nested expansions
-          yas-triggers-in-field t
-          ;; add key into candidate list
-          helm-yas-display-key-on-candidate t)
-
-    ;; this makes it easy to get out of a nested expansion
-    (define-key yas-minor-mode-map
-      (kbd "M-s-/") 'yas-next-field)
-
-    ;; on multiple keys, fall back to completing read typically this means helm
-    (setq yas-prompt-functions '(yas-completing-prompt))
-
-    (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(prog-mode-hook
-                                                      markdown-mode-hook
-                                                      org-mode-hook))
-
-    (dotemacs-add-toggle yasnippet
-      :status yas-minor-mode
-      :on (yas-minor-mode)
-      :off (yas-minor-mode -1)
-      :documentation "Enable snippets"
-      :evil-leader "ty")
-
-    (dotemacs/add-to-hooks 'dotemacs-force-yasnippet-off '(term-mode-hook
-                                                           shell-mode-hook
-                                                           eshell-mode-hook)))
-  :config
-  (progn
-    ;;  We need to know whether the smartparens was enabled, see
-    ;; `yas-before-expand-snippet-hook' below.
-    (defvar smartparens-enabled-initially t
-      "Stored whether smartparens is originally enabled or not.")
-
-    (add-hook 'yas-before-expand-snippet-hook (lambda ()
-                                                ;; If enabled, smartparens will mess snippets expanded by `hippie-expand`
-                                                (setq smartparens-enabled-initially smartparens-mode)
-                                                (smartparens-mode -1)))
-    (add-hook 'yas-after-exit-snippet-hook (lambda ()
-                                             (when smartparens-enabled-initially
-                                               (smartparens-mode 1))))
-    (dotemacs-diminish yas-minor-mode " ⓨ" " y")))
-
-(use-package auto-yasnippet
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (setq aya-persist-snippets-dir
-          (or dotemacs-ac-private-snippets-directory
-              (concat dotemacs-private-dir "snippets/")))
-    (dotemacs-declare-prefix "iS" "auto-yasnippet")
-    (dotemacs-set-leader-keys
-      "iSc" 'aya-create
-      "iSe" 'dotemacs-auto-yasnippet-expand
-      "iSw" 'aya-persist-snippet)))
-
-(use-package helm-c-yasnippet
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (defun dotemacs-helm-yas ()
-      "Properly lazy load helm-c-yasnipper."
-      (interactive)
-      (dotemacs-load-yasnippet)
-      (require 'helm-c-yasnippet)
-      (call-interactively 'helm-yas-complete))
-    (dotemacs-set-leader-keys "is" 'dotemacs-helm-yas)
-    (setq helm-c-yas-space-match-any-greedy t)))
+(use-package module-auto-complete)
+(use-package module-hippie-exp)
+(use-package module-company)
+(use-package module-yasnippet)
 
 
-;;; The mode line
+;;; Space line
+(use-package module-spaceline)
 
-(use-package spaceline-config
-  :ensure spaceline
-  :init
-  (progn
-    (dotemacs|do-after-display-system-init
-     (setq-default powerline-default-separator
-                   (if (display-graphic-p) 'wave 'utf-8)))
+
+;;; Date and time
+(use-package calendar                   ; Built-in calendar
+  :bind ("C-c u c" . calendar)
+  :config
+  ;; In Europe we start on Monday
+  (setq calendar-week-start-day 1))
 
-    (defun dotemacs-set-powerline-for-startup-buffers ()
-      "Set the powerline for buffers created when Emacs starts."
-      (dolist (buffer '("*Messages*" "*dotemacs*" "*scratch" "*Compile-Log*" "*Require Times*"))
-        (when (get-buffer buffer)
-          (dotemacs-restore-powerline buffer))))
-    (add-hook 'emacs-startup-hook
-              'dotemacs-set-powerline-for-startup-buffers))
+(use-package time                       ; Show current time
+  :defer t
+  :config
+  (setq display-time-world-time-format "%H:%M %Z, %d. %b"
+        display-time-world-list '(("Europe/Berlin"    "Berlin")
+                                  ("Europe/London"    "London")
+                                  ("Europe/Istanbul"  "Istanbul")
+                                  ("America/Winnipeg" "Winnipeg (CA)")
+                                  ("America/New_York" "New York (USA)")
+                                  ("Asia/Tokyo"       "Tokyo (JP)"))))
+
+
+;;; Net & Web
+(use-package browse-url                 ; Browse URLs
+  :bind (("C-c w u" . browse-url)))
+
+(use-package bug-reference              ; Turn bug refs into browsable buttons
+  :defer t
+  :init (progn (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
+               (add-hook 'text-mode-hook #'bug-reference-mode)))
+
+(use-package goto-addr                  ; Make links clickable
+  :defer t
+  :init (progn (add-hook 'prog-mode-hook #'goto-address-prog-mode)
+               (add-hook 'text-mode-hook #'goto-address-mode)))
+
+(use-package eww                        ; Emacs' built-in web browser
+  :bind (("C-c w b" . eww-list-bookmarks)
+         ("C-c w w" . eww)))
+
+(use-package sendmail                   ; Send mails from Emacs
+  :defer t
+  :config (setq send-mail-function 'smtpmail-send-it))
+
+(use-package message                    ; Compose mails from Emacs
+  :defer t
+  :config (setq message-send-mail-function 'smtpmail-send-it
+                ;; Don't keep message buffers around
+                message-kill-buffer-on-exit t))
+
+
+;;; Miscellaneous
+(use-package module-location)
+(use-package module-emoji)
+
+(use-package theme-changer
+  :if geolocation-enable-automatic-theme-changer
+  :ensure t
   :config
   (progn
-    (spaceline-toggle-battery-off)
-    (spaceline-toggle-version-control-off)
-    (spaceline-toggle-minor-modes-off)
-    (spaceline-toggle-major-mode-off)
-    (spaceline-toggle-org-clock-off)
+    (when (> (length dotemacs-themes) 1)
+      (change-theme (nth 0 dotemacs-themes)
+                    (nth 1 dotemacs-themes)))))
 
-    (defun dotemacs/customize-powerline-faces ()
-      "Alter powerline face to make them work with more themes."
-      (set-face-attribute 'powerline-inactive2 nil
-                          :inherit 'font-lock-comment-face))
-    (dotemacs/customize-powerline-faces)
+(use-package lorem-ipsum
+  :ensure t
+  :commands (lorem-ipsum-insert-list
+             lorem-ipsum-insert-paragraphs
+             lorem-ipsum-insert-sentences)
+  :init
+  (progn
+    (dotemacs-declare-prefix "il" "lorem ipsum")
+    (dotemacs-set-leader-keys
+      "ill" 'lorem-ipsum-insert-list
+      "ilp" 'lorem-ipsum-insert-paragraphs
+      "ils" 'lorem-ipsum-insert-sentences)))
 
-    (dolist (spec '((minor-modes "tmm")
-                    (major-mode "tmM")
-                    (version-control "tmv")
-                    (point-position "tmp")
-                    (org-clock "tmc")))
-      (let* ((segment (car spec))
-             (status-var (intern (format "spaceline-%S-p" segment))))
-        (eval `(dotemacs-add-toggle ,(intern (format "mode-line-%S" segment))
-                 :status ,status-var
-                 :on (setq ,status-var t)
-                 :off (setq ,status-var nil)
-                 :documentation ,(format "Show %s in the mode-line."
-                                         (replace-regexp-in-string
-                                          "-" " " (format "%S" segment)))
-                 :evil-leader ,(cadr spec)))))
-    (setq spaceline-org-clock-p nil)
+;; Google Translate
+(use-package google-translate
+  :ensure t
+  :commands (google-translate-query-translate
+             google-translate-at-point
+             google-translate-query-translate-reverse
+             google-translate-at-point-reverse)
+  :init
+  (dotemacs-set-leader-keys
+    "xgQ" 'google-translate-query-translate-reverse
+    "xgq" 'google-translate-query-translate
+    "xgT" 'google-translate-at-point-reverse
+    "xgt" 'google-translate-at-point)
+  :config
+  (progn
+    (require 'google-translate-default-ui)
+    (setq google-translate-enable-ido-completion t)
+    (setq google-translate-show-phonetic t)
+    (setq google-translate-default-source-language "en")
+    (setq google-translate-default-target-language "sp")))
 
-    (defun dotemacs//evil-state-face ()
-      (if (bound-and-true-p evil-state)
-          (let ((state (if (eq 'operator evil-state) evil-previous-state evil-state)))
-            (intern (format "dotemacs-%S-face" state)))
-        'face-of-god))
-    (setq spaceline-highlight-face-func 'dotemacs//evil-state-face)
+(use-package spray          ; Speed Reading
+  :commands spray-mode
+  :ensure t
+  :init
+  (progn
+    (defun dotemacs-start-spray ()
+      "Start spray speed reading on current buffer at current point."
+      (interactive)
+      (evil-insert-state)
+      (spray-mode t)
+      (internal-show-cursor (selected-window) nil))
+    (dotemacs-set-leader-keys "asr" 'dotemacs-start-spray)
 
-    (let ((unicodep (dotemacs-symbol-value
-                     dotemacs-mode-line-unicode-symbols)))
-      (setq spaceline-window-numbers-unicode unicodep)
-      (setq spaceline-workspace-numbers-unicode unicodep))
-
-    (spaceline-spacemacs-theme)
-    (spaceline-helm-mode t)
-    ; (when (configuration-layer/package-usedp 'info+)
-    ;   (spaceline-info-mode t))
-
-    (defun dotemacs-restore-powerline (buffer)
-      "Restore the powerline in buffer"
-      (with-current-buffer buffer
-        (setq-local mode-line-format (default-value 'mode-line-format))
-        (powerline-set-selected-window)
-        (powerline-reset)))
-
-    (defun dotemacs//prepare-diminish ()
-      (when spaceline-minor-modes-p
-        (let ((unicodep (dotemacs-symbol-value
-                         dotemacs-mode-line-unicode-symbols)))
-          (dotemacs|do-after-display-system-init
-           (setq spaceline-minor-modes-separator
-                 (if unicodep (if (display-graphic-p) "" " ") "|")))
-          (dolist (mm dotemacs--diminished-minor-modes)
-            (let ((mode (car mm)))
-              (when (and (boundp mode) (symbol-value mode))
-                (let* ((unicode (cadr mm))
-                       (ascii (caddr mm))
-                       (dim (if unicodep
-                                unicode
-                              (if ascii ascii unicode))))
-                  (diminish mode dim))))))))
-    (add-hook 'spaceline-pre-hook 'dotemacs//prepare-diminish)))
+    (defadvice spray-quit (after dotemacs-quit-spray activate)
+      "Correctly quit spray."
+      (internal-show-cursor (selected-window) t)
+      (evil-normal-state)))
+  :config
+  (progn
+    (define-key spray-mode-map (kbd "h") 'spray-backward-word)
+    (define-key spray-mode-map (kbd "l") 'spray-forward-word)
+    (define-key spray-mode-map (kbd "q") 'spray-quit)))
 
 (use-package evil-anzu                  ; Position/matches count for isearch
   :ensure t
@@ -7497,13 +1995,32 @@ If the error list is visible, hide it.  Otherwise, show it."
           status)))
     (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
 
+(use-package tildify
+  :bind (("C-c e t" . tildify-region))
+  :init (dolist (hook '(markdown-mode-hook
+                        latex-mode-hook
+                        rst-mode-hook))
+          (add-hook hook #'tildify-mode))
+  ;; Use the right space for LaTeX
+  :config (add-hook 'LaTeX-mode-hook
+                    (lambda () (setq-local tildify-space-string "~"))))
+
 (use-package rfringe
   :ensure t
   :defer t)
 
-; (byte-recompile-directory (expand-file-name dotemacs-core-directory) 0)
-; (byte-recompile-directory (expand-file-name dotemacs-config-dir) 0)
-; (byte-recompile-file (expand-file-name "init.el" user-emacs-directory))
+(use-package proced                     ; Edit system processes
+  ;; Proced isn't available on OS X
+  :if (not (eq system-type 'darwin))
+  :bind ("C-x p" . proced))
+
+;;; todo
+(use-package module-firestarter
+  :disabled t
+  :commands (dotemacs-firestarter-mode-line)
+  :init (with-eval-after-load 'firestarter
+          (setq firestarter-lighter
+                '(:eval (dotemacs-firestarter-mode-line)))))
 
 ;; Local Variables:
 ;; coding: utf-8
