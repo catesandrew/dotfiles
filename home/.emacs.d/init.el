@@ -7259,7 +7259,7 @@ If called with a prefix argument, uses the other-window instead."
       ;; repl
       "si" 'elm-repl-load
       "sf" 'elm-repl-push-decl
-      "sF" 'dotemacs/elm-repl-push-decl
+      "sF" 'dotemacs/elm-repl-push-decl-focus
       "sr" 'elm-repl-push
       "sR" 'dotemacs/elm-repl-push-focus
 
