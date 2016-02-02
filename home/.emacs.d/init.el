@@ -977,7 +977,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
                              cursor))))
 
     ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
-    ;; (setq evil-want-fine-undo t)
+    (setq evil-want-fine-undo t)
 
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
