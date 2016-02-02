@@ -6049,19 +6049,28 @@ Otherwise use Enh Ruby Mode, which is the default.")
     (dotemacs-hide-lighter ruby-test-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-declare-prefix-for-mode mode "mt" "ruby/test")
-      (dotemacs-set-leader-keys-for-major-mode mode "tb" 'ruby-test-run)
-      (dotemacs-set-leader-keys-for-major-mode mode "tt" 'ruby-test-run-at-point))))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "tb" 'ruby-test-run)
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "tt" 'ruby-test-run-at-point))))
 
 (use-package rubocop
   :defer t
   :ensure t
-  :init (add-hook 'enh-ruby-mode-hook 'rubocop-mode)
+  :init (dotemacs/add-to-hooks 'rubocop-mode '(ruby-mode-hook
+                                               enh-ruby-mode-hook))
   :config
   (progn
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraD" 'rubocop-autocorrect-directory)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraP" 'rubocop-autocorrect-project)
-    (evil-leader/set-key-for-mode 'enh-ruby-mode "mraF" 'rubocop-autocorrect-current-file)
-    ))
+    (dolist (mode '(ruby-mode enh-ruby-mode))
+      (dotemacs-declare-prefix-for-mode mode "mr" "ruby/refactor")
+      (dotemacs-set-leader-keys-for-major-mode mode
+                                                "rrd" 'rubocop-check-directory
+                                                "rrD" 'rubocop-autocorrect-directory
+                                                "rrf" 'rubocop-check-current-file
+                                                "rrF" 'rubocop-autocorrect-current-file
+                                                "rrp" 'rubocop-check-project
+                                                "rrP" 'rubocop-autocorrect-project))))
+
 
 (use-package inf-ruby                   ; Ruby REPL
   :ensure t
