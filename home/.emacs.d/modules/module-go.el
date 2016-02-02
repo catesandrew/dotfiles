@@ -71,5 +71,63 @@
         (message "Gocheck is needed to test the current suite"))
     (message "Must be in a _test.go file to run go-test-current-suite")))
 
-(provide 'init-go)
-;;; init-go.el ends here
+(dotemacs-defvar-company-backends go-mode)
+
+(defvar go-use-gocheck-for-testing nil
+  "If using gocheck for testing when running the tests -check.f
+  will be used instead of -run to specify the test that will be
+  ran. Gocheck is mandatory for testing suites.")
+
+(use-package go-rename
+  :disabled t
+  :init
+  (dotemacs-set-leader-keys-for-major-mode 'go-mode "rn" 'go-rename))
+
+(use-package go-mode
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (add-hook 'before-save-hook 'gofmt-before-save)
+
+    (dotemacs-set-leader-keys-for-major-mode 'go-mode
+      "hh" 'godoc-at-point
+      "ig" 'go-goto-imports
+      "ia" 'go-import-add
+      "ir" 'go-remove-unused-imports
+      "eb" 'go-play-buffer
+      "er" 'go-play-region
+      "ed" 'go-download-play
+      "xx" 'dotemacs/go-run-main
+      "ga" 'ff-find-other-file
+      "gg" 'godef-jump
+      "tt" 'dotemacs/go-run-test-current-function
+      "ts" 'dotemacs/go-run-test-current-suite
+      "tp" 'dotemacs/go-run-package-tests
+      "tP" 'dotemacs/go-run-package-tests-nested)))
+
+(use-package go-eldoc
+  :disabled t
+  :init
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (dotemacs/add-flycheck-hook 'go-mode))
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook go-mode))))
+
+(use-package company-go
+  :if (eq dotemacs-completion-engine 'company)
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (push 'company-go company-backends-go-mode)))
+
+(provide 'module-go)
+;;; module-go.el ends here
