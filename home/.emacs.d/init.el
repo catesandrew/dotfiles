@@ -6062,7 +6062,7 @@ Otherwise use Enh Ruby Mode, which is the default.")
   :config
   (progn
     (dolist (mode '(ruby-mode enh-ruby-mode))
-      (dotemacs-declare-prefix-for-mode mode "mr" "ruby/refactor")
+      (dotemacs-declare-prefix-for-mode mode "mrr" "ruby/RuboCop")
       (dotemacs-set-leader-keys-for-major-mode mode
                                                 "rrd" 'rubocop-check-directory
                                                 "rrD" 'rubocop-autocorrect-directory
