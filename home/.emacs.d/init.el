@@ -5043,8 +5043,16 @@ It will toggle the overlay under point or create an overlay of one character."
   :config
   (progn
     (dotemacs-set-leader-keys-for-major-mode 'scheme-mode
+      ","  'lisp-state-toggle-lisp-state
+
       "cc" 'geiser-compile-current-buffer
       "cp" 'geiser-add-to-load-path
+
+      "eb" 'geiser-eval-buffer
+      "ee" 'geiser-eval-last-sexp
+      "ef" 'geiser-eval-definition
+      "el" 'lisp-state-eval-sexp-end-of-line
+      "er" 'geiser-eval-region
 
       "gg" 'geiser-edit-symbol-at-point
       "gb" 'geiser-pop-symbol-stack
