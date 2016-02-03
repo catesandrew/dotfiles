@@ -1,17 +1,21 @@
 ;;; module-eyebrowse.el --- Eyebrowse Module
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
-(require 'module-common)
-(require 'module-global)
-
-;;; Code:
+;;
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+(require 'module-utils)
 
 (declare-function dotemacs-home "module-utils")
+
+;;; Code:
 
 (defvar eyebrowse-display-help t
   "If non-nil additional help is displayed when selecting a workspace.")
@@ -110,6 +114,7 @@
                 (neotree-find (projectile-project-root))
                 (neotree-find origin-buffer-file-name))
               (neotree-hide))))))
+
     (with-eval-after-load 'projectile
       (add-hook 'eyebrowse-post-window-switch-hook 'dotemacs-eyebrowse-switch))))
 

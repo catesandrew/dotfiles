@@ -1,5 +1,17 @@
-;;; Helm
-(require 'module-global)
+;;; module-helm.el --- Heml Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+(require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
 (defun dotemacs-helm-find-files (arg)
   "Custom implementation for calling helm-find-files-1.
@@ -822,6 +834,7 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
       "ss"    'helm-swoop
       "sS"    'dotemacs-helm-swoop-region-or-symbol
       "s C-s" 'helm-multi-swoop-all)
+
     (defadvice helm-swoop (before add-evil-jump activate)
       (evil-set-jump))))
 

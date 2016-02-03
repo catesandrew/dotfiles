@@ -28,5 +28,8 @@
     makefile-bsdmake-mode)
   "Modes for which auto-indenting is suppressed.")
 
+(defconst dotemacs-editing-style 'vim
+  "Always `vim', Evil is always enabled.")
+
 (provide 'module-vars)
 ;;; module-vars.el ends here

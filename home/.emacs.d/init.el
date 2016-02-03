@@ -68,9 +68,6 @@
 (unless (file-exists-p dotemacs-cache-directory)
     (make-directory dotemacs-cache-directory))
 
-(defconst dotemacs-editing-style 'vim
-  "Always `vim', Evil is always enabled.")
-
 (defcustom dotemacs-erc-nick
   'catesandrew
   "The erc nickname to use"
@@ -685,6 +682,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; stock package configuration
 (setq use-package-inject-hooks t)
 (require 'core-keybindings)
+(require 'module-vars)
 
 
 ;;; Initialization
@@ -700,7 +698,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; because it avoids autoloads of elisp modes)
 (setq initial-major-mode 'text-mode)
 
-(require 'module-vars)
 (require 'module-common)
 (require 'module-core)
 (require 'module-utils)
@@ -846,15 +843,9 @@ environment, otherwise it is strongly recommended to let it set to t.")
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 
 
-;;; Perspective
+;;; Perspective, EyeBrowse, and Helm
 (use-package module-perspective)
-
-
-;;; Eyebrowse
 (use-package module-eyebrowse)
-
-
-;;; Helm
 (use-package module-helm)
 
 

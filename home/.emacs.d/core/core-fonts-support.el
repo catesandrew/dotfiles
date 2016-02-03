@@ -9,8 +9,13 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+;;
+;;; Commentary:
+
 (require 'core-funcs)
 (require 'core-buffers)
+
+;;; Code:
 
 (defvar dotemacs--diminished-minor-modes nil
   "List of diminished modes to unicode or ascii values.")
@@ -97,3 +102,4 @@ If ASCII is not provided then UNICODE is used instead."
   `(eval-after-load 'diminish '(diminish ',mode)))
 
 (provide 'core-fonts-support)
+;;; core-fonts-support.el ends here
