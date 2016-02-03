@@ -845,13 +845,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (setq minibuffer-prompt-properties
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 
-(use-package unicode-fonts              ; Map Unicode blocks to fonts
-  :ensure t
-  ;; Enable emoticon mappings
-  :config (progn (setq unicode-fonts-skip-font-groups '(low-quality-glyphs)
-                       unicode-fonts-use-prepend t)
-                 (unicode-fonts-setup)))
-
 
 ;;; Perspective
 (use-package module-perspective)
