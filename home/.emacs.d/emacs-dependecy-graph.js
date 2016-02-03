@@ -163,6 +163,18 @@ function main() {
   // module-eshell
   ns.setEdge('eshell', ['company'])
 
+  // module-smooth-scrollling
+  // ns.setEdge('smooth-scrolling')
+
+  // module-perspective
+  ns.setEdge('perspective', ['spaceline', 'eyebrowse', 'helm', 'swiper'])
+
+  // module-eyebrowse
+  ns.setEdge('eyebrowse', [''])
+
+  // module-helm
+  ns.setEdge('helm', [])
+
   // c-c++
   ns.setEdge('cmake-mode', 'company')
   ns.setEdge(['c-mode', 'c++-mode'], 'flycheck')
