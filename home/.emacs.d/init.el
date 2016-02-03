@@ -1,14 +1,18 @@
 ;;; init.el --- Emacs configuration
 
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
 ;;; Commentary:
 
 ;; Without this comment emacs25 adds (package-initialize) here
 ;; (package-initialize)
 
+;;; Code:
+
 ;; Don't be so stingy on the memory, we have lots now. It's the distant future.
 (setq gc-cons-threshold 100000000)
-
-;;; Code:
 
 ;; No splash screen please ... jeez
 (setq inhibit-startup-message t)
@@ -847,11 +851,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
         ("z"  "zoom")))
 (mapc (lambda (x) (apply #'dotemacs-declare-prefix x))
       dotemacs-key-binding-prefixes)
-
-(when (eq dotemacs-colors-engine 'rainbow)
-  (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
-  (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
-        colors/key-binding-prefixes))
 
 
 ;;; Evil

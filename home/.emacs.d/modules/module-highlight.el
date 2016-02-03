@@ -1,5 +1,21 @@
-;;; Highlight
+;;; module-highlight.el --- Highlight Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
+
+(when (eq dotemacs-colors-engine 'rainbow)
+  (setq colors/key-binding-prefixes '(("Ci" . "colors-identifiers")))
+  (mapc (lambda (x) (dotemacs-declare-prefix (car x) (cdr x)))
+        colors/key-binding-prefixes))
 
 (defun colors//tweak-theme-colors (theme)
   "Tweak color themes by adjusting rainbow-identifiers."
