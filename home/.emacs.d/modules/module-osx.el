@@ -1,6 +1,20 @@
 ;;; OSX
 (require 'module-global)
 
+
+(when (and (dotemacs/system-is-mac) (version< emacs-version "25"))
+  (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)
+  (warn "brew install emacs --HEAD --srgb --use-git-head --with-cocoa --with-gnutls --with-rsvg --with-imagemagick"))
+
+(when (dotemacs/system-is-mac)
+  ;; Warn if the current build is more than a week old
+  (run-with-idle-timer
+   2 nil
+   (lambda ()
+     (let ((time-since-build (time-subtract (current-time) emacs-build-time)))
+       (when (> (time-to-number-of-days time-since-build) 7)
+         (lwarn 'emacs :warning "Your Emacs build is more than a week old!"))))))
+
 (defun dotemacs-id-of-bundle (bundle)
   "Get the ID of a BUNDLE.
 
