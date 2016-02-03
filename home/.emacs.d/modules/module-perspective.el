@@ -1,17 +1,21 @@
 ;;; module-perspective.el --- Perspective Module
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
-(require 'module-common)
-(require 'module-global)
-
-;;; Code:
+;;
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+(require 'module-utils)
 
 (declare-function dotemacs-home "module-utils")
+
+;;; Code:
 
 (defvar dotemacs-layouts-directory
   (expand-file-name (concat dotemacs-cache-directory "layouts/"))
