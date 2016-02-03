@@ -1,5 +1,16 @@
-;;; Elm
+;;; module-elm.el --- Elm Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
 
 (dotemacs-defvar-company-backends elm-mode)
 
@@ -101,4 +112,4 @@
     (add-hook 'elm-mode-hook #'smartparens-mode)))
 
 (provide 'module-elm)
-;;; module-elm ends here
+;;; module-elm.el ends here

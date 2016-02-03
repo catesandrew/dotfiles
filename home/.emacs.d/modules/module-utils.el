@@ -6,6 +6,7 @@
 
 ;;; Commentary:
 
+(require 'module-vars)
 (require 'module-common)
 (require 'module-global)
 

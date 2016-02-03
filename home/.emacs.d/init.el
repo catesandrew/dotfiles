@@ -246,16 +246,6 @@ Possible values are: `recents' `bookmarks' `projects'."
 `dotemacs-startup-lists' doesn't include `recents'."
   :group 'dotemacs)
 
-;; Regexp for useful and useless buffers for smarter buffer switching
-(defcustom dotemacs-useless-buffers-regexp '("*\.\+")
-  "Regexp used to determine if a buffer is not useful."
-  :group 'dotemacs)
-
-(defcustom dotemacs-useful-buffers-regexp '("\\*\\(scratch\\|terminal\.\+\\|ansi-term\\|eshell\\)\\*")
-  "Regexp used to define buffers that are useful despite matching
-`dotemacs-useless-buffers-regexp'."
-  :group 'dotemacs)
-
 (defcustom dotemacs-active-transparency 96
   "A value from the range (0..100), in increasing opacity, which describes the
 transparency level of a frame when it's active or selected. Transparency

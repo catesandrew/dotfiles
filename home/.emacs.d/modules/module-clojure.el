@@ -1,5 +1,16 @@
-;;; Clojure
+;;; module-clojure.el --- Clojure Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
 
 (dotemacs-defvar-company-backends cider-mode)
 (dotemacs-defvar-company-backends cider-repl-mode)

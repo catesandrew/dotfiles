@@ -1,5 +1,17 @@
-;;; EShell
+;;; module-eshell.el --- EShell Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
+(require 'comint)
+
+;;; Code:
 
 ;; Emacs built-in variables
 
