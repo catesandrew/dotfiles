@@ -779,9 +779,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; because it avoids autoloads of elisp modes)
 (setq initial-major-mode 'text-mode)
 
-;; Disable case insensitivity for filename autocompletion in shell-mode
-(setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
-
 (require 'module-vars)
 (require 'module-common)
 (require 'module-core)

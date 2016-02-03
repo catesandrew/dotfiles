@@ -61,6 +61,8 @@ is achieved by adding the relevant text properties."
 (defun dotemacs-init-eshell ()
   "Stuff to do when enabling eshell."
   (setq pcomplete-cycle-completions nil)
+  ;; Disable case insensitivity for filename autocompletion in shell-mode
+  (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
   (if (bound-and-true-p linum-mode) (linum-mode -1))
   (unless dotemacs-shell-enable-smart-eshell
     ;; we don't want auto-jump to prompt when smart eshell is enabled.
