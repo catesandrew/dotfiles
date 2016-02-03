@@ -311,21 +311,5 @@ current window."
 ;;   (split-window-below)
 ;;   (balance-windows))
 
-;; ;; From http://xugx2007.blogspot.ca/2007/06/benjamin-rutts-emacs-c-development-tips.html
-;; (setq compilation-finish-function
-;;       (lambda (buf str)
-
-;;         (if (or (string-match "exited abnormally" str)
-;;                 (string-match "FAILED" (buffer-string)))
-
-;;             ;; there were errors
-;;             (message "There were errors. SPC-e-n to visit.")
-;;           (unless (or (string-match "Grep finished" (buffer-string))
-;;                       (string-match "Ag finished" (buffer-string))
-;;                       (string-match "nosetests" (buffer-name)))
-
-;;             ;; no errors
-;;             (message "compilation ok.")))))
-
 (provide 'module-utils)
 ;;; module-utils.el ends here

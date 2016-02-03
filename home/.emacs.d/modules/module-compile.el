@@ -1,6 +1,17 @@
-;;; Compile
+;;; module-compile.el --- Evil Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
 (require 'ansi-color)
+
+;;; Code:
 
 (defun dotemacs-colorize-compilation-buffer ()
   "Colorize a compilation mode buffer.
@@ -14,6 +25,21 @@ Taken from http://stackoverflow.com/a/3072831/355252."
 (use-package compile                    ; Compile from Emacs
   :config
   (progn
+    ;; From http://xugx2007.blogspot.ca/2007/06/benjamin-rutts-emacs-c-development-tips.html
+    (setq compilation-finish-function
+          (lambda (buf str)
+            (if (or (string-match "exited abnormally" str)
+                    (string-match "FAILED" (buffer-string)))
+
+                ;; there were errors
+                (message "There were errors. SPC-e-n to visit.")
+              (unless (or (string-match "Grep finished" (buffer-string))
+                          (string-match "Ag finished" (buffer-string))
+                          (string-match "nosetests" (buffer-name)))
+
+                ;; no errors
+                (message "compilation ok.")))))
+
     (setq compilation-ask-about-save nil
           compilation-always-kill t
           ;; Kill old compilation processes before starting new ones,
