@@ -366,35 +366,6 @@ start.")
   :group 'dotemacs
   :prefix 'dotemacs-shell)
 
-(defcustom dotemacs-shell-default-shell (if (eq window-system 'w32)
-                                'eshell
-                              'ansi-term)
-  "Default shell to use in emacs. Possible values are `eshell', `shell',
-`term', `multi-term`,  and `ansi-term'."
-  :group 'dotemacs-shell)
-
-(defcustom dotemacs-shell-default-position 'bottom
-  "Position of the shell. Possible values are `top', `bottom' and `full'."
-  :group 'dotemacs-shell)
-
-(defcustom dotemacs-shell-default-height 30
-  "Height in percents for the shell window."
-  :group 'dotemacs-shell)
-
-(defcustom dotemacs-shell-default-term-shell shell-file-name
-  "Default shell to use in `term' and `ansi-term' shells."
-  :group 'dotemacs-shell)
-
-(defcustom dotemacs-shell-enable-smart-eshell nil
-  "If non-nil then `em-smart' is enabled. `em-smart' allows to quickly review
-commands, modify old commands or enter a new one."
-  :group 'dotemacs-shell)
-
-(defcustom dotemacs-shell-protect-eshell-prompt t
-  "If non-nil then eshell's prompt is protected. This means that
-movement to the prompt is inhibited like for `comint-mode'
-prompts and the prompt is made read-only"
-  :group 'dotemacs-shell)
 
 
 ;; haskell settings
@@ -820,11 +791,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 
 ;;; Shell
-
-(use-package comint
-  :init
-  (setq comint-prompt-read-only t))
-
 (use-package module-eshell)
 (use-package module-shell)
 

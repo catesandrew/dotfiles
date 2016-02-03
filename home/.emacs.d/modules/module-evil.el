@@ -48,6 +48,7 @@ to a major mode, a list of such symbols, or the symbol t,
 acting as default. The values are either integers, symbols
 or lists of these.")
 
+;; functions
 
 (defun dotemacs-state-color-face (state)
   "Return the symbol of the face for the given STATE."
@@ -352,7 +353,7 @@ Example: (evil-map visual \"<\" \"<gv\")"
       ;; support smart 1parens-strict-mode
       (with-eval-after-load 'smartparens
         (defadvice evil-delete-backward-char-and-join
-            (around dotemacs-evil-delete-backward-char-and-join activate)
+            (around dotemacs/evil-delete-backward-char-and-join activate)
           (if (bound-and-true-p smartparens-strict-mode)
               (call-interactively 'sp-backward-delete-char)
             ad-do-it)))
