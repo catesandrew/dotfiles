@@ -1,5 +1,22 @@
-;;; Fringe
-(require 'module-global)
+;;; module-fringe.el --- Fringe Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+(require 'core-display-init)
+(require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+;; (require 'linum)
+;; (require 'linum-relative)
+
+;;; Code:
 
 (dotemacs|do-after-display-system-init
  (when (display-graphic-p)
@@ -8,11 +25,10 @@
    (setq-default fringe-indicator-alist
                  '((truncation . nil) (continuation . nil)))))
 
-;; line number
-(setq linum-format "%4d")
-
 (when dotemacs-line-numbers
   (add-hook 'text-mode-hook 'linum-mode))
+
+(setq linum-format "%4d") ;; line number
 
 (custom-set-faces
  '(linum ((t (:height 0.9 :family "Bebas Neue")))))

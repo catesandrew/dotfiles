@@ -1,27 +1,33 @@
 ;;; module-keybindings.el --- Key Bindings Module
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
-(require 'module-common)
-(require 'module-global)
+;;
+(require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+(require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
 ;;; Code:
 
 (declare-function dotemacs-home "module-utils")
 
 (defun dotemacs/sort-lines ()
-  "Sort lines in region or current buffer"
+  "Sort lines in region or current buffer."
   (interactive)
   (let ((beg (if (region-active-p) (region-beginning) (point-min)))
         (end (if (region-active-p) (region-end) (point-max))))
     (sort-lines nil beg end)))
 
 (defun dotemacs/uniquify-lines ()
-  "Remove duplicate adjacent lines in region or current buffer"
+  "Remove duplicate adjacent lines in region or current buffer."
   (interactive)
   (save-excursion
     (save-restriction

@@ -1,8 +1,36 @@
-;;; Which Key
-(require 'module-global)
+;;; module-which-key.el --- Which Key Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+(require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 ;; Display current keystrokes almost immediately in mini buffer
 (setq echo-keystrokes 0.02)
+
+(defvar dotemacs-which-key-delay 0.4
+  "Delay in seconds starting from the last keystroke after which
+the which-key buffer will be shown if you have not completed a
+key sequence.  Setting this variable is equivalent to setting
+`which-key-idle-delay'.")
+
+;; Possible options should be: right bottom right-then-bottom
+(defvar dotemacs-which-key-position 'bottom
+  "Location of the which-key popup buffer. Possible choices are bottom,
+right, and right-then-bottom. The last one will display on the
+right if possible and fallback to bottom if not.")
 
 (use-package which-key
   :ensure t

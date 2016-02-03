@@ -6,27 +6,34 @@
 
 ;;; Commentary:
 
+(require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
 (require 'module-vars)
-(require 'module-common)
-(require 'module-global)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
 ;;; Code:
 
+(defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
+  "Filepath to the installed dotfile.")
+
 (defun dotemacs-home ()
-  "Go to home dotemacs buffer"
+  "Go to home dotemacs buffer."
   (interactive)
   (switch-to-buffer "*dotemacs*"))
 
 (defun dotemacs-alternate-buffer ()
-  "Switch back and forth between current and last buffer in the
-current window."
+  "Switch back and forth between current and last buffer in the current window."
   (interactive)
   (if (evil-alternate-buffer)
       (switch-to-buffer (car (evil-alternate-buffer)))
     (switch-to-buffer (other-buffer (current-buffer) t))))
 
 (defun dotemacs-next-error (&optional n reset)
-  "Dispatch to flycheck or standard emacs error."
+  "Dispatch to flycheck or standard Emacs error."
   (interactive "P")
   (if (and (boundp 'flycheck-mode)
            (symbol-value flycheck-mode))
@@ -34,7 +41,7 @@ current window."
     (call-interactively 'next-error)))
 
 (defun dotemacs-previous-error (&optional n reset)
-  "Dispatch to flycheck or standard emacs error."
+  "Dispatch to flycheck or standard Emacs error."
   (interactive "P")
   (if (and (boundp 'flycheck-mode)
            (symbol-value flycheck-mode))

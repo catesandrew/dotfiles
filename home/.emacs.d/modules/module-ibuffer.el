@@ -1,6 +1,29 @@
-;;; ibuffer
-(require 'module-global)
+;;; module-ibuffer.el --- iBuffer Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+(require 'core-vars)
+;; (require 'core-funcs)
+(require 'core-keybindings)
+;; (require 'core-display-init)
+(require 'evil-evilified-state)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+;; (require 'ibuffer)
+;; (require 'evil-ex)
 
+;;; Code:
+
+(defvar ibuffer-group-buffers-by 'modes
+  "If non nil ibuffer will group the buffers according to the passed symbol.
+The supported values are `modes' to group by major-modes and `projects' to
+group by projectile projects.")
 
 (defun dotemacs-ibuffer-get-major-modes-ibuff-rules-list (mm-list result-list)
   (if mm-list
@@ -40,14 +63,14 @@
 
 (defun dotemacs-ibuffer-group-by-projects ()
   "Group buffers by projects."
-  (when (eq 'projects dotemacs-ibuffer-group-buffers-by)
+  (when (eq 'projects ibuffer-group-buffers-by)
     (ibuffer-projectile-set-filter-groups)
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
 (defun dotemacs-ibuffer-group-by-modes ()
   "Group buffers by modes."
-  (when (eq 'modes dotemacs-ibuffer-group-buffers-by)
+  (when (eq 'modes ibuffer-group-buffers-by)
     (dotemacs-ibuffer-create-buffs-group)))
 
 (use-package ibuffer                    ; Better buffer list
@@ -56,7 +79,6 @@
   :init
   (progn
     (dotemacs-set-leader-keys "bB" 'ibuffer)
-
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
 

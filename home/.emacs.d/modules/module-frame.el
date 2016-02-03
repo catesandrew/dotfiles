@@ -1,5 +1,21 @@
-;;; Frame
-(require 'module-global)
+;;; module-frame.el --- Frame Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+(require 'core-display-init)
+(require 'core-micro-state)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (setq truncate-partial-width-windows nil ; Make side by side buffers function
                                          ; the same as the main window.

@@ -22,7 +22,7 @@
   "Save layouts in this directory.")
 
 (defvar layouts-enable-autosave nil
-  "If true, saves perspectives to file per `layouts-autosave-delay'")
+  "If true, saves perspectives to file per `layouts-autosave-delay'.")
 
 (defvar layouts-autosave-delay 900
   "Delay in seconds between each layouts auto-save.")

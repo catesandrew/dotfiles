@@ -19,251 +19,76 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-echo-area-message t)
 
-(defvar dotemacs--default-mode-line mode-line-format
-  "Backup of default mode line format.")
+
+;;; Load Paths
+
+(defun add-to-load-path (dir) (add-to-list 'load-path dir))
+
+(defconst dotemacs-core-directory
+  (expand-file-name (concat user-emacs-directory "core/"))
+  "The core directory.")
+
+(defconst dotemacs-modules-dir
+  (expand-file-name (concat user-emacs-directory "modules/"))
+  "The modules directory.")
+
+(defconst dotemacs-evil-dir
+  (expand-file-name (concat user-emacs-directory "evil/"))
+  "The evil directory.")
+
+(defvar dotemacs-user-settings-dir (
+  concat user-emacs-directory "users/" user-login-name)
+  "The currently logged in user's storage location for settings.")
+
+;; load paths
+(mapc 'add-to-load-path
+      `(
+        ,dotemacs-core-directory
+        ,dotemacs-evil-dir
+        ,dotemacs-modules-dir
+        ,dotemacs-user-settings-dir
+        ))
+
+(require 'core-vars)
+
+
+;;; Initialization
 
 ;; Set path to dependencies
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
   :group 'local)
 
-(defconst dotemacs-core-directory
-  (expand-file-name (concat user-emacs-directory "core/"))
-  "core directory.")
-
-(defconst dotemacs-modules-dir
-  (expand-file-name (concat user-emacs-directory "modules/"))
-  "modules directory.")
-
-(defconst dotemacs-cache-directory
-  (expand-file-name (concat user-emacs-directory ".cache/"))
-  "The storage location for various persistent files.")
-
-(defconst dotemacs-auto-save-directory
-  (expand-file-name (concat dotemacs-cache-directory "auto-save/"))
-  "The auto-save directory")
-
 (defconst dotemacs-quelpa-directory
   (concat dotemacs-cache-directory "quelpa/")
-  "Quelpa directory")
+  "Quelpa directory.")
 
 (defconst dotemacs-quelpa-build-directory
   (expand-file-name "build" dotemacs-quelpa-directory)
-  "Quelpa build directory")
+  "Quelpa build directory.")
 
 (defconst dotemacs-quelpa-cache-directory
   (expand-file-name "cache" dotemacs-quelpa-directory)
-  "Quelpa cache directory")
+  "Quelpa cache directory.")
 
 (defconst user-home-directory
   (expand-file-name "~/")
   "User home directory (~/).")
-
-(defconst emacs-version-short (replace-regexp-in-string
-                               "\\([0-9]+\\)\\.\\([0-9]+\\).*"
-                               "\\1_\\2" emacs-version))
 
 (defconst pcache-directory
   (concat dotemacs-cache-directory "pcache"))
 (unless (file-exists-p dotemacs-cache-directory)
     (make-directory dotemacs-cache-directory))
 
-(defcustom dotemacs-erc-nick
-  'catesandrew
-  "The erc nickname to use"
-  :group 'dotemacs)
-
-(defcustom dotemacs-user-settings-dir (concat user-emacs-directory "users/" user-login-name)
-  "The currently logged in user's storage location for settings."
-  :group 'dotemacs)
-
-(defcustom dotemacs-themes '(zenburn
-                             solarized-dark
-                             solarized-light
-                             leuven
-                             monokai
-                             tao
-                             ;; monster theme support
-                             afternoon
-                             ample
-                             ample-zen
-                             anti-zenburn
-                             birds-of-paradise-plus
-                             bubbleberry
-                             busybee
-                             cherry-blossom
-                             clues
-                             cyberpunk
-                             dakrone
-                             darkburn
-                             darkmine
-                             darktooth
-                             django
-                             espresso
-                             farmhouse
-                             firebelly
-                             flatland
-                             flatui
-                             gandalf
-                             gotham
-                             grandshell
-                             gruber-darker
-                             gruvbox
-                             hc-zenburn
-                             heroku
-                             inkpot
-                             ir-black
-                             jazz
-                             jbeans
-                             light-soap
-                             lush
-                             material
-                             minimal
-                             molokai
-                             monochrome
-                             mustang
-                             naquadah
-                             niflheim
-                             noctilux
-                             obsidian
-                             occidental
-                             oldlace
-                             organic-green
-                             pastels-on-dark
-                             phoenix-dark-mono
-                             phoenix-dark-pink
-                             planet
-                             professional
-                             purple-haze
-                             seti
-                             smyx
-                             soft-charcoal
-                             soft-morning
-                             soft-stone
-                             soothe
-                             spacegray
-                             subatomic
-                             subatomic256
-                             sunny-day
-                             tango-2
-                             tango-plus
-                             tangotango
-                             tronesque
-                             twilight-anti-bright
-                             twilight-bright
-                             twilight
-                             ujelly
-                             underwater
-                             zen-and-art)
-  "List of themes, the first of the list is loaded when emacs starts.
-Press <Leader> T n to cycle to the next theme in the list (works great
-with 2 themes variants, one dark and one light")
-
-(defcustom dotemacs--cur-theme nil
-  "The current theme"
-  :group 'dotemacs)
-
-(defvar dotemacs-remap-Y-to-y$ t
-  "If non nil `Y' is remapped to `y$'.")
-
-(defvar dotemacs-ex-substitute-global nil
-  "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
-
-(defcustom dotemacs-leader-key ","
-  "The leader key."
-  :group 'dotemacs)
-
-(defcustom dotemacs-emacs-leader-key "M-m"
-  "The leader key accessible in `emacs state' and `insert state'"
-  :group 'dotemacs)
-
-;; major-mode-leader to 0x00A0 (NO_BREAK_SPACE)
-(defcustom dotemacs-major-mode-leader-key "\\"
-  "Major mode leader key is a shortcut key which is the equivalent of
-pressing `<leader> m`. Set it to `nil` to disable it."
-  :group 'dotemacs)
-
-(defcustom dotemacs-major-mode-emacs-leader-key nil
-  "Major mode leader key accessible in `emacs state' and `insert state'"
-  :group 'dotemacs)
-
 ; Source Code Pro for Powerline
 ; Pragmata Pro
-(defcustom dotemacs-default-font '("Hasklig"
+(defvar dotemacs-default-font '("Hasklig"
                                     :size 13
                                     :weight normal
                                     :width normal
                                     :powerline-scale 1.0)
   "Default font. `powerline-scale' allows to quickly tweak the mode-line
-size to make separators look not too crappy."
-  :group 'dotemacs)
-
-(defcustom dotemacs-command-key ":"
-  "The key used for Evil commands (ex-commands) and Emacs commands (M-x).
-By default the command key is `:' so ex-commands are executed like in Vim
-with `:' and Emacs commands are executed with `<leader> :'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-enable-paste-micro-state t
-  "If non nil the paste micro-state is enabled. While enabled pressing `p`
-several times cycle between the kill ring content.'"
-  :group 'dotemacs)
-
-(defcustom dotemacs-guide-key-delay 1.0
-  "Guide-key delay in seconds."
-  :group 'dotemacs)
-
-(defcustom dotemacs-which-key-delay 0.4
-  "Delay in seconds starting from the last keystroke after which
-the which-key buffer will be shown if you have not completed a
-key sequence. Setting this variable is equivalent to setting
-`which-key-idle-delay'."
-  :group 'dotemacs)
-
-;; Possible options should be: right bottom right-then-bottom
-(defcustom dotemacs-which-key-position 'bottom
-  "Location of the which-key popup buffer. Possible choices are bottom,
-right, and right-then-bottom. The last one will display on the
-right if possible and fallback to bottom if not."
-  :group 'dotemacs)
-
-(defcustom dotemacs-search-tools '("ag" "pt" "ack" "grep")
-  "List of search tool executable names. Dotemacs uses the first installed
-tool of the list. Supported tools are `ag', `pt', `ack' and `grep'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-startup-lists '(recents projects)
-  "List of items to show in the startup buffer. If nil it is disabled.
-Possible values are: `recents' `bookmarks' `projects'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-startup-recent-list-size 5
-  "Number of recent files to show in the startup buffer. Ignored if
-`dotemacs-startup-lists' doesn't include `recents'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-active-transparency 96
-  "A value from the range (0..100), in increasing opacity, which describes the
-transparency level of a frame when it's active or selected. Transparency
-can be toggled through `toggle-transparency'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-inactive-transparency 96
-  "A value from the range (0..100), in increasing opacity, which describes the
-transparency level of a frame when it's inactive or deselected. Transparency
-can be toggled through `toggle-transparency'."
-  :group 'dotemacs)
-
-(defcustom dotemacs-smartparens-strict-mode nil
-  "If non-nil smartparens-strict-mode will be enabled in programming modes."
-  :group 'dotemacs)
-
-(defconst dotemacs-filepath (expand-file-name "." user-emacs-directory)
-  "Filepath to the installed dotfile.")
-
-(defvar dotemacs-line-numbers 'relative
-  "If non nil line numbers are turned on in all `prog-mode' and `text-mode'.
-derivatives. If set to `relative', also turns on relative line numbers.")
+size to make separators look not too crappy.")
 
 (defcustom dotemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting."
@@ -350,14 +175,6 @@ start.")
 (defcustom dotemacs-c-c++-default-mode-for-headers 'c-mode
   "Default mode to open header files. Can be `c-mode' or `c++-mode'."
   :group 'dotemacs-c-c++)
-
-;; shell settings
-(defgroup dotemacs-shell nil
-  "Configuration options for shell."
-  :group 'dotemacs
-  :prefix 'dotemacs-shell)
-
-
 
 ;; haskell settings
 (defgroup dotemacs-haskell nil
@@ -488,33 +305,6 @@ to complet without blocking common line endings."
   "If non nil some feedback are displayed in tooltips."
   :group 'dotemacs-s)
 
-;; buffer settings
-(defgroup dotemacs-ibuffer nil
-  "Configuration options for ibuffer"
-  :group 'dotemacs
-  :prefix 'dotemacs-ibuffer)
-
-(defcustom dotemacs-ibuffer-group-buffers-by 'modes
-  "If non nil ibuffer will group the buffers according to the passed symbol.
-The supported values are `modes' to group by major-modes and `projects' to
-group by projectile projects."
-  :group 'dotemacs-ibuffer)
-
-;;helm
-(defgroup dotemacs-helm nil
-  "Configuration options for helm"
-  :group 'dotemacs
-  :prefix 'dotemacs-helm)
-
-(defcustom dotemacs-helm-resize nil
-  "If non nil, `helm' will try to miminimize the space it uses.")
-
-(defcustom dotemacs-helm-no-header t
-  "if non nil, the helm header is hidden when there is only one source.")
-
-(defcustom dotemacs-helm-position 'bottom
-  "Position in which to show the `helm' mini-buffer.")
-
 (defvar python-fill-column 79
   "Fill column value for python buffers")
 
@@ -549,18 +339,6 @@ group by projectile projects."
 ;;                           feature
 ;;                           (format-time-string "%Y-%m-%d %H:%M:%S.%3N" (current-time))
 ;;                           elapsed)))))))
-
-
-;;; Load Paths
-(defun add-to-load-path (dir) (add-to-list 'load-path dir))
-
-;; load paths
-(mapc 'add-to-load-path
-      `(
-        ,dotemacs-core-directory
-        ,dotemacs-modules-dir
-        ,dotemacs-user-settings-dir
-        ))
 
 
 ;;; Core Package management
@@ -764,18 +542,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
       dotemacs-key-binding-prefixes)
 
 
-;;; Evil
-(use-package module-evil)
-
-
-;;; Shell
-(use-package module-eshell)
-(use-package module-shell)
-
-
 ;;; User interface
-(use-package module-smooth-scrolling)
-(use-package module-diminish)
 
 ;; Just don’t show them. Use native Emacs controls:
 (setq use-dialog-box nil)
@@ -822,22 +589,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 
 
-;;; Perspective, EyeBrowse, and Helm
-(use-package module-perspective)
-(use-package module-eyebrowse)
-(use-package module-helm)
-
-
-;;; Buffer, Windows and Frames
-(use-package module-fringe)
-(use-package module-frame)
-(use-package module-buffer)
-(use-package module-ibuffer)
-(use-package module-window)
-(use-package module-desktop)
-(use-package module-popwin)
-
-
 ;;; File handling
 
 ;; don't create backup~ files
@@ -851,6 +602,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; Auto-save file
 (setq auto-save-default (not (null dotemacs-auto-save-file-location)))
 (setq auto-save-list-file-prefix (concat dotemacs-auto-save-directory))
+
 ;; always save TRAMP URLs to cache directory no matter what is the value
 ;; of `dotemacs-auto-save-file-location'
 (let ((autosave-dir (concat dotemacs-auto-save-directory "dist/")))
@@ -859,6 +611,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
   (unless (or (file-exists-p autosave-dir)
               (null dotemacs-auto-save-file-location))
     (make-directory autosave-dir t)))
+
 ;; Choose auto-save location
 (cl-case dotemacs-auto-save-file-location
   (cache (let ((autosave-dir (concat dotemacs-auto-save-directory "site/")))
@@ -880,6 +633,34 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (defun server-remove-kill-buffer-hook ()
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function))
 (add-hook 'server-visit-hook 'server-remove-kill-buffer-hook)
+
+
+;;; Evil
+(use-package module-evil)
+
+
+;;; Shell
+(use-package module-eshell)
+(use-package module-shell)
+
+
+;;; Buffer, Windows and Frames
+(use-package module-fringe)
+(use-package module-frame)
+(use-package module-buffer)
+(use-package module-ibuffer)
+(use-package module-window)
+(use-package module-desktop)
+(use-package module-popwin)
+(use-package popup :ensure t :defer t)
+(use-package module-smooth-scrolling)
+(use-package module-diminish)
+
+
+;;; Perspective, EyeBrowse, and Helm
+(use-package module-perspective)
+(use-package module-eyebrowse)
+(use-package module-helm)
 
 
 ;;; Files

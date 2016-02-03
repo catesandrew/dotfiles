@@ -1,39 +1,46 @@
-;;; Window
-(require 'module-global)
+;;; module-window.el --- Window Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+(require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
-(defun dotemacs-quit-bottom-side-windows ()
-  "Quit side windows of the current frame."
-  (interactive)
-  (dolist (window (window-at-side-list))
-    (quit-window nil window)))
+;;; Code:
+
+(defvar dotemacs/winner-boring-buffers '("*Completions*"
+                                         "*Compile-Log*"
+                                         "*inferior-lisp*"
+                                         "*Fuzzy Completions*"
+                                         "*Apropos*"
+                                         "*Help*"
+                                         "*cvs*"
+                                         "*Buffer List*"
+                                         "*Ibuffer*"
+                                         "*esh command on file*"
+                                         )
+  "List of boring buffers for winner mode to ignore.")
 
 (use-package windmove                   ; Move between windows with Shift+Arrow
-  :bind (("S-<left>"  . windmove-left)
-         ("S-<right>" . windmove-right)
-         ("S-<up>"    . windmove-up)
-         ("S-<down>"  . windmove-down)))
+  :init (windmove-default-keybindings))
 
 (use-package winner                     ; Undo and redo window configurations
   :ensure t
   :init
   (progn
-    ;; activate winner mode use to undo and redo windows layout
-    (winner-mode t))
-  :config
-  (progn
-    (setq dotemacs-winner-boring-buffers '("*Completions*"
-                                           "*Compile-Log*"
-                                           "*inferior-lisp*"
-                                           "*Fuzzy Completions*"
-                                           "*Apropos*"
-                                           "*Help*"
-                                           "*cvs*"
-                                           "*Buffer List*"
-                                           "*Ibuffer*"
-                                           "*esh command on file*"
-                                            ))
+    (winner-mode t)
     (setq winner-boring-buffers
-          (append winner-boring-buffers dotemacs-winner-boring-buffers))))
+          (append winner-boring-buffers dotemacs/winner-boring-buffers))
+    (winner-mode t)))
 
 (use-package window-numbering
   :ensure t
@@ -73,8 +80,8 @@
 
     ;; Prevent Ediff from spamming the frame
     (setq ediff-diff-options "-w"
-            ediff-window-setup-function #'ediff-setup-windows-plain
-            ediff-split-window-function #'split-window-horizontally)))
+          ediff-window-setup-function 'ediff-setup-windows-plain
+          ediff-split-window-function 'split-window-horizontally)))
 
 (provide 'module-window)
 ;;; module-window.el ends here

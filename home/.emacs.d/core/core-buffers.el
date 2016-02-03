@@ -1,3 +1,29 @@
+;;; module-buffers.el --- Buffers Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
+
+(defvar dotemacs--default-mode-line mode-line-format
+  "Backup of default mode line format.")
+
+(defvar dotemacs-startup-lists '(recents projects)
+  "List of items to show in the startup buffer. If nil it is disabled.
+Possible values are: `recents' `bookmarks' `projects'.")
+
 (defconst dotemacs-buffer-name "*dotemacs*"
   "The name of the dotemacs buffer.")
 

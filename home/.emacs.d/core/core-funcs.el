@@ -211,7 +211,7 @@ FILE-TO-LOAD is an explicit file to load after the installation."
      (concat "Hidden Mode Line Mode enabled.  "
              "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
 
-(defun spacemacs-recompile-elpa ()
+(defun dotemacs-recompile-elpa ()
   "Recompile packages in elpa directory. Useful if you switch
 Emacs versions."
   (interactive)

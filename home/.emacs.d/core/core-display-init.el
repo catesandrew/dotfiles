@@ -40,3 +40,4 @@ created."
        (push (lambda () ,@body) dotemacs--after-display-system-init-list))))
 
 (provide 'core-display-init)
+;;; core-display.init.el ends here

@@ -1,9 +1,37 @@
-;;; Desktop
+;;; module-desktop.el --- Desktop Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
 ;; http://stackoverflow.com/a/4485083/740527
-(require 'module-global)
+;;
+(require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+(require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
+
+(defvar dotemacs/desktop-dirname (concat dotemacs-cache-directory "desktop/")
+  "Folder where to save desktop sessions.")
+
+(defvar dotemacs/desktop-base-file-name (
+  concat "emacs_" emacs-version-short ".desktop")
+  "File names of desktop files.")
+
+(defvar dotemacs/desktop-base-lock-name (
+  concat "emacs_" emacs-version-short ".desktop.lock")
+  "Desktop lock file name.")
 
 (defun dotemacs-desktop-session-restore-and-enable ()
-  "Load the desktop and enable autosaving"
+  "Load the desktop and enable autosaving."
   (interactive)
   (let ((desktop-load-locked-desktop "ask"))
     (if (dotemacs-saved-session)
@@ -13,7 +41,7 @@
 
 ;; use session-save to save the desktop manually
 (defun dotemacs-session-save ()
-  "Save an emacs session."
+  "Save an Emacs session."
   (interactive)
   (if (dotemacs-saved-session)
       (if (y-or-n-p "Overwrite existing desktop? ")
@@ -23,24 +51,25 @@
 
 ;; use session-restore to restore the desktop manually
 (defun dotemacs-session-restore ()
-  "Restore a saved emacs session."
+  "Restore a saved Emacs session."
   (interactive)
   (if (dotemacs-saved-session)
       (desktop-read)
     (message "No desktop found.")))
 
 (defun dotemacs-desktop-after-read ()
-  "Load the desktop and enable autosaving"
+  "Load the desktop and enable autosaving."
   (interactive)
   ;; desktop-remove clears desktop-dirname
-  (setq desktop-dirname-tmp desktop-dirname)
+  (setq desktop-dirname-tmp dotemacs/desktop-dirname)
   (desktop-remove)
   (setq desktop-dirname desktop-dirname-tmp))
 
 (defun dotemacs-saved-session ()
   "Save session."
   (interactive)
-  (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+  (file-exists-p (
+    concat dotemacs/desktop-dirname "/" dotemacs/desktop-base-file-name)))
 
 (defun dotemacs-desktop-after-init ()
   "Save an emacs session."
@@ -49,29 +78,24 @@
       (if (y-or-n-p "Restore desktop? ")
           (dotemacs-session-restore))))
 
-;; remove desktop after it's been read
-(add-hook 'desktop-after-read-hook 'dotemacs-desktop-after-read)
-
 ;; ask user whether to restore desktop at start-up
 (add-hook 'after-init-hook 'dotemacs-desktop-after-init)
 
 (use-package desktop                    ; Save buffers, windows and frames
   :defer t
-  :init
-  (setq desktop-dirname (concat dotemacs-cache-directory "desktop/")
-        desktop-base-file-name (concat "emacs_" emacs-version-short
-                                       ".desktop")
-        desktop-base-lock-name (concat "emacs_" emacs-version-short
-                                       ".desktop.lock")
-        desktop-path (list desktop-dirname)
-        desktop-load-locked-desktop nil
-        ;; Fix the frameset warning at startup
-        desktop-restore-frames nil
-        ;; Save desktops a minute after Emacs was idle.
-        desktop-auto-save-timeout 60)
-  (desktop-save-mode 0)
   :config
   (progn
+    (desktop-save-mode 0)
+    (setq desktop-dirname dotemacs/desktop-dirname
+          desktop-base-file-name dotemacs/desktop-base-file-name
+          desktop-base-lock-name dotemacs/desktop-base-lock-name
+          desktop-path (list dotemacs/desktop-dirname)
+          desktop-load-locked-desktop nil
+          ;; Fix the frameset warning at startup
+          desktop-restore-frames nil
+          ;; Save desktops a minute after Emacs was idle.
+          desktop-auto-save-timeout 60)
+
     ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-sessions.el
     ;; Save a bunch of variables to the desktop file.
     ;; For lists, specify the length of the maximal saved data too.
@@ -121,13 +145,16 @@
                                               "\\|\\(^eww\\(<[0-9]+>\\)*$\\)"))
 
     (dolist (mode '(magit-mode magit-log-mode))
-      (add-to-list 'desktop-modes-not-to-save mode))))
+      (add-to-list 'desktop-modes-not-to-save mode))
+
+    ;; remove desktop after it's been read
+    (add-hook 'desktop-after-read-hook 'dotemacs-desktop-after-read)))
 
 (dotemacs-use-package-add-hook ignoramus
   :post-config
-  (setq desktop-files-not-to-save (concat desktop-files-not-to-save
-                                         ignoramus-boring-file-regexp)))
-
+  (with-eval-after-load 'desktop
+    (setq desktop-files-not-to-save (concat desktop-files-not-to-save
+                                            ignoramus-boring-file-regexp))))
 
 (provide 'module-desktop)
 ;;; module-desktop.el ends here

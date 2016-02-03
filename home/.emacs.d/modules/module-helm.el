@@ -6,12 +6,26 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
 (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+
+(defvar helm-resize nil
+  "If non nil, `helm' will try to miminimize the space it uses.")
+
+(defvar helm-no-header t
+  "if non nil, the helm header is hidden when there is only one source.")
+
+(defvar dotemacs-helm-position 'bottom
+  "Position in which to show the `helm' mini-buffer.")
+
+(defvar dotemacs-search-tools '("ag" "pt" "ack" "grep")
+  "List of search tool executable names.  Dotemacs uses the first installed
+tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.")
 
 (defun dotemacs-helm-find-files (arg)
   "Custom implementation for calling helm-find-files-1.
@@ -505,7 +519,7 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
 
 (defun helm-toggle-header-line ()
  "Hide the `helm' header is there is only one source."
- (when dotemacs-helm-no-header
+ (when helm-no-header
    (if (> (length helm-sources) 1)
        (set-face-attribute 'helm-source-header
                            nil
@@ -705,7 +719,7 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   (progn
     (helm-mode +1)
 
-    (when (and dotemacs-helm-resize
+    (when (and helm-resize
                (or (eq dotemacs-helm-position 'bottom)
                    (eq dotemacs-helm-position 'top)))
       (setq helm-autoresize-min-height 10)

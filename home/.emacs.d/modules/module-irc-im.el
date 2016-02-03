@@ -1,5 +1,24 @@
-;;; IRC and IM
-(require 'module-global)
+;;; module-irc-im.el --- IRC and IM Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+(require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
+
+(defvar dotemacs/erc-nick 'catesandrew
+  "The erc nickname to use.")
 
 (use-package erc                        ; Powerful IRC client
   :defer t
@@ -9,7 +28,7 @@
     (setq erc-server "chat.freenode.net"
           erc-log-channels-directory (concat dotemacs-cache-directory "erc/logs")
           erc-port 7000
-          erc-nick 'dotemacs-erc-nick
+          erc-nick 'dotemacs/erc-nick
           erc-nick-uniquifier "_"
           ;; Never open unencrypted ERC connections
           erc-server-connect-function 'erc-open-tls-stream)

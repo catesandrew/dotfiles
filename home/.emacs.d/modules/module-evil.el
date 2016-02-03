@@ -12,6 +12,10 @@
 
 ;;; Code:
 
+(defvar dotemacs-enable-paste-micro-state t
+  "If non nil the paste micro-state is enabled.  While enabled pressing `p`
+several times cycle between the kill ring content.'")
+
 (defvar dotemacs-colorize-cursor-according-to-state t
   "If non nil the cursor color matches the state color in GUI Emacs.")
 

@@ -155,25 +155,18 @@ function main() {
   // with-eval-after-loads
   // ns.setEdge('evil', ['dired', 'smartparens', 'evil-surround'])
 
-  // module-shell.el
-  // with-eval-after-loads
-  // ns.setEdge('shell', 'esh-mode')
-  ns.setEdge('shell', ['smooth-scrolling', 'magit'])
-
-  // module-eshell
   ns.setEdge('eshell', ['company'])
-
-  // module-smooth-scrollling
-  // ns.setEdge('smooth-scrolling')
-
-  // module-perspective
+  ns.setEdge('shell', ['smooth-scrolling', 'magit'])
+  ns.setEdge('smooth-scrolling', [])
   ns.setEdge('perspective', ['spaceline', 'eyebrowse', 'helm', 'swiper'])
-
-  // module-eyebrowse
-  ns.setEdge('eyebrowse', [''])
-
-  // module-helm
+  ns.setEdge('eyebrowse', [])
   ns.setEdge('helm', [])
+  ns.setEdge('fringe', [])
+  ns.setEdge('frame', [])
+  ns.setEdge('buffer', []) // requires helm
+  ns.setEdge('ibuffer', [])
+  ns.setEdge('window', [])
+  ns.setEdge('desktop', ['ignoramus'])
 
   // c-c++
   ns.setEdge('cmake-mode', 'company')
