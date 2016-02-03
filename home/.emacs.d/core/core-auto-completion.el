@@ -8,7 +8,11 @@
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
+;;; Commentary:
+;;
 ;;; License: GPLv3
+
+;;; Code:
 
 ;; Company -------------------------------------------------------------------
 
@@ -75,3 +79,4 @@ The initialization function is hooked to `MODE-hook'."
        (add-hook ',mode-hook 'auto-complete-mode))))
 
 (provide 'core-auto-completion)
+;;; core-auto-completion.el ends here
