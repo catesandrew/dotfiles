@@ -779,15 +779,6 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;;; User interface
 (use-package module-smooth-scrolling)
 
-(use-package bind-map
-  :init
-  (bind-map dotemacs-default-map
-    :prefix-cmd dotemacs-cmds
-    :keys (dotemacs-emacs-leader-key)
-    :evil-keys (dotemacs-leader-key)
-    :override-minor-modes t
-    :override-mode-name dotemacs-leader-override-mode))
-
 (use-package diminish
   :ensure t
   :init
@@ -1442,7 +1433,17 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :if (eq system-type 'darwin))
 
 
-;;; Bindings
+;;; Key Bindings
+
+(use-package bind-map
+  :init
+  (bind-map dotemacs-default-map
+    :prefix-cmd dotemacs-cmds
+    :keys (dotemacs-emacs-leader-key)
+    :evil-keys (dotemacs-leader-key)
+    :override-minor-modes t
+    :override-mode-name dotemacs-leader-override-mode))
+
 (use-package module-key-bindings
   :config (dotemacs-toggle-transparency-core))
 
