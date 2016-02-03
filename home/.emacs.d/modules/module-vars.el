@@ -1,11 +1,11 @@
 ;;; module-vars.el --- Settings and variables
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
+;;
 ;;; Code:
 
 (require 'core-vars)

@@ -1,6 +1,21 @@
-;;; OSX
-(require 'module-global)
+;;; module-osx.el --- OSX Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
+;;; Code:
 
 (when (and (dotemacs/system-is-mac) (version< emacs-version "25"))
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)

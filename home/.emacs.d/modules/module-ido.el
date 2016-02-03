@@ -1,5 +1,21 @@
-;;; IDO
-(require 'module-global)
+;;; module-ido.el --- IDO Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 ;; from https://gist.github.com/timcharper/493269
 (defun dotemacs/split-window-vertically-and-switch ()

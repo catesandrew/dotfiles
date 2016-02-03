@@ -1,14 +1,19 @@
 ;;; module-evil-packages.el --- Evil Packages Module
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
 (require 'module-vars)
-(require 'module-common)
-(require 'module-global)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 (require 'evil)
 
 ;;; Code:

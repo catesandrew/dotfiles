@@ -1,5 +1,21 @@
-;;; Markup Languages
-(require 'module-global)
+;;; module-markup-languages.el --- Markup Languages Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 ;; Other markup languages
 (use-package rst                        ; ReStructuredText

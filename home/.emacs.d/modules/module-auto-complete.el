@@ -10,8 +10,17 @@
 ;;
 ;;; License: GPLv3
 ;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
-(require 'module-global)
+;;; Code:
 
 ;; auto-completion key bindings functions
 

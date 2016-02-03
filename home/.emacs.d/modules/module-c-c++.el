@@ -1,5 +1,21 @@
-;;; C/C++
-(require 'module-global)
+;;; module-c-c++.el --- C/C++ Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defvar c-c++-enable-clang-support nil
   "If non nil Clang related packages and configuration are enabled.")

@@ -1,5 +1,21 @@
-;;; Markdown
-(require 'module-global)
+;;; module-markdown.el --- Markdown Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (dotemacs-defvar-company-backends markdown-mode)
 

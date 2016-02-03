@@ -1,6 +1,11 @@
-;;; Haskell
-(require 'module-global)
-
+;;; module-haskell.el --- Haskell Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
 ;; This Haskell setup needs:
 ;;
 ;; cabal install hasktags haskell-docs hoogle hindent
@@ -9,6 +14,17 @@
 ;; Additionally, to be installed from source:
 ;;
 ;; - https://github.com/chrisdone/ghci-ng
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defun dotemacs-init-haskell-mode ()
   ;; use only internal indentation system from haskell

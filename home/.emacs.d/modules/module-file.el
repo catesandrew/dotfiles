@@ -1,15 +1,33 @@
+;;; module-file.el --- File Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
 ;; Additional utilities for file handling, see:
 ;; http://emacsredux.com/blog/2013/05/04/rename-file-and-buffer/
 ;; http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
 ;; http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
 ;; http://emacsredux.com/blog/2013/04/05/recently-visited-files/
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el
-
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 (require 'init-macosx)
 (require 'package)
 (require 'lisp-mnt)
 (require 'find-func)
 (require 'subr-x)
+
+;;; Code:
 
 ;; We only access these variables if the corresponding library is loaded
 (defvar recentf-list)

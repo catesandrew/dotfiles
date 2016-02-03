@@ -1,5 +1,21 @@
-;;; YASnippet
-(require 'module-global)
+;;; module-yasnippet.el --- YASnippet Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defun dotemacs-load-yasnippet ()
   (unless yas-global-mode

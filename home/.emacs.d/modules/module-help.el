@@ -1,5 +1,21 @@
-;;; Online Help
-(require 'module-global)
+;;; module-help.el --- Help Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (use-package sx                         ; StackExchange client for Emacs
   :ensure t

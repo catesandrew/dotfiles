@@ -1,5 +1,21 @@
-;;; Flycheck
-(require 'module-global)
+;;; module-flycheck.el --- Flycheck Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 ;; (defun current-buffer-remote-p ()
 ;;   (--any? (and it (file-remote-p it))

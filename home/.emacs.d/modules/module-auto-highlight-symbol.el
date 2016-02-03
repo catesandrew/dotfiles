@@ -1,5 +1,21 @@
-;;; Auto Highlight Symbol
-(require 'module-global)
+;;; module-auto-highlight-symbol.el --- Auto Highlight Symbol
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defun dotemacs-goto-last-searched-ahs-symbol ()
   "Go to the last known occurrence of the last symbol searched with

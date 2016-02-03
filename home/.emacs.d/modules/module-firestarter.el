@@ -1,6 +1,22 @@
-;;; Firestarter
-(require 'module-global)
+;;; module-firestarter.el --- Firestarter Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 ;; (require 'firestarter)
+
+;;; Code:
 
 (defvar-local dotemacs-firestarter-last-status nil
   "The last state of firestarter.")

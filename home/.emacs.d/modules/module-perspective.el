@@ -6,16 +6,18 @@
 ;;
 ;;; Commentary:
 ;;
+;; (require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
+;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 (require 'module-utils)
 
-(declare-function dotemacs-home "module-utils")
-
 ;;; Code:
+
+(declare-function dotemacs-home "module-utils")
 
 (defvar dotemacs-layouts-directory
   (expand-file-name (concat dotemacs-cache-directory "layouts/"))

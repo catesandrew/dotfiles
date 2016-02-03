@@ -1,30 +1,43 @@
-;;; Vinegar
-(require 'module-global)
+;;; module-vinegar.el --- Vinegar Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; Tim Pope
+;;
+;; This layer is a port contribution layer for vim-vinegar for Emacs.
+;;
+;; A port of tpope's vinegar.vim
+;; [vinegar][https://github.com/tpope/vim-vinegar], simplifying =dired=
+;; with a limited number of details and exposing the ~-~ command in all
+;; buffers to enter dired.
+;;
+;; ** Features
+;;
+;; -  navigation up folders with ~-~ key
+;; -  simplify dired buffer to show only file names
+;; -  better evil/vim bindings for navigation within dired buffer
+;; -  keep only one active dired buffer
+;; -  Use dired-k extension to show time / vcs related information in
+;;    single bar
+;; -  right mouse click moves up directory if in blank space or shows context menu
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
-;;; Tim Pope
-
-;; vinegar
-; This layer is a port contribution layer for vim-vinegar for emacs.
-;
-; A port of tpope's vinegar.vim
-; [vinegar][https://github.com/tpope/vim-vinegar], simplifying =dired=
-; with a limited number of details and exposing the ~-~ command in all
-; buffers to enter dired.
-;
-; ** Features
-;
-; -  navigation up folders with ~-~ key
-; -  simplify dired buffer to show only file names
-; -  better evil/vim bindings for navigation within dired buffer
-; -  keep only one active dired buffer
-; -  Use dired-k extension to show time / vcs related information in
-;    single bar
-; -  right mouse click moves up directory if in blank space or shows context menu
+;;; Code:
 
 (defvar vinegar-reuse-dired-buffer nil
   "If non-nil, reuses one dired buffer for navigation.")
-
-;; funcs.el file for vinegar contribution layer
 
 (defun vinegar/dotfiles-toggle ()
   "Show/hide dot-files"

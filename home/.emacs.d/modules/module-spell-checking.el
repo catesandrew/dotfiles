@@ -1,5 +1,21 @@
-;;; Spell Checking
-(require 'module-global)
+;;; module-spell-checking.el --- Spell Checking Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defun spell-checking/add-flyspell-hook (mode &optional target)
   "Enable flyspell for the given MODE, if

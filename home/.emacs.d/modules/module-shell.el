@@ -1,11 +1,11 @@
 ;;; module-shell.el --- Shell Module
-
+;;
 ;; This file is NOT part of GNU Emacs.
-
+;;
 ;;; License:
-
+;;
 ;;; Commentary:
-
+;;
 (require 'core-funcs)
 (require 'core-keybindings)
 (require 'module-vars)

@@ -14,6 +14,8 @@
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
+;;; Code:
+
 (defvar helm-resize nil
   "If non nil, `helm' will try to miminimize the space it uses.")
 

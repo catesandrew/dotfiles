@@ -1,15 +1,26 @@
-;;; SmartParens
-
+;;; module-smartparens.el --- Smart Parens Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
 ;;; Commentary:
-
+;;
 ;; Personal smartparens configuration.
 ;;
 ;; Extends the default `smartparens-config' with key-bindings and
 ;; additional pairs.
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
 ;;; Code:
-
-(require 'module-global)
 
 ;; enable smartparens-mode in `eval-expression'
 (defun dotemacs-conditionally-enable-smartparens-mode ()

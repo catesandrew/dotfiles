@@ -1,5 +1,21 @@
-;;; Rust
-(require 'module-global)
+;;; module-rust.el --- Rust Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 ;; http://doc.crates.io/guide.html
 (defun dotemacs-rust-cargo-build ()

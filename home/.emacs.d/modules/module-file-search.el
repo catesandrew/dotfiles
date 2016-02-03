@@ -1,5 +1,21 @@
-;;; File Search
-(require 'module-global)
+;;; module-file-search.el --- File Search Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
+
+;;; Code:
 
 (defun dotemacs-rgrep-quit-window ()
   (interactive)

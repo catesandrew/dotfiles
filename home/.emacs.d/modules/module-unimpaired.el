@@ -1,13 +1,29 @@
-;;; Unimpaired
-(require 'module-global)
+;;; module-unimpaired.el --- Unimpaired Module
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+;;
+;; From tpope's unimpaired
+;;
+;; This layer ports some of the functionality of tpope's vim-unimpaired
+;; [unimpaired][https://github.com/tpope/vim-unimpaired]
+;;
+;; This plugin provides several pairs of bracket maps using ~[~ to denote
+;; previous, and ~]~ as next.
+;;
+;; (require 'core-vars)
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'core-display-init)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+;; (require 'module-utils)
 
-;; from tpope's unimpaired
-
-; This layer ports some of the functionality of tpope's vim-unimpaired
-; [unimpaired][https://github.com/tpope/vim-unimpaired]
-;
-; This plugin provides several pairs of bracket maps using ~[~ to denote
-; previous, and ~]~ as next.
+;;; Code:
 
 (defun unimpaired/paste-above ()
   (interactive)
