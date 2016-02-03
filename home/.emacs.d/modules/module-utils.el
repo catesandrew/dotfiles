@@ -112,6 +112,10 @@ current window."
   (interactive)
   (find-file-existing (dotemacs-location)))
 
+(defun dotemacs//unset-scroll-margin ()
+  "Set `scroll-margin` to zero."
+  (setq-local scroll-margin 0))
+
 
 ;;; Unused functions
 

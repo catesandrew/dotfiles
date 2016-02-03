@@ -10,7 +10,8 @@
 (require 'core-keybindings)
 (require 'module-vars)
 ;; (require 'module-common)
-;; (require 'module-global)
+;; (require 'module-core)
+(require 'module-utils)
 
 (declare-function dotemacs-register-repl "core-funcs"
                   (feature repl-func &optional tag))
@@ -20,6 +21,7 @@
                   (mode key def &rest bindings))
 (declare-function dotemacs/add-to-hooks "module-utils"
                   (fun hooks))
+(declare-function dotemacs//unset-scroll-margin "module-utils" ())
 
 ;;; Code:
 

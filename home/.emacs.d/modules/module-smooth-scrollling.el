@@ -1,9 +1,28 @@
-;;; Smooth Scrolling
-(require 'module-global)
+;;; module-smooth-scrolling.el --- Smooth Scrolling Module
 
-(defun dotemacs//unset-scroll-margin ()
-  "Set `scroll-margin` to zero."
-  (setq-local scroll-margin 0))
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+;; (require 'core-funcs)
+;; (require 'core-keybindings)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-core)
+(require 'module-utils)
+
+(declare-function dotemacs/add-to-hooks "module-utils"
+                  (fun hooks))
+(declare-function dotemacs//unset-scroll-margin "module-utils" ())
+
+;;; Code:
+
+(defvar dotemacs-smooth-scrolling t
+  "If non nil smooth scrolling (native-scrolling) is enabled. Smooth scrolling
+overrides the default behavior of Emacs which recenters the point when
+it reaches the top or bottom of the screen.")
 
 (use-package smooth-scrolling
   :ensure t

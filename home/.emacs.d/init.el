@@ -272,12 +272,6 @@ derivatives. If set to `relative', also turns on relative line numbers.")
   "If non nil advises quit functions to keep server open when quitting."
   :group 'dotemacs)
 
-(defcustom dotemacs-smooth-scrolling t
-  "If non nil smooth scrolling (native-scrolling) is enabled. Smooth scrolling
-overrides the default behavior of Emacs which recenters the point when
-it reaches the top or bottom of the screen."
-  :group 'dotemacs)
-
 (defcustom dotemacs-mode-line-unicode-symbols t
   "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)"
   :group 'dotemacs)
