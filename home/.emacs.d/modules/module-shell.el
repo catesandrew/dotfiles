@@ -9,8 +9,8 @@
 (require 'core-funcs)
 (require 'core-keybindings)
 (require 'module-vars)
-(require 'module-common)
-(require 'module-global)
+;; (require 'module-common)
+;; (require 'module-global)
 
 (declare-function dotemacs-register-repl "core-funcs"
                   (feature repl-func &optional tag))

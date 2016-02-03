@@ -7,7 +7,7 @@
 ;;; Commentary:
 
 (require 'module-vars)
-(require 'module-common)
+;; (require 'module-common)
 (require 'evil)
 
 ;;; Code:
@@ -118,6 +118,41 @@ or lists of these.")
   (format (concat "[%s/%s] Type [p] or [P] to paste the previous or "
                   "next copied text, [.] to paste the same text")
           (length kill-ring-yank-pointer) (length kill-ring)))
+
+;; taken from Prelude: https://github.com/bbatsov/prelude
+(defmacro dotemacs-advise-commands (advice-name commands class &rest body)
+  "Apply advice named ADVICE-NAME to multiple COMMANDS.
+The body of the advice is in BODY."
+  `(progn
+     ,@(mapcar (lambda (command)
+                 `(defadvice ,command
+                      (,class ,(intern (format "%S-%s" command advice-name))
+                              activate)
+                    ,@body))
+               commands)))
+
+;; indent on paste
+;; from Prelude: https://github.com/bbatsov/prelude
+(defun dotemacs/yank-advised-indent-function (beg end)
+  "Do indentation, as long as the region isn't too large."
+  (if (<= (- end beg) dotemacs-yank-indent-threshold)
+      (indent-region beg end nil)))
+
+(dotemacs-advise-commands
+ "indent" (yank yank-pop evil-paste-before evil-paste-after) around
+ "If current mode is not one of dotemacs-indent-sensitive-modes
+ indent yanked text (with universal arg don't indent)."
+ (evil-start-undo-step)
+ ad-do-it
+ (if (and (not (equal '(4) (ad-get-arg 0)))
+          (not (member major-mode dotemacs-indent-sensitive-modes))
+          (or (derived-mode-p 'prog-mode)
+              (member major-mode dotemacs-indent-sensitive-modes)))
+     (let ((transient-mark-mode nil)
+           (save-undo buffer-undo-list))
+       (dotemacs/yank-advised-indent-function (region-beginning)
+                                              (region-end))))
+ (evil-end-undo-step))
 
 (defun dotemacs-set-evil-shift-width ()
   "Set the value of `evil-shift-width' based on the indentation settings of the

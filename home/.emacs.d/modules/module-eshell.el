@@ -8,9 +8,9 @@
 
 (require 'core-funcs)
 (require 'core-auto-completion)
-(require 'module-vars)
-(require 'module-common)
-(require 'module-global)
+;; (require 'module-vars)
+;; (require 'module-common)
+;; (require 'module-global)
 (require 'comint)
 
 (declare-function dotemacs-register-repl "core-funcs"

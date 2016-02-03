@@ -15,6 +15,18 @@
   "Regexp used to define buffers that are useful despite matching
 `spacemacs-useless-buffers-regexp'.")
 
-(provide 'module-vars)
+;; from Prelude
+(defvar dotemacs-indent-sensitive-modes
+  '(coffee-mode
+    python-mode
+    slim-mode
+    haml-mode
+    yaml-mode
+    makefile-mode
+    makefile-gmake-mode
+    makefile-imake-mode
+    makefile-bsdmake-mode)
+  "Modes for which auto-indenting is suppressed.")
 
+(provide 'module-vars)
 ;;; module-vars.el ends here
