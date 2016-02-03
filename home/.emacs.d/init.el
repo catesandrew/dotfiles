@@ -775,28 +775,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 ;;; User interface
 (use-package module-smooth-scrolling)
-
-(use-package diminish
-  :ensure t
-  :init
-  (progn
-    ;; Minor modes abbrev --------------------------------------------------------
-    (dotemacs|do-after-display-system-init
-      (when (display-graphic-p)
-        (with-eval-after-load 'eproject
-          (diminish 'eproject-mode " eⓅ"))
-        (with-eval-after-load 'flymake
-          (diminish 'flymake-mode " Ⓕ2"))))
-    ;; Minor Mode (hidden) ------------------------------------------------------
-    (with-eval-after-load 'elisp-slime-nav
-      (diminish 'elisp-slime-nav-mode))
-    (with-eval-after-load 'hi-lock
-      (diminish 'hi-lock-mode))
-    (with-eval-after-load 'abbrev
-      (diminish 'abbrev-mode))
-    (with-eval-after-load 'subword
-      (when (eval-when-compile (version< "24.3.1" emacs-version))
-         (diminish 'subword-mode)))))
+(use-package module-diminish)
 
 ;; Just don’t show them. Use native Emacs controls:
 (setq use-dialog-box nil)
