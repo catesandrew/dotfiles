@@ -1,5 +1,20 @@
-;;; Evil Packages
+;;; module-evil-packages.el --- Evil Packages Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-vars)
+(require 'module-common)
 (require 'module-global)
+(require 'evil)
+
+;;; Code:
+
+(defvar dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors nil
+  "if non nil f/F/t/T behaviors are replaced by evil-snipe behavior.")
 
 (use-package evil-snipe
   :diminish evil-snipe-local-mode

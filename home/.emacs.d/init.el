@@ -166,11 +166,6 @@ with 2 themes variants, one dark and one light")
   "The current theme"
   :group 'dotemacs)
 
-(defcustom dotemacs-colorize-cursor-according-to-state t
-  "If non nil the cursor color matches the state color in GUI
-Emacs."
-  :group 'dotemacs)
-
 (defvar dotemacs-remap-Y-to-y$ t
   "If non nil `Y' is remapped to `y$'.")
 
@@ -439,39 +434,6 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled."
 (defcustom dotemacs-git-magit-status-fullscreen t
   "If non nil magit-status buffer is displayed in fullscreen."
   :group 'dotemacs-git)
-
-;; evil settings
-(defgroup dotemacs-evil nil
-  "Configuration options for evil-mode."
-  :group 'dotemacs
-  :prefix 'dotemacs-evil)
-
-(defcustom dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors nil
-  "if non nil f/F/t/T behaviors are replaced by evil-snipe behavior."
-  :group 'dotemacs-evil)
-
-(defcustom dotemacs-evil-evil-state-modes
-  '(fundamental-mode
-    text-mode
-    prog-mode
-    sws-mode
-    dired-mode
-    comint-mode
-    log-edit-mode
-    messages-buffer-mode
-    project-explorer-mode
-    compilation-mode)
-  "List of modes that should start up in Evil state."
-  :type '(repeat (symbol))
-  :group 'dotemacs-evil)
-
-(defcustom dotemacs-evil-emacs-state-modes
-  '(debugger-mode
-    git-commit-mode
-    git-rebase-mode)
-  "List of modes that should start up in Evil Emacs state."
-  :type '(repeat (symbol))
-  :group 'dotemacs-evil)
 
 ;; colors settings
 (defgroup dotemacs-colors nil
