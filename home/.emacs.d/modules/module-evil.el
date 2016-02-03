@@ -1,7 +1,16 @@
-;;; Evil
-(require 'module-global)
+;;; module-evil.el --- Evil Module
 
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-common)
+(require 'module-global)
 (require 'evil)
+
+;;; Code:
 
 (defun dotemacs-state-color-face (state)
   "Return the symbol of the face for the given STATE."

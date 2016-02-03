@@ -27,10 +27,6 @@
   (expand-file-name (concat user-emacs-directory "core/"))
   "core directory.")
 
-(defconst dotemacs-config-dir
-  (expand-file-name (concat user-emacs-directory "config/"))
-  "config directory.")
-
 (defconst dotemacs-modules-dir
   (expand-file-name (concat user-emacs-directory "modules/"))
   "modules directory.")
@@ -644,7 +640,6 @@ group by projectile projects."
 (mapc 'add-to-load-path
       `(
         ,dotemacs-core-directory
-        ,dotemacs-config-dir
         ,dotemacs-modules-dir
         ,dotemacs-user-settings-dir
         ))
@@ -787,7 +782,10 @@ environment, otherwise it is strongly recommended to let it set to t.")
 ;; Disable case insensitivity for filename autocompletion in shell-mode
 (setq pcomplete-ignore-case t) ;; Controls case sensitivity for pcomplete
 
-(use-package module-utils)
+(require 'module-vars)
+(require 'module-common)
+(require 'module-core)
+(require 'module-utils)
 
 (when (and (dotemacs/system-is-mac) (version< emacs-version "25"))
   (warn "This configuration needs Emacs trunk, but this is %s!" emacs-version)

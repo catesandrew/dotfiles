@@ -1,5 +1,17 @@
-;;; Eyebrowse
+;;; module-eyebrowse.el --- Eyebrowse Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
+
+(declare-function dotemacs-home "module-utils")
 
 (defvar eyebrowse-display-help t
   "If non-nil additional help is displayed when selecting a workspace.")

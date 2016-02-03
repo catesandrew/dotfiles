@@ -1,5 +1,17 @@
-;;; Key Bindings
+;;; module-keybindings.el --- Key Bindings Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
+
+(declare-function dotemacs-home "module-utils")
 
 (defun dotemacs/sort-lines ()
   "Sort lines in region or current buffer"

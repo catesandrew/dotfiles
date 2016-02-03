@@ -1,5 +1,14 @@
+;;; module-global.el --- Global functions and utilities
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;;; License:
+;;
+;;; Commentary:
+
+;;; Code:
+
 ;; from Prelude
-;; TODO: dispatch these in the layers
 (defvar dotemacs-indent-sensitive-modes
   '(coffee-mode
     python-mode
@@ -13,4 +22,4 @@
   "Modes for which auto-indenting is suppressed.")
 
 (provide 'module-global)
-;;; module-global ends here
+;;; module-global.el ends here

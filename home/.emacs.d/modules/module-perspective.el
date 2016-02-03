@@ -1,14 +1,17 @@
-;;; module-perspective.el --- Spacemacs Layouts Layer functions File
-;;
-;; Copyright (c) 2012-2016 Sylvain Benner & Contributors
-;;
-;; Author: Sylvain Benner <sylvain.benner@gmail.com>
-;; URL: https://github.com/syl20bnr/spacemacs
-;;
-;; This file is not part of GNU Emacs.
-;;
-;;; License: GPLv3
+;;; module-perspective.el --- Perspective Module
+
+;; This file is NOT part of GNU Emacs.
+
+;;; License:
+
+;;; Commentary:
+
+(require 'module-common)
 (require 'module-global)
+
+;;; Code:
+
+(declare-function dotemacs-home "module-utils")
 
 (defvar dotemacs-layouts-directory
   (expand-file-name (concat dotemacs-cache-directory "layouts/"))
