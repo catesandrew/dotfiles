@@ -322,5 +322,10 @@ Press any other key to exit." component (eval var) component component)))
   :config
   (dotemacs-hide-lighter rainbow-mode))
 
+(use-package adaptive-wrap              ; Choose wrap prefix automatically
+  :ensure t
+  :defer t
+  :init (add-hook 'visual-line-mode-hook 'adaptive-wrap-prefix-mode))
+
 (provide 'module-highlight)
 ;;; module-highlight.el ends here

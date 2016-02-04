@@ -207,8 +207,7 @@ none."
               (lambda ()
                 (unless (eq major-mode 'org-mode)
                   (setq show-trailing-whitespace t))))
-    (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
-    ))
+    (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)))
 
 (use-package open-junk-file
   :ensure t
@@ -217,6 +216,9 @@ none."
   :init
   (dotemacs-set-leader-keys "fJ" 'open-junk-file)
   (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
+
+(use-package image-file                 ; Visit images as images
+  :init (auto-image-file-mode))
 
 (use-package recentf                    ; Save recently visited files
   :defer t

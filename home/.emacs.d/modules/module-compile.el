@@ -28,6 +28,10 @@ Taken from http://stackoverflow.com/a/3072831/355252."
       (ansi-color-apply-on-region (point-min) (point-max)))))
 
 (use-package compile                    ; Compile from Emacs
+  :init
+  (progn
+    (setq compilation-ask-about-save nil
+          compilation-always-kill t))
   :config
   (progn
     ;; From http://xugx2007.blogspot.ca/2007/06/benjamin-rutts-emacs-c-development-tips.html
@@ -44,12 +48,6 @@ Taken from http://stackoverflow.com/a/3072831/355252."
 
                 ;; no errors
                 (message "compilation ok.")))))
-
-    (setq compilation-ask-about-save nil
-          compilation-always-kill t
-          ;; Kill old compilation processes before starting new ones,
-          ;; and automatically scroll up to the first error.
-          compilation-scroll-output 'first-error)
 
     (add-to-list 'display-buffer-alist
                  `(,(rx bos "*compilation")

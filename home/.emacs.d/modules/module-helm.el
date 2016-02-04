@@ -656,24 +656,26 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
 
     (dotemacs-set-leader-keys
       "<f1>" 'helm-apropos
+      "a'"   'helm-available-repls
       "bb"   'helm-mini
       "Cl"   'helm-colors
       "ff"   'dotemacs-helm-find-files
       "fF"   'helm-find-files
       "fL"   'helm-locate
-      "fm"   'dotemacs-helm-multi-files
       "fr"   'helm-recentf
-      "hb"   'helm-filtered-bookmarks
+      "fb"   'helm-filtered-bookmarks
       "hdF"  'dotemacs/helm-faces
       "hi"   'helm-info-at-point
-      "hl"   'helm-resume
       "hm"   'helm-man-woman
       "iu"   'helm-ucs
-      "ry"   'helm-show-kill-ring
-      "rr"   'helm-register
+      "jI"   'helm-imenu-in-all-buffers
       "rm"   'helm-all-mark-rings
+      "rl"   'helm-resume
+      "rr"   'helm-register
+      "rs"   'spacemacs/resume-last-search-buffer
+      "ry"   'helm-show-kill-ring
       "sL"   'dotemacs-last-search-buffer
-      "sl"   'dotemacs-jump-in-buffer)
+      "sj"   'dotemacs-jump-in-buffer)
 
     ;; search with grep
     (dotemacs-set-leader-keys
@@ -859,7 +861,7 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   :bind (([remap switch-to-buffer] . helm-mini)))
 
 (use-package helm-themes
-  :ensure helm
+  :ensure t
   :defer t
   :init
   (dotemacs-set-leader-keys
@@ -870,13 +872,13 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
   :bind (([remap execute-extended-command] . helm-M-x)))
 
 (use-package helm-eval                  ; Evaluate expressions with Helm
-  :ensure helm
-  :bind (("C-c h M-:" . helm-eval-expression-with-eldoc)
-         ("C-c h *"   . helm-calcul-expression)))
+  :ensure helm)
 
 (use-package helm-color                 ; Input colors with Helm
-  :ensure helm
-  :bind (("C-c h c" . helm-colors)))
+  :ensure helm)
+
+(use-package helm-imenu
+  :ensure helm)
 
 (use-package helm-unicode               ; Unicode input with Helm
   :ensure t
@@ -894,13 +896,17 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
 (use-package helm-files
   :ensure helm
   :defer t
-  :bind (([remap find-file] . helm-find-files)
-         ("C-c f r"         . helm-recentf))
+  :bind (([remap find-file] . helm-find-files))
   :config (setq helm-recentf-fuzzy-match t
                 ;; Use recentf to find recent files
                 helm-ff-file-name-history-use-recentf t
                 ;; Find library from `require', `declare-function' and friends
                 helm-ff-search-library-in-sexp t))
+
+(use-package helm-ring                  ; Helm commands for rings
+  :ensure helm
+  :bind (([remap yank-pop]        . helm-show-kill-ring)
+         ([remap insert-register] . helm-register)))
 
 (provide 'module-helm)
 ;;; module-helm.el ends here

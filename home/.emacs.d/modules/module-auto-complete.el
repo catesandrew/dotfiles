@@ -165,9 +165,6 @@
 ;; than five candidates. Cycle instead.
 (setq completion-cycle-threshold 5)
 
-;; tell emacs where to read abbrev
-(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
-
 (use-package auto-complete
   :ensure t
   :if (eq dotemacs-completion-engine 'auto-complete)
@@ -183,6 +180,7 @@
         ; completion-ignored-extensions '(".xpt" ".a" ".so" ".o" ".d" ".elc" ".class" "~" ".ckp" ".bak" ".imp" ".lpt" ".bin" ".otl" ".err" ".lib" ".aux" ".elf" )
         ac-fuzzy-enable t
         ac-comphist-file (concat dotemacs-cache-directory "ac-comphist.dat")
+        standard-indent 2
         ;; use 'complete when auto-complete is disabled
         tab-always-indent 'complete
         ac-dwim t)

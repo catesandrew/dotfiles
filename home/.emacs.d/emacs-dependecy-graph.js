@@ -155,20 +155,34 @@ function main() {
   // with-eval-after-loads
   // ns.setEdge('evil', ['dired', 'smartparens', 'evil-surround'])
 
+  // Evil
+  ns.setEdge('evil', [])
+
+  // Shell
   ns.setEdge('eshell', ['company'])
   ns.setEdge('shell', ['smooth-scrolling', 'magit'])
-  ns.setEdge('smooth-scrolling', [])
-  ns.setEdge('perspective', ['spaceline', 'eyebrowse', 'helm', 'swiper'])
-  ns.setEdge('eyebrowse', [])
-  ns.setEdge('helm', [])
+
+  // Buffer, Windows and Frames
   ns.setEdge('fringe', [])
   ns.setEdge('frame', [])
   ns.setEdge('buffer', []) // requires helm
   ns.setEdge('ibuffer', [])
   ns.setEdge('window', [])
   ns.setEdge('desktop', ['ignoramus'])
+  ns.setEdge('popwin', [])
+  ns.setEdge('smooth-scrolling', [])
+  ns.setEdge('diminish', [])
 
-  // c-c++
+  // Perspective, EyeBrowse, and Helm
+  ns.setEdge('perspective', ['spaceline', 'eyebrowse', 'helm', 'swiper'])
+  ns.setEdge('eyebrowse', [])
+  ns.setEdge('helm', [])
+
+  // files
+  ns.setEdge('file', ['ignoramus'])
+  ns.setEdge('ignoramus', [])
+
+  // programming languages
   ns.setEdge('cmake-mode', 'company')
   ns.setEdge(['c-mode', 'c++-mode'], 'flycheck')
   ns.setEdge(['c-mode', 'c++-mode'], 'helm-gtags')

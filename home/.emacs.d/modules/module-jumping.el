@@ -17,6 +17,30 @@
 
 ;;; Code:
 
+(use-package simple
+  :init
+  (progn
+    ;; Handy way of getting back to previous places.
+    (dotemacs-set-leader-keys
+      ;; "mn" 'dotemacs-delete-file-and-buffer
+      ;; "m}" 'dotemacs-delete-file-and-buffer
+      "m{" 'pop-to-mark-command
+      "mp" 'pop-to-mark-command))
+  :config
+  (progn
+    (setq set-mark-command-repeat-pop t)
+
+    ;; When popping the mark, continue popping until the cursor actually moves
+    ;; Also, if the last command was a copy - skip past all the expand-region cruft.
+    (defadvice pop-to-mark-command (around ensure-new-position activate)
+      (let ((p (point)))
+        (when (eq last-command 'save-region-or-current-line)
+          ad-do-it
+          ad-do-it
+          ad-do-it)
+        (dotimes (i 10)
+          (when (= p (point)) ad-do-it))))))
+
 (use-package avy                   ; Jump to characters in buffers
   :ensure t
   :commands (dotemacs-avy-open-url)
@@ -27,8 +51,7 @@
     (dotemacs-set-leader-keys
       "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
       "y" 'avy-goto-line ; 'avy-goto-char-2
-      "xo" 'dotemacs-avy-open-url
-    ))
+      "xo" 'dotemacs-avy-open-url))
   :config
   (progn
     (defun dotemacs-avy-goto-url()

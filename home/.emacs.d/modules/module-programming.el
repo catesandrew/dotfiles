@@ -17,6 +17,25 @@
 
 ;;; Code:
 
+(define-minor-mode auto-fill-comments-mode
+  "Toggle `auto-fill-mode` to auto-fill comments."
+  :lighter nil
+  :keymap nil
+  (cond
+   (auto-fill-comments-mode
+    (setq-local comment-auto-fill-only-comments t)
+    (auto-fill-mode 1))
+   (:else
+    (kill-local-variable 'comment-auto-fill-only-comments)
+    (auto-fill-mode -1))))
+
+(dotemacs-add-toggle auto-fill-comments-mode
+  :status auto-fill-function
+  :on (auto-fill-comments-mode)
+  :off (auto-fill-comments-mode -1)
+  :documentation "Break line beyond `current-fill-column` in comments only, while editing."
+  :evil-leader "tc")
+
 (defun dotemacs-disable-electric-indent-mode ()
   (if (fboundp 'electric-indent-local-mode)
       ;; for 24.4
@@ -35,9 +54,6 @@
                    (format "%s [ %d ] … "
                            (make-string (- (window-width) col 32) (string-to-char "."))
                            count)))))
-
-(defun dotemacs-local-comment-auto-fill ()
-  (set (make-local-variable 'comment-auto-fill-only-comments) t))
 
 ;; required for evil folding
 (defun dotemacs-enable-hs-minor-mode ()
@@ -103,8 +119,14 @@
     ; (unless (bound-and-true-p hs-minor-mode)
     ;   (hs-minor-mode t))
     (dotemacs-enable-hs-minor-mode)
-    (dotemacs-local-comment-auto-fill)
+    (auto-fill-comments-mode)
     (dotemacs-highlight-TODO-words)))
+
+;; (use-package outline                    ; Navigate outlines in buffers
+;;   :defer t
+;;   :init (dolist (hook '(text-mode-hook prog-mode-hook))
+;;           (add-hook hook #'outline-minor-mode))
+;;   :diminish (outline-minor-mode . "📑"))
 
 (use-package aggressive-indent
   :defer t

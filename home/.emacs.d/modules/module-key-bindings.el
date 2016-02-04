@@ -91,6 +91,36 @@ the right."
                        (justify nil t)))
                 nil))
 
+(defun dotemacs-smart-move-beginning-of-line (arg)
+  "Move point back to indentation of beginning of line.
+Move point to the first non-whitespace character on this line.
+If point is already there, move to the beginning of the line.
+Effectively toggle between the first non-whitespace character and
+the beginning of the line.
+If ARG is not nil or 1, move forward ARG - 1 lines first. If
+point reaches the beginning or end of the buffer, stop there."
+  (interactive "^p")
+  (setq arg (or arg 1))
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+(defun dotemacs-backward-kill-word-or-region (&optional arg)
+  "Calls `kill-region' when a region is active and
+`backward-kill-word' otherwise. ARG is passed to
+`backward-kill-word' if no region is active."
+  (interactive "p")
+  (if (region-active-p)
+      ;; call interactively so kill-region handles rectangular selection
+      ;; correctly (see https://github.com/syl20bnr/spacemacs/issues/3278)
+      (call-interactively #'kill-region)
+    (backward-kill-word arg)))
+
 (defmacro dotemacs/create-align-repeat-x (name regexp &optional justify-right default-after)
   (let ((new-func (intern (concat "dotemacs/align-repeat-" name))))
     `(defun ,new-func (start end switch)
@@ -622,6 +652,9 @@ Compare them on count first,and in case of tie sort them alphabetically."
 (evil-define-key 'motion help-mode-map (kbd "TAB") 'forward-button)
 (evil-define-key 'motion help-mode-map (kbd "S-TAB") 'backward-button)
 
+(global-set-key (kbd "C-a") 'dotemacs-smart-move-beginning-of-line)
+(global-set-key (kbd "C-w") 'dotemacs-backward-kill-word-or-region)
+
 ;; ---------------------------------------------------------------------------
 ;; evil-leader key bindings
 ;; ---------------------------------------------------------------------------
@@ -718,8 +751,8 @@ Ensure that helm is required before calling FUNC."
   "ik" 'dotemacs/evil-insert-line-above
   "ij" 'evil-insert-line-below)
 ;; format ---------------------------------------------------------------------
-;; <SPC> j k key binding for a frequent action: go and indent line below the point
-;; <SPC> J split the current line at point and indent it
+;; , j k key binding for a frequent action: go and indent line below the point
+;; , J split the current line at point and indent it
 (dotemacs-set-leader-keys
   "J"  'sp-split-sexp
   "jj" 'sp-newline
@@ -731,7 +764,13 @@ Ensure that helm is required before calling FUNC."
 ;; navigation -----------------------------------------------------------------
 (dotemacs-set-leader-keys
   "jh" 'dotemacs-push-mark-and-goto-beginning-of-line
-  "jl" 'dotemacs-push-mark-and-goto-end-of-line)
+  "jl" 'dotemacs-push-mark-and-goto-end-of-line
+  "jb" 'bookmark-jump
+  "jd" 'dired-jump
+  "jD" 'dired-jump-other-window
+  "jf" 'find-function-at-point
+  "ji" 'dotemacs/jump-in-buffer
+  "jv" 'find-variable-at-point)
 
 ;; Compilation ----------------------------------------------------------------
 (dotemacs-set-leader-keys

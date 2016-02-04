@@ -386,10 +386,9 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 ;;; Initialization
 
-(prefer-coding-system 'utf-8) ; with sugar on top
-
 ;; silence ad-handle-definition about advised functions getting redefined
 (setq ad-redefinition-action 'accept)
+
 ;; this is for a smoother UX at startup (i.e. less graphical glitches)
 (hidden-mode-line-mode)
 
@@ -400,17 +399,31 @@ environment, otherwise it is strongly recommended to let it set to t.")
   (tool-bar-mode -1))
 (when (and (fboundp 'scroll-bar-mode) (not (eq scroll-bar-mode -1)))
   (scroll-bar-mode -1))
+(unless (eq window-system 'mac)
+  (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
+    (menu-bar-mode -1)))
 ;; tooltips in echo-aera
 (when (and (fboundp 'tooltip-mode) (not (eq tooltip-mode -1)))
   (tooltip-mode -1))
-(unless (eq system-type 'darwin)
-  (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
-    (menu-bar-mode -1)))
-;; for convenience and user support
-(unless (fboundp 'tool-bar-mode)
-  (dotemacs-message (concat "No graphical support detected, you won't be"
-                             "able to launch a graphical instance of Emacs"
-                             "with this build.")))
+
+(prefer-coding-system 'utf-8) ; with sugar on top
+
+(setq-default ;; evil-want-C-u-scroll t
+              ;; evil-want-C-w-in-emacs-state t
+              ;; `evil-want-C-i-jump' is set to nil to avoid `TAB' being
+              ;; overlapped in terminal mode. The GUI specific `<C-i>' is used
+              ;; instead (defined in the init of `evil-jumper' package).
+              evil-want-C-i-jump nil)
+
+;; theme
+(let ((default-theme (car dotemacs-themes)))
+  (dotemacs-load-theme default-theme)
+  ;; used to prevent automatic deletion of used packages
+  (setq dotemacs-used-theme-packages
+        (delq nil (mapcar 'dotemacs-get-theme-package
+                          dotemacs-themes)))
+  (setq dotemacs--cur-theme default-theme)
+  (setq-default dotemacs--cycle-themes (cdr dotemacs-themes)))
 
 ;; font
 (dotemacs|do-after-display-system-init
@@ -419,24 +432,19 @@ environment, otherwise it is strongly recommended to let it set to t.")
   (dotemacs-buffer/warning "Cannot find font \"%s\"!"
                            (car dotemacs-default-font))))
 
-;; dotemacs init
+(setq inhibit-startup-screen t)
 (dotemacs-buffer/goto-buffer)
-;; explicitly recreate the home buffer for the first GUI client
-(dotemacs|do-after-display-system-init
- (kill-buffer (get-buffer dotemacs-buffer-name))
- (dotemacs-buffer/goto-buffer))
-(setq initial-buffer-choice (lambda () (get-buffer dotemacs-buffer-name)))
-
-;; mandatory dependencies
+(unless (display-graphic-p)
+  ;; explicitly recreate the home buffer for the first GUI client
+  (dotemacs|do-after-display-system-init
+  (kill-buffer (get-buffer dotemacs-buffer-name))
+  (dotemacs-buffer/goto-buffer)))
+(setq initial-buffer-choice nil)
+(setq inhibit-startup-screen t)
+;; dependencies
 ; (dotemacs-load-or-install-package 'dash t)
 (dotemacs-load-or-install-package 's t)
 ;; (dotemacs-load-or-install-package 'f t)
-(setq-default ;; evil-want-C-u-scroll t
-              ;; evil-want-C-w-in-emacs-state t
-              ;; `evil-want-C-i-jump' is set to nil to avoid `TAB' being
-              ;; overlapped in terminal mode. The GUI specific `<C-i>' is used
-              ;; instead (defined in the init of `evil-jumper' package).
-              evil-want-C-i-jump nil)
 (setq evil-want-Y-yank-to-eol dotemacs-remap-Y-to-y$
       evil-ex-substitute-global dotemacs-ex-substitute-global)
 (dotemacs-load-or-install-package 'evil t)
@@ -463,25 +471,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (require 'module-vars)
 
 
-;;; Initialization
-
-;; And disable the site default settings
-(setq inhibit-default-init t)
-
-;; save custom variables
-(unless (bound-and-true-p custom-file)
-  (setq custom-file dotemacs-custom-file))
-
-;; start scratch in text mode (usefull to get a faster Emacs load time
-;; because it avoids autoloads of elisp modes)
-(setq initial-major-mode 'text-mode)
-
-(require 'module-common)
-(require 'module-core)
-(require 'module-utils)
-
-
-;;; Key Binding Init
+;;; Prefixes
 
 ;; We define prefix commands only for the sake of which-key
 (setq dotemacs-key-binding-prefixes
@@ -542,62 +532,147 @@ environment, otherwise it is strongly recommended to let it set to t.")
       dotemacs-key-binding-prefixes)
 
 
-;;; User interface
+;;; Navigation
 
-;; Just don’t show them. Use native Emacs controls:
-(setq use-dialog-box nil)
+;; Auto refresh
+(global-auto-revert-mode 1)
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t
+      auto-revert-verbose nil)
 
-;; Show line number in mode line
-(setq line-number-mode t)
-;; Show column number in mode line
-(setq column-number-mode t)
-
-;; No blinking and beeping, no startup screen, no scratch message and short
-;; Yes/No questions.
-(blink-cursor-mode 0)
-(tooltip-mode 0)
-
-;; draw underline lower
-(setq x-underline-at-descent-line t)
+;; Make dired "guess" target directory for some operations, like copy to
+;; directory visited in other split buffer.
+(setq dired-dwim-target t)
 
 ;; no beep pleeeeeease ! (and no visual blinking too please)
-(setq ring-bell-function #'ignore
-      ;; no welcome buffer
-      inhibit-startup-screen t
-      visible-bell nil
-      initial-scratch-message nil)
+(setq ring-bell-function 'ignore
+      visible-bell nil)
 
-;; default theme
-(let ((default-theme (car dotemacs-themes)))
-  (dotemacs-load-theme default-theme)
-  ;; used to prevent automatic deletion of used packages
-  (setq dotemacs-used-theme-packages
-        (delq nil (mapcar 'dotemacs-get-theme-package
-                          dotemacs-themes)))
-  (setq dotemacs--cur-theme default-theme)
-  (setq-default dotemacs--cycle-themes (cdr dotemacs-themes)))
+;; Hack to fix a bug with tabulated-list.el
+;; see: http://redd.it/2dgy52
+(defun tabulated-list-revert (&rest ignored)
+  "The `revert-buffer-function' for `tabulated-list-mode'.
+It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
+  (interactive)
+  (unless (derived-mode-p 'tabulated-list-mode)
+    (error "The current buffer is not in Tabulated List mode"))
+  (run-hooks 'tabulated-list-revert-hook)
+  ;; hack is here
+  ;; (tabulated-list-print t)
+  (tabulated-list-print))
 
+;; Mouse cursor in terminal mode
+(xterm-mouse-mode 1)
+
+;; Highlight and allow to open http link at point in programming buffers
+;; goto-address-prog-mode only highlights links in strings and comments
+(add-hook 'prog-mode-hook 'goto-address-prog-mode)
+(add-hook 'text-mode-hook 'goto-address-mode)
+;; Highlight and follow bug references in comments and strings
+(add-hook 'prog-mode-hook 'bug-reference-prog-mode)
+
+;; Keep focus while navigating help buffers
+(setq help-window-select 't)
+
+;; Scroll compilation to first error or end
+(setq compilation-scroll-output 'first-error)
+
+
+;;; Edit
+
+;; start scratch in text mode (usefull to get a faster Emacs load time
+;; because it avoids autoloads of elisp modes)
+(setq initial-major-mode 'text-mode)
+
+;; Disable tabs, but given them proper width
+(setq-default indent-tabs-mode nil
+              highlight-tabs t
+              tab-width 8)
+
+;; Text
+(setq longlines-show-hard-newlines t)
+
+;; Use system trash for file deletion should work on Windows and Linux distros
+;; on OS X, see contrib/osx layer
+(setq delete-by-moving-to-trash t)
+
+;; auto fill breaks line beyond buffer's fill-column
+(setq-default fill-column 80)
+(dotemacs-diminish auto-fill-function " Ⓕ" " F")
+
+;; persistent abbreviation file
+(setq abbrev-file-name (concat dotemacs-cache-directory "abbrev_defs"))
+
+;; Save clipboard contents into kill-ring before replace them
+(setq save-interprogram-paste-before-kill t)
+
+;; Single space between sentences is more widespread than double
+(setq-default sentence-end-double-space nil)
+
+;; The C-d rebinding that most shell-like buffers inherit from
+;; comint-mode assumes non-evil configuration with its
+;; `comint-delchar-or-maybe-eof' function, so we disable it
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "C-d") nil))
+
+;; whitespace-cleanup configuration
+(pcase dotemacs-whitespace-cleanup
+  (`all (add-hook 'before-save-hook 'whitespace-cleanup))
+  (`trailing (add-hook 'before-save-hook 'delete-trailing-whitespace)))
+
+; Exclude very large buffers from dabbrev
+; From https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
+(defun dotemacs/dabbrev-friend-buffer (other-buffer)
+  (< (buffer-size other-buffer) (* 1 1024 1024)))
+(setq dabbrev-friend-buffer-function 'dotemacs/dabbrev-friend-buffer)
+
+
+;;; User Interface
+
+;; important for golden-ratio to better work
+(setq window-combination-resize t)
+
+;; fringes
+(dotemacs|do-after-display-system-init
+ (when (display-graphic-p)
+   (custom-set-variables
+    '(fringe-mode (quote (4 . 4)) nil (fringe)))
+   (custom-set-faces
+    '(linum ((t (:height 0.9 :family "Bebas Neue")))))
+   (setq-default fringe-indicator-alist
+                 '((truncation . nil) (continuation . nil)))))
+
+;; Show column number in mode line
+(setq column-number-mode t)
+;; Activate linum-mode in all text-mode buffers if the setting is enabled.
+(when dotemacs-line-numbers
+  (add-hook 'text-mode-hook 'linum-mode))
+;; line number
+(setq linum-format "%4d")
+;; highlight current line
+(global-hl-line-mode t)
+;; no blink
+(blink-cursor-mode 0)
 ;; Answering just 'y' or 'n' will do
 (fset 'yes-or-no-p #'y-or-n-p)
-;; Opt out from the startup message in the echo area by simply disabling this
-;; ridiculously bizarre thing entirely.
-(fset 'display-startup-echo-area-message #'ignore)
-
+;; draw underline lower
+(setq x-underline-at-descent-line t)
 ;; don't let the cursor go into minibuffer prompt
 ;; Tip taken from Xah Lee: http://ergoemacs.org/emacs/emacs_stop_cursor_enter_prompt.html
 (setq minibuffer-prompt-properties
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
 
 
-;;; File handling
+;;; Session
 
+;; save custom variables
+(unless (bound-and-true-p custom-file)
+  (setq custom-file dotemacs-custom-file))
+
+;; scratch buffer empty
+(setq initial-scratch-message nil)
 ;; don't create backup~ files
-(setq backup-by-copying t
-      make-backup-files nil
-      create-lockfiles nil)
-
-;; Keep backup files out of the way
-(setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups"))))
+(setq make-backup-files nil)
 
 ;; Auto-save file
 (setq auto-save-default (not (null dotemacs-auto-save-file-location)))
@@ -623,16 +698,72 @@ environment, otherwise it is strongly recommended to let it set to t.")
   (_ (setq auto-save-default nil
            auto-save-list-file-prefix nil)))
 
-;; Transparently open compressed files
-(auto-compression-mode t)
+;; remove annoying ellipsis when printing sexp in message buffer
+(setq eval-expression-print-length nil
+      eval-expression-print-level nil)
 
-;; Delete files to trash
-(setq delete-by-moving-to-trash t)
+;; cache files
+(setq url-configuration-directory (concat dotemacs-cache-directory "url")
+      eshell-directory-name (concat dotemacs-cache-directory "eshell" )
+      tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))
+
+;; Give us narrowing back! Seems pointless to warn. There's always undo.
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+(put 'scroll-left 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; Same for region casing
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 
 ;; Remove prompt if the file is opened in other clients
 (defun server-remove-kill-buffer-hook ()
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function))
 (add-hook 'server-visit-hook 'server-remove-kill-buffer-hook)
+
+
+;;; Core Begin
+
+(require 'module-common)
+(require 'module-core)
+(require 'module-utils)
+
+;; enable electric indent
+(electric-indent-mode)
+
+;; And disable the site default settings
+;; (setq inhibit-default-init t)
+
+;; Keep backup files out of the way
+(setq backup-directory-alist `((".*" . ,(concat dotemacs-cache-directory "backups"))))
+;; don't create backup~ files
+(setq backup-by-copying t)
+(setq create-lockfiles nil)
+
+;; Transparently open compressed files
+;; (auto-compression-mode t)
+
+;; Opt out from the startup message in the echo area by simply disabling this
+;; ridiculously bizarre thing entirely.
+;; (fset 'display-startup-echo-area-message #'ignore)
+
+;; Show active region
+;; (transient-mark-mode 1)
+;; (make-variable-buffer-local 'transient-mark-mode)
+;; (put 'transient-mark-mode 'permanent-local t)
+;; (setq-default transient-mark-mode t)
+
+;; Indicate empty lines at the end of a buffer in the fringe, but require a
+;; final new line
+(setq indicate-empty-lines t
+      require-final-newline t)
+
+(setq mark-ring-max 64
+      kill-ring-max 200
+      global-mark-ring-max 128)
 
 
 ;;; Evil
@@ -653,8 +784,21 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (use-package module-desktop)
 (use-package module-popwin)
 (use-package popup :ensure t :defer t)
-(use-package module-smooth-scrolling)
 (use-package module-diminish)
+
+
+;;; Files
+(use-package module-file            ; Personal file tools
+  :init
+  (dotemacs-declare-prefix "fp" "personal tools")
+  (dotemacs-set-leader-keys
+    "fpD" 'dotemacs-delete-file-and-buffer
+    "fpi" 'dotemacs-open-in-intellij
+    "fpo" 'dotemacs-launch-dwim
+    "fpR" 'dotemacs-rename-file-and-buffer
+    "fpw" 'dotemacs-copy-filename-as-kill
+    "fpu" 'dotemacs-find-user-init-file-other-window
+    "fpw" 'dotemacs-browse-feature-url))
 
 
 ;;; Perspective, EyeBrowse, and Helm
@@ -662,438 +806,27 @@ environment, otherwise it is strongly recommended to let it set to t.")
 (use-package module-eyebrowse)
 (use-package module-helm)
 
-
-;;; Files
-(use-package module-file            ; Personal file tools
-  ;; :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
-  ;;        ("C-c f i" . dotemacs-open-in-intellij)
-  ;;        ("C-c f o" . dotemacs-launch-dwim)
-  ;;        ("C-c f R" . dotemacs-rename-file-and-buffer)
-  ;;        ("C-c f w" . dotemacs-copy-filename-as-kill)
-  ;;        ("C-c f u" . dotemacs-find-user-init-file-other-window)
-  ;;        ("C-c w ." . dotemacs-browse-feature-url))
-  )
-
-;; Additional bindings for built-ins
-(bind-key "C-c f v d" #'add-dir-local-variable)
-(bind-key "C-c f v l" #'add-file-local-variable)
-(bind-key "C-c f v p" #'add-file-local-variable-prop-line)
-
 (use-package module-ignoramus)
 
 
-;;; todo
-
-(setq editorconfig-packages '(editorconfig))
-(use-package editorconfig
-  :defer t
-  :ensure t
-  :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
-
-(use-package autorevert                 ; Auto-revert buffers of changed files
-  :if (not noninteractive)
-  :defer
-  :init
-  (progn
-    (setq auto-revert-check-vc-info nil
-          auto-revert-mode-text " ♻"
-          auto-revert-tail-mode-text " ♻~"
-          auto-revert-verbose nil)
-    (defun auto-revert-turn-on-maybe ()
-      (unless (file-remote-p default-directory)
-        (auto-revert-mode)))
-    (add-hook 'find-file-hook 'auto-revert-turn-on-maybe))
-  :config
-  (setq auto-revert-verbose nil ; Shut up, please!
-        ;; Revert Dired buffers, too
-        global-auto-revert-non-file-buffers t))
-
-(use-package image-file                 ; Visit images as images
-  :init (auto-image-file-mode))
-
-(use-package launch                     ; Open files in external programs
-  :ensure t
-  :defer t)
-
-
 ;;; Navigation and scrolling
-
-;; Handy way of getting back to previous places.
-(bind-key "C-x p" 'pop-to-mark-command)
-(setq set-mark-command-repeat-pop t)
-
-;; Keep focus while navigating help buffers
-(setq help-window-select 't)
-
-;; The commands defined in this layer are taken from various sources like
-;; [[https://github.com/bbatsov/prelude][Prelude]].
-(defun dotemacs-smart-move-beginning-of-line (arg)
-  "Move point back to indentation of beginning of line.
-Move point to the first non-whitespace character on this line.
-If point is already there, move to the beginning of the line.
-Effectively toggle between the first non-whitespace character and
-the beginning of the line.
-If ARG is not nil or 1, move forward ARG - 1 lines first. If
-point reaches the beginning or end of the buffer, stop there."
-  (interactive "^p")
-  (setq arg (or arg 1))
-  ;; Move lines first
-  (when (/= arg 1)
-    (let ((line-move-visual nil))
-      (forward-line (1- arg))))
-  (let ((orig-point (point)))
-    (back-to-indentation)
-    (when (= orig-point (point))
-      (move-beginning-of-line 1))))
-(global-set-key (kbd "C-a") 'dotemacs-smart-move-beginning-of-line)
-
-(defun dotemacs-backward-kill-word-or-region (&optional arg)
-  "Calls `kill-region' when a region is active and
-`backward-kill-word' otherwise. ARG is passed to
-`backward-kill-word' if no region is active."
-  (interactive "p")
-  (if (region-active-p)
-      ;; call interactively so kill-region handles rectangular selection
-      ;; correctly (see https://github.com/syl20bnr/spacemacs/issues/3278)
-      (call-interactively #'kill-region)
-    (backward-kill-word arg)))
-(global-set-key (kbd "C-w") 'dotemacs-backward-kill-word-or-region)
-
-(setq scroll-margin 3                   ; 0 to drag the point along while scrolling
-      scroll-conservatively 1000        ; Never recenter the screen while scrolling
-      scroll-error-top-bottom t         ; Move to beg/end of buffer before
-                                        ; signalling an error
-      ;; scroll-preserve-screen-position t
-      ;; These settings make trackpad scrolling on OS X much more predictable
-      ;; and smooth
-      mouse-wheel-progressive-speed nil
-      mouse-wheel-scroll-amount '(1))
-
-;; Hack to fix a bug with tabulated-list.el
-;; see: http://redd.it/2dgy52
-(defun tabulated-list-revert (&rest ignored)
-  "The `revert-buffer-function' for `tabulated-list-mode'.
-It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
-  (interactive)
-  (unless (derived-mode-p 'tabulated-list-mode)
-    (error "The current buffer is not in Tabulated List mode"))
-  (run-hooks 'tabulated-list-revert-hook)
-  ;; hack is here
-  ;; (tabulated-list-print t)
-  (tabulated-list-print))
-
-;; Mouse cursor in terminal mode
-(xterm-mouse-mode 1)
-
-;; When popping the mark, continue popping until the cursor actually moves
-;; Also, if the last command was a copy - skip past all the expand-region cruft.
-(defadvice pop-to-mark-command (around ensure-new-position activate)
-  (let ((p (point)))
-    (when (eq last-command 'save-region-or-current-line)
-      ad-do-it
-      ad-do-it
-      ad-do-it)
-    (dotimes (i 10)
-      (when (= p (point)) ad-do-it))))
-
+(use-package module-smooth-scrolling)
 (use-package module-jumping)
 
-(use-package page-break-lines           ; Turn page breaks into lines
-  :ensure t
-  :init
-  (progn
-    (global-page-break-lines-mode)
-    (dotemacs-hide-lighter page-break-lines-mode)))
-
-(use-package outline                    ; Navigate outlines in buffers
-  :defer t
-  :init (dolist (hook '(text-mode-hook prog-mode-hook))
-          (add-hook hook #'outline-minor-mode))
-  :diminish (outline-minor-mode . "📑"))
-
-(use-package helm-imenu
-  :ensure helm
-  :bind (("C-c i" . helm-imenu-in-all-buffers)))
-
 
-;;; Buffer Editing
-
-;; Show active region
-(transient-mark-mode 1)
-(make-variable-buffer-local 'transient-mark-mode)
-(put 'transient-mark-mode 'permanent-local t)
-(setq-default transient-mark-mode t)
-
-;; Nic says eval-expression-print-level needs to be set to nil (turned off) so
-;; that you can always see what's happening. Also remove annoying ellipsis when
-;; printing sexp in message buffer
-(setq eval-expression-print-length nil
-      eval-expression-print-level nil)
-
-;; Don't highlight matches with jump-char - it's distracting
-(setq jump-char-lazy-highlight-face nil)
-
-;; Real emacs knights don't use shift to mark things
-(setq shift-select-mode nil)
-
-;; Sentences do not need double spaces to end. Period.
-(set-default 'sentence-end-double-space nil)
-
-;; The C-d rebinding that most shell-like buffers inherit from
-;; comint-mode assumes non-evil configuration with its
-;; `comint-delchar-or-maybe-eof' function, so we disable it
-(with-eval-after-load 'comint
-  (define-key comint-mode-map (kbd "C-d") nil))
-
-;; whitespace-cleanup configuration
-(pcase dotemacs-whitespace-cleanup
-  (`all (add-hook 'before-save-hook 'whitespace-cleanup))
-  (`trailing (add-hook 'before-save-hook 'delete-trailing-whitespace)))
-
-;; enable electric indent
-(setq electric-indent-mode 1)
-
-;; Text
-(setq longlines-show-hard-newlines t)
-
-;; Disable tabs, but given them proper width
-(setq-default indent-tabs-mode nil
-              highlight-tabs t
-              tab-width 8)
-
-;; Make Tab complete if the line is indented
-(setq tab-always-indent 'complete)
-
-;; Indicate empty lines at the end of a buffer in the fringe, but require a
-;; final new line
-(setq indicate-empty-lines t
-      require-final-newline t)
-
-(setq kill-ring-max 200                 ; More killed items
-      ;; Save the contents of the clipboard to kill ring before killing
-      save-interprogram-paste-before-kill t)
-
-(setq mark-ring-max 64
-      global-mark-ring-max 128
-      create-lockfiles nil)
-
-;; Configure a reasonable fill column, indicate it in the buffer and enable
-;; automatic filling
-(setq-default fill-column 80)
-(setq standard-indent 2)
-
-; Also, =visual-line-mode= is so much better than =auto-fill-mode=. It doesn't
-; actually break the text into multiple lines - it only looks that way.
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-(dotemacs-diminish auto-fill-function " Ⓕ" " F")
-
-; Exclude very large buffers from dabbrev
-; From https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
-(defun sanityinc/dabbrev-friend-buffer (other-buffer)
-  (< (buffer-size other-buffer) (* 1 1024 1024)))
-(setq dabbrev-friend-buffer-function 'sanityinc/dabbrev-friend-buffer)
-
-(use-package module-buffer-editing           ; Personal editing helpers
-  :bind (([remap kill-whole-line]        . dotemacs-smart-kill-whole-line)
-         ([remap move-beginning-of-line] . dotemacs-back-to-indentation-or-beginning-of-line)
-         ("C-<backspace>"                . dotemacs-smart-backward-kill-line)
-         ("C-S-j"                        . dotemacs-smart-open-line)
-         ;; Additional utilities
-         ("C-c e d"                      . dotemacs-insert-current-date))
-  :commands (dotemacs-auto-fill-comments-mode)
-  ;; Auto-fill comments in programming modes
-  :init (add-hook 'prog-mode-hook #'dotemacs-auto-fill-comments-mode))
-
-(use-package clean-aindent-mode ; Keeps track of the last auto-indent operation and trims down white space
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'prog-mode-hook 'clean-aindent-mode))
-
-(use-package move-text
-  :ensure t
-  :defer t
-  :init
-  (dotemacs-define-micro-state move-text
-    :doc "[J] move down [K] move up"
-    :use-minibuffer t
-    :execute-binding-on-enter t
-    :evil-leader "xJ" "xK"
-    :bindings
-    ("J" move-text-down)
-    ("K" move-text-up)))
-
-(use-package helm-ring                  ; Helm commands for rings
-  :ensure helm
-  :bind (([remap yank-pop]        . helm-show-kill-ring)
-         ([remap insert-register] . helm-register)))
-
-(use-package delsel                     ; Delete the selection instead of insert
-  :defer t
-  :init (delete-selection-mode))
-
-(use-package subword                    ; Subword/superword editing
-  :ensure t
-  :if (unless (version< emacs-version "24.4"))
-  :defer t
-  :init
-  (progn
-    (unless (category-docstring ?U)
-      (define-category ?U "Uppercase")
-      (define-category ?u "Lowercase"))
-    (modify-category-entry (cons ?A ?Z) ?U)
-    (modify-category-entry (cons ?a ?z) ?u)
-    (make-variable-buffer-local 'evil-cjk-word-separating-categories)
-    (defun dotemacs-subword-enable-camel-case ()
-      "Add support for camel case to subword."
-      (if subword-mode
-          (push '(?u . ?U) evil-cjk-word-separating-categories)
-        (setq evil-cjk-word-separating-categories
-              (default-value 'evil-cjk-word-separating-categories))))
-    (add-hook 'subword-mode-hook 'dotemacs-subword-enable-camel-case)
-    (dotemacs-add-toggle camel-case-motion
-      :status subword-mode
-      :on (subword-mode +1)
-      :off (subword-mode -1)
-      :documentation "Toggle camelCase motions"
-      :evil-leader "tc")
-    (dotemacs-add-toggle camel-case-motion-globally
-      :status subword-mode
-      :on (global-subword-mode +1)
-      :off (global-subword-mode -1)
-      :documentation "Globally toggle camelCase motions"
-      :evil-leader "t C-c"))
-  :config
-  (dotemacs-diminish subword-mode " ⓒ" " c"))
-
-(use-package adaptive-wrap              ; Choose wrap prefix automatically
-  :ensure t
-  :defer t
-  :init (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode))
-
-(use-package visual-fill-column
-  :ensure t
-  :disabled t
-  :init (add-hook 'visual-line-mode-hook #'visual-fill-column-mode))
-
-;;https://www.masteringemacs.org/article/re-builder-interactive-regexp-builder
-(setq reb-re-syntax 'string) ;; fix backslash madness
-
-(use-package zop-to-char
-  :ensure t
-  :bind (("M-z" . zop-to-char)
-         ("M-Z" . zop-up-to-char)))
-
-(use-package align                      ; Align text in buffers
-  :bind (("C-c e a" . align)
-         ("C-c e c" . align-current)
-         ("C-c e r" . align-regexp)))
-
-(use-package multiple-cursors           ; Edit text with multiple cursors
-  :disabled t
-  :ensure t
-  :bind (("C-c m <SPC>" . mc/vertical-align-with-space)
-         ("C-c m a"     . mc/vertical-align)
-         ("C-c m e"     . mc/mark-more-like-this-extended)
-         ("C-c m h"     . mc/mark-all-like-this-dwim)
-         ("C-c m l"     . mc/edit-lines)
-         ("C-c m n"     . mc/mark-next-like-this)
-         ("C-c m p"     . mc/mark-previous-like-this)
-         ("C-c m r"     . vr/mc-mark)
-         ("C-c m C-a"   . mc/edit-beginnings-of-lines)
-         ("C-c m C-e"   . mc/edit-ends-of-lines)
-         ("C-c m C-s"   . mc/mark-all-in-region))
-  :config
-  (setq mc/mode-line
-        ;; Simplify the MC mode line indicator
-        '(:propertize (:eval (concat " " (number-to-string (mc/num-cursors))))
-                      face font-lock-warning-face)))
-
-(use-package expand-region              ; Expand region by semantic units
-  :ensure t
-  :defer t
-  :init (dotemacs-set-leader-keys "v" 'er/expand-region)
-  :config
-  (progn
-    ;; add search capability to expand-region
-    (defadvice er/prepare-for-more-expansions-internal
-        (around helm-ag/prepare-for-more-expansions-internal activate)
-      ad-do-it
-      (let ((new-msg (concat (car ad-return-value)
-                             ", / to search in project, "
-                             "f to search in files, "
-                             "b to search in opened buffers"))
-            (new-bindings (cdr ad-return-value)))
-        (cl-pushnew
-         '("/" (lambda ()
-                 (call-interactively
-                  'dotemacs-helm-project-smart-do-search-region-or-symbol)))
-         new-bindings)
-        (cl-pushnew
-         '("f" (lambda ()
-                 (call-interactively
-                  'dotemacs-helm-files-smart-do-search-region-or-symbol)))
-         new-bindings)
-        (cl-pushnew
-         '("b" (lambda ()
-                 (call-interactively
-                  'dotemacs-helm-buffers-smart-do-search-region-or-symbol)))
-         new-bindings)
-        (setq ad-return-value (cons new-msg new-bindings))))
-    (setq expand-region-contract-fast-key "V"
-          expand-region-reset-fast-key "r")))
-
-(use-package undo-tree                  ; Branching undo
-  :ensure t
-  :init
-  (global-undo-tree-mode)
-  ;; https://bitbucket.org/lyro/evil/issues/522/when-saving-the-buffer-change-list-got
-  ;; https://github.com/syl20bnr/spacemacs/issues/774
-  ;; (setq undo-tree-auto-save-history t
-  ;;       undo-tree-history-directory-alist
-  ;;       `(("." . ,(concat dotemacs-cache-directory "undo"))))
-  ;; (unless (file-exists-p (concat dotemacs-cache-directory "undo"))
-  ;;     (make-directory (concat dotemacs-cache-directory "undo")))
-  (setq undo-tree-visualizer-timestamps t)
-  (setq undo-tree-visualizer-diff t)
-  :config
-  (dotemacs-hide-lighter undo-tree-mode))
-
-;; Give us narrowing back!
-(put 'narrow-to-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'erase-buffer 'disabled nil)
-(put 'scroll-left 'disabled nil)
-(put 'dired-find-alternate-file 'disabled nil)
-
-;; Same for region casing
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-
-(use-package auto-insert                ; Automatic insertion into new files
-  :defer t
-  :bind (("C-c e i" . auto-insert)))
-
-(use-package copyright                  ; Deal with copyright notices
-  :defer t
-  :bind (("C-c e C" . copyright-update))
-  ;; Update copyright when visiting files
-  :init (add-hook 'find-file-hook #'copyright-update)
-  ;; Use ranges to denote consecutive years
-  :config (setq copyright-year-ranges t
-                copyright-names-regexp (regexp-quote user-full-name)))
-
-;; Additional keybindings
-(bind-key [remap just-one-space] #'cycle-spacing)
-
-
-;;; Whitespace
+;;; Editing
+(use-package module-editing           ; Personal editing helpers
+  ;; :bind (([remap kill-whole-line]        . dotemacs-smart-kill-whole-line)
+  ;;        ([remap move-beginning-of-line] . dotemacs-back-to-indentation-or-beginning-of-line)
+  ;;        ("C-<backspace>"                . dotemacs-smart-backward-kill-line)
+  ;;        ("C-S-j"                        . dotemacs-smart-open-line)
+  ;;        ;; Additional utilities
+  ;;        ("C-c e d"                      . dotemacs-insert-current-date))
+  )
 (use-package module-whitespace)
 
 
-;;; Evil
+;;; Evil Addons
 (use-package module-evil-packages)
 (use-package evil-evilified-state :load-path "evil/")
 (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
@@ -1110,7 +843,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 
 ;;; Key Bindings
-
 (use-package bind-map
   :init
   (bind-map dotemacs-default-map
@@ -1119,101 +851,21 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     :evil-keys (dotemacs-leader-key)
     :override-minor-modes t
     :override-mode-name dotemacs-leader-override-mode))
-
 (use-package module-key-bindings
   :config (dotemacs-toggle-transparency-core))
 
 
-;;; Text editing
+;;; Text Mode
 
+;; `visual-line-mode` is so much better than `auto-fill-mode`. It doesn't
+;; actually break the text into multiple lines - it only looks that way.
+(remove-hook 'text-mode-hook 'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
+(use-package module-typography)
 (use-package writeroom-mode             ; Distraction-free editing
   :ensure t
-  :bind (("C-c u r" . writeroom-mode)))
-
-(use-package typo
-  :ensure t
-  :init (progn
-          (typo-global-mode)
-          (dolist (hook '(markdown-mode-hook rst-mode-hook))
-            (add-hook hook 'typo-mode)))
-  :diminish (typo-mode . "𝕿"))
-
-;;; Documents
-(use-package doc-view
-  :defer t
-  :init
-       (evilified-state-evilify doc-view-mode doc-view-mode-map
-         "/"  'dotemacs-doc-view-search-new-query
-         "?"  'dotemacs-doc-view-search-new-query-backward
-         "gg" 'doc-view-first-page
-         "G"  'doc-view-last-page
-         "gt" 'doc-view-goto-page
-         "h"  'doc-view-previous-page
-         "j"  'doc-view-next-line-or-next-page
-         "k"  'doc-view-previous-line-or-previous-page
-         "K"  'doc-view-kill-proc-and-buffer
-         "l"  'doc-view-next-page
-         "n"  'doc-view-search
-         "N"  'doc-view-search-backward
-         (kbd "C-d") 'doc-view-scroll-up-or-next-page
-         (kbd "C-k") 'doc-view-kill-proc
-         (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
-  :config
-  (progn
-    (defun dotemacs-doc-view-search-new-query ()
-      "Initiate a new query."
-      (interactive)
-      (doc-view-search 'newquery))
-
-    (defun dotemacs-doc-view-search-new-query-backward ()
-      "Initiate a new query."
-      (interactive)
-      (doc-view-search 'newquery t))
-
-    ;; fixed a weird issue where toggling display does not
-    ;; swtich to text mode
-    (defadvice doc-view-toggle-display
-        (around dotemacs-doc-view-toggle-display activate)
-      (if (eq major-mode 'doc-view-mode)
-          (progn
-            ad-do-it
-            (text-mode)
-            (doc-view-minor-mode))
-        ad-do-it))))
-
-;; Asciidoc
-(use-package adoc-mode
-  ;; We will NOT default `.txt' files to AsciiDoc mode,
-  ;; and `.asciidoc' extension is just plain stupid.
-  :mode (("\\.adoc?$" . adoc-mode))
-  :defer t
-  :ensure t
-  :config
-  (progn
-    ;; We have quite a lot of possible keybindings.
-    ;; See `adoc-mode.el', its bottom part where the huge easy-menu
-    ;; is defined and after that, where the various `tempo-template-*'
-    ;; functions are defined.
-
-    ;; See /doc/CONVENTIONS.md#plain-text-markup-languages
-    (dotemacs-set-leader-keys-for-major-mode 'adoc-mode
-      "h1" 'tempo-template-adoc-title-1
-      ;; Alternative method of inserting top-level heading
-      "hI" 'tempo-template-adoc-title-1
-      "h2" 'tempo-template-adoc-title-2
-      ;; Alternative method of inserting the most usual heading
-      "hi" 'tempo-template-adoc-title-2
-      "h3" 'tempo-template-adoc-title-3
-      "h4" 'tempo-template-adoc-title-4
-      "h5" 'tempo-template-adoc-title-5
-      "xb" 'tempo-template-adoc-strong
-      "xi" 'tempo-template-adoc-emphasis)
-    ;; yes, exactly like that. To "promote" title is to INCREASE its size.
-    ;; `adoc-denote' does the opposite: increases its LEVEL,
-    ;; which DECREASES its size.
-    (define-key adoc-mode-map (kbd "M-h") 'adoc-denote)
-    ;; see the comment about  adoc-denote above
-    (define-key adoc-mode-map (kbd "M-l") 'adoc-promote)))
+  :defer t)
 
 
 ;;; Markup Languages
@@ -1221,29 +873,19 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package module-latex)
 (use-package module-markdown)
 (use-package module-pandoc)
-
+(use-package module-asciidoc)
 (use-package graphviz-dot-mode          ; Graphviz
   :ensure t
   :defer t
   :config
   (setq graphviz-dot-indent-width 4))
 
-(use-package systemd                    ; Mode for systemd unit files
-  :ensure t
-  :defer t)
-
 
 ;;; Programming Languages, Utils
 (use-package module-programming
   :init
   (progn
-    ;; Highlight and allow to open http link at point in programming buffers
-    ;; goto-address-prog-mode only highlights links in strings and comments
-    (add-hook 'prog-mode-hook 'goto-address-prog-mode)
-    ;; Highlight and follow bug references in comments and strings
-    (add-hook 'prog-mode-hook 'bug-reference-prog-mode)
-
-    (setq dotemacs-prog-mode-hook #'dotemacs-prog-mode-defaults)
+    (setq dotemacs-prog-mode-hook 'dotemacs-prog-mode-defaults)
     (add-hook 'prog-mode-hook
               (lambda ()
                 (run-hooks #'dotemacs-prog-mode-hook)))))
@@ -1280,6 +922,22 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package module-restclient)
 (use-package module-swift)
 (use-package module-shell-script)
+
+;; Misc programming languages
+(use-package arduino-mode :defer t :ensure t)
+(use-package faust-mode :defer t :ensure t :mode "\\.\\(dsp\\|lib\\)\\'")
+(use-package scad-mode :defer t :ensure t)
+(use-package qml-mode :defer t :ensure t :mode "\\.qml\\'")
+(use-package julia-mode :defer t :ensure t)
+(use-package matlab-mode :defer t :ensure t)
+(use-package stan-mode :defer t :ensure t)
+(use-package thrift :defer t :ensure t)
+;; no associated extension because conflicts with more common Objective-C,
+;; manually invoke for .m files.
+(use-package wolfram-mode
+  :defer t
+  :ensure t
+  :interpreter "\\(Wolfram\\|Mathematica\\)Script\\( -script\\)?")
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
@@ -1323,20 +981,6 @@ point. Requires smartparens because all movement is done using
         "ec" 'dotemacs-eval-current-form-sp
         "es" 'dotemacs-eval-current-symbol-sp))))
 
-;;; Misc programming languages
-(use-package cmake-mode                 ; CMake files
-  :ensure t
-  :defer t)
-
-(use-package thrift                     ; Thrift interface files
-  :ensure t
-  :defer t
-  :init (put 'thrift-indent-level 'safe-local-variable #'integerp))
-
-
-;; Databases
-(use-package module-sql)
-
 
 ;; Source Code tags, and metadata
 ;; e.g. etags, ebrowse, exuberant ctags, cscope, GNU Global and GTags
@@ -1348,6 +992,10 @@ point. Requires smartparens because all movement is done using
 (use-package module-git)
 (use-package module-github)
 (use-package module-magit)
+
+
+;; Databases
+(use-package module-sql)
 
 
 ;;; File Search
@@ -1383,12 +1031,13 @@ point. Requires smartparens because all movement is done using
 (use-package module-unimpaired)
 
 
-;;; Virtual Machine
+;;; Virtual Machine/SysOp
 (use-package module-virtual-machine)
 (use-package module-ansible)
 (use-package module-puppet)
 (use-package module-vagrant)
 (use-package module-nixos)
+(use-package module-systemd)
 
 
 ;;; Finance
@@ -1427,9 +1076,9 @@ point. Requires smartparens because all movement is done using
 
 ;;; Date and time
 (use-package calendar                   ; Built-in calendar
-  :bind ("C-c u c" . calendar)
+  :defer t
   :config
-  ;; In Europe we start on Monday
+  ;; I start on Monday
   (setq calendar-week-start-day 1))
 
 (use-package time                       ; Show current time
@@ -1447,16 +1096,6 @@ point. Requires smartparens because all movement is done using
 ;;; Net & Web
 (use-package browse-url                 ; Browse URLs
   :bind (("C-c w u" . browse-url)))
-
-(use-package bug-reference              ; Turn bug refs into browsable buttons
-  :defer t
-  :init (progn (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
-               (add-hook 'text-mode-hook #'bug-reference-mode)))
-
-(use-package goto-addr                  ; Make links clickable
-  :defer t
-  :init (progn (add-hook 'prog-mode-hook #'goto-address-prog-mode)
-               (add-hook 'text-mode-hook #'goto-address-mode)))
 
 (use-package eww                        ; Emacs' built-in web browser
   :bind (("C-c w b" . eww-list-bookmarks)
@@ -1485,19 +1124,6 @@ point. Requires smartparens because all movement is done using
     (when (> (length dotemacs-themes) 1)
       (change-theme (nth 0 dotemacs-themes)
                     (nth 1 dotemacs-themes)))))
-
-(use-package lorem-ipsum
-  :ensure t
-  :commands (lorem-ipsum-insert-list
-             lorem-ipsum-insert-paragraphs
-             lorem-ipsum-insert-sentences)
-  :init
-  (progn
-    (dotemacs-declare-prefix "il" "lorem ipsum")
-    (dotemacs-set-leader-keys
-      "ill" 'lorem-ipsum-insert-list
-      "ilp" 'lorem-ipsum-insert-paragraphs
-      "ils" 'lorem-ipsum-insert-sentences)))
 
 ;; Google Translate
 (use-package google-translate
@@ -1543,48 +1169,6 @@ point. Requires smartparens because all movement is done using
     (define-key spray-mode-map (kbd "l") 'spray-forward-word)
     (define-key spray-mode-map (kbd "q") 'spray-quit)))
 
-(use-package evil-anzu                  ; Position/matches count for isearch
-  :ensure t
-  :init
-  (global-anzu-mode t)
-  :config
-  (progn
-    (dotemacs-hide-lighter anzu-mode)
-    (setq anzu-search-threshold 1000
-          anzu-cons-mode-line-p nil)
-    ;; powerline integration
-    (defun dotemacs-anzu-update-mode-line (here total)
-      "Custom update function which does not propertize the status."
-      (when anzu--state
-        (let ((status (cl-case anzu--state
-                        (search (format "(%s/%d%s)"
-                                        (anzu--format-here-position here total)
-                                        total (if anzu--overflow-p "+" "")))
-                        (replace-query (format "(%d replace)" total))
-                        (replace (format "(%d/%d)" here total)))))
-          status)))
-    (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
-
-(use-package tildify
-  :bind (("C-c e t" . tildify-region))
-  :init (dolist (hook '(markdown-mode-hook
-                        latex-mode-hook
-                        rst-mode-hook))
-          (add-hook hook #'tildify-mode))
-  ;; Use the right space for LaTeX
-  :config (add-hook 'LaTeX-mode-hook
-                    (lambda () (setq-local tildify-space-string "~"))))
-
-(use-package rfringe
-  :ensure t
-  :defer t)
-
-(use-package proced                     ; Edit system processes
-  ;; Proced isn't available on OS X
-  :if (not (eq system-type 'darwin))
-  :bind ("C-x p" . proced))
-
-;;; todo
 (use-package module-firestarter
   :disabled t
   :commands (dotemacs-firestarter-mode-line)

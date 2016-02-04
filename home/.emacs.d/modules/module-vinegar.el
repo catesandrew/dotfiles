@@ -192,8 +192,6 @@
   :config
   (progn
     (setq dired-auto-revert-buffer t    ; Revert on re-visiting
-          ;; Move files between split panes
-          dired-dwim-target t
           ;; Better dired flags: `-l' is mandatory, `-a' shows all files, `-h'
           ;; uses human-readable sizes, and `-F' appends file-type classifiers
           ;; to file names (for better highlighting)

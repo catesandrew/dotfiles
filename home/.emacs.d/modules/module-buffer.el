@@ -30,6 +30,25 @@
     "*Require Times*")
   "Names of buffers that should not be killed.")
 
+;; Auto refresh
+(use-package autorevert                 ; Auto-revert buffers of changed files
+  :init
+  (progn
+    (setq auto-revert-check-vc-info nil
+          auto-revert-mode-text " ♻"
+          auto-revert-tail-mode-text " ♻~")
+    (defun auto-revert-turn-on-maybe ()
+      (unless (file-remote-p default-directory)
+        (auto-revert-mode)))
+    (add-hook 'find-file-hook 'auto-revert-turn-on-maybe)))
+
+(use-package page-break-lines           ; Turn page breaks into lines
+  :ensure t
+  :init
+  (progn
+    (global-page-break-lines-mode)
+    (dotemacs-hide-lighter page-break-lines-mode)))
+
 (use-package buffer-move
   :defer t
   :init

@@ -51,7 +51,8 @@ Possible values are: `recents' `bookmarks' `projects'.")
   (setq truncate-lines t)
   (page-break-lines-mode)
   ;; needed to make tab work correctly in terminal
-  (evil-define-key 'motion dotemacs-buffer-mode-map (kbd "C-i") 'widget-forward)
+  (evil-define-key 'motion dotemacs-buffer-mode-map
+    (kbd "C-i") 'widget-forward)
   ;; motion state since this is a special mode
   (evil-set-initial-state 'dotemacs-buffer-mode 'motion))
 

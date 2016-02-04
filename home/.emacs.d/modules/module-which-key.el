@@ -77,7 +77,7 @@ right if possible and fallback to bottom if not.")
       (dolist (leader-key `(,dotemacs-leader-key ,dotemacs-emacs-leader-key))
         (which-key-add-key-based-replacements
          (concat leader-key " m")    "major mode commands"
-         (concat leader-key " " dotemacs-command-key) "helm M-x"))
+         (concat leader-key " " dotemacs-command-key) "M-x"))
 
       (which-key-declare-prefixes
         dotemacs-leader-key '("root" . "dotemacs root")

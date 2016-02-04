@@ -67,10 +67,8 @@
     ;; Minibuffer history
     (setq savehist-file (concat dotemacs-cache-directory "savehist")
           enable-recursive-minibuffers t ; Allow commands in minibuffers
-          history-length 1000
-          savehist-additional-variables '(search
-                                          ring
-                                          mark-ring
+          history-length 2000
+          savehist-additional-variables '(mark-ring
                                           global-mark-ring
                                           search-ring
                                           regexp-search-ring
@@ -144,6 +142,49 @@
   :disabled t
   :init (server-mode)
   :diminish server-buffer-clients)
+
+;;; View PDF/PostScript/DVI files in Emacs
+(use-package doc-view
+  :defer t
+  :init
+       (evilified-state-evilify doc-view-mode doc-view-mode-map
+         "/"  'dotemacs-doc-view-search-new-query
+         "?"  'dotemacs-doc-view-search-new-query-backward
+         "gg" 'doc-view-first-page
+         "G"  'doc-view-last-page
+         "gt" 'doc-view-goto-page
+         "h"  'doc-view-previous-page
+         "j"  'doc-view-next-line-or-next-page
+         "k"  'doc-view-previous-line-or-previous-page
+         "K"  'doc-view-kill-proc-and-buffer
+         "l"  'doc-view-next-page
+         "n"  'doc-view-search
+         "N"  'doc-view-search-backward
+         (kbd "C-d") 'doc-view-scroll-up-or-next-page
+         (kbd "C-k") 'doc-view-kill-proc
+         (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
+  :config
+  (progn
+    (defun dotemacs-doc-view-search-new-query ()
+      "Initiate a new query."
+      (interactive)
+      (doc-view-search 'newquery))
+
+    (defun dotemacs-doc-view-search-new-query-backward ()
+      "Initiate a new query."
+      (interactive)
+      (doc-view-search 'newquery t))
+
+    ;; fixed a weird issue where toggling display does not
+    ;; swtich to text mode
+    (defadvice doc-view-toggle-display
+        (around dotemacs-doc-view-toggle-display activate)
+      (if (eq major-mode 'doc-view-mode)
+          (progn
+            ad-do-it
+            (text-mode)
+            (doc-view-minor-mode))
+        ad-do-it))))
 
 (provide 'module-emacs)
 ;;; module-emacs.el ends here

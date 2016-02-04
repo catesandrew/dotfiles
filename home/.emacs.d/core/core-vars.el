@@ -41,5 +41,90 @@ with `:' and Emacs commands are executed with `<leader> :'.")
 (defvar dotemacs-ex-substitute-global nil
   "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
 
+(defvar dotemacs-themes '(zenburn
+                          solarized-dark
+                          solarized-light
+                          leuven
+                          monokai
+                          tao
+                          ;; monster theme support
+                          afternoon
+                          ample
+                          ample-zen
+                          anti-zenburn
+                          birds-of-paradise-plus
+                          bubbleberry
+                          busybee
+                          cherry-blossom
+                          clues
+                          cyberpunk
+                          dakrone
+                          darkburn
+                          darkmine
+                          darktooth
+                          django
+                          espresso
+                          farmhouse
+                          firebelly
+                          flatland
+                          flatui
+                          gandalf
+                          gotham
+                          grandshell
+                          gruber-darker
+                          gruvbox
+                          hc-zenburn
+                          heroku
+                          inkpot
+                          ir-black
+                          jazz
+                          jbeans
+                          light-soap
+                          lush
+                          material
+                          minimal
+                          molokai
+                          monochrome
+                          mustang
+                          naquadah
+                          niflheim
+                          noctilux
+                          obsidian
+                          occidental
+                          oldlace
+                          organic-green
+                          pastels-on-dark
+                          phoenix-dark-mono
+                          phoenix-dark-pink
+                          planet
+                          professional
+                          purple-haze
+                          seti
+                          smyx
+                          soft-charcoal
+                          soft-morning
+                          soft-stone
+                          soothe
+                          spacegray
+                          subatomic
+                          subatomic256
+                          sunny-day
+                          tango-2
+                          tango-plus
+                          tangotango
+                          tronesque
+                          twilight-anti-bright
+                          twilight-bright
+                          twilight
+                          ujelly
+                          underwater
+                          zen-and-art)
+  "List of themes, the first of the list is loaded when Emacs starts.
+Press <Leader> T n to cycle to the next theme in the list (works great
+with 2 themes variants, one dark and one light.")
+
+(defvar dotemacs--cur-theme nil
+  "The current theme.")
+
 (provide 'core-vars)
 ;;; core-vars.el ends here

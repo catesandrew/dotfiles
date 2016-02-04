@@ -66,35 +66,6 @@
   :ensure t
   :init (evil-exchange-install))
 
-(use-package iedit
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq iedit-current-symbol-default t
-          iedit-only-at-symbol-boundaries t
-          iedit-toggle-key-default nil))
-  :config
-  (progn
-    (defun iedit-toggle-selection ()
-      "Override default iedit function to be able to add arbitrary overlays.
-
-It will toggle the overlay under point or create an overlay of one character."
-      (interactive)
-      (iedit-barf-if-buffering)
-      (let ((ov (iedit-find-current-occurrence-overlay)))
-        (if ov
-            (iedit-restrict-region (overlay-start ov) (overlay-end ov) t)
-          (save-excursion
-            (push (iedit-make-occurrence-overlay (point) (1+ (point)))
-                  iedit-occurrences-overlays))
-          (setq iedit-mode
-                (propertize
-                 (concat " Iedit:" (number-to-string
-                                    (length iedit-occurrences-overlays)))
-                 'face 'font-lock-warning-face))
-          (force-mode-line-update))))))
-
 (use-package evil-iedit-state
   :ensure t
   :commands (evil-iedit-state evil-iedit-state/iedit-mode)
@@ -318,6 +289,28 @@ It will toggle the overlay under point or create an overlay of one character."
   :ensure t
   :bind (([remap kill-ring-save] . easy-kill)
          ([remap mark-sexp]      . easy-mark)))
+
+(use-package evil-anzu                  ; Position/matches count for isearch
+  :ensure t
+  :init
+  (global-anzu-mode t)
+  :config
+  (progn
+    (dotemacs-hide-lighter anzu-mode)
+    (setq anzu-search-threshold 1000
+          anzu-cons-mode-line-p nil)
+    ;; powerline integration
+    (defun dotemacs-anzu-update-mode-line (here total)
+      "Custom update function which does not propertize the status."
+      (when anzu--state
+        (let ((status (cl-case anzu--state
+                        (search (format "(%s/%d%s)"
+                                        (anzu--format-here-position here total)
+                                        total (if anzu--overflow-p "+" "")))
+                        (replace-query (format "(%d replace)" total))
+                        (replace (format "(%d/%d)" here total)))))
+          status)))
+    (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
 
 (provide 'module-evil-packages)
 ;;; module-evil-packages.el ends here
