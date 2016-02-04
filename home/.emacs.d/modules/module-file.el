@@ -21,11 +21,10 @@
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
-(require 'init-macosx)
-(require 'package)
-(require 'lisp-mnt)
-(require 'find-func)
-(require 'subr-x)
+;; (require 'package)
+;; (require 'lisp-mnt)
+;; (require 'find-func)
+;; (require 'subr-x)
 
 ;;; Code:
 
@@ -187,20 +186,6 @@ none."
               (browse-url url)
             (user-error "Library %s has no URL header" library)))))))
 
-(defun dotemacs-find-file-check-large-file ()
-  (when (> (buffer-size) (* 1024 1024))
-    (setq buffer-read-only t)
-    (buffer-disable-undo)
-    (when (fboundp #'undo-tree-mode)
-      (undo-tree-mode -1))
-    (fundamental-mode)))
-
-(defun dotemacs-wrap-with (s)
-  "Create a wrapper function for smartparens using S."
-  `(lambda (&optional arg)
-     (interactive "P")
-     (sp-wrap-with-pair ,s)))
-
 ;; Offer to create parent directories if they do not exist
 ;; http://iqbalansari.github.io/blog/2014/12/07/automatically-create-parent-directories-on-visiting-a-new-file-in-emacs/
 (defun dotemacs-create-non-existent-directory ()
@@ -209,4 +194,57 @@ none."
                (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
       (make-directory parent-directory t))))
 
-(provide 'init-files)
+(use-package files
+  ;; Revert the current buffer (re-read the contents from disk). Burying
+  ;; a buffer (removing it from the current window and sending it to the bottom
+  ;; of the stack) is very common for dismissing buffers.
+  :bind (("C-c e u" . revert-buffer)
+         ("C-c e y" . bury-buffer))
+  :init
+  (progn
+    (setq view-read-only t) ; View read-only files
+    (add-hook 'find-file-hook
+              (lambda ()
+                (unless (eq major-mode 'org-mode)
+                  (setq show-trailing-whitespace t))))
+    (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
+    ))
+
+(use-package open-junk-file
+  :ensure t
+  :defer t
+  :commands (open-junk-file)
+  :init
+  (dotemacs-set-leader-keys "fJ" 'open-junk-file)
+  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
+
+(use-package recentf                    ; Save recently visited files
+  :defer t
+  :init
+  (progn
+    ;; lazy load recentf
+    (add-hook 'find-file-hook (lambda () (unless recentf-mode
+                                      (recentf-mode)
+                                      (recentf-track-opened-file))))
+    (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
+          recentf-max-saved-items 5000
+          recentf-max-menu-items 10
+          recentf-auto-save-timer (run-with-idle-timer 1800 t 'recentf-save-list)
+          ;; Cleanup recent files only when Emacs is idle, but not when the mode
+          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+          ;; idles often enough to have the recent files list clean up regularly
+          recentf-auto-cleanup 300))
+  :config
+  (progn
+    (setq recentf-exclude (list "COMMIT_EDITMSG\\'"
+                                (expand-file-name package-user-dir)
+                                (expand-file-name dotemacs-cache-directory)))))
+
+(dotemacs-use-package-add-hook ignoramus
+  :post-config
+  (with-eval-after-load 'recentf
+    (setq recentf-exclude (append recentf-exclude
+                                  (list ignoramus-boring-file-regexp)))))
+
+(provide 'module-file)
+;;; module-file.el ends here

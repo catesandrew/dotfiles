@@ -22,6 +22,12 @@
 
 ;;; Code:
 
+(defun dotemacs-wrap-with (s)
+  "Create a wrapper function for smartparens using S."
+  `(lambda (&optional arg)
+     (interactive "P")
+     (sp-wrap-with-pair ,s)))
+
 ;; enable smartparens-mode in `eval-expression'
 (defun dotemacs-conditionally-enable-smartparens-mode ()
   "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."

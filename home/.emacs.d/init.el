@@ -665,89 +665,21 @@ environment, otherwise it is strongly recommended to let it set to t.")
 
 ;;; Files
 (use-package module-file            ; Personal file tools
-  :defer t
-  :commands (dotemacs-create-non-existent-directory
-             dotemacs-recompile-packages)
-  :init
-  (add-to-list 'find-file-not-found-functions 'dotemacs-create-non-existent-directory)
-  :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
-         ("C-c f i" . dotemacs-open-in-intellij)
-         ("C-c f o" . dotemacs-launch-dwim)
-         ("C-c f R" . dotemacs-rename-file-and-buffer)
-         ("C-c f w" . dotemacs-copy-filename-as-kill)
-         ("C-c f u" . dotemacs-find-user-init-file-other-window)
-         ("C-c w ." . dotemacs-browse-feature-url))
-  :config
-  (progn
-    (add-hook 'find-file-hook
-              (lambda ()
-                (unless (eq major-mode 'org-mode)
-                  (setq show-trailing-whitespace t))))
-    (add-hook 'find-file-hook #'visual-line-mode)
-    (add-hook 'find-file-hook #'dotemacs-find-file-check-large-file)))
+  ;; :bind (("C-c f D" . dotemacs-delete-file-and-buffer)
+  ;;        ("C-c f i" . dotemacs-open-in-intellij)
+  ;;        ("C-c f o" . dotemacs-launch-dwim)
+  ;;        ("C-c f R" . dotemacs-rename-file-and-buffer)
+  ;;        ("C-c f w" . dotemacs-copy-filename-as-kill)
+  ;;        ("C-c f u" . dotemacs-find-user-init-file-other-window)
+  ;;        ("C-c w ." . dotemacs-browse-feature-url))
+  )
 
 ;; Additional bindings for built-ins
 (bind-key "C-c f v d" #'add-dir-local-variable)
 (bind-key "C-c f v l" #'add-file-local-variable)
 (bind-key "C-c f v p" #'add-file-local-variable-prop-line)
 
-(use-package files
-  ;; Revert the current buffer (re-read the contents from disk). Burying
-  ;; a buffer (removing it from the current window and sending it to the bottom
-  ;; of the stack) is very common for dismissing buffers.
-  :bind (("C-c e u" . revert-buffer)
-         ("C-c e y" . bury-buffer)))
-
-(use-package open-junk-file
-  :ensure t
-  :defer t
-  :commands (open-junk-file)
-  :init
-  (dotemacs-set-leader-keys "fJ" 'open-junk-file)
-  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
-
-(use-package helm-files
-  :ensure helm
-  :defer t
-  :bind (([remap find-file] . helm-find-files)
-         ("C-c f r"         . helm-recentf))
-  :config (setq helm-recentf-fuzzy-match t
-                ;; Use recentf to find recent files
-                helm-ff-file-name-history-use-recentf t
-                ;; Find library from `require', `declare-function' and friends
-                helm-ff-search-library-in-sexp t))
-
-(use-package recentf                    ; Save recently visited files
-  :defer t
-  :init
-  (progn
-    ;; lazy load recentf
-    (add-hook 'find-file-hook (lambda () (unless recentf-mode
-                                      (recentf-mode)
-                                      (recentf-track-opened-file))))
-    (setq recentf-save-file (concat dotemacs-cache-directory "recentf")
-          recentf-max-saved-items 5000
-          recentf-max-menu-items 10
-          recentf-auto-save-timer (run-with-idle-timer 1800 t 'recentf-save-list)
-          ;; Cleanup recent files only when Emacs is idle, but not when the mode
-          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
-          ;; idles often enough to have the recent files list clean up regularly
-          recentf-auto-cleanup 300))
-  :config
-  (progn
-    (setq recentf-exclude (list "COMMIT_EDITMSG\\'"
-                                (expand-file-name package-user-dir)
-                                (expand-file-name dotemacs-cache-directory)))))
-
-(dotemacs-use-package-add-hook ignoramus
-  :post-config
-  (with-eval-after-load 'recentf
-    (setq recentf-exclude (append recentf-exclude
-                                  (list ignoramus-boring-file-regexp)))))
-
 (use-package module-ignoramus)
-
-(setq view-read-only t)                 ; View read-only files
 
 
 ;;; todo

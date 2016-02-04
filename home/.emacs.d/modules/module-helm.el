@@ -891,5 +891,16 @@ Search for a search tool in the order provided by `dotemacs-search-tools'."
     ;; "hm"    'helm-disable-minor-mode
     "h C-m" 'helm-enable-minor-mode))
 
+(use-package helm-files
+  :ensure helm
+  :defer t
+  :bind (([remap find-file] . helm-find-files)
+         ("C-c f r"         . helm-recentf))
+  :config (setq helm-recentf-fuzzy-match t
+                ;; Use recentf to find recent files
+                helm-ff-file-name-history-use-recentf t
+                ;; Find library from `require', `declare-function' and friends
+                helm-ff-search-library-in-sexp t))
+
 (provide 'module-helm)
 ;;; module-helm.el ends here
