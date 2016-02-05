@@ -13,8 +13,7 @@
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
-;; (require 'module-utils)
-;; (require 'ensime)
+(require 'module-utils)
 
 ;;; Code:
 
@@ -113,10 +112,6 @@ point to the position of the join."
         (t
          (insert ".")
          (company-complete))))
-
-;; (defun current-line ()
-;;   "Return the line at point as a string."
-;;   (buffer-substring (line-beginning-position) (line-end-position)))
 
 ;;; Flyspell
 (defun scala/flyspell-verify ()

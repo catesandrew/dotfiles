@@ -119,6 +119,10 @@ NOERROR and NOMESSAGE are passed to `load'."
   (load (dotemacs-expand-private-file file-name)
         noerror nomessage))
 
+(defun current-line ()
+  "Return the line at point as a string."
+  (buffer-substring (line-beginning-position) (line-end-position)))
+
 
 ;;; Unused functions
 
