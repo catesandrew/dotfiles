@@ -123,6 +123,17 @@
   "Set `scroll-margin` to zero."
   (setq-local scroll-margin 0))
 
+(defun dotemacs-expand-private-file (file-name)
+  "Get the absolute path for a private file with FILE-NAME."
+  (expand-file-name file-name dotemacs-private-dir))
+
+(defun dotemacs-load-private-file (file-name &optional noerror nomessage)
+  "Load a private file with FILE-NAME.
+
+NOERROR and NOMESSAGE are passed to `load'."
+  (load (dotemacs-expand-private-file file-name)
+        noerror nomessage))
+
 
 ;;; Unused functions
 
