@@ -18,6 +18,7 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
+(require 'core-toggle)
 (require 'core-keybindings)
 (require 'core-use-package-ext)
 (require 'core-auto-completion)
@@ -38,34 +39,8 @@
               'js2-mode (car x) (cdr x)))
       javascript/key-binding-prefixes)
 
-;; http://emacs.stackexchange.com/questions/7308/define-key-to-toggle-between-javascript-implementation-and-test-file
-(defun dotemacs-js-jump-to (current from to format-name)
-  (find-file
-   (cl-loop with parts = (reverse current)
-            with fname = (file-name-sans-extension (cl-first parts))
-            for (name . rest) on (cl-rest parts)
-            until (string-equal name from)
-            collect name into names
-            finally (cl-return
-                     (mapconcat 'identity
-                                (nconc (reverse rest)
-                                       (list to)
-                                       (reverse names)
-                                       (list (funcall format-name fname) )) "/" )))))
-
-(defun dotemacs-js-format-impl-name (fname)
-  (format "%s.js" (replace-regexp-in-string "Spec" "" fname)))
-
-(defun dotemacs-js-format-test-name (fname)
-  (format "%sSpec.js" fname))
-
-(defun dotemacs-js-jump-to-implementation-or-test ()
-  (interactive)
-  (let ((current (split-string (buffer-file-name) "/")))
-    (cond
-     ((member "test" current) (dotemacs-js-jump-to current "test" "lib" 'dotemacs-js-format-impl-name))
-     ((member "lib" current)  (dotemacs-js-jump-to current "lib" "test" 'dotemacs-js-format-test-name))
-     (t (error "not within a test or lib directory")))))
+(defvar javascript-disable-tern-port-files t
+  "Stops tern from creating tern port files.")
 
 (use-package coffee-mode
   :defer t
@@ -92,24 +67,26 @@
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
-      (dotemacs-add-company-hook js2-mode))))
+      (dotemacs-add-company-hook js2-mode)))
 
-(use-package company-tern       ; JavaScript backend for Company
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push 'company-tern company-backends-js2-mode)))
+  (use-package company-tern       ; JavaScript backend for Company
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (push 'company-tern company-backends-js2-mode))))
+
+;; (dotemacs-use-package-add-hook flycheck
+;;   :post-init
+;;   (dolist (mode '(coffee-mode js2-mode json-mode))
+;;     (dotemacs-add-flycheck-hook mode)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
   (progn
     (dolist (mode '(coffee-mode js2-mode json-mode))
       (dotemacs/add-flycheck-hook mode))
-    (add-hook 'js2-mode-hook 'dotemacs-flycheck-init-javascript)))
-
-(dotemacs-use-package-add-hook flycheck
+    (add-hook 'js2-mode-hook 'dotemacs-flycheck-init-javascript))
   :post-config
   (progn
     (dotemacs-flycheck-executables-search)
@@ -128,10 +105,10 @@
   :ensure t
   :init
   (progn
-    (defun dotemacs-js-doc-require ()
+    (defun dotemacs/js-doc-require ()
       "Lazy load js-doc"
       (require 'js-doc))
-    (add-hook 'js2-mode-hook 'dotemacs-js-doc-require)
+    (add-hook 'js2-mode-hook 'dotemacs/js-doc-require)
 
     (setq js-doc-mail-address "catesandrew@gmail.com"
           js-doc-author (format "Andrew Cates <%s>" js-doc-mail-address)
@@ -141,8 +118,7 @@
 
     (setq js-doc-file-doc-lines
             '(js-doc-top-line
-              " * @file\n"
-              " * @name %F\n"
+              " * @module %F\n"
               " * @author %a\n"
               " * @license %l\n"
               js-doc-bottom-line))
@@ -228,13 +204,13 @@
             ("variation" . "Distinguish different objects with the same name.")
             ("version" . "Documents the version number of an item.")))
 
-    (defun dotemacs-js-doc-set-key-bindings (mode)
+    (defun dotemacs/js-doc-set-key-bindings (mode)
       "Setup the key bindings for `js2-doc' for the given MODE."
       (dotemacs-set-leader-keys-for-major-mode mode "rdb" 'js-doc-insert-file-doc)
       (dotemacs-set-leader-keys-for-major-mode mode "rdf" 'js-doc-insert-function-doc)
       (dotemacs-set-leader-keys-for-major-mode mode "rdt" 'js-doc-insert-tag)
       (dotemacs-set-leader-keys-for-major-mode mode "rdh" 'js-doc-describe-tag))
-    (dotemacs-js-doc-set-key-bindings 'js2-mode)))
+    (dotemacs/js-doc-set-key-bindings 'js2-mode)))
 
 (use-package js2-mode                   ; Javascript editing
   :defer t
@@ -246,9 +222,9 @@
       (unless (bound-and-true-p my-js2mh-ran)
         ;; add buffer-local indicator for whether `js2-prog-mode-hook` has run.
         (set (make-local-variable 'my-js2mh-ran) t)))
-    (setq dotemacs-js2-mode-hook #'dotemacs-js2-mode-defaults)
+    (setq dotemacs-js2-mode-hook 'dotemacs-js2-mode-defaults)
     (add-hook 'js2-mode-hook
-              (lambda () (run-hooks #'dotemacs-js2-mode-hook)))
+              (lambda () (run-hooks 'dotemacs-js2-mode-hook)))
 
     ;; Let flycheck handle parse errors
     (setq js2-show-parse-errors nil
@@ -266,17 +242,29 @@
           js2-warn-about-unused-function-arguments nil
           js2-strict-trailing-comma-warning nil)
 
+    (add-to-list 'auto-mode-alist '("\\.tern-project\\'" . json-mode))
     (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.jscsrc$" . json-mode))
     (add-to-list 'auto-mode-alist '("\\.eslintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (add-hook 'js2-mode-hook #'js2-highlight-unused-variables-mode))
+    (add-hook 'js2-mode-hook 'js2-highlight-unused-variables-mode))
   :config
   (progn
     (setq-default js2-basic-offset 2)
     (setq-default js-indent-level 2)
 
-    (setq js2-global-externs '("__dirname" "_" "describe" "it" "before" "after" "beforeEach" "afterEach" "chai" "sinon" "asyncTest" "ok" "equal" "notEqual" "deepEqual" "expect"))
+    (setq js2-global-externs '("__dirname"
+                               "_"
+                               "describe"
+                               "it"
+                               "before"
+                               "after"
+                               "beforeEach"
+                               "afterEach"
+                               "chai"
+                               "sinon"
+                               "expect"
+                               ))
 
     (dotemacs-declare-prefix-for-mode 'js2-mode "mz" "folding")
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "w" 'js2-mode-toggle-warnings-and-errors)
@@ -287,22 +275,21 @@
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zF" 'js2-mode-toggle-hide-functions)
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "zC" 'js2-mode-toggle-hide-comments)))
 
-(use-package evil-matchit-js2
-  :defer t
-  :ensure evil-matchit
-  :init (add-hook `js2-mode-hook `turn-on-evil-matchit-mode))
+(dotemacs-use-package-add-hook evil-matchit
+  :post-init
+  (add-hook `js2-mode-hook `turn-on-evil-matchit-mode))
 
 (use-package js2-refactor
   :defer t
   :ensure t
   :init
   (progn
-    (defun javascript/load-js2-refactor ()
-      "Lazy load js2-refactor"
+    (defun dotemacs/js2-refactor-require ()
+      "Lazy load js2-refactor."
       (require 'js2-refactor))
-    (add-hook 'js2-mode-hook 'javascript/load-js2-refactor)
+    (add-hook 'js2-mode-hook 'dotemacs/js2-refactor-require)
 
-    (defun dotemacs-js2-refactor-set-key-bindings (mode)
+    (defun dotemacs/js2-refactor-set-key-bindings (mode)
       (dotemacs-declare-prefix-for-mode 'js2-mode "mr3" "ternary")
       (dotemacs-set-leader-keys-for-major-mode 'js2-mode "r3i" 'js2r-ternary-to-if)
 
@@ -357,21 +344,13 @@
       (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rwl" 'js2r-wrap-in-for-loop)
 
       (dotemacs-set-leader-keys-for-major-mode 'js2-mode "k" 'js2r-kill)
+
+      (dotemacs-declare-prefix-for-mode mode "mx" "text")
+      (dotemacs-declare-prefix-for-mode mode "mxm" "move")
       (dotemacs-set-leader-keys-for-major-mode 'js2-mode "mj" 'js2r-move-line-down)
       (dotemacs-set-leader-keys-for-major-mode 'js2-mode "mk" 'js2r-move-line-up))
 
-    (dotemacs-js2-refactor-set-key-bindings 'js2-mode)))
-
-(use-package json-mode                  ; JSON files
-  :ensure t
-  :defer t)
-
-(use-package json-snatcher
-  :defer t
-  :ensure t
-  :config
-  (dotemacs-set-leader-keys-for-major-mode 'json-mode
-    "hp" 'jsons-print-path))
+    (dotemacs/js2-refactor-set-key-bindings 'js2-mode)))
 
 (use-package js2-imenu-extras
   :ensure js2-mode
@@ -384,10 +363,103 @@
     ;; required to make `<LEADER> s l' to work correctly
     (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)))
 
-(use-package json-reformat              ; Reformat JSON
+(use-package json-mode                  ; JSON files
+  :ensure t
+  :defer t)
+
+(use-package json-snatcher
+  :defer t
+  :ensure t
+  :config
+  (dotemacs-set-leader-keys-for-major-mode 'json-mode
+    "hp" 'jsons-print-path))
+
+(use-package nodejs-repl
   :ensure t
   :defer t
-  :bind (("C-c e j" . json-reformat-region)))
+  :config
+  (progn
+    ;; nodejs-repl-eval.el --- Summary
+    ;; Commentary:
+    ;;
+    ;; Evaluation functions for the `nodejs-repl' package.  Written on a stormy
+    ;; night between days of node hacking.
+    ;;
+    ;; https://gist.github.com/emallson/0eae865bc99fc9639fac
+    ;;
+    (defun nodejs-repl-eval-region (start end)
+      "Evaluate the region specified by `START' and `END'."
+      (let ((proc (get-process nodejs-repl-process-name)))
+        (comint-simple-send proc (buffer-substring-no-properties start end))))
+
+    (defun nodejs-repl-eval-node (node)
+      "Evaluate `NODE', a `js2-mode' node."
+      (let ((beg (js2-node-abs-pos node))
+            (end (js2-node-abs-end node)))
+        (nodejs-repl-eval-region beg end)))
+
+    (defun nodejs-repl--find-current-or-prev-node (pos &optional include-comments)
+      "Locate the first node before `POS'.  Return a node or nil.
+
+If `INCLUDE-COMMENTS' is set to t, then comments are considered
+valid nodes.  This is stupid, don't do it."
+      (let ((node (js2-node-at-point pos (not include-comments))))
+        (if (or (null node)
+                (js2-ast-root-p node))
+            (unless (= 0 pos)
+              (nodejs-repl--find-current-or-prev-node (1- pos) include-comments))
+          node)))
+
+    (defun nodejs-repl-eval-function ()
+      "Evaluate the current or previous function."
+      (interactive)
+      (let* ((fn-above-node (lambda (node)
+                              (js2-mode-function-at-point (js2-node-abs-pos node))))
+             (fn (funcall fn-above-node
+                          (nodejs-repl--find-current-or-prev-node
+                           (point) (lambda (node)
+                                     (not (null (funcall fn-above-node node))))))))
+        (unless (null fn)
+          (nodejs-repl-eval-node fn))))
+
+    (defun nodejs-repl-eval-first-stmt (pos)
+      "Evaluate the first statement found from `POS' by `js2-mode'.
+
+If this statement is a block statement, its first parent
+statement is found.  This will be either a function declaration,
+function call, or assignment statement."
+      (let ((node (js2-mode-find-first-stmt (nodejs-repl--find-current-or-prev-node pos))))
+        (cond
+         ((js2-block-node-p node) (nodejs-repl-eval-node (js2-node-parent-stmt node)))
+         ((not (null node)) (nodejs-repl-eval-node node)))))
+
+    (defun nodejs-repl-eval-dwim ()
+      "Heuristic evaluation of JS code in a NodeJS repl.
+
+Evaluates the region, if active, or the first statement found at
+or prior to the point.
+
+If the point is at the end of a line, evaluation is done from one
+character prior.  In many cases, this will be a semicolon and will
+change what is evaluated to the statement on the current line."
+      (interactive)
+      (cond
+       ((use-region-p) (nodejs-repl-eval-region (region-beginning) (region-end)))
+       ((= (line-end-position) (point)) (nodejs-repl-eval-first-stmt (1- (point))))
+       (t (nodejs-repl-eval-first-stmt (point)))))
+
+    (defun nodejs-repl-eval-buffer (&optional buffer)
+      "Evaluate the current buffer or the one given as `BUFFER'.
+
+`BUFFER' should be a string or buffer."
+      (interactive)
+      (let ((buffer (or buffer (current-buffer))))
+        (with-current-buffer buffer
+          (nodejs-repl-eval-region (point-min) (point-max)))))))
+
+(use-package json-reformat              ; Reformat JSON
+  :ensure t
+  :defer t)
 
 (use-package tern
   :defer t
@@ -411,6 +483,16 @@
     (dotemacs-set-leader-keys-for-major-mode 'json-mode "=" 'web-beautify-js)
     (dotemacs-set-leader-keys-for-major-mode 'web-mode  "=" 'web-beautify-html)
     (dotemacs-set-leader-keys-for-major-mode 'css-mode  "=" 'web-beautify-css)))
+
+(use-package livid-mode
+  :ensure t
+  :defer t
+  :init (dotemacs-add-toggle javascript-repl-live-evaluation
+          :status livid-mode
+          :on (livid-mode)
+          :off (livid-mode -1)
+          :documentation "Live evaluation of JS buffer change."
+          :evil-leader-for-mode (js2-mode . "sa")))
 
 (provide 'module-javascript)
 ;;; module-javascript.el ends here
