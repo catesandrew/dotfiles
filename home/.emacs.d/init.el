@@ -148,10 +148,6 @@ NOERROR and NOMESSAGE are passed to `load'."
   "File used to store settings from Customization UI."
   :group 'dotemacs)
 
-(defcustom dotemacs-clojure-enable-fancify-symbols nil
-  "If non nil the `fancify-symbols' function is enabled."
-  :group 'dotemacs)
-
 (defvar dotemacs-default-layout-name "Default"
   " Name of the default layout.")
 

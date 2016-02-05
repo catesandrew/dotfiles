@@ -330,6 +330,11 @@ Possible values are `rbenv', `rvm' or `chruby'.)")
   (dolist (mode '(ruby-mode enh-ruby-mode))
     (dotemacs/add-flycheck-hook mode)))
 
+(dotemacs-use-package-add-hook popwin
+  :post-config
+  (push '("*rspec-compilation*"    :dedicated t :position bottom :stick t :noselect t   :height 0.4)
+        popwin:special-display-config))
+
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
