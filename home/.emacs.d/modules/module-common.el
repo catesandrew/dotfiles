@@ -33,6 +33,12 @@
       ;; (add-hook mode-hook 'flycheck//turn-on-maybe)
       (add-hook mode-hook 'flycheck-mode))))
 
+(defun spell-checking/add-flyspell-hook (mode &optional target)
+  "Enable flyspell for the given MODE, if
+`spell-checking-enable-by-default' is true."
+  (when spell-checking-enable-by-default
+    (let ((mode-hook (intern (format "%S-hook" mode))))
+      (add-hook mode-hook 'flyspell-mode))))
 
 (defun dotemacs-load-yasnippet ()
   (unless yas-global-mode
