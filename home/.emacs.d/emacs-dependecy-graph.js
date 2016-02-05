@@ -183,6 +183,8 @@ function main() {
   ns.setEdge('ignoramus', [])
 
   // programming languages
+  ns.setEdge('ruby', ['smartparens', 'company', 'popwin', 'flycheck', 'evil-matchit'])
+  ns.setEdge('latex', ['which-key', 'yasnippet', 'typo', 'smartparens', 'flyspell', 'flycheck', 'evil-matchit', 'company'])
   ns.setEdge('cmake-mode', 'company')
   ns.setEdge(['c-mode', 'c++-mode'], 'flycheck')
   ns.setEdge(['c-mode', 'c++-mode'], 'helm-gtags')

@@ -86,3 +86,4 @@ used."
        ,@bindkeys)))
 
 (provide 'core-toggle)
+;;; core-toggle.el ends here

@@ -6,12 +6,10 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'core-fonts-support)
+(require 'core-toggle)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -24,9 +22,9 @@ Disable the highlighting of overlong lines."
   (setq-local whitespace-style (-difference whitespace-style
                                             '(lines lines-tail))))
 
-(defun dotemacs-whitespace-mode-local ()
+(defun dotemacs//whitespace-mode-local ()
   "Enable `whitespace-mode' after local variables where set up."
-  (add-hook 'hack-local-variables-hook #'whitespace-mode nil 'local))
+  (add-hook 'hack-local-variables-hook 'whitespace-mode nil 'local))
 ;; Trailing whitespace
 ;; I don’t want to leave trailing whitespace in files I touch, so set
 ;; up a hook that automatically deletes trailing whitespace after
@@ -35,9 +33,13 @@ Disable the highlighting of overlong lines."
 
 (use-package whitespace                 ; Highlight bad whitespace
   :ensure t
-  :bind (("C-c u w w" . whitespace-mode))
+  :defer t
   :init
   (progn
+    (setq dotemacs-show-trailing-whitespace t)
+    ;; Use `fill-column' for overlong lines
+    (setq-local whitespace-line-column nil))
+
     (dotemacs-add-toggle whitespace
       :status whitespace-mode
       :on (whitespace-mode)
@@ -51,7 +53,7 @@ Disable the highlighting of overlong lines."
       :documentation "Display whitespace globally"
       :evil-leader "t C-w")
 
-    (defun dotemacs-set-whitespace-style-for-diff ()
+    (defun dotemacs//set-whitespace-style-for-diff ()
       "Whitespace configuration for `diff-mode'"
       (setq-local whitespace-style '(face
                                      tabs
@@ -63,6 +65,8 @@ Disable the highlighting of overlong lines."
                                      indentation::tab
                                      newline
                                      newline-mark)))
+    (add-hook 'diff-mode-hook 'whitespace-mode)
+    (add-hook 'diff-mode-hook 'dotemacs//set-whitespace-style-for-diff)
 
     (defun dotemacs-set-whitespace-style-for-others ()
       "Whitespace configuration for `prog-mode, `text-mode, `conf-mode'"
@@ -76,22 +80,16 @@ Disable the highlighting of overlong lines."
                                      empty
                                      trailing
                                      lines-tail))
-
-      ; Use `fill-column' for overlong lines
-      (setq-local whitespace-line-column nil))
-
-    (add-hook 'diff-mode-hook #'whitespace-mode)
-    (add-hook 'diff-mode-hook #'dotemacs-set-whitespace-style-for-diff)
-
     (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
       (progn
-        (add-hook hook #'dotemacs-whitespace-mode-local)
-        (add-hook hook #'dotemacs-set-whitespace-style-for-others))))
+        (add-hook hook 'dotemacs//whitespace-mode-local)
+        (add-hook hook 'dotemacs-set-whitespace-style-for-others))))
   :config
   (progn
     (set-face-attribute 'whitespace-space nil
                         :background nil
-                        :foreground (face-attribute 'font-lock-warning-face :foreground))
+                        :foreground (face-attribute 'font-lock-warning-face
+                                                    :foreground))
     (set-face-attribute 'whitespace-tab nil
                         :background nil)
     (set-face-attribute 'whitespace-indentation nil
@@ -101,10 +99,10 @@ Disable the highlighting of overlong lines."
 
 (use-package whitespace-cleanup-mode    ; Cleanup whitespace in buffers
   :ensure t
-  :bind (("C-c u w c" . whitespace-cleanup-mode)
-         ("C-c e w" . whitespace-cleanup))
-  :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-          (add-hook hook #'whitespace-cleanup-mode))
+  :defer t
+  :init
+  (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+    (add-hook hook 'whitespace-cleanup-mode))
   :diminish (whitespace-cleanup-mode . "⌫"))
 
 (use-package ws-butler

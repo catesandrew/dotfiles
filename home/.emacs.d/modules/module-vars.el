@@ -123,12 +123,13 @@ auto-save the file in-place, `cache' to auto-save the file to another
 file stored in the cache directory and `nil' to disable auto-saving.
 Default value is `cache'.")
 
-;; whitespace-mode
 (defvar dotemacs-whitespace-cleanup 'changed
   "Delete whitespace while saving buffer.
 
 Possible values are `all', `trailing', `changed' or `nil'.
 Default is `changed' (cleanup whitespace on changed lines)")
+
+(defvar dotemacs-show-trailing-whitespace nil)
 
 (defvar dotemacs-highlight-delimiters 'all
   "Select a scope to highlight delimiters. Possible values are `any',
