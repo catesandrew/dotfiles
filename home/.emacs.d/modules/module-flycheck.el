@@ -17,27 +17,6 @@
 
 ;;; Code:
 
-;; (defun current-buffer-remote-p ()
-;;   (--any? (and it (file-remote-p it))
-;;           (list
-;;            (buffer-file-name)
-;;            list-buffers-directory
-;;            default-directory)))
-;;
-;; (defun flycheck-turn-on-maybe ()
-;;   (unless (or buffer-read-only
-;;               (hardhat-buffer-included-p (current-buffer))
-;;               (current-buffer-remote-p))
-;;     (flycheck-mode)))
-
-(defun dotemacs/add-flycheck-hook (mode &optional target)
-  "Enable flycheck for the given MODE, if
-`syntax-checking-enable-by-default' is true."
-  (when syntax-checking-enable-by-default
-    (let ((mode-hook (intern (format "%S-hook" mode))))
-      ;; (add-hook mode-hook 'flycheck-turn-on-maybe)
-      (add-hook mode-hook 'flycheck-mode))))
-
 (defun dotemacs-discard-undesired-html-tidy-error (err)
   "Discard ERR if it is undesired.
 
