@@ -159,7 +159,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
   (tool-bar-mode -1))
 (when (and (fboundp 'scroll-bar-mode) (not (eq scroll-bar-mode -1)))
   (scroll-bar-mode -1))
-(unless (eq window-system 'mac)
+(unless (eq system-type 'darwin)
   (when (and (fboundp 'menu-bar-mode) (not (eq menu-bar-mode -1)))
     (menu-bar-mode -1)))
 ;; tooltips in echo-aera
