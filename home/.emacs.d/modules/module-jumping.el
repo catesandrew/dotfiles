@@ -8,9 +8,10 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-buffers)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
@@ -28,18 +29,36 @@
       "mp" 'pop-to-mark-command))
   :config
   (progn
+    ;; ensures we can quickly pop the mark several times by typing
+    ;; `C-u C-SPC C-SPC`, instead of having to type `C-u C-SPC C-u C-SPC`.
     (setq set-mark-command-repeat-pop t)
 
     ;; When popping the mark, continue popping until the cursor actually moves
-    ;; Also, if the last command was a copy - skip past all the expand-region cruft.
-    (defadvice pop-to-mark-command (around ensure-new-position activate)
+    ;; Also, if the last command was a copy - skip past all the expand-region
+    ;; cruft. Testing the new `advicd-add` interface.
+    (defun dotemacs/multi-pop-to-mark (orig-fun &rest args)
+      "Call ORIG-FUN until the cursor moves.
+Try the repeated popping up to 10 times."
       (let ((p (point)))
         (when (eq last-command 'save-region-or-current-line)
-          ad-do-it
-          ad-do-it
-          ad-do-it)
+          (apply orig-fun args)
+          (apply orig-fun args)
+          (apply orig-fun args))
         (dotimes (i 10)
-          (when (= p (point)) ad-do-it))))))
+          (when (= p (point)) (apply orig-fun args)))))
+    (advice-add 'pop-to-mark-command :around 'dotemacs/multi-pop-to-mark)
+
+    ;; When popping the mark, continue popping until the cursor actually moves
+    ;; Also, if the last command was a copy - skip past all the expand-region cruft.
+    ;; (defadvice pop-to-mark-command (around ensure-new-position activate)
+    ;;   (let ((p (point)))
+    ;;     (when (eq last-command 'save-region-or-current-line)
+    ;;       ad-do-it
+    ;;       ad-do-it
+    ;;       ad-do-it)
+    ;;     (dotimes (i 10)
+    ;;       (when (= p (point)) ad-do-it))))
+    ))
 
 (use-package avy                   ; Jump to characters in buffers
   :ensure t
