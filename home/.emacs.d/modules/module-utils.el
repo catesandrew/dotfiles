@@ -48,21 +48,6 @@
       (call-interactively 'flycheck-previous-error)
     (call-interactively 'previous-error)))
 
-;; from https://github.com/cofi/dotfiles/blob/master/emacs.d/config/cofi-util.el#L38
-(defun dotemacs/add-to-hooks (fun hooks)
-  "Add function to hooks"
-  (dolist (hook hooks)
-    (add-hook hook fun)))
-
-(defun dotemacs/add-all-to-hook (hook &rest funs)
-  "Add functions to hook."
-  (dotemacs/add-to-hook hook funs))
-
-(defun dotemacs/add-to-hook (hook funs)
-  "Add list of functions to hook."
-  (dolist (fun funs)
-    (add-hook hook fun)))
-
 (defun dotemacs/echo (msg &rest args)
   "Display MSG in echo-area without logging it in *Messages* buffer."
   (interactive)

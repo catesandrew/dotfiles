@@ -60,6 +60,19 @@
         (setq yas-wrap-around-region t))))
   (yas-minor-mode 1))
 
+(defun dotemacs/add-to-hooks (fun hooks)
+  "Add function to hooks"
+  (dolist (hook hooks)
+    (add-hook hook fun)))
+
+(defun dotemacs/add-all-to-hook (hook &rest funs)
+  "Add functions to hook."
+  (dotemacs/add-to-hook hook funs))
+
+(defun dotemacs/add-to-hook (hook funs)
+  "Add list of functions to hook."
+  (dolist (fun funs)
+    (add-hook hook fun)))
 
 (provide 'module-common)
 ;;; module-common.el ends here
