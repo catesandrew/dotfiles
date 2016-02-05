@@ -314,6 +314,7 @@
 
 (use-package evil-cleverparens
   :defer t
+  :ensure t
   :diminish evil-cleverparens-mode
   :init
   (progn
@@ -323,6 +324,18 @@
       :on  (evil-cleverparens-mode)
       :off (evil-cleverparens-mode -1)
       :documentation "Enable evil-cleverparens.")))
+
+(use-package evil-visual-mark-mode
+  :defer t
+  :ensure t
+  :diminish evil-visual-mark-mode
+  :init
+  (progn
+    (dotemacs-add-toggle evil-visual-mark-mode
+      :status evil-visual-mark-mode
+      :on (evil-visual-mark-mode)
+      :off (evil-visual-mark-mode -1)
+      :documentation "Show evil marks")))
 
 (provide 'module-evil-packages)
 ;;; module-evil-packages.el ends here
