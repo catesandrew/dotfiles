@@ -126,5 +126,15 @@ with 2 themes variants, one dark and one light.")
 (defvar dotemacs--cur-theme nil
   "The current theme.")
 
+;; Source Code Pro for Powerline
+;; Pragmata Pro
+(defvar dotemacs-default-font '("Hasklig"
+                                :size 13
+                                :weight normal
+                                :width normal
+                                :powerline-scale 1.0)
+  "Default font. `powerline-scale' allows to quickly tweak the mode-line
+size to make separators look not too crappy.")
+
 (provide 'core-vars)
 ;;; core-vars.el ends here
