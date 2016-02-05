@@ -21,21 +21,8 @@
 (dotemacs-defvar-company-backends web-mode)
 (dotemacs-defvar-company-backends jade-mode)
 (dotemacs-defvar-company-backends slim-mode)
-
-(defun dotemacs-web-mode-ms-doc ()
-  (if (equal 0 dotemacs--web-mode-ms-doc-toggle)
-      "[?] for help"
-    "
-  [?] display this help
-  [k] previous [j] next   [K] previous sibling [J] next sibling
-  [h] parent   [l] child  [c] clone [d] delete [D] kill [r] rename
-  [w] wrap     [p] xpath
-  [q] quit"))
-
-(defun dotemacs-web-mode-ms-toggle-doc ()
-  (interactive)
-  (setq dotemacs--web-mode-ms-doc-toggle
-        (logxor dotemacs--web-mode-ms-doc-toggle 1)))
+;; TODO: uncomment this when it becomes available
+;; (dotemacs-defvar-company-backends haml-mode)
 
 ;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
 ;; can see the effect of your HTML as you type it.
@@ -57,8 +44,14 @@
   :ensure t
   :init
   (progn
+    (push 'company-css company-backends-css-mode)
+
     ;; Mark `css-indent-offset' as safe-local variable
     (put 'css-indent-offset 'safe-local-variable #'integerp)
+
+    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
+    ;; `fundamental-mode'.
+    ;; (add-hook 'css-mode-hook (lambda () (run-hooks 'dotemacs-prog-mode-hook)))
 
     (defun css-expand-statement ()
       "Expand CSS block"
@@ -85,32 +78,19 @@
 
     (dotemacs-set-leader-keys-for-major-mode 'css-mode
       "zc" 'css-contract-statement
-      "zo" 'css-expand-statement))
-  :config
-  (progn
-    ;; Run Prog Mode hooks, because for whatever reason CSS Mode derives from
-    ;; `fundamental-mode'.
-    (add-hook 'css-mode-hook (lambda () (run-hooks #'dotemacs-prog-mode-hook)))
-
-    ;; Mark css-indent-offset as safe local variable.
-    (put 'css-indent-offset 'safe-local-variable #'integerp)))
+      "zo" 'css-expand-statement)))
 
 (dotemacs-use-package-add-hook yasnippet
   :post-init
   (progn
     (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
-                                                      jade-mode-hook
-                                                      slim-mode-hook))))
+                                                      jade-mode
+                                                      slim-mode))))
 
 (use-package css-eldoc                  ; Basic Eldoc for CSS
   :ensure t
   :commands (turn-on-css-eldoc)
   :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
-
-(use-package evil-matchit-web
-  :defer t
-  :ensure evil-matchit
-  :init (add-hook `web-mode-hook `turn-on-evil-matchit-mode))
 
 (use-package helm-css-scss
   :defer t
@@ -122,7 +102,8 @@
 (dotemacs-use-package-add-hook rainbow-delimiters
   :post-init
   (progn
-    (dotemacs/add-to-hooks 'rainbow-delimiters-mode '(jade-mode-hook
+    (dotemacs/add-to-hooks 'rainbow-delimiters-mode '(haml-mode-hook
+                                                      jade-mode-hook
                                                       less-css-mode-hook
                                                       scss-mode-hook
                                                       slim-mode-hook))))
@@ -130,9 +111,10 @@
 (use-package web-mode                   ; Template editing
   :defer t
   :ensure t
+  :init
+  (push '(company-web-html company-css) company-backends-web-mode)
   :config
   (progn
-    ;; Only use smartparens in web-mode
     (setq web-mode-enable-auto-pairing nil
           web-mode-markup-indent-offset 2
           web-mode-code-indent-offset 2
@@ -144,7 +126,7 @@
 
     (add-hook 'web-mode-hook
       (lambda ()
-        (run-hooks #'dotemacs-prog-mode-hook)
+        (run-hooks 'dotemacs-prog-mode-hook)
         ; todo: verify this is not needed now
         ; (when (equal web-mode-content-type "jsx")
         ;   (setq-local cursor-type nil)
@@ -168,15 +150,29 @@
       ;; TODO element close would be nice but broken with evil.
       )
 
-    (defvar dotemacs--web-mode-ms-doc-toggle 0
-      "Display a short doc when nil, full doc otherwise.")
+  ;;   (defvar dotemacs--web-mode-ms-doc-toggle 0
+  ;;     "Display a short doc when nil, full doc otherwise.")
+
+  ;;   (defun dotemacs-web-mode-ms-doc ()
+  ;;     (if (equal 0 dotemacs--web-mode-ms-doc-toggle)
+  ;;         "[?] for help"
+  ;;       "
+  ;; [?] display this help
+  ;; [k] previous [j] next   [K] previous sibling [J] next sibling
+  ;; [h] parent   [l] child  [c] clone [d] delete [D] kill [r] rename
+  ;; [w] wrap     [p] xpath
+  ;; [q] quit"))
+
+  ;;   (defun dotemacs-web-mode-ms-toggle-doc ()
+  ;;     (interactive)
+  ;;     (setq dotemacs--web-mode-ms-doc-toggle
+  ;;           (logxor dotemacs--web-mode-ms-doc-toggle 1)))
 
     (dotemacs-define-micro-state web-mode
-      :doc (dotemacs-web-mode-ms-doc)
-      :persistent t
-      :evil-leader-for-mode (web-mode . "m.")
+      :title "Web-mode Transient State"
+      :columns 4
+      :foreign-keys run
       :bindings
-      ("<escape>" nil :exit t)
       ("?" dotemacs-web-mode-ms-toggle-doc)
       ("c" web-mode-element-clone)
       ("d" web-mode-element-vanish)
@@ -192,7 +188,11 @@
       ("p" web-mode-dom-xpath)
       ("r" web-mode-element-rename :exit t)
       ("q" nil :exit t)
-      ("w" web-mode-element-wrap))
+      ("w" web-mode-element-wrap)
+      ("<escape>" nil :exit t))
+
+    (dotemacs-set-leader-keys-for-major-mode 'web-mode
+      "." 'dotemacs/web-mode-transient-state/body)
 
   ; todo: verify these settigns work: And if you want to have 2 space indent
   ; also for element's attributes, concatenations and contiguous function
@@ -208,20 +208,16 @@
    ("\\.html\\'"       . web-mode)
    ("\\.htm\\'"        . web-mode)
    ("\\.[gj]sp\\'"     . web-mode)
-   ("\\.as[cp]x\\'"    . web-mode)
+   ("\\.as[cp]x?\\'"   . web-mode)
    ("\\.eex\\'"        . web-mode)
    ("\\.erb\\'"        . web-mode)
+   ("\\.mustache\\'"   . web-mode)
+   ("\\.handlebars\\'" . web-mode)
+   ("\\.hbs\\'"        . web-mode)
    ("\\.eco\\'"        . web-mode)
+   ("\\.jsx\\'"        . web-mode)
    ("\\.ejs\\'"        . web-mode)
    ("\\.djhtml\\'"     . web-mode)))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-config
-  (progn
-    (dotemacs-flycheck-executables-search)
-    (when (bound-and-true-p dotemacs//flycheck-executables-searched)
-      (when dotemacs//flycheck-executable-tidy5
-        (flycheck-add-mode 'html-tidy 'web-mode)))))
 
 (use-package emmet-mode
   :defer t
@@ -232,6 +228,8 @@
           emmet-move-cursor-between-quotes t)
     (dotemacs/add-to-hooks 'emmet-mode '(css-mode-hook
                                          html-mode-hook
+                                         sass-mode-hook
+                                         scss-mode-hook
                                          web-mode-hook)))
   :config
   (progn
@@ -246,6 +244,10 @@
 (use-package jade-mode
   :defer t
   :ensure t)
+
+(use-package haml-mode
+  :ensure t
+  :defer t)
 
 (use-package slim-mode
   :ensure t
@@ -266,6 +268,37 @@
   :ensure t
   :mode ("\\.less\\'" . less-css-mode))
 
+(use-package tagedit
+  :defer t
+  :ensure t
+  :config
+  (progn
+    (tagedit-add-experimental-features)
+    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
+    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
+
+(dotemacs-use-package-add-hook evil-matchit
+  :post-init
+  (add-hook `web-mode-hook `turn-on-evil-matchit-mode))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (dolist (mode '(haml-mode
+                  jade-mode
+                  less-mode
+                  sass-mode
+                  scss-mode
+                  slim-mode
+                  ;; css-mode
+                  web-mode))
+    (dotemacs/add-flycheck-hook mode))
+  :post-config
+  (progn
+    (dotemacs-flycheck-executables-search)
+    (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+      (when dotemacs//flycheck-executable-tidy5
+        (flycheck-add-mode 'html-tidy 'web-mode)))))
+
 (dotemacs-use-package-add-hook smartparens
   :post-init
   (progn
@@ -273,7 +306,8 @@
      (if dotemacs-smartparens-strict-mode
          'smartparens-strict-mode
        'smartparens-mode)
-     '(prog-mode-hook css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook)))
+     '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
+    (add-hook 'web-mode-hook 'dotemacs-toggle-smartparens-off))
   :post-config
   (sp-with-modes '(web-mode)
     (sp-local-pair "<% " " %>")
@@ -288,39 +322,22 @@
     (sp-local-pair "{%- "  " %}")
     (sp-local-pair "{# "  " #}")))
 
-(use-package tagedit
-  :defer t
-  :ensure t
-  :config
-  (progn
-    (tagedit-add-experimental-features)
-    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
-    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
-
-(dotemacs-use-package-add-hook flycheck
+(dotemacs-use-package-add-hook dotemacs-load-yasnippet
   :post-init
-  (dolist (mode '(jade-mode less-mode slim-mode sass-mode css-mode scss-mode web-mode))
-    (dotemacs/add-flycheck-hook mode)))
+  (progn
+    (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
+                                                      jade-mode
+                                                      slim-mode))))
 
 (when (eq dotemacs-completion-engine 'company)
+  ;;TODO: whenever company-web makes a backend for haml-mode it should be added
+  ;;here.
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
       (dotemacs-add-company-hook css-mode)
-      (dotemacs-add-company-hook web-mode)
-      (dotemacs-add-company-hook jade-mode)
-      (dotemacs-add-company-hook slim-mode))))
-
-(use-package company-web
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push 'company-css company-backends-css-mode)
-    (push 'company-web-slim company-backends-slim-mode)
-    (push 'company-web-jade company-backends-jade-mode)
-    (push '(company-web-html company-css) company-backends-web-mode)))
+      (dotemacs-add-company-hook web-mode)))
+  (use-package company-web :ensure t))
 
 (provide 'module-web)
 ;;; module-web.el ends here

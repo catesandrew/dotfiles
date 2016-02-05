@@ -48,6 +48,7 @@
     (push '("*cider-doc*"            :dedicated t :position bottom :stick t :noselect nil :height 0.4) popwin:special-display-config)
     (push '("*elm*" :tail t :noselect t) popwin:special-display-config)
     (push '("*elm-make*" :tail t :noselect t) popwin:special-display-config)
+    (push '("*rspec-compilation*"    :dedicated t :position bottom :stick t :noselect t   :height 0.4) popwin:special-display-config)
 
     (defun dotemacs-remove-popwin-display-config (str)
       "Removes the popwin display configurations that matches the passed STR"
