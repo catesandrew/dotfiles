@@ -49,3 +49,4 @@ override lazy-loaded settings."
     `(progn ,@expanded-forms)))
 
 (provide 'core-use-package-ext)
+;;; core-iuse-package.el ends here
