@@ -54,6 +54,14 @@
     ;; `fundamental-mode'.
     ;; (add-hook 'css-mode-hook (lambda () (run-hooks 'dotemacs-prog-mode-hook)))
 
+    ;; Custom iMenu
+    (defun css-imenu-make-index ()
+      (save-excursion
+        (imenu--generic-function '((nil "^ *\\([^ ]+\\) *{ *$" 1)))))
+    (add-hook 'css-mode-hook
+              (lambda ()
+                (setq imenu-create-index-function 'css-imenu-make-index)))
+
     (defun css-expand-statement ()
       "Expand CSS block"
       (interactive)
@@ -106,6 +114,8 @@
     (dotemacs/add-to-hooks 'rainbow-delimiters-mode '(haml-mode-hook
                                                       jade-mode-hook
                                                       less-css-mode-hook
+                                                      sass-mode-hook
+                                                      css-mode-hook
                                                       scss-mode-hook
                                                       slim-mode-hook))))
 
