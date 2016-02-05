@@ -11,7 +11,7 @@
 ;; (require 'core-keybindings)
 ;; (require 'core-display-init)
 (require 'module-vars)
-;; (require 'module-common)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
