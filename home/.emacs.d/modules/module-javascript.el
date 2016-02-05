@@ -6,9 +6,21 @@
 ;;
 ;;; Commentary:
 ;;
+;; npm install -g js-beautify, jshint, eslint, tern
+;;
+;; - Smart code folding
+;; - Refactoring: done using `js2-refactor`.
+;; - Auto-completion and documentation: provided by `tern`
+;; - CoffeeScript support
+;; - Formatting with `web-beautify`
+;; - Get the path to a JSON value with `json-snatcher`
+;; - REPL available via `skewer-mode` and `livid-mode`
+;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 ;; (require 'core-display-init)
 (require 'module-vars)
 (require 'module-common)
