@@ -286,6 +286,7 @@
   (progn
     (tagedit-add-experimental-features)
     (dotemacs-diminish tagedit-mode " Ⓣ" " T")
+    ;; (add-hook 'web-mode-hook (lambda () (tagedit-mode 1)))
     (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
 
 (dotemacs-use-package-add-hook evil-matchit
