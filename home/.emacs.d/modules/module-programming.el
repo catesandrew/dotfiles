@@ -209,6 +209,7 @@
     ;   (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
     ;             (lambda ()
     ;               (prettify-symbols-mode))))
+    (setq prettify-symbols-unprettify-at-point 'right)
     (setq prettify-symbol-categories '(lambda relational logical))))
 
 ; Instead set the mode globally
