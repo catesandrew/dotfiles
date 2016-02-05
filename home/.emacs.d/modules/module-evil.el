@@ -220,6 +220,9 @@ current major mode."
 
     ; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
+    ;; prevent certain movement commands from breaking at the end of the lines
+    ;; (setq evil-move-beyond-eol t)
+
     ; (setq evil-search-module 'evil-search)
     ; (setq evil-magic 'very-magic)
 

@@ -17,22 +17,6 @@
 
 ;;; Code:
 
-(defvar sql-pre-extensions
-  '(
-    ;; pre extension sqls go here
-    )
-  "List of all extensions to load before the packages.")
-
-(defvar sql-post-extensions
-  '(
-    ;; post extension sqls go here
-    )
-  "List of all extensions to load after the packages.")
-
-(defvar sql-packages '(sql sql-indent))
-
-(defvar sql-excluded-packages '())
-
 (defun dotemacs-sql-source (products)
   "return a source for helm selection"
   `((name . "SQL Products")

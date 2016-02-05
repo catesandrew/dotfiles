@@ -312,5 +312,17 @@
           status)))
     (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
 
+(use-package evil-cleverparens
+  :defer t
+  :diminish evil-cleverparens-mode
+  :init
+  (progn
+    (setq evil-cleverparens-use-regular-insert t)
+    (dotemacs-add-toggle evil-cleverparens
+      :status evil-cleverparens-mode
+      :on  (evil-cleverparens-mode)
+      :off (evil-cleverparens-mode -1)
+      :documentation "Enable evil-cleverparens.")))
+
 (provide 'module-evil-packages)
 ;;; module-evil-packages.el ends here
