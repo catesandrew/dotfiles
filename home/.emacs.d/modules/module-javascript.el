@@ -18,6 +18,7 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
+(require 'core-fonts-support)
 (require 'core-toggle)
 (require 'core-keybindings)
 (require 'core-use-package-ext)
@@ -86,7 +87,13 @@
   (progn
     (dolist (mode '(coffee-mode js2-mode json-mode))
       (dotemacs/add-flycheck-hook mode))
-    (add-hook 'js2-mode-hook 'dotemacs-flycheck-init-javascript))
+    (add-hook 'js2-mode-hook 'dotemacs-flycheck-init-javascript)
+
+    (defun dotemacs/disable-js2-checks-if-flycheck-active ()
+      (unless (flycheck-get-checker-for-buffer)
+        (set (make-local-variable 'js2-mode-show-parse-errors) t)
+        (set (make-local-variable 'js2-mode-show-strict-warnings) t)))
+    (add-hook 'js2-mode-hook 'dotemacs/disable-js2-checks-if-flycheck-active))
   :post-config
   (progn
     (dotemacs-flycheck-executables-search)
@@ -226,22 +233,6 @@
     (add-hook 'js2-mode-hook
               (lambda () (run-hooks 'dotemacs-js2-mode-hook)))
 
-    ;; Let flycheck handle parse errors
-    (setq js2-show-parse-errors nil
-          js2-use-font-lock-faces t
-          js2-strict-missing-semi-warning nil
-          js2-highlight-external-variables nil
-          js2-include-browser-externs t
-          js2-include-node-externs t
-          js2-missing-semi-one-line-override t
-          js2-strict-cond-assign-warning nil
-          js2-strict-inconsistent-return-warning nil
-          js2-strict-trailing-comma-warning nil
-          js2-strict-var-hides-function-arg-warning nil
-          js2-strict-var-redeclaration-warning nil
-          js2-warn-about-unused-function-arguments nil
-          js2-strict-trailing-comma-warning nil)
-
     (add-to-list 'auto-mode-alist '("\\.tern-project\\'" . json-mode))
     (add-to-list 'auto-mode-alist '("\\.jshintrc$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.jscsrc$" . json-mode))
@@ -252,19 +243,43 @@
   (progn
     (setq-default js2-basic-offset 2)
     (setq-default js-indent-level 2)
+    (setq-default js2-use-font-lock-faces t)
+    (setq-default js2-include-browser-externs t)
+    (setq-default js2-include-node-externs t)
+    (setq-default js2-missing-semi-one-line-override t)
+    (setq-default js2-strict-cond-assign-warning nil)
+    (setq-default js2-strict-var-hides-function-arg-warning nil)
+    (setq-default js2-strict-var-redeclaration-warning nil)
+    (setq-default js2-warn-about-unused-function-arguments nil)
+    (setq-default js2-allow-rhino-new-expr-initializer nil)
+    (setq-default js2-auto-indent-p nil)
+    (setq-default js2-enter-indents-newline nil)
+    (setq-default js2-mirror-mode nil)
+    (setq-default js2-strict-inconsistent-return-warning nil)
+    (setq-default js2-include-rhino-externs nil)
+    (setq-default js2-include-gears-externs nil)
+    (setq-default js2-concat-multiline-strings 'eol)
+    (setq-default js2-rebind-eol-bol-keys nil)
+    (setq-default js2-bounce-indent nil)
+    (setq-default js2-indent-switch-body t)
+    (setq-default js2-global-externs '("__dirname"
+                                       "_"
+                                       "describe"
+                                       "it"
+                                       "before"
+                                       "after"
+                                       "beforeEach"
+                                       "afterEach"
+                                       "chai"
+                                       "sinon"
+                                       "expect"
+                                       ))
 
-    (setq js2-global-externs '("__dirname"
-                               "_"
-                               "describe"
-                               "it"
-                               "before"
-                               "after"
-                               "beforeEach"
-                               "afterEach"
-                               "chai"
-                               "sinon"
-                               "expect"
-                               ))
+    ;; Let flycheck handle parse errors
+    (setq-default js2-show-parse-errors nil)
+    (setq-default js2-strict-missing-semi-warning nil)
+    (setq-default js2-highlight-external-variables t)
+    (setq-default js2-strict-trailing-comma-warning nil)
 
     (dotemacs-declare-prefix-for-mode 'js2-mode "mz" "folding")
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "w" 'js2-mode-toggle-warnings-and-errors)
@@ -361,7 +376,42 @@
     (setq js2-imenu-enabled-frameworks 'nil)
     (js2-imenu-extras-mode)
     ;; required to make `<LEADER> s l' to work correctly
-    (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)))
+    (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)
+
+    (defun js2-imenu-make-index ()
+      (interactive)
+      (save-excursion
+        (imenu--generic-function '(("describe" "\\s-*describe\\s-*(\\s-*[\"']\\(.+\\)[\"']\\s-*,.*" 1)
+                                   ("it" "\\s-*it\\s-*(\\s-*[\"']\\(.+\\)[\"']\\s-*,.*" 1)
+                                   ("before" "\\s-*before\\s-*(\\s-*[\"']\\(.+\\)[\"']\\s-*,.*" 1)
+                                   ("after" "\\s-*after\\s-*(\\s-*[\"']\\(.+\\)[\"']\\s-*,.*" 1)
+                                   ("Controller" "[. \t]controller([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Controller" "[. \t]controllerAs:[ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Filter" "[. \t]filter([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("State" "[. \t]state([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Factory" "[. \t]factory([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Service" "[. \t]service([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Module" "[. \t]module([ \t]*['\"]\\([a-zA-Z0-9_\.]+\\)" 1)
+                                   ("ngRoute" "[. \t]when(\\(['\"][a-zA-Z0-9_\/]+['\"]\\)" 1)
+                                   ("Directive" "[. \t]directive([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Event" "[. \t]\$on([ \t]*['\"]\\([^'\"]+\\)" 1)
+                                   ("Config" "[. \t]config([ \t]*function *( *\\([^\)]+\\)" 1)
+                                   ("Config" "[. \t]config([ \t]*\\[ *['\"]\\([^'\"]+\\)" 1)
+                                   ("OnChange" "[ \t]*\$(['\"]\\([^'\"]*\\)['\"]).*\.change *( *function" 1)
+                                   ("OnClick" "[ \t]*\$([ \t]*['\"]\\([^'\"]*\\)['\"]).*\.click *( *function" 1)
+                                   ("Watch" "[. \t]\$watch( *['\"]\\([^'\"]+\\)" 1)
+                                   ("Function" "function[ \t]+\\([a-zA-Z0-9_$.]+\\)[ \t]*(" 1)
+                                   ("Function" "^[ \t]*\\([a-zA-Z0-9_$.]+\\)[ \t]*=[ \t]*function[ \t]*(" 1)
+                                   ("Function" "^[ \t]*\\([a-zA-Z0-9_$.]+\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+                                   ("Class" "^[ \t]*var[ \t]*\\([0-9a-zA-Z]+\\)[ \t]*=[ \t]*\\([a-zA-Z]*\\).extend" 1)
+                                   ("Class" "^[ \t]*cc\.\\(.+\\)[ \t]*=[ \t]*cc\.\\(.+\\)\.extend" 1)
+                                   ("Task" "[. \t]task([ \t]*['\"]\\([^'\"]+\\)" 1)))))
+    ;; (add-hook 'js2-mode-hook
+    ;;           (lambda ()
+    ;;             (setq imenu-create-index-function 'js2-imenu-make-index)))
+    ;; (set-default 'imenu-auto-rescan t)
+    ;; (add-hook 'js2-mode-hook 'which-function-mode)
+    ))
 
 (use-package json-mode                  ; JSON files
   :ensure t

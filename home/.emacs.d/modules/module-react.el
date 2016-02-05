@@ -57,8 +57,8 @@
 
 (dotemacs-use-package-add-hook js-doc
   :post-init
-  (add-hook 'react-mode-hook 'dotemacs-js-doc-require)
-  (dotemacs-js-doc-set-key-bindings 'react-mode))
+  (add-hook 'react-mode-hook 'dotemacs/js2-refactor-require)
+  (dotemacs/js-doc-set-key-bindings 'react-mode))
 
 (dotemacs-use-package-add-hook js2-mode
   :post-init
@@ -67,8 +67,8 @@
 
 (dotemacs-use-package-add-hook js2-refactor
   :post-init
-  (add-hook 'react-mode-hook 'dotemacs-js2-refactor-require)
-  (dotemacs-js2-refactor-set-key-bindings 'react-mode))
+  (add-hook 'react-mode-hook 'dotemacs/js2-refactor-require)
+  (dotemacs/js2-refactor-set-key-bindings 'react-mode))
 
 (dotemacs-use-package-add-hook tern
   :post-init
