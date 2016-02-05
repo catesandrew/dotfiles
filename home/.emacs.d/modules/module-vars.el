@@ -192,5 +192,11 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled.")
     (zenburn . (40 65)))
   "alist of theme symbols and pair of saturation and lightness values.")
 
+(defvar dotemacs//flycheck-executables-searched nil)
+(defvar dotemacs//flycheck-executable-eslint nil)
+(defvar dotemacs//flycheck-executable-jscs nil)
+(defvar dotemacs//flycheck-executable-jshint nil)
+(defvar dotemacs//flycheck-executable-tidy5 nil)
+
 (provide 'module-vars)
 ;;; module-vars.el ends here
