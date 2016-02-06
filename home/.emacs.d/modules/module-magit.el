@@ -92,8 +92,8 @@
       (interactive)
       (magit-diff "HEAD"))
 
-    (dotmacs-declare-prefix "gd" "diff")
-    (dotmacs-set-leader-keys
+    (dotemacs-declare-prefix "gd" "diff")
+    (dotemacs-set-leader-keys
      "gA" 'magit-cherry-pick-popup
      "gb" 'dotemacs/git-blame-micro-state
      "gc" 'magit-commit-popup

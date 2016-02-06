@@ -62,6 +62,7 @@
       (setq projectile-indexing-method 'alien
             projectile-generic-command "find . -type f"))
     (setq projectile-sort-order 'recentf
+          projectile-use-git-grep t
           projectile-switch-project-action 'projectile-dired
           projectile-cache-file (concat dotemacs-cache-directory
                                         "projectile.cache")

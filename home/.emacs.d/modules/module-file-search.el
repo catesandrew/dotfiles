@@ -6,9 +6,10 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'evil-evilified-state)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -32,11 +33,6 @@
 ;; --no-color, oddly enough, is required to allow emacs to colorize the output
 (defvar git-grep-switches "--extended-regexp -I -n --ignore-case --no-color"
   "Switches to pass to `git grep'.")
-
-(use-package helm-regex                 ; Helm regex tools
-  :ensure helm
-  :bind (([remap occur] . helm-occur)
-         ("C-c e o"     . helm-multi-occur)))
 
 (use-package grep
   :defer t
@@ -113,6 +109,263 @@
   :defer t
   :init
   (progn
+    (defun dotemacs-helm-do-ag-region-or-symbol (func &optional dir)
+      "Search with `ag' with a default input."
+      (require 'helm-ag)
+      (cl-letf* (((symbol-value 'helm-ag-insert-at-point) 'symbol)
+                 ;; make thing-at-point choosing the active region first
+                 ((symbol-function 'this-fn) (symbol-function 'thing-at-point))
+                 ((symbol-function 'thing-at-point)
+                  (lambda (thing)
+                    (let ((res (if (region-active-p)
+                                   (buffer-substring-no-properties
+                                    (region-beginning) (region-end))
+                                 (this-fn thing))))
+                      (when res (rxt-quote-pcre res))))))
+        (funcall func dir)))
+
+    (defun dotemacs-helm-do-search-find-tool (base tools default-inputp)
+      "Create a cond form given a TOOLS string list and evaluate it."
+      (eval
+       `(cond
+         ,@(mapcar
+            (lambda (x)
+              `((executable-find ,x)
+                ',(let ((func
+                         (intern
+                          (format (if default-inputp
+                                      "dotemacs-%s-%s-region-or-symbol"
+                                    "dotemacs-%s-%s")
+                                  base x))))
+                    (if (fboundp func)
+                        func
+                      (intern (format "%s-%s"  base x))))))
+            tools)
+         (t 'helm-do-grep))))
+
+    ;; Search in current file ----------------------------------------------
+
+    (defun dotemacs-helm-file-do-ag (&optional _)
+      "Wrapper to execute `helm-ag-this-file.'"
+      (interactive)
+      (helm-ag-this-file))
+
+    (defun dotemacs-helm-file-do-ag-region-or-symbol ()
+      "Search in current file with `ag' using a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-file-do-ag))
+
+    (defun dotemacs-helm-file-smart-do-search (&optional default-inputp)
+      "Search in current file using `dotemacs-search-tools'.
+Search for a search tool in the order provided by `dotemacs-search-tools'
+If DEFAULT-INPUTP is non nil then the current region or symbol at point
+are used as default input."
+      (interactive)
+      (call-interactively
+       (dotemacs-helm-do-search-find-tool "helm-file-do"
+                                          dotemacs-search-tools
+                                          default-inputp)))
+
+    (defun dotemacs-helm-file-smart-do-search-region-or-symbol ()
+      "Search in current file using `dotemacs-search-tools' with
+ default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+      (interactive)
+      (dotemacs-helm-file-smart-do-search t))
+
+    ;; Search in files -----------------------------------------------------
+
+    (defun dotemacs-helm-files-do-ag (&optional dir)
+      "Search in files with `ag' using a default input."
+      (interactive)
+      (let ((helm-ag-use-agignore t)
+            (helm-ag-base-command "ag --nocolor --nogroup --smart-case --hidden"))
+        (helm-do-ag dir)))
+
+    (defun dotemacs-helm-files-do-ag-region-or-symbol ()
+      "Search in files with `ag' using a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ag))
+
+    (defun dotemacs-helm-files-do-ack (&optional dir)
+      "Search in files with `ack'."
+      (interactive)
+      (let ((ackrc (concat user-home-directory ".ackrc")))
+        (if (file-exists-p ackrc)
+            (let ((helm-ag-base-command (format "ack --nocolor --nogroup --ackrc=%s" ackrc)))
+              (helm-do-ag dir))
+          (let ((helm-ag-base-command "ack --nocolor --nogroup"))
+            (helm-do-ag dir)))))
+
+    (defun dotemacs-helm-files-do-ack-region-or-symbol ()
+      "Search in files with `ack' using a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ack))
+
+    (defun dotemacs-helm-files-do-pt (&optional dir)
+      "Search in files with `pt'."
+      (interactive)
+      (let ((ptignore (concat user-home-directory ".ptignore.toml")))
+        (if (file-exists-p ptignore)
+            (let ((helm-ag-base-command "pt -e --nocolor --nogroup --hidden --home-ptignore"))
+              (helm-do-ag dir))
+          (let ((helm-ag-base-command "pt -e --nocolor --nogroup --hidden --smart-case"))
+            (helm-do-ag dir)))))
+
+    (defun dotemacs-helm-files-do-pt-region-or-symbol ()
+      "Search in files with `pt' using a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-pt))
+
+    (defun dotemacs-helm-files-smart-do-search (&optional default-inputp)
+      "Search in opened buffers using `dotemacs-search-tools'.
+Search for a search tool in the order provided by `dotemacs-search-tools'
+If DEFAULT-INPUTP is non nil then the current region or symbol at point
+are used as default input."
+      (interactive)
+      (call-interactively
+       (dotemacs-helm-do-search-find-tool "helm-files-do"
+                                          dotemacs-search-tools
+                                          default-inputp)))
+
+    (defun dotemacs-helm-files-smart-do-search-region-or-symbol ()
+      "Search in opened buffers using `dotemacs-search-tools'.
+with default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+      (interactive)
+      (dotemacs-helm-files-smart-do-search t))
+
+    ;; Search in buffers ---------------------------------------------------
+
+    (defun dotemacs-helm-buffers-do-ag (&optional _)
+      "Wrapper to execute `helm-ag-buffers.'"
+      (interactive)
+      (let ((helm-ag-use-agignore t)
+            (helm-ag-base-command "ag --nocolor --nogroup --smart-case --hidden"))
+        (helm-do-ag-buffers)))
+
+    (defun dotemacs-helm-buffers-do-ag-region-or-symbol ()
+      "Search in opened buffers with `ag' with a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-ag))
+
+    (defun dotemacs-helm-buffers-do-ack (&optional _)
+      "Search in opened buffers with `ack'."
+      (interactive)
+      (let ((ackrc (concat user-home-directory ".ackrc")))
+        (if (file-exists-p ackrc)
+            (let ((helm-ag-base-command (format "ack --nocolor --nogroup --ackrc=%s" ackrc)))
+              (helm-do-ag-buffers))
+          (let ((helm-ag-base-command "ack --nocolor --nogroup"))
+            (helm-do-ag-buffers)))))
+
+    (defun dotemacs-helm-buffers-do-ack-region-or-symbol ()
+      "Search in opened buffers with `ack' with a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-ack))
+
+    (defun dotemacs-helm-buffers-do-pt (&optional _)
+      "Search in opened buffers with `pt'."
+      (interactive)
+      (let ((ptignore (concat user-home-directory ".ptignore.toml")))
+        (if (file-exists-p ptignore)
+            (let ((helm-ag-base-command "pt -e --nocolor --nogroup --hidden --home-ptignore"))
+              (helm-do-ag-buffers))
+          (let ((helm-ag-base-command "pt -e --nocolor --nogroup --hidden --smart-case"))
+            (helm-do-ag-buffers)))))
+
+    (defun dotemacs-helm-buffers-do-pt-region-or-symbol ()
+      "Search in opened buffers with `pt' using a default input."
+      (interactive)
+      (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-pt))
+
+    (defun dotemacs-helm-buffers-smart-do-search (&optional default-inputp)
+      "Search in opened buffers using `dotemacs-search-tools'.
+Search for a search tool in the order provided by `dotemacs-search-tools'
+If DEFAULT-INPUTP is non nil then the current region or symbol at point
+are used as default input."
+      (interactive)
+      (call-interactively
+       (dotemacs-helm-do-search-find-tool "helm-buffers-do"
+                                          dotemacs-search-tools
+                                          default-inputp)))
+
+    (defun dotemacs-helm-buffers-smart-do-search-region-or-symbol ()
+      "Search in opened buffers using `dotemacs-search-tools' with
+default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+      (interactive)
+      (dotemacs-helm-buffers-smart-do-search t))
+
+    ;; Search in project ---------------------------------------------------
+
+    (defun dotemacs-helm-project-do-ag ()
+      "Search in current project with `ag'."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (helm-do-ag dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-do-ag-region-or-symbol ()
+      "Search in current project with `ag' using a default input."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (dotemacs-helm-do-ag-region-or-symbol 'helm-do-ag dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-do-ack ()
+      "Search in current project with `ack'."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (dotemacs-helm-files-do-ack dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-do-ack-region-or-symbol ()
+      "Search in current project with `ack' using a default input."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ack dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-do-pt ()
+      "Search in current project with `pt'."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (dotemacs-helm-files-do-pt dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-do-pt-region-or-symbol ()
+      "Search in current project with `pt' using a default input."
+      (interactive)
+      (let ((dir (projectile-project-root)))
+        (if dir
+            (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-pt dir)
+          (message "error: Not in a project."))))
+
+    (defun dotemacs-helm-project-smart-do-search (&optional default-inputp)
+      "Search in current project using `dotemacs-search-tools'.
+Search for a search tool in the order provided by `dotemacs-search-tools'
+If DEFAULT-INPUTP is non nil then the current region or symbol at point
+are used as default input."
+      (interactive)
+      (let ((projectile-require-project-root nil))
+        (call-interactively
+         (dotemacs-helm-do-search-find-tool "helm-project-do"
+                                            dotemacs-search-tools
+                                            default-inputp))))
+
+    (defun dotemacs-helm-project-smart-do-search-region-or-symbol ()
+      "Search in current project using `dotemacs-search-tools' with
+ default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+      (interactive)
+      (dotemacs-helm-project-smart-do-search t))
+
     ;; This overrides the default C-s action in helm-projectile-switch-project
     ;; to search using ag/pt/whatever instead of just grep
     (with-eval-after-load 'helm-projectile
@@ -124,7 +377,8 @@
         (kbd "C-s")
         (lambda ()
           (interactive)
-          (helm-exit-and-execute-action 'dotemacs-helm-project-smart-do-search-in-dir))))
+          (helm-exit-and-execute-action
+           'dotemacs-helm-project-smart-do-search-in-dir))))
 
     ;; evilify the helm-grep buffer
     (evilified-state-evilify helm-grep-mode helm-grep-mode-map
@@ -172,21 +426,15 @@
   (progn
     ;; Use `grep-find-ignored-files' and `grep-find-ignored-directories' as
     ;; ignore pattern, but does not seem to be working, need to confirm
-    (setq helm-ag-use-grep-ignore-list t)
-
+    ;; (setq helm-ag-use-grep-ignore-list nil)
     ;; example: (helm-ag-ignore-patterns '("*.md" "*.el"))
     ;; (setq helm-ag-ignore-patterns '(append grep-find-ignored-files
     ;;                                        grep-find-ignored-directories))
 
-    (setq helm-ag-fuzzy-match t
-          helm-ag-base-command "ag --nocolor --nogroup --hidden"
-          helm-ag-insert-at-point 'symbol
-          helm-ag-source-type 'file-line))
-
-  (evil-define-key 'normal helm-ag-map (kbd dotemacs-leader-key) dotemacs-default-map)
-    (evilified-state-evilify helm-ag-mode helm-ag-mode-map
-      (kbd "RET") 'helm-ag-mode-jump-other-window
-      (kbd "q") 'quit-window))
+  (evil-define-key 'normal helm-ag-map "SPC" dotemacs-default-map)
+  (evilified-state-evilify helm-ag-mode helm-ag-mode-map
+    (kbd "RET") 'helm-ag-mode-jump-other-window
+    (kbd "q") 'quit-window)))
 
 (provide 'module-file-search)
 ;;; module-file-search.el ends here

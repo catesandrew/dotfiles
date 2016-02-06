@@ -165,6 +165,28 @@ a display strng and the value is the actual value to return."
     (cadr (assoc (ido-completing-read prompt (mapcar 'car candidates))
                  candidates))))
 
+(defun dotemacs//describe-last-keys-string ()
+  "Gathers info about your Emacs last keys and returns it as a string."
+  (view-lossage)
+  (let* ((lossage-buffer "*Help*")
+         (last-keys (format "#### Emacs last keys\n```text\n%s```\n"
+                            (with-current-buffer lossage-buffer
+                              (buffer-string)))))
+    (kill-buffer lossage-buffer)
+    last-keys))
+
+(defun spacemacs/describe-last-keys ()
+  "Gathers info about your Emacs last keys and copies to clipboard."
+  (interactive)
+  (let ((lossage (dotemacs//describe-last-keys-string)))
+    (kill-new lossage)
+    (message lossage)
+    (message (concat "Information has been copied to clipboard.\n"
+                     (propertize
+                      "PLEASE REVIEW THE DATA."
+                      'face 'font-lock-warning-face)
+                     "Check the *Messages* buffer if you need to review it"))))
+
 
 ;;; Unused functions
 

@@ -10,11 +10,15 @@
 (require 'core-funcs)
 (require 'core-keybindings)
 (require 'core-themes-support)
+(require 'core-use-package-ext)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
+;;; Code:
+
+;; describe functions ---------------------------------------------------------
 (defmacro dotemacs||set-helm-key (keys func)
   "Define a key bindings for FUNC using KEYS.
 Ensure that helm is required before calling FUNC."
@@ -33,7 +37,7 @@ Ensure that helm is required before calling FUNC."
 (dotemacs||set-helm-key "sww" helm-wikipedia-suggest)
 (dotemacs||set-helm-key "swg" helm-google-suggest)
 
-;;; Code:
+;;; Variables:
 
 (defvar helm-resize nil
   "If non nil, `helm' will try to miminimize the space it uses.")
@@ -48,227 +52,8 @@ Ensure that helm is required before calling FUNC."
   "List of search tool executable names.  Dotemacs uses the first installed
 tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.")
 
-
 (defvar dotemacs--helm-navigation-ms-face-cookie-header nil)
 (defvar dotemacs--helm-navigation-ms-face-cookie-minibuffer nil)
-
-;; helm-ag
-
-(defun dotemacs-helm-do-ag-region-or-symbol (func &optional dir)
-  "Search with `ag' with a default input."
-  (require 'helm-ag)
-  (cl-letf* (((symbol-value 'helm-ag-insert-at-point) 'symbol)
-             ;; make thing-at-point choosing the active region first
-             ((symbol-function 'this-fn) (symbol-function 'thing-at-point))
-             ((symbol-function 'thing-at-point)
-              (lambda (thing)
-                (let ((res (if (region-active-p)
-                    (buffer-substring-no-properties
-                     (region-beginning) (region-end))
-                    (this-fn thing))))
-                  (when res (rxt-quote-pcre res))))))
-    (funcall func dir)))
-
-(defun dotemacs-helm-do-search-find-tool (base tools default-inputp)
-  "Create a cond form given a TOOLS string list and evaluate it."
-  (eval
-   `(cond
-     ,@(mapcar
-        (lambda (x)
-          `((executable-find ,x)
-            ',(let ((func
-                     (intern
-                      (format (if default-inputp
-                                  "dotemacs-%s-%s-region-or-symbol"
-                                "dotemacs-%s-%s")
-                              base x))))
-                (if (fboundp func)
-                    func
-                  (intern (format "%s-%s"  base x))))))
-               tools)
-     (t 'helm-do-grep))))
-
-;; Search in current file ----------------------------------------------
-
-(defun dotemacs-helm-file-do-ag (&optional _)
-  "Wrapper to execute `helm-ag-this-file.'"
-  (interactive)
-  (helm-ag-this-file))
-
-(defun dotemacs-helm-file-do-ag-region-or-symbol ()
-  "Search in current file with `ag' using a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-file-do-ag))
-
-(defun dotemacs-helm-file-smart-do-search (&optional default-inputp)
-  "Search in current file using `dotemacs-search-tools'.
-Search for a search tool in the order provided by `dotemacs-search-tools'
-If DEFAULT-INPUTP is non nil then the current region or symbol at point
-are used as default input."
-  (interactive)
-  (call-interactively
-   (dotemacs-helm-do-search-find-tool "helm-file-do"
-                                      dotemacs-search-tools
-                                      default-inputp)))
-
-(defun dotemacs-helm-file-smart-do-search-region-or-symbol ()
-  "Search in current file using `dotemacs-search-tools' with
- default input.
-Search for a search tool in the order provided by `dotemacs-search-tools'."
-  (interactive)
-  (dotemacs-helm-file-smart-do-search t))
-
-;; Search in files -----------------------------------------------------
-
-(defun dotemacs-helm-files-do-ag (&optional dir)
-  "Search in files with `ag' using a default input."
-  (interactive)
-  (helm-do-ag dir))
-
-(defun dotemacs-helm-files-do-ag-region-or-symbol ()
-  "Search in files with `ag' using a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ag))
-
-(defun dotemacs-helm-files-do-ack (&optional dir)
-  "Search in files with `ack'."
-  (interactive)
-  (let ((helm-ag-base-command "ack --nocolor --nogroup"))
-    (helm-do-ag dir)))
-
-(defun dotemacs-helm-files-do-ack-region-or-symbol ()
-  "Search in files with `ack' using a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ack))
-
-(defun dotemacs-helm-files-do-pt (&optional dir)
-  "Search in files with `pt'."
-  (interactive)
-  (let ((helm-ag-base-command "pt -e --nocolor --nogroup"))
-    (helm-do-ag dir)))
-
-(defun dotemacs-helm-files-do-pt-region-or-symbol ()
-  "Search in files with `pt' using a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-pt))
-
-(defun dotemacs-helm-files-smart-do-search (&optional default-inputp)
-  "Search in opened buffers using `dotemacs-search-tools'.
-Search for a search tool in the order provided by `dotemacs-search-tools'
-If DEFAULT-INPUTP is non nil then the current region or symbol at point
-are used as default input."
-  (interactive)
-  (call-interactively
-   (dotemacs-helm-do-search-find-tool "helm-files-do"
-                                      dotemacs-search-tools
-                                      default-inputp)))
-
-;; Search in buffers ---------------------------------------------------
-
-(defun dotemacs-helm-buffers-do-ag (&optional _)
-  "Wrapper to execute `helm-ag-buffers.'"
-  (interactive)
-  (helm-do-ag-buffers))
-
-(defun dotemacs-helm-buffers-do-ag-region-or-symbol ()
-  "Search in opened buffers with `ag' with a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-ag))
-
-(defun dotemacs-helm-buffers-do-ack (&optional _)
-  "Search in opened buffers with `ack'."
-  (interactive)
-  (let ((helm-ag-base-command "ack --nocolor --nogroup"))
-    (helm-do-ag-buffers)))
-
-(defun dotemacs-helm-buffers-do-ack-region-or-symbol ()
-  "Search in opened buffers with `ack' with a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-ack))
-
-(defun dotemacs-helm-buffers-do-pt (&optional _)
-  "Search in opened buffers with `pt'."
-  (interactive)
-  (let ((helm-ag-base-command "pt -e --nocolor --nogroup"))
-    (helm-do-ag-buffers)))
-
-(defun dotemacs-helm-buffers-do-pt-region-or-symbol ()
-  "Search in opened buffers with `pt' using a default input."
-  (interactive)
-  (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-buffers-do-pt))
-
-(defun dotemacs-helm-buffers-smart-do-search (&optional default-inputp)
-  "Search in opened buffers using `dotemacs-search-tools'.
-Search for a search tool in the order provided by `dotemacs-search-tools'
-If DEFAULT-INPUTP is non nil then the current region or symbol at point
-are used as default input."
-  (interactive)
-  (call-interactively
-   (dotemacs-helm-do-search-find-tool "helm-buffers-do"
-                                      dotemacs-search-tools
-                                      default-inputp)))
-
-;; Search in project ---------------------------------------------------
-
-(defun dotemacs-helm-project-do-ag ()
-  "Search in current project with `ag'."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (helm-do-ag dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-do-ag-region-or-symbol ()
-  "Search in current project with `ag' using a default input."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (dotemacs-helm-do-ag-region-or-symbol 'helm-do-ag dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-do-ack ()
-  "Search in current project with `ack'."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (dotemacs-helm-files-do-ack dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-do-ack-region-or-symbol ()
-  "Search in current project with `ack' using a default input."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-ack dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-do-pt ()
-  "Search in current project with `pt'."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (dotemacs-helm-files-do-pt dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-do-pt-region-or-symbol ()
-  "Search in current project with `pt' using a default input."
-  (interactive)
-  (let ((dir (projectile-project-root)))
-    (if dir
-        (dotemacs-helm-do-ag-region-or-symbol 'dotemacs-helm-files-do-pt dir)
-      (message "error: Not in a project."))))
-
-(defun dotemacs-helm-project-smart-do-search (&optional default-inputp)
-  "Search in current project using `dotemacs-search-tools'.
-Search for a search tool in the order provided by `dotemacs-search-tools'
-If DEFAULT-INPUTP is non nil then the current region or symbol at point
-are used as default input."
-  (interactive)
-  (let ((projectile-require-project-root nil))
-   (call-interactively
-    (dotemacs-helm-do-search-find-tool "helm-project-do"
-                                       dotemacs-search-tools
-                                       default-inputp))))
 
 ;;; Debugging
 ;;
@@ -329,7 +114,7 @@ are used as default input."
 (use-package helm
   :ensure t
   :defer 1
-  :commands dotemacs-helm-find-files
+  :commands (dotemacs/helm-find-files)
   :init
   (progn
     (with-eval-after-load 'helm-config
@@ -356,7 +141,7 @@ are used as default input."
                                           helm-source-bookmarks
                                           helm-source-file-cache
                                           helm-source-files-in-current-dir))
-    ;; (define-key evil-normal-state-map (kbd "C-p") #'dotemacs-helm-multi-files)
+    ;; (define-key evil-normal-state-map (kbd "C-p") 'dotemacs-helm-multi-files)
 
     (setq helm-prevent-escaping-from-minibuffer t
           helm-bookmark-show-location t
@@ -499,7 +284,7 @@ are used as default input."
       "a'"   'helm-available-repls
       "bb"   'helm-mini
       "Cl"   'helm-colors
-      "ff"   'dotemacs-helm-find-files
+      "ff"   'dotemacs/helm-find-files
       "fF"   'helm-find-files
       "fL"   'helm-locate
       "fr"   'helm-recentf
@@ -507,14 +292,15 @@ are used as default input."
       "hdF"  'dotemacs/helm-faces
       "hi"   'helm-info-at-point
       "hm"   'helm-man-woman
+      "hu"   'helm-unicode
       "iu"   'helm-ucs
       "jI"   'helm-imenu-in-all-buffers
       "rm"   'helm-all-mark-rings
       "rl"   'helm-resume
       "rr"   'helm-register
-      "rs"   'spacemacs/resume-last-search-buffer
+      "rs"   'dotemacs/resume-last-search-buffer
       "ry"   'helm-show-kill-ring
-      "sL"   'dotemacs-resume-last-search-buffer
+      "sL"   'dotemacs/resume-last-search-buffer
       "sj"   'dotemacs-jump-in-buffer)
 
     ;; search with grep
@@ -613,6 +399,12 @@ are used as default input."
   (progn
     (helm-mode +1)
 
+    (setq helm-recentf-fuzzy-match t
+          ;; Use recentf to find recent files
+          helm-ff-file-name-history-use-recentf t
+          ;; Find library from `require', `declare-function' and friends
+          helm-ff-search-library-in-sexp t)
+
     (when (and helm-resize
                (or (eq dotemacs-helm-position 'bottom)
                    (eq dotemacs-helm-position 'top)))
@@ -657,7 +449,7 @@ are used as default input."
            :height 0.1))))
     (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
 
-    (defun dotemacs-helm-find-files (arg)
+    (defun dotemacs/helm-find-files (arg)
       "Custom implementation for calling helm-find-files-1.
 
 Removes the automatic guessing of the initial value based on thing at point. "
@@ -776,20 +568,19 @@ ARG non nil means that the editing style is `vim'."
         :on-enter (dotemacs//helm-navigation-ms-on-enter)
         :on-exit  (dotemacs//helm-navigation-ms-on-exit)
         :bindings
-        ("1" spacemacs/helm-action-1 :exit t)
-        ("2" spacemacs/helm-action-2 :exit t)
-        ("3" spacemacs/helm-action-3 :exit t)
-        ("4" spacemacs/helm-action-4 :exit t)
-        ("5" spacemacs/helm-action-5 :exit t)
-        ("6" spacemacs/helm-action-6 :exit t)
-        ("7" spacemacs/helm-action-7 :exit t)
-        ("8" spacemacs/helm-action-8 :exit t)
-        ("9" spacemacs/helm-action-9 :exit t)
-        ("0" spacemacs/helm-action-10 :exit t)
+        ("1" dotemacs/helm-action-1 :exit t)
+        ("2" dotemacs/helm-action-2 :exit t)
+        ("3" dotemacs/helm-action-3 :exit t)
+        ("4" dotemacs/helm-action-4 :exit t)
+        ("5" dotemacs/helm-action-5 :exit t)
+        ("6" dotemacs/helm-action-6 :exit t)
+        ("7" dotemacs/helm-action-7 :exit t)
+        ("8" dotemacs/helm-action-8 :exit t)
+        ("9" dotemacs/helm-action-9 :exit t)
+        ("0" dotemacs/helm-action-10 :exit t)
         ("<tab>" helm-select-action :exit t)
         ("TAB" helm-select-action :exit t)
         ("<RET>" helm-maybe-exit-minibuffer :exit t)
-        ;; ("?" nil :doc (spacemacs//helm-navigation-ms-full-doc))
         ("a" dotemacs/helm-transient-state-select-action)
         ("e" dotemacs/helm-edit)
         ("g" helm-beginning-of-buffer)
@@ -837,7 +628,7 @@ ARG non nil means that the editing style is `vim'."
   :ensure t
   :defer t
   :init
-  (with-eval-after-load 'helm
+  (progn
     (setq helm-swoop-split-with-multiple-windows t
           helm-swoop-use-line-number-face t
           helm-swoop-split-direction 'split-window-vertically
@@ -865,33 +656,12 @@ ARG non nil means that the editing style is `vim'."
     (defadvice helm-swoop (before add-evil-jump activate)
       (evil-set-jump))))
 
-(use-package helm-misc                  ; Misc helm commands
-  :ensure helm
-  :bind (([remap switch-to-buffer] . helm-mini)))
-
 (use-package helm-themes
   :ensure t
   :defer t
   :init
   (dotemacs-set-leader-keys
     "Th" 'helm-themes))
-
-(use-package helm-command               ; M-x in Helm
-  :ensure helm
-  :bind (([remap execute-extended-command] . helm-M-x)))
-
-(use-package helm-eval                  ; Evaluate expressions with Helm
-  :ensure helm)
-
-(use-package helm-color                 ; Input colors with Helm
-  :ensure helm)
-
-(use-package helm-imenu
-  :ensure helm)
-
-(use-package helm-unicode               ; Unicode input with Helm
-  :ensure t
-  :bind ("C-c h 8" . helm-unicode))
 
 (use-package helm-mode-manager
   :ensure t
@@ -901,21 +671,6 @@ ARG non nil means that the editing style is `vim'."
     "hM"    'helm-switch-major-mode
     ;; "hm"    'helm-disable-minor-mode
     "h C-m" 'helm-enable-minor-mode))
-
-(use-package helm-files
-  :ensure helm
-  :defer t
-  :bind (([remap find-file] . helm-find-files))
-  :config (setq helm-recentf-fuzzy-match t
-                ;; Use recentf to find recent files
-                helm-ff-file-name-history-use-recentf t
-                ;; Find library from `require', `declare-function' and friends
-                helm-ff-search-library-in-sexp t))
-
-(use-package helm-ring                  ; Helm commands for rings
-  :ensure helm
-  :bind (([remap yank-pop]        . helm-show-kill-ring)
-         ([remap insert-register] . helm-register)))
 
 (provide 'module-helm)
 ;;; module-helm.el ends here

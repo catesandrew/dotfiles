@@ -8,7 +8,7 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -19,9 +19,7 @@
 
 (use-package sx                         ; StackExchange client for Emacs
   :ensure t
-  :bind (("C-c w s" . sx-tab-frontpage)
-         ("C-c w S" . sx-tab-newest)
-         ("C-c w a" . sx-ask)))
+  :defer t)
 
 (use-package sx-compose
   :ensure sx
@@ -50,11 +48,7 @@
   :config (setq sx-question-mode-display-buffer-function #'switch-to-buffer))
 
 (use-package find-func                  ; Find function/variable definitions
-  :bind (("C-x F"   . find-function)
-         ("C-x 4 F" . find-function-other-window)
-         ("C-x K"   . find-function-on-key)
-         ("C-x V"   . find-variable)
-         ("C-x 4 V" . find-variable-other-window)))
+  :defer t)
 
 (use-package info                       ; Info manual viewer
   :defer t
@@ -66,12 +60,11 @@
 
 (use-package helm-info                  ; Helm tools for Info
   :ensure helm
-  :bind (("C-c h e" . helm-info-emacs)
-         ("C-c h i" . helm-info-at-point)))
+  :defer t)
 
 (use-package helm-man                   ; Browse manpages with Heml
   :ensure helm
-  :bind (("C-c h m" . helm-man-woman)))
+  :defer t)
 
 (use-package helm-descbinds
   :ensure t

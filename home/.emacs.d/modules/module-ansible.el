@@ -30,9 +30,7 @@
 
 (defun ansible/ansible-doc-maybe-enable ()
   (when (ansible/ansible-should-enable?)
-    (ansible-doc-mode 1)
-    (dotemacs-set-leader-keys-for-major-mode 'yaml-mode
-      "a?" 'ansible-doc)))
+    (ansible-doc-mode 1)))
 
 (use-package ansible
   ;; Tracking here:
