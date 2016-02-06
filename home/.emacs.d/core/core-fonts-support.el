@@ -34,7 +34,7 @@ PLIST has the form (\"fontname\" :prop1 val1 :prop2 val2 ...)"
     (dotemacs-buffer/message "Setting font \"%s\"..." font)
     (set-default-font fontspec nil t)
     (setq-default powerline-scale scale)
-    (setq-default powerline-height (dotemacs-compute-powerline-height))
+    (setq-default powerline-height (dotemacs/compute-powerline-height))
     ;; fallback font for unicode characters used in emacs
     (pcase system-type
       (`gnu/linux
@@ -79,23 +79,21 @@ PLIST has the form (\"fontname\" :prop1 val1 :prop2 val2 ...)"
                           '(#x2190 . #x2200) fallback-spec2 nil 'prepend)))
     ))
 
-(defun dotemacs-compute-powerline-height ()
+(defun dotemacs/compute-powerline-height ()
   "Return an adjusted powerline height."
   (let ((scale (if (and (boundp 'powerline-scale) powerline-scale)
                    powerline-scale 1)))
     (truncate (* scale (frame-char-height)))))
 
-(defmacro dotemacs-symbol-value (symbol)
-  "Return the value of SYMBOL corresponding to a dotemacs variable.
-If SYMBOL value is `display-graphic-p' then return the result of
- `(display-graphic-p)', otherwise return the value of the symbol."
-  `(if (eq 'display-graphic-p ,symbol) (display-graphic-p) ,symbol))
-
-(defmacro dotemacs-diminish (mode unicode &optional ascii)
+(defmacro dotemacs-diminish (mode &optional unicode ascii)
   "Diminish MODE name in mode line to UNICODE or ASCII depending on the value
 `dotemacs-mode-line-unicode-symbols'.
-If ASCII is not provided then UNICODE is used instead."
-  `(add-to-list 'dotemacs--diminished-minor-modes '(,mode ,unicode ,ascii)))
+If ASCII is not provided then UNICODE is used instead. If neither are provided,
+the mode will not show in the mode line."
+  `(let ((cell (assq ',mode dotemacs--diminished-minor-modes)))
+     (if cell
+         (setcdr cell '(,unicode ,ascii))
+       (push '(,mode ,unicode ,ascii) dotemacs--diminished-minor-modes))))
 
 (defmacro dotemacs-hide-lighter (mode)
   "Diminish MODE name in mode line to LIGHTER."

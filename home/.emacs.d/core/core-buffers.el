@@ -37,10 +37,14 @@ Possible values are: `recents' `bookmarks' `projects'.")
     (define-key map [backtab] 'widget-backward)
     (define-key map (kbd "RET") 'widget-button-press)
     (define-key map [down-mouse-1] 'widget-button-click)
+    (define-key map "q" 'quit-window)
     map)
   "Keymap for dotemacs buffer mode.")
 
-(define-derived-mode dotemacs-buffer-mode special-mode "Dotemacs buffer"
+(with-eval-after-load 'evil
+  (evil-make-overriding-map dotemacs-buffer-mode-map 'motion))
+
+(define-derived-mode dotemacs-buffer-mode fundamental-mode "Dotemacs buffer"
   "Dotemacs major mode for startup screen.
 
 \\<dotemacs-buffer-mode-map>
@@ -48,7 +52,8 @@ Possible values are: `recents' `bookmarks' `projects'.")
   :group 'dotemacs
   :syntax-table nil
   :abbrev-table nil
-  (setq truncate-lines t)
+  (setq buffer-read-only t
+        truncate-lines t)
   (page-break-lines-mode)
   ;; needed to make tab work correctly in terminal
   (evil-define-key 'motion dotemacs-buffer-mode-map

@@ -8,10 +8,11 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-transient-state)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -79,14 +80,14 @@ Otherwise insert the date as Mar 04, 2014."
   :ensure t
   :defer t
   :init
-  (dotemacs-define-micro-state move-text
-    :doc "[J] move down [K] move up"
-    :use-minibuffer t
-    :execute-binding-on-enter t
-    :evil-leader "xJ" "xK"
+  (dotemacs-define-transient-state move-text
+    :title "Move Text Transient State"
     :bindings
-    ("J" move-text-down)
-    ("K" move-text-up)))
+    ("J" move-text-down "move down")
+    ("K" move-text-up "move up"))
+  (dotemacs-set-leader-keys
+   "xJ" 'dotemacs/move-text-transient-state/move-text-down
+   "xK" 'dotemacs/move-text-transient-state/move-text-up))
 
 (use-package delsel                     ; Delete the selection instead of insert
   :defer t

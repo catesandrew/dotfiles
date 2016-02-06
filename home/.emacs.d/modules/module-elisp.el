@@ -8,7 +8,9 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
+(require 'core-transient-state)
+(require 'core-auto-completion)
 ;; (require 'core-display-init)
 (require 'module-vars)
 (require 'module-common)
@@ -227,17 +229,18 @@
   :init
   (progn
     (evil-define-key 'normal macrostep-keymap "q" 'macrostep-collapse-all)
-    (dotemacs-define-micro-state macrostep
-      :doc "[e] expand [c] collapse [n/N] next/previous [q] quit"
-      :disable-evil-leader t
-      :persistent t
-      :evil-leader-for-mode (emacs-lisp-mode . "dm")
+    (dotemacs-define-transient-state macrostep
+      :title "MacroStep Transient State"
+      :doc "\n[_e_] expand [_c_] collapse [_n_/_N_] next/previous [_q_] quit"
+      :foreign-keys run
       :bindings
       ("e" macrostep-expand)
       ("c" macrostep-collapse)
       ("n" macrostep-next-macro)
       ("N" macrostep-prev-macro)
-      ("q" macrostep-collapse-all :exit t))))
+      ("q" macrostep-collapse-all :exit t))
+    (dotemacs-set-leader-keys-for-major-mode 'emacs-lisp-mode
+      "dm" 'dotemacs/macrostep-transient-state/body)))
 
 (use-package ielm                       ; Emacs Lisp REPL
   :config

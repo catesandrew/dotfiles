@@ -29,7 +29,7 @@ The variable name format is company-backends-MODE."
 MODE must match the symbol passed in `dotemacs-defvar-company-backends'.
 The initialization function is hooked to `MODE-hook'."
   (let ((mode-hook (intern (format "%S-hook" mode)))
-        (func (intern (format "dotemacs-init-company-%S" mode)))
+        (func (intern (format "dotemacs//init-company-%S" mode)))
         (backend-list (intern (format "company-backends-%S" mode))))
     `(when (eq dotemacs-completion-engine 'company)
        (defun ,func ()
@@ -49,7 +49,7 @@ The initialization function is hooked to `MODE-hook'."
 MODE parameter must match the parameter used in the call to
 `dotemacs-add-company-hook'."
   (let ((mode-hook (intern (format "%S-hook" mode)))
-        (func (intern (format "spacemacs-init-company-%S" mode))))
+        (func (intern (format "dotemacs//init-company-%S" mode))))
     `(progn
        (remove-hook ',mode-hook ',func)
        (remove-hook ',mode-hook 'company-mode))))
@@ -67,7 +67,7 @@ MODE parameter must match the parameter used in the call to
   "Enable auto-complete for the given MODE.
 The initialization function is hooked to `MODE-hook'."
   (let ((mode-hook (intern (format "%S-hook" mode)))
-        (func (intern (format "spacemacs-init-auto-complete-%S" mode))))
+        (func (intern (format "dotemacs//init-auto-complete-%S" mode))))
     `(when (eq dotemacs-completion-engine 'auto-complete)
        (defun ,func ()
          ,(format "Initialize auto-complete for %S" mode)

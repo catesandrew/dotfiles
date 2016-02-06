@@ -27,13 +27,13 @@
   "Major mode leader key is a shortcut key which is the equivalent of
 pressing `<leader> m`. Set it to `nil` to disable it.")
 
-(defvar dotemacs-major-mode-emacs-leader-key nil
+(defvar dotemacs-major-mode-emacs-leader-key "C-M-m"
   "Major mode leader key accessible in `emacs state' and `insert state'")
 
 (defvar dotemacs-command-key ":"
-  "The key used for Evil commands (ex-commands) and Emacs commands (M-x).
-By default the command key is `:' so ex-commands are executed like in Vim
-with `:' and Emacs commands are executed with `<leader> :'.")
+  "The key used for Emacs commands (M-x) (after pressing on the leader key).")
+(defvaralias 'dotemacs-emacs-command-key 'dotemacs-command-key
+  "New official name for `dotemacs-command-key'")
 
 (defvar dotemacs-remap-Y-to-y$ t
   "If non nil `Y' is remapped to `y$'.")
@@ -135,6 +135,35 @@ with 2 themes variants, one dark and one light.")
                                 :powerline-scale 1.0)
   "Default font. `powerline-scale' allows to quickly tweak the mode-line
 size to make separators look not too crappy.")
+
+(defvar dotemacs-distinguish-gui-tab nil
+  "If non nil, distinguish C-i and tab in the GUI version of Emacs.")
+
+(defvar dotemacs-scratch-mode 'text-mode
+  "Default major mode of the scratch buffer.")
+
+(defvar dotemacs-show-transient-state-title t
+  "If non nil show the titles of transient states.")
+
+(defvar dotemacs-show-transient-state-color-guide t
+  "If non nil show the color guide hint for transient state keys.")
+
+(defvar dotemacs-enable-paste-transient-state t
+  "If non nil the paste transient-state is enabled. While enabled pressing `p`
+several times cycle between the kill ring content.'")
+
+(defvar dotemacs-default-package-repository 'melpa-stable
+  "The default package repository used if no explicit repository has been
+specified with an installed package.
+NOT USED FOR NOW :-)")
+
+(defvar dotemacs-elpa-https t
+  "If non nil ELPA repositories are contacted via HTTPS whenever it's
+possible. Set it to nil if you have no way to use HTTPS in your
+environment, otherwise it is strongly recommended to let it set to t.")
+
+(defvar dotemacs-elpa-timeout 5
+  "Maximum allowed time in seconds to contact an ELPA repository.")
 
 (provide 'core-vars)
 ;;; core-vars.el ends here

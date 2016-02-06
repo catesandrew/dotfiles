@@ -8,9 +8,11 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 (require 'core-display-init)
 (require 'core-auto-completion)
+(require 'core-transient-state)
+(require 'core-use-package-ext)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -25,8 +27,7 @@
 ;; TODO: uncomment this when it becomes available
 ;; (dotemacs-defvar-company-backends haml-mode)
 
-;; Thanks to [[https://github.com/skeeto/impatient-mode][impatient-mode]] you
-;; can see the effect of your HTML as you type it.
+;; Thanks to `impatient-mode` you can see the effect of your HTML as you type it.
 (use-package impatient-mode
   :ensure t
   :defer t
@@ -164,44 +165,42 @@
   ;;   (defvar dotemacs--web-mode-ms-doc-toggle 0
   ;;     "Display a short doc when nil, full doc otherwise.")
 
-  ;;   (defun dotemacs-web-mode-ms-doc ()
-  ;;     (if (equal 0 dotemacs--web-mode-ms-doc-toggle)
-  ;;         "[?] for help"
-  ;;       "
-  ;; [?] display this help
-  ;; [k] previous [j] next   [K] previous sibling [J] next sibling
-  ;; [h] parent   [l] child  [c] clone [d] delete [D] kill [r] rename
-  ;; [w] wrap     [p] xpath
-  ;; [q] quit"))
+  ;;     (defun dotemacs-web-mode-ms-doc ()
+  ;;       (if (equal 0 dotemacs--web-mode-ms-doc-toggle)
+  ;;           "[_?_] for help"
+  ;;         "
+  ;; [_?_] display this help
+  ;; [_k_] previous [_j_] next   [_K_] previous sibling [_J_] next sibling
+  ;; [_h_] parent   [_l_] child  [_c_] clone [_d_] delete [_D_] kill [_r_] rename
+  ;; [_w_] wrap     [_p_] xpath
+  ;; [_q_] quit"))
 
   ;;   (defun dotemacs-web-mode-ms-toggle-doc ()
   ;;     (interactive)
   ;;     (setq dotemacs--web-mode-ms-doc-toggle
   ;;           (logxor dotemacs--web-mode-ms-doc-toggle 1)))
 
-    (dotemacs-define-micro-state web-mode
+    (dotemacs-define-transient-state web-mode
       :title "Web-mode Transient State"
       :columns 4
       :foreign-keys run
       :bindings
-      ("?" dotemacs-web-mode-ms-toggle-doc)
-      ("c" web-mode-element-clone)
-      ("d" web-mode-element-vanish)
-      ("D" web-mode-element-kill)
-      ("j" web-mode-element-next)
-      ("J" web-mode-element-sibling-next)
+      ("j" web-mode-element-next "next")
+      ("J" web-mode-element-sibling-next "next sibling")
       ("gj" web-mode-element-sibling-next)
-      ("k" web-mode-element-previous)
-      ("K" web-mode-element-sibling-previous)
+      ("k" web-mode-element-previous "previous")
+      ("K" web-mode-element-sibling-previous "previous sibling")
       ("gk" web-mode-element-sibling-previous)
-      ("h" web-mode-element-parent)
-      ("l" web-mode-element-child)
-      ("p" web-mode-dom-xpath)
-      ("r" web-mode-element-rename :exit t)
-      ("q" nil :exit t)
-      ("w" web-mode-element-wrap)
-      ("<escape>" nil :exit t))
-
+      ("h" web-mode-element-parent "parent")
+      ("l" web-mode-element-child "child")
+      ("c" web-mode-element-clone "clone")
+      ("d" web-mode-element-vanish "delete")
+      ("D" web-mode-element-kill "kill")
+      ("r" web-mode-element-rename "rename" :exit t)
+      ("w" web-mode-element-wrap "wrap")
+      ("p" web-mode-dom-xpath "xpath")
+      ("q" nil "quit" :exit t)
+      ("<escape>" nil nil :exit t))
     (dotemacs-set-leader-keys-for-major-mode 'web-mode
       "." 'dotemacs/web-mode-transient-state/body)
 

@@ -6,6 +6,9 @@
 
 ;;; Commentary:
 
+(require 'core-vars)
+(require 'core-keybindings)
+(require 'core-transient-state)
 (require 'module-vars)
 ;; (require 'module-common)
 (require 'evil)
@@ -53,75 +56,6 @@ acting as default. The values are either integers, symbols
 or lists of these.")
 
 ;; functions
-
-(defun dotemacs-state-color-face (state)
-  "Return the symbol of the face for the given STATE."
-  (intern (format "dotemacs-%s-face" (symbol-name state))))
-
-(defun dotemacs-state-color (state)
-  "Return the color string associated to STATE."
-  (face-background (dotemacs-state-color-face state)))
-
-(defun dotemacs-current-state-color ()
-  "Return the color string associated to the current state."
-  (face-background (dotemacs-state-color-face evil-state)))
-
-(defun dotemacs-state-face (state)
-  "Return the face associated to the STATE."
-  (dotemacs-state-color-face state))
-
-(defun dotemacs-current-state-face ()
-  "Return the face associated to the current state."
-  (let ((state (if (eq evil-state 'operator)
-                   evil-previous-state
-                 evil-state)))
-    (dotemacs-state-color-face state)))
-
-(defun evil-insert-state-cursor-hide ()
-  (setq evil-insert-state-cursor '((hbar . 0))))
-
-(defun dotemacs-evil-smart-doc-lookup ()
-  "Version of `evil-lookup' that attempts to use
-  the mode specific goto-definition binding,
-  i.e. `<leader> m h h`, to lookup the source of the definition,
-  while falling back to `evil-lookup'"
-  (interactive)
-  (condition-case nil
-      (execute-kbd-macro (kbd (concat dotemacs-leader-key " mhh")))
-    (error (evil-lookup))))
-
-(defun dotemacs-evil-smart-goto-definition ()
-  "Version of `evil-goto-definition' that attempts to use
-  the mode specific goto-definition binding,
-  i.e. `<leader> m g g`, to lookup the source of the definition,
-  while falling back to `evil-goto-definition'"
-  (interactive)
-  (condition-case nil
-      (execute-kbd-macro (kbd (concat dotemacs-leader-key " mgg")))
-    (error (evil-goto-definition))))
-
-;; scrolling micro state
-(defun dotemacs-scroll-half-page-up ()
-  "Scroll half a page up while keeping cursor in middle of page."
-  (interactive)
-  (evil-window-top)
-  (let ((recenter-redisplay nil))
-    (recenter nil)))
-
-(defun dotemacs-scroll-half-page-down ()
-  "Scroll half a page down while keeping cursor in middle of page."
-  (interactive)
-  (evil-window-bottom)
-  ;; required to make repeated presses idempotent
-  (evil-next-visual-line)
-  (let ((recenter-redisplay nil))
-    (recenter nil)))
-
-(defun dotemacs-paste-ms-doc ()
-  "The documentation for the paste micro-state."
-  (format (concat "[%s/%s] Type [p] or [P] to paste the previous or "
-                  "next copied text, [.] to paste the same text")
-          (length kill-ring-yank-pointer) (length kill-ring)))
 
 ;; taken from Prelude: https://github.com/bbatsov/prelude
 (defmacro dotemacs-advise-commands (advice-name commands class &rest body)
@@ -211,20 +145,46 @@ current major mode."
                        (list (when dotemacs-colorize-cursor-according-to-state color)
                              cursor))))
 
-    ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
-    (setq evil-want-fine-undo t)
-
     ;; put back refresh of the cursor on post-command-hook see status of:
     ;; https://bitbucket.org/lyro/evil/issue/502/cursor-is-not-refreshed-in-some-cases
     ;; (add-hook 'post-command-hook 'evil-refresh-cursor)
 
-    ; Don't move back the cursor one position when exiting insert mode
+    (defun dotemacs/state-color-face (state)
+      "Return the symbol of the face for the given STATE."
+      (intern (format "dotemacs-%s-face" (symbol-name state))))
+
+    (defun dotemacs/state-color (state)
+      "Return the color string associated to STATE."
+      (face-background (dotemacs/state-color-face state)))
+
+    (defun dotemacs/current-state-color ()
+      "Return the color string associated to the current state."
+      (face-background (dotemacs/state-color-face evil-state)))
+
+    (defun dotemacs/state-face (state)
+      "Return the face associated to the STATE."
+      (dotemacs/state-color-face state))
+
+    (defun dotemacs/current-state-face ()
+      "Return the face associated to the current state."
+      (let ((state (if (eq evil-state 'operator)
+                       evil-previous-state
+                     evil-state)))
+        (dotemacs/state-color-face state)))
+
+    (defun evil-insert-state-cursor-hide ()
+      (setq evil-insert-state-cursor '((hbar . 0))))
+
+    ;; https://bitbucket.org/lyro/evil/issues/444/evils-undo-granularity-is-too-coarse
+    (setq evil-want-fine-undo t)
+
+    ;; Don't move back the cursor one position when exiting insert mode
     (setq evil-move-cursor-back nil)
     ;; prevent certain movement commands from breaking at the end of the lines
     ;; (setq evil-move-beyond-eol t)
 
-    ; (setq evil-search-module 'evil-search)
-    ; (setq evil-magic 'very-magic)
+    ;; (setq evil-search-module 'evil-search)
+    ;; (setq evil-magic 'very-magic)
 
     (evil-mode 1))
   :config
@@ -298,58 +258,73 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (evil-map visual "<" "<gv")
     (evil-map visual ">" ">gv")
 
-    (define-key evil-normal-state-map (kbd "K") 'dotemacs-evil-smart-doc-lookup)
+    (defun dotemacs/evil-smart-doc-lookup ()
+      "Version of `evil-lookup' that attempts to use
+        the mode specific goto-definition binding,
+        i.e. `SPC m h h`, to lookup the source of the definition,
+        while falling back to `evil-lookup'"
+      (interactive)
+      (condition-case nil
+          (execute-kbd-macro (kbd (concat dotemacs-leader-key " mhh")))
+        (error (evil-lookup))))
+    (define-key evil-normal-state-map (kbd "K") 'dotemacs/evil-smart-doc-lookup)
 
+    (defun dotemacs/evil-smart-goto-definition ()
+      "Version of `evil-goto-definition' that attempts to use
+        the mode specific goto-definition binding,
+        i.e. `SPC m g g`, to lookup the source of the definition,
+        while falling back to `evil-goto-definition'"
+      (interactive)
+      (condition-case nil
+          (execute-kbd-macro (kbd (concat dotemacs-leader-key " mgg")))
+        (error (evil-goto-definition))))
     (define-key evil-normal-state-map
-      (kbd "gd") 'dotemacs-evil-smart-goto-definition)
+      (kbd "gd") 'dotemacs/evil-smart-goto-definition)
 
-    (dotemacs-define-micro-state scroll
-      :doc "[,] page up [.] page down [<] half page up [>] half page down"
-      :execute-binding-on-enter t
-      :evil-leader "n." "n," "n<" "n>"
+    (defun dotemacs/scroll-half-page-up ()
+      "Scroll half a page up while keeping cursor in middle of page."
+      (interactive)
+      (evil-window-top)
+      (let ((recenter-redisplay nil))
+        (recenter nil)))
+    (defun dotemacs/scroll-half-page-down ()
+      "Scroll half a page down while keeping cursor in middle of page."
+      (interactive)
+      (evil-window-bottom)
+      ;; required to make repeated presses idempotent
+      (evil-next-visual-line)
+      (let ((recenter-redisplay nil))
+        (recenter nil)))
+
+    (dotemacs-define-transient-state scroll
+      :title "Scrolling Transient State"
       :bindings
-      ;; page
-      ("," evil-scroll-page-up)
-      ("." evil-scroll-page-down)
+      ("," evil-scroll-page-up "page up")
+      ("." evil-scroll-page-down "page down")
       ;; half page
-      ("<" dotemacs-scroll-half-page-up)
-      (">" dotemacs-scroll-half-page-down))
+      ("<" dotemacs/scroll-half-page-up "half page up")
+      (">" dotemacs/scroll-half-page-down "half page down"))
 
-    ; support for auto-indentation inhibition on universal argument
-    (dotemacs-advise-commands
-     "handle-indent" (evil-paste-before evil-paste-after) around
-     "Handle the universal prefix argument for auto-indentation."
-     (let ((prefix (ad-get-arg 0)))
-       (ad-set-arg 0 (unless (equal '(4) prefix) prefix))
-       ad-do-it
-       (ad-set-arg 0 prefix)))
+    (dotemacs-set-leader-keys
+     "n," 'dotemacs/scroll-transient-state/evil-scroll-page-up
+     "n." 'dotemacs/scroll-transient-state/evil-scroll-page-down
+     "n<" 'dotemacs/scroll-transient-state/dotemacs/scroll-half-page-up
+     "n>" 'dotemacs/scroll-transient-state/dotemacs/scroll-half-page-down)
 
-    ; pasting micro-state
-    (dotemacs-advise-commands
-     "paste-micro-state"
-     (evil-paste-before evil-paste-after evil-visual-paste) after
-     "Initate the paste micro-state."
-     (unless (or (evil-ex-p)
-                 (eq 'evil-paste-from-register this-command))
-       (dotemacs-paste-micro-state)))
-
-    (dotemacs-define-micro-state paste
-      :doc (dotemacs-paste-ms-doc)
-      :use-minibuffer t
-      :bindings
-      ("p" evil-paste-pop)
-      ("P" evil-paste-pop-next))
-
-    (unless dotemacs-enable-paste-micro-state
-      (ad-disable-advice 'evil-paste-before 'after
-                         'evil-paste-before-paste-micro-state)
-      (ad-activate 'evil-paste-before)
-      (ad-disable-advice 'evil-paste-after 'after
-                         'evil-paste-after-paste-micro-state)
-      (ad-activate 'evil-paste-after)
-      (ad-disable-advice 'evil-visual-paste 'after
-                         'evil-visual-paste-paste-micro-state)
-      (ad-activate 'evil-visual-paste))
+    ;; pasting transient-state
+    (dotemacs-define-transient-state paste
+      :title "Pasting Transient State"
+      :doc "\n[%s(length kill-ring-yank-pointer)/%s(length kill-ring)] \
+[_J_/_K_] cycles through yanked text, [_p_/_P_] pastes the same text above or \
+below. Anything else exits."
+        :bindings
+        ("J" evil-paste-pop)
+        ("K" evil-paste-pop-next)
+        ("p" evil-paste-after)
+        ("P" evil-paste-before))
+      (when dotemacs-enable-paste-transient-state
+        (define-key evil-normal-state-map "p" 'dotemacs/paste-transient-state/evil-paste-after)
+        (define-key evil-normal-state-map "P" 'dotemacs/paste-transient-state/evil-paste-before))
 
     ;; define text objects
     (defmacro dotemacs-define-text-object (key name start end)

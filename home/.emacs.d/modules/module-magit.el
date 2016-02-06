@@ -6,14 +6,17 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+
+(require 'evil-evilified-state)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'core-micro-state)
+(require 'core-keybindings)
+(require 'core-transient-state)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
-;; (require 'module-utils)
+(require 'module-utils)
 
 ;;; Code:
 
@@ -48,44 +51,27 @@
     ;; Remove trailing slashes from project directories, because Magit adds
     ;; trailing slashes again, which breaks the presentation in the Magit
     ;; prompt.
-    (setq magit-repo-dirs (mapcar #'directory-file-name project-dirs))))
-
-(defun dotemacs-magit-diff-head ()
-  "Execute `magit-diff' against current HEAD."
-  (interactive)
-  (magit-diff "HEAD"))
-
-;; whitespace
-(defun magit-toggle-whitespace ()
-  (interactive)
-  (if (member "-w" (if (derived-mode-p 'magit-diff-mode)
-                       magit-refresh-args
-                     magit-diff-section-arguments))
-      (magit-dont-ignore-whitespace)
-    (magit-ignore-whitespace)))
-
-(defun magit-ignore-whitespace ()
-  (interactive)
-  (add-to-list (if (derived-mode-p 'magit-diff-mode)
-                   'magit-refresh-args 'magit-diff-section-arguments) "-w")
-  (magit-refresh))
-
-(defun magit-dont-ignore-whitespace ()
-  (interactive)
-  (setq magit-diff-options
-        (remove "-w"
-                (if (derived-mode-p 'magit-diff-mode)
-                    magit-refresh-args
-                  magit-diff-section-arguments))) (magit-refresh))
+    (setq magit-repo-dirs (mapcar 'directory-file-name project-dirs))))
 
 (use-package magit                      ; The one and only Git frontend
   :ensure t
-  :commands (magit-status
-             magit-blame-mode
-             magit-log
-             magit-commit)
+  :commands (magit-blame-mode
+             magit-cherry-pick-popup
+             magit-commit-popup
+             magit-diff-popup
+             magit-fetch-popup
+             magit-log-popup
+             magit-pull-popup
+             magit-push-popup
+             magit-rebase-popup
+             magit-status)
   :init
   (progn
+    (with-eval-after-load 'projectile
+      (add-hook 'projectile-after-switch-project-hook
+                'dotemacs-magit-set-repo-dirs-from-projectile)
+      (dotemacs-magit-set-repo-dirs-from-projectile))
+
     (setq magit-save-some-buffers 'dontask
           magit-stage-all-confirm nil
           magit-unstage-all-confirm nil
@@ -93,35 +79,48 @@
           magit-completing-read-function 'magit-builtin-completing-read
           ;; Except when you ask something useful…
           magit-set-upstream-on-push t)
-
-    (when (boundp 'fci-mode)
-      (add-hook 'git-commit-mode-hook #'fci-mode))
+    (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+    (add-hook 'git-commit-mode-hook 'fci-mode)
 
     ;; On Windows, we must use Git GUI to enter username and password
     ;; See: https://github.com/magit/magit/wiki/FAQ#windows-cannot-push-via-https
     (when (eq window-system 'w32)
       (setenv "GIT_ASKPASS" "git-gui--askpass"))
 
-    (with-eval-after-load 'projectile
-      (dotemacs-magit-set-repo-dirs-from-projectile))
+    (defun dotemacs-magit-diff-head ()
+      "Execute `magit-diff' against current HEAD."
+      (interactive)
+      (magit-diff "HEAD"))
 
-    (dotemacs-set-leader-keys
-      "gb" 'dotemacs-git-blame-micro-state
-      "gc" 'magit-commit
-      "gC" 'magit-checkout
-      "gdh" 'dotemacs-magit-diff-head
-      "gi" 'magit-init
-      "gl" 'magit-log-all
-      "gL" 'magit-log-buffer-file
-      "gs" 'magit-status)
+    (dotmacs-declare-prefix "gd" "diff")
+    (dotmacs-set-leader-keys
+     "gA" 'magit-cherry-pick-popup
+     "gb" 'dotemacs/git-blame-micro-state
+     "gc" 'magit-commit-popup
+     "gC" 'magit-checkout
+     "gd" 'magit-diff-popup
+     "gD" 'dotemacs/magit-diff-head
+     "ge" 'magit-ediff-compare
+     "gE" 'magit-ediff-show-working-tree
+     "gf" 'magit-fetch-popup
+     "gF" 'magit-pull-popup
+     "gi" 'magit-init
+     "gl" 'magit-log-popup
+     "gL" 'magit-log-buffer-file
+     "gr" 'magit-rebase-popup
+     "gP" 'magit-push-popup
+     "gs" 'magit-status
+     "gS" 'magit-stage-file
+     "gU" 'magit-unstage-file)
 
     (dotemacs-define-micro-state git-blame
-      :doc (concat "Press [b] again to blame further in the history, "
-                   "[q] to go up or quit.")
+      :title "Git Blame Transient State"
+      :doc "
+Press [_b_] again to blame further in the history, [_q_] to go up or quit."
       :on-enter (let (golden-ratio-mode)
                   (unless (bound-and-true-p magit-blame-mode)
                     (call-interactively 'magit-blame)))
-      :persistent t
+      :foreign-keys run
       :bindings
       ("b" magit-blame)
       ;; here we use the :exit keyword because we should exit the
@@ -134,10 +133,14 @@
   (progn
     ;; seems to be necessary at the time of release
     (require 'git-rebase)
-
+    ;; bind function keys
+    ;; (define-key magit-mode-map (kbd "<tab>") 'magit-section-toggle)
     (unless (boundp 'dotemacs-use-evil-magit)
-      ;; mode maps
-      (evilified-state-evilify-map magit-mode-map)
+      ;; use auto evilification if `evil-magit' is not used
+      (evilified-state-evilify-map magit-mode-map
+        :bindings
+        "gr" 'magit-refresh
+        "gR" 'magit-refresh-all)
       (evilified-state-evilify-map magit-status-mode-map
         :mode magit-status-mode
         :bindings
@@ -233,30 +236,94 @@
         "K" 'git-rebase-move-line-up
         "u" 'git-rebase-undo
         "y" 'git-rebase-insert)
-
       ;; default state for additional modes
       (dolist (mode '(magit-popup-mode
                       magit-popup-sequence-mode))
-        (add-to-list 'evil-emacs-state-modes mode))
-      (dotemacs-evilify-configure-default-state 'magit-revision-mode)
-      ;; section maps
-      (evilified-state-evilify-map magit-tag-section-map)
-      (evilified-state-evilify-map magit-untracked-section-map)
-      (evilified-state-evilify-map magit-branch-section-map)
-      (evilified-state-evilify-map magit-remote-section-map)
-      (evilified-state-evilify-map magit-file-section-map)
-      (evilified-state-evilify-map magit-hunk-section-map)
-      (evilified-state-evilify-map magit-unstaged-section-map)
-      (evilified-state-evilify-map magit-staged-section-map)
-      (evilified-state-evilify-map magit-commit-section-map)
-      (evilified-state-evilify-map magit-module-commit-section-map)
-      (evilified-state-evilify-map magit-unpulled-section-map)
-      (evilified-state-evilify-map magit-unpushed-section-map)
-      (evilified-state-evilify-map magit-stashes-section-map)
-      (evilified-state-evilify-map magit-stash-section-map))
-
-    (add-hook 'projectile-after-switch-project-hook
-      #'dotemacs-magit-set-repo-dirs-from-projectile)
+        (evil-set-initial-state mode 'emacs))
+      (let ((refresh-key "gr")
+            (refresh-all-key "gR")
+            (delete-key (nth 0 (where-is-internal 'magit-delete-thing
+                                                  magit-mode-map))))
+        (evilified-state--configure-default-state 'magit-revision-mode)
+        ;; section maps
+        (eval `(evilified-state-evilify-map magit-tag-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-tag-delete
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-untracked-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-branch-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-branch-delete
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-remote-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-remote-remove
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-file-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-hunk-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-unstaged-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-staged-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-commit-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-discard
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-stashes-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-stash-clear
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-stash-section-map
+                 :pre-bindings
+                 ,delete-key 'magit-stash-drop
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-module-commit-section-map
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-unpulled-section-map
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))
+        (eval `(evilified-state-evilify-map magit-unpushed-section-map
+                 :bindings
+                 ,refresh-key 'magit-refresh
+                 ,refresh-all-key 'magit-refresh-all))))
 
     ;; full screen magit-status
     (when dotemacs-git-magit-status-fullscreen
@@ -288,14 +355,39 @@
 
     (when dotemacs-major-mode-leader-key
       (add-hook 'with-editor-mode-hook 'evil-normalize-keymaps)
-      (evil-define-key 'normal with-editor-mode-map
-        (concat dotemacs-major-mode-leader-key "c") 'with-editor-finish
-        (concat dotemacs-major-mode-leader-key "a") 'with-editor-cancel)
-      (evil-define-key 'motion with-editor-mode-map
-        (concat dotemacs-major-mode-leader-key "c") 'with-editor-finish
-        (concat dotemacs-major-mode-leader-key "a") 'with-editor-cancel))
+      (let ((mm-key dotspacemacs-major-mode-leader-key))
+        (dolist (state '(normal motion))
+          (evil-define-key state with-editor-mode-map
+            (concat mm-key mm-key) 'with-editor-finish
+            (concat mm-key "a")    'with-editor-cancel
+            (concat mm-key "c")    'with-editor-finish
+            (concat mm-key "k")    'with-editor-cancel))))
 
-    (define-key magit-status-mode-map (kbd "C-S-w") 'magit-toggle-whitespace)))
+    ;; whitespace
+    (defun magit-toggle-whitespace ()
+      (interactive)
+      (if (member "-w" (if (derived-mode-p 'magit-diff-mode)
+                           magit-refresh-args
+                         magit-diff-section-arguments))
+          (magit-dont-ignore-whitespace)
+        (magit-ignore-whitespace)))
+
+    (defun magit-ignore-whitespace ()
+      (interactive)
+      (add-to-list (if (derived-mode-p 'magit-diff-mode)
+                       'magit-refresh-args 'magit-diff-section-arguments) "-w")
+      (magit-refresh))
+
+    (defun magit-dont-ignore-whitespace ()
+      (interactive)
+      (setq magit-diff-options
+            (remove "-w"
+                    (if (derived-mode-p 'magit-diff-mode)
+                        magit-refresh-args
+                      magit-diff-section-arguments))) (magit-refresh))
+
+    (define-key magit-status-mode-map (kbd "C-S-w")
+      'magit-toggle-whitespace)))
 
 (use-package evil-magit
   :defer t

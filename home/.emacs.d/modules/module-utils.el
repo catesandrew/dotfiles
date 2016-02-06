@@ -25,6 +25,13 @@
   (interactive)
   (switch-to-buffer "*dotemacs*"))
 
+(defun dotemacs-home-delete-other-windows ()
+  "Open home Dotemacs buffer and delete other windows.
+Useful for making the home buffer the only visible buffer in the frame."
+  (interactive)
+  (dotemacs-home)
+  (delete-other-windows))
+
 (defun dotemacs-alternate-buffer ()
   "Switch back and forth between current and last buffer in the current window."
   (interactive)
@@ -122,6 +129,41 @@ NOERROR and NOMESSAGE are passed to `load'."
 (defun current-line ()
   "Return the line at point as a string."
   (buffer-substring (line-beginning-position) (line-end-position)))
+
+(defmacro dotemacs|call-func (func &optional msg)
+  "Call the function from the dotfile only if it is bound.
+If MSG is not nil then display a message in `*Messages'. Errors
+are caught and signalled to user in spacemacs buffer."
+  `(progn
+     (when ,msg (dotemacs-buffer/message ,msg))
+     (when (fboundp ',func)
+       (condition-case-unless-debug err
+           (,func)
+         (error
+          (dotemacs-buffer/append (format "Error in %s: %s\n"
+                                          ',(symbol-name func)
+                                          (error-message-string err))
+                                  t))))))
+
+(defun dotemacs/get-variable-string-list ()
+  "Return a list of all the dotemacs variables as strings."
+  (all-completions "" obarray
+                   (lambda (x)
+                     (and (boundp x)
+                          (not (keywordp x))
+                          (string-prefix-p "dotemacs"
+                                           (symbol-name x))))))
+
+(defun dotemacs/get-variable-list ()
+  "Return a list of all dotemacs variable symbols."
+  (mapcar 'intern (dotemacs/get-variable-string-list)))
+
+(defun dotemacs//ido-completing-read (prompt candidates)
+  "Call `ido-completing-read' with a CANDIDATES alist where the key is
+a display strng and the value is the actual value to return."
+  (let ((ido-max-window-height (1+ (length candidates))))
+    (cadr (assoc (ido-completing-read prompt (mapcar 'car candidates))
+                 candidates))))
 
 
 ;;; Unused functions

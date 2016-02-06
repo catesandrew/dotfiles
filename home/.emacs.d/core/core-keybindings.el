@@ -10,22 +10,33 @@
 ;;
 ;;; License: GPLv3
 
-(require 'core-funcs)
-(unless (require 'which-key nil t)
-  (dotemacs-load-or-install-package 'which-key t))
-(unless (require 'bind-map nil t)
-  (dotemacs-load-or-install-package 'bind-map t))
+;;; Code:
 
-(defvar dotemacs-prefix-titles nil
-  "alist for mapping command prefixes to long names.")
+(require 'core-vars)
+(require 'core-funcs)
+
+(defvar dotemacs/prefix-titles nil
+  "A `alist` for mapping command prefixes to long names.")
 
 (defvar dotemacs-default-map (make-sparse-keymap)
   "Base keymap for all dotemacs leader key commands.")
 
+(defun dotemacs/translate-C-i (_)
+  "If `dotemacs-distinguish-gui-tab' is non nil, the raw key
+sequence does not include <tab> or <kp-tab>, and we are in the
+gui, translate to [C-i]. Otherwise, [9] (TAB)."
+  (interactive)
+  (if (and (not (cl-position 'tab (this-single-command-raw-keys)))
+           (not (cl-position 'kp-tab (this-single-command-raw-keys)))
+           dotemacs-distinguish-gui-tab
+           (display-graphic-p))
+      [C-i] [?\C-i]))
+(define-key key-translation-map [?\C-i] 'dotemacs/translate-C-i)
+
 (defun dotemacs-declare-prefix (prefix name &optional long-name)
   "Declare a prefix PREFIX. PREFIX is a string describing a key
 sequence. NAME is a string used as the prefix command.
-LONG-NAME if given is stored in `dotemacs-prefix-titles'."
+LONG-NAME if given is stored in `dotemacs/prefix-titles'."
   (let* ((command name)
         (full-prefix (concat dotemacs-leader-key " " prefix))
         (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix))
@@ -46,8 +57,11 @@ used as the prefix command."
          (full-prefix (concat dotemacs-leader-key " " prefix))
          (full-prefix-emacs (concat dotemacs-emacs-leader-key " " prefix))
          (is-major-mode-prefix (string-prefix-p "m" prefix))
-         (major-mode-prefix (concat dotemacs-major-mode-leader-key " " (substring prefix 1)))
-         (major-mode-prefix-emacs (concat dotemacs-major-mode-emacs-leader-key " " (substring prefix 1))))
+         (major-mode-prefix (concat dotemacs-major-mode-leader-key
+                                    " " (substring prefix 1)))
+         (major-mode-prefix-emacs
+          (concat dotemacs-major-mode-emacs-leader-key
+                  " " (substring prefix 1))))
     (unless long-name (setq long-name name))
     (let ((prefix-name (cons name long-name)))
       (which-key-declare-prefixes-for-mode mode
@@ -56,7 +70,8 @@ used as the prefix command."
       (when (and is-major-mode-prefix dotemacs-major-mode-leader-key)
         (which-key-declare-prefixes-for-mode mode major-mode-prefix prefix-name))
       (when (and is-major-mode-prefix dotemacs-major-mode-emacs-leader-key)
-        (which-key-declare-prefixes-for-mode mode major-mode-prefix-emacs prefix-name)))))
+        (which-key-declare-prefixes-for-mode
+          mode major-mode-prefix-emacs prefix-name)))))
 
 (defun dotemacs-set-leader-keys (key def &rest bindings)
   "Add KEY and DEF as key bindings under
@@ -81,22 +96,41 @@ pairs. For example,
 
 (defalias 'evil-leader/set-key 'dotemacs-set-leader-keys)
 
+(defun dotemacs//acceptable-leader-p (key)
+  "Return t if key is a string and non-empty."
+  (and (stringp key) (not (string= key ""))))
+
 (defun dotemacs//init-leader-mode-map (mode map &optional minor)
   "Check for MAP-prefix. If it doesn't exist yet, use `bind-map'
 to create it and bind it to `dotemacs-major-mode-leader-key'
 and `dotemacs-major-mode-emacs-leader-key'. If MODE is a
 minor-mode, the third argument should be non nil."
-  (let ((prefix (intern (format "%s-prefix" map))))
+  (let* ((prefix (intern (format "%s-prefix" map)))
+         (leader1 (when (dotemacs//acceptable-leader-p
+                         dotemacs-major-mode-leader-key)
+                    dotemacs-major-mode-leader-key))
+         (leader2 (when (dotemacs//acceptable-leader-p
+                         dotemacs-leader-key)
+                    (concat dotemacs-leader-key
+                            (unless minor " m"))))
+         (emacs-leader1 (when (dotemacs//acceptable-leader-p
+                               dotemacs-major-mode-emacs-leader-key)
+                          dotemacs-major-mode-emacs-leader-key))
+         (emacs-leader2 (when (dotemacs//acceptable-leader-p
+                               dotemacs-emacs-leader-key)
+                          (concat dotemacs-emacs-leader-key
+                                  (unless minor " m"))))
+         (leaders (delq nil (list leader1 leader2)))
+         (emacs-leaders (delq nil (list emacs-leader1 emacs-leader2))))
     (or (boundp prefix)
         (progn
           (eval
            `(bind-map ,map
               :prefix-cmd ,prefix
               ,(if minor :minor-modes :major-modes) (,mode)
-              :keys (,dotemacs-major-mode-emacs-leader-key
-                     ,(concat dotemacs-emacs-leader-key " m"))
-              :evil-keys (,dotemacs-major-mode-leader-key
-                          ,(concat dotemacs-leader-key " m"))))
+              :keys ,emacs-leaders
+              :evil-keys ,leaders
+              :evil-states (normal motion visual evilified)))
           (boundp prefix)))))
 
 (defun dotemacs-set-leader-keys-for-major-mode (mode key def &rest bindings)
@@ -113,7 +147,9 @@ they are in `dotemacs-set-leader-keys'."
         (setq key (pop bindings) def (pop bindings))))))
 (put 'dotemacs-set-leader-keys-for-major-mode 'lisp-indent-function 'defun)
 
-(defalias 'evil-leader/set-key-for-mode 'dotemacs-set-leader-keys-for-major-mode)
+(defalias
+  'evil-leader/set-key-for-mode
+  'dotemacs-set-leader-keys-for-major-mode)
 
 (defun dotemacs-set-leader-keys-for-minor-mode (mode key def &rest bindings)
   "Add KEY and DEF as key bindings under

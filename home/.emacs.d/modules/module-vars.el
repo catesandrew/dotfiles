@@ -13,9 +13,10 @@
 ;; Regexp for useful and useless buffers for smarter buffer switching
 (defvar dotemacs-useless-buffers-regexp '("*\.\+")
   "Regexp used to determine if a buffer is not useful.")
+
 (defvar dotemacs-useful-buffers-regexp '("\\*scratch\\*")
   "Regexp used to define buffers that are useful despite matching
-`spacemacs-useless-buffers-regexp'.")
+`emacs-useless-buffers-regexp'.")
 
 ;; from Prelude
 (defvar dotemacs-indent-sensitive-modes
@@ -113,9 +114,16 @@ to complet without blocking common line endings.")
 (defvar dotemacs-mode-line-unicode-symbols t
   "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
 
+(defvar dotemacs-fullscreen-at-startup nil
+  "If non nil the frame is fullscreen when Emacs starts up (Emacs 24.4+ only).")
+
 (defvar dotemacs-fullscreen-use-non-native nil
   "If non nil `dotemacs-toggle-fullscreen' will not use native fullscreen. Use
 to disable fullscreen animations in OSX.")
+
+(defvar dotemacs-maximized-at-startup nil
+  "If non nil the frame is maximized when Emacs starts up (Emacs 24.4+ only).
+Takes effect only if `dotemacs-fullscreen-at-startup' is nil.")
 
 (defvar dotemacs-auto-save-file-location 'cache
   "Location where to auto-save files. Possible values are `original' to
@@ -197,6 +205,13 @@ johan-tibell chris-done gibiansky. If nil hindent is disabled.")
 (defvar dotemacs//flycheck-executable-jscs nil)
 (defvar dotemacs//flycheck-executable-jshint nil)
 (defvar dotemacs//flycheck-executable-tidy5 nil)
+
+(defvar dotemacs-use-ido nil
+  "If non nil then `ido' replaces `helm' for some commands. For now only
+`find-files' (SPC f f) is replaced.")
+
+;; only for backward compatibility
+(defalias 'dotemacs-mode 'emacs-lisp-mode)
 
 (provide 'module-vars)
 ;;; module-vars.el ends here

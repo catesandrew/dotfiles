@@ -8,12 +8,13 @@
 ;;
 (require 'core-vars)
 ;; (require 'core-funcs)
+(require 'core-transient-state)
 ;; (require 'core-keybindings)
 ;; (require 'core-display-init)
 (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
-;; (require 'module-utils)
+(require 'module-utils)
 
 ;;; Code:
 
@@ -991,17 +992,15 @@ Ensure that helm is required before calling FUNC."
 ;; ---------------------------------------------------------------------------
 
 ;; Buffer micro state
-
-(dotemacs-define-micro-state buffer
-  :doc "[n]ext [p]revious [K]ill [q]uit"
-  :disable-evil-leader t
-  :evil-leader "b."
+(dotemacs-define-transient-state buffer
+  :title "Buffer Selection Transient State"
   :bindings
-  ("K" kill-this-buffer)
-  ("n" dotemacs-next-useful-buffer)
-  ("N" dotemacs-previous-useful-buffer)
-  ("p" dotemacs-previous-useful-buffer)
-  ("q" nil :exit t))
+  ("n" dotemacs-next-useful-buffer "next")
+  ("N" dotemacs-previous-useful-buffer "previous")
+  ("p" dotemacs-previous-useful-buffer "previous")
+  ("K" kill-this-buffer "kill")
+  ("q" nil "quit" :exit t))
+(dotemacs-set-leader-keys "b." 'dotemacs/buffer-transient-state/body)
 
 ;; end of Buffer micro state
 
@@ -1027,104 +1026,67 @@ Ensure that helm is required before calling FUNC."
   (interactive "p")
   (enlarge-window delta t))
 
-(defun dotemacs-window-manipulation-full-doc ()
-  "Full documentation for window manipulation micro-state."
+(dotemacs-define-transient-state window-manipulation
+  :title "Window Manipulation Transient State"
+  :doc
   "
-  [?]                       display this help
-  [0,9]                     go to numbered window
-  [-] [/] [s] [v] [S] [V]   split windows below|right and focus
-  [c] [C]                   close current|other windows
-  [g]                       toggle golden-ratio
-  [h] [j] [k] [l]           go to left|bottom|top|right
-  [H] [J] [K] [L]           move windows to far/very left|bottom|top|right
-  [[] []] [{] [}]           shrink/enlarge horizontally and vertically respectively
-  [o] [w]                   other frame|window
-  [R]                       rotate windows
-  [u] [U]                   restore previous|next window layout")
-
-(defun dotemacs-window-manipulation-move-doc ()
-  "Help string for moving between windows"
-  (concat "[h] [j] [k] [l] to move focus, "
-          "[H] [J] [K] [L] to move window, "
-          "[R]otate windows, other [f]rame, other [w]indow"))
-
-(defun dotemacs-window-manipulation-resize-doc ()
-  "Dynamic help string when resizing windows."
-  (format
-   (concat "[%sx%s] Resize window: [[] []] shrink/enlarge horizontally, "
-           "[{] [}] shrink/enlarge vertically.")
-   (window-total-width) (window-total-height)))
-
-(defun dotemacs-window-manipulation-split-doc ()
-  "Help string for moving between windows"
-  (concat "[-], [s] to split horizontally,  [/], [v] to split vertically, "
-          "[S], [V] to split and focus"))
-
-(defun dotemacs-window-manipulation-number-doc ()
-  "Help string for selecting window with number."
-  (format "(selected window #%s) press [0,9] to select the corresponding numbered window."
-          (window-numbering-get-number-string)))
-
-(defun dotemacs-window-manipulation-layout-doc ()
-  "Help string for layout manipulation"
-  (concat "[c]lose window, [C]lose other windows, "
-          "[u]ndo window layout, [U] redo window layout."))
-
-(defun dotemacs-window-manipulation-gratio-doc ()
-  "Help string for golden ratio"
-  (format "(golden-ration %s) toggle with [g]"
-          (if (symbol-value golden-ratio-mode) "enabled" "disabled")))
-
-(dotemacs-define-micro-state window-manipulation
-  :doc "[?] for help"
-  :evil-leader "w."
-  :use-minibuffer t
+Select^^^^               Move^^^^              Split^^                Resize^^                     Other^^
+------^^^^------------- -----^^^^------------ ------^^-------------- -------^^------------------- ------^^-------------------
+[_j_/_k_] down/up        [_J_/_K_] down/up     [_s_] vertical         [_[_] shrink horizontally    [_q_] quit
+[_h_/_l_] left/right     [_h_/_l_] left/right  [_S_] vert & follow    [_]_] enlarge horizontally   [_u_] restore prev layout
+[_0_-_9_] window N       [_R_]^^   rotate      [_v_] horizontal       [_{_] shrink vertically      [_U_] restore next layout
+[_w_]^^   other window   ^^^^                  [_V_] horiz & follow   [_}_] enlarge vertically     [_c_] close current
+[_o_]^^   other frame    ^^^^                  ^^                     ^^                           [_C_] close other
+^^^^                     ^^^^                  ^^                     ^^                           [_g_] golden-ratio %`golden-ratio-mode
+"
   :bindings
-  ("?" nil                                   :doc (dotemacs-window-manipulation-full-doc))
-  ("0" select-window-0                       :doc (dotemacs-window-manipulation-number-doc))
-  ("1" select-window-1                       :doc (dotemacs-window-manipulation-number-doc))
-  ("2" select-window-2                       :doc (dotemacs-window-manipulation-number-doc))
-  ("3" select-window-3                       :doc (dotemacs-window-manipulation-number-doc))
-  ("4" select-window-4                       :doc (dotemacs-window-manipulation-number-doc))
-  ("5" select-window-5                       :doc (dotemacs-window-manipulation-number-doc))
-  ("6" select-window-6                       :doc (dotemacs-window-manipulation-number-doc))
-  ("7" select-window-7                       :doc (dotemacs-window-manipulation-number-doc))
-  ("8" select-window-8                       :doc (dotemacs-window-manipulation-number-doc))
-  ("9" select-window-9                       :doc (dotemacs-window-manipulation-number-doc))
-  ("-" split-window-below-and-focus          :doc (dotemacs-window-manipulation-split-doc))
-  ("/" split-window-right-and-focus          :doc (dotemacs-window-manipulation-split-doc))
-  ("[" dotemacs-shrink-window-horizontally   :doc (dotemacs-window-manipulation-resize-doc))
-  ("]" dotemacs-enlarge-window-horizontally  :doc (dotemacs-window-manipulation-resize-doc))
-  ("{" dotemacs-shrink-window                :doc (dotemacs-window-manipulation-resize-doc))
-  ("}" dotemacs-enlarge-window               :doc (dotemacs-window-manipulation-resize-doc))
-  ("c" delete-window                         :doc (dotemacs-window-manipulation-layout-doc))
-  ("C" delete-other-windows                  :doc (dotemacs-window-manipulation-layout-doc))
-  ; ("g" dotemacs-toggle-golden-ratio          :doc (dotemacs-window-manipulation-gratio-doc))
-  ("h" evil-window-left                      :doc (dotemacs-window-manipulation-move-doc))
-  ("<left>" evil-window-left                 :doc (dotemacs-window-manipulation-move-doc))
-  ("j" evil-window-down                      :doc (dotemacs-window-manipulation-move-doc))
-  ("<down>" evil-window-down                 :doc (dotemacs-window-manipulation-move-doc))
-  ("k" evil-window-up                        :doc (dotemacs-window-manipulation-move-doc))
-  ("<up>" evil-window-up                     :doc (dotemacs-window-manipulation-move-doc))
-  ("l" evil-window-right                     :doc (dotemacs-window-manipulation-move-doc))
-  ("<right>" evil-window-right               :doc (dotemacs-window-manipulation-move-doc))
-  ("H" evil-window-move-far-left             :doc (dotemacs-window-manipulation-move-doc))
-  ("<S-left>" evil-window-move-far-left      :doc (dotemacs-window-manipulation-move-doc))
-  ("J" evil-window-move-very-bottom          :doc (dotemacs-window-manipulation-move-doc))
-  ("<S-down>" evil-window-move-very-bottom   :doc (dotemacs-window-manipulation-move-doc))
-  ("K" evil-window-move-very-top             :doc (dotemacs-window-manipulation-move-doc))
-  ("<S-up>" evil-window-move-very-top        :doc (dotemacs-window-manipulation-move-doc))
-  ("L" evil-window-move-far-right            :doc (dotemacs-window-manipulation-move-doc))
-  ("<S-right>" evil-window-move-far-right    :doc (dotemacs-window-manipulation-move-doc))
-  ("o" other-frame                           :doc (dotemacs-window-manipulation-move-doc))
-  ("R" dotemacs/rotate-windows               :doc (dotemacs-window-manipulation-move-doc))
-  ("s" split-window-below                    :doc (dotemacs-window-manipulation-split-doc))
-  ("S" split-window-below-and-focus          :doc (dotemacs-window-manipulation-split-doc))
-  ("u" winner-undo                           :doc (dotemacs-window-manipulation-layout-doc))
-  ("U" winner-redo                           :doc (dotemacs-window-manipulation-layout-doc))
-  ("v" split-window-right                    :doc (dotemacs-window-manipulation-split-doc))
-  ("V" split-window-right-and-focus          :doc (dotemacs-window-manipulation-split-doc))
-  ("w" other-window                          :doc (dotemacs-window-manipulation-move-doc)))
+  ("q" nil :exit t)
+  ("0" select-window-0)
+  ("1" select-window-1)
+  ("2" select-window-2)
+  ("3" select-window-3)
+  ("4" select-window-4)
+  ("5" select-window-5)
+  ("6" select-window-6)
+  ("7" select-window-7)
+  ("8" select-window-8)
+  ("9" select-window-9)
+  ("-" split-window-below-and-focus)
+  ("/" split-window-right-and-focus)
+  ("[" dotemacs-shrink-window-horizontally)
+  ("]" dotemacs-enlarge-window-horizontally)
+  ("{" dotemacs-shrink-window)
+  ("}" dotemacs-enlarge-window)
+  ("c" delete-window)
+  ("C" delete-other-windows)
+  ;; ("g" dotemacs-toggle-golden-ratio)
+  ("h" evil-window-left)
+  ("<left>" evil-window-left)
+  ("j" evil-window-down)
+  ("<down>" evil-window-down)
+  ("k" evil-window-up)
+  ("<up>" evil-window-up)
+  ("l" evil-window-right)
+  ("<right>" evil-window-right)
+  ("H" evil-window-move-far-left)
+  ("<S-left>" evil-window-move-far-left)
+  ("J" evil-window-move-very-bottom)
+  ("<S-down>" evil-window-move-very-bottom)
+  ("K" evil-window-move-very-top)
+  ("<S-up>" evil-window-move-very-top)
+  ("L" evil-window-move-far-right)
+  ("<S-right>" evil-window-move-far-right)
+  ("o" other-frame)
+  ("R" dotemacs/rotate-windows)
+  ("s" split-window-below)
+  ("S" split-window-below-and-focus)
+  ("u" winner-undo)
+  ("U" winner-redo)
+  ("v" split-window-right)
+  ("V" split-window-right-and-focus)
+  ("w" other-window))
+(dotemacs-set-leader-keys "w."
+  'dotemacs/window-manipulation-transient-state/body)
 
 ;; end of Window Manipulation Micro State
 
@@ -1156,15 +1118,16 @@ otherwise it is scaled down."
   (interactive)
   (dotemacs-scale-up-or-down-font-size 0))
 
-(dotemacs-define-micro-state scale-font
-  :doc "[+/=] scale up [-] scale down [0] reset font [q]uit"
-  :evil-leader "zx"
+(dotemacs-define-transient-state scale-font
+  :title "Font Scaling Transient State"
+  :doc "\n[_+_/_=_] scale up [_-_] scale down [_0_] reset font [_q_] quit"
   :bindings
   ("+" dotemacs-scale-up-font)
   ("=" dotemacs-scale-up-font)
   ("-" dotemacs-scale-down-font)
   ("0" dotemacs-reset-font-size)
   ("q" nil :exit t))
+(dotemacs-set-leader-keys "zx" 'dotemacs/scale-font-transient-state/body)
 
 ;; end of Text Manipulation Micro State
 
@@ -1196,7 +1159,8 @@ otherwise it is scaled down."
   (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
          (increased-alpha (- current-alpha 5)))
     (when (>= increased-alpha frame-alpha-lower-limit)
-      (set-frame-parameter (selected-frame) 'alpha (list increased-alpha increased-alpha)))))
+      (set-frame-parameter (selected-frame) 'alpha
+                           (list increased-alpha increased-alpha)))))
 
 (defun dotemacs-decrease-transparency ()
   "Decrease transparency of current frame."
@@ -1204,15 +1168,18 @@ otherwise it is scaled down."
   (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
          (decreased-alpha (+ current-alpha 5)))
     (when (<= decreased-alpha 100)
-      (set-frame-parameter (selected-frame) 'alpha (list decreased-alpha decreased-alpha)))))
+      (set-frame-parameter (selected-frame) 'alpha
+                           (list decreased-alpha decreased-alpha)))))
 
-(dotemacs-define-micro-state scale-transparency
-  :doc "[+] increase [-] decrease [T] toggle transparency [q] quit"
+(dotemacs-define-transient-state scale-transparency
+  :title "Frame Transparency Transient State"
   :bindings
-  ("+" dotemacs-increase-transparency)
-  ("-" dotemacs-decrease-transparency)
-  ("T" dotemacs-toggle-transparency)
-  ("q" nil :exit t))
+  ("+" dotemacs-increase-transparency "increase")
+  ("-" dotemacs-decrease-transparency "decrease")
+  ("T" dotemacs-toggle-transparency "toggle")
+  ("q" nil "quit" :exit t))
+(dotemacs-set-leader-keys "TT"
+  'dotemacs/scale-transparency-transient-state/dotemacs/toggle-transparency)
 
 (provide 'module-key-bindings)
 ;;; module-key-bindings.el ends here

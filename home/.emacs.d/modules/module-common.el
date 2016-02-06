@@ -74,6 +74,27 @@
   (dolist (fun funs)
     (add-hook hook fun)))
 
+(defun dotemacs-helm-project-smart-do-search-region-or-symbol ()
+  "Search in current project using `dotemacs-search-tools' with
+ default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+  (interactive)
+  (dotemacs-helm-project-smart-do-search t))
+
+(defun dotemacs-helm-files-smart-do-search-region-or-symbol ()
+  "Search in opened buffers using `dotemacs-search-tools'.
+with default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+  (interactive)
+  (dotemacs-helm-files-smart-do-search t))
+
+(defun dotemacs-helm-buffers-smart-do-search-region-or-symbol ()
+  "Search in opened buffers using `dotemacs-search-tools' with
+default input.
+Search for a search tool in the order provided by `dotemacs-search-tools'."
+  (interactive)
+  (dotemacs-helm-buffers-smart-do-search t))
+
 (defun dotemacs-eslint-set-local-eslint-from-projectile ()
   "Use local eslint CLI from `./node_modules` if available."
   (when-let (eslint (executable-find "eslint"))

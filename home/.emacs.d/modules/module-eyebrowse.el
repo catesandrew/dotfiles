@@ -7,13 +7,12 @@
 ;;; Commentary:
 ;;
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
+(require 'core-transient-state)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 (require 'module-utils)
-
-(declare-function dotemacs-home "module-utils")
 
 ;;; Code:
 
@@ -28,7 +27,7 @@
   :diminish eyebrowse-mode
   :init
   (progn
-    (setq eyebrowse-new-workspace #'dotemacs-home
+    (setq eyebrowse-new-workspace #'dotemacs-home-delete-other-windows
           eyebrowse-wrap-around t)
     (eyebrowse-mode)
 
@@ -58,46 +57,31 @@
                 (< (car it) (car other)))
               (eyebrowse--get 'window-configs)))
 
-    (defun dotemacs//workspaces-ms-documentation ()
-      "Return the docstring for the workspaces micro-state."
-      (let* ((current-slot (eyebrowse--get 'current-slot))
-             (window-configs (dotemacs//workspaces-ms-get-window-configs)))
-        (concat
-         "<" (if window-configs
-                 (concat
-                  (mapconcat 'dotemacs//workspaces-ms-get-slot-name
-                             window-configs "> <") ">")
-               (when eyebrowse-display-help
-                 (concat
-                  "\n[0-9] to create/switch to a workspace, "
-                  "[n] next, [p/N] previous, [TAB] back and forth, [c] close, "
-                  "[r] rename"))))))
-
-    (dotemacs-define-micro-state workspaces
-      :doc (dotemacs//workspaces-ms-documentation)
-      :use-minibuffer t
-      :evil-leader "W"
-      :bindings
-      ("0" eyebrowse-switch-to-window-config-0)
-      ("1" eyebrowse-switch-to-window-config-1)
-      ("2" eyebrowse-switch-to-window-config-2)
-      ("3" eyebrowse-switch-to-window-config-3)
-      ("4" eyebrowse-switch-to-window-config-4)
-      ("5" eyebrowse-switch-to-window-config-5)
-      ("6" eyebrowse-switch-to-window-config-6)
-      ("7" eyebrowse-switch-to-window-config-7)
-      ("8" eyebrowse-switch-to-window-config-8)
-      ("9" eyebrowse-switch-to-window-config-9)
-      ("<tab>" eyebrowse-last-window-config)
-      ("C-i" eyebrowse-last-window-config)
-      ("c" eyebrowse-close-window-config)
-      ("h" eyebrowse-prev-window-config)
-      ("l" eyebrowse-next-window-config)
-      ("n" eyebrowse-next-window-config)
-      ("N" eyebrowse-prev-window-config)
-      ("p" eyebrowse-prev-window-config)
-      ("r" dotemacs/workspaces-ms-rename :exit t)
-      ("w" eyebrowse-switch-to-window-config :exit t))
+    (dotemacs-define-transient-state workspaces
+        :title "Workspaces Transient State"
+        :doc "
+[_0_.._9_] switch to workspace  [_n_/_p_] next/prev  [_[tab]_] last  [_c_] close  [_r_] rename"
+        :bindings
+        ("0" eyebrowse-switch-to-window-config-0)
+        ("1" eyebrowse-switch-to-window-config-1)
+        ("2" eyebrowse-switch-to-window-config-2)
+        ("3" eyebrowse-switch-to-window-config-3)
+        ("4" eyebrowse-switch-to-window-config-4)
+        ("5" eyebrowse-switch-to-window-config-5)
+        ("6" eyebrowse-switch-to-window-config-6)
+        ("7" eyebrowse-switch-to-window-config-7)
+        ("8" eyebrowse-switch-to-window-config-8)
+        ("9" eyebrowse-switch-to-window-config-9)
+        ("<tab>" eyebrowse-last-window-config)
+        ("C-i" eyebrowse-last-window-config)
+        ("c" eyebrowse-close-window-config)
+        ("h" eyebrowse-prev-window-config)
+        ("l" eyebrowse-next-window-config)
+        ("n" eyebrowse-next-window-config)
+        ("N" eyebrowse-prev-window-config)
+        ("p" eyebrowse-prev-window-config)
+        ("r" dotemacs/workspaces-ms-rename :exit t)
+        ("w" eyebrowse-switch-to-window-config :exit t))
 
     (defun dotemacs-eyebrowse-switch ()
       "Hook eyebrowse to projectile and neotree."

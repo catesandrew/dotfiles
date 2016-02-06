@@ -62,14 +62,20 @@ Try the repeated popping up to 10 times."
 
 (use-package avy                   ; Jump to characters in buffers
   :ensure t
-  :commands (dotemacs-avy-open-url)
+  :commands (dotemacs-avy-open-url
+             dotemacs-avy-goto-url
+             avy-pop-mark)
   :init
   (progn
     (setq avy-all-windows 'all-frames)
     (setq avy-background t)
     (dotemacs-set-leader-keys
-      "SPC" 'avy-goto-word-or-subword-1 ; 'avy-goto-word-1
-      "y" 'avy-goto-line ; 'avy-goto-char-2
+      "jj" 'evil-avy-goto-char
+      "jJ" 'evil-avy-goto-char-2
+      "jl" 'evil-avy-goto-line
+      "ju" 'avy-pop-mark
+      "jU" 'dotemacs-avy-goto-url
+      "jw" 'evil-avy-goto-word-or-subword-1
       "xo" 'dotemacs-avy-open-url))
   :config
   (progn
@@ -82,8 +88,7 @@ Try the repeated popping up to 10 times."
       (interactive)
       (save-excursion
         (dotemacs-avy-goto-url)
-        (browse-url-at-point)))
-    (dotemacs-set-leader-keys "`" 'avy-pop-mark)))
+        (browse-url-at-point)))))
 
 (use-package ace-jump-helm-line
   :ensure t
@@ -116,6 +121,7 @@ Try the repeated popping up to 10 times."
           (while (re-search-forward dotemacs--link-pattern end t)
             (push (+ (match-beginning 0) 1) points))
           (nreverse points))))
+
     (defun dotemacs-ace-buffer-links ()
       "Ace jump to links in `emacs' buffer."
       (interactive)

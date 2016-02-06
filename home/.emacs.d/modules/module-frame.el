@@ -8,6 +8,7 @@
 ;;
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
+(require 'core-transient-state)
 (require 'core-display-init)
 (require 'core-micro-state)
 ;; (require 'module-vars)
@@ -64,16 +65,17 @@
   :ensure t
   :init
   (progn
-    (dotemacs-define-micro-state zoom-frm
-      :doc "[+/=] zoom frame in [-] zoom frame out [0] reset zoom [q]uit"
-      :evil-leader "zf"
-      :use-minibuffer t
-      :bindings
-      ("+" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
-      ("=" dotemacs-zoom-frm-in :post (dotemacs-zoom-frm-powerline-reset))
-      ("-" dotemacs-zoom-frm-out :post (dotemacs-zoom-frm-powerline-reset))
-      ("0" dotemacs-zoom-frm-unzoom :post (dotemacs-zoom-frm-powerline-reset))
-      ("q" nil :exit t))
+    (dotemacs-define-transient-state zoom-frm
+      :title "Zoom Frame Transient State"
+      :doc "
+[_+_/_=_] zoom frame in [_-_] zoom frame out [_0_] reset zoom [_q_] quit"
+        :bindings
+        ("+" dotemacs-zoom-frm-in)
+        ("=" dotemacs-zoom-frm-in)
+        ("-" dotemacs-zoom-frm-out)
+        ("0" dotemacs-zoom-frm-unzoom)
+        ("q" nil :exit t))
+      (dotemacs-set-leader-keys "zf" 'dotemacs/zoom-frm-transient-state/body)
 
     (defun dotemacs-zoom-frm-powerline-reset ()
       (when (fboundp 'powerline-reset)

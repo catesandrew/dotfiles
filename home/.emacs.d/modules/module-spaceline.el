@@ -17,6 +17,12 @@
 
 ;;; Code:
 
+(defmacro dotemacs-symbol-value (symbol)
+  "Return the value of SYMBOL corresponding to a dotemacs variable.
+If SYMBOL value is `display-graphic-p' then return the result of
+ `(display-graphic-p)', otherwise return the value of the symbol."
+  `(if (eq 'display-graphic-p ,symbol) (display-graphic-p) ,symbol))
+
 (use-package spaceline-config
   :ensure spaceline
   :init

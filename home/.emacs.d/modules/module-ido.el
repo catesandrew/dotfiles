@@ -6,9 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'core-vars)
+(require 'evil-evilified-state)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
+(provide 'core-transient-state)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -16,60 +18,6 @@
 ;; (require 'module-utils)
 
 ;;; Code:
-
-;; from https://gist.github.com/timcharper/493269
-(defun dotemacs/split-window-vertically-and-switch ()
-  (interactive)
-  (split-window-vertically)
-  (other-window 1))
-
-(defun dotemacs/split-window-horizontally-and-switch ()
-  (interactive)
-  (split-window-horizontally)
-  (other-window 1))
-
-(defun dotemacs/ido-invoke-in-other-window ()
-  "signals ido mode to switch to (or create) another window after exiting"
-  (interactive)
-  (setq ido-exit-minibuffer-target-window 'other)
-  (ido-exit-minibuffer))
-
-(defun dotemacs/ido-invoke-in-horizontal-split ()
-  "signals ido mode to split horizontally and switch after exiting"
-  (interactive)
-  (setq ido-exit-minibuffer-target-window 'horizontal)
-  (ido-exit-minibuffer))
-
-(defun dotemacs/ido-invoke-in-vertical-split ()
-  "signals ido mode to split vertically and switch after exiting"
-  (interactive)
-  (setq ido-exit-minibuffer-target-window 'vertical)
-  (ido-exit-minibuffer))
-
-(defun dotemacs/ido-invoke-in-new-frame ()
-  "signals ido mode to create a new frame after exiting"
-  (interactive)
-  (setq ido-exit-minibuffer-target-window 'frame)
-  (ido-exit-minibuffer))
-
-(defadvice ido-read-internal (around ido-read-internal-with-minibuffer-other-window activate)
-  (let* (ido-exit-minibuffer-target-window
-         (this-buffer (current-buffer))
-         (result ad-do-it))
-    (cond
-     ((equal ido-exit-minibuffer-target-window 'other)
-      (if (= 1 (count-windows))
-          (dotemacs/split-window-horizontally-and-switch)
-        (other-window 1)))
-     ((equal ido-exit-minibuffer-target-window 'horizontal)
-      (dotemacs/split-window-horizontally-and-switch))
-
-     ((equal ido-exit-minibuffer-target-window 'vertical)
-      (dotemacs/split-window-vertically-and-switch))
-     ((equal ido-exit-minibuffer-target-window 'frame)
-      (make-frame)))
-    (switch-to-buffer this-buffer) ;; why? Some ido commands, such as textmate.el's textmate-goto-symbol don't switch the current buffer
-    result))
 
 (use-package ido
   :init
@@ -94,6 +42,8 @@
   :init
   (progn
     (ido-vertical-mode t)
+    ;; (when dotemacs-use-ido
+    ;;   (dotemacs-set-leader-keys "ff" 'ido-find-file))
     (defun dotemacs//ido-minibuffer-setup ()
       "Setup the minibuffer."
       ;; Since ido is implemented in a while loop where each
@@ -168,6 +118,17 @@
       (setq ido-exit-minibuffer-target-window 'frame)
       (ido-exit-minibuffer))
 
+    ;; from https://gist.github.com/timcharper/493269
+    (defun dotemacs/split-window-vertically-and-switch ()
+      (interactive)
+      (split-window-vertically)
+      (other-window 1))
+
+    (defun dotemacs/split-window-horizontally-and-switch ()
+      (interactive)
+      (split-window-horizontally)
+      (other-window 1))
+
     (defadvice ido-read-internal
         (around ido-read-internal-with-minibuffer-other-window activate)
       (let* (ido-exit-minibuffer-target-window
@@ -212,7 +173,7 @@
 
     (defun dotemacs//ido-navigation-ms-on-enter ()
       "Initialization of ido micro-state."
-    (setq dotemacs--ido-navigation-ms-enabled t)
+      (setq dotemacs--ido-navigation-ms-enabled t)
       (dotemacs//ido-navigation-ms-set-face))
 
     (defun dotemacs//ido-navigation-ms-on-exit ()
@@ -236,13 +197,13 @@
 [v]          open in a new vertical split
 [q]          quit")
 
-    (dotemacs-define-micro-state ido-navigation
-      :persistent t
-      :disable-evil-leader t
+    (dotemacs-define-transient-state ido-navigation
+      :title "ido Transient State"
+      :foreign-keys run
       :on-enter (dotemacs//ido-navigation-ms-on-enter)
       :on-exit  (dotemacs//ido-navigation-ms-on-exit)
       :bindings
-      ("?" nil :doc (dotemacs//ido-navigation-ms-full-doc))
+      ;;("?" nil (dotemacs//ido-navigation-ms-full-doc))
       ("<RET>" ido-exit-minibuffer :exit t)
       ("<escape>" nil :exit t)
       ("e" ido-select-text :exit t)

@@ -6,9 +6,10 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'core-transient-state)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -60,27 +61,29 @@
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
   :defer t
-  :commands dotemacs-time-machine-micro-state
+  :commands dotemacs/time-machine-transient-state/body
   :init
   (dotemacs-set-leader-keys
     "gt" 'dotemacs-time-machine-micro-state)
   :config
   (progn
-    (dotemacs-define-micro-state time-machine
-      :doc "[p] [N] previous [n] next [c] current [Y] copy hash [q] quit"
-      :on-enter (let (golden-ratio-mode)
-                  (unless (bound-and-true-p git-timemachine-mode)
-                    (call-interactively 'git-timemachine)))
-      :on-exit (when (bound-and-true-p git-timemachine-mode)
-                 (git-timemachine-quit))
-      :persistent t
-      :bindings
-      ("c" git-timemachine-show-current-revision)
-      ("p" git-timemachine-show-previous-revision)
-      ("n" git-timemachine-show-next-revision)
-      ("N" git-timemachine-show-previous-revision)
-      ("Y" git-timemachine-kill-revision)
-      ("q" nil :exit t))))
+    (dotemacs-define-transient-state time-machine
+      :title "Git Timemachine Transient State"
+      :doc "
+[_p_/_N_] previous [_n_] next [_c_] current [_Y_] copy hash [_q_] quit"
+        :on-enter (let (golden-ratio-mode)
+                    (unless (bound-and-true-p git-timemachine-mode)
+                      (call-interactively 'git-timemachine)))
+        :on-exit (when (bound-and-true-p git-timemachine-mode)
+                   (git-timemachine-quit))
+        :foreign-keys run
+        :bindings
+        ("c" git-timemachine-show-current-revision)
+        ("p" git-timemachine-show-previous-revision)
+        ("n" git-timemachine-show-next-revision)
+        ("N" git-timemachine-show-previous-revision)
+        ("Y" git-timemachine-kill-revision)
+        ("q" nil :exit t))))
 
 (provide 'module-git)
 ;;; module-git.el ends here

@@ -9,6 +9,7 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+
 (defvar dotemacs-repl-list '()
   "List of all registered REPLs.")
 
@@ -98,19 +99,23 @@ Supported properties:
         (evil-leader-for-mode (dotemacs-mplist-get props :evil-leader-for-mode))
         (global-key (dotemacs-mplist-get props :global-key))
         (def-key (dotemacs-mplist-get props :define-key)))
-    `((unless (null ',evil-leader)
-        (dolist (key ',evil-leader)
-          (dotemacs-set-leader-keys key ',func)))
-      (unless (null ',evil-leader-for-mode)
-        (dolist (val ',evil-leader-for-mode)
-          (dotemacs-set-leader-keys-for-major-mode
-            (car val) (cdr val) ',func)))
-      (unless (null ',global-key)
-        (dolist (key ',global-key)
-          (global-set-key (kbd key) ',func)))
-      (unless (null ',def-key)
-        (dolist (val ',def-key)
-          (define-key (eval (car val)) (kbd (cdr val)) ',func))))))
+    (append
+     (when evil-leader
+       `((dolist (key ',evil-leader)
+           (dotemacs-set-leader-keys key ',func))))
+
+     (when evil-leader-for-mode
+       `((dolist (val ',evil-leader-for-mode)
+           (dotemacs-set-leader-keys-for-major-mode
+            (car val) (cdr val) ',func))))
+
+     (when global-key
+       `((dolist (key ',global-key)
+           (global-set-key (kbd key) ',func))))
+
+     (when def-key
+       `((dolist (val ',def-key)
+           (define-key (eval (car val)) (kbd (cdr val)) ',func)))))))
 
 (defun dotemacs-view-org-file (file &optional anchor-text expand-scope)
   "Open the change log for the current version."

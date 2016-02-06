@@ -10,6 +10,18 @@
 ;;
 ;;; License: GPLv3
 
+(require 'core-funcs)
+(require 'core-vars)
+(require 'core-keybindings)
+
+;; http://stackoverflow.com/questions/11847547/emacs-regexp-count-occurrences
+(defun how-many-str (regexp str)
+  (loop with start = 0
+        for count from 0
+        while (string-match regexp str start)
+        do (setq start (match-end 0))
+        finally return count))
+
 (defun dotemacs-defface-micro-state-faces ()
   "Define faces for micro-states."
   (let* ((hname 'dotemacs-micro-state-header-face)
@@ -34,14 +46,6 @@ Characters enclosed in `[]' will have this face applied to them."
                         :foreground err
                         :bold t)))
 (dotemacs-defface-micro-state-faces)
-
-;; http://stackoverflow.com/questions/11847547/emacs-regexp-count-occurrences
-(defun how-many-str (regexp str)
-  (loop with start = 0
-        for count from 0
-        while (string-match regexp str start)
-        do (setq start (match-end 0))
-        finally return count))
 
 (defun dotemacs-micro-state-set-minibuffer-height (str)
   "Set the max mini windows size given a string STR."
@@ -107,7 +111,9 @@ used."
          (doc (dotemacs-mplist-get props :doc))
          (persistent (plist-get props :persistent))
          (disable-leader (plist-get props :disable-evil-leader))
-         (msg-func (if (plist-get props :use-minibuffer) 'message 'message))
+         (msg-func (if (plist-get props :use-minibuffer)
+                       'message
+                     'lv-message))
          (exec-binding (plist-get props :execute-binding-on-enter))
          (on-enter (dotemacs-mplist-get props :on-enter))
          (on-exit (dotemacs-mplist-get props :on-exit))
@@ -116,24 +122,24 @@ used."
                     name doc msg-func disable-leader bindings))
          (keymap-body (dotemacs-micro-state-fill-map-sexps wrappers))
          (bindkeys (dotemacs-create-key-binding-form props func)))
-    `(progn (defun ,func ()
-              ,(format "%S micro-state." name)
-              (interactive)
-              ,@on-enter
-              (let ((doc ,@doc))
-                (when doc
-                  (dotemacs-micro-state-set-minibuffer-height doc)
-                  (apply ',msg-func (list (dotemacs-micro-state-propertize-doc
-                                      (format "%S: %s" ',name doc))))))
-              ,(when exec-binding
-                 (dotemacs-micro-state-auto-execute bindings))
-              (,(if (version< emacs-version "24.4")
-                    'set-temporary-overlay-map
-                  'set-transient-map)
-               (let ((map (make-sparse-keymap)))
-                 ,@keymap-body map) ',(dotemacs-micro-state-create-exit-func
-                                       name wrappers persistent on-exit)))
-            ,@bindkeys)))
+    (progn (defun ,func ()
+             ,(format "%S micro-state." name)
+             (interactive)
+             ,@on-enter
+             ,(when exec-binding
+                (dotemacs-micro-state-auto-execute bindings))
+             (let ((doc ,@doc))
+               (when doc
+                 (dotemacs-micro-state-set-minibuffer-height doc)
+                 (apply ',msg-func (list (dotemacs-micro-state-propertize-doc
+                                          (format "%S: %s" ',name doc))))))
+             (,(if (version< emacs-version "24.4")
+                   'set-temporary-overlay-map
+                 'set-transient-map)
+              (let ((map (make-sparse-keymap)))
+                ,@keymap-body map) ',(dotemacs-micro-state-create-exit-func
+                                      name wrappers persistent on-exit)))
+           ,@bindkeys)))
 
 (defun dotemacs-micro-state-func-name (name)
   "Return the name of the micro-state function."
@@ -179,7 +185,8 @@ used."
                   (dotemacs-micro-state-set-minibuffer-height defdoc)
                   (apply ',msg-func
                          (list (dotemacs-micro-state-propertize-doc
-                                (format "%S: %s" ',name defdoc)))) defdoc)))))
+                                (format "%S: %s" ',name defdoc))))
+                  defdoc)))))
          (wrapper-func
           (if (and (boundp wrapped)
                    (eval `(keymapp ,wrapped)))
@@ -251,7 +258,7 @@ pressed)."
       (concat pheader tail))))
 
 (defun dotemacs-micro-state-propertize-doc-rec (doc)
-  "Recursively propertize keys"
+  "Recursively propertize keys."
   (if (string-match "^\\([[:ascii:]]*?\\)\\(\\[.+?\\]\\)\\([[:ascii:]]*\\)$" doc)
       (let* ((head (match-string 1 doc))
              (key (match-string 2 doc))
@@ -263,6 +270,11 @@ pressed)."
     doc))
 
 (defun dotemacs-micro-state-close-window ()
-  "Close micro-state help window.")
+  "Close micro-state help window."
+  (when (window-live-p lv-wnd)
+    (let ((buf (window-buffer lv-wnd)))
+      (delete-window lv-wnd)
+      (kill-buffer buf))))
 
 (provide 'core-micro-state)
+;;; core-micro-state.el ends here

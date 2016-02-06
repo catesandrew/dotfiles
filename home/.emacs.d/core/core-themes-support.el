@@ -224,3 +224,4 @@ changed to THEME."
     (dotemacs-adaptive-evil-highlight-persist-face)))
 
 (provide 'core-themes-support)
+;;; core-themes-support.el ends here
