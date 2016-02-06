@@ -1,0 +1,8 @@
+# Search hidden files and directories
+hidden = true
+
+# Use as many concurrent finders as possible, this will lead the result disorder
+smart-case = true
+
+# Ignore files/directories matching pattern
+ignore = ["bower_components", "node_modules", "build", "elpa", ".cache", "/[.-]min[.](css|js)$/" ]
