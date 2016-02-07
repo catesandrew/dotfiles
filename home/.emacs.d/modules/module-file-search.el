@@ -57,17 +57,6 @@
   (when-let (mdfind (and (eq system-type 'darwin) (executable-find "mdfind")))
     (setq locate-command mdfind)))
 
-(use-package ag                         ; Search code in files/projects
-  :ensure t
-  :config
-  ; (add-hook 'ag-mode-hook (lambda () (toggle-truncate-lines t)))
-  (setq ag-reuse-buffers t            ; Don't spam buffer list with ag buffers
-        ag-highlight-search t         ; A little fanciness
-
-        ;; Use Projectile to find the project root
-        ag-project-root-function (lambda (d) (let ((default-directory d))
-                                               (projectile-project-root)))))
-
 (use-package fasd
   :ensure t
   :init
