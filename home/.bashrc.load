@@ -188,6 +188,7 @@ unset lib
 
 pathmunge "/usr/local/sbin"
 pathmunge "/usr/local/bin"
+pathmunge "${HOME}/.cabal/bin"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
     export CHEATCOLORS=true
@@ -198,8 +199,6 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     export PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5";
     export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
 
-    pathmunge "${HOME}/.cabal/bin"
-    pathmunge "${HOME}/.bin"
 
     if brew_contains_element "openconnect"; then
         export VPNC_SCRIPT="$__dot_brew_home/etc/vpnc-script"
@@ -214,8 +213,6 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
     pathmunge "/usr/local/linuxbrew/bin"
-    pathmunge "${HOME}/.cabal/bin"
-    pathmunge "${HOME}/.bin"
 
     # if [ ${#__dot_brew_list[@]} -gt 0 ]; then
     if [ -n "$__dot_brew_home" ]; then
@@ -256,6 +253,10 @@ function _load_bash_it_files() {
 for file_type in "plugins" "completion" "aliases"; do
   _load_bash_it_files $file_type
 done
+
+pathmunge "${HOME}/.bin"
+PATH=$(strip_path "$PATH" "\./bin")
+path_prepend "./bin"
 
 # Load custom aliases, completion, plugins
 for file_type in "plugins" "completion" "aliases"; do

@@ -1,6 +1,7 @@
 # System-wide .profile for sh(1)
 
 if [ -x /usr/libexec/path_helper ]; then
+    export PATH="" # reset PATH, start fresh
 	eval `/usr/libexec/path_helper -s`
 fi
 

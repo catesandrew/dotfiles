@@ -101,6 +101,11 @@ path_prepend() {
   fi
 }
 
+strip_path() {
+  echo "$1" | command sed -e "s#$2[^:]*:##g"
+}
+
+
 #
 # prevent duplicate directories in you PATH variable
 #
