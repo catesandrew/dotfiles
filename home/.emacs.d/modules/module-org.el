@@ -6,16 +6,19 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
 ;;; Code:
+
+(defvar org-enable-github-support t
+  "If non-nil Github related packages are configured.")
 
 (dotemacs-defvar-company-backends org-mode)
 

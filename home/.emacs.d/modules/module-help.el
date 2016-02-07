@@ -6,12 +6,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-vars)
+(require 'core-funcs)
 (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'core-display-init)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -57,6 +57,25 @@
   ;; to the default face.
   (set-face-attribute 'Info-quoted nil :family 'unspecified
                       :inherit font-lock-type-face))
+
+(use-package info+
+  :ensure t
+  :init
+  (progn
+    (with-eval-after-load 'info
+      (require 'info+))
+    (setq Info-fontify-angle-bracketed-flag nil)))
+
+(use-package eldoc                      ; Documentation in minibuffer
+  :defer t
+  :config
+  (progn
+    ;; enable eldoc in `eval-expression'
+    (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
+    ;; enable eldoc in IELM
+    (add-hook 'ielm-mode-hook #'eldoc-mode)
+    ;; don't display eldoc on modeline
+    (dotemacs-hide-lighter eldoc-mode)))
 
 (use-package helm-info                  ; Helm tools for Info
   :ensure helm
@@ -116,14 +135,10 @@
   :ensure t
   :if (eq system-type 'darwin)
   :defer t
-  :bind (("C-c h d" . dash-at-point)
-         ("C-c h D" . dash-at-point-with-docset))
   :init
   (progn
     (dotemacs-set-leader-keys "dd" 'dash-at-point)
-    (dotemacs-set-leader-keys "dD" 'dash-at-point-with-docset))
-  :config (add-to-list 'dash-at-point-mode-alist
-                       '(swift-mode . "ios,swift")))
+    (dotemacs-set-leader-keys "dD" 'dash-at-point-with-docset)))
 
 (use-package zeal-at-point
   :ensure t
@@ -138,12 +153,12 @@
   (push '(web-mode . "html,css,javascript") zeal-at-point-mode-alist))
 
 (use-package engine-mode
-  :commands (defengine dotemacs-search-engine-select)
   :ensure t
+  :commands (defengine dotemacs/search-engine-select)
   :defines search-engine-alist
   :init
   (dotemacs-set-leader-keys
-    "a/" 'dotemacs-search-engine-select)
+    "a/" 'dotemacs/search-engine-select)
   (setq search-engine-alist
         '((amazon
            :name "Amazon"
@@ -188,7 +203,7 @@
                    (engine-url (plist-get (cdr engine) :url)))
               (eval `(defengine ,cur-engine ,engine-url))))
           search-engine-alist)
-  (defun dotemacs-search-engine-source (engines)
+  (defun dotemacs//search-engine-source (engines)
     "return a source for helm selection"
     `((name . "Search Engines")
       (candidates . ,(mapcar (lambda (engine)
@@ -197,11 +212,17 @@
                                                      (car engine)))))
                              engines))
       (action . (lambda (candidate) (call-interactively candidate)))))
-  (defun dotemacs-search-engine-select ()
-    "set search engine to use"
+
+  (defun dotemacs/helm-search-engine-select ()
+    "Set search engine to use with helm."
     (interactive)
-    (helm :sources (list (dotemacs-search-engine-source
-                          search-engine-alist)))))
+    (helm :sources (list (dotemacs//search-engine-source
+                          search-engine-alist))))
+
+  (defun dotemacs/search-engine-select ()
+    "Set search engine to use."
+    (interactive)
+    (call-interactively 'dotemacs/helm-search-engine-select)))
 
 (provide 'module-help)
 ;;; module-help.el ends here

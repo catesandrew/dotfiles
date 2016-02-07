@@ -6,16 +6,25 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'core-auto-completion)
 ;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-funcs)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-use-package-ext)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
 ;;; Code:
+
+(dotemacs-defvar-company-backends purescript-mode)
+
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (dotemacs-add-company-hook purescript-mode)))
 
 (use-package purescript-mode
   :defer t
@@ -29,41 +38,31 @@
       "ia"  'purescript-align-imports
       "in"  'purescript-navigate-imports)))
 
-(with-eval-after-load 'flycheck
-  (flycheck-define-checker purs-check
-    "Use purscheck to flycheck PureScript code."
-    :command ("purscheck" source source-original temporary-file-name)
-    :error-patterns
-    ((error line-start
-            (or (and "Error at " (file-name)    " line " line ", column " column ":" (zero-or-more " "))
-                (and "\""        (file-name) "\" (line " line ", column " column "):"))
-            (or (message (one-or-more not-newline))
-                (and "\n"
-                     (message
-                      (zero-or-more " ") (one-or-more not-newline)
-                      (zero-or-more "\n"
-                                    (zero-or-more " ")
-                                    (one-or-more not-newline)))))
-            line-end))
-    :modes purescript-mode)
-  (add-to-list 'flycheck-checkers 'purs-check))
-
-; Waiting on purscheck to make it to melpa
-; (dotemacs-use-package-add-hook flycheck
-;   :post-init
-;   (dotemacs/add-flycheck-hook 'purescript-mode))
-
 (use-package psci
   :defer t
   :ensure t
   :init
   (progn
+    (dotemacs-register-repl 'psci 'psci "purescript")
     (add-hook 'purescript-mode-hook 'inferior-psci-mode)
     (dotemacs-set-leader-keys-for-major-mode 'purescript-mode
+      "'"  'psci
       "sb" 'psci/load-current-file!
       "si" 'psci
       "sm" 'psci/load-module!
       "sp" 'psci/load-project-modules!)))
+
+(use-package psc-ide
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'purescript-mode-hook 'psc-ide-mode)
+    (push 'company-psc-ide-backend company-backends-purescript-mode)
+    (dotemacs-set-leader-keys-for-major-mode 'purescript-mode
+      "ms" 'psc-ide-server-start
+      "ml" 'psc-ide-load-module
+      "ht" 'psc-ide-show-type)))
 
 (provide 'module-purescript)
 ;;; module-purescript.el ends here

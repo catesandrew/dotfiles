@@ -6,6 +6,8 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
@@ -26,9 +28,7 @@
     (set (make-local-variable 'my-react-mh-ran) t)))
 
 (setq dotemacs-react-mode-hook #'dotemacs-react-mode-defaults)
-(add-hook 'react-mode-hook
-          (lambda ()
-            (run-hooks #'dotemacs-react-mode-hook)))
+(add-hook 'react-mode-hook (lambda () (run-hooks #'dotemacs-react-mode-hook)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -57,7 +57,7 @@
 
 (dotemacs-use-package-add-hook js-doc
   :post-init
-  (add-hook 'react-mode-hook 'dotemacs/js2-refactor-require)
+  (add-hook 'react-mode-hook 'dotemacs/js-doc-require)
   (dotemacs/js-doc-set-key-bindings 'react-mode))
 
 (dotemacs-use-package-add-hook js2-mode
@@ -83,14 +83,20 @@
   (define-derived-mode react-mode web-mode "react")
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . react-mode))
   (add-to-list 'auto-mode-alist '("\\.react.js\\'" . react-mode))
+  (add-to-list 'auto-mode-alist '("\\index.android.js\\'" . react-mode))
+  (add-to-list 'auto-mode-alist '("\\index.ios.js\\'" . react-mode))
   (add-to-list 'magic-mode-alist '("/** @jsx React.DOM */" . react-mode))
   (defun dotemacs//setup-react-mode ()
     "Adjust web-mode to accommodate react-mode"
     (emmet-mode 0)
     ;; See https://github.com/CestDiego/emmet-mode/commit/3f2904196e856d31b9c95794d2682c4c7365db23
     (setq-local emmet-expand-jsx-className? t)
+    ;; Enable js-mode snippets
+    (yas-activate-extra-mode 'js-mode)
     ;; Force jsx content type
     (web-mode-set-content-type "jsx")
+    ;; Don't auto-quote attribute values
+    (setq-local web-mode-enable-auto-quoting nil)
     ;; Why do we do this ?
     (defadvice web-mode-highlight-part (around tweak-jsx activate)
       (let ((web-mode-enable-part-face nil))

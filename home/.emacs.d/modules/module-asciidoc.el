@@ -6,6 +6,7 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 (require 'core-keybindings)
 
 ;;; Code:

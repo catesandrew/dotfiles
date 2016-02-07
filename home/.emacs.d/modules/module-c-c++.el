@@ -6,10 +6,12 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -54,27 +56,32 @@
                     (split-string (buffer-string) "\n" t))))
     compile-flags))
 
-(defun company-mode/more-than-prefix-guesser ()
+(defun c-c++/load-clang-args ()
+  "Set the arguments for company-clang based on a project-specific text file."
   (unless company-clang-arguments
     (let* ((cc-file (company-mode/find-clang-complete-file))
            (flags (if cc-file (company-mode/load-clang-complete-file cc-file) '())))
       (setq-local company-clang-arguments flags)
-      (setq flycheck-clang-args flags)))
-  (company-clang-guess-prefix))
+      (setq flycheck-clang-args flags))))
 
-(defun c-c++/post-init-helm-gtags ()
-  (dotemacs-helm-gtags-define-keys-for-mode 'c-mode)
-  (dotemacs-helm-gtags-define-keys-for-mode 'c++-mode))
+(defun dotemacs-lazy-load-srefactor ()
+  "Lazy load the package."
+  (require 'srefactor)
+  ;; currently, evil-mode overrides key mapping of srefactor menu
+  ;; must expplicity enable evil-emacs-state. This is ok since
+  ;; srefactor supports j,k,/ and ? commands when Evil is
+  ;; available
+  (add-hook 'srefactor-ui-menu-mode-hook 'evil-emacs-state))
 
-(defun c-c++/post-init-semantic ()
-  (semantic/enable-semantic-mode 'c-mode)
-  (semantic/enable-semantic-mode 'c++-mode))
+(defun dotemacs-lazy-load-stickyfunc-enhance ()
+  "Lazy load the package."
+  (require 'stickyfunc-enhance))
 
 (use-package cc-mode
   :ensure t
   :defer t
   :init
-  (add-to-list 'auto-mode-alist `("\\.h$" . ,dotemacs-c-c++-default-mode-for-headers))
+  (add-to-list 'auto-mode-alist `("\\.h$" . ,c-c++-default-mode-for-headers))
   :config
   (progn
     (require 'compile)
@@ -86,9 +93,20 @@
       "ga" 'projectile-find-other-file
       "gA" 'projectile-find-other-file-other-window)))
 
+(use-package disaster
+  :ensure t
+  :defer t
+  :commands (disaster)
+  :init
+  (progn
+    (dotemacs-set-leader-keys-for-major-mode 'c-mode
+      "D" 'disaster)
+    (dotemacs-set-leader-keys-for-major-mode 'c++-mode
+      "D" 'disaster)))
+
 (use-package clang-format
   :ensure t
-  :if dotemacs-c-c++-enable-clang-support)
+  :if c-c++-enable-clang-support)
 
 (use-package cmake-mode
   :ensure t
@@ -102,24 +120,32 @@
       (dotemacs-add-company-hook c-mode-common)
       (dotemacs-add-company-hook cmake-mode)
 
-      (when dotemacs-c-c++-enable-clang-support
+      (when c-c++-enable-clang-support
         (push 'company-clang company-backends-c-mode-common)
+
+        (defun company-mode/more-than-prefix-guesser ()
+          (c-c++/load-clang-args)
+          (company-clang-guess-prefix))
+
         ;; .clang_complete file loading
         ;; Sets the arguments for company-clang based on a project-specific text file.
-        (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)))))
+        (setq company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+        (dotemacs/add-to-hooks 'c-c++/load-clang-args '(c-mode-hook c++-mode-hook))))))
 
 (use-package company-c-headers
   :if (eq dotemacs-completion-engine 'company)
   :ensure t
   :defer t
   :init
-  (progn
-    (push 'company-c-headers company-backends-c-mode-common)))
+  (progn (push 'company-c-headers company-backends-c-mode-common)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
-  (dolist (mode '(c-mode c++-mode))
-    (dotemacs/add-flycheck-hook mode)))
+  (progn
+    (dolist (mode '(c-mode c++-mode))
+      (dotemacs/add-flycheck-hook mode))
+    (when c-c++-enable-clang-support
+      (dotemacs/add-to-hooks 'c-c++/load-clang-args '(c-mode-hook c++-mode-hook)))))
 
 (use-package gdb-mi
   :ensure t
@@ -168,25 +194,13 @@
   (progn
     (push 'company-ycmd company-backends-c-mode-common)))
 
-(use-package srefactor
-  :ensure t
-  :init
-  (progn
-    (defun dotemacs-lazy-load-srefactor ()
-      "Lazy load the package."
-      (require 'srefactor)
-      ;; currently, evil-mode overrides key mapping of srefactor menu
-      ;; must expplicity enable evil-emacs-state. This is ok since
-      ;; srefactor supports j,k,/ and ? commands when Evil is
-      ;; available
-      (add-hook 'srefactor-ui-menu-mode-hook 'evil-emacs-state))))
-
-(use-package stickyfunc-enhance
-  :ensure t
-  :init
-  (defun dotemacs-lazy-load-stickyfunc-enhance ()
-    "Lazy load the package."
-    (require 'stickyfunc-enhance)))
+(dotemacs-use-package-add-hook helm-cscope
+  :pre-init
+  (dotemacs-use-package-add-hook xcscope
+    :post-init
+    (dolist (mode '(c-mode c++-mode))
+      (dotemacs-setup-helm-cscope mode)
+      (dotemacs-set-leader-keys-for-major-mode mode "gi" 'cscope-index-files))))
 
 (provide 'module-c-c++)
 ;;; module-c-c++ ends here

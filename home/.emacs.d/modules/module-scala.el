@@ -6,10 +6,10 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'use-package)
+(require 'core-vars)
 (require 'core-funcs)
 (require 'core-keybindings)
-;; (require 'core-display-init)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -113,7 +113,8 @@ point to the position of the join."
          (insert ".")
          (company-complete))))
 
-;;; Flyspell
+;; flyspell
+
 (defun scala/flyspell-verify ()
   "Prevent common flyspell false positives in scala-mode."
   (and (flyspell-generic-progmode-verify)
@@ -122,81 +123,7 @@ point to the position of the join."
 (defun scala/configure-flyspell ()
   (setq-local flyspell-generic-check-word-predicate 'scala/flyspell-verify))
 
-(use-package noflet
-  :ensure t
-  :defer t)
-
-(use-package scala-mode2                ; Scala editing
-  :ensure t
-  :defer t
-  :init
-  (dolist (ext '(".cfe" ".cfs" ".si" ".gen" ".lock"))
-    (add-to-list 'completion-ignored-extensions ext))
-  :config
-  (progn
-    ;; Automatically insert asterisk in a comment when enabled
-    (defun scala/newline-and-indent-with-asterisk ()
-      (interactive)
-      (newline-and-indent)
-      (when scala-auto-insert-asterisk-in-comments
-        (scala-indent:insert-asterisk-on-multiline-comment)))
-
-    (evil-define-key 'insert scala-mode-map
-      (kbd "RET") 'scala/newline-and-indent-with-asterisk)
-
-    ;; Automatically replace arrows with unicode ones when enabled
-    (defconst scala-unicode-arrows-alist
-      '(("=>" . "⇒")
-        ("->" . "→")
-        ("<-" . "←")))
-
-    (defun scala/replace-arrow-at-point ()
-      "Replace the arrow before the point (if any) with unicode ones.
-An undo boundary is inserted before doing the replacement so that
-it can be undone."
-      (let* ((end (point))
-             (start (max (- end 2) (point-min)))
-             (x (buffer-substring start end))
-             (arrow (assoc x scala-unicode-arrows-alist)))
-        (when arrow
-          (undo-boundary)
-          (backward-delete-char 2)
-          (insert (cdr arrow)))))
-
-    (defun scala/gt ()
-      "Insert a `>' to the buffer. If it's part of a right arrow (`->' or `=>'),
-replace it with the corresponding unicode arrow."
-      (interactive)
-      (insert ">")
-      (scala/replace-arrow-at-point))
-
-    (defun scala/hyphen ()
-      "Insert a `-' to the buffer. If it's part of a left arrow (`<-'),
-replace it with the unicode arrow."
-      (interactive)
-      (insert "-")
-      (scala/replace-arrow-at-point))
-
-    (when scala-use-unicode-arrows
-      (define-key scala-mode-map
-        (kbd ">") 'scala/gt)
-      (define-key scala-mode-map
-        (kbd "-") 'scala/hyphen))
-
-    (evil-define-key 'normal scala-mode-map "J" 'dotemacs/scala-join-line)
-
-    ;; Compatibility with `aggressive-indent'
-    (setq scala-indent:align-forms t
-          scala-indent:align-parameters t
-          scala-indent:default-run-on-strategy scala-indent:operator-strategy)))
-
-(use-package sbt-mode                   ; Scala build tool
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'scala-mode
-      "bb" 'sbt-command)))
+;; packages
 
 (use-package ensime                     ; Scala interaction mode
   :ensure t
@@ -353,12 +280,86 @@ replace it with the unicode arrow."
     (with-eval-after-load 'flycheck
       (defun scala/disable-flycheck-scala ()
         (push 'scala flycheck-disabled-checkers))
+
       (add-hook 'ensime-mode-hook 'scala/disable-flycheck-scala))
 
     ;; Enable Expand Region integration from Ensime.  Ignore load errors to
     ;; handle older Ensime versions gracefully.
-    (with-eval-after-load 'expand-region
-      (require 'ensime-expand-region nil 'noerror))))
+    (require 'ensime-expand-region nil 'noerror)))
+
+(use-package noflet :ensure t)
+
+(use-package sbt-mode                   ; Scala build tool
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (dotemacs-set-leader-keys-for-major-mode 'scala-mode
+      "bb" 'sbt-command)))
+
+(use-package scala-mode2                ; Scala editing
+  :ensure t
+  :defer t
+  :init
+  (dolist (ext '(".cfe" ".cfs" ".si" ".gen" ".lock"))
+    (add-to-list 'completion-ignored-extensions ext))
+  :config
+  (progn
+    ;; Automatically insert asterisk in a comment when enabled
+    (defun scala/newline-and-indent-with-asterisk ()
+      (interactive)
+      (newline-and-indent)
+      (when scala-auto-insert-asterisk-in-comments
+        (scala-indent:insert-asterisk-on-multiline-comment)))
+
+    (evil-define-key 'insert scala-mode-map
+      (kbd "RET") 'scala/newline-and-indent-with-asterisk)
+
+    ;; Automatically replace arrows with unicode ones when enabled
+    (defconst scala-unicode-arrows-alist
+      '(("=>" . "⇒")
+        ("->" . "→")
+        ("<-" . "←")))
+
+    (defun scala/replace-arrow-at-point ()
+      "Replace the arrow before the point (if any) with unicode ones.
+An undo boundary is inserted before doing the replacement so that
+it can be undone."
+      (let* ((end (point))
+             (start (max (- end 2) (point-min)))
+             (x (buffer-substring start end))
+             (arrow (assoc x scala-unicode-arrows-alist)))
+        (when arrow
+          (undo-boundary)
+          (backward-delete-char 2)
+          (insert (cdr arrow)))))
+
+    (defun scala/gt ()
+      "Insert a `>' to the buffer. If it's part of a right arrow (`->' or `=>'),
+replace it with the corresponding unicode arrow."
+      (interactive)
+      (insert ">")
+      (scala/replace-arrow-at-point))
+
+    (defun scala/hyphen ()
+      "Insert a `-' to the buffer. If it's part of a left arrow (`<-'),
+replace it with the unicode arrow."
+      (interactive)
+      (insert "-")
+      (scala/replace-arrow-at-point))
+
+    (when scala-use-unicode-arrows
+      (define-key scala-mode-map
+        (kbd ">") 'scala/gt)
+      (define-key scala-mode-map
+        (kbd "-") 'scala/hyphen))
+
+    (evil-define-key 'normal scala-mode-map "J" 'dotemacs/scala-join-line)
+
+    ;; Compatibility with `aggressive-indent'
+    (setq scala-indent:align-forms t
+          scala-indent:align-parameters t
+          scala-indent:default-run-on-strategy scala-indent:operator-strategy)))
 
 (provide 'module-scala)
 ;;; module-scala.el ends here

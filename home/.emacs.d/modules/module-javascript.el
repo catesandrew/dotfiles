@@ -18,6 +18,7 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
+(require 'use-package)
 (require 'core-fonts-support)
 (require 'core-toggle)
 (require 'core-keybindings)
@@ -31,6 +32,8 @@
 
 ;;; Code:
 
+;; config
+
 (dotemacs-defvar-company-backends js2-mode)
 
 (setq javascript/key-binding-prefixes '(("mh" . "documentation")
@@ -42,6 +45,8 @@
 
 (defvar javascript-disable-tern-port-files t
   "Stops tern from creating tern port files.")
+
+;; packages
 
 (use-package coffee-mode
   :defer t
@@ -57,8 +62,8 @@
           ;; We need to insert an additional tab because the last line was special.
           (coffee-insert-spaces (+ (coffee-previous-indent) coffee-tab-width))
         ;; otherwise keep at the same indentation level
-        (coffee-insert-spaces (coffee-previous-indent)))
-      )
+        (coffee-insert-spaces (coffee-previous-indent))))
+
     ;; indent to right position after `evil-open-below' and `evil-open-above'
     (add-hook 'coffee-mode-hook '(lambda ()
                                    (setq indent-line-function 'javascript/coffee-indent
@@ -76,11 +81,6 @@
     :init
     (progn
       (push 'company-tern company-backends-js2-mode))))
-
-;; (dotemacs-use-package-add-hook flycheck
-;;   :post-init
-;;   (dolist (mode '(coffee-mode js2-mode json-mode))
-;;     (dotemacs-add-flycheck-hook mode)))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
@@ -517,6 +517,9 @@ change what is evaluated to the statement on the current line."
   :init (add-hook 'js2-mode-hook 'tern-mode)
   :config
   (progn
+    (when javascript-disable-tern-port-files
+      (add-to-list 'tern-command "--no-port-file" 'append))
+
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "rrV" 'tern-rename-variable)
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "hd" 'tern-get-docs)
     (dotemacs-set-leader-keys-for-major-mode 'js2-mode "gg" 'tern-find-definition)

@@ -6,9 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
+(require 'evil-evilified-state)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)

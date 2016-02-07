@@ -6,23 +6,24 @@
 
 ;;; Commentary:
 
+(require 'use-package)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
 ;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-common)
 ;; (require 'module-core)
 (require 'module-utils)
 
-(declare-function dotemacs/add-to-hooks "module-utils"
-                  (fun hooks))
+(declare-function dotemacs/add-to-hooks "module-common" (fun hooks))
 (declare-function dotemacs//unset-scroll-margin "module-utils" ())
 
 ;;; Code:
 
 (defvar dotemacs-smooth-scrolling t
-  "If non-nil, smooth scrolling (native-scrolling) is enabled.  Smooth scrolling
-overrides the default behavior of Emacs which recenters the point when
-it reaches the top or bottom of the screen.")
+  "If non-nil, smooth scrolling (native-scrolling) is enabled.
+Smooth scrolling overrides the default behavior of Emacs which
+recenters the point when it reaches the top or bottom of the
+screen.")
 
 ;; Defaults
 (setq scroll-margin 5                   ; 0 to drag the point along while scrolling
@@ -45,6 +46,7 @@ it reaches the top or bottom of the screen.")
               auto-window-vscroll nil)
   :config
   (progn
+    (setq scroll-margin 5)
     ;; add hooks here only for emacs built-in packages
     (dotemacs/add-to-hooks 'dotemacs//unset-scroll-margin
                            '(messages-buffer-mode-hook))))

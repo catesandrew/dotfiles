@@ -6,6 +6,7 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 (require 'core-keybindings)
@@ -17,17 +18,7 @@
 
 ;;; Code:
 
-(defvar dotemacs/winner-boring-buffers '("*Completions*"
-                                         "*Compile-Log*"
-                                         "*inferior-lisp*"
-                                         "*Fuzzy Completions*"
-                                         "*Apropos*"
-                                         "*Help*"
-                                         "*cvs*"
-                                         "*Buffer List*"
-                                         "*Ibuffer*"
-                                         "*esh command on file*"
-                                         )
+(defvar dotemacs/winner-boring-buffers nil
   "List of boring buffers for winner mode to ignore.")
 
 (use-package windmove                   ; Move between windows with Shift+Arrow
@@ -38,6 +29,16 @@
   :init
   (progn
     (winner-mode t)
+    (setq dotemacs/winner-boring-buffers '("*Compile-Log*"
+                                            "*inferior-lisp*"
+                                            "*Fuzzy Completions*"
+                                            "*Apropos*"
+                                            "*Help*"
+                                            "*cvs*"
+                                            "*Buffer List*"
+                                            "*Ibuffer*"
+                                            "*esh command on file*"
+                                            ))
     (setq winner-boring-buffers
           (append winner-boring-buffers dotemacs/winner-boring-buffers))
     (winner-mode t)))
@@ -46,6 +47,8 @@
   :ensure t
   :config
   (progn
+    (defun window-numbering-install-mode-line (&optional position)
+      "Do nothing, the display is handled by the powerline.")
     (setq window-numbering-auto-assign-0-to-minibuffer nil)
     (dotemacs-set-leader-keys
       "0" 'select-window-0
@@ -60,14 +63,14 @@
       "9" 'select-window-9)
     (window-numbering-mode 1))
 
-  (defun dotemacs-window-numbering-assign (windows)
+  (defun dotemacs//window-numbering-assign (windows)
     "Custom number assignment for special buffers."
     (mapc (lambda (w)
             (when (and (boundp 'neo-global--window)
                        (eq w neo-global--window))
               (window-numbering-assign w 0)))
           windows))
-  (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign)
+  (add-hook 'window-numbering-before-hook 'dotemacs//window-numbering-assign)
   (add-hook 'neo-after-create-hook '(lambda (w) (window-numbering-update))))
 
 (provide 'module-window)

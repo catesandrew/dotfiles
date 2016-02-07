@@ -23,17 +23,51 @@
 (dotemacs-defvar-company-backends emacs-lisp-mode)
 (dotemacs-defvar-company-backends ielm-mode)
 
-(defun dotemacs-ert-run-tests-buffer ()
-  "Run all the tests in the current buffer."
-  (interactive)
-  (save-buffer)
-  (load-file (buffer-file-name))
-  (ert t))
+(use-package ielm                       ; Emacs Lisp REPL
+  :defer t
+  :init
+  (progn
+    (dotemacs-register-repl 'ielm 'ielm)
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "ms" "ielm")
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "'" 'ielm
+        "si" 'ielm)))
+  :config
+  (progn
+    (defun ielm-indent-line ()
+      (interactive)
+      (let ((current-point (point)))
+        (save-restriction
+          (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
+          (lisp-indent-line))))))
 
-(use-package helm-elisp                 ; Helm commands for Emacs Lisp
-  :ensure helm
-  :bind (("C-c f l" . helm-locate-library)
-         ("C-c h a" . helm-apropos)))
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (push '(company-files company-capf) company-backends-ielm-mode)
+      (dotemacs-add-company-hook ielm-mode))))
+
+(dotemacs-use-package-add-hook eldoc
+  :post-init
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode))
+
+(use-package auto-compile
+  :defer t
+  :ensure t
+  :diminish (auto-compile-mode . "")
+  :init
+  (progn
+    (setq auto-compile-display-buffer nil
+          ;; lets spaceline manage the mode-line
+          auto-compile-use-mode-line nil
+          auto-compile-mode-line-counter t)
+    (add-hook 'emacs-lisp-mode-hook 'auto-compile-mode))
+  :config
+  (progn
+    (dotemacs-set-leader-keys-for-major-mode 'emacs-lisp-mode
+      "cl" 'auto-compile-display-log)))
 
 (use-package elisp-slime-nav            ; Jump to definition of symbol at point
   ;; Elisp go-to-definition with M-. and back again with M-,
@@ -47,181 +81,40 @@
       (dotemacs-declare-prefix-for-mode mode "mh" "help")
       (dotemacs-set-leader-keys-for-major-mode mode
         "gg" 'elisp-slime-nav-find-elisp-thing-at-point
-        "hh" 'elisp-slime-nav-describe-elisp-thing-at-point)))
-  :config
-  (defadvice elisp-slime-nav-find-elisp-thing-at-point
-      (after advice-for-elisp-slime-nav-find-elisp-thing-at-point activate)
-    (recenter))
-  :diminish elisp-slime-nav-mode)
+        "hh" 'elisp-slime-nav-describe-elisp-thing-at-point))))
 
-(use-package flycheck-cask              ; Setup Flycheck by Cask projects
-  :ensure t
-  :commands (flycheck-cask-setup)
-  :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
-
-(use-package flycheck-package           ; Check package conventions with Flycheck
-  :ensure t
-  :defer t
-  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
-
-(use-package slime
-  :ensure t
-  :commands slime-mode
+(use-package elisp-mode                  ; Emacs Lisp editing
   :init
   (progn
-    (setq slime-contribs '(slime-fancy
-                           slime-indentation
-                           slime-sbcl-exts
-                           slime-scratch))
+    (defun dotemacs-ert-run-tests-buffer ()
+      "Run all the tests in the current buffer."
+      (interactive)
+      (save-buffer)
+      (load-file (buffer-file-name))
+      (ert t))
 
-    (when-let (clisp (executable-find "clisp"))
-      (setq inferior-lisp-program clisp))
-
-    ;; enable fuzzy matching in code buffer and SLIME REPL
-    (setq slime-complete-symbol*-fancy t)
-    (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
-    (defun slime/disable-smartparens ()
-      (smartparens-strict-mode -1)
-      (turn-off-smartparens-mode))
-    (add-hook 'slime-repl-mode-hook #'slime/disable-smartparens)
-    (dotemacs/add-to-hooks 'slime-mode '(lisp-mode-hook)))
-  :config
-  (progn
-    (slime-setup)
-    (dolist (m `(,slime-mode-map ,slime-repl-mode-map))
-      (define-key m [(tab)] 'slime-fuzzy-complete-symbol))
-    ;; TODO: Add bindings for the SLIME debugger?
-    (dotemacs-set-leader-keys-for-major-mode 'lisp-mode
-      "cc" 'slime-compile-file
-      "cC" 'slime-compile-and-load-file
-      "cl" 'slime-load-file
-      "cf" 'slime-compile-defun
-      "cr" 'slime-compile-region
-      "cn" 'slime-remove-notes
-
-      "eb" 'slime-eval-buffer
-      "ef" 'slime-eval-defun
-      "eF" 'slime-undefine-function
-      "ee" 'slime-eval-last-sexp
-      "er" 'slime-eval-region
-
-      "gg" 'slime-inspect-definition
-      "gb" 'slime-pop-find-definition-stack
-      "gn" 'slime-next-note
-      "gN" 'slime-previous-note
-
-      "ha" 'slime-apropos
-      "hA" 'slime-apropos-all
-      "hd" 'slime-disassemble-symbol
-      "hh" 'slime-describe-symbol
-      "hH" 'slime-hyperspec-lookup
-      "hp" 'slime-apropos-package
-      "ht" 'slime-toggle-trace-fdefinition
-      "hT" 'slime-untrace-all
-      "h<" 'slime-who-calls
-      "h>" 'slime-calls-who
-      ;; TODO: Add key bindings for who binds/sets globals?
-      "hr" 'slime-who-references
-      "hm" 'slime-who-macroexpands
-      "hs" 'slime-who-specializes
-
-      "ma" 'slime-macroexpand-all
-      "mo" 'slime-macroexpand-1
-
-      "se" 'slime-eval-last-expression-in-repl
-      "si" 'slime
-      "sq" 'slime-quit-lisp
-
-      "tf" 'slime-toggle-fancy-trace)))
-
-(dotemacs-defvar-company-backends geiser-mode)
-
-(use-package geiser
-  :ensure t
-  :commands run-geiser
-  :config
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'scheme-mode
-      ","  'lisp-state-toggle-lisp-state
-
-      "cc" 'geiser-compile-current-buffer
-      "cp" 'geiser-add-to-load-path
-
-      "eb" 'geiser-eval-buffer
-      "ee" 'geiser-eval-last-sexp
-      "ef" 'geiser-eval-definition
-      "el" 'lisp-state-eval-sexp-end-of-line
-      "er" 'geiser-eval-region
-
-      "gg" 'geiser-edit-symbol-at-point
-      "gb" 'geiser-pop-symbol-stack
-      "gm" 'geiser-edit-module
-      "gn" 'next-error
-      "gN" 'previous-error
-
-      "hh" 'geiser-doc-symbol-at-point
-      "hd" 'geiser-doc-look-up-manual
-      "hm" 'geiser-doc-module
-      "h<" 'geiser-xref-callers
-      "h>" 'geiser-xref-callees
-
-      "il" 'geiser-insert-lambda
-
-      "me" 'geiser-expand-last-sexp
-      "mf" 'geiser-expand-definition
-      "mx" 'geiser-expand-region
-
-      "si" 'geiser-mode-switch-to-repl
-      "sb" 'geiser-eval-buffer
-      "sB" 'geiser-eval-buffer-and-go
-      "sf" 'geiser-eval-definition
-      "sF" 'geiser-eval-definition-and-go
-      "se" 'geiser-eval-last-sexp
-      "sr" 'geiser-eval-region
-      "sR" 'geiser-eval-region-and-go
-      "ss" 'geiser-set-scheme)))
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-declare-prefix-for-mode mode "mc" "compile")
+      (dotemacs-declare-prefix-for-mode mode "me" "eval")
+      (dotemacs-declare-prefix-for-mode mode "mt" "tests")
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "cc" 'emacs-lisp-byte-compile
+        "e$" 'lisp-state-eval-sexp-end-of-line
+        "eb" 'eval-buffer
+        "ee" 'eval-last-sexp
+        "er" 'eval-region
+        "ef" 'eval-defun
+        "el" 'lisp-state-eval-sexp-end-of-line
+        ","  'lisp-state-toggle-lisp-state
+        "tb" 'dotemacs-ert-run-tests-buffer
+        "tq" 'ert))))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
-      ;; Geiser provides completion as long as company mode is loaded.
-      (dotemacs-add-company-hook geiser-mode))))
-
-(use-package pcre2el                    ; Convert regexps to RX and back
-  :ensure t
-  :defer t
-  :commands rxt-fontify-regexp-at-point
-  :init
-  (progn
-    (dotemacs-declare-prefix "R" "pcre2el")
-    (dotemacs-set-leader-keys
-      "R/"  'rxt-explain
-      "Rc"  'rxt-convert-syntax
-      "Rx"  'rxt-convert-to-rx
-      "R'"  'rxt-convert-to-strings
-      "Rpe" 'rxt-pcre-to-elisp
-      "R%"  'pcre-query-replace-regexp
-      "Rpx" 'rxt-pcre-to-rx
-      "Rps" 'rxt-pcre-to-sre
-      "Rp'" 'rxt-pcre-to-strings
-      "Rp/" 'rxt-explain-pcre
-      "Re/" 'rxt-explain-elisp
-      "Rep" 'rxt-elisp-to-pcre
-      "Rex" 'rxt-elisp-to-rx
-      "Res" 'rxt-elisp-to-sre
-      "Re'" 'rxt-elisp-to-strings
-      "Ret" 'rxt-toggle-elisp-rx
-      "Rt"  'rxt-toggle-elisp-rx
-      "Rh"  'rxt-fontify-regexp-at-point)))
-
-(use-package visual-regexp              ; Regexp replace with in-buffer display
-  :ensure t
-  :bind (("C-c r" . vr/query-replace)
-         ("C-c R" . vr/replace)))
-
-(use-package visual-regexp-steroids
-  :defer t)
+      (push 'company-capf company-backends-emacs-lisp-mode)
+      (dotemacs-add-company-hook emacs-lisp-mode))))
 
 (use-package macrostep                  ; Interactively expand macros in code
   :ensure t
@@ -243,61 +136,11 @@
     (dotemacs-set-leader-keys-for-major-mode 'emacs-lisp-mode
       "dm" 'dotemacs/macrostep-transient-state/body)))
 
-(use-package ielm                       ; Emacs Lisp REPL
-  :config
+(with-eval-after-load 'evil
   (progn
-    (defun ielm-indent-line ()
-      (interactive)
-      (let ((current-point (point)))
-        (save-restriction
-          (narrow-to-region (search-backward-regexp "^ELISP>") (goto-char current-point))
-          (lisp-indent-line))))
-    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (dotemacs-declare-prefix-for-mode mode "ms" "ielm")
-      (dotemacs-set-leader-keys-for-major-mode mode
-        "si" 'ielm))))
-
-(use-package elisp-mode                  ; Emacs Lisp editing
-  :defer t
-  :interpreter ("emacs" . emacs-lisp-mode)
-  :mode ("/Cask\\'" . emacs-lisp-mode)
-  :config
-  (progn
-    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (dotemacs-declare-prefix-for-mode mode "mc" "compile")
-      (dotemacs-declare-prefix-for-mode mode "me" "eval")
-      (dotemacs-declare-prefix-for-mode mode "mt" "tests")
-      (dotemacs-set-leader-keys-for-major-mode mode
-        "cc" 'emacs-lisp-byte-compile
-        "e$" 'lisp-state-eval-sexp-end-of-line
-        "eb" 'eval-buffer
-        "ee" 'eval-last-sexp
-        "er" 'eval-region
-        "ef" 'eval-defun
-        "el" 'lisp-state-eval-sexp-end-of-line
-        ","  'lisp-state-toggle-lisp-state
-        "tb" 'dotemacs-ert-run-tests-buffer
-        "tq" 'ert))))
-
-(use-package eldoc                      ; Documentation in minibuffer
-  :defer t
-  :config
-  (progn
-    ;; enable eldoc in `eval-expression'
-    (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
-    ;; enable eldoc in IELM
-    (add-hook 'ielm-mode-hook #'eldoc-mode)
-    ;; don't display eldoc on modeline
-    (dotemacs-hide-lighter eldoc-mode)))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (push 'company-capf company-backends-emacs-lisp-mode)
-      (push '(company-files company-capf) company-backends-ielm-mode)
-      (dotemacs-add-company-hook ielm-mode)
-      (dotemacs-add-company-hook emacs-lisp-mode))))
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda ()
+                (dotemacs-define-text-object ";" "elisp-comment" ";; " "")))))
 
 (dotemacs-use-package-add-hook flycheck
   :post-init
@@ -311,10 +154,6 @@
     ;; Make flycheck recognize packages in loadpath
     ;; i.e (require 'company) will not give an error now
     (setq flycheck-emacs-lisp-load-path 'inherit)))
-
-(with-eval-after-load 'evil
-  (progn
-    (dotemacs-define-text-object ";" "elisp-comment" ";; " "")))
 
 (dotemacs-use-package-add-hook semantic
   :post-init
@@ -340,6 +179,83 @@
           "=d" 'srefactor-lisp-format-defun
           "=o" 'srefactor-lisp-one-line
           "=s" 'srefactor-lisp-format-sexp)))))
+
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (if (version< emacs-version "24.4")
+        (ad-disable-advice 'preceding-sexp 'around 'evil)
+      (advice-remove 'elisp--preceding-sexp 'evil--preceding-sexp))
+
+    ;; but alwayws enable for lisp mode
+    (dotemacs/add-to-hooks 'smartparens-strict-mode '(lisp-mode))
+
+    (defun dotemacs-eval-current-form-sp (&optional arg)
+      "Call `eval-last-sexp' after moving out of one level of
+parentheses. Will exit any strings and/or comments first.
+Requires smartparens because all movement is done using
+`sp-up-sexp'. An optional ARG can be used which is passed to
+`sp-up-sexp' to move out of more than one sexp."
+      (interactive "p")
+      (require 'smartparens)
+      (save-excursion
+        (let ((max 10))
+          (while (and (> max 0)
+                      (sp-point-in-string-or-comment))
+            (decf max)
+            (sp-up-sexp)))
+        (sp-up-sexp arg)
+        (call-interactively 'eval-last-sexp)))
+
+    (defun dotemacs-eval-current-symbol-sp ()
+      "Call `eval-last-sexp' on the symbol underneath the
+point. Requires smartparens because all movement is done using
+`sp-forward-symbol'."
+      (interactive)
+      (require 'smartparens)
+      (save-excursion
+        (sp-forward-symbol)
+        (call-interactively 'eval-last-sexp)))
+
+    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
+      (dotemacs-set-leader-keys-for-major-mode mode
+        "ec" 'dotemacs-eval-current-form-sp
+        "es" 'dotemacs-eval-current-symbol-sp))))
+
+(use-package pcre2el                    ; Convert regexps to RX and back
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (dotemacs-declare-prefix "R" "pcre2el")
+    (dotemacs-set-leader-keys
+      "R/"  'rxt-explain
+      "Rc"  'rxt-convert-syntax
+      "Rx"  'rxt-convert-to-rx
+      "R'"  'rxt-convert-to-strings
+      "Rpe" 'rxt-pcre-to-elisp
+      "R%"  'pcre-query-replace-regexp
+      "Rpx" 'rxt-pcre-to-rx
+      "Rps" 'rxt-pcre-to-sre
+      "Rp'" 'rxt-pcre-to-strings
+      "Rp/" 'rxt-explain-pcre
+      "Re/" 'rxt-explain-elisp
+      "Rep" 'rxt-elisp-to-pcre
+      "Rex" 'rxt-elisp-to-rx
+      "Res" 'rxt-elisp-to-sre
+      "Re'" 'rxt-elisp-to-strings
+      "Ret" 'rxt-toggle-elisp-rx
+      "Rt"  'rxt-toggle-elisp-rx)))
+
+(use-package flycheck-cask              ; Setup Flycheck by Cask projects
+  :ensure t
+  :commands (flycheck-cask-setup)
+  :init (add-hook 'flycheck-mode-hook #'flycheck-cask-setup))
+
+(use-package flycheck-package           ; Check package conventions with Flycheck
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 (provide 'module-elisp)
 ;;; module-elisp.el ends here

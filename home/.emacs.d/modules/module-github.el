@@ -6,12 +6,14 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'core-use-package-ext)
+(require 'evil-evilified-state)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -59,11 +61,23 @@
   :ensure t
   :init
   (progn
+    (defun dotemacs/git-link-copy-url-only ()
+      "Only copy the generated link to the kill ring."
+      (interactive)
+      (let (git-link-open-in-browser)
+        (call-interactively 'git-link)))
+
+    (defun dotemacs/git-link-commit-copy-url-only ()
+      "Only copy the generated link to the kill ring."
+      (interactive)
+      (let (git-link-open-in-browser)
+        (call-interactively 'git-link-commit)))
+
     (dotemacs-set-leader-keys
       "ghl" 'git-link
-      "ghL" 'dotemacs-git-link-copy-url-only
+      "ghL" 'dotemacs/git-link-copy-url-only
       "ghc" 'git-link-commit
-      "ghC" 'dotemacs-git-link-commit-copy-url-only)
+      "ghC" 'dotemacs/git-link-commit-copy-url-only)
 
     ;; default is to open the generated link
     (setq git-link-open-in-browser t))
@@ -103,7 +117,13 @@
       :ensure t
       :init
       (progn
-        (define-key magit-mode-map "#" 'dotemacs-load-gh-pulls-mode))
+        (defun dotemacs/load-gh-pulls-mode ()
+          "Start `magit-gh-pulls-mode' only after a manual request."
+          (interactive)
+          (magit-gh-pulls-mode)
+          (magit-gh-pulls-popup))
+
+        (define-key magit-mode-map "#" 'dotemacs/load-gh-pulls-mode))
       :config
       (dotemacs-diminish magit-gh-pulls-mode "Github-PR"))))
 

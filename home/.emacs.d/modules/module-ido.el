@@ -10,32 +10,28 @@
 (require 'evil-evilified-state)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
-(provide 'core-transient-state)
+(require 'core-transient-state)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
 (use-package ido
   :init
   (progn
-    (setq ido-enable-flex-matching t ;; enable fuzzy matching
-          ido-use-faces nil       ;; disable ido faces to see flx highlights.
-          ido-enable-prefix nil
-          ido-create-new-buffer 'always
-          ido-use-filename-at-point 'guess
-          ido-save-directory-list-file (concat dotemacs-cache-directory "ido.last")
-          ido-default-file-method 'selected-window
-          ido-auto-merge-work-directories-length 0))
-  :config
-  (progn
-    (ido-mode t)))
-
-(evilified-state-evilify-map package-menu-mode-map
-  :mode package-menu-mode)
+    (ido-mode t)
+    (setq ido-save-directory-list-file (concat dotemacs-cache-directory "ido.last")
+          ;; ido-use-faces nil       ;; disable ido faces to see flx highlights.
+          ;; ido-enable-prefix nil
+          ;; ido-create-new-buffer 'always
+          ;; ido-use-filename-at-point 'guess
+          ;; ido-default-file-method 'selected-window
+          ;; enable fuzzy matching
+          ido-enable-flex-matching t)))
 
 (use-package ido-vertical-mode
   :ensure t

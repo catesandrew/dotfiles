@@ -6,11 +6,14 @@
 ;;
 ;;; Commentary:
 ;;
+
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 (require 'core-transient-state)
 (require 'core-keybindings)
-;; (require 'core-display-init)
+(require 'core-fonts-support)
+(require 'core-toggle)
 ;; (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -70,7 +73,8 @@ Otherwise insert the date as Mar 04, 2014."
   (interactive "P")
   (insert (format-time-string (if iso "%F" "%b %d, %Y"))))
 
-(use-package clean-aindent-mode ; Keeps track of the last auto-indent operation and trims down white space
+;; Keeps track of the last auto-indent operation and trims down white space
+(use-package clean-aindent-mode
   :ensure t
   :defer t
   :init
@@ -169,39 +173,38 @@ It will toggle the overlay under point or create an overlay of one character."
                  'face 'font-lock-warning-face))
           (force-mode-line-update))))))
 
-(use-package subword                    ; Subword/superword editing
-  :ensure t
-  :if (unless (version< emacs-version "24.4"))
-  :defer t
-  :init
-  (progn
-    (unless (category-docstring ?U)
-      (define-category ?U "Uppercase")
-      (define-category ?u "Lowercase"))
-    (modify-category-entry (cons ?A ?Z) ?U)
-    (modify-category-entry (cons ?a ?z) ?u)
-    (make-variable-buffer-local 'evil-cjk-word-separating-categories)
-    (defun dotemacs-subword-enable-camel-case ()
-      "Add support for camel case to subword."
-      (if subword-mode
-          (push '(?u . ?U) evil-cjk-word-separating-categories)
-        (setq evil-cjk-word-separating-categories
-              (default-value 'evil-cjk-word-separating-categories))))
-    (add-hook 'subword-mode-hook 'dotemacs-subword-enable-camel-case)
-    (dotemacs-add-toggle camel-case-motion
-      :status subword-mode
-      :on (subword-mode +1)
-      :off (subword-mode -1)
-      :documentation "Toggle camelCase motions"
-      :evil-leader "tc")
-    (dotemacs-add-toggle camel-case-motion-globally
-      :status subword-mode
-      :on (global-subword-mode +1)
-      :off (global-subword-mode -1)
-      :documentation "Globally toggle camelCase motions"
-      :evil-leader "t C-c"))
-  :config
-  (dotemacs-diminish subword-mode " ⓒ" " c"))
+(unless (version< emacs-version "24.4")
+  (use-package subword                    ; Subword/superword editing
+    :defer t
+    :init
+    (progn
+      (unless (category-docstring ?U)
+        (define-category ?U "Uppercase")
+        (define-category ?u "Lowercase"))
+      (modify-category-entry (cons ?A ?Z) ?U)
+      (modify-category-entry (cons ?a ?z) ?u)
+      (make-variable-buffer-local 'evil-cjk-word-separating-categories)
+      (defun dotemacs-subword-enable-camel-case ()
+        "Add support for camel case to subword."
+        (if subword-mode
+            (push '(?u . ?U) evil-cjk-word-separating-categories)
+          (setq evil-cjk-word-separating-categories
+                (default-value 'evil-cjk-word-separating-categories))))
+      (add-hook 'subword-mode-hook 'dotemacs-subword-enable-camel-case)
+      (dotemacs-add-toggle camel-case-motion
+        :status subword-mode
+        :on (subword-mode +1)
+        :off (subword-mode -1)
+        :documentation "Toggle camelCase motions"
+        :evil-leader "tc")
+      (dotemacs-add-toggle camel-case-motion-globally
+        :status subword-mode
+        :on (global-subword-mode +1)
+        :off (global-subword-mode -1)
+        :documentation "Globally toggle camelCase motions"
+        :evil-leader "t C-c"))
+    :config
+    (dotemacs-diminish subword-mode " ⓒ" " c")))
 
 (use-package visual-fill-column
   :ensure t
@@ -224,11 +227,40 @@ It will toggle the overlay under point or create an overlay of one character."
   :config (setq copyright-year-ranges t
                 copyright-names-regexp (regexp-quote user-full-name)))
 
-(setq editorconfig-packages '(editorconfig))
+;; (setq editorconfig-packages '(editorconfig))
 (use-package editorconfig
   :defer t
   :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.editorconfig" . conf-unix-mode)))
+
+(use-package eval-sexp-fu
+  :defer t
+  :ensure t
+  :init
+  (let ((byte-compile-not-obsolete-funcs (append byte-compile-not-obsolete-funcs '(preceding-sexp))))
+    (require 'eval-sexp-fu)))
+
+(use-package hexl
+  :defer t
+  :init
+  (progn
+    (dotemacs-set-leader-keys "fh" 'hexl-find-file)
+    (dotemacs-set-leader-keys-for-major-mode 'hexl-mode
+      "d" 'hexl-insert-decimal-char
+      "c" 'hexl-insert-octal-char
+      "x" 'hexl-insert-hex-char
+      "X" 'hexl-insert-hex-string
+      "g" 'hexl-goto-address)
+    (evil-define-key 'motion hexl-mode-map
+      "]]" 'hexl-end-of-1k-page
+      "[[" 'hexl-beginning-of-1k-page
+      "h" 'hexl-backward-char
+      "l" 'hexl-forward-char
+      "j" 'hexl-next-line
+      "k" 'hexl-previous-line
+      "$" 'hexl-end-of-line
+      "^" 'hexl-beginning-of-line
+      "0" 'hexl-beginning-of-line)))
 
 (provide 'module-editing)
 ;;; module-editing.el ends here

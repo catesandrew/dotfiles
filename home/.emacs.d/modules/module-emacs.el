@@ -6,14 +6,15 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'core-keybindings)
+(require 'evil-evilified-state)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
@@ -38,7 +39,6 @@
   :config
   ;; Store auto-save files locally
   (setq tramp-auto-save-directory (concat dotemacs-cache-directory "tramp-auto-save")))
-
 
 (use-package bookmark                   ; Bookmarks for Emacs buffers
   :ensure t
@@ -97,8 +97,6 @@
 
 (use-package paradox                    ; Better package menu
   :ensure t
-  :bind (("C-c l p" . paradox-list-packages)
-         ("C-c l P" . package-list-packages-no-fetch))
   :commands paradox-list-packages
   :init
   (progn
@@ -129,10 +127,7 @@
       "L" 'paradox-menu-view-commit-list
       "o" 'paradox-menu-visit-homepage)
     (dotemacs-set-leader-keys
-      "aP" 'dotemacs-paradox-list-packages)))
-
-(use-package bug-hunter                 ; Search init file for bugs
-  :ensure t)
+      "ak" 'dotemacs-paradox-list-packages)))
 
 (use-package server                     ; The server of `emacsclient'
   :defer t
@@ -144,22 +139,22 @@
 (use-package doc-view
   :defer t
   :init
-       (evilified-state-evilify doc-view-mode doc-view-mode-map
-         "/"  'dotemacs-doc-view-search-new-query
-         "?"  'dotemacs-doc-view-search-new-query-backward
-         "gg" 'doc-view-first-page
-         "G"  'doc-view-last-page
-         "gt" 'doc-view-goto-page
-         "h"  'doc-view-previous-page
-         "j"  'doc-view-next-line-or-next-page
-         "k"  'doc-view-previous-line-or-previous-page
-         "K"  'doc-view-kill-proc-and-buffer
-         "l"  'doc-view-next-page
-         "n"  'doc-view-search
-         "N"  'doc-view-search-backward
-         (kbd "C-d") 'doc-view-scroll-up-or-next-page
-         (kbd "C-k") 'doc-view-kill-proc
-         (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
+  (evilified-state-evilify doc-view-mode doc-view-mode-map
+    "/"  'dotemacs-doc-view-search-new-query
+    "?"  'dotemacs-doc-view-search-new-query-backward
+    "gg" 'doc-view-first-page
+    "G"  'doc-view-last-page
+    "gt" 'doc-view-goto-page
+    "h"  'doc-view-previous-page
+    "j"  'doc-view-next-line-or-next-page
+    "k"  'doc-view-previous-line-or-previous-page
+    "K"  'doc-view-kill-proc-and-buffer
+    "l"  'doc-view-next-page
+    "n"  'doc-view-search
+    "N"  'doc-view-search-backward
+    (kbd "C-d") 'doc-view-scroll-up-or-next-page
+    (kbd "C-k") 'doc-view-kill-proc
+    (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
   :config
   (progn
     (defun dotemacs-doc-view-search-new-query ()
@@ -182,6 +177,12 @@
             (text-mode)
             (doc-view-minor-mode))
         ad-do-it))))
+
+(use-package request
+  :ensure t
+  :init
+  (setq request-storage-directory (concat dotemacs-cache-directory
+                                          "request/")))
 
 (provide 'module-emacs)
 ;;; module-emacs.el ends here

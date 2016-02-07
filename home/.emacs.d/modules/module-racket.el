@@ -6,10 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'core-use-package-ext)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -17,47 +18,9 @@
 
 ;;; Code:
 
-(defun dotemacs-racket-test-with-coverage ()
-  "Call `racket-test' with universal argument."
-  (interactive)
-  (racket-test t))
-
-(defun dotemacs-racket-run-and-switch-to-repl ()
-  "Call `racket-run-and-switch-to-repl' and enable
-`insert state'."
-  (interactive)
-  (racket-run-and-switch-to-repl)
-  (evil-insert-state))
-
-(defun dotemacs-racket-send-last-sexp-focus ()
-  "Call `racket-send-last-sexp' and switch to REPL buffer in
-`insert state'."
-  (interactive)
-  (racket-send-last-sexp)
-  (racket-repl)
-  (evil-insert-state))
-
-(defun dotemacs-racket-send-definition-focus ()
-  "Call `racket-send-definition' and switch to REPL buffer in
-`insert state'."
-  (interactive)
-  (racket-send-definition)
-  (racket-repl)
-  (evil-insert-state))
-
-(defun dotemacs-racket-send-region-focus (start end)
-  "Call `racket-send-region' and switch to REPL buffer in
-`insert state'."
-  (interactive "r")
-  (racket-send-region start end)
-  (racket-repl)
-  (evil-insert-state))
-
-
 (when (eq dotemacs-completion-engine 'company)
-  ;; this is the only thing to do to enable company in racket-mode
-  ;; because racket-mode handle everything for us when company
-  ;; is loaded.
+  ;; This is the only thing to do to enable company in racket-mode because
+  ;; racket-mode handle everything for us when company is loaded.
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
@@ -67,17 +30,59 @@
   ;; company-quickhelp calls it. Note hook is appended for proper ordering.
   (dotemacs-use-package-add-hook company-quickhelp
     :post-init
-    (progn
-      (add-hook 'company-mode-hook
-          '(lambda ()
-             (when (equal major-mode 'racket-mode)
-               (company-quickhelp-mode -1))) t))))
+    (add-hook 'company-mode-hook
+              '(lambda ()
+                 (when (equal major-mode 'racket-mode)
+                   (company-quickhelp-mode -1))) t)))
 
 (use-package racket-mode
   :defer t
+  :init (dotemacs-register-repl 'racket-mode 'racket-repl "racket")
   :ensure t
   :config
   (progn
+    (with-eval-after-load 'smartparens
+      (add-to-list 'sp--lisp-modes 'racket-mode)
+      (when (fboundp 'sp-local-pair)
+        (sp-local-pair 'racket-mode "'" nil :actions nil)
+        (sp-local-pair 'racket-mode "`" nil :actions nil)))
+
+    (defun dotemacs-racket-test-with-coverage ()
+      "Call `racket-test' with universal argument."
+      (interactive)
+      (racket-test t))
+
+    (defun dotemacs-racket-run-and-switch-to-repl ()
+      "Call `racket-run-and-switch-to-repl' and enable
+`insert state'."
+      (interactive)
+      (racket-run-and-switch-to-repl)
+      (evil-insert-state))
+
+    (defun dotemacs-racket-send-last-sexp-focus ()
+      "Call `racket-send-last-sexp' and switch to REPL buffer in
+`insert state'."
+      (interactive)
+      (racket-send-last-sexp)
+      (racket-repl)
+      (evil-insert-state))
+
+    (defun dotemacs-racket-send-definition-focus ()
+      "Call `racket-send-definition' and switch to REPL buffer in
+`insert state'."
+      (interactive)
+      (racket-send-definition)
+      (racket-repl)
+      (evil-insert-state))
+
+    (defun dotemacs-racket-send-region-focus (start end)
+      "Call `racket-send-region' and switch to REPL buffer in
+`insert state'."
+      (interactive "r")
+      (racket-send-region start end)
+      (racket-repl)
+      (evil-insert-state))
+
     (dotemacs-set-leader-keys-for-major-mode 'racket-mode
       ;; navigation
       "g`" 'racket-unvisit
@@ -90,6 +95,7 @@
       ;; insert
       "il" 'racket-insert-lambda
       ;; REPL
+      "'"  'racket-repl
       "sb" 'racket-run
       "sB" 'dotemacs-racket-run-and-switch-to-repl
       "se" 'racket-send-last-sexp
@@ -109,10 +115,6 @@
     (define-key racket-mode-map ")" 'self-insert-command)
     (define-key racket-mode-map "]" 'self-insert-command)
     (define-key racket-mode-map "}" 'self-insert-command)))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'racket-mode))
 
 (provide 'module-racket)
 ;;; module-racket.el ends here

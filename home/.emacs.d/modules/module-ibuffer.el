@@ -7,12 +7,11 @@
 ;;; Commentary:
 ;;
 (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-funcs)
 (require 'core-keybindings)
-;; (require 'core-display-init)
 (require 'evil-evilified-state)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 ;; (require 'ibuffer)
@@ -25,21 +24,21 @@
 The supported values are `modes' to group by major-modes and `projects' to
 group by projectile projects.")
 
-(defun dotemacs-ibuffer-get-major-modes-ibuff-rules-list (mm-list result-list)
+(defun dotemacs//ibuffer-get-major-modes-ibuff-rules-list (mm-list result-list)
   (if mm-list
       (let* ((cur-mm (car mm-list))
              (next-res-list-el `(,(symbol-name cur-mm) (mode . ,cur-mm))))
-        (dotemacs-ibuffer-get-major-modes-ibuff-rules-list
+        (dotemacs//ibuffer-get-major-modes-ibuff-rules-list
          (cdr mm-list) (cons next-res-list-el result-list)))
     result-list))
 
-(defun dotemacs-ibuffer-get-major-modes-list ()
+(defun dotemacs//ibuffer-get-major-modes-list ()
   (mapcar
    (function (lambda (buffer)
                (buffer-local-value 'major-mode (get-buffer buffer))))
    (buffer-list (selected-frame))))
 
-(defun dotemacs-ibuffer-create-buffs-group ()
+(defun dotemacs//ibuffer-create-buffs-group ()
   (interactive)
   (let* ((ignore-modes '(Buffer-menu-mode
                          compilation-mode
@@ -53,42 +52,33 @@ group by projectile projects.")
                          Info-mode))
          (cur-bufs
           (list (cons "Home"
-                      (dotemacs-ibuffer-get-major-modes-ibuff-rules-list
+                      (dotemacs//ibuffer-get-major-modes-ibuff-rules-list
                        (cl-set-difference
                         (remove-duplicates
-                         (dotemacs-ibuffer-get-major-modes-list))
+                         (dotemacs//ibuffer-get-major-modes-list))
                         ignore-modes) '())))))
     (setq ibuffer-saved-filter-groups cur-bufs)
     (ibuffer-switch-to-saved-filter-groups "Home")))
 
-(defun dotemacs-ibuffer-group-by-projects ()
-  "Group buffers by projects."
-  (when (eq 'projects ibuffer-group-buffers-by)
-    (ibuffer-projectile-set-filter-groups)
-    (unless (eq ibuffer-sorting-mode 'alphabetic)
-      (ibuffer-do-sort-by-alphabetic))))
-
-(defun dotemacs-ibuffer-group-by-modes ()
-  "Group buffers by modes."
-  (when (eq 'modes ibuffer-group-buffers-by)
-    (dotemacs-ibuffer-create-buffs-group)))
-
 (use-package ibuffer                    ; Better buffer list
-  :bind (([remap list-buffers] . ibuffer))
-  ;; Show VC Status in ibuffer
+  :defer t
   :init
   (progn
     (dotemacs-set-leader-keys "bB" 'ibuffer)
     (global-set-key (kbd "C-x C-b") 'ibuffer)
-    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-modes)
+    (defun dotemacs//ibuffer-group-by-modes ()
+      "Group buffers by modes."
+      (when (eq 'modes ibuffer-group-buffers-by)
+        (dotemacs//ibuffer-create-buffs-group)))
+    (add-hook 'ibuffer-hook 'dotemacs//ibuffer-group-by-modes)
 
     (setq ibuffer-expert t
           ibuffer-show-empty-filter-groups nil)
+
     ;; Use ibuffer to provide :ls
     (evil-ex-define-cmd "buffers" 'ibuffer))
   :config
   (progn
-
     ;; Since we could override `,` with <leader>, let's make `;` do that
     ;; functionality
     (when (equal dotemacs-leader-key ",")
@@ -99,21 +89,19 @@ group by projectile projects.")
     (evilified-state-evilify-map ibuffer-mode-map
       :mode ibuffer-mode)))
 
-(use-package ibuffer-vc                 ; Group buffers by VC project and status
-  :ensure t
-  :defer t
-  :init (add-hook 'ibuffer-hook
-                  (lambda ()
-                    (ibuffer-vc-set-filter-groups-by-vc-root)
-                    (unless (eq ibuffer-sorting-mode 'alphabetic)
-                      (ibuffer-do-sort-by-alphabetic)))))
-
 (use-package ibuffer-projectile         ; Group buffers by Projectile project
   :ensure t
   :defer t
   :init
   (progn
-    (add-hook 'ibuffer-hook 'dotemacs-ibuffer-group-by-projects)))
+    (defun dotemacs//ibuffer-group-by-projects ()
+      "Group buffers by projects."
+      (when (eq 'projects ibuffer-group-buffers-by)
+        (ibuffer-projectile-set-filter-groups)
+        (unless (eq ibuffer-sorting-mode 'alphabetic)
+          (ibuffer-do-sort-by-alphabetic))))
+
+    (add-hook 'ibuffer-hook 'dotemacs//ibuffer-group-by-projects)))
 
 (provide 'module-ibuffer)
 ;;; module-ibuffer.el ends here

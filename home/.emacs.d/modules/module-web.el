@@ -8,6 +8,7 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
+(require 'use-package)
 (require 'core-keybindings)
 (require 'core-display-init)
 (require 'core-auto-completion)
@@ -27,6 +28,18 @@
 ;; TODO: uncomment this when it becomes available
 ;; (dotemacs-defvar-company-backends haml-mode)
 
+(when (eq dotemacs-completion-engine 'company)
+  ;;TODO: whenever company-web makes a backend for haml-mode it should be added here.
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook css-mode)
+      (dotemacs-add-company-hook jade-mode)
+      (dotemacs-add-company-hook slim-mode)
+      (dotemacs-add-company-hook web-mode)))
+
+  (use-package company-web :ensure t))
+
 ;; Thanks to `impatient-mode` you can see the effect of your HTML as you type it.
 (use-package impatient-mode
   :ensure t
@@ -38,8 +51,12 @@
       (interactive)
       (impatient-mode)
       (httpd-start))
-    (dotemacs|do-after-display-system-init
-     (add-hook 'web-mode-hook 'dotemacs-impatient-mode-hook))))
+    (add-hook 'web-mode-hook 'dotemacs-impatient-mode-hook)))
+
+(use-package css-eldoc                  ; Basic Eldoc for CSS
+  :ensure t
+  :commands (turn-on-css-eldoc)
+  :init (add-hook 'css-mode-hook 'turn-on-css-eldoc))
 
 (use-package css-mode
   :defer t
@@ -90,17 +107,53 @@
       "zc" 'css-contract-statement
       "zo" 'css-expand-statement)))
 
-(dotemacs-use-package-add-hook yasnippet
-  :post-init
-  (progn
-    (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
-                                                      jade-mode
-                                                      slim-mode))))
-
-(use-package css-eldoc                  ; Basic Eldoc for CSS
+(use-package emmet-mode
+  :defer t
   :ensure t
-  :commands (turn-on-css-eldoc)
-  :init (add-hook 'css-mode-hook #'turn-on-css-eldoc))
+  :init
+  (progn
+    (setq emmet-indentation 2
+          emmet-move-cursor-between-quotes t)
+    (dotemacs/add-to-hooks 'emmet-mode '(css-mode-hook
+                                         html-mode-hook
+                                         sass-mode-hook
+                                         scss-mode-hook
+                                         web-mode-hook)))
+  :config
+  (progn
+    (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (evil-define-key 'hybrid emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
+    (evil-define-key 'hybrid emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
+    (dotemacs-hide-lighter emmet-mode)))
+
+(dotemacs-use-package-add-hook evil-matchit
+  :post-init
+  (add-hook `web-mode-hook `turn-on-evil-matchit-mode))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (dolist (mode '(haml-mode
+                  jade-mode
+                  less-mode
+                  sass-mode
+                  scss-mode
+                  slim-mode
+                  ;; css-mode
+                  web-mode))
+    (dotemacs/add-flycheck-hook mode))
+  :post-config
+  (progn
+    (dotemacs-flycheck-executables-search)
+    (when (bound-and-true-p dotemacs//flycheck-executables-searched)
+      (when dotemacs//flycheck-executable-tidy5
+        (flycheck-add-mode 'html-tidy 'web-mode)))))
+
+(use-package haml-mode
+  :ensure t
+  :defer t)
 
 (use-package helm-css-scss
   :defer t
@@ -108,6 +161,61 @@
   :init
   (dolist (mode '(css-mode scss-mode))
     (dotemacs-set-leader-keys-for-major-mode mode "gh" 'helm-css-scss)))
+
+(use-package jade-mode
+  :defer t
+  :ensure t)
+
+(use-package less-css-mode
+  :defer t
+  :ensure t
+  :mode ("\\.less\\'" . less-css-mode))
+
+(use-package sass-mode
+  :ensure t
+  :defer t
+  :mode ("\\.sass\\'" . sass-mode))
+
+(use-package scss-mode
+  :defer t
+  :ensure t
+  :mode ("\\.scss\\'" . scss-mode))
+
+(use-package slim-mode
+  :ensure t
+  :defer t)
+
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (progn
+    (dotemacs/add-to-hooks
+     (if dotemacs-smartparens-strict-mode
+         'smartparens-strict-mode
+       'smartparens-mode)
+     '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
+    (add-hook 'web-mode-hook 'dotemacs-toggle-smartparens-off))
+  :post-config
+  (sp-with-modes '(web-mode)
+    (sp-local-pair "<% " " %>")
+    (sp-local-pair "{ " " }")
+    (sp-local-pair "<%= "  " %>")
+    (sp-local-pair "<%# "  " %>")
+    (sp-local-pair "<%$ "  " %>")
+    (sp-local-pair "<%@ "  " %>")
+    (sp-local-pair "<%: "  " %>")
+    (sp-local-pair "{{ "  " }}")
+    (sp-local-pair "{% "  " %}")
+    (sp-local-pair "{%- "  " %}")
+    (sp-local-pair "{# "  " #}")))
+
+(use-package tagedit
+  :defer t
+  :ensure t
+  :config
+  (progn
+    (tagedit-add-experimental-features)
+    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))
+    (dotemacs-diminish tagedit-mode " Ⓣ" " T")))
 
 (dotemacs-use-package-add-hook rainbow-delimiters
   :post-init
@@ -229,126 +337,12 @@
    ("\\.ejs\\'"        . web-mode)
    ("\\.djhtml\\'"     . web-mode)))
 
-(use-package emmet-mode
-  :defer t
-  :ensure t
-  :init
-  (progn
-    (setq emmet-indentation 2
-          emmet-move-cursor-between-quotes t)
-    (dotemacs/add-to-hooks 'emmet-mode '(css-mode-hook
-                                         html-mode-hook
-                                         sass-mode-hook
-                                         scss-mode-hook
-                                         web-mode-hook)))
-  :config
-  (progn
-    (evil-define-key 'insert emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    (evil-define-key 'insert emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    (evil-define-key 'emacs emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    (evil-define-key 'emacs emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    (evil-define-key 'hybrid emmet-mode-keymap (kbd "TAB") 'emmet-expand-yas)
-    (evil-define-key 'hybrid emmet-mode-keymap (kbd "<tab>") 'emmet-expand-yas)
-    (dotemacs-hide-lighter emmet-mode)))
-
-(use-package jade-mode
-  :defer t
-  :ensure t)
-
-(use-package haml-mode
-  :ensure t
-  :defer t)
-
-(use-package slim-mode
-  :ensure t
-  :defer t)
-
-(use-package scss-mode
-  :defer t
-  :ensure t
-  :mode ("\\.scss\\'" . scss-mode))
-
-(use-package sass-mode
-  :ensure t
-  :defer t
-  :mode ("\\.sass\\'" . sass-mode))
-
-(use-package less-css-mode
-  :defer t
-  :ensure t
-  :mode ("\\.less\\'" . less-css-mode))
-
-(use-package tagedit
-  :defer t
-  :ensure t
-  :config
-  (progn
-    (tagedit-add-experimental-features)
-    (dotemacs-diminish tagedit-mode " Ⓣ" " T")
-    ;; (add-hook 'web-mode-hook (lambda () (tagedit-mode 1)))
-    (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))))
-
-(dotemacs-use-package-add-hook evil-matchit
-  :post-init
-  (add-hook `web-mode-hook `turn-on-evil-matchit-mode))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dolist (mode '(haml-mode
-                  jade-mode
-                  less-mode
-                  sass-mode
-                  scss-mode
-                  slim-mode
-                  ;; css-mode
-                  web-mode))
-    (dotemacs/add-flycheck-hook mode))
-  :post-config
-  (progn
-    (dotemacs-flycheck-executables-search)
-    (when (bound-and-true-p dotemacs//flycheck-executables-searched)
-      (when dotemacs//flycheck-executable-tidy5
-        (flycheck-add-mode 'html-tidy 'web-mode)))))
-
-(dotemacs-use-package-add-hook smartparens
-  :post-init
-  (progn
-    (dotemacs/add-to-hooks
-     (if dotemacs-smartparens-strict-mode
-         'smartparens-strict-mode
-       'smartparens-mode)
-     '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
-    (add-hook 'web-mode-hook 'dotemacs-toggle-smartparens-off))
-  :post-config
-  (sp-with-modes '(web-mode)
-    (sp-local-pair "<% " " %>")
-    (sp-local-pair "{ " " }")
-    (sp-local-pair "<%= "  " %>")
-    (sp-local-pair "<%# "  " %>")
-    (sp-local-pair "<%$ "  " %>")
-    (sp-local-pair "<%@ "  " %>")
-    (sp-local-pair "<%: "  " %>")
-    (sp-local-pair "{{ "  " }}")
-    (sp-local-pair "{% "  " %}")
-    (sp-local-pair "{%- "  " %}")
-    (sp-local-pair "{# "  " #}")))
-
-(dotemacs-use-package-add-hook dotemacs-load-yasnippet
+(dotemacs-use-package-add-hook yasnippet
   :post-init
   (progn
     (dotemacs/add-to-hooks 'dotemacs-load-yasnippet '(css-mode-hook
                                                       jade-mode
                                                       slim-mode))))
-
-(when (eq dotemacs-completion-engine 'company)
-  ;;TODO: whenever company-web makes a backend for haml-mode it should be added
-  ;;here.
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook css-mode)
-      (dotemacs-add-company-hook web-mode)))
-  (use-package company-web :ensure t))
 
 (provide 'module-web)
 ;;; module-web.el ends here

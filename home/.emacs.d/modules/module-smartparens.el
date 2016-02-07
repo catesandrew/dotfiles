@@ -11,12 +11,15 @@
 ;; Extends the default `smartparens-config' with key-bindings and
 ;; additional pairs.
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-fonts-support)
+(require 'core-keybindings)
+(require 'core-toggle)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -27,21 +30,6 @@
   `(lambda (&optional arg)
      (interactive "P")
      (sp-wrap-with-pair ,s)))
-
-;; enable smartparens-mode in `eval-expression'
-(defun dotemacs-conditionally-enable-smartparens-mode ()
-  "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
-  (if (eq this-command 'eval-expression)
-      (smartparens-mode)))
-
-(defun dotemacs-smartparens-pair-newline (id action context)
-  (save-excursion
-    (newline)
-    (indent-according-to-mode)))
-
-(defun dotemacs-smartparens-pair-newline-and-indent (id action context)
-  (dotemacs-smartparens-pair-newline id action context)
-  (indent-according-to-mode))
 
 (defun dotemacs-sp-kill-surrounding-sexp ()
   "Kill from beginning to end of sexp."
@@ -95,16 +83,21 @@
   :commands (sp-split-sexp sp-newline)
   :init
   (progn
+    ;; TODO move these hooks into their layers
+    ;; (dolist (hook '(LaTeX-mode-hook web-moode-hook inferior-python-mode-hook))
+    ;;   (add-hook hook #'smartparens-mode))
+
     (dotemacs/add-to-hooks (if dotemacs-smartparens-strict-mode
                                 'smartparens-strict-mode
                               'smartparens-mode)
                             '(prog-mode-hook))
 
-    (add-hook 'minibuffer-setup-hook 'dotemacs-conditionally-enable-smartparens-mode)
-
-    ;; TODO move these hooks into their layers
-    ;; (dolist (hook '(LaTeX-mode-hook web-moode-hook inferior-python-mode-hook))
-    ;;   (add-hook hook #'smartparens-mode))
+    ;; enable smartparens-mode in `eval-expression'
+    (defun conditionally-enable-smartparens-mode ()
+      "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
+      (if (eq this-command 'eval-expression)
+          (smartparens-mode)))
+    (add-hook 'minibuffer-setup-hook 'conditionally-enable-smartparens-mode)
 
     (dotemacs-add-toggle smartparens
       :status smartparens-mode
@@ -127,8 +120,8 @@
           sp-cancel-autoskip-on-backward-movement nil)
 
     (dotemacs-set-leader-keys
-     "J"  'sp-split-sexp
-     "jj" 'sp-newline))
+     "js" 'sp-split-sexp
+     "jn" 'sp-newline))
   :config
   (progn
     (require 'smartparens-config)
@@ -136,7 +129,25 @@
 
     (show-smartparens-global-mode +1)
 
-    ;;; Additional pairs for various modes
+    (defun dotemacs/smartparens-pair-newline (id action context)
+      (save-excursion
+        (newline)
+        (indent-according-to-mode)))
+
+    (defun dotemacs/smartparens-pair-newline-and-indent (id action context)
+      (dotemacs/smartparens-pair-newline id action context)
+      (indent-according-to-mode))
+
+    ;; don't create a pair with single quote in minibuffer
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+
+    (sp-pair "{" nil :post-handlers
+             '(:add (dotemacs/smartparens-pair-newline-and-indent "RET")))
+    (sp-pair "[" nil :post-handlers
+             '(:add (dotemacs/smartparens-pair-newline-and-indent "RET")))
+
+
+    ;;; TODO: Move these additional pairs for various modes into their modules
     (sp-with-modes '(php-mode)
       (sp-local-pair "/**" "*/" :post-handlers '(("| " "SPC")
                                                  (dotemacs-php-handle-docstring "RET")))
@@ -202,15 +213,7 @@
                      lisp-mode)
       (sp-local-pair "'" nil :actions nil)
       (sp-local-pair "(" nil :bind "M-(")
-      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))
-
-    ;; don't create a pair with single quote in minibuffer
-    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-
-    (sp-pair "{" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))
-    (sp-pair "[" nil :post-handlers
-             '(:add (dotemacs-smartparens-pair-newline-and-indent "RET")))))
+      (sp-local-pair "`" "'" :when '(sp-in-string-p) :actions '(insert wrap)))))
 
 (provide 'module-smartparens)
 ;;; module-smartparens.el ends here

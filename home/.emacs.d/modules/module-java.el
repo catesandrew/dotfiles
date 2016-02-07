@@ -6,16 +6,21 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'use-package)
+(require 'core-use-package-ext)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
+(require 'core-auto-completion)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
 ;;; Code:
+
+;; config
 
 (dotemacs-defvar-company-backends java-mode)
 
@@ -33,6 +38,8 @@
 (mapc (lambda(x) (dotemacs-declare-prefix-for-mode
              'java-mode (car x) (cdr x)))
       java/key-binding-prefixes)
+
+;; funcs
 
 (defun dotemacs-java-completing-dot ()
   "Insert a period and show company completions."
@@ -69,6 +76,8 @@
 (defun dotemacs-java-maven-install ()
   (interactive)
   (eclim-maven-run "install"))
+
+;; packages
 
 (use-package eclim
   :defer t
@@ -182,13 +191,12 @@
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
-      (dotemacs-add-company-hook java-mode))))
+      (dotemacs-add-company-hook java-mode)))
 
-(use-package company-emacs-eclim
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (push 'company-emacs-eclim company-backends-java-mode))
+  (use-package company-emacs-eclim
+    :defer t
+    :init
+    (push 'company-emacs-eclim company-backends-java-mode)))
 
 (provide 'module-java)
 ;;; module-java.el ends here

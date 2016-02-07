@@ -5,4 +5,4 @@ hidden = true
 smart-case = true
 
 # Ignore files/directories matching pattern
-ignore = ["bower_components", "node_modules", "build", "elpa", ".cache", "/[.-]min[.](css|js)$/" ]
+ignore = ["bower_components", "node_modules", "build", "elpa", ".cache", ".git", "/[.-]min[.](css|js)$/" ]

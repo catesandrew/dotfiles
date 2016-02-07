@@ -6,12 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'core-display-init)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 

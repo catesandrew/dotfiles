@@ -17,6 +17,7 @@
 (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
@@ -136,13 +137,13 @@
             (dotemacs-integrate-evil-search t)
             (dotemacs-ahs-highlight-now-wrapper)
             (evil-set-jump)
-            (dotemacs-symbol-highlight-micro-state)
+            (dotemacs/symbol-highlight-transient-state/body)
             (ahs-forward))
         (progn
           (dotemacs-integrate-evil-search nil)
           (dotemacs-ahs-highlight-now-wrapper)
           (evil-set-jump)
-          (dotemacs-symbol-highlight-micro-state)
+          (dotemacs/symbol-highlight-transient-state/body)
           (ahs-backward))))
 
     (with-eval-after-load 'evil
@@ -156,7 +157,7 @@
       (interactive)
       (dotemacs-ahs-highlight-now-wrapper)
       (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
-      (dotemacs-symbol-highlight-micro-state)
+      (dotemacs/symbol-highlight-transient-state/body)
       (dotemacs-integrate-evil-search nil))
 
     (defun dotemacs-ahs-ms-on-exit ()
@@ -233,7 +234,15 @@
       ("/" dotemacs-helm-project-smart-do-search-region-or-symbol :exit t)
       ("b" dotemacs-helm-buffers-smart-do-search-region-or-symbol :exit t)
       ("f" dotemacs-helm-files-smart-do-search-region-or-symbol :exit t)
-      ("q" nil :exit t))))
+      ("q" nil :exit t))
+
+    (defun dotemacs/symbol-highlight ()
+      "Highlight the symbol under point with `auto-highlight-symbol'."
+      (interactive)
+      (dotemacs-ahs-highlight-now-wrapper)
+      (setq dotemacs-last-ahs-highlight-p (ahs-highlight-p))
+      (dotemacs/symbol-highlight-transient-state/body)
+      (dotemacs-integrate-evil-search nil))))
 
 (provide 'module-auto-highlight-symbol)
 ;;; module-auto-highlight-symbol.el ends here

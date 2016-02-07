@@ -6,12 +6,15 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'core-auto-completion)
+(require 'core-use-package-ext)
+(require 'core-fonts-support)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
@@ -24,6 +27,9 @@
     ;; Use two spaces in shell scripts.
     (setq sh-indentation 2
           sh-basic-offset 2)
+
+    (dotemacs-set-leader-keys-for-major-mode 'sh-mode
+      "\\" 'sh-backslash-region)
 
     ;; Use sh-mode when opening `.zsh' files, and when opening Prezto runcoms.
     (dolist (pattern '("\\.zsh\\'"

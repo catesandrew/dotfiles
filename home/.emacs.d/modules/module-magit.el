@@ -9,7 +9,7 @@
 
 (require 'evil-evilified-state)
 (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-funcs)
 (require 'core-micro-state)
 (require 'core-keybindings)
 (require 'core-transient-state)
@@ -22,24 +22,6 @@
 
 ;; gravatars from magit use this to store their cache
 (setq url-configuration-directory (concat dotemacs-cache-directory "url/"))
-
-(defun dotemacs-load-gh-pulls-mode ()
-  "Start `magit-gh-pulls-mode' only after a manual request."
-  (interactive)
-  (magit-gh-pulls-mode)
-  (magit-gh-pulls-popup))
-
-(defun dotemacs-git-link-copy-url-only ()
-  "Only copy the generated link to the kill ring."
-  (interactive)
-  (let (git-link-open-in-browser)
-    (call-interactively 'git-link)))
-
-(defun dotemacs-git-link-commit-copy-url-only ()
-  "Only copy the generated link to the kill ring."
-  (interactive)
-  (let (git-link-open-in-browser)
-    (call-interactively 'git-link-commit)))
 
 ;; Set Magit's repo dirs for `magit-status' from Projectile's known
 ;; projects.  Initialize the `magit-repo-dirs' immediately after Projectile
@@ -133,6 +115,7 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
   (progn
     ;; seems to be necessary at the time of release
     (require 'git-rebase)
+
     ;; bind function keys
     ;; (define-key magit-mode-map (kbd "<tab>") 'magit-section-toggle)
     (unless (boundp 'dotemacs-use-evil-magit)
@@ -326,7 +309,7 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
                  ,refresh-all-key 'magit-refresh-all))))
 
     ;; full screen magit-status
-    (when dotemacs-git-magit-status-fullscreen
+    (when git-magit-status-fullscreen
       (setq magit-display-buffer-function
             (lambda (buffer)
               (if (or
@@ -355,7 +338,7 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
 
     (when dotemacs-major-mode-leader-key
       (add-hook 'with-editor-mode-hook 'evil-normalize-keymaps)
-      (let ((mm-key dotspacemacs-major-mode-leader-key))
+      (let ((mm-key dotemacs-major-mode-leader-key))
         (dolist (state '(normal motion))
           (evil-define-key state with-editor-mode-map
             (concat mm-key mm-key) 'with-editor-finish
@@ -411,17 +394,6 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
       (with-eval-after-load 'magit
         (define-key magit-mode-map "%" 'magit-gitflow-popup)))
   :config (dotemacs-diminish magit-gitflow-mode "Flow"))
-
-(use-package magit-svn
-  :if dotemacs-git-enable-magit-svn-plugin
-  :disabled t ; not compatible with magit 2.1
-  :ensure t
-  :commands turn-on-magit-svn
-  :init (add-hook 'magit-mode-hook 'turn-on-magit-svn)
-  :config
-  (progn
-    (evil-define-key 'emacs magit-status-mode-map
-      "N" 'magit-key-mode-popup-svn)))
 
 (provide 'module-magit)
 ;;; module-magit.el ends here

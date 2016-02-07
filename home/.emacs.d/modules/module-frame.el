@@ -6,6 +6,7 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
 (require 'core-transient-state)
@@ -29,7 +30,7 @@
 (defvar dotemacs//frame-height nil)
 
 (use-package frame
-  :bind (("C-c u F" . toggle-frame-fullscreen))
+  :defer t
   :init
   (progn
     (defun dotemacs-set-frame-size ()
@@ -100,17 +101,20 @@
     (defun dotemacs-zoom-frm-in ()
       "zoom in frame, but keep the same pixel size"
       (interactive)
-      (dotemacs-zoom-frm-do 1))
+      (dotemacs-zoom-frm-do 1)
+      (dotemacs-zoom-frm-powerline-reset))
 
     (defun dotemacs-zoom-frm-out ()
       "zoom out frame, but keep the same pixel size"
       (interactive)
-      (dotemacs-zoom-frm-do -1))
+      (dotemacs-zoom-frm-do -1)
+      (dotemacs-zoom-frm-powerline-reset))
 
     (defun dotemacs-zoom-frm-unzoom ()
       "Unzoom current frame, keeping the same pixel size"
       (interactive)
-      (dotemacs-zoom-frm-do 0))
+      (dotemacs-zoom-frm-do 0)
+      (dotemacs-zoom-frm-powerline-reset))
 
     ;; Font size, either with ctrl + mouse wheel
     (global-set-key (kbd "<C-wheel-up>") 'dotemacs-zoom-frm-in)

@@ -6,11 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 (require 'core-transient-state)
-;; (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-vars)
+(require 'core-funcs)
 (require 'core-keybindings)
-;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
@@ -18,7 +18,12 @@
 
 ;;; Code:
 
-(use-package git-commit                 ; Git commit message mode
+(use-package helm-gitignore
+  :ensure t
+  :defer t
+  :init (dotemacs-set-leader-keys "gI" 'helm-gitignore))
+
+(use-package git-commit
   :ensure t
   :defer t)
 
@@ -31,40 +36,13 @@
   :config
   (define-key git-messenger-map [escape] 'git-messenger:popup-close))
 
-(use-package gitconfig-mode             ; Git configuration mode
-  :ensure t
-  :defer t)
-
-(use-package gitignore-mode             ; .gitignore mode
-  :ensure t
-  :defer t)
-
-(use-package gitattributes-mode         ; Git attributes mode
-  :ensure t
-  :defer t)
-
-(use-package git-rebase-mode            ; Mode for git rebase -i
-  :disabled t ; not compatible with magit 2.1
-  :defer t
-  :config
-  (progn
-    (evilified-state-evilify git-rebase-mode git-rebase-mode-map
-      "J" 'git-rebase-move-line-down
-      "K" 'git-rebase-move-line-up
-      "u" 'git-rebase-undo
-      "y" 'git-rebase-insert)
-
-    (dotemacs-set-leader-keys-for-major-mode 'git-rebase-mode
-      "mcc" 'git-rebase-server-edit
-      "mk" 'git-rebase-abort)))
-
 (use-package git-timemachine            ; Go back in Git time
   :ensure t
   :defer t
   :commands dotemacs/time-machine-transient-state/body
   :init
   (dotemacs-set-leader-keys
-    "gt" 'dotemacs-time-machine-micro-state)
+    "gt" 'dotemacs/time-machine-transient-state/body)
   :config
   (progn
     (dotemacs-define-transient-state time-machine
@@ -84,6 +62,39 @@
         ("N" git-timemachine-show-previous-revision)
         ("Y" git-timemachine-kill-revision)
         ("q" nil :exit t))))
+
+(use-package gitattributes-mode
+  :ensure t
+  :defer t)
+
+(use-package gitconfig-mode
+  :ensure t
+  :defer t)
+
+(use-package gitignore-mode
+  :ensure t
+  :defer t)
+
+(use-package smeargle
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (dotemacs-declare-prefix "gH" "highlight")
+
+    (let ((descr
+           '(("smeargle" . "highlight by last update time")
+             ("smeargle-commits" . "highlight by age of changes")
+             ("smeargle-clear" . "clear"))))
+      (dolist (nd descr)
+        ;; ensure the target matches the whole string
+        (push (cons (concat "\\`" (car nd) "\\'") (cdr nd))
+              which-key-description-replacement-alist)))
+
+    (dotemacs-set-leader-keys
+      "gHc" 'smeargle-clear
+      "gHh" 'smeargle-commits
+      "gHt" 'smeargle)))
 
 (provide 'module-git)
 ;;; module-git.el ends here

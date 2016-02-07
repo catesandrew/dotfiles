@@ -25,19 +25,24 @@
 ;;    single bar
 ;; -  right mouse click moves up directory if in blank space or shows context menu
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'use-package)
+(require 'evil-evilified-state)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+(require 'dired-x)
 
 ;;; Code:
 
 (defvar vinegar-reuse-dired-buffer nil
   "If non-nil, reuses one dired buffer for navigation.")
+
+;; funcs
 
 (defun vinegar/dotfiles-toggle ()
   "Show/hide dot-files"
@@ -174,7 +179,14 @@
          ))
     )))
 
-; (dotemacs|do-after-display-system-init)
+;; packages
+
+(use-package dired-x                    ; Additional tools for Dired
+  :init
+  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
+  :config
+  (define-key evil-normal-state-map (kbd "-") 'dired-jump))
+
 (use-package dired+
   :defer t
   :ensure t
@@ -186,6 +198,10 @@
           ;; disable font themeing from dired+
           font-lock-maximum-decoration (quote ((dired-mode . 1) (t . t))))
     (toggle-diredp-find-file-reuse-dir 1)))
+
+(dotemacs-use-package-add-hook diff-hl
+  :post-init
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode))
 
 (use-package dired                      ; Edit directories
   :defer t
@@ -224,26 +240,40 @@
       "gg"        'vinegar/back-to-top
       "G"         'vinegar/jump-to-bottom)
 
-    (when (eq system-type 'darwin)
-      ;; OS X bsdtar is mostly compatible with GNU Tar
-      (setq dired-guess-shell-gnutar "tar"))
+    ;; (evilified-state-evilify dired-mode dired-mode-map
+    ;;   (kbd "RET") 'dired-open-file)
 
-    ;; Use `gls' if `coreutils' was installed prefixed ('g') otherwise, leave
-    ;; alone. Manually add to config `(setq dired-use-ls-dired nil)' to surpesss
-    ;; warnings, when not using `coreutils' version of 'ls' on OS X.
-    ;; We must look for `gls' to make sure that `gls' is in `exec-path'
-    ;; See brew info coreutils
-    (when-let (gnu-ls (and (eq system-type 'darwin)
-                             (executable-find "gls")))
-      (setq insert-directory-program gnu-ls
-            dired-listing-switches "-aBhl --group-directories-first"))))
+    (with-eval-after-load 'projectile
+      (evilified-state-evilify dired-mode dired-mode-map
+        (kbd "RET") 'dired-open-file))
 
-(use-package dired-x                    ; Additional tools for Dired
+    ))
+
+(use-package dired-open
+  :ensure t
   :defer t
   :init
-  (add-hook 'dired-mode-hook 'vinegar/dired-setup)
-  :config
-  (define-key evil-normal-state-map (kbd "-") 'dired-jump))
+  (progn
+    (defun dotemacs-dired-open-file ()
+      "Hook dired to translate to projectile and neotree."
+      (interactive)
+      (let ((file (ignore-errors (dired-get-file-for-visit))))
+        (when file
+          (find-file (expand-file-name file (projectile-project-root)))
+          (run-hooks 'projectile-find-file-hook)
+          (message "Projectile root found: %s" (projectile-project-root))
+          (when (fboundp 'neotree-dir)
+            (if (neo-global--window-exists-p)
+                (neotree-dir (projectile-project-root))
+              (progn
+                (neotree-dir (projectile-project-root))
+                (neotree-hide)
+                (let ((origin-buffer-file-name (buffer-file-name)))
+                  (neotree-find (projectile-project-root))
+                  (neotree-find origin-buffer-file-name))
+                (neotree-hide)))))))
+    (with-eval-after-load 'projectile
+      (setq dired-open-functions 'dotemacs-dired-open-file))))
 
 (provide 'module-vinegar)
 ;;; module-vinegar.el ends here

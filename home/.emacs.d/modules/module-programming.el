@@ -6,10 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-fonts-support)
+(require 'core-toggle)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
@@ -34,7 +37,7 @@
   :on (auto-fill-comments-mode)
   :off (auto-fill-comments-mode -1)
   :documentation "Break line beyond `current-fill-column` in comments only, while editing."
-  :evil-leader "tc")
+  :evil-leader "tg")
 
 (defun dotemacs-disable-electric-indent-mode ()
   (if (fboundp 'electric-indent-local-mode)
@@ -88,13 +91,7 @@
     ;; add buffer-local indicator for whether prog-mode-hook has run.
     (set (make-local-variable 'my-pmh-ran) t)
 
-    (when dotemacs-show-trailing-whitespace
-      (set-face-attribute 'trailing-whitespace nil
-                          :background (face-attribute 'font-lock-comment-face
-                                                      :foreground))
-      (setq show-trailing-whitespace 1))
-
-    ;; disable line wrap
+        ;; disable line wrap
     (unless (bound-and-true-p truncate-lines)
       ; (set (make-local-variable 'truncate-lines) t)
       (setq truncate-lines t))

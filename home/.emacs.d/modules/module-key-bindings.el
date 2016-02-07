@@ -237,7 +237,7 @@
   :evil-leader "Tf")
 (dotemacs-add-toggle fullscreen-frame
   :status nil
-  :on (dotemacs-toggle-frame-fullscreen)
+  :on (dotemacs/toggle-frame-fullscreen)
   :documentation "Display the current frame in full screen."
   :evil-leader "TF")
 (dotemacs-add-toggle maximize-frame
@@ -475,7 +475,7 @@ Select^^^^               Move^^^^              Split^^                Resize^^  
 
 ;; text Manipulation Transient State
 
-(defun dotemacs-scale-up-or-down-font-size (direction)
+(defun dotemacs/scale-up-or-down-font-size (direction)
   "Scale the font. If DIRECTION is positive or zero the font is scaled up,
 otherwise it is scaled down."
   (interactive)
@@ -486,17 +486,17 @@ otherwise it is scaled down."
           (text-scale-decrease scale)
         (text-scale-increase scale)))))
 
-(defun dotemacs-scale-up-font ()
+(defun dotemacs/scale-up-font ()
   "Scale up the font."
   (interactive)
   (dotemacs-scale-up-or-down-font-size 1))
 
-(defun dotemacs-scale-down-font ()
+(defun dotemacs/scale-down-font ()
   "Scale up the font."
   (interactive)
   (dotemacs-scale-up-or-down-font-size -1))
 
-(defun dotemacs-reset-font-size ()
+(defun dotemacs/reset-font-size ()
   "Reset the font size."
   (interactive)
   (dotemacs-scale-up-or-down-font-size 0))
@@ -505,10 +505,10 @@ otherwise it is scaled down."
   :title "Font Scaling Transient State"
   :doc "\n[_+_/_=_] scale up [_-_] scale down [_0_] reset font [_q_] quit"
   :bindings
-  ("+" dotemacs-scale-up-font)
-  ("=" dotemacs-scale-up-font)
-  ("-" dotemacs-scale-down-font)
-  ("0" dotemacs-reset-font-size)
+  ("+" dotemacs/scale-up-font)
+  ("=" dotemacs/scale-up-font)
+  ("-" dotemacs/scale-down-font)
+  ("0" dotemacs/reset-font-size)
   ("q" nil :exit t))
 (dotemacs-set-leader-keys "zx" 'dotemacs/scale-font-transient-state/body)
 

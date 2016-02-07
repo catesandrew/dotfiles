@@ -6,10 +6,15 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'use-package)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
+(require 'core-keybindings)
+(require 'core-display-init)
+(require 'core-toggle)
+(require 'core-fonts-support)
+(require 'core-transient-state)
+(require 'core-use-package-ext)
 (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
@@ -18,7 +23,7 @@
 
 ;;; Code:
 
-(defvar dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors nil
+(defvar evil-snipe-enable-alternate-f-and-t-behaviors nil
   "if non nil f/F/t/T behaviors are replaced by evil-snipe behavior.")
 
 (use-package evil-snipe
@@ -33,7 +38,7 @@
         evil-snipe-smart-case t)
   :config
   (progn
-    (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
+    (if evil-snipe-enable-alternate-f-and-t-behaviors
         (progn
           (setq evil-snipe-repeat-scope 'whole-buffer)
           (evil-snipe-override-mode 1))
@@ -41,7 +46,7 @@
 
 (dotemacs-use-package-add-hook magit
   :post-init
-  (if dotemacs-evil-snipe-enable-alternate-f-and-t-behaviors
+  (if evil-snipe-enable-alternate-f-and-t-behaviors
       (progn
         (add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode)
         (add-hook 'git-rebase-mode-hook 'turn-off-evil-snipe-override-mode))
@@ -85,10 +90,8 @@
 
 (use-package evil-lisp-state
   :ensure t
-  :init (setq evil-lisp-state-global t
-              ;; work-around to be removed when the fix is available in MELPA
-              evil-lisp-state-leader (concat dotemacs-leader-key " k"))
-  :config (evil-lisp-state-leader (concat dotemacs-leader-key " k")))
+  :init (setq evil-lisp-state-global t)
+  :config (dotemacs-set-leader-keys "k" evil-lisp-state-map))
 
 (use-package evil-mc
   :ensure t
@@ -166,11 +169,12 @@
       "cy" 'dotemacs/copy-and-comment-lines
       "cY" 'dotemacs/copy-and-comment-lines-inverse)))
 
+;; TODO: These modes have to enable evil-matchit from their moduels
+;; (dolist (hook '(LaTeX-mode-hook mustache-mode-hook handlebars-mode-hook ruby-mode-hook))
+;;   (add-hook hook 'turn-on-evil-matchit-mode))
 (use-package evil-matchit
   :ensure t
-  :init
-  (dolist (hook '(LaTeX-mode-hook mustache-mode-hook handlebars-mode-hook ruby-mode-hook))
-    (add-hook hook 'turn-on-evil-matchit-mode)))
+  :defer t)
 
 (use-package evil-indent-plus
   :ensure t
@@ -181,65 +185,36 @@
   :ensure t
   :config
   (progn
-    (defun dotemacs-evil-numbers-micro-state-doc ()
-      "Display a short documentation in the mini buffer."
-      (dotemacs/echo "+/= to increase the value or - to decrease it"))
-
-    (defun dotemacs-evil-numbers-micro-state-overlay-map ()
-      "Set a temporary overlay map to easily increase or decrease a number"
-      (set-temporary-overlay-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map (kbd "+") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "=") 'dotemacs-evil-numbers-increase)
-         (define-key map (kbd "-") 'dotemacs-evil-numbers-decrease)
-         map) t)
-      (dotemacs-evil-numbers-micro-state-doc))
-
-    (defun dotemacs-evil-numbers-increase (amount &optional no-region)
-      "Increase number at point."
-      (interactive "p*")
-      (evil-numbers/inc-at-pt amount no-region)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-    (defun dotemacs-evil-numbers-decrease (amount)
-      "Decrease number at point."
-      (interactive "p*")
-      (evil-numbers/dec-at-pt amount)
-      (dotemacs-evil-numbers-micro-state-overlay-map))
-
-    (dotemacs-set-leader-keys "n+" 'dotemacs-evil-numbers-increase)
-    (dotemacs-set-leader-keys "n=" 'dotemacs-evil-numbers-increase)
-    (dotemacs-set-leader-keys "n-" 'dotemacs-evil-numbers-decrease)))
+    (dotemacs-define-transient-state evil-numbers
+      :title "Evil Numbers Transient State"
+      :doc "\n[_+_/_=_] increase number [_-_] decrease"
+      :bindings
+      ("+" evil-numbers/inc-at-pt)
+      ("=" evil-numbers/inc-at-pt)
+      ("-" evil-numbers/dec-at-pt))
+    (dotemacs-set-leader-keys
+     "n+" 'dotemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
+     "n=" 'dotemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
+     "n-" 'dotemacs/evil-numbers-transient-state/evil-numbers/dec-at-pt)))
 
 (use-package evil-search-highlight-persist
   :ensure t
   :init
   (progn
-    (defun dotemacs-turn-on-search-highlight-persist ()
-      "Enable search-highlight-persist in the current buffer."
-      (interactive)
-      (evil-search-highlight-persist 1))
-
-    (defun dotemacs-turn-off-search-highlight-persist ()
-      "Disable evil-search-highlight-persist in the current buffer."
-      (interactive)
-      (evil-search-highlight-persist -1))
-
     (global-evil-search-highlight-persist)
+    ;; (set-face-attribute )
     (dotemacs-set-leader-keys "/" 'evil-search-highlight-persist-remove-all)
-    ;; (dotemacs-set-leader-keys "sc" 'evil-search-highlight-persist-remove-all)
+    (dotemacs-set-leader-keys "sc" 'evil-search-highlight-persist-remove-all)
     (define-key evil-search-highlight-persist-map (kbd "C-x SPC") 'rectangle-mark-mode)
+    (evil-ex-define-cmd "nohlsearch"
+                        'evil-search-highlight-persist-remove-all)
 
-    (evil-ex-define-cmd "nohl[search]" 'dotemacs-turn-off-search-highlight-persist)
-    (evil-ex-define-cmd "hl[search]" 'dotemacs-turn-on-search-highlight-persist)
-    (define-key evil-ex-map "nohl" 'dotemacs-turn-off-search-highlight-persist)
-    (define-key evil-ex-map "hl" 'dotemacs-turn-on-search-highlight-persist)
-
-    (defun dotemacs-adaptive-evil-highlight-persist-face ()
+    (defun dotemacs/adaptive-evil-highlight-persist-face ()
       (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
                           :inherit 'region
                           :background nil
                           :foreground nil))
-    (dotemacs-adaptive-evil-highlight-persist-face)))
+    (dotemacs/adaptive-evil-highlight-persist-face)))
 
 (use-package evil-surround
   :ensure t
@@ -285,11 +260,6 @@
     (define-key evil-visual-state-map (kbd "#")
       'evil-visualstar/begin-search-backward)))
 
-(use-package easy-kill                  ; Easy killing and marking on C-w
-  :ensure t
-  :bind (([remap kill-ring-save] . easy-kill)
-         ([remap mark-sexp]      . easy-mark)))
-
 (use-package evil-anzu                  ; Position/matches count for isearch
   :ensure t
   :init
@@ -300,7 +270,7 @@
     (setq anzu-search-threshold 1000
           anzu-cons-mode-line-p nil)
     ;; powerline integration
-    (defun dotemacs-anzu-update-mode-line (here total)
+    (defun dotemacs/anzu-update-mode-line (here total)
       "Custom update function which does not propertize the status."
       (when anzu--state
         (let ((status (cl-case anzu--state
@@ -310,7 +280,7 @@
                         (replace-query (format "(%d replace)" total))
                         (replace (format "(%d/%d)" here total)))))
           status)))
-    (setq anzu-mode-line-update-function 'dotemacs-anzu-update-mode-line)))
+    (setq anzu-mode-line-update-function 'dotemacs/anzu-update-mode-line)))
 
 (use-package evil-cleverparens
   :defer t

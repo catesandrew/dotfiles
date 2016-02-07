@@ -6,10 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
+(require 'evil-evilified-state)
 ;; (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-funcs)
 ;; (require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -40,6 +43,8 @@
   :ensure t
   :init
   (progn
+    (dotemacs-register-repl 'elm-mode 'elm-repl-load "elm")
+
     (defun dotemacs/init-elm-mode ()
       "Disable electric-indent-mode and let indentation cycling feature work"
       (if (fboundp 'electric-indent-local-mode)
@@ -78,6 +83,7 @@
       "ht" 'elm-oracle-type-at-point
 
       ;; repl
+      "'"  'elm-repl-load
       "si" 'elm-repl-load
       "sf" 'elm-repl-push-decl
       "sF" 'dotemacs/elm-repl-push-decl-focus
@@ -109,6 +115,11 @@
       "u" 'elm-package-unmark
       "x" 'elm-package-install
       "q" 'quit-window)))
+
+(dotemacs-use-package-add-hook popwin
+  :post-config
+  (push '("*elm*" :tail t :noselect t) popwin:special-display-config)
+  (push '("*elm-make*" :tail t :noselect t) popwin:special-display-config))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init

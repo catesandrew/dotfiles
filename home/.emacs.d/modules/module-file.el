@@ -13,9 +13,10 @@
 ;; http://emacsredux.com/blog/2013/04/05/recently-visited-files/
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el
 ;;
-;; (require 'core-vars)
+(require 'core-vars)
+(require 'core-use-package-ext)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -148,7 +149,7 @@ nil if no project root was found."
   "Get the IntelliJ launcher for the current system."
   (pcase system-type
     (`darwin
-     (when-let (bundle (dotemacs-path-of-bundle "com.jetbrains.intellij"))
+     (when-let (bundle (dotemacs/path-of-bundle "com.jetbrains.intellij"))
        (expand-file-name "Contents/MacOS/idea" bundle)))
     (_ (user-error "No launcher for system %S" system-type))))
 
@@ -195,9 +196,9 @@ none."
       (make-directory parent-directory t))))
 
 (use-package files
-  ;; Revert the current buffer (re-read the contents from disk). Burying
-  ;; a buffer (removing it from the current window and sending it to the bottom
-  ;; of the stack) is very common for dismissing buffers.
+  ;; Revert the current buffer (re-read the contents from disk). Burying a
+  ;; buffer (removing it from the current window and sending it to the bottom of
+  ;; the stack) is very common for dismissing buffers.
   :bind (("C-c e u" . revert-buffer)
          ("C-c e y" . bury-buffer))
   :init
@@ -214,8 +215,24 @@ none."
   :defer t
   :commands (open-junk-file)
   :init
-  (dotemacs-set-leader-keys "fJ" 'open-junk-file)
-  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S.")))
+  (setq open-junk-file-directory (concat dotemacs-cache-directory "junk/%Y/%m/%d-%H%M%S."))
+  (defun dotemacs/open-junk-file (&optional arg)
+    "Open junk file Open junk file using helm, with `prefix-arg'
+search in junk files."
+    (interactive "P")
+    (let* ((fname (format-time-string open-junk-file-format (current-time)))
+           (rel-fname (file-name-nondirectory fname))
+           (junk-dir (file-name-directory fname))
+           (default-directory junk-dir))
+      (cond (arg
+             (require 'helm)
+             (let (helm-ff-newfile-prompt-p)
+               (dotemacs-helm-files-smart-do-search)))
+            (t
+             (require 'helm)
+             (let (helm-ff-newfile-prompt-p)
+               (helm-find-files-1 fname))))))
+  (dotemacs-set-leader-keys "fJ" 'dotemacs/open-junk-file))
 
 (use-package image-file                 ; Visit images as images
   :init (auto-image-file-mode))

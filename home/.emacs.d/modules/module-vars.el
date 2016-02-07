@@ -10,6 +10,9 @@
 
 (require 'core-vars)
 
+(defvar ycmd-server-command '("python" "/usr/local/src/ycmdycmd")
+  "The path to the ycmd server.")
+
 ;; Regexp for useful and useless buffers for smarter buffer switching
 (defvar dotemacs-useless-buffers-regexp '("*\.\+")
   "Regexp used to determine if a buffer is not useful.")
@@ -58,52 +61,11 @@ can be toggled through `toggle-transparency'.")
 (defvar dotemacs-completion-engine 'company
   "The completion engine the use.  Use either `company` or `auto-complete`.")
 
-(defvar auto-completion-return-key-behavior 'complete
-  "What the RET key should do when auto-completion menu is active.
-Possible values are `complete' or `nil'.")
-
-(defvar auto-completion-enable-snippets-in-popup t
-  "If non nil show snippets in the auto-completion popup.")
-
-(defvar auto-completion-tab-key-behavior 'cycle
-  "What the TAB key should do when auto-completion menu is active.
-Possible values are `complete', `cycle' or `nil'.")
-
-(defvar auto-completion-complete-with-key-sequence nil
-  "Provide a key sequence (string) to complete the current
-selection.")
-
-(defvar auto-completion-enable-sort-by-usage t
-  "If non nil suggestions are sorted by how often they are used.")
-
-(defvar auto-completion-enable-help-tooltip t
-  "If non nil the docstring appears in a tooltip.")
-
-(defvar company-mode-completion-cancel-keywords
-  '("do"
-    "then"
-    "begin"
-    "case")
-  "Keywords on which to cancel completion so that you can use RET
-to complet without blocking common line endings.")
-
-(defvar dotemacs-ac-private-snippets-directory nil
+(defvar auto-completion-private-snippets-directory nil
   "Configurable private snippets directory.")
-
-(defvar dotemacs-s-syntax-checking-enable-tooltips t
-  "If non nil some feedback are displayed in tooltips.")
 
 (defvar python-fill-column 79
   "Fill column value for python buffers")
-
-(defvar syntax-checking-enable-by-default t
-  "Enable syntax-checking by default.")
-
-(defvar spell-checking-enable-by-default t
-  "Enable spell checking by default.")
-
-(defvar spell-checking-enable-auto-dictionary nil
-  "Specify if auto-dictionary should be enabled or not.")
 
 (defvar dotemacs-really-kill-emacs nil
   "prevent window manager close from closing instance.")
@@ -160,45 +122,11 @@ Default is `changed' (cleanup whitespace on changed lines)")
   "If non nil then the last auto saved layouts are resume automatically upon
 start.")
 
-(defvar dotemacs-c-c++-enable-clang-support t
-  "If non nil Clang related packages and configuration are enabled.")
-
-(defvar dotemacs-c-c++-default-mode-for-headers 'c-mode
-  "Default mode to open header files. Can be `c-mode' or `c++-mode'.")
-
-;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
-(defvar dotemacs-haskell-enable-ghci-ng-support nil
-  "If non-nil ghci-ng support is enabled")
-
-(defvar dotemacs-haskell-enable-shm-support nil
-  "If non-nil structured-haskell-mode support is enabled")
-
-(defvar dotemacs-haskell-enable-hindent-style 'fundamental
-  "Style to use for formatting with hindent; available are: fundamental
-johan-tibell chris-done gibiansky. If nil hindent is disabled.")
-
-(defvar dotemacs-haskell-enable-ghc-mod-support t
-  "If non-nil ghc-mod support is enabled")
-
-(defvar dotemacs-git-enable-magit-svn-plugin nil
+(defvar git-enable-magit-svn-plugin nil
   "If non nil `magit-svn' plugin is enabled.")
 
-(defvar dotemacs-git-magit-status-fullscreen t
+(defvar git-magit-status-fullscreen t
   "If non nil magit-status buffer is displayed in fullscreen.")
-
-(defvar dotemacs-colors-engine 'rainbow
-  "The color identifier engine to use.  Either `rainbow` or `color`.")
-
-(defvar dotemacs-colors-theme-identifiers-sat&light
-  '((jazz . (50 55))
-    (gotham . (45 60))
-    (leuven . (100 40))
-    (material . (95 105))
-    (monokai . (55 60))
-    (solarized-dark . (65 55))
-    (solarized-light . (60 55))
-    (zenburn . (40 65)))
-  "alist of theme symbols and pair of saturation and lightness values.")
 
 (defvar dotemacs//flycheck-executables-searched nil)
 (defvar dotemacs//flycheck-executable-eslint nil)

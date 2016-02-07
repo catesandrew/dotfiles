@@ -6,10 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -19,19 +22,30 @@
 
 (dotemacs-defvar-company-backends php-mode)
 
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (dotemacs-add-company-hook php-mode)))
+
 (use-package drupal-mode
   :defer t)
 
-; todo
-; (defun php/post-init-eldoc ()
-;   (add-hook 'php-mode-hook 'eldoc-mode)
-;     (dotemacs-ggtags-enable-eldoc 'php-mode))
-;
-; (defun php/post-init-ggtags ()
-;   (add-hook 'php-mode-hook 'ggtags-mode))
-;
-; (defun php/post-init-helm-gtags ()
-;   (dotemacs-helm-gtags-define-keys-for-mode 'php-mode))
+(dotemacs-use-package-add-hook eldoc
+  :post-init
+  (add-hook 'php-mode-hook 'eldoc-mode)
+  (dotemacs-ggtags-enable-eldoc 'php-mode))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (add-hook 'php-mode-hook 'flycheck-mode))
+
+(dotemacs-use-package-add-hook ggtags
+  :post-init
+  (add-hook 'php-mode-hook 'ggtags-mode))
+
+(dotemacs-use-package-add-hook helm-gtags
+  :post-init
+  (dotemacs-helm-gtags-define-keys-for-mode 'php-mode))
 
 (use-package php-auto-yasnippets
   :defer t
@@ -52,16 +66,6 @@
 (use-package phpunit
   :defer t
   :ensure t)
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'php-mode))
-
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook php-mode))))
 
 (provide 'module-php)
 ;;; module-php.el ends here

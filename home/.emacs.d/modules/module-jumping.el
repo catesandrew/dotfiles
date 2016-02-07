@@ -6,6 +6,8 @@
 ;;
 ;;; Commentary:
 ;;
+
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 (require 'core-buffers)

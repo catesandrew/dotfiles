@@ -9,6 +9,8 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+;;; Commentary:
+;;; Code:
 
 (defvar dotemacs--after-display-system-init-list '()
   "List of functions to be run after the display system is initialized.")
@@ -16,8 +18,8 @@
 (defadvice server-create-window-system-frame
     (after dotemacs-init-display activate)
   "After Emacs server creates a frame, run functions queued in
-`DOTEMACS--AFTER-DISPLAY-SYSTEM-INIT-LIST' to do any setup that needs to have
-the display system initialized."
+`dotemacs--after-display-system-init-list' to do any setup that
+needs to have the display system initialized."
   (progn
     (dolist (fn (reverse dotemacs--after-display-system-init-list))
       (funcall fn))

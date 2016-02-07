@@ -6,13 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 (require 'evil-evilified-state)
-;; (require 'core-vars)
-;; (require 'core-funcs)
+(require 'core-vars)
+(require 'core-funcs)
 (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
-;; (require 'module-common)
+(require 'module-vars)
+(require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 

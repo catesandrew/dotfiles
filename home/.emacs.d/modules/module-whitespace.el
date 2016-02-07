@@ -12,6 +12,7 @@
 (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
@@ -36,9 +37,19 @@ Disable the highlighting of overlong lines."
   :defer t
   :init
   (progn
-    (setq dotemacs-show-trailing-whitespace t)
     ;; Use `fill-column' for overlong lines
     (setq-local whitespace-line-column nil))
+
+    (setq dotemacs-show-trailing-whitespace t)
+    (defun dotemacs//show-trailing-whitespace ()
+      (when dotemacs-show-trailing-whitespace
+        (set-face-attribute 'trailing-whitespace nil
+                            :background
+                            (face-attribute 'font-lock-comment-face
+                                            :foreground))
+        (setq show-trailing-whitespace 1)))
+    (add-hook 'prog-mode-hook 'dotemacs//show-trailing-whitespace)
+
 
     (dotemacs-add-toggle whitespace
       :status whitespace-mode

@@ -15,10 +15,13 @@
 ;;
 ;; - https://github.com/chrisdone/ghci-ng
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -26,30 +29,68 @@
 
 ;;; Code:
 
-(defun dotemacs-init-haskell-mode ()
-  ;; use only internal indentation system from haskell
-  (if (fboundp 'electric-indent-local-mode)
-      (electric-indent-local-mode -1))
-  (when dotemacs-haskell-enable-shm-support
-    ;; in structured-haskell-mode line highlighting creates noise
-    (setq-local global-hl-line-mode nil)))
-
-(defun dotemacs-haskell-process-do-type-on-prev-line ()
-  (interactive)
-  (if dotemacs-haskell-enable-ghci-ng-support
-      (haskell-mode-show-type-at 1)
-    (haskell-process-do-type 1)))
-
-(defun dotemacs/haskell-interactive-bring ()
-  "Bring up the interactive mode for this session without
-         switching to it."
-  (interactive)
-  (let* ((session (haskell-session))
-         (buffer (haskell-session-interactive-buffer session)))
-    (display-buffer buffer)))
+;; config
 
 (dotemacs-defvar-company-backends haskell-mode)
 (dotemacs-defvar-company-backends haskell-cabal-mode)
+
+(defvar haskell-enable-ghci-ng-support nil
+  "If non-nil ghci-ng support is enabled")
+
+(defvar haskell-enable-shm-support nil
+  "If non-nil structured-haskell-mode support is enabled")
+
+(defvar haskell-enable-hindent-style 'fundamental
+  "Style to use for formatting with hindent; available are: fundamental johan-tibell chris-done gibiansky. If nil hindent is disabled.")
+
+(defvar haskell-enable-ghc-mod-support t
+  "If non-nil ghc-mod support is enabled")
+
+(use-package cmm-mode
+  :ensure t
+  :defer t)
+
+(use-package helm-hoogle
+  :ensure t
+  :defer t
+  :init
+  (dotemacs-set-leader-keys-for-major-mode 'haskell-mode "hf" 'helm-hoogle))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (dotemacs/add-flycheck-hook 'haskell-mode))
+
+(use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
+  :ensure t
+  :commands flycheck-haskell-configure
+  :init (add-hook 'flycheck-mode-hook 'flycheck-haskell-configure))
+
+(use-package ghc
+  :ensure t
+  :if haskell-enable-ghc-mod-support
+  :defer t
+  :init (add-hook 'haskell-mode-hook 'ghc-init)
+  :config
+  (progn
+    (dotemacs-declare-prefix-for-mode 'haskell-mode "mm" "haskell/ghc-mod")
+    (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
+      "mt" 'ghc-insert-template-or-signature
+      "mu" 'ghc-initial-code-from-signature
+      "ma" 'ghc-auto
+      "mf" 'ghc-refine
+      "me" 'ghc-expand-th
+      "mn" 'ghc-goto-next-hole
+      "mp" 'ghc-goto-prev-hole
+      "m>"  'ghc-make-indent-deeper
+      "m<"  'ghc-make-indent-shallower)))
+
+(dotemacs-use-package-add-hook flycheck
+  :post-config
+  (progn
+    (with-eval-after-load 'ghc
+      ;; remove overlays from ghc-check.el if flycheck is enabled
+      (set-face-attribute 'ghc-face-error nil :underline nil)
+      (set-face-attribute 'ghc-face-warn nil :underline nil))))
 
 (use-package haskell-mode
   :ensure t
@@ -86,10 +127,26 @@
       haskell-stylish-on-save nil))
   :config
   (progn
+    ;; Haskell main editing mode key bindings.
+    (defun dotemacs-init-haskell-mode ()
+      ;; use only internal indentation system from haskell
+      (if (fboundp 'electric-indent-local-mode)
+          (electric-indent-local-mode -1))
+      (when haskell-enable-shm-support
+        ;; in structured-haskell-mode line highlighting creates noise
+        (setq-local global-hl-line-mode nil)))
+
+    (defun dotemacs/haskell-interactive-bring ()
+      "Bring up the interactive mode for this session without
+         switching to it."
+      (interactive)
+      (let* ((session (haskell-session))
+             (buffer (haskell-session-interactive-buffer session)))
+        (display-buffer buffer)))
+
     ;; hooks
     (add-hook 'haskell-mode-hook 'dotemacs-init-haskell-mode)
-    (add-hook 'haskell-cabal-mode-hook 'haskell-cabal-hook)
-    (unless dotemacs-haskell-enable-ghc-mod-support
+    (unless haskell-enable-ghc-mod-support
       (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
 
     ;; prefixes
@@ -102,6 +159,12 @@
     (dotemacs-declare-prefix-for-mode 'haskell-cabal-mode "ms" "haskell/repl")
 
     ;; key bindings
+    (defun dotemacs-haskell-process-do-type-on-prev-line ()
+      (interactive)
+      (if haskell-enable-ghci-ng-support
+          (haskell-mode-show-type-at 1)
+        (haskell-process-do-type 1)))
+
     (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
       "gg"  'haskell-mode-jump-to-def-or-tag
       "gi"  'haskell-navigate-imports
@@ -170,7 +233,7 @@
       (kbd "RET") 'haskell-interactive-mode-return)
 
     ;;GHCi-ng
-    (when dotemacs-haskell-enable-ghci-ng-support
+    (when haskell-enable-ghci-ng-support
       (when-let (ghci-ng (executable-find "ghci-ng"))
         ;; Use GHCI NG from https://github.com/chrisdone/ghci-ng
         (setq haskell-process-path-ghci ghci-ng)
@@ -178,6 +241,11 @@
         ;; if haskell-process-type == cabal-repl
         (add-to-list 'haskell-process-args-cabal-repl
                      '("--ghc-option=-ferror-spans" (concat "--with-ghc=" ghci-ng))))
+
+      ;; fixes ghci-ng for stack projects
+      (setq haskell-process-wrapper-function
+            (lambda (args)
+              (append args (list "--with-ghc" "ghci-ng"))))
 
       (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
         ;; function suggested in
@@ -210,35 +278,6 @@
                      (regexp . "\\(\\s-+\\)\\(<-\\|?\\)\\s-+")
                      (modes . '(haskell-mode literate-haskell-mode)))))))
 
-(use-package hindent                    ; Automated Haskell indentation
-  :defer t
-  :ensure t
-  :if (stringp dotemacs-haskell-enable-hindent-style)
-  :init
-  (add-hook 'haskell-mode-hook #'hindent-mode)
-  :config
-  (progn
-    (setq hindent-style dotemacs-haskell-enable-hindent-style)
-    (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
-      "F" 'hindent/reformat-decl)))
-
-(use-package flycheck-haskell           ; Setup Flycheck from Cabal projects
-  :ensure t
-  :commands flycheck-haskell-configure
-  :init (add-hook 'flycheck-mode-hook 'flycheck-haskell-configure))
-
-(use-package helm-hayoo
-  :ensure t
-  :defer t
-  :init (with-eval-after-load 'haskell-mode
-          (bind-key "C-c h h" #'helm-hayoo haskell-mode-map)))
-
-(use-package helm-hoogle
-  :ensure t
-  :defer t
-  :init (with-eval-after-load 'haskell-mode
-          (bind-key "C-c h H" #'helm-hoogle haskell-mode-map)))
-
 (use-package haskell-snippets
   :ensure t
   :defer t
@@ -254,44 +293,24 @@
         (add-to-list 'yas-snippet-dirs snip-dir t)
         (yas-load-directory snip-dir)))
 
-    ;; TODO only load once
     (with-eval-after-load 'yasnippet (haskell-snippets-initialize))))
 
-(use-package cmm-mode
-  :ensure t
-  :defer t)
-
-(use-package ghc
-  :ensure t
-  :if dotemacs-haskell-enable-ghc-mod-support
+(use-package hindent                    ; Automated Haskell indentation
   :defer t
-  :init (add-hook 'haskell-mode-hook 'ghc-init)
+  :ensure t
+  :if (stringp haskell-enable-hindent-style)
+  :init
+  (add-hook 'haskell-mode-hook #'hindent-mode)
   :config
   (progn
-    (dotemacs-declare-prefix-for-mode 'haskell-mode "mm" "haskell/ghc-mod")
+    (setq hindent-style haskell-enable-hindent-style)
     (dotemacs-set-leader-keys-for-major-mode 'haskell-mode
-      "mt" 'ghc-insert-template-or-signature
-      "mu" 'ghc-initial-code-from-signature
-      "ma" 'ghc-auto
-      "mf" 'ghc-refine
-      "me" 'ghc-expand-th
-      "mn" 'ghc-goto-next-hole
-      "mp" 'ghc-goto-prev-hole
-      "m>"  'ghc-make-indent-deeper
-      "m<"  'ghc-make-indent-shallower)))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-config
-  (progn
-    (with-eval-after-load 'ghc
-      ;; remove overlays from ghc-check.el if flycheck is enabled
-      (set-face-attribute 'ghc-face-error nil :underline nil)
-      (set-face-attribute 'ghc-face-warn nil :underline nil))))
+      "F" 'hindent/reformat-decl)))
 
 (use-package shm
   :defer t
   :ensure t
-  :if dotemacs-haskell-enable-shm-support
+  :if haskell-enable-shm-support
   :init
   (add-hook 'haskell-mode-hook 'structured-haskell-mode)
   :config
@@ -323,34 +342,28 @@
     (define-key shm-map (kbd "C-j") nil)
     (define-key shm-map (kbd "C-k") nil)))
 
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'haskell-mode))
-
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
       (dotemacs-add-company-hook haskell-mode)
-      (dotemacs-add-company-hook haskell-cabal-mode))))
+      (dotemacs-add-company-hook haskell-cabal-mode)))
 
-(use-package company-ghc
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (push (if dotemacs-haskell-enable-ghc-mod-support
-            '(company-ghc company-dabbrev-code company-yasnippet)
-          '(company-dabbrev-code company-yasnippet))
-        company-backends-haskell-mode))
+  (use-package company-ghc
+    :ensure t
+    :defer t
+    :init
+    (push (if haskell-enable-ghc-mod-support
+              '(company-ghc company-dabbrev-code company-yasnippet)
+            '(company-dabbrev-code company-yasnippet))
+          company-backends-haskell-mode))
 
-(use-package company-cabal
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init
-  (progn
-    (push '(company-cabal) company-backends-haskell-cabal-mode)))
+  (use-package company-cabal
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (push '(company-cabal) company-backends-haskell-cabal-mode))))
 
 (provide 'module-haskell)
 ;;; module-haskell.el ends here

@@ -6,11 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'use-package)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
@@ -18,16 +18,12 @@
 ;;; Code:
 
 (use-package hippie-exp                 ; Powerful expansion and completion
-  :bind (([remap dabbrev-expand] . hippie-expand))
   :init
-  :config
   (progn
     ;; replace dabbrev-expand
     (global-set-key (kbd "M-/") 'hippie-expand)
-    (define-key evil-insert-state-map (kbd "C-p") 'hippie-expand)
+    (define-key evil-insert-state-map [remap evil-complete-previous] 'hippie-expand)
     (setq hippie-expand-try-functions-list '(
-          ;; Try to expand yasnippet snippets based on prefix
-          yas-hippie-try-expand
           ;; Try to expand word "dynamically", searching the current buffer.
           try-expand-dabbrev
           ;; Try to expand word "dynamically", searching all other buffers.
@@ -48,7 +44,9 @@
           ;; unique.
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol))))
+          try-complete-lisp-symbol
+          ;; Try to expand yasnippet snippets based on prefix
+          yas-hippie-try-expand))))
 
 (provide 'module-hippie-exp)
 ;;; module-hippie-exp.el ends here

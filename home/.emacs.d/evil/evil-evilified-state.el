@@ -32,6 +32,7 @@
 
 (require 'evil)
 (require 'bind-map)
+(require 'core-vars)
 
 (defvar evilified-state--modes nil
   "List of all evilified modes.")
@@ -128,7 +129,7 @@ Needed to bypass keymaps set as text properties."
     (evilified-state--clear-normal-state-keymap)))
 
 (defun evilified-state--visual-state-on-exit ()
-  "Clean visual state"
+  "Clean visual state."
   (evilified-state--restore-normal-state-keymap))
 
 (add-hook 'evil-evilified-state-entry-hook
@@ -257,7 +258,7 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
       (eval `(define-key ,map key ,func)))))
 
 (defun evilified-state--configure-default-state (mode)
-  "Configure default state for the passed mode."
+  "Configure default state for the passed MODE."
   (add-to-list 'evilified-state--modes mode)
   (unless (bound-and-true-p holy-mode)
     (evil-set-initial-state mode 'evilified)))
@@ -305,7 +306,7 @@ Each pair KEYn FUNCTIONn is defined in MAP after the evilification of it."
      ((and (numberp event) (<= 1 event) (<= event 26)) (+ (expt 2 25) event)))))
 
 (defun evilified-state--sort-keymap (map)
-  "Sort MAP following the order: `s' > `S' > `C-s' > `C-S-s'"
+  "Sort MAP following the order: `s' > `S' > `C-s' > `C-S-s'."
   (let (list)
     (map-keymap (lambda (a b) (push (cons a b) list)) map)
     (sort list

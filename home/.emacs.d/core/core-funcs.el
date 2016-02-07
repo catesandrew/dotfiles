@@ -222,6 +222,14 @@ Emacs versions."
   (interactive)
   (byte-recompile-directory package-user-dir nil t))
 
+(defun dotemacs-recompile-user-home ()
+  "Recompile packages in elpa user dir."
+  (interactive)
+  (byte-recompile-directory dotemacs-core-directory 0 t)
+  (byte-recompile-directory dotemacs-evil-dir 0 t)
+  (byte-recompile-directory dotemacs-modules-dir 0 t)
+  (byte-recompile-directory dotemacs-user-settings-dir 0 t))
+
 (defun dotemacs-register-repl (feature repl-func &optional tag)
   "Register REPL-FUNC to the global list of REPLs DOTEMACS-REPL-LIST.
 FEATURE will be loaded before running the REPL, in case it is not already

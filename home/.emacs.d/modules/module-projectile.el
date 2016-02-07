@@ -6,14 +6,15 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
-;; (require 'module-utils)
+(require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
@@ -120,6 +121,7 @@
         "pb" 'projectile-switch-to-buffer
         "pd" 'projectile-find-dir
         "pf" 'projectile-find-file
+        "pF" 'projectile-find-file-dwim
         "ph" 'helm-projectile
         "pr" 'projectile-recentf
         "ps" 'projectile-switch-project))
@@ -138,7 +140,6 @@
       "py" 'projectile-find-tag))
   :config
   (progn
-    ; (add-hook 'projectile-after-switch-project-hook 'pyenv-mode-set-local-version)
     (defun dotemacs//projectile-switch-project-by-name (fcn project-to-switch &optional args)
       (apply fcn project-to-switch args)
       (when (projectile-project-p)

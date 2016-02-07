@@ -242,7 +242,7 @@ tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.")
                               collect (buffer-file-name buffer))))
         (dotemacs-helm-do-grep-region-or-symbol buffers t)))
 
-    (defun dotemacs-resume-last-search-buffer ()
+    (defun dotemacs/resume-last-search-buffer ()
       "open last helm-ag or hgrep buffer."
       (interactive)
       (cond ((get-buffer "*helm ag results*")

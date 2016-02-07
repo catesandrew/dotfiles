@@ -6,11 +6,13 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
 ;; (require 'core-keybindings)
-;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'core-fonts-support)
+(require 'core-display-init)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
@@ -33,7 +35,7 @@ If SYMBOL value is `display-graphic-p' then return the result of
 
     (defun dotemacs-set-powerline-for-startup-buffers ()
       "Set the powerline for buffers created when Emacs starts."
-      (dolist (buffer '("*Messages*" "*dotemacs*" "*scratch" "*Compile-Log*" "*Require Times*"))
+      (dolist (buffer '("*Messages*" "*dotemacs*" "*scratch" "*Compile-Log*"))
         (when (get-buffer buffer)
           (dotemacs-restore-powerline buffer))))
     (add-hook 'emacs-startup-hook
@@ -83,8 +85,7 @@ If SYMBOL value is `display-graphic-p' then return the result of
 
     (spaceline-spacemacs-theme)
     (spaceline-helm-mode t)
-    ; (when (configuration-layer/package-usedp 'info+)
-    ;   (spaceline-info-mode t))
+    (spaceline-info-mode t)
 
     (defun dotemacs-restore-powerline (buffer)
       "Restore the powerline in buffer"

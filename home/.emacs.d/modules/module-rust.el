@@ -6,10 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
-;; (require 'core-funcs)
-;; (require 'core-keybindings)
-;; (require 'core-display-init)
+(require 'core-vars)
+(require 'core-funcs)
+(require 'core-keybindings)
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -17,77 +18,102 @@
 
 ;;; Code:
 
+;; config
+
+;; Define the buffer local company backend variable
+(dotemacs-defvar-company-backends rust-mode)
+
+(defvar rust-enable-rustfmt-on-save nil
+  "If non-nil, automatically format code with rustfmt on save.")
+
+;; funcs
+
 ;; http://doc.crates.io/guide.html
-(defun dotemacs-rust-cargo-build ()
+(defun dotemacs/rust-cargo-build ()
   (interactive)
   (compile "cargo build"))
 
-(defun dotemacs-rust-cargo-run ()
+(defun dotemacs/rust-cargo-run ()
   (interactive)
   (compile "cargo run"))
 
-(defun dotemacs-rust-cargo-test ()
+(defun dotemacs/rust-cargo-test ()
   (interactive)
   (compile "cargo test"))
 
-(defun dotemacs-rust-cargo-doc ()
+(defun dotemacs/rust-cargo-doc ()
   (interactive)
   (compile "cargo doc"))
 
-(dotemacs-defvar-company-backends rust-mode)
+(defun dotemacs/rust-cargo-clean ()
+  (interactive)
+  (compile "cargo clean"))
 
-(defvar rust-enable-racer nil
-  "If non-nil, load the racer package (this has an external dependency).")
+;; packages
+
+(dotemacs-use-package-add-hook flycheck
+  :post-init
+  (dotemacs/add-flycheck-hook 'rust-mode))
+
+(use-package flycheck-rust
+  :ensure t
+  :defer t
+  :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 (use-package rust-mode                  ; Rust
   :ensure t
   :defer t
   :config
   (progn
+    (dotemacs-declare-prefix-for-mode 'rust-mode "mc" "cargo")
     (dotemacs-set-leader-keys-for-major-mode 'rust-mode
-      "cc" 'dotemacs-rust-cargo-build
-      "ct" 'dotemacs-rust-cargo-test
-      "cd" 'dotemacs-rust-cargo-doc
-      "cx" 'dotemacs-rust-cargo-run)))
+      "cc" 'dotemacs/rust-cargo-build
+      "ct" 'dotemacs/rust-cargo-test
+      "cd" 'dotemacs/rust-cargo-doc
+      "cx" 'dotemacs/rust-cargo-run
+      "cC" 'dotemacs/rust-cargo-clean)))
 
-(use-package racer
-  :if rust-enable-racer
-  :defer t
+(use-package toml-mode
   :ensure t
-  :init (dotemacs/add-to-hook 'rust-mode-hook '(racer-mode eldoc-mode)))
-
-(use-package flycheck-rust              ; Flycheck setup for Rust
-  :ensure t
-  :commands (flycheck-rust-setup)
-  :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-
-(dotemacs-use-package-add-hook flycheck
-  :post-init
-  (dotemacs/add-flycheck-hook 'rust-mode))
+  :defer t)
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
     :post-init
     (progn
-      (dotemacs-add-company-hook rust-mode))))
+      (push 'company-capf company-backends-rust-mode)
+      (dotemacs-add-company-hook rust-mode)
+      (add-hook 'rust-mode-hook
+                (lambda ()
+                  (setq-local company-tooltip-align-annotations t))))))
 
-(use-package company-racer
-  :if (eq dotemacs-completion-engine 'company)
+(dotemacs-use-package-add-hook smartparens
+  :post-init
+  (with-eval-after-load 'smartparens
+    ;; Don't pair lifetime specifiers
+    (sp-local-pair 'rust-mode "'" nil :actions nil)))
+
+(use-package racer
   :ensure t
   :defer t
   :init
   (progn
-    (push 'company-tern company-backends-rust-mode)))
+    (dotemacs/add-to-hook 'rust-mode-hook '(racer-mode eldoc-mode))
+    (dotemacs-declare-prefix-for-mode 'rust-mode "mg" "goto")
+    (dotemacs-set-leader-keys-for-major-mode 'rust-mode
+      "gg" 'racer-find-definition)))
 
-(use-package toml-mode                  ; Toml for Cargo files
-  :ensure t
+(use-package rustfmt
   :defer t
-  :mode ("\\.toml$" . toml-mode)
-  :config
-    (add-hook 'toml-mode-hook
-              (lambda ()
-                (electric-indent-local-mode -1)
-                (run-hooks 'prog-mode-hook))))
+  :ensure t
+  :init
+  (progn
+    (when rust-enable-rustfmt-on-save
+      (dotemacs/add-to-hook 'rust-mode-hook
+                             '(rustfmt-enable-on-save)))
+
+    (dotemacs-set-leader-keys-for-major-mode 'rust-mode
+      "=" 'rustfmt-format-buffer)))
 
 (provide 'module-rust)
 ;;; module-rust.el ends here

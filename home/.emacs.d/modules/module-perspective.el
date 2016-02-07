@@ -6,14 +6,18 @@
 ;;
 ;;; Commentary:
 ;;
-;; (require 'core-vars)
+(require 'use-package)
+(require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'core-use-package-ext)
+(require 'core-buffers)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 (require 'module-utils)
+(require 'use-package)
 
 ;;; Code:
 
@@ -215,11 +219,11 @@ FRAME defaults to the current frame."
     (set-persp-parameter
      'eyebrowse-last-slot (eyebrowse--get 'last-slot frame) persp)))
 
-(defun dotemacs/layout-workspaces-micro-state ()
-  "Launches the workspaces micro state, if defined."
+(defun dotemacs/layout-workspaces-transient-state ()
+  "Launches the workspaces transient state, if defined."
   (interactive)
-  (if (fboundp 'dotemacs-workspaces-micro-state)
-      (call-interactively 'dotemacs-workspaces-micro-state)
+  (if (fboundp 'dotemacs/workspaces-transient-state/body)
+      (call-interactively 'dotemacs/workspaces-transient-state/body)
     (message "You need the eyebrowse layer to use this feature.")))
 
 (use-package persp-mode
@@ -257,7 +261,7 @@ FRAME defaults to the current frame."
                            *persp-hash* 'non-existent))
         (persp-switch dotemacs--last-selected-layout)))
 
-    ;; Perspectives micro-state -------------------------------------------
+    ;; Perspectives transient-state -------------------------------------------
 
     (defun dotemacs//layouts-ms-toggle-doc ()
       "Toggle the full documenation for the layouts micro-state."
@@ -383,7 +387,7 @@ FRAME defaults to the current frame."
                           "Do you want to create one? "))
              (let ((persp-reset-windows-on-nil-window-conf t))
                (persp-switch nil)
-               (dotemacs-home))))))
+               (dotemacs-home-delete-other-windows))))))
 
      ;; Define all `dotemacs/persp-switch-to-X' functions
      (dolist (i (number-sequence 9 0 -1))
@@ -391,7 +395,7 @@ FRAME defaults to the current frame."
                 ,(format "Switch to layout %s." i)
                 (interactive)
                 (dotemacs/layout-switch-by-pos ,(if (eq 0 i) 9 (1- i)))
-                (dotemacs-layouts-micro-state))))
+                (dotemacs/layouts-transient-state/body))))
 
      (defun dotemacs/layout-goto-default ()
        "Go to `dotemacs-default-layout-name` layout"
@@ -403,7 +407,7 @@ FRAME defaults to the current frame."
        "Rename a layout and get back to the perspectives micro-state."
        (interactive)
        (call-interactively 'persp-rename)
-       (dotemacs-layouts-micro-state))
+       (spacemacs/layouts-transient-state/body))
 
      (defun dotemacs/layouts-ms-close ()
        "Kill current perspective"
@@ -413,7 +417,7 @@ FRAME defaults to the current frame."
      (defun dotemacs/layouts-ms-close-other ()
        (interactive)
        (call-interactively 'dotemacs/helm-persp-close)
-       (dotemacs-layouts-micro-state))
+       (spacemacs/layouts-transient-state/body))
 
      (defun dotemacs/layouts-ms-kill ()
        "Kill current perspective"
@@ -423,7 +427,7 @@ FRAME defaults to the current frame."
      (defun dotemacs/layouts-ms-kill-other ()
        (interactive)
        (call-interactively 'dotemacs/helm-persp-kill)
-       (dotemacs-layouts-micro-state))
+       (spacemacs/layouts-transient-state/body))
 
      (defun dotemacs/layouts-ms-last ()
        "Switch to the last active perspective"
@@ -472,7 +476,7 @@ Available PROPS:
            ;; Check for Clashes
            (if ,already-defined?
                (unless (equal ,already-defined? ,name)
-                 (warn "Replacing existing binding \"%s\" for %s with %s"
+                 (dotemacs-buffer/warning "Replacing existing binding \"%s\" for %s with %s"
                        ,binding ,already-defined? ,name )
                  (push '(,binding . ,name) dotemacs--custom-layout-alist))
              (push '(,binding . ,name) dotemacs--custom-layout-alist)))))
@@ -495,7 +499,7 @@ Available PROPS:
                        (format "[%s] %s"
                                (car custom-persp) (cdr custom-persp)))
                      dotemacs--custom-layout-alist " ")
-        (warn (format "`dotemacs--custom-layout-alist' variable is empty" ))))
+        (dotemacs-buffer/warning (format "`dotemacs--custom-layout-alist' variable is empty" ))))
 
     (defun dotemacs//update-custom-layouts ()
       "Ensure the custom-perspectives transient-state is updated.
@@ -531,8 +535,8 @@ current perspective."
       (helm-mini)
       (add-hook 'ido-make-buffer-list-hook  #'persp-restrict-ido-buffers))
 
-    ;; (dotemacs-declare-prefix "b" "persp-buffers")
-    ;; (dotemacs-declare-prefix "B" "global-buffers")
+    (dotemacs-declare-prefix "b" "persp-buffers")
+    (dotemacs-declare-prefix "B" "global-buffers")
 
     ;; Override SPC TAB to only change buffers in perspective
     (dotemacs-set-leader-keys

@@ -6,11 +6,14 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-use-package-ext)
+(require 'core-keybindings)
+(require 'core-auto-completion)
 ;; (require 'core-display-init)
-;; (require 'module-vars)
+(require 'module-vars)
 ;; (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
@@ -19,18 +22,9 @@
 
 (dotemacs-defvar-company-backends markdown-mode)
 
-;; Insert key for org-mode and markdown a la C-h k
-;; from SE endless http://emacs.stackexchange.com/questions/2206/i-want-to-have-the-kbd-tags-for-my-blog-written-in-org-mode/2208#2208
-(defun dotemacs-insert-keybinding-markdown (key)
-  "Ask for a key then insert its description.
-Will work on both org-mode and any mode that accepts plain html."
-  (interactive "kType key sequence: ")
-  (let* ((tag "~%s~"))
-    (if (null (equal key "\r"))
-        (insert
-         (format tag (help-key-description key nil)))
-      (insert (format tag ""))
-      (forward-char -6))))
+(dotemacs-use-package-add-hook emoji-cheat-sheet-plus
+  :post-init
+  (add-hook 'markdown-mode-hook 'emoji-cheat-sheet-plus-display-mode))
 
 (use-package gh-md
   :ensure t
@@ -65,7 +59,17 @@ Will work on both org-mode and any mode that accepts plain html."
             ("fn"   "^\\[\\^\\(.*\\)\\]" 1))))
   :config
   (progn
-    ;; Process Markdown with Pandoc, using a custom stylesheet for nice output
+    ;; GFM: No filling because line breaks are significant.
+    (add-hook 'gfm-mode-hook 'turn-off-auto-fill)
+    ;; Use visual lines instead
+    (add-hook 'gfm-mode-hook 'visual-line-mode)
+    (add-hook 'gfm-mode-hook 'dotemacs-whitespace-style-no-long-lines)
+
+    (bind-key "C-c C-s C" 'markdown-insert-gfm-code-block markdown-mode-map)
+    (bind-key "C-c C-s P" 'markdown-insert-gfm-code-block markdown-mode-map)
+
+    ;; PANDOC: Process Markdown with Pandoc, using a custom stylesheet for nice
+    ;; output
     (let ((stylesheet (expand-file-name
                        (locate-user-emacs-file "etc/pandoc.css"))))
       (setq markdown-command
@@ -75,23 +79,27 @@ Will work on both org-mode and any mode that accepts plain html."
                          "--standalone" "-f" "markdown" "-t" "html5")
                        " ")))
 
-    (when (eq system-type 'darwin)
-      (setq markdown-open-command "mark"))
-
     ;; disable auto indent
     (add-hook 'markdown-mode-hook
               (lambda ()
                 (electric-indent-local-mode -1)
                 (setq imenu-generic-expression markdown-imenu-generic-expression)))
 
-    ;; No filling in GFM, because line breaks are significant.
-    (add-hook 'gfm-mode-hook #'turn-off-auto-fill)
-    ;; Use visual lines instead
-    (add-hook 'gfm-mode-hook #'visual-line-mode)
-    (add-hook 'gfm-mode-hook #'dotemacs-whitespace-style-no-long-lines)
+    (when (eq system-type 'darwin)
+      (setq markdown-open-command "mark"))
 
-    (bind-key "C-c C-s C" #'markdown-insert-gfm-code-block markdown-mode-map)
-    (bind-key "C-c C-s P" #'markdown-insert-gfm-code-block markdown-mode-map)
+    ;; IMENU: Insert key for org-mode and markdown a la C-h k from SE endless
+    ;; http://emacs.stackexchange.com/questions/2206/i-want-to-have-the-kbd-tags-for-my-blog-written-in-org-mode/2208#2208
+    (defun dotemacs-insert-keybinding-markdown (key)
+      "Ask for a key then insert its description. Will work on
+both org-mode and any mode that accepts plain html."
+      (interactive "kType key sequence: ")
+      (let* ((tag "~%s~"))
+        (if (null (equal key "\r"))
+            (insert
+             (format tag (help-key-description key nil)))
+          (insert (format tag ""))
+          (forward-char -6))))
 
     ;; Declare prefixes and bind keys
     (dolist (prefix '(("mc" . "markdown/command")
@@ -188,41 +196,51 @@ Will work on both org-mode and any mode that accepts plain html."
     "cs"   'mmm-parse-buffer)
   :config
   (progn
-    (mmm-add-classes '((markdown-python
-                        :submode python-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```python[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-html
-                        :submode web-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```html[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-java
-                        :submode java-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```java[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-ruby
-                        :submode ruby-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```ruby[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-c
-                        :submode c-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```c[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-c++
-                        :submode c++-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```c\+\+[\n\r]+"
-                        :back "^```$")))
-    (mmm-add-classes '((markdown-elisp
-                        :submode emacs-lisp-mode
-                        :face mmm-declaration-submode-face
-                        :front "^```elisp[\n\r]+"
-                        :back "^```$")))
+      (mmm-add-classes '((markdown-python
+                          :submode python-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```python[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-html
+                          :submode web-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```html[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-java
+                          :submode java-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```java[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-ruby
+                          :submode ruby-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```ruby[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-c
+                          :submode c-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```c[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-c++
+                          :submode c++-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```c\+\+[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-elisp
+                          :submode emacs-lisp-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```elisp[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-javascript
+                          :submode javascript-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```javascript[\n\r]+"
+                          :back "^```$")))
+      (mmm-add-classes '((markdown-ess
+                          :submode R-mode
+                          :face mmm-declaration-submode-face
+                          :front "^```{?r.*}?[\n\r]+"
+                          :back "^```$")))
     (setq mmm-global-mode t)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-python)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-java)
@@ -230,7 +248,9 @@ Will work on both org-mode and any mode that accepts plain html."
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-c)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-c++)
     (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-elisp)
-    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)))
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-html)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-javascript)
+    (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-ess)))
 
 (when (eq dotemacs-completion-engine 'company)
   (dotemacs-use-package-add-hook company
@@ -238,6 +258,7 @@ Will work on both org-mode and any mode that accepts plain html."
     (progn
       (dotemacs-add-company-hook markdown-mode)
       (push 'company-capf company-backends-markdown-mode)))
+
   (dotemacs-use-package-add-hook company-emoji
     :post-init
     (progn
@@ -246,10 +267,6 @@ Will work on both org-mode and any mode that accepts plain html."
 (dotemacs-use-package-add-hook flyspell
   :post-init
   (spell-checking/add-flyspell-hook 'markdown-mode))
-
-(dotemacs-use-package-add-hook emoji-cheat-sheet-plus
-  :post-init
-  (add-hook 'markdown-mode-hook 'emoji-cheat-sheet-plus-display-mode))
 
 (provide 'module-markdown)
 ;;; module-markdown.el ends here

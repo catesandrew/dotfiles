@@ -225,11 +225,14 @@ environment, otherwise it is strongly recommended to let it set to t.")
       quelpa-update-melpa-p nil)
 (dotemacs-load-or-install-package 'quelpa t)
 (dotemacs-load-or-install-package 'quelpa-use-package t)
+;; required for some micro-states
+(dotemacs-load-or-install-package 'hydra t)
 
 ;; inject use-package hooks for easy customization of
 ;; stock package configuration
 (setq use-package-inject-hooks t)
 (require 'core-keybindings)
+(require 'use-package)
 (require 'module-vars)
 
 (add-hook
@@ -254,7 +257,7 @@ environment, otherwise it is strongly recommended to let it set to t.")
       '(("a"  "applications")
         ("ai"  "irc")
         ("as"  "shells")
-        ("b"   "buffers")
+        ;; ("b"   "buffers")
         ("bm"  "move")
         ("c"   "compile/comments")
         ("C"   "capture/colors")
@@ -546,8 +549,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 
 ;;; Shell
-(use-package module-eshell)
 (use-package module-shell)
+(use-package module-eshell)
 
 
 ;;; Buffer, Windows and Frames
@@ -602,10 +605,13 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 
 ;;; Evil Addons
-(use-package module-evil-packages)
 (use-package evil-evilified-state :load-path "evil/")
 (define-key evil-evilified-state-map (kbd dotemacs-leader-key)
   dotemacs-default-map)
+(evilified-state-evilify-map package-menu-mode-map
+  :mode package-menu-mode)
+(evilified-state-evilify process-menu-mode process-menu-mode-map)
+(use-package module-evil-packages)
 
 
 ;;; EMacs
@@ -626,8 +632,20 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
     :evil-keys (dotemacs-leader-key)
     :override-minor-modes t
     :override-mode-name dotemacs-leader-override-mode))
+(use-package hydra
+  :ensure t
+  :init
+  ;; turn off evil in corelv buffers
+  (push '("\\*LV\\*") evil-buffer-regexps)
+
+  (defun dotemacs//hydra-key-doc-function (key key-width doc doc-width)
+    (format (format "[%%%ds] %%%ds" key-width (- -1 doc-width))
+            key doc))
+  (setq hydra-key-doc-function 'dotemacs//hydra-key-doc-function)
+  (setq hydra-head-format "[%s] "))
 (use-package module-key-bindings
   :config (dotemacs-toggle-transparency-core))
+
 
 
 ;;; Text Mode
@@ -674,6 +692,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 ;; Programming Languages
 (use-package module-elisp)
+(use-package module-clisp)
+(use-package module-csv)
 (use-package module-scala)
 (use-package module-python)
 (use-package module-ruby)
@@ -696,7 +716,10 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package module-java)
 (use-package module-restclient)
 (use-package module-swift)
+(use-package module-scheme)
 (use-package module-shell-script)
+(use-package module-semantic)
+(use-package module-ycmd)
 
 ;; Misc programming languages
 (use-package arduino-mode :defer t :ensure t)
@@ -713,48 +736,6 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   :defer t
   :ensure t
   :interpreter "\\(Wolfram\\|Mathematica\\)Script\\( -script\\)?")
-
-(dotemacs-use-package-add-hook smartparens
-  :post-init
-  (progn
-    (if (version< emacs-version "24.4")
-        (ad-disable-advice 'preceding-sexp 'around 'evil)
-      (advice-remove 'elisp--preceding-sexp 'evil--preceding-sexp))
-
-    ;; but alwayws enable for lisp mode
-    (dotemacs/add-to-hooks 'smartparens-strict-mode '(lisp-mode))
-
-    (defun dotemacs-eval-current-form-sp (&optional arg)
-      "Call `eval-last-sexp' after moving out of one level of
-parentheses. Will exit any strings and/or comments first.
-Requires smartparens because all movement is done using
-`sp-up-sexp'. An optional ARG can be used which is passed to
-`sp-up-sexp' to move out of more than one sexp."
-      (interactive "p")
-      (require 'smartparens)
-      (save-excursion
-        (let ((max 10))
-          (while (and (> max 0)
-                      (sp-point-in-string-or-comment))
-            (decf max)
-            (sp-up-sexp)))
-        (sp-up-sexp arg)
-        (call-interactively 'eval-last-sexp)))
-
-    (defun dotemacs-eval-current-symbol-sp ()
-      "Call `eval-last-sexp' on the symbol underneath the
-point. Requires smartparens because all movement is done using
-`sp-forward-symbol'."
-      (interactive)
-      (require 'smartparens)
-      (save-excursion
-        (sp-forward-symbol)
-        (call-interactively 'eval-last-sexp)))
-
-    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (dotemacs-set-leader-keys-for-major-mode mode
-        "ec" 'dotemacs-eval-current-form-sp
-        "es" 'dotemacs-eval-current-symbol-sp))))
 
 
 ;; Source Code tags, and metadata
@@ -800,7 +781,6 @@ point. Requires smartparens because all movement is done using
 
 
 ;;; File Navigation
-(use-package module-file-navigation)
 (use-package module-ranger)
 (use-package module-vinegar)
 (use-package module-unimpaired)
@@ -813,6 +793,7 @@ point. Requires smartparens because all movement is done using
 (use-package module-vagrant)
 (use-package module-nixos)
 (use-package module-systemd)
+(use-package module-tmux)
 
 
 ;;; Finance
@@ -835,13 +816,11 @@ point. Requires smartparens because all movement is done using
 
 ;;; Spell Checking
 (use-package module-spell-checking)
-(use-package module-flyspell)
 
 
 ;;; Skeletons, completion and expansion
 (use-package module-auto-complete)
 (use-package module-hippie-exp)
-(use-package module-company)
 (use-package module-yasnippet)
 
 
@@ -869,72 +848,53 @@ point. Requires smartparens because all movement is done using
 
 
 ;;; Net & Web
-(use-package browse-url                 ; Browse URLs
-  :bind (("C-c w u" . browse-url)))
-
-(use-package eww                        ; Emacs' built-in web browser
-  :bind (("C-c w b" . eww-list-bookmarks)
-         ("C-c w w" . eww)))
-
-(use-package sendmail                   ; Send mails from Emacs
-  :defer t
-  :config (setq send-mail-function 'smtpmail-send-it))
-
-(use-package message                    ; Compose mails from Emacs
-  :defer t
-  :config (setq message-send-mail-function 'smtpmail-send-it
-                ;; Don't keep message buffers around
-                message-kill-buffer-on-exit t))
+(use-package module-net)
 
 
 ;;; Miscellaneous
 (use-package module-location)
 (use-package module-emoji)
 
-(use-package theme-changer
-  :if geolocation-enable-automatic-theme-changer
-  :ensure t
-  :config
-  (progn
-    (when (> (length dotemacs-themes) 1)
-      (change-theme (nth 0 dotemacs-themes)
-                    (nth 1 dotemacs-themes)))))
-
-;; Google Translate
 (use-package google-translate
   :ensure t
-  :commands (google-translate-query-translate
-             google-translate-at-point
-             google-translate-query-translate-reverse
-             google-translate-at-point-reverse)
   :init
-  (dotemacs-set-leader-keys
-    "xgQ" 'google-translate-query-translate-reverse
-    "xgq" 'google-translate-query-translate
-    "xgT" 'google-translate-at-point-reverse
-    "xgt" 'google-translate-at-point)
-  :config
   (progn
-    (require 'google-translate-default-ui)
-    (setq google-translate-enable-ido-completion t)
-    (setq google-translate-show-phonetic t)
-    (setq google-translate-default-source-language "en")
-    (setq google-translate-default-target-language "sp")))
+    (defun dotemacs/set-google-translate-languages (source target)
+      "Set source language for google translate.
+For instance pass En as source for English."
+      (interactive
+       "sEnter source language (ie. en): \nsEnter target language (ie. en): "
+       source target)
+      (message
+       (format "Set google translate source language to %s and target to %s"
+               source target))
+      (setq google-translate-default-source-language (downcase source))
+      (setq google-translate-default-target-language (downcase target)))
+    (dotemacs-set-leader-keys
+     "xgl" 'dotemacs/set-google-translate-languages
+     "xgQ" 'google-translate-query-translate-reverse
+     "xgq" 'google-translate-query-translate
+     "xgT" 'google-translate-at-point-reverse
+     "xgt" 'google-translate-at-point))
+  (setq google-translate-enable-ido-completion t)
+  (setq google-translate-show-phonetic t)
+  (setq google-translate-default-source-language "en")
+  (setq google-translate-default-target-language "sp"))
 
 (use-package spray          ; Speed Reading
   :commands spray-mode
   :ensure t
   :init
   (progn
-    (defun dotemacs-start-spray ()
+    (defun speed-reading/start-spray ()
       "Start spray speed reading on current buffer at current point."
       (interactive)
       (evil-insert-state)
       (spray-mode t)
       (internal-show-cursor (selected-window) nil))
-    (dotemacs-set-leader-keys "asr" 'dotemacs-start-spray)
+    (dotemacs-set-leader-keys "aR" 'speed-reading/start-spray)
 
-    (defadvice spray-quit (after dotemacs-quit-spray activate)
+    (defadvice spray-quit (after speed-reading//quit-spray activate)
       "Correctly quit spray."
       (internal-show-cursor (selected-window) t)
       (evil-normal-state)))
@@ -943,6 +903,11 @@ point. Requires smartparens because all movement is done using
     (define-key spray-mode-map (kbd "h") 'spray-backward-word)
     (define-key spray-mode-map (kbd "l") 'spray-forward-word)
     (define-key spray-mode-map (kbd "q") 'spray-quit)))
+
+(dotemacs-use-package-add-hook which-key
+  :post-init
+  (push '("\\`speed-reading/\\(.+\\)\\'" . "\\1")
+        which-key-description-replacement-alist))
 
 (use-package module-firestarter
   :disabled t

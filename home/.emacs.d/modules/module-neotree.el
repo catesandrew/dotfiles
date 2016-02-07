@@ -6,9 +6,11 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
+(require 'evil-evilified-state)
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
 ;; (require 'module-vars)
 ;; (require 'module-common)
@@ -24,7 +26,7 @@
   :init
   (progn
     (add-to-list 'evil-motion-state-modes 'neotree-mode)
-    (setq neo-window-width 25
+    (setq neo-window-width 27
           neo-theme 'nerd
           neo-create-file-auto-open t
           neo-banner-message nil
@@ -88,24 +90,27 @@
 
     (defun dotemacs-neotree-key-bindings ()
       "Set the key bindings for a neotree buffer."
-      (define-key evil-motion-state-local-map (kbd "TAB") 'neotree-stretch-toggle)
-      (define-key evil-motion-state-local-map (kbd "RET") 'neotree-enter)
-      (define-key evil-motion-state-local-map (kbd "|")   'neotree-enter-vertical-split)
-      (define-key evil-motion-state-local-map (kbd "-")   'neotree-enter-horizontal-split)
-      (define-key evil-motion-state-local-map (kbd "?")   'evil-search-backward)
-      (define-key evil-motion-state-local-map (kbd "c")   'neotree-create-node)
-      (define-key evil-motion-state-local-map (kbd "d")   'neotree-delete-node)
-      (define-key evil-motion-state-local-map (kbd "gr")  'neotree-refresh)
-      (define-key evil-motion-state-local-map (kbd "h")   'dotemacs-neotree-collapse-or-up)
-      (define-key evil-motion-state-local-map (kbd "H")   'neotree-select-previous-sibling-node)
-      (define-key evil-motion-state-local-map (kbd "J")   'neotree-select-down-node)
-      (define-key evil-motion-state-local-map (kbd "K")   'neotree-select-up-node)
-      (define-key evil-motion-state-local-map (kbd "l")   'dotemacs-neotree-expand-or-open)
-      (define-key evil-motion-state-local-map (kbd "L")   'neotree-select-next-sibling-node)
-      (define-key evil-motion-state-local-map (kbd "q")   'neotree-hide)
-      (define-key evil-motion-state-local-map (kbd "r")   'neotree-rename-node)
-      (define-key evil-motion-state-local-map (kbd "R")   'neotree-change-root)
-      (define-key evil-motion-state-local-map (kbd "s")   'neotree-hidden-file-toggle))
+      (evilified-state-evilify-map neotree-mode-map
+        :mode neotree-mode
+        :bindings
+        (kbd "TAB")  'neotree-stretch-toggle
+        (kbd "RET") 'neotree-enter
+        (kbd "|") 'neotree-enter-vertical-split
+        (kbd "-") 'neotree-enter-horizontal-split
+        (kbd "?") 'evil-search-backward
+        (kbd "c") 'neotree-create-node
+        (kbd "d") 'neotree-delete-node
+        (kbd "gr") 'neotree-refresh
+        (kbd "h") 'dotemacs-neotree-collapse-or-up
+        (kbd "H") 'neotree-select-previous-sibling-node
+        (kbd "J") 'neotree-select-down-node
+        (kbd "K") 'neotree-select-up-node
+        (kbd "l") 'dotemacs-neotree-expand-or-open
+        (kbd "L") 'neotree-select-next-sibling-node
+        (kbd "q") 'neotree-hide
+        (kbd "r") 'neotree-rename-node
+        (kbd "R") 'neotree-change-root
+        (kbd "s") 'neotree-hidden-file-toggle))
 
     ;; neo-global--select-window
     (dotemacs-set-leader-keys
@@ -116,12 +121,12 @@
 
   :config
   (progn
+    (dotemacs-neotree-key-bindings)
     (when neo-persist-show
       (add-hook 'popwin:before-popup-hook
                 (lambda () (setq neo-persist-show nil)))
       (add-hook 'popwin:after-popup-hook
-                (lambda () (setq neo-persist-show t))))
-    (dotemacs/add-to-hook 'neotree-mode-hook '(dotemacs-neotree-key-bindings))))
+                (lambda () (setq neo-persist-show t))))))
 
 (provide 'module-neotree)
 ;;; module-neotree.el ends here

@@ -6,15 +6,19 @@
 ;;
 ;;; Commentary:
 ;;
+(require 'use-package)
 (require 'core-vars)
 (require 'core-keybindings)
 (require 'core-auto-completion)
+(require 'core-use-package-ext)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
 ;; (require 'module-utils)
 
 ;;; Code:
+
+;; config
 
 (dotemacs-defvar-company-backends LaTeX-mode)
 
@@ -34,6 +38,8 @@
                            "tabular"
                            "tikzpicture")
   "List of environment names in which `auto-fill-mode' will be inhibited.")
+
+;; funcs
 
 (defun latex/build ()
   (interactive)
@@ -86,8 +92,18 @@ the automatic filling of the current paragraph."
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
-(use-package tex-site                   ; AUCTeX initialization
-  :ensure auctex)
+;; packages
+
+(use-package auctex-latexmk             ; latexmk command for AUCTeX
+  :ensure t
+  :if (string= latex-build-command "LatexMk")
+  :defer t
+  :init
+  (progn
+    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+    (dotemacs-use-package-add-hook tex
+      :post-config
+      (auctex-latexmk-setup))))
 
 (use-package tex                        ; TeX editing/processing
   :ensure auctex
@@ -106,7 +122,7 @@ the automatic filling of the current paragraph."
           ;; Don't ask for confirmation when cleaning
           TeX-clean-confirm nil
           TeX-syntactic-comment t
-          ;; Provide forward and inverse search with SyncTeX
+          ;; Provide forward and inverse search with Sync TeX
           TeX-source-correlate-mode t
           TeX-source-correlate-start-server nil
           ;; Setup reftex style (RefTeX is supported through extension)
@@ -188,28 +204,8 @@ the automatic filling of the current paragraph."
       "xfn" 'latex/font-normal
       "xfu" 'latex/font-upright)))
 
-(when (eq dotemacs-completion-engine 'company)
-  (dotemacs-use-package-add-hook company
-    :post-init
-    (progn
-      (dotemacs-add-company-hook LaTeX-mode))))
-
-(use-package company-math
-  :if (eq dotemacs-completion-engine 'company)
-  :ensure t
-  :defer t
-  :init (push 'company-math company-backends-LaTeX-mode))
-
-(use-package company-auctex
-  :if (eq dotemacs-completion-engine 'company)
-  :defer t
-  :init
-  (progn
-    (push 'company-auctex-labels company-backends-LaTeX-mode)
-    (push 'company-auctex-bibs company-backends-LaTeX-mode)
-    (push '(company-auctex-macros
-            company-auctex-symbols
-            company-auctex-environments) company-backends-LaTeX-mode)))
+(use-package tex-site                   ; AUCTeX initialization
+  :ensure auctex)
 
 (use-package tex-buf                    ; TeX buffer management
   :ensure auctex
@@ -255,17 +251,6 @@ the automatic filling of the current paragraph."
           LaTeX-babel-hyphen nil)
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)))    ; Easy math input
 
-(use-package auctex-latexmk             ; latexmk command for AUCTeX
-  :ensure t
-  :if (string= latex-build-command "LatexMk")
-  :defer t
-  :init
-  (progn
-    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-    (dotemacs-use-package-add-hook tex
-      :post-config
-      (auctex-latexmk-setup))))
-
 (use-package bibtex                     ; BibTeX editing
   :defer t
   :config
@@ -276,80 +261,26 @@ the automatic filling of the current paragraph."
     ;; Use a modern BibTeX dialect
     (bibtex-set-dialect 'biblatex)))
 
-(use-package reftex                     ; TeX/BibTeX cross-reference management
-  :defer t
-  :init (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  :config
-  (progn
-    ;; (setq reftex-plug-into-AUCTeX '(nil nil t t t))
-    (setq reftex-use-fonts t)
+(when (eq dotemacs-completion-engine 'company)
+  (dotemacs-use-package-add-hook company
+    :post-init
+    (progn
+      (dotemacs-add-company-hook LaTeX-mode)))
 
-    (dotemacs-declare-prefix-for-mode 'latex-mode "mr"  "reftex")
-    (dotemacs-set-leader-keys-for-major-mode 'latex-mode
-      "rc"    'reftex-citation
-      "rg"    'reftex-grep-document
-      "ri"    'reftex-index-selection-or-word
-      "rI"    'reftex-display-index
-      "r TAB" 'reftex-index
-      "rl"    'reftex-label
-      "rp"    'reftex-index-phrase-selection-or-word
-      "rP"    'reftex-index-visit-phrases-buffer
-      "rr"    'reftex-reference
-      "rs"    'reftex-search-document
-      "rt"    'reftex-toc
-      "rT"    'reftex-toc-recenter
-      "rv"    'reftex-view-crossref)
+  (use-package company-auctex
+    :defer t
+    :init
+    (progn
+      (push 'company-auctex-labels company-backends-LaTeX-mode)
+      (push 'company-auctex-bibs company-backends-LaTeX-mode)
+      (push '(company-auctex-macros
+              company-auctex-symbols
+              company-auctex-environments) company-backends-LaTeX-mode)))
 
-    ;; Plug into AUCTeX
-    (setq reftex-plug-into-AUCTeX t
-          ;; Automatically derive labels, and prompt for confirmation
-          reftex-insert-label-flags '(t t)
-          reftex-label-alist
-          '(
-            ;; Additional label definitions for RefTeX.
-            ("definition" ?d "def:" "~\\ref{%s}"
-             dotemacs/reftex-find-ams-environment-caption
-             ("definition" "def.") -3)
-            ("theorem" ?h "thm:" "~\\ref{%s}"
-             dotemacs/reftex-find-ams-environment-caption
-             ("theorem" "th.") -3)
-            ("example" ?x "ex:" "~\\ref{%s}"
-             dotemacs/reftex-find-ams-environment-caption
-             ("example" "ex") -3)
-            ;; Algorithms package
-            ("algorithm" ?a "alg:" "~\\ref{%s}"
-             "\\\\caption[[{]" ("algorithm" "alg") -3)))
-
-    (defun dotemacs/reftex-find-ams-environment-caption (environment)
-      "Find the caption of an AMS ENVIRONMENT."
-      (let ((re (rx-to-string `(and "\\begin{" ,environment "}"))))
-        ;; Go to the beginning of the label first
-        (re-search-backward re)
-        (goto-char (match-end 0)))
-      (if (not (looking-at (rx (zero-or-more space) "[")))
-          (error "Environment %s has no title" environment)
-        (let ((beg (match-end 0)))
-          ;; Move point onto the title start bracket and move over to the end,
-          ;; skipping any other brackets in between, and eventually extract the text
-          ;; between the brackets
-          (goto-char (1- beg))
-          (forward-list)
-          (buffer-substring-no-properties beg (1- (point))))))
-
-    ;; Provide basic RefTeX support for biblatex
-    (unless (assq 'biblatex reftex-cite-format-builtin)
-      (add-to-list 'reftex-cite-format-builtin
-                   '(biblatex "The biblatex package"
-                              ((?\C-m . "\\cite[]{%l}")
-                               (?t . "\\textcite{%l}")
-                               (?a . "\\autocite[]{%l}")
-                               (?p . "\\parencite{%l}")
-                               (?f . "\\footcite[][]{%l}")
-                               (?F . "\\fullcite[]{%l}")
-                               (?x . "[]{%l}")
-                               (?X . "{%l}"))))
-      (setq reftex-cite-format 'biblatex)))
-  :diminish reftex-mode)
+  (use-package company-math
+    :ensure t
+    :defer t
+    :init (push 'company-math company-backends-LaTeX-mode)))
 
 (dotemacs-use-package-add-hook evil-matchit
   :post-init
@@ -361,7 +292,7 @@ the automatic filling of the current paragraph."
 
 (dotemacs-use-package-add-hook flyspell
   :post-init
-  (spell-checking/add-flyspell-hook 'LaTeX-mode))
+  (spell-checking/add-flyspell-hook 'LaTeX-mode-hook))
 
 (dotemacs-use-package-add-hook smartparens
   :post-init
@@ -379,8 +310,7 @@ the automatic filling of the current paragraph."
 
 (dotemacs-use-package-add-hook which-key
   :post-init
-  (push '("\\`latex/font-\\(.+\\)\\'" . "\\1")
-        which-key-description-replacement-alist))
+  (push '("\\`latex/font-\\(.+\\)\\'" . "\\1") which-key-description-replacement-alist))
 
 (provide 'module-latex)
 ;;; module-latex.el ends here

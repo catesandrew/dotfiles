@@ -57,21 +57,5 @@ Taken from http://stackoverflow.com/a/3072831/355252."
                    (reusable-frames . visible)
                    (window-height   . 0.4)))))
 
-(use-package auto-compile
-  :defer t
-  :ensure t
-  :diminish (auto-compile-mode . "")
-  :init
-  (progn
-    (setq auto-compile-display-buffer nil
-          ;; lets spaceline manage the mode-line
-          auto-compile-use-mode-line nil
-          auto-compile-mode-line-counter t)
-    (add-hook 'emacs-lisp-mode-hook 'auto-compile-mode))
-  :config
-  (progn
-    (dotemacs-set-leader-keys-for-major-mode 'emacs-lisp-mode
-      "cl" 'auto-compile-display-log)))
-
 (provide 'module-compile)
 ;;; module-compile.el ends here
