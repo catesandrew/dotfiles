@@ -70,18 +70,5 @@
   (add-hook 'window-numbering-before-hook 'dotemacs-window-numbering-assign)
   (add-hook 'neo-after-create-hook '(lambda (w) (window-numbering-update))))
 
-(use-package ediff-wind
-  :defer t
-  :config
-  (progn
-    ;;revert windows on exit - needs winner mode
-    (when (fboundp 'winner-undo)
-      (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
-
-    ;; Prevent Ediff from spamming the frame
-    (setq ediff-diff-options "-w"
-          ediff-window-setup-function 'ediff-setup-windows-plain
-          ediff-split-window-function 'split-window-horizontally)))
-
 (provide 'module-window)
 ;;; module-window.el ends here
