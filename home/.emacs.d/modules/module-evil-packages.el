@@ -337,5 +337,9 @@
       :off (evil-visual-mark-mode -1)
       :documentation "Show evil marks")))
 
+(use-package evil-ediff
+  :after (ediff)
+  :ensure t)
+
 (provide 'module-evil-packages)
 ;;; module-evil-packages.el ends here
