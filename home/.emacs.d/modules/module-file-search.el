@@ -18,18 +18,6 @@
 
 ;;; Code:
 
-(defun dotemacs-rgrep-quit-window ()
-  (interactive)
-  (kill-buffer)
-  (jump-to-register ?$))
-
-(defun dotemacs-rgrep-goto-file-and-close-rgrep ()
-  (interactive)
-  (compile-goto-error)
-  (kill-buffer "*grep*")
-  (delete-other-windows)
-  (message "Type C-x r j $ to return to pre-rgrep windows."))
-
 ;; --no-color, oddly enough, is required to allow emacs to colorize the output
 (defvar git-grep-switches "--extended-regexp -I -n --ignore-case --no-color"
   "Switches to pass to `git grep'.")
@@ -38,9 +26,19 @@
   :defer t
   :config
   (progn
-    ;; Add custom keybindings
-    (define-key grep-mode-map "q" #'dotemacs-rgrep-quit-window)
-    (define-key grep-mode-map (kbd "C-<return>") #'dotemacs-rgrep-goto-file-and-close-rgrep)
+    (defun dotemacs-rgrep-quit-window ()
+      (interactive)
+      (kill-buffer)
+      (jump-to-register ?$))
+    (define-key grep-mode-map "q" 'dotemacs-rgrep-quit-window)
+
+    (defun dotemacs-rgrep-goto-file-and-close-rgrep ()
+      (interactive)
+      (compile-goto-error)
+      (kill-buffer "*grep*")
+      (delete-other-windows)
+      (message "Type C-x r j $ to return to pre-rgrep windows."))
+    (define-key grep-mode-map (kbd "C-<return>") 'dotemacs-rgrep-goto-file-and-close-rgrep)
 
     (when-let (gnu-find (and (eq system-type 'darwin)
                              (executable-find "gfind")))
