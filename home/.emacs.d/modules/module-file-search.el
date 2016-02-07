@@ -79,20 +79,6 @@
     ;; we will fall back to using the default completing-read function, which is helm once helm is loaded.
     (setq fasd-completing-read-function 'nil)))
 
-(use-package wgrep                      ; Edit grep/occur/ag results in-place
-  :ensure t
-  :defer t
-  :config
-  (progn
-    ;; Add custom keybindings
-    (define-key grep-mode-map (kbd "C-x C-s") #'wgrep-save-all-buffers)
-    ;; Use same keybinding as occur
-    (setq wgrep-enable-key "e")))
-
-(use-package wgrep-ag                   ; Wgrep for ag
-  :ensure t
-  :defer t)
-
 (use-package helm-ag
   :ensure t
   :defer t
