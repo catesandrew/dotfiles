@@ -8,8 +8,10 @@
 ;;
 ;; (require 'core-vars)
 ;; (require 'core-funcs)
-;; (require 'core-keybindings)
+(require 'core-keybindings)
 ;; (require 'core-display-init)
+(require 'core-use-package-ext)
+(require 'core-auto-completion)
 (require 'module-vars)
 (require 'module-common)
 ;; (require 'module-core)
@@ -22,9 +24,6 @@
 (use-package puppet-mode                ; Puppet manifests
   :defer t
   :ensure t
-  :config
-  ;; Fontify variables in Puppet comments
-  (setq puppet-fontify-variables-in-comments t)
   :init
   (progn
     (dotemacs-set-leader-keys-for-major-mode 'puppet-mode
