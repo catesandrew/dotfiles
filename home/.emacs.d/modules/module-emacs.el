@@ -47,10 +47,7 @@
   (progn
     (setq bookmark-save-flag 1 ;; autosave each change
           ;; Store auto-save files locally
-          bookmark-default-file (concat dotemacs-cache-directory "bookmarks")
-          url-configuration-directory (concat dotemacs-cache-directory "url")
-          eshell-directory-name (concat dotemacs-cache-directory "eshell" )
-          tramp-persistency-file-name (concat dotemacs-cache-directory "tramp"))))
+          bookmark-default-file (concat dotemacs-cache-directory "bookmarks"))))
 
 (use-package restart-emacs
   :defer t
