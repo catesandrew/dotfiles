@@ -11,6 +11,7 @@
 (require 'core-keybindings)
 (require 'core-transient-state)
 (require 'core-auto-completion)
+(require 'core-fonts-support)
 ;; (require 'core-display-init)
 (require 'module-vars)
 (require 'module-common)
@@ -280,10 +281,8 @@
 
 (use-package eldoc                      ; Documentation in minibuffer
   :defer t
-  :init (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
   :config
   (progn
-    (setq-default eldoc-documentation-function #'describe-char-eldoc)
     ;; enable eldoc in `eval-expression'
     (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
     ;; enable eldoc in IELM
