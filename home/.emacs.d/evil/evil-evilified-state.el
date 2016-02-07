@@ -36,13 +36,13 @@
 (defvar evilified-state--modes nil
   "List of all evilified modes.")
 
-(defvar evilified-state--normal-state-map nil
-  "Local backup of normal state keymap.")
-(make-variable-buffer-local 'evilified-state--normal-state-map)
-
 (defvar evilified-state--evil-surround nil
   "Evil surround mode variable backup.")
 (make-variable-buffer-local 'evilified-state--evil-surround)
+
+(defvar evilified-state--normal-state-map nil
+  "Local backup of normal state keymap.")
+(make-variable-buffer-local 'evilified-state--normal-state-map)
 
 (evil-define-state evilified
   "Evilified state.
@@ -59,6 +59,12 @@
   :evil-states (evilified)
   :override-minor-modes t
   :override-mode-name dotemacs-leader-override-mode)
+
+(evil-define-command evil-force-evilified-state ()
+  "Switch to evilified state without recording current command."
+  :repeat abort
+  :suppress-operator t
+  (evil-evilified-state))
 
 (defun evilified-state--pre-command-hook ()
   "Redirect key bindings to `evilified-state'.
