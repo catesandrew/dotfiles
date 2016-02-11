@@ -54,11 +54,41 @@
                     (unless (equal (bound-and-true-p  calendar-latitude) _latitdue)
                       (setq calendar-latitude _latitdue
                             location-changed-p t))
-                    (when (and (configuration-layer/layer-usedp 'geolocation) location-changed-p)
+                    (when location-changed-p
                       (message "Location changed %s %s (restarting rase-timer)" calendar-latitude calendar-longitude)
                       (rase-start t)
                       ))))
       (osx-location-watch))))
+
+(use-package rase
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (add-hook 'osx-location-changed-hook
+              (lambda ()
+                (setq calendar-latitude osx-location-latitude
+                      calendar-longitude osx-location-longitude)
+                (unless (bound-and-true-p calendar-location-name)
+                  (setq calendar-location-name
+                        (format "%s, %s"
+                                osx-location-latitude
+                                osx-location-longitude)))))
+    (osx-location-watch)
+    (defadvice rase-start (around test-calendar activate)
+      "Don't call `raise-start' if `calendar-latitude' or
+`calendar-longitude' are not bound yet, or still nil.
+
+This is setup this way because `rase.el' does not test these
+values, and will fail under such conditions, when calling
+`solar.el' functions.
+
+Also, it allows users who enabled service such as `osx-location'
+to not have to set these variables manually when enabling this layer."
+      (if (and (bound-and-true-p calendar-longitude)
+               (bound-and-true-p calendar-latitude))
+          ad-do-it))
+    (rase-start t)))
 
 (use-package sunshine
   :if geolocation-enable-weather-forecast

@@ -41,8 +41,7 @@
     (define-key yas-minor-mode-map (kbd "M-s-/") 'yas-next-field)
 
     ;; configure snippet directories
-    (let* ((dotemacs--auto-completion-dir (configuration-layer/get-layer-property 'auto-completion :dir))
-           (private-yas-dir (if auto-completion-private-snippets-directory
+    (let* ((private-yas-dir (if auto-completion-private-snippets-directory
                                 auto-completion-private-snippets-directory
                               (concat dotemacs-private-dir "/snippets/")))
            (dotemacs-directory-snippets-dir (when user-emacs-directory

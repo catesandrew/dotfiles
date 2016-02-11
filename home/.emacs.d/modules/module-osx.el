@@ -44,7 +44,7 @@
 
 
 ;; keybindings
-(dotemacs/set-leader-keys "bf" 'reveal-in-osx-finder)
+(dotemacs-set-leader-keys "bf" 'reveal-in-osx-finder)
 
 ;; this is only applicable to GUI mode
 (dotemacs|do-after-display-system-init

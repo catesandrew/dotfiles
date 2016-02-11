@@ -852,7 +852,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 
 
 ;;; Miscellaneous
-(use-package module-location)
+; (use-package module-location)
 (use-package module-emoji)
 
 (use-package google-translate

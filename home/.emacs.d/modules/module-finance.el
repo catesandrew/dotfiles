@@ -19,15 +19,18 @@
 
 (dotemacs-defvar-company-backends ledger-mode)
 
+(use-package flycheck-ledger
+  :ensure t
+  :defer t)
+; (with-eval-after-load 'flycheck
+;   (require 'flycheck-ledger))
+
 (use-package ledger-mode
   :mode ("\\.\\(ledger\\|ldg\\)\\'" . ledger-mode)
   :ensure t
   :defer t
   :init
   (progn
-    (with-eval-after-load 'flycheck
-      (require 'flycheck-ledger))
-
     (setq ledger-post-amount-alignment-column 62)
     (push 'company-capf company-backends-ledger-mode)
     (dotemacs-set-leader-keys-for-major-mode 'ledger-mode
