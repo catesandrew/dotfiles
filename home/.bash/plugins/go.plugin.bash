@@ -1,5 +1,4 @@
-cite about-plugin
-about-plugin 'load go, if you are using it'
+# 'load go, if you are using it'
 
 if brew_contains_element "go"; then
     # export GOROOT=$(brew --prefix go)

@@ -1,45 +1,35 @@
-cite about-plugin
-about-plugin 'git helper functions'
+# 'git helper functions'
 
+# about 'adds remote $GIT_HOSTING:$1 to current repo'
 function git_remote {
-  about 'adds remote $GIT_HOSTING:$1 to current repo'
-  group 'git'
-
   echo "Running: git remote add origin ${GIT_HOSTING}:$1.git"
   git remote add origin $GIT_HOSTING:$1.git
 }
 
+# about 'push into origin refs/heads/master'
 function git_first_push {
-  about 'push into origin refs/heads/master'
-  group 'git'
-
   echo "Running: git push origin master:refs/heads/master"
   git push origin master:refs/heads/master
 }
 
+# about 'publishes current branch to remote origin'
 function git_pub() {
-  about 'publishes current branch to remote origin'
-  group 'git'
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
   echo "Publishing ${BRANCH} to remote origin"
   git push -u origin $BRANCH
 }
 
+# about 'applies changes to HEAD that revert all changes after this commit'
 function git_revert() {
-  about 'applies changes to HEAD that revert all changes after this commit'
-  group 'git'
-
   git reset $1
   git reset --soft HEAD@{1}
   git commit -m "Revert to ${1}"
   git reset --hard
 }
 
+# about 'resets the current HEAD to this commit'
 function git_rollback() {
-  about 'resets the current HEAD to this commit'
-  group 'git'
-
   function is_clean() {
     if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
       echo "Your branch is dirty, please commit your changes"

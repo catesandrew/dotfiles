@@ -1,10 +1,5 @@
-cite about-plugin
-about-plugin 'miscellaneous tools'
-
-function ips ()
-{
-    about 'display all ip addresses for this host'
-    group 'base'
+# display all ip addresses for this host
+function ips () {
     if command -v ifconfig &>/dev/null
     then
         ifconfig | awk '/inet /{ print $2 }'
@@ -16,60 +11,49 @@ function ips ()
     fi
 }
 
-function down4me ()
-{
-    about 'checks whether a website is down for you, or everybody'
-    param '1: website url'
-    example '$ down4me http://www.google.com'
-    group 'base'
+# about 'checks whether a website is down for you, or everybody'
+# param '1: website url'
+# example '$ down4me http://www.google.com'
+function down4me () {
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
-function myip ()
-{
-    about 'displays your ip address, as seen by the Internet'
-    group 'base'
+# about 'displays your ip address, as seen by the Internet'
+function myip () {
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
-function pass ()
-{
-    about 'generates random password from dictionary words'
-    param 'optional integer length'
-    param 'if unset, defaults to 4'
-    example '$ pass'
-    example '$ pass 6'
-    group 'base'
+# about 'generates random password from dictionary words'
+# param 'optional integer length'
+# param 'if unset, defaults to 4'
+# example '$ pass'
+# example '$ pass 6'
+function pass () {
     local i pass length=${1:-4}
     pass=$(echo $(for i in $(eval echo "{1..$length}"); do pickfrom /usr/share/dict/words; done))
     echo "With spaces (easier to memorize): $pass"
     echo "Without (use this as the pass): $(echo $pass | tr -d ' ')"
 }
 
-function mkcd ()
-{
-    about 'make a directory and cd into it'
-    param 'path to create'
-    example '$ mkcd foo'
-    example '$ mkcd /tmp/img/photos/large'
-    group 'base'
+# about 'make a directory and cd into it'
+# param 'path to create'
+# example '$ mkcd foo'
+# example '$ mkcd /tmp/img/photos/large'
+function mkcd () {
     mkdir -p "$*"
     cd "$*"
 }
 
-function lsgrep ()
-{
-    about 'search through directory contents with grep'
-    group 'base'
-    ls | grep "$*"
+# about 'search through directory contents with grep'
+# group 'base'
+function lsgrep () {
+  ls | grep "$*"
 }
 
-function disk_usage ()
-{
-    about 'disk usage per directory, in Mac OS X and Linux'
-    param '1: directory name'
-    group 'base'
+# about 'disk usage per directory, in Mac OS X and Linux'
+# param '1: directory name'
+function disk_usage () {
     if [ $(uname) = "Darwin" ]; then
         if [ -n $1 ]; then
             du -hd $1
@@ -86,21 +70,17 @@ function disk_usage ()
     fi
 }
 
-function command_exists ()
-{
-    about 'checks for existence of a command'
-    param '1: command to check'
-    example '$ command_exists ls && echo exists'
-    group 'base'
+# about 'checks for existence of a command'
+# param '1: command to check'
+# example '$ command_exists ls && echo exists'
+function command_exists () {
     type "$1" &> /dev/null ;
 }
 
 # useful for administrators and configs
-function buf ()
-{
-    about 'back up file with timestamp'
-    param 'filename'
-    group 'base'
+# about 'back up file with timestamp'
+# param 'filename'
+function buf () {
     local filename=$1
     local filetime=$(date +%Y%m%d_%H%M%S)
     cp ${filename} ${filename}_${filetime}

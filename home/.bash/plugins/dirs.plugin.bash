@@ -5,8 +5,7 @@
 # Show stack with: d
 # Jump to location by number.
 
-cite about-plugin
-about-plugin 'directory stack navigation'
+# 'directory stack navigation'
 
 # Show directory stack
 alias d="dirs -v -l"
@@ -31,10 +30,8 @@ alias pu="pushd"
 # Pop current location
 alias po="popd"
 
+# about 'directory navigation alias usage'
 function dirs-help() {
-  about 'directory navigation alias usage'
-  group 'dirs'
-
   echo "Directory Navigation Alias Usage"
   echo
   echo "Use the power of directory stacking to move"
@@ -67,21 +64,17 @@ fi
 alias L='cat ~/.dirs'
 
 # goes to distination dir otherwise, stay in the dir
+# about 'goes to destination dir'
+# param '1: directory'
+# example '$ G ..'
 G () {
-    about 'goes to destination dir'
-    param '1: directory'
-    example '$ G ..'
-    group 'dirs'
-
     cd "${1:-$(pwd)}" ;
 }
 
+# about 'save a bookmark'
+# param '1: bookmark name'
+# example '$ S mybkmrk'
 S () {
-    about 'save a bookmark'
-    param '1: bookmark name'
-    example '$ S mybkmrk'
-    group 'dirs'
-
     [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
     sed "/$@/d" ~/.dirs > ~/.dirs1;
@@ -90,12 +83,10 @@ S () {
     source ~/.dirs ;
 }
 
+# about 'remove a bookmark'
+# param '1: bookmark name'
+# example '$ R mybkmrk'
 R () {
-    about 'remove a bookmark'
-    param '1: bookmark name'
-    example '$ R mybkmrk'
-    group 'dirs'
-
     [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
     sed "/$@/d" ~/.dirs > ~/.dirs1;

@@ -1,9 +1,7 @@
-cite about-plugin
-about-plugin 'AWS helper functions'
+# 'AWS helper functions'
 
+# about 'helper function for AWS credentials file'
 function awskeys {
-    about 'helper function for AWS credentials file'
-    group 'aws'
     if [[ $# -eq 1 ]] && [[ "$1" = "list" ]]; then
         __awskeys_list "$2"
     elif [[ $# -eq 1 ]] && [[ "$1" = "unset" ]]; then

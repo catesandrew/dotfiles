@@ -35,27 +35,29 @@ fi
 export BASH_IT="${HOME}/.bash"
 export DFM_REPO="${HOME}/.dotfiles"
 
+declare -a on_exit_items
+function add_on_exit() {
+  local n=${#on_exit_items[*]}
+  on_exit_items[$n]="$*"
+}
+
 # No dependency, simple and useful utilities
-. "${BASH_IT}/vars.sh"
-# . "${BASH_IT}/common.sh"
-# . "${BASH_IT}/core.sh"
-. "${BASH_IT}/utils.sh"
+. "${BASH_IT}/lib/vars.sh"
+. "${BASH_IT}/lib/funcs.sh"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
     ulimit -n 65536 65536
 
     if hash brew 2>/dev/null; then
         __dot_brew_home="$(brew --prefix)"
-        export BREW_HOME=$__dot_brew_home
+        BREW_HOME=$__dot_brew_home
+        export BREW_HOME
+        HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
+        export HOMEBREW_CASK_OPTS
 
-        __dot_brew_list="$(brew list | sed 's/:.*//')"
-        __dot_brew_list=($__dot_brew_list)
+        __dot_brew_list=($(brew list | sed 's/:.*//'))
         __dot_brew_taps=($(brew tap | sed 's/:.*//'))
-
-        if contains_element "caskroom/cask" "${__dot_brew_taps[@]}"; then
-            export HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
-            __dot_cask_list=($(brew cask list --caskroom=/usr/local/caskroom | sed 's/:.*//'))
-        fi
+        __dot_cask_list=($(brew cask list --caskroom=/usr/local/caskroom | sed 's/:.*//'))
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
     true
@@ -65,31 +67,12 @@ fi
 # echo "Found ${#__dot_brew_taps[@]} taps"
 # echo "Found ${#__dot_cask_list[@]} installed applications"
 
-# Checks if an item is installed in homebrew.
-#
-# @param The element to check if present
-# @return 0 if present 1 otherwise
-brew_contains_element() {
-  # http://stackoverflow.com/questions/3685970
-  local e && e=$(contains_element "$1" "${__dot_brew_list[@]}")
-  return $e
-}
-
-brew_contains_tap() {
-  local e && e=$(contains_element "$1" "${__dot_brew_taps[@]}")
-  return $e
-}
-
-cask_contains_element() {
-  local e && e=$(contains_element "$1" "${__dot_cask_list[@]}")
-  return $e
-}
-
 # detect ssh or not, but no bother in emacs term
 if [ -z "$INSIDE_EMACS" ]; then
   # http://unix.stackexchange.com/questions/9605/
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    export SESSION_TYPE=remote/ssh
+    SESSION_TYPE=remote/ssh
+    export SESSION_TYPE
   else
     case $(ps -o comm= -p $PPID) in
       sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
@@ -97,16 +80,17 @@ if [ -z "$INSIDE_EMACS" ]; then
   fi
 fi
 
-
 # Set mveditor/MacVim as EDITOR.
 if [ -f "${BASH_IT}/mveditor.sh" ]; then
-    export EDITOR="${BASH_IT}/mveditor.sh"
-    export GIT_EDITOR="${BASH_IT}/mveditor.sh"
+    EDITOR="${BASH_IT}/mveditor.sh"
+    GIT_EDITOR="${BASH_IT}/mveditor.sh"
 else
     echo "WARNING: Can't find mac vim editor. Using vim instead."
-    export EDITOR="vim"
-    export GIT_EDITOR="vim"
+    EDITOR="vim"
+    GIT_EDITOR="vim"
 fi
+export EDITOR
+export GIT_EDITOR
 
 # Don't check mail when opening terminal.
 unset MAILCHECK
@@ -119,10 +103,11 @@ complete -cf sudo
 # Note this should be set in ~/.profile for Fedora startup scripts to
 # setup LS_COLORS correctly.
 if [[ $COLORTERM = gnome-* && $TERM = xterm ]]  && infocmp gnome-256color >/dev/null 2>&1; then
-    export TERM=gnome-256color
+    TERM=gnome-256color
 elif infocmp xterm-256color >/dev/null 2>&1; then
-    export TERM=xterm-256color
+    TERM=xterm-256color
 fi
+export TERM
 
 # General Startup #
 umask 002
@@ -196,9 +181,8 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     export PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5";
     export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
 
-
     if brew_contains_element "openconnect"; then
-        export VPNC_SCRIPT="$__dot_brew_home/etc/vpnc-script"
+        export VPNC_SCRIPT="${__dot_brew_home}/etc/vpnc-script"
     fi
 
     if cask_contains_element "vagrant"; then
@@ -231,7 +215,7 @@ elif [ "$__dot_system_type" == "Linux" ]; then
 fi
 
 # Helper function loading various enable-able files
-function _load_bash_it_files() {
+function load_bash_it_files() {
   subdirectory="$1"
   if [ ! -d "${BASH_IT}/${subdirectory}" ]; then
     continue
@@ -239,16 +223,17 @@ function _load_bash_it_files() {
   FILES="${BASH_IT}/${subdirectory}/*.bash"
   for bash_config_file in $FILES; do
     if [ -e "${bash_config_file}" ]; then
-        source $bash_config_file
+        . $bash_config_file
         # mytime="$(time (source $bash_config_file) 2>&1 1>/dev/null )"
         # echo "${bash_config_file}: ${mytime}"
     fi
   done
 }
+add_on_exit load_bash_it_files
 
 # Load enabled plugins, aliases, and completion
 for file_type in "plugins" "completion" "aliases"; do
-  _load_bash_it_files $file_type
+  load_bash_it_files $file_type
 done
 
 path_munge "${HOME}/.bin"
@@ -258,7 +243,7 @@ path_prepend "./bin"
 # Load custom aliases, completion, plugins
 for file_type in "plugins" "completion" "aliases"; do
   if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
-    source "${BASH_IT}/${file_type}/custom.${file_type}.bash"
+    . "${BASH_IT}/${file_type}/custom.${file_type}.bash"
   fi
 done
 unset file_type
@@ -318,7 +303,7 @@ if [ -z "$INSIDE_EMACS" ]; then
     fi
 fi
 
-. ${BASH_IT}/custom.sh
+. ${BASH_IT}/lib/custom.sh
 
 if hash gdate 2>/dev/null; then
     toc=$(($(gdate +%s%N)/1000000))
@@ -329,5 +314,12 @@ if hash gdate 2>/dev/null; then
 else
     echo "Bash loaded in $SECONDS secs"
 fi
+
+for i in "${on_exit_items[@]}"; do
+  # echo "on_exit: $i"
+  unset "$i"
+done
+unset add_on_exit
+unset on_exit_items
 
 fi

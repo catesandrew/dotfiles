@@ -1,9 +1,7 @@
 cite about-plugin
 about-plugin 'load nvm, if you are using it'
 
-if ! brew_contains_element "nvm"; then
-    exit 0;
-fi
+if brew_contains_element "nvm"; then
 
 # export NVM_TARGET="$(brew --prefix nvm)"
 if [ -z "$NVM_TARGET" ]; then
@@ -21,3 +19,5 @@ nvm() {
     [ -s "$NVM_TARGET/nvm.sh" ] && . "$NVM_TARGET/nvm.sh"
     nvm "$@"
 }
+
+fi

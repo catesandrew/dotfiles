@@ -99,7 +99,7 @@ cdf() {
 #  - tsort outputs the order from bottom to top; that's why we need to reverse
 #    it with tail -r.
 #
-# try So I'll try "uninstall... install" instead of "reinstal".
+# try So I'll try "uninstall... install" instead of "reinstall".
 function brew_reinstall () {
     brew list \
         | while read l; do echo -n "$l "; echo $(brew deps $l); done \
@@ -128,36 +128,6 @@ function limited_pwd() {
     else
         echo -e "${RELATIVE_PWD}"
     fi
-}
-
-function geticon() {
-  APP=`echo $1|sed -e 's/\.app$//'`
-  APPDIR=''
-  for dir in "/Applications/" "/Applications/Utilities/"; do
-    if [[ -d ${dir}$APP.app ]]; then
-        APPDIR=$dir
-        break
-    fi
-  done
-  if [[ $APPDIR == '' ]]; then
-    echo "App not found"
-  else
-    ICON=`defaults read "${APPDIR}$APP.app/Contents/Info" CFBundleIconFile|sed -e 's/\.icns$//'`
-    OUTFILE="$HOME/Downloads/${APP}_icon.jpg"
-    MAXAVAIL=`sips -g pixelWidth "${APPDIR}$APP.app/Contents/Resources/$ICON.icns"|tail -1|awk '{print $2}'`
-    echo -n "Enter max pixel width ($MAXAVAIL): "
-  	read MAX
-  	if [[ $MAX == ''  || $MAX -gt $MAXAVAIL ]]; then
-  	  MAX=$MAXAVAIL
-  	fi
-    /usr/bin/sips -s format jpeg --resampleHeightWidthMax $MAX "${APPDIR}$APP.app/Contents/Resources/$ICON.icns" --out "$OUTFILE" > /dev/null 2>&1
-    echo "Wrote JPEG to $OUTFILE."
-  	echo -n 'Open in Preview? (y/N): '
-  	read ANSWER
-  	if [[ $ANSWER == 'y' ]]; then
-  	  open -a "Preview.app" "$OUTFILE"
-  	fi
-  fi
 }
 
 # Example usage:

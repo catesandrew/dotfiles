@@ -9,13 +9,8 @@ about-plugin 'Search&Select history and fasd with percol'
 ## C-r to search&select from history
 ## zz to search&select from fasd
 
-if ! hash percol 2>/dev/null; then
-  exit 0
-fi
-
-if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
-  exit 0
-fi
+if hash percol 2>/dev/null || \
+    [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
 
 _replace_by_history() {
     if command -v tac>/dev/null; then
@@ -36,4 +31,6 @@ if command -v fasd>/dev/null; then
         local l=$(fasd -d | awk '{print $2}' | percol)
         cd $l
     }
+fi
+
 fi

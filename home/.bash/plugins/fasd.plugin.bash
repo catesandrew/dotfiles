@@ -1,5 +1,4 @@
-cite about-plugin
-about-plugin 'load fasd, if you are using it'
+# 'load fasd, if you are using it'
 
 # fasd_cache="$HOME/.fasd-init-bash"
 # if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
@@ -8,10 +7,8 @@ about-plugin 'load fasd, if you are using it'
 # source "$fasd_cache"
 # unset fasd_cache
 
-if ! brew_contains_element "fasd" && \
-    ! hash fasd 2>/dev/null; then
-    exit 0
-fi
+if brew_contains_element "fasd" || \
+    hash fasd 2>/dev/null; then
 
 _fasd_ps1_func() {
   { eval "fasd --proc $(fasd --sanitize $(fc -nl -1))"; } \
@@ -32,3 +29,5 @@ case $PROMPT_COMMAND in
   *_fasd_prompt_func*) ;;
   *) PROMPT_COMMAND="_fasd_prompt_func;$PROMPT_COMMAND";;
 esac
+
+fi

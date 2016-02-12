@@ -3,9 +3,7 @@
 cite about-plugin
 about-plugin 'virtualenvwrapper helper functions'
 
-if ! hash virtualenvwrapper.sh 2>/dev/null; then
-    exit 0;
-fi
+if hash virtualenvwrapper.sh 2>/dev/null; then
 
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/Devel
@@ -41,3 +39,5 @@ function wovenv {
 
   workon "$(basename `pwd`)"
 }
+
+fi

@@ -4,6 +4,7 @@
 is_git_repo() {
     $(git rev-parse --is-inside-work-tree &> /dev/null)
 }
+add_on_exit is_git_repo
 
 #
 # Checks if an element is present in an array.
@@ -17,6 +18,7 @@ contains_element() {
   for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
   return 1
 }
+add_on_exit contains_element
 
 #
 # Add directory paths to end of PATH. From fink's init.sh
@@ -26,6 +28,7 @@ path_append() {
     eval "PATH=\$PATH:$1"
   fi
 }
+add_on_exit path_append
 
 #
 # Add to front of path. From fink's init.sh
@@ -35,10 +38,12 @@ path_prepend() {
     eval "PATH=$1:\$PATH"
   fi
 }
+add_on_exit path_prepend
 
 path_strip() {
   echo "$1" | command sed -e "s#$2[^:]*:##g"
 }
+add_on_exit path_strip
 
 #
 # prevent duplicate directories in you PATH variable
@@ -56,3 +61,27 @@ path_munge() {
     fi
   fi
 }
+add_on_exit path_munge
+
+# Checks if an item is installed in homebrew.
+#
+# @param The element to check if present
+# @return 0 if present 1 otherwise
+brew_contains_element() {
+  # http://stackoverflow.com/questions/3685970
+  local e && e=$(contains_element "$1" "${__dot_brew_list[@]}")
+  return $e
+}
+add_on_exit brew_contains_element
+
+brew_contains_tap() {
+  local e && e=$(contains_element "$1" "${__dot_brew_taps[@]}")
+  return $e
+}
+add_on_exit brew_contains_tap
+
+cask_contains_element() {
+  local e && e=$(contains_element "$1" "${__dot_cask_list[@]}")
+  return $e
+}
+add_on_exit cask_contains_element
