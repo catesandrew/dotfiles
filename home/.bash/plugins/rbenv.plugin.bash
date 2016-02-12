@@ -1,21 +1,47 @@
 # Load rbebv, if you are using it
-cite about-plugin
-about-plugin 'load rbenv, if you are using it'
 
-if brew_contains_element "rbenv"; then
-    # export RBENV_ROOT="$__dot_brew_home/var/rbenv"
-    export RBENV_ROOT="$HOME/.rbenv"
-    export RBENV_HOME="$__dot_brew_home/opt/rbenv"
-else
-    export RBENV_ROOT="$HOME/.rbenv"
-fi
+if brew_contains_element "rbenv" || \
+    hash rbenv 2>/dev/null; then
 
-[[ `which rbenv` ]] && eval "$(rbenv init -)"
+  RBENV_ROOT="$HOME/.rbenv"
+  export RBENV_ROOT
+  export RBENV_SHELL=bash
 
-path_munge "${RBENV_ROOT}/shims"
+  if brew_contains_element "rbenv"; then
+    RBENV_HOME="${__dot_brew_home}/opt/rbenv"
+    export RBENV_HOME
+  fi
 
-if [ -n $RBENV_HOME ]; then
-    # Load the auto-completion script if rbenv was loaded.
-    [[ -e $RBENV_HOME/completions/rbenv.bash ]] && \
-        source $RBENV_HOME/completions/rbenv.bash
+  # Instead of `eval $(rbenv init -)`, lets run it directly here.
+  # eval "$(rbenv init -)"
+  path_munge "${RBENV_ROOT}/shims" "after"
+
+  # lazy load rbenv
+  rbenv() {
+    echo "Lazy loading rbenv..."
+    command rbenv rehash 2>/dev/null
+
+    rbenv() {
+      local command
+      command="$1"
+      if [ "$#" -gt 0 ]; then
+        shift
+      fi
+
+      case "$command" in
+        rehash|shell)
+          eval "$(rbenv "sh-$command" "$@")";;
+        *)
+          command rbenv "$command" "$@";;
+      esac
+    }
+
+    if [ -n "${RBENV_HOME}" ]; then
+      [[ -e ${RBENV_HOME}/completions/rbenv.bash ]] && \
+        . "${RBENV_HOME}/completions/rbenv.bash"
+    fi
+
+    rbenv "$@"
+  }
+
 fi

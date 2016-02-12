@@ -1,8 +1,5 @@
 # Some aliases for npm
 
-cite 'about-alias'
-about-alias 'npm abbreviations'
-
 # Use `nup` most of the time; use `nub` if you have packages that are newer
 # than <package>@latest and you want to keep them on the absolute newest
 # version rather than latest.

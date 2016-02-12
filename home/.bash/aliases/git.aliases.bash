@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'common git abbreviations'
-
 # Aliases
 alias gaa='git add --all'
 alias gff='git merge --ff-only'

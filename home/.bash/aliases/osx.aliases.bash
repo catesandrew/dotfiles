@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'osx-specific aliases'
-
 alias cwd=__cwd
 
 function __cwd

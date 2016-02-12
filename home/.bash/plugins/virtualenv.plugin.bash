@@ -1,7 +1,5 @@
 # make sure virtualenvwrapper is enabled if available
-
-cite about-plugin
-about-plugin 'virtualenvwrapper helper functions'
+# 'virtualenvwrapper helper functions'
 
 if hash virtualenvwrapper.sh 2>/dev/null; then
 
@@ -10,33 +8,24 @@ export PROJECT_HOME=$HOME/Devel
 export VIRTUALENVWRAPPER_SCRIPT=/usr/local/bin/virtualenvwrapper.sh
 source /usr/local/bin/virtualenvwrapper_lazy.sh
 
+# create a new virtualenv for this directory
 function mkvenv {
-  about 'create a new virtualenv for this directory'
-  group 'virtualenv'
-
   cwd=`basename \`pwd\``
   mkvirtualenv --distribute $cwd
 }
 
-
+# create a new virtualenv for the current branch
 function mkvbranch {
-  about 'create a new virtualenv for the current branch'
-  group 'virtualenv'
-
   mkvirtualenv --distribute "$(basename `pwd`)@$SCM_BRANCH"
 }
 
+# sets workon branch
 function wovbranch {
-  about 'sets workon branch'
-  group 'virtualenv'
-
   workon "$(basename `pwd`)@$SCM_BRANCH"
 }
 
+# works on the virtualenv for this directory
 function wovenv {
-  about 'works on the virtualenv for this directory'
-  group 'virtualenv'
-
   workon "$(basename `pwd`)"
 }
 

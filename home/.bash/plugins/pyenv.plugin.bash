@@ -1,38 +1,57 @@
-cite about-plugin
-about-plugin 'load pyenv, if you are using it'
+ # load pyenv, if you are using it
 
-if brew_contains_element "pyenv"; then
-    # export PYENV_HOME="$(brew --prefix pyenv)"
-    export PYENV_HOME="$__dot_brew_home/opt/pyenv"
-    export PYENV_ROOT="$__dot_brew_home/var/pyenv"
-else
-    export PYENV_ROOT="$HOME/.pyenv"
-fi
+if brew_contains_element "pyenv" || \
+    hash pyenv 2>/dev/null; then
 
-if [ -n $PYENV_HOME ]; then
-    # Load the auto-completion script if pyenv was loaded.
-    # [[ -e $PYENV_HOME/completions/pyenv.bash ]] && \
-    #     source $PYENV_HOME/completions/pyenv.bash
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PYENV_SHELL=bash
 
-    # [[ `which pyenv` ]] && eval "$(pyenv init -)"
+  if brew_contains_element "pyenv"; then
+    export PYENV_HOME="${__dot_brew_home}/opt/pyenv"
+  fi
 
-    #Load pyenv virtualenv if the virtualenv plugin is installed.
-    # if pyenv virtualenv-init - &> /dev/null; then
-    #   eval "$(pyenv virtualenv-init -)"
-    # fi
+  # Instead of `eval $(pyenv init -)`, lets run it directly here.
+  # eval "$(pyenv init -)"
+  path_munge "${PYENV_ROOT}/shims" "after"
 
-    # lazy load pyenv into a shell session *as a function*
+  HAS_VIRTUALENV=0
+  if brew_contains_element "pyenv-virtualenv" || \
+      hash pyenv-virtualenv-init 2>/dev/null; then
+    HAS_VIRTUALENV=1
+  fi
+
+  # lazy load pyenv
+  pyenv() {
+    echo "Lazy loading pyenv..."
+    command pyenv rehash 2>/dev/null
     pyenv() {
-        [ -s "$PYENV_HOME/completions/pyenv.bash" ] && \
-            . $PYENV_HOME/completions/pyenv.bash
+      local command
+      command="$1"
+      if [ "$#" -gt 0 ]; then
+        shift
+      fi
 
-        eval "$(pyenv init -)"
-
-        #Load pyenv virtualenv if the virtualenv plugin is installed.
-        if pyenv virtualenv-init - &> /dev/null; then
-            eval "$(pyenv virtualenv-init -)"
-        fi
-
-        pyenv "$@"
+      case "$command" in
+        rehash|shell)
+          eval "$(pyenv "sh-$command" "$@")";;
+        *)
+          command pyenv "$command" "$@";;
+      esac
     }
+
+    if [ -n "${PYENV_HOME}" ]; then
+      [[ -e ${PYENV_HOME}/completions/pyenv.bash ]] && \
+        . "${PYENV_HOME}/completions/pyenv.bash"
+    fi
+
+    if [ $HAS_VIRTUALENV ]; then
+      echo "Lazy loading virtualenv..."
+      eval "$(pyenv virtualenv-init -)"
+      unset HAS_VIRTUALENV
+    else
+      unset HAS_VIRTUALENV
+    fi
+
+    pyenv "$@"
+  }
 fi

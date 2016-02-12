@@ -1,8 +1,5 @@
 # Some aliases for Homebrew Cask
 
-cite 'about-alias'
-about-alias 'homebrew-cask abbreviations'
-
 alias bcup='brew-cask update'
 alias bcin='brew-cask install'
 alias bcrm='brew-cask uninstall'

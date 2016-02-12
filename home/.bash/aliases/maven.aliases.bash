@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'maven abbreviations'
-
 alias mci='mvn clean install'
 alias mi='mvn install'
 alias mrprep='mvn release:prepare'

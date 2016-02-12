@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'docker'
-
 __docker_func_wrap ()
 {
     local cur words cword prev

@@ -1,4 +1,4 @@
-# 'load fzf, if you are using it'
+# load fzf, if you are using it
 
 if brew_contains_element "fzf"; then
     export FZF_TARGET="$__dot_brew_home/opt/fzf"

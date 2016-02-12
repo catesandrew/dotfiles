@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'vagrant aliases'
-
 # Aliases
 alias vup="vagrant up"
 alias vh="vagrant halt"

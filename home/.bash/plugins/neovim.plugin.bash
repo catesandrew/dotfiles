@@ -1,4 +1,3 @@
-cite about-plugin
-about-plugin 'neovim'
+# neovim
 
 export NVIM_TUI_ENABLE_TRUE_COLOR=1

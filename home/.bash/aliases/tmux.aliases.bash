@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'Tmux terminal multiplexer'
-
 alias txl='tmux ls'
 # alias txl='tmux list-sessions'
 # alias txl="tmux list-sessions"

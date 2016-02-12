@@ -5,7 +5,7 @@
 # Show stack with: d
 # Jump to location by number.
 
-# 'directory stack navigation'
+# directory stack navigation
 
 # Show directory stack
 alias d="dirs -v -l"
@@ -30,7 +30,7 @@ alias pu="pushd"
 # Pop current location
 alias po="popd"
 
-# about 'directory navigation alias usage'
+# directory navigation alias usage
 function dirs-help() {
   echo "Directory Navigation Alias Usage"
   echo
@@ -54,43 +54,41 @@ function dirs-help() {
 
 # ADD BOOKMARKing functionality
 # usage:
-
 if [ ! -f ~/.dirs ]; then  # if doesn't exist, create it
-    touch ~/.dirs
+  touch ~/.dirs
 else
-    source ~/.dirs
+  source ~/.dirs
 fi
 
 alias L='cat ~/.dirs'
 
 # goes to distination dir otherwise, stay in the dir
-# about 'goes to destination dir'
 # param '1: directory'
 # example '$ G ..'
 G () {
-    cd "${1:-$(pwd)}" ;
+  cd "${1:-$(pwd)}" ;
 }
 
-# about 'save a bookmark'
+# save a bookmark
 # param '1: bookmark name'
 # example '$ S mybkmrk'
 S () {
-    [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
+  [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
-    sed "/$@/d" ~/.dirs > ~/.dirs1;
-    \mv ~/.dirs1 ~/.dirs;
-    echo "$@"=\"`pwd`\" >> ~/.dirs;
-    source ~/.dirs ;
+  sed "/$@/d" ~/.dirs > ~/.dirs1;
+  \mv ~/.dirs1 ~/.dirs;
+  echo "$@"=\"`pwd`\" >> ~/.dirs;
+  source ~/.dirs ;
 }
 
-# about 'remove a bookmark'
+# remove a bookmark
 # param '1: bookmark name'
 # example '$ R mybkmrk'
 R () {
-    [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
+  [[ $# -eq 1 ]] || { echo "${FUNCNAME[0]} function requires 1 argument"; return 1; }
 
-    sed "/$@/d" ~/.dirs > ~/.dirs1;
-    \mv ~/.dirs1 ~/.dirs;
+  sed "/$@/d" ~/.dirs > ~/.dirs1;
+  \mv ~/.dirs1 ~/.dirs;
 }
 
 alias U='source ~/.dirs' 	# Update BOOKMARK stack

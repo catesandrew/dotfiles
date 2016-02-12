@@ -1,8 +1,5 @@
 # Some aliases for Homebrew
 
-cite 'about-alias'
-about-alias 'homebrew abbreviations'
-
 alias bup='brew update && brew upgrade --all'
 alias bupc='brew update && brew upgrade --all && brew cleanup'
 

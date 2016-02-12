@@ -1,6 +1,3 @@
-cite 'about-alias'
-about-alias 'ruby bundler'
-
 # Bundler Commands
 alias be='bundle exec'
 alias bi='bundle install'

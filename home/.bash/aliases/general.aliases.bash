@@ -1,6 +1,3 @@
-cite about-alias
-about-alias 'general aliases'
-
 # Reload Library
 alias reload='source ~/.bash_profile'
 

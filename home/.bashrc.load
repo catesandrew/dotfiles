@@ -85,7 +85,6 @@ if [ -f "${BASH_IT}/mveditor.sh" ]; then
     EDITOR="${BASH_IT}/mveditor.sh"
     GIT_EDITOR="${BASH_IT}/mveditor.sh"
 else
-    echo "WARNING: Can't find mac vim editor. Using vim instead."
     EDITOR="vim"
     GIT_EDITOR="vim"
 fi
@@ -134,12 +133,6 @@ export MANPAGER="less -X"
 
 # Change this to your console based IRC client of choice.
 export IRC_CLIENT='irssi'
-
-# Load composure first, so we support function metadata
-source "${BASH_IT}/lib/composure.sh"
-
-# support 'plumbing' metadata
-cite _about _param _example _group _author _version
 
 export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
 export THEME_BATTERY_PERCENTAGE_CHECK=false
