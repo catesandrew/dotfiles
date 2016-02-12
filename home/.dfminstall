@@ -15,4 +15,5 @@ indent.pro skip
 .mrconfig skip
 README.md skip
 Quiver-settings.json skip
+provision skip
 .mackup recurse
