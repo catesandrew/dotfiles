@@ -353,9 +353,6 @@
 	path = home/.vim/bundle/vim-ansible
 	url = git://github.com/chase/vim-ansible-yaml.git
 	ignore = untracked
-[submodule "home/.bin/git-scripts"]
-	path = home/.bin/git-scripts
-	url = https://github.com/jwiegley/git-scripts.git
 [submodule "home/.vim/bundle/splitjoin"]
 	path = home/.vim/bundle/splitjoin
 	url = https://github.com/AndrewRadev/splitjoin.vim.git
