@@ -32,17 +32,14 @@ if hash gdate 2>/dev/null; then
 fi
 
 # Path to the bash it configuration
-export BASH_IT=$HOME/.bash
+export BASH_IT="${HOME}/.bash"
 export DFM_REPO="${HOME}/.dotfiles"
 
 # No dependency, simple and useful utilities
-. "${BASH_IT}/lib/utils.sh"
-
-__dot_system_type=$(uname)
-__dot_brew_home=""
-declare -a __dot_brew_list="()"
-declare -a __dot_brew_taps="()"
-declare -a __dot_cask_list="()"
+. "${BASH_IT}/vars.sh"
+# . "${BASH_IT}/common.sh"
+# . "${BASH_IT}/core.sh"
+. "${BASH_IT}/utils.sh"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
     ulimit -n 65536 65536
@@ -292,7 +289,7 @@ function precmd () {
 }
 
 function iterm2_preexec_hook() {
-    . "${BASH_IT}/lib/iterm2-preexec.sh"
+    . "${BASH_IT}/preexec/iterm2-preexec.sh"
 
     preexec_functions+=(iterm2_preexec_invoke_cmd)
 
@@ -305,8 +302,8 @@ function iterm2_preexec_hook() {
 # TODO: Migrate to brew `bash-preexec`
 if [ -z "$INSIDE_EMACS" ]; then
     if [[ -n "$BASH_VERSION" ]]; then
-        . "${BASH_IT}/lib/bash-preexec.sh"
-        . "${BASH_IT}/lib/bashhub-preexec.sh"
+        . "${BASH_IT}/preexec/bash-preexec.sh"
+        . "${BASH_IT}/preexec/bashhub-preexec.sh"
 
         if [ "${TERM_PROGRAM:-""}" != "" ]; then
             if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
