@@ -72,10 +72,9 @@ If SYMBOL value is `display-graphic-p' then return the result of
     (setq spaceline-org-clock-p nil)
 
     (defun dotemacs//evil-state-face ()
-      (if (bound-and-true-p evil-state)
+      (when (bound-and-true-p evil-state)
           (let ((state (if (eq 'operator evil-state) evil-previous-state evil-state)))
-            (intern (format "dotemacs-%S-face" state)))
-        'face-of-god))
+            (intern (format "dotemacs-%S-face" state)))))
     (setq spaceline-highlight-face-func 'dotemacs//evil-state-face)
 
     (let ((unicodep (dotemacs-symbol-value

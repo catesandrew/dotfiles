@@ -115,6 +115,7 @@
 
 (use-package helm-dash
   :defer t
+  :disabled t
   :ensure t
   :init
   (progn

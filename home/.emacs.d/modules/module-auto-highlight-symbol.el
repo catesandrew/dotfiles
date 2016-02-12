@@ -64,7 +64,7 @@
       (if dotemacs-last-ahs-highlight-p
           (progn (goto-char (nth 1 dotemacs-last-ahs-highlight-p))
                  (dotemacs-ahs-highlight-now-wrapper)
-                 (dotemacs-symbol-highlight-micro-state))
+                 (dotemacs/symbol-highlight-transient-state/body))
         (message "No symbol has been searched for now.")))
 
     (defun dotemacs-integrate-evil-search (forward)
@@ -181,7 +181,7 @@
                    ahs-backward-definition
                    ahs-back-to-start
                    ahs-change-range))
-      (let* ((advice (intern (format "dotemacs-%s" (symbol-name sym)))))
+      (let* ((advice (intern (format "dotemacs/%s" (symbol-name sym)))))
         (eval `(defadvice ,sym (around ,advice activate)
                  (dotemacs-ahs-highlight-now-wrapper)
                  ad-do-it

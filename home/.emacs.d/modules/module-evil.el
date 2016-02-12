@@ -15,7 +15,7 @@
 
 ;;; Code:
 
-(defvar dotemacs-enable-paste-micro-state t
+(defvar dotemacs-enable-paste-transient-state t
   "If non nil the paste micro-state is enabled.  While enabled pressing `p`
 several times cycle between the kill ring content.'")
 
@@ -132,7 +132,7 @@ current major mode."
                                     ("iedit-insert" "firebrick1" (bar . 2)))
       "Colors assigned to evil states with cursor definitions.")
 
-    (loop for (state color cursor) in dotemacs-evil-cursors
+    (cl-loop for (state color cursor) in dotemacs-evil-cursors
           do
           (eval `(defface ,(intern (format "dotemacs-%s-face" state))
                    `((t (:background ,color
@@ -316,11 +316,11 @@ Example: (evil-map visual \"<\" \"<gv\")"
     (dotemacs-define-transient-state paste
       :title "Pasting Transient State"
       :doc "\n[%s(length kill-ring-yank-pointer)/%s(length kill-ring)] \
-[_J_/_K_] cycles through yanked text, [_p_/_P_] pastes the same text above or \
+[_C-j_/_C-k_] cycles through yanked text, [_p_/_P_] pastes the same text above or \
 below. Anything else exits."
         :bindings
-        ("J" evil-paste-pop)
-        ("K" evil-paste-pop-next)
+        ("C-j" evil-paste-pop)
+        ("C-k" evil-paste-pop-next)
         ("p" evil-paste-after)
         ("P" evil-paste-before))
       (when dotemacs-enable-paste-transient-state

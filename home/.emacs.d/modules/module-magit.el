@@ -95,7 +95,7 @@
      "gS" 'magit-stage-file
      "gU" 'magit-unstage-file)
 
-    (dotemacs-define-micro-state git-blame
+    (dotemacs-define-transient-state git-blame
       :title "Git Blame Transient State"
       :doc "
 Press [_b_] again to blame further in the history, [_q_] to go up or quit."

@@ -218,10 +218,12 @@ changed to THEME."
     (dotemacs-set-state-faces))
   (when (fboundp 'dotemacs-set-flycheck-mode-line-faces)
     (dotemacs-set-flycheck-mode-line-faces))
-  (when (fboundp 'dotemacs-defface-micro-state-faces)
-    (dotemacs-defface-micro-state-faces))
-  (when (fboundp 'dotemacs-adaptive-evil-highlight-persist-face)
-    (dotemacs-adaptive-evil-highlight-persist-face)))
+  (when (fboundp 'dotemacs/defface-micro-state-faces)
+    (dotemacs/defface-micro-state-faces))
+ (when (fboundp 'dotemacs/customize-powerline-faces)
+    (dotemacs/customize-powerline-faces))
+  (when (fboundp 'dotemacs/adaptive-evil-highlight-persist-face)
+    (dotemacs/adaptive-evil-highlight-persist-face)))
 
 (provide 'core-themes-support)
 ;;; core-themes-support.el ends here

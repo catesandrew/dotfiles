@@ -122,12 +122,13 @@ version-control markers.")
 
 (defun version-control/stage-hunk ()
   (interactive)
-  (let ((current-prefix-arg t))
-    (call-interactively
-     (cl-case version-control-diff-tool
-       (diff-hl     (message "staging not available."))
-       (git-gutter  'git-gutter:stage-hunk)
-       (git-gutter+ 'git-gutter+-stage-hunks)))))
+  (if (eq 'diff-hl version-control-diff-tool)
+      (message "Staging not available")
+    (let ((current-prefix-arg t))
+      (call-interactively
+       (cl-case version-control-diff-tool
+         (git-gutter  'git-gutter:stage-hunk)
+         (git-gutter+ 'git-gutter+-stage-hunks))))))
 
 (defun version-control/show-hunk ()
   (interactive)
@@ -289,8 +290,8 @@ version-control markers.")
                version-control-global-margin)
       (global-git-gutter-mode t))
     ;; If you would like to use git-gutter.el and linum-mode
-    (unless dotemacs-line-numbers
-      (git-gutter:linum-setup))
+    (if dotemacs-line-numbers
+        (git-gutter:linum-setup))
     (setq git-gutter:update-interval 2
           git-gutter:modified-sign " "
           git-gutter:added-sign "+"

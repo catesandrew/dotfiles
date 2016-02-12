@@ -254,7 +254,7 @@
   :evil-leader "tmt")
 (dotemacs-add-toggle transparent-frame
   :status nil
-  :on (dotemacs-toggle-transparency)
+  :on (dotemacs/toggle-transparency)
   :documentation "Make the current frame non-opaque."
   :evil-leader "TT")
 (dotemacs-add-toggle tool-bar
@@ -516,27 +516,27 @@ otherwise it is scaled down."
 
 ;; Transparency transient-state
 
-(defun dotemacs-toggle-transparency-core ()
+(defun dotemacs//toggle-transparency-core ()
   "Toggle between transparent or opaque display."
   (interactive)
-  ;; Define alpha if it's nil
-  (if (eq (frame-parameter (selected-frame) 'alpha) nil)
-      (set-frame-parameter (selected-frame) 'alpha '(100 100)))
-  ;; Do the actual toggle
-  (if (/= (cadr (frame-parameter (selected-frame) 'alpha)) 100)
-      (set-frame-parameter (selected-frame) 'alpha '(100 100))
-    (set-frame-parameter (selected-frame) 'alpha
-                         (list dotemacs-active-transparency
-                               dotemacs-inactive-transparency))))
+  (let* ((frame (selected-frame))
+         (alpha (frame-parameter frame 'alpha))
+         (dotfile-setting (cons dotemacs-active-transparency
+                                dotemacs-inactive-transparency)))
+    (set-frame-parameter
+     frame 'alpha
+     (if (not (equal alpha dotfile-setting))
+         dotfile-setting
+       '(100 . 100)))))
 
-(defun dotemacs-toggle-transparency ()
+(defun dotemacs/toggle-transparency ()
   "Toggle between transparent or opaque display, then enter the micro-state."
   (interactive)
-  (dotemacs-toggle-transparency-core)
-  ;; Immediately enter the micro-state
-  (dotemacs-scale-transparency-micro-state))
+  (dotemacs//toggle-transparency-core)
+  (dotemacs/scale-transparency-transient-state/dotemacs/toggle-transparency)
+  )
 
-(defun dotemacs-increase-transparency ()
+(defun dotemacs/increase-transparency ()
   "Increase transparency of current frame."
   (interactive)
   (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
@@ -545,7 +545,7 @@ otherwise it is scaled down."
       (set-frame-parameter (selected-frame) 'alpha
                            (list increased-alpha increased-alpha)))))
 
-(defun dotemacs-decrease-transparency ()
+(defun dotemacs/decrease-transparency ()
   "Decrease transparency of current frame."
   (interactive)
   (let* ((current-alpha (car (frame-parameter (selected-frame) 'alpha)))
@@ -557,9 +557,9 @@ otherwise it is scaled down."
 (dotemacs-define-transient-state scale-transparency
   :title "Frame Transparency Transient State"
   :bindings
-  ("+" dotemacs-increase-transparency "increase")
-  ("-" dotemacs-decrease-transparency "decrease")
-  ("T" dotemacs-toggle-transparency "toggle")
+  ("+" dotemacs/increase-transparency "increase")
+  ("-" dotemacs/decrease-transparency "decrease")
+  ("T" dotemacs/toggle-transparency "toggle")
   ("q" nil "quit" :exit t))
 (dotemacs-set-leader-keys "TT"
   'dotemacs/scale-transparency-transient-state/dotemacs/toggle-transparency)

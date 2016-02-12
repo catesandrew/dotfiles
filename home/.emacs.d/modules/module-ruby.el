@@ -175,15 +175,17 @@ Possible values are `rbenv', `rvm' or `chruby'.)")
     (dotemacs-hide-lighter rspec-mode)
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (dotemacs-set-leader-keys-for-major-mode mode
-        "ta" 'rspec-verify-all
-        "tb" 'rspec-verify
-        "tc" 'rspec-verify-continue
-        "te" 'rspec-toggle-example-pendingness
-        "tf" 'rspec-verify-method
-        "tl" 'rspec-run-last-failed
-        "tm" 'rspec-verify-matching
-        "tr" 'rspec-rerun
-        "tt" 'rspec-verify-single))))
+        "ta"    'rspec-verify-all
+        "tb"    'rspec-verify
+        "tc"    'rspec-verify-continue
+        "te"    'rspec-toggle-example-pendingness
+        "tf"    'rspec-verify-method
+        "tl"    'rspec-run-last-failed
+        "tm"    'rspec-verify-matching
+        "tr"    'rspec-rerun
+        "tt"    'rspec-verify-single
+        "t~"    'rspec-toggle-spec-and-target-find-example
+        "t TAB" 'rspec-toggle-spec-and-target))))
 
 (use-package rubocop
   :defer t

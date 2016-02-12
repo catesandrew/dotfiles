@@ -39,7 +39,7 @@
       "Rename a workspace and get back to micro-state."
       (interactive)
       (eyebrowse-rename-window-config (eyebrowse--get 'current-slot))
-      (dotemacs-workspaces-micro-state))
+      (dotemacs/workspaces-micro-state))
 
     (defun dotemacs//workspaces-ms-get-slot-name (window-config)
       "Return the name for the given window-config"
@@ -59,7 +59,7 @@
     (dotemacs-define-transient-state workspaces
         :title "Workspaces Transient State"
         :doc "
-[_0_.._9_] switch to workspace  [_n_/_p_] next/prev  [_[tab]_] last  [_c_] close  [_r_] rename"
+[_0_.._9_] switch to workspace  [_n_/_p_] next/prev  [_<tab>_] last  [_c_] close  [_r_] rename"
         :bindings
         ("0" eyebrowse-switch-to-window-config-0)
         ("1" eyebrowse-switch-to-window-config-1)

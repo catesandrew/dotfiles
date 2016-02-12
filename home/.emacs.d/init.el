@@ -644,7 +644,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
   (setq hydra-key-doc-function 'dotemacs//hydra-key-doc-function)
   (setq hydra-head-format "[%s] "))
 (use-package module-key-bindings
-  :config (dotemacs-toggle-transparency-core))
+  :config (dotemacs//toggle-transparency-core))
 
 
 
@@ -793,7 +793,7 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 (use-package module-vagrant)
 (use-package module-nixos)
 (use-package module-systemd)
-(use-package module-tmux)
+;; (use-package module-tmux)
 
 
 ;;; Finance

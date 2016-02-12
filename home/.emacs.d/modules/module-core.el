@@ -31,7 +31,12 @@
 (defun dotemacs/switch-to-scratch-buffer ()
   "Switch to the `*scratch*' buffer. Create it first if needed."
   (interactive)
-  (switch-to-buffer (get-buffer-create "*scratch*")))
+  (let ((exists (get-buffer "*scratch*")))
+    (switch-to-buffer (get-buffer-create "*scratch*"))
+    (when (and (not exists)
+               (not (eq major-mode dotemacs-scratch-mode))
+               (fboundp dotemacs-scratch-mode))
+      (funcall dotemacs-scratch-mode))))
 
 (defun dotemacs-copy-file ()
   "Write the file under new name."

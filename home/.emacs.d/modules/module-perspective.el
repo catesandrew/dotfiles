@@ -140,7 +140,7 @@ perspectives does."
                     (persp-switch project)
                     (let ((projectile-completion-system 'helm))
                       (projectile-switch-project-by-name project)))))))
-   :buffer "*Projectile Layouts*"))
+   :buffer "*Helm Projectile Layouts*"))
 
 (defun dotemacs/ivy-persp-switch-project (arg)
   (interactive "P")
@@ -264,7 +264,7 @@ FRAME defaults to the current frame."
     ;; Perspectives transient-state -------------------------------------------
 
     (defun dotemacs//layouts-ms-toggle-doc ()
-      "Toggle the full documenation for the layouts micro-state."
+      "Toggle the full documenation for the layouts transient-state."
       (interactive)
       (setq dotemacs--layouts-ms-doc-toggle
             (logxor dotemacs--layouts-ms-doc-toggle 1)))
@@ -321,7 +321,7 @@ FRAME defaults to the current frame."
   [_s_]^^^^       save all layouts
   [_S_]^^^^       save layouts by names
   [_t_]^^^^       show a buffer without adding it to current layout
-  [_w_]^^^^       workspaces micro-state (needs eyebrowse layer enabled)
+  [_w_]^^^^       workspaces micro state
   [_x_]^^^^       kill current layout with its buffers
   [_X_]^^^^       kill other layouts with their buffers")
         :bindings
@@ -404,7 +404,7 @@ FRAME defaults to the current frame."
          (persp-switch dotemacs-default-layout-name)))
 
      (defun dotemacs/layouts-ms-rename ()
-       "Rename a layout and get back to the perspectives micro-state."
+       "Rename a layout and get back to the perspectives transient-state."
        (interactive)
        (call-interactively 'persp-rename)
        (spacemacs/layouts-transient-state/body))
@@ -434,7 +434,7 @@ FRAME defaults to the current frame."
        (interactive)
        (persp-switch persp-last-persp-name))
 
-     ;; Custom perspectives micro-state -------------------------------------
+     ;; Custom perspectives transient-state -------------------------------------
 
      (defun dotemacs//custom-layout-func-name (name)
        "Return the name of the custom-perspective function for NAME."
@@ -493,7 +493,7 @@ Available PROPS:
       (dotemacs/custom-layouts-transient-state/body))
 
     (defun dotemacs//custom-layouts-ms-documentation ()
-      "Return the docstring for the custom perspectives micro-state."
+      "Return the docstring for the custom perspectives transient-state."
       (if dotemacs--custom-layout-alist
           (mapconcat (lambda (custom-persp)
                        (format "[%s] %s"

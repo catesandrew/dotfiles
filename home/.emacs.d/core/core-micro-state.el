@@ -22,7 +22,7 @@
         do (setq start (match-end 0))
         finally return count))
 
-(defun dotemacs-defface-micro-state-faces ()
+(defun dotemacs/defface-micro-state-faces ()
   "Define faces for micro-states."
   (let* ((hname 'dotemacs-micro-state-header-face)
          (bname 'dotemacs-micro-state-binding-face)
@@ -45,9 +45,9 @@ Characters enclosed in `[]' will have this face applied to them."
     (set-face-attribute bname nil
                         :foreground err
                         :bold t)))
-(dotemacs-defface-micro-state-faces)
+(dotemacs/defface-micro-state-faces)
 
-(defun dotemacs-micro-state-set-minibuffer-height (str)
+(defun dotemacs//micro-state-set-minibuffer-height (str)
   "Set the max mini windows size given a string STR."
   (let ((line-count (1+ (how-many-str "\n" str))))
     (when (and (> line-count max-mini-window-height)
@@ -107,7 +107,7 @@ Available PROPS:
 All properties supported by `dotemacs-create-key-binding-form' can be
 used."
   (declare (indent 1))
-  (let* ((func (dotemacs-micro-state-func-name name))
+  (let* ((func (dotemacs//micro-state-func-name name))
          (doc (dotemacs-mplist-get props :doc))
          (persistent (plist-get props :persistent))
          (disable-leader (plist-get props :disable-evil-leader))
@@ -118,34 +118,34 @@ used."
          (on-enter (dotemacs-mplist-get props :on-enter))
          (on-exit (dotemacs-mplist-get props :on-exit))
          (bindings (dotemacs-mplist-get props :bindings))
-         (wrappers (dotemacs-micro-state-create-wrappers
+         (wrappers (dotemacs//micro-state-create-wrappers
                     name doc msg-func disable-leader bindings))
-         (keymap-body (dotemacs-micro-state-fill-map-sexps wrappers))
+         (keymap-body (dotemacs//micro-state-fill-map-sexps wrappers))
          (bindkeys (dotemacs-create-key-binding-form props func)))
     (progn (defun ,func ()
              ,(format "%S micro-state." name)
              (interactive)
              ,@on-enter
              ,(when exec-binding
-                (dotemacs-micro-state-auto-execute bindings))
+                (dotemacs//micro-state-auto-execute bindings))
              (let ((doc ,@doc))
                (when doc
-                 (dotemacs-micro-state-set-minibuffer-height doc)
-                 (apply ',msg-func (list (dotemacs-micro-state-propertize-doc
+                 (dotemacs//micro-state-set-minibuffer-height doc)
+                 (apply ',msg-func (list (dotemacs//micro-state-propertize-doc
                                           (format "%S: %s" ',name doc))))))
              (,(if (version< emacs-version "24.4")
                    'set-temporary-overlay-map
                  'set-transient-map)
               (let ((map (make-sparse-keymap)))
-                ,@keymap-body map) ',(dotemacs-micro-state-create-exit-func
+                ,@keymap-body map) ',(dotemacs//micro-state-create-exit-func
                                       name wrappers persistent on-exit)))
            ,@bindkeys)))
 
-(defun dotemacs-micro-state-func-name (name)
+(defun dotemacs//micro-state-func-name (name)
   "Return the name of the micro-state function."
-  (intern (format "dotemacs-%S-micro-state" name)))
+  (intern (format "dotemacs/%S-micro-state" name)))
 
-(defun dotemacs-micro-state-auto-execute (bindings)
+(defun dotemacs//micro-state-auto-execute (bindings)
   "Auto execute the binding corresponding to `this-command-keys'."
   `(let* ((key (substring (this-command-keys)
                           (1- (length (this-command-keys)))))
@@ -153,10 +153,10 @@ used."
      (when binding
        (call-interactively (cadr binding)))))
 
-(defun dotemacs-micro-state-create-wrappers
+(defun dotemacs//micro-state-create-wrappers
     (name doc msg-func disable-leader bindings)
   "Return an alist (key wrapper) for each binding in BINDINGS."
-  (mapcar (lambda (x) (dotemacs-micro-state-create-wrapper
+  (mapcar (lambda (x) (dotemacs//micro-state-create-wrapper
                        name doc msg-func x))
           (append bindings
                   ;; force SPC to quit the micro-state to avoid a edge case
@@ -165,26 +165,26 @@ used."
                           ,(unless disable-leader 'dotemacs-default-map)
                           :exit t)))))
 
-(defun dotemacs-micro-state-create-wrapper (name default-doc msg-func binding)
+(defun dotemacs//micro-state-create-wrapper (name default-doc msg-func binding)
   "Create a wrapper of FUNC and return a tuple (key wrapper BINDING)."
   (let* ((key (car binding))
          (wrapped (cadr binding))
          (binding-doc (dotemacs-mplist-get binding :doc))
          (binding-pre (dotemacs-mplist-get binding :pre))
          (binding-post (dotemacs-mplist-get binding :post))
-         (wrapper-name (intern (format "dotemacs-%S-%S-%s" name wrapped key)))
+         (wrapper-name (intern (format "dotemacs//%S-%S-%s" name wrapped key)))
          (doc-body
           `((let ((bdoc ,@binding-doc)
                   (defdoc ,@default-doc))
               (if bdoc
                   (apply ',msg-func
-                         (list (dotemacs-micro-state-propertize-doc
+                         (list (dotemacs//micro-state-propertize-doc
                                 (format "%S: %s" ',name bdoc))))
                 (when (and defdoc
                            ',wrapped (not (plist-get ',binding :exit)))
-                  (dotemacs-micro-state-set-minibuffer-height defdoc)
+                  (dotemacs//micro-state-set-minibuffer-height defdoc)
                   (apply ',msg-func
-                         (list (dotemacs-micro-state-propertize-doc
+                         (list (dotemacs//micro-state-propertize-doc
                                 (format "%S: %s" ',name defdoc))))
                   defdoc)))))
          (wrapper-func
@@ -205,37 +205,37 @@ used."
                  ,@binding-post
                  (when throwp (throw 'exit nil)))
                (when ,@doc-body
-                 (dotemacs-micro-state-set-minibuffer-height ,@doc-body)
+                 (dotemacs//micro-state-set-minibuffer-height ,@doc-body)
                ,@doc-body)))))
     (append (list (car binding) (eval wrapper-func)) binding)))
 
-(defun dotemacs-micro-state-fill-map-sexps (wrappers)
+(defun dotemacs//micro-state-fill-map-sexps (wrappers)
   "Return a list of `define-key' sexp to fill the micro-state temporary map."
   (mapcar (lambda (x) `(define-key map ,(kbd (car x)) ',(cadr x)))
           wrappers))
 
-(defun dotemacs-micro-state-create-exit-func
+(defun dotemacs//micro-state-create-exit-func
     (name wrappers persistent on-exit)
   "Return a function to execute when leaving the micro-state.
 
 The returned function returns nil if the executed command exits the
 micro-state."
-  (let ((func (intern (format "dotemacs-%s-on-exit" name))))
+  (let ((func (intern (format "dotemacs//%s-on-exit" name))))
     (eval `(defun ,func ()
              "Function executed after each micro-state command."
-             (let* ((cur-wrapper (dotemacs-get-current-wrapper
+             (let* ((cur-wrapper (dotemacs//get-current-wrapper
                                   ',name ',wrappers))
                     (exitp (if cur-wrapper (plist-get cur-wrapper :exit)
                              ,(not persistent))))
                (when (listp exitp) (setq exitp (eval exitp)))
-               (when exitp ,@on-exit (dotemacs-micro-state-close-window))
+               (when exitp ,@on-exit (dotemacs//micro-state-close-window))
                (not exitp))))))
 
-(defun dotemacs-get-current-wrapper (name wrappers)
+(defun dotemacs//get-current-wrapper (name wrappers)
   "Return the wrapper being executed.
 Return nil if no wrapper is being executed (i.e. an unbound key has been
 pressed)."
-  (let ((micro-state-fun (dotemacs-micro-state-func-name name)))
+  (let ((micro-state-fun (dotemacs//micro-state-func-name name)))
     (catch 'found
       (dolist (wrapper wrappers)
         (let ((key (car wrapper))
@@ -246,30 +246,30 @@ pressed)."
               (throw 'found wrapper))))
       nil)))
 
-(defun dotemacs-micro-state-propertize-doc (doc)
+(defun dotemacs//micro-state-propertize-doc (doc)
   "Return a propertized doc string from DOC."
   (when (string-match "^\\(.+?\\):\\([[:ascii:]]*\\)$" doc)
     (let* ((header (match-string 1 doc))
            (pheader (when header
                       (propertize (concat " " header " ")
                                   'face 'dotemacs-micro-state-header-face)))
-           (tail (dotemacs-micro-state-propertize-doc-rec
+           (tail (dotemacs//micro-state-propertize-doc-rec
                   (match-string 2 doc))))
       (concat pheader tail))))
 
-(defun dotemacs-micro-state-propertize-doc-rec (doc)
+(defun dotemacs//micro-state-propertize-doc-rec (doc)
   "Recursively propertize keys."
   (if (string-match "^\\([[:ascii:]]*?\\)\\(\\[.+?\\]\\)\\([[:ascii:]]*\\)$" doc)
       (let* ((head (match-string 1 doc))
              (key (match-string 2 doc))
              (pkey (when key
                      (propertize key 'face 'dotemacs-micro-state-binding-face)))
-             (tail (dotemacs-micro-state-propertize-doc-rec
+             (tail (dotemacs//micro-state-propertize-doc-rec
                     (match-string 3 doc))))
         (concat head pkey tail))
     doc))
 
-(defun dotemacs-micro-state-close-window ()
+(defun dotemacs//micro-state-close-window ()
   "Close micro-state help window."
   (when (window-live-p lv-wnd)
     (let ((buf (window-buffer lv-wnd)))

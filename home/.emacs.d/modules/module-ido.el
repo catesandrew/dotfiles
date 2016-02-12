@@ -47,7 +47,7 @@
       ;; track of any activated ido navigation micro-state and force
       ;; the reactivation at each iteration.
       (when dotemacs--ido-navigation-ms-enabled
-        (dotemacs-ido-navigation-micro-state)))
+        (dotemacs/ido-navigation-micro-state)))
     (add-hook 'ido-minibuffer-setup-hook 'dotemacs//ido-minibuffer-setup)
 
     (defun dotemacs//ido-setup ()
@@ -85,8 +85,8 @@
       (define-key ido-completion-map (kbd "<left>") 'ido-delete-backward-updir)
       (define-key ido-completion-map (kbd "<right>") 'ido-exit-minibuffer)
       ;; initiate micro-state
-      (define-key ido-completion-map (kbd "M-SPC") 'dotemacs-ido-navigation-micro-state)
-      (define-key ido-completion-map (kbd "s-M-SPC") 'dotemacs-ido-navigation-micro-state)
+      (define-key ido-completion-map (kbd "M-SPC") 'dotemacs/ido-navigation-micro-state)
+      (define-key ido-completion-map (kbd "s-M-SPC") 'dotemacs/ido-navigation-micro-state)
       )
     (add-hook 'ido-setup-hook 'dotemacs//ido-setup)
 
