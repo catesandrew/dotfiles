@@ -12,7 +12,7 @@ fi
 
 [[ `which rbenv` ]] && eval "$(rbenv init -)"
 
-pathmunge "${RBENV_ROOT}/shims"
+path_munge "${RBENV_ROOT}/shims"
 
 if [ -n $RBENV_HOME ]; then
     # Load the auto-completion script if rbenv was loaded.

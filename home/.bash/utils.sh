@@ -36,19 +36,18 @@ path_prepend() {
   fi
 }
 
-strip_path() {
+path_strip() {
   echo "$1" | command sed -e "s#$2[^:]*:##g"
 }
-
 
 #
 # prevent duplicate directories in you PATH variable
 #
 # @example
-# pathmunge /path/to/dir is equivalent to PATH=/path/to/dir:$PATH
-# pathmunge /path/to/dir after is equivalent to PATH=$PATH:/path/to/dir
+# path_munge /path/to/dir is equivalent to PATH=/path/to/dir:$PATH
+# path_munge /path/to/dir after is equivalent to PATH=$PATH:/path/to/dir
 #
-function pathmunge () {
+path_munge() {
   if ! [[ $PATH =~ (^|:)$1($|:) ]] ; then
     if [ "$2" = "after" ] ; then
       export PATH=$PATH:$1

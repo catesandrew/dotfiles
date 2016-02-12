@@ -210,7 +210,7 @@ This started off from [github-keygen](https://github.com/dolmen/github-keygen), 
 
 ## Global Variables on OSX ##
 
-Nothing quite works right for yosemite for enabling global variables for GUI applications launched from Finder. You can try the `launchctl setenv var val` route but that does not work for `PATH`. You can try the `/etc/paths` route but that too is limited in variable substitutions. I ended up using a combination of these two methods and using a `pathmunge` function helper in my bashrc.load to not add duplicate entries.
+Nothing quite works right for yosemite for enabling global variables for GUI applications launched from Finder. You can try the `launchctl setenv var val` route but that does not work for `PATH`. You can try the `/etc/paths` route but that too is limited in variable substitutions. I ended up using a combination of these two methods and using a `path_munge` function helper in my bashrc.load to not add duplicate entries.
 
 ### /etc/paths ###
 

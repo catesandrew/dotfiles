@@ -6,7 +6,7 @@ about-plugin 'ruby and rubygems specific functions and settings'
 
 if hash ruby 2>/dev/null; then
     if hash gem 2>/dev/null; then
-        pathmunge "$(ruby -e 'print Gem.user_dir')/bin" after
+        path_munge "$(ruby -e 'print Gem.user_dir')/bin" after
     fi
 fi
 

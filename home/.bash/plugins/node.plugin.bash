@@ -5,7 +5,7 @@ about-plugin 'Node.js helper functions'
 export NODE_REPL_HISTORY_FILE="$HOME/.node_history"
 
 # Strip other version from PATH
-PATH=$(strip_path "$PATH" "\./node_modules/\.bin")
+PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
 
 # Prepend `./node_modules/.bin`
 path_prepend "./node_modules/.bin"

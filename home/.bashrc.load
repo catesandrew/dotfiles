@@ -183,9 +183,9 @@ done
 unset config_file
 unset lib
 
-pathmunge "/usr/local/sbin"
-pathmunge "/usr/local/bin"
-pathmunge "${HOME}/.cabal/bin"
+path_munge "/usr/local/sbin"
+path_munge "/usr/local/bin"
+path_munge "${HOME}/.cabal/bin"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
     export CHEATCOLORS=true
@@ -209,7 +209,7 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
-    pathmunge "/usr/local/linuxbrew/bin"
+    path_munge "/usr/local/linuxbrew/bin"
 
     # if [ ${#__dot_brew_list[@]} -gt 0 ]; then
     if [ -n "$__dot_brew_home" ]; then
@@ -251,8 +251,8 @@ for file_type in "plugins" "completion" "aliases"; do
   _load_bash_it_files $file_type
 done
 
-pathmunge "${HOME}/.bin"
-PATH=$(strip_path "$PATH" "\./bin")
+path_munge "${HOME}/.bin"
+PATH=$(path_strip "$PATH" "\./bin")
 path_prepend "./bin"
 
 # Load custom aliases, completion, plugins
