@@ -1013,9 +1013,8 @@ vmap gcc gc
 
 " Put focus to the NERD Tree with F3 (tricked by quickly closing it and
 " immediately showing it again, since there is no :NERDTreeFocus command)
-nmap <leader>n :NERDTreeClose<CR>:NERDTreeToggle<CR>
-nmap <leader>m :NERDTreeClose<CR>:NERDTreeFind<CR>
-nmap <leader>N :NERDTreeClose<CR>
+nmap <leader>fn :NERDTreeClose<CR>:NERDTreeToggle<CR>
+nmap <leader>fN :NERDTreeClose<CR>
 "map <F2> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 
 let NERDTreeChDirMode=0
