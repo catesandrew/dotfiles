@@ -1,5 +1,5 @@
 # heroku
-alias h='heroku'
+alias he='heroku'
 alias hl='heroku list'
 alias hi='heroku info'
 alias ho='heroku open'
