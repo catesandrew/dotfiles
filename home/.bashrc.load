@@ -247,7 +247,7 @@ unset file_type
 # you can add your accounts to that keychain.
 if [ "$__dot_system_type" == "Darwin" ]; then
   export SUDO_ASKPASS="$HOME/.bin/sudo_askpass"
-  alias sudo="sudo -A"
+  alias sudo="sudo -A "
 fi
 
 if [[ $PROMPT ]]; then
