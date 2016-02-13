@@ -1,6 +1,10 @@
 # Some aliases for Homebrew Dupes
 
 if [ "${__dot_system_type}" == "Darwin" ]; then
+  if brew_contains_element "ccat"; then
+     alias cat='ccat'
+  fi
+
   if brew_contains_element "coreutils" && \
       [ -f "${HOME}/.dircolors" ]; then
 
@@ -9,9 +13,10 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
 
     if brew_contains_element "grep"; then
       alias shuf=gshuf
-      alias grep="ggrep --color=always"
+      alias grep='ggrep --color=always'
       alias grepno="ggrep --color=never -n -E '.*'"
-      alias egrep="gegrep --color=always"
+      alias egrep='gegrep --color=always'
+      alias fgrep='gfgrep --color=auto'
     fi
   else
     # colored grep
