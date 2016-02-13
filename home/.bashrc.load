@@ -241,6 +241,15 @@ for file_type in "plugins" "completion" "aliases"; do
 done
 unset file_type
 
+# Use the Keychain to store your sudo passwords on the cli. Start by adding a
+# new keychain, I choose to name it "Local Accounts" and create a master
+# password for that keychain. Note that "login" is your default keychain. Now
+# you can add your accounts to that keychain.
+if [ "$__dot_system_type" == "Darwin" ]; then
+  export SUDO_ASKPASS="$HOME/.bin/sudo_askpass"
+  alias sudo="sudo -A"
+fi
+
 if [[ $PROMPT ]]; then
     export PS1="\["$PROMPT"\]"
 fi
