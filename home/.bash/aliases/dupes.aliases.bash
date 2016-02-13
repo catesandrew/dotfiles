@@ -11,6 +11,26 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     eval $(gdircolors -b "${HOME}/.dircolors")
     alias ls="gls -G --color=always"
 
+    # Directory
+    alias md='gmkdir -p'             # Create parent directories on demand
+    alias mkdir='gmkdir -pv'         # Create parent directories on demand
+    alias rd='grmdir'
+
+    # Add safety nets
+
+    # do not delete / or prompt if deleting more than 3 files at a time
+    alias rm='grm -I --preserve-root'
+
+    # confirmation
+    alias mv='gmv -i'
+    alias cp='gcp -i'
+    alias ln='gln -i'
+
+    # Parenting changing perms on /
+    alias chown='gchown --preserve-root'
+    alias chmod='gchmod --preserve-root'
+    alias chgrp='gchgrp --preserve-root'
+
     if brew_contains_element "grep"; then
       alias shuf=gshuf
       alias grep='ggrep --color=always'

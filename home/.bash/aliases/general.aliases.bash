@@ -98,19 +98,5 @@ alias ports='netstat -tulan -p tcp' # Use netstat command to quickly list all
 alias header='curl -I'             # get web server headers
 alias headerc='curl -I --compress' # find out if remote server supports gzip /
                                    # mod_deflate or not #
-# Add safety nets
-
-# do not delete / or prompt if deleting more than 3 files at a time
-alias rm='rm -I --preserve-root'
-
-# confirmation
-# alias mv='mv -i'
-# alias cp='cp -i'
-# alias ln='ln -i'
-
-# Parenting changing perms on /
-alias chown='chown --preserve-root'
-alias chmod='chmod --preserve-root'
-alias chgrp='chgrp --preserve-root'
 
 alias wget='wget -c'            # Resume wget by default
