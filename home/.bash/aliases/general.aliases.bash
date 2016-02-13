@@ -3,7 +3,6 @@ alias reload='source ~/.bash_profile'
 
 # List directory contents
 alias sl=ls
-alias ls='ls -G'        # Compact view, show colors
 
 alias la='ls -AF'       # Compact view, show hidden
 alias ll='ls -al'
@@ -27,21 +26,6 @@ alias lld='ls -lUd */'  #list directories
 
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
-
-alias _="sudo"
-
-# Allow aliases to be with sudo
-alias sudo="sudo "
-
-if [ $(uname) = "Linux" ]
-then
-  alias ls="ls --color=auto"
-fi
-which gshuf &> /dev/null
-if [ $? -eq 1 ]
-then
-  alias shuf=gshuf
-fi
 
 alias cls='clear'
 

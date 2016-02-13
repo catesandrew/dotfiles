@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# colored grep
-export GREP_COLOR='1;33'
-
-# colored ls
-export CLICOLOR=1
-export LSCOLORS='Gxfxcxdxdxegedabagacad'
-
 # Load the theme
 if [[ $BASH_IT_THEME ]]; then
     . "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
