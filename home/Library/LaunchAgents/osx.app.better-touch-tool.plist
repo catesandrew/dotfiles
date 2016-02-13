@@ -8,12 +8,8 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.better-touch-tool</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
