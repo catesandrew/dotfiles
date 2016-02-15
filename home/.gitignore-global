@@ -95,6 +95,9 @@ local.properties
 auto-save-list
 tramp
 
+# Flycheck
+flycheck_*.el
+
 # IntelliJ #
 ######################
 # *.iml
