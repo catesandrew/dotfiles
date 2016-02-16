@@ -165,24 +165,6 @@ function svn_prompt_info() {
     echo -e "$prefix${REF_COLOR}$ref${DEFAULT_COLOR}:$revision$state$suffix"
 }
 
-# Displays last X characters of pwd 
-function limited_pwd() {
-
-    # Replace $HOME with ~ if possible 
-    RELATIVE_PWD=${PWD/#$HOME/\~}
-
-    local offset=$((${#RELATIVE_PWD}-$MAX_PWD_LENGTH))
-
-    if [ $offset -gt "0" ]
-    then
-        local truncated_symbol="..."
-        TRUNCATED_PWD=${RELATIVE_PWD:$offset:$MAX_PWD_LENGTH}
-        echo -e "${truncated_symbol}/${TRUNCATED_PWD#*/}"
-    else
-        echo -e "${RELATIVE_PWD}"
-    fi
-}
-
 # Displays the current prompt
 function prompt() {
     local UC=$USER_COLOR

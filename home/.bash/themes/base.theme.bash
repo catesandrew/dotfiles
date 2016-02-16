@@ -422,39 +422,153 @@ function aws_profile {
 
 # from oh-my-git
 function get_current_action () {
-    local info="$(git rev-parse --git-dir 2>/dev/null)"
-    if [ -n "$info" ]; then
-        local action
-        if [ -f "$info/rebase-merge/interactive" ]
+  local info="$(git rev-parse --git-dir 2>/dev/null)"
+  if [ -n "$info" ]; then
+    local action
+    if [ -f "$info/rebase-merge/interactive" ]
+    then
+      action=${is_rebasing_interactively:-"rebase -i"}
+    elif [ -d "$info/rebase-merge" ]
+    then
+      action=${is_rebasing_merge:-"rebase -m"}
+    else
+      if [ -d "$info/rebase-apply" ]
+      then
+        if [ -f "$info/rebase-apply/rebasing" ]
         then
-            action=${is_rebasing_interactively:-"rebase -i"}
-        elif [ -d "$info/rebase-merge" ]
+          action=${is_rebasing:-"rebase"}
+        elif [ -f "$info/rebase-apply/applying" ]
         then
-            action=${is_rebasing_merge:-"rebase -m"}
+          action=${is_applying_mailbox_patches:-"am"}
         else
-            if [ -d "$info/rebase-apply" ]
-            then
-                if [ -f "$info/rebase-apply/rebasing" ]
-                then
-                    action=${is_rebasing:-"rebase"}
-                elif [ -f "$info/rebase-apply/applying" ]
-                then
-                    action=${is_applying_mailbox_patches:-"am"}
-                else
-                    action=${is_rebasing_mailbox_patches:-"am/rebase"}
-                fi
-            elif [ -f "$info/MERGE_HEAD" ]
-            then
-                action=${is_merging:-"merge"}
-            elif [ -f "$info/CHERRY_PICK_HEAD" ]
-            then
-                action=${is_cherry_picking:-"cherry-pick"}
-            elif [ -f "$info/BISECT_LOG" ]
-            then
-                action=${is_bisecting:-"bisect"}
-            fi
+          action=${is_rebasing_mailbox_patches:-"am/rebase"}
         fi
-
-        if [[ -n $action ]]; then printf "%s" "${1-}$action${2-}"; fi
+      elif [ -f "$info/MERGE_HEAD" ]
+      then
+        action=${is_merging:-"merge"}
+      elif [ -f "$info/CHERRY_PICK_HEAD" ]
+      then
+        action=${is_cherry_picking:-"cherry-pick"}
+      elif [ -f "$info/BISECT_LOG" ]
+      then
+        action=${is_bisecting:-"bisect"}
+      fi
     fi
+
+    if [[ -n $action ]]; then printf "%s" "${1-}$action${2-}"; fi
+  fi
+}
+
+function set_rgb_color {
+  if [[ "${1}" != "-" ]]; then
+    fg="38;5;${1}"
+  fi
+  if [[ "${2}" != "-" ]]; then
+    bg="48;5;${2}"
+    [[ -n "${fg}" ]] && bg=";${bg}"
+  fi
+  echo -e "\[\033[${fg}${bg}m\]"
+}
+
+# Modified from http://stackoverflow.com/a/1617048/359287
+function rootable_limited_pwd() {
+  local begin='' # The unshortened beginning of the path.
+  local shortbegin='' # The shortened beginning of the path.
+  local current='' # The section of the path we're currently working on.
+  local INHOME=0
+  local root_dir="$1"
+  local end="${2:-$(pwd)}/" # The unmodified rest of the path.
+  local maxlength="${3:-0}"
+  local final_max_length="${5:-0}"
+  local relative_pwd=''
+  local end_basename=''
+
+  # treat root dirs as starting point of filesystem, like npm roots
+  if [[ ! -z "${root_dir}" ]]; then
+    local offset=${#root_dir}
+    if [ $offset -gt "0" ]; then
+      end=${end:$offset}
+    fi
+  elif [[ "$end" =~ $HOME ]]; then
+    INHOME=1
+    end="${end#$HOME}" #strip /home/username from start of string
+    begin="$HOME"      #start expansion from the right spot
+  fi
+
+  end="${end#/}" # Strip the first /
+  local shortenedpath="$end" # The whole path, to check the length.
+  end_basename=$(basename "${end}")
+  maxlength=$(($maxlength-${#end_basename}))
+
+  shopt -q nullglob && NGV="-s" || NGV="-u" # Store the value for later.
+  shopt -s nullglob    # Without this, anything that doesn't exist in the filesystem turns into */*/*/...
+
+  while [[ "$end" ]] && (( ${#shortenedpath} > maxlength ))
+  do
+    current="${end%%/*}" # everything before the first /
+    end="${end#*/}"    # everything after the first /
+
+    if [[ "${current}" && -z "${end}" ]]; then
+      shortcurstar="$current" # No star if we don't shorten it.
+    else
+      shortcurstar="$current" # No star if we don't shorten it.
+
+      for ((i=${#current}-2; i>=0; i--)); do
+        subcurrent="${current:0:i}"
+        matching=("$begin/$subcurrent"*) # Array of all files that start with $subcurrent.
+        (( ${#matching[*]} != 1 )) && break # Stop shortening if more than one file matches.
+        shortcurstar="$subcurrent*"
+      done
+    fi
+
+    #advance
+    begin="$begin/$current"
+    shortbegin="$shortbegin/$shortcurstar"
+    shortenedpath="$shortbegin/$end"
+  done
+
+  shortenedpath="${shortenedpath%/}" # strip trailing /
+  shortenedpath="${shortenedpath#/}" # strip leading /
+
+  if [ $INHOME -eq 1 ]; then
+    relative_pwd="~/$shortenedpath" #make sure it starts with ~/
+  else
+    relative_pwd="/$shortenedpath" # Make sure it starts with /
+  fi
+  eval "$4=\$relative_pwd"
+  # eval "$4='$relative_pwd'"
+  # eval "$4='"${relative_pwd//\'/\'\"\'\"\'}"'"
+
+  local offset=$((${#relative_pwd}-$final_max_length))
+  if [ $offset -gt "0" ]
+  then
+    local truncated_rel=${relative_pwd:$offset:$final_max_length}
+    truncated_rel="${TRUNCATED_SYMBOL}/${truncated_rel#*/}"
+    eval "$6=\$truncated_rel"
+  else
+    eval "$6=\$relative_pwd"
+  fi
+
+  shopt "$NGV" nullglob # Reset nullglob in case this is being used as a function.
+}
+
+# Max length of PWD to display
+MAX_PWD_LENGTH=24
+
+# Displays last X characters of pwd
+function limited_pwd() {
+
+  # Replace $HOME with ~ if possible
+  RELATIVE_PWD=${PWD/#$HOME/\~}
+
+  local offset=$((${#RELATIVE_PWD}-$MAX_PWD_LENGTH))
+
+  if [ $offset -gt "0" ]
+  then
+    local truncated_symbol="..."
+    TRUNCATED_PWD=${RELATIVE_PWD:$offset:$MAX_PWD_LENGTH}
+    echo -e "${truncated_symbol}/${TRUNCATED_PWD#*/}"
+  else
+    echo -e "${RELATIVE_PWD}"
+  fi
 }

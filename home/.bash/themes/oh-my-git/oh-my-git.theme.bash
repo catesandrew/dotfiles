@@ -65,17 +65,6 @@ BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR=160
 
 THEME_PROMPT_CLOCK_FORMAT=${THEME_PROMPT_CLOCK_FORMAT:="%H:%M:%S"}
 
-function set_rgb_color {
-    if [[ "${1}" != "-" ]]; then
-        fg="38;5;${1}"
-    fi
-    if [[ "${2}" != "-" ]]; then
-        bg="48;5;${2}"
-        [[ -n "${fg}" ]] && bg=";${bg}"
-    fi
-    echo -e "\[\033[${fg}${bg}m\]"
-}
-
 function powerline_shell_prompt {
     SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
     CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1 | grep "load" | wc -l)
@@ -209,89 +198,6 @@ function powerline_scm_prompt {
     fi
 }
 
-# Modified from http://stackoverflow.com/a/1617048/359287
-
-function npm_limited_pwd() {
-  local begin='' # The unshortened beginning of the path.
-  local shortbegin='' # The shortened beginning of the path.
-  local current='' # The section of the path we're currently working on.
-  local INHOME=0
-  local npm_root="$1"
-  local end="${2:-$(pwd)}/" # The unmodified rest of the path.
-  local maxlength="${3:-0}"
-  local final_max_length="${5:-0}"
-  local relative_pwd=''
-  local end_basename=''
-
-  # treat npm roots as starting point of filesystem
-  if [[ ! -z "${npm_root}" ]]; then
-    local offset=${#npm_root}
-    if [ $offset -gt "0" ]; then
-      end=${end:$offset}
-    fi
-  elif [[ "$end" =~ $HOME ]]; then
-    INHOME=1
-    end="${end#$HOME}" #strip /home/username from start of string
-    begin="$HOME"      #start expansion from the right spot
-  fi
-
-  end="${end#/}" # Strip the first /
-  local shortenedpath="$end" # The whole path, to check the length.
-  end_basename=$(basename "${end}")
-  maxlength=$(($maxlength-${#end_basename}))
-
-  shopt -q nullglob && NGV="-s" || NGV="-u" # Store the value for later.
-  shopt -s nullglob    # Without this, anything that doesn't exist in the filesystem turns into */*/*/...
-
-  while [[ "$end" ]] && (( ${#shortenedpath} > maxlength ))
-  do
-    current="${end%%/*}" # everything before the first /
-    end="${end#*/}"    # everything after the first /
-
-    if [[ "${current}" && -z "${end}" ]]; then
-      shortcurstar="$current" # No star if we don't shorten it.
-    else
-      shortcurstar="$current" # No star if we don't shorten it.
-
-      for ((i=${#current}-2; i>=0; i--)); do
-        subcurrent="${current:0:i}"
-        matching=("$begin/$subcurrent"*) # Array of all files that start with $subcurrent.
-        (( ${#matching[*]} != 1 )) && break # Stop shortening if more than one file matches.
-        shortcurstar="$subcurrent*"
-      done
-    fi
-
-    #advance
-    begin="$begin/$current"
-    shortbegin="$shortbegin/$shortcurstar"
-    shortenedpath="$shortbegin/$end"
-  done
-
-  shortenedpath="${shortenedpath%/}" # strip trailing /
-  shortenedpath="${shortenedpath#/}" # strip leading /
-
-  if [ $INHOME -eq 1 ]; then
-    relative_pwd="~/$shortenedpath" #make sure it starts with ~/
-  else
-    relative_pwd="/$shortenedpath" # Make sure it starts with /
-  fi
-  eval "$4=\$relative_pwd"
-  # eval "$4='$relative_pwd'"
-  # eval "$4='"${relative_pwd//\'/\'\"\'\"\'}"'"
-
-  local offset=$((${#relative_pwd}-$final_max_length))
-  if [ $offset -gt "0" ]
-  then
-    local truncated_rel=${relative_pwd:$offset:$final_max_length}
-    truncated_rel="${TRUNCATED_SYMBOL}/${truncated_rel#*/}"
-    eval "$6=\$truncated_rel"
-  else
-    eval "$6=\$relative_pwd"
-  fi
-
-  shopt "$NGV" nullglob # Reset nullglob in case this is being used as a function.
-}
-
 function powerline_cwd_prompt {
   local npm_root=''
   local npm_prompt=''
@@ -315,9 +221,9 @@ function powerline_cwd_prompt {
   if [[ ! -z "${npm_root}" ]]; then
     # strip the package.json filename
     npm_root=$(dirname "${npm_root}")
-    npm_limited_pwd "$npm_root" "$working_dir" 24 short_pwd 30 trunc_short_pwd
+    rootable_limited_pwd "$npm_root" "$working_dir" 24 short_pwd 30 trunc_short_pwd
   else
-    npm_limited_pwd '' "$working_dir" 24 short_pwd 30 trunc_short_pwd
+    rootable_limited_pwd '' "$working_dir" 24 short_pwd 30 trunc_short_pwd
   fi
 
   if [[ ! -z "${npm_root}" ]]; then

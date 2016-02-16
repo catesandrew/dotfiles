@@ -109,27 +109,6 @@ function brew_reinstall () {
         | while read l; do echo -n "$l "; brew reinstall $l; done
 }
 
-# Max length of PWD to display
-MAX_PWD_LENGTH=24
-
-# TODO: Unused, use version from theme base
-# Displays last X characters of pwd
-function limited_pwd() {
-    # Replace $HOME with ~ if possible
-    RELATIVE_PWD=${PWD/#$HOME/\~}
-
-    local offset=$((${#RELATIVE_PWD}-$MAX_PWD_LENGTH))
-
-    if [ $offset -gt "0" ]
-    then
-        local truncated_symbol="…"
-        TRUNCATED_PWD=${RELATIVE_PWD:$offset:$MAX_PWD_LENGTH}
-        echo -e "${truncated_symbol}/${TRUNCATED_PWD#*/}"
-    else
-        echo -e "${RELATIVE_PWD}"
-    fi
-}
-
 # Example usage:
 # try apt-fast upgrade -y
 # try asuser vagrant "echo 'uname -a' >> ~/.profile"

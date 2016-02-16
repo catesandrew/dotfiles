@@ -25,17 +25,6 @@ CWD_THEME_PROMPT_COLOR=240
 
 LAST_STATUS_THEME_PROMPT_COLOR=124
 
-function set_rgb_color {
-    if [[ "${1}" != "-" ]]; then
-        fg="38;5;${1}"
-    fi
-    if [[ "${2}" != "-" ]]; then
-        bg="48;5;${2}"
-        [[ -n "${fg}" ]] && bg=";${bg}"
-    fi
-    echo -e "\[\033[${fg}${bg}m\]"
-}
-
 function powerline_shell_prompt {
     if [[ -n "${SSH_CLIENT}" ]]; then
         SHELL_PROMPT="${bold_white} ${SHELL_SSH_CHAR}\u@\h ${normal}"

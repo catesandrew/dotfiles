@@ -47,18 +47,6 @@ THEME_PROMPT_USERINFO_MODE=${THEME_PROMPT_USERINFO_MODE:="default"}
 IN_VIM_PROMPT_COLOR=35
 IN_VIM_PROMPT_TEXT="vim"
 
-
-function set_rgb_color {
-    if [[ "${1}" != "-" ]]; then
-        fg="38;5;${1}"
-    fi
-    if [[ "${2}" != "-" ]]; then
-        bg="48;5;${2}"
-        [[ -n "${fg}" ]] && bg=";${bg}"
-    fi
-    echo -e "\[\033[${fg}${bg}m\]"
-}
-
 function powerline_shell_prompt {
     SHELL_PROMPT=""
     SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
