@@ -174,7 +174,6 @@ function git_prompt_vars {
 
   ## oh my git
 
-  deteached=
   just_init=
   has_upstream=
   has_modifications=
@@ -189,11 +188,6 @@ function git_prompt_vars {
   should_push=
   has_stashes=
   will_rebase=
-
-  current_commit_hash=$(git rev-parse HEAD 2> /dev/null)
-
-  current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-  if [[ $current_branch == 'HEAD' ]]; then detached=true; fi
 
   local number_of_logs="$(git log --pretty=oneline -n1 2> /dev/null | wc -l)"
   if [[ $number_of_logs -eq 0 ]]; then
@@ -215,11 +209,11 @@ function git_prompt_vars {
       local number_of_untracked_files=$(\grep -c "^??" <<< "${git_status}")
       if [[ $number_of_untracked_files -gt 0 ]]; then has_untracked_files=true; fi
 
-      tag_at_current_commit=$(git describe --exact-match --tags $current_commit_hash 2> /dev/null)
+      tag_at_current_commit=$(git describe --exact-match --tags $SCM_CHANGE 2> /dev/null)
       if [[ -n $tag_at_current_commit ]]; then is_on_a_tag=true; fi
 
       if [[ $has_upstream == true ]]; then
-          local commits_diff="$(git log --pretty=oneline --topo-order --left-right ${current_commit_hash}...${upstream} 2> /dev/null)"
+          local commits_diff="$(git log --pretty=oneline --topo-order --left-right ${SCM_CHANGE}...${upstream} 2> /dev/null)"
           commits_ahead=$(\grep -c "^<" <<< "$commits_diff")
           commits_behind=$(\grep -c "^>" <<< "$commits_diff")
       fi
@@ -227,7 +221,7 @@ function git_prompt_vars {
       if [[ $commits_ahead -gt 0 && $commits_behind -gt 0 ]]; then has_diverged=true; fi
       if [[ $has_diverged == false && $commits_ahead -gt 0 ]]; then should_push=true; fi
 
-      will_rebase=$(git config --get branch.${current_branch}.rebase 2> /dev/null)
+      will_rebase=$(git config --get branch.${SCM_BRANCH}.rebase 2> /dev/null)
 
       local number_of_stashes="$(git stash list -n1 2> /dev/null | wc -l)"
       if [[ $number_of_stashes -gt 0 ]]; then has_stashes=true; fi

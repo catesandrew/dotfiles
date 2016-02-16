@@ -157,12 +157,12 @@ function powerline_scm_prompt {
             # where
             SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
 
-            if [[ $detached == true ]]; then
-                if [[ $detached ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
-                if [[ $detached ]]; then SCM_PROMPT+="(${current_commit_hash:0:7})${omg_space}"; fi
+            if [[ $SCM_GIT_DETACHED == true ]]; then
+                if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
+                if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"; fi
             else
                 if [[ $has_upstream == false ]]; then
-                  SCM_PROMPT+ ="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${current_branch})${omg_space}"
+                  SCM_PROMPT+ ="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${SCM_BRANCH})${omg_space}"
                 else
                     if [[ $will_rebase == true ]]; then
                         local type_of_upstream=$omg_rebase_tracking_branch_symbol
@@ -184,7 +184,7 @@ function powerline_scm_prompt {
                         fi
 
                     fi
-                    SCM_PROMPT+=" (${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/}) "
+                    SCM_PROMPT+=" (${SCM_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_BRANCH/}) "
                 fi
             fi
             if [[ ${is_on_a_tag} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
