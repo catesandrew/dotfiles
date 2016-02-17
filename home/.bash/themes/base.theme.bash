@@ -112,6 +112,7 @@ function git_prompt_vars {
   SCM_WILL_REBASE=false
   SCM_COMMITS_AHEAD=0
   SCM_COMMITS_BEHIND=0
+  SCM_CURRENT_BRANCH=
 
   SCM_STATE=${GIT_THEME_PROMPT_CLEAN:-$SCM_THEME_PROMPT_CLEAN}
   if [[ "$(git config --get bash-it.hide-status)" != "1" ]]; then
@@ -162,6 +163,7 @@ function git_prompt_vars {
   local ref=$(git symbolic-ref -q HEAD 2> /dev/null)
   if [[ -n "$ref" ]]; then
     SCM_BRANCH=${SCM_THEME_BRANCH_PREFIX}${ref#refs/heads/}
+    SCM_CURRENT_BRANCH="${ref#refs/heads/}"
     local tracking_info="$(grep "${SCM_BRANCH}\.\.\." <<< "${status}")"
     if [[ -n "${tracking_info}" ]]; then
       [[ "${tracking_info}" =~ .+\[gone\]$ ]] && local branch_gone="true"

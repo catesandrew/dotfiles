@@ -179,14 +179,19 @@ function powerline_scm_prompt {
       fi
 
       # where
-      SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
+      SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}"
+      SCM_PROMPT+="$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}"
+      SCM_PROMPT+="$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})"
+      SCM_PROMPT+="${THEME_PROMPT_SEPARATOR} ${normal}"
+      SCM_PROMPT+="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
 
       if [[ $SCM_GIT_DETACHED == true ]]; then
-        if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
-        if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"; fi
+        SCM_PROMPT+="${omg_detached_symbol}${omg_space}"
+        SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"
       else
         if [[ $SCM_HAS_UPSTREAM == false ]]; then
-          SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${SCM_BRANCH})${omg_space}"
+          SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}"
+          SCM_PROMPT+="${omg_space}—${omg_space}(${SCM_CURRENT_BRANCH})${omg_space}"
         else
           if [[ $SCM_WILL_REBASE == true ]]; then
             local type_of_upstream=$omg_rebase_tracking_branch_symbol
@@ -195,7 +200,8 @@ function powerline_scm_prompt {
           fi
 
           if [[ $SCM_HAS_DIVERGED == true ]]; then
-            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
+            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}"
+            SCM_PROMPT+="${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
           else
             if [[ $SCM_COMMITS_BEHIND -gt 0 ]]; then
               SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
@@ -208,7 +214,7 @@ function powerline_scm_prompt {
             fi
 
           fi
-          SCM_PROMPT+=" (${SCM_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_BRANCH/}) "
+          SCM_PROMPT+=" (${SCM_CURRENT_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_CURRENT_BRANCH/}) "
         fi
       fi
       if [[ ${SCM_IS_ON_A_TAG} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
