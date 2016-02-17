@@ -16,26 +16,6 @@ SCM_GIT_CHAR=${POWERLINE_SCM_GIT_CHAR:=" "}
 PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:="❯"}
 TRUNCATED_SYMBOL="…"
 
-omg_is_a_git_repo_symbol=''
-omg_has_untracked_files_symbol=''        #                ?    
-omg_has_adds_symbol=''
-omg_has_deletions_symbol=''
-omg_has_cached_deletions_symbol=''
-omg_has_modifications_symbol=''
-omg_has_cached_modifications_symbol=''
-omg_ready_to_commit_symbol=''            #   →
-omg_is_on_a_tag_symbol=''                #   
-omg_needs_to_merge_symbol='ᄉ'
-omg_detached_symbol=''
-omg_can_fast_forward_symbol=''
-omg_has_diverged_symbol=''               #   
-omg_not_tracked_branch_symbol=''
-omg_rebase_tracking_branch_symbol=''     #   
-omg_merge_tracking_branch_symbol=''      #  
-omg_should_push_symbol=''                #    
-omg_has_stashes_symbol=''
-omg_space='　'
-
 SCM_THEME_PROMPT_CLEAN=""
 SCM_THEME_PROMPT_DIRTY=""
 
@@ -124,102 +104,122 @@ function powerline_virtualenv_prompt {
 }
 
 function powerline_scm_prompt {
-    scm_prompt_vars
-    if [[ "${SCM_NONE_CHAR}" != "${SCM_CHAR}" ]]; then
-        if [[ "${SCM_DIRTY}" -eq 3 ]]; then
-            SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_STAGED_COLOR}
-        elif [[ "${SCM_DIRTY}" -eq 2 ]]; then
-            SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_UNSTAGED_COLOR}
-        elif [[ "${SCM_DIRTY}" -eq 1 ]]; then
-            SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_DIRTY_COLOR}
-        else
-            SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_CLEAN_COLOR}
-        fi
+  local omg_is_a_git_repo_symbol=''
+  local omg_has_untracked_files_symbol=''        #                ?    
+  local omg_has_adds_symbol=''
+  local omg_has_deletions_symbol=''
+  local omg_has_cached_deletions_symbol=''
+  local omg_has_modifications_symbol=''
+  local omg_has_cached_modifications_symbol=''
+  local omg_ready_to_commit_symbol=''            #   →
+  local omg_is_on_a_tag_symbol=''                #   
+  # local omg_needs_to_merge_symbol='ᄉ'
+  local omg_detached_symbol=''
+  local omg_can_fast_forward_symbol=''
+  local omg_has_diverged_symbol=''               #   
+  local omg_not_tracked_branch_symbol=''
+  local omg_rebase_tracking_branch_symbol=''     #   
+  local omg_merge_tracking_branch_symbol=''      #  
+  local omg_should_push_symbol=''                #    
+  local omg_has_stashes_symbol=''
+  local omg_space='　'
 
-        if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
-            # on filesystem
-            SCM_PROMPT="${omg_is_a_git_repo_symbol}${omg_space}"
-
-            if [[ $SCM_ACTION ]]; then
-              SCM_PROMPT+="${SCM_ACTION}${omg_space}"
-            fi
-
-            if [[ $SCM_HAS_STASHES ]]; then
-              SCM_PROMPT+="${omg_has_stashes_symbol}${omg_space}"
-            fi
-
-            if [[ $SCM_HAS_UNTRACKED_FILES ]]; then
-              SCM_PROMPT+="${omg_has_untracked_files_symbol}${omg_space}"
-            fi
-
-            if [[ $SCM_HAS_MODIFICATIONS ]]; then
-              SCM_PROMPT+="${omg_has_modifications_symbol}"
-            fi
-
-            if [[ $SCM_HAS_DELETIONS ]]; then
-              SCM_PROMPT+="${omg_has_deletions_symbol}${omg_space}"
-            fi
-
-            # ready
-            if [[ $SCM_HAS_ADDS ]]; then
-              SCM_PROMPT+="${omg_has_adds_symbol}${omg_space}"
-            fi
-
-            if [[ $SCM_HAS_MODIFICATIONS_CACHED ]]; then
-              SCM_PROMPT+="${omg_has_cached_modifications_symbol}${omg_space}"
-            fi
-
-            if [[ $SCM_HAS_DELETIONS_CACHED ]]; then
-              SCM_PROMPT+="${omg_has_cached_deletions_symbol}${omg_space}"
-            fi
-
-            # next operation
-            if [[ $SCM_READY_TO_COMMIT ]]; then
-              SCM_PROMPT+="${omg_ready_to_commit_symbol}${omg_space}"
-            fi
-
-            # where
-            SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
-
-            if [[ $SCM_GIT_DETACHED == true ]]; then
-                if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
-                if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"; fi
-            else
-                if [[ $SCM_HAS_UPSTREAM == false ]]; then
-                  SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${SCM_BRANCH})${omg_space}"
-                else
-                    if [[ $SCM_WILL_REBASE == true ]]; then
-                        local type_of_upstream=$omg_rebase_tracking_branch_symbol
-                    else
-                        local type_of_upstream=$omg_merge_tracking_branch_symbol
-                    fi
-
-                    if [[ $SCM_HAS_DIVERGED == true ]]; then
-                        SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-                    else
-                        if [[ $SCM_COMMITS_BEHIND -gt 0 ]]; then
-                            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
-                        fi
-                        if [[ $SCM_SHOULD_PUSH == true ]]; then
-                            SCM_PROMPT+="—${omg_space}${omg_should_push_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-                        fi
-                        if [[ $SCM_COMMITS_AHEAD == 0 && $SCM_COMMITS_BEHIND == 0 ]]; then
-                            SCM_PROMPT+="${omg_space}—${omg_space}—${omg_space}"
-                        fi
-
-                    fi
-                    SCM_PROMPT+=" (${SCM_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_BRANCH/}) "
-                fi
-            fi
-            if [[ ${SCM_IS_ON_A_TAG} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
-        fi
-
-        SCM_PROMPT="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})${SCM_PROMPT} ${normal}"
-        LAST_THEME_COLOR=${SCM_THEME_PROMPT_COLOR}
-        (( SEGMENT_AT_LEFT += 1 ))
+  scm_prompt_vars
+  if [[ "${SCM_NONE_CHAR}" != "${SCM_CHAR}" ]]; then
+    if [[ "${SCM_DIRTY}" -eq 3 ]]; then
+      SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_STAGED_COLOR}
+    elif [[ "${SCM_DIRTY}" -eq 2 ]]; then
+      SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_UNSTAGED_COLOR}
+    elif [[ "${SCM_DIRTY}" -eq 1 ]]; then
+      SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_DIRTY_COLOR}
     else
-        SCM_PROMPT=""
+      SCM_THEME_PROMPT_COLOR=${SCM_THEME_PROMPT_CLEAN_COLOR}
     fi
+
+    if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
+      # on filesystem
+      SCM_PROMPT="${omg_is_a_git_repo_symbol}${omg_space}"
+
+      if [[ $SCM_ACTION ]]; then
+        SCM_PROMPT+="${SCM_ACTION}${omg_space}"
+      fi
+
+      if [[ $SCM_HAS_STASHES ]]; then
+        SCM_PROMPT+="${omg_has_stashes_symbol}${omg_space}"
+      fi
+
+      if [[ $SCM_HAS_UNTRACKED_FILES ]]; then
+        SCM_PROMPT+="${omg_has_untracked_files_symbol}${omg_space}"
+      fi
+
+      if [[ $SCM_HAS_MODIFICATIONS ]]; then
+        SCM_PROMPT+="${omg_has_modifications_symbol}"
+      fi
+
+      if [[ $SCM_HAS_DELETIONS ]]; then
+        SCM_PROMPT+="${omg_has_deletions_symbol}${omg_space}"
+      fi
+
+      # ready
+      if [[ $SCM_HAS_ADDS ]]; then
+        SCM_PROMPT+="${omg_has_adds_symbol}${omg_space}"
+      fi
+
+      if [[ $SCM_HAS_MODIFICATIONS_CACHED ]]; then
+        SCM_PROMPT+="${omg_has_cached_modifications_symbol}${omg_space}"
+      fi
+
+      if [[ $SCM_HAS_DELETIONS_CACHED ]]; then
+        SCM_PROMPT+="${omg_has_cached_deletions_symbol}${omg_space}"
+      fi
+
+      # next operation
+      if [[ $SCM_READY_TO_COMMIT ]]; then
+        SCM_PROMPT+="${omg_ready_to_commit_symbol}${omg_space}"
+      fi
+
+      # where
+      SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR} ${normal}$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
+
+      if [[ $SCM_GIT_DETACHED == true ]]; then
+        if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="${omg_detached_symbol}${omg_space}"; fi
+        if [[ $SCM_GIT_DETACHED ]]; then SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"; fi
+      else
+        if [[ $SCM_HAS_UPSTREAM == false ]]; then
+          SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}${omg_space}—${omg_space}(${SCM_BRANCH})${omg_space}"
+        else
+          if [[ $SCM_WILL_REBASE == true ]]; then
+            local type_of_upstream=$omg_rebase_tracking_branch_symbol
+          else
+            local type_of_upstream=$omg_merge_tracking_branch_symbol
+          fi
+
+          if [[ $SCM_HAS_DIVERGED == true ]]; then
+            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
+          else
+            if [[ $SCM_COMMITS_BEHIND -gt 0 ]]; then
+              SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
+            fi
+            if [[ $SCM_SHOULD_PUSH == true ]]; then
+              SCM_PROMPT+="—${omg_space}${omg_should_push_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
+            fi
+            if [[ $SCM_COMMITS_AHEAD == 0 && $SCM_COMMITS_BEHIND == 0 ]]; then
+              SCM_PROMPT+="${omg_space}—${omg_space}—${omg_space}"
+            fi
+
+          fi
+          SCM_PROMPT+=" (${SCM_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_BRANCH/}) "
+        fi
+      fi
+      if [[ ${SCM_IS_ON_A_TAG} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
+    fi
+
+    SCM_PROMPT="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})${SCM_PROMPT} ${normal}"
+    LAST_THEME_COLOR=${SCM_THEME_PROMPT_COLOR}
+    (( SEGMENT_AT_LEFT += 1 ))
+  else
+    SCM_PROMPT=""
+  fi
 }
 
 function powerline_cwd_prompt {
@@ -376,8 +376,8 @@ function powerline_prompt_command() {
     powerline_scm_prompt
     local_git_root="$(find_git_root)"
 
-    powerline_virtualenv_prompt
-    powerline_rvm_prompt
+    # powerline_virtualenv_prompt
+    # powerline_rvm_prompt
     powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
     powerline_last_status_prompt LAST_STATUS
 
