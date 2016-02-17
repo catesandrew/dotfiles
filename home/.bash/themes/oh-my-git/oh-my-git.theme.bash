@@ -315,19 +315,6 @@ function findup_npm_root {
   done
 }
 
-function find_git_root {
-  git_root=''
-
-  if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
-    git_root="$(git rev-parse --git-dir 2>/dev/null)"
-
-    if [ -d "$git_root" ]; then
-      git_root=$(dirname "$git_root")
-      echo "$git_root"
-    fi
-  fi
-}
-
 function npm_prompt {
   local npm_root
   local npm_name

@@ -140,12 +140,12 @@ export THEME_CLOCK_CHECK=false
 
 if [ -z "$INSIDE_EMACS" ]; then
   # Lock and load a custom theme file location /.bash/themes/
-  # export BASH_IT_THEME='powerline-multiline'
+  # export BASH_IT_THEME='oh-my-git-pure'
   export BASH_IT_THEME='oh-my-git'
   # . /usr/local/share/liquidprompt
 else
   unset PROMPT_COMMAND
-  export BASH_IT_THEME='pure'
+  export BASH_IT_THEME='oh-my-git-pure'
 fi
 
 # Load colors first so they can be use in base theme
