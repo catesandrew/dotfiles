@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 THEME_PROMPT_HOST='\H'
 
@@ -94,6 +94,25 @@ function scm_prompt_info {
 
 function git_prompt_vars {
   local details=''
+
+  # oh my git
+  SCM_ACTION=
+  SCM_HAS_UPSTREAM=false
+  SCM_HAS_MODIFICATIONS=
+  SCM_HAS_MODIFICATIONS_CACHED=
+  SCM_HAS_ADDS=
+  SCM_HAS_DELETIONS=
+  SCM_HAS_DELETIONS_CACHED=
+  SCM_READY_TO_COMMIT=
+  SCM_HAS_UNTRACKED_FILES=
+  SCM_IS_ON_A_TAG=
+  SCM_HAS_DIVERGED=false
+  SCM_SHOULD_PUSH=false
+  SCM_HAS_STASHES=
+  SCM_WILL_REBASE=false
+  SCM_COMMITS_AHEAD=0
+  SCM_COMMITS_BEHIND=0
+
   SCM_STATE=${GIT_THEME_PROMPT_CLEAN:-$SCM_THEME_PROMPT_CLEAN}
   if [[ "$(git config --get bash-it.hide-status)" != "1" ]]; then
     [[ "${SCM_GIT_IGNORE_UNTRACKED}" = "true" ]] && local git_status_flags='-uno'
@@ -105,9 +124,34 @@ function git_prompt_vars {
         local untracked_count="$(egrep -c '^\?\? .+' <<< "${status}")"
         local unstaged_count="$(egrep -c '^.[^ ?#] .+' <<< "${status}")"
         local staged_count="$(egrep -c '^[^ ?#]. .+' <<< "${status}")"
-        [[ "${staged_count}" -gt 0 ]] && details+=" ${SCM_GIT_STAGED_CHAR}${staged_count}" && SCM_DIRTY=3
-        [[ "${unstaged_count}" -gt 0 ]] && details+=" ${SCM_GIT_UNSTAGED_CHAR}${unstaged_count}" && SCM_DIRTY=2
-        [[ "${untracked_count}" -gt 0 ]] && details+=" ${SCM_GIT_UNTRACKED_CHAR}${untracked_count}" && SCM_DIRTY=1
+
+        if [[ "${staged_count}" -gt 0 ]]; then
+          details+=" ${SCM_GIT_STAGED_CHAR}${staged_count}"
+          SCM_DIRTY=3
+
+          if [[ $status =~ ($'\n'|^)M ]]; then SCM_HAS_MODIFICATIONS_CACHED=true; fi
+          if [[ $status =~ ($'\n'|^)A ]]; then SCM_HAS_ADDS=true; fi
+          if [[ $status =~ ($'\n'|^)D ]]; then SCM_HAS_DELETIONS_CACHED=true; fi
+
+          if [[ "${unstaged_count}" -eq 0 ]]; then
+            SCM_READY_TO_COMMIT=true
+          fi
+        fi
+
+        if [[ "${unstaged_count}" -gt 0 ]]; then
+          details+=" ${SCM_GIT_UNSTAGED_CHAR}${unstaged_count}"
+          SCM_DIRTY=2
+
+          if [[ $status =~ ($'\n'|^).M ]]; then SCM_HAS_MODIFICATIONS=true; fi
+          if [[ $status =~ ($'\n'|^).D ]]; then SCM_HAS_DELETIONS=true; fi
+        fi
+
+        if [[ "${untracked_count}" -gt 0 ]]; then
+          details+=" ${SCM_GIT_UNTRACKED_CHAR}${untracked_count}"
+          SCM_DIRTY=1
+
+          SCM_HAS_UNTRACKED_FILES=true
+        fi
       fi
       SCM_STATE=${GIT_THEME_PROMPT_DIRTY:-$SCM_THEME_PROMPT_DIRTY}
     fi
@@ -127,15 +171,21 @@ function git_prompt_vars {
       local remote_branch=${tracking_info#${remote_name}/}
       local remote_info=""
       local num_remotes=$(git remote | wc -l 2> /dev/null)
+
+      if [[ "${num_remotes}" -ge 1 ]]; then
+        SCM_HAS_UPSTREAM=true
+      fi
+
       [[ "${SCM_BRANCH}" = "${remote_branch}" ]] && local same_branch_name=true
       if ([[ "${SCM_GIT_SHOW_REMOTE_INFO}" = "auto" ]] && [[ "${num_remotes}" -ge 2 ]]) ||
           [[ "${SCM_GIT_SHOW_REMOTE_INFO}" = "true" ]]; then
-        remote_info="${remote_name}"
-        [[ "${same_branch_name}" != "true" ]] && remote_info+="/${remote_branch}"
+        remote_info="${remote_branch}"
+
+        [[ "${same_branch_name}" != "true" ]] && remote_info="${remote_name}/${remote_branch}"
       elif [[ ${same_branch_name} != "true" ]]; then
         remote_info="${remote_branch}"
       fi
-      if [[ -n "${remote_info}" ]];then
+      if [[ -n "${remote_info}" ]]; then
         if [[ "${branch_gone}" = "true" ]]; then
           SCM_BRANCH+="${SCM_THEME_BRANCH_GONE_PREFIX}${remote_info}"
         else
@@ -148,6 +198,8 @@ function git_prompt_vars {
     local detached_prefix=""
     ref=$(git describe --tags --exact-match 2> /dev/null)
     if [[ -n "$ref" ]]; then
+      SCM_IS_ON_A_TAG=true
+      tag_at_current_commit="${ref}"
       detached_prefix=${SCM_THEME_TAG_PREFIX}
     else
       ref=$(git describe --contains --all HEAD 2> /dev/null)
@@ -161,11 +213,29 @@ function git_prompt_vars {
 
   local ahead_re='.+ahead ([0-9]+).+'
   local behind_re='.+behind ([0-9]+).+'
-  [[ "${status}" =~ ${ahead_re} ]] && SCM_BRANCH+=" ${SCM_GIT_AHEAD_CHAR}${BASH_REMATCH[1]}"
-  [[ "${status}" =~ ${behind_re} ]] && SCM_BRANCH+=" ${SCM_GIT_BEHIND_CHAR}${BASH_REMATCH[1]}"
+  if [[ "${status}" =~ ${ahead_re} ]]; then
+    SCM_BRANCH+=" ${SCM_GIT_AHEAD_CHAR}${BASH_REMATCH[1]}"
+    SCM_COMMITS_AHEAD=${BASH_REMATCH[1]}
+  fi
+
+  if [[ "${status}" =~ ${behind_re} ]]; then
+    SCM_BRANCH+=" ${SCM_GIT_BEHIND_CHAR}${BASH_REMATCH[1]}"
+    SCM_COMMITS_BEHIND=${BASH_REMATCH[1]}
+  fi
+
+  if [[ $SCM_COMMITS_AHEAD -gt 0 && $SCM_COMMITS_BEHIND -gt 0 ]]; then
+    SCM_HAS_DIVERGED=true
+  fi
+
+  if [[ $SCM_HAS_DIVERGED == false && $SCM_COMMITS_AHEAD -gt 0 ]]; then
+    SCM_SHOULD_PUSH=true
+  fi
 
   local stash_count="$(git stash list 2> /dev/null | wc -l | tr -d ' ')"
-  [[ "${stash_count}" -gt 0 ]] && SCM_BRANCH+=" {${stash_count}}"
+  if [[ "${stash_count}" -gt 0 ]]; then
+    SCM_BRANCH+=" {${stash_count}}"
+    SCM_HAS_STASHES=true
+  fi
 
   SCM_BRANCH+=${details}
 
@@ -173,58 +243,10 @@ function git_prompt_vars {
   SCM_SUFFIX=${GIT_THEME_PROMPT_SUFFIX:-$SCM_THEME_PROMPT_SUFFIX}
 
   ## oh my git
-
-  just_init=
-  has_upstream=
-  has_modifications=
-  has_modifications_cached=
-  has_adds=
-  has_deletions=
-  has_deletions_cached=
-  ready_to_commit=
-  has_untracked_files=
-  is_on_a_tag=
-  has_diverged=
-  should_push=
-  has_stashes=
-  will_rebase=
-
   local number_of_logs="$(git log --pretty=oneline -n1 2> /dev/null | wc -l)"
-  if [[ $number_of_logs -eq 0 ]]; then
-      just_init=true
-  else
-      local upstream=$(git rev-parse --symbolic-full-name --abbrev-ref @{upstream} 2> /dev/null)
-      if [[ -n "${upstream}" && "${upstream}" != "@{upstream}" ]]; then has_upstream=true; fi
-
-      local git_status="$(git status --porcelain 2> /dev/null)"
-      action="$(get_current_action)"
-
-      if [[ $git_status =~ ($'\n'|^).M ]]; then has_modifications=true; fi
-      if [[ $git_status =~ ($'\n'|^)M ]]; then has_modifications_cached=true; fi
-      if [[ $git_status =~ ($'\n'|^)A ]]; then has_adds=true; fi
-      if [[ $git_status =~ ($'\n'|^).D ]]; then has_deletions=true; fi
-      if [[ $git_status =~ ($'\n'|^)D ]]; then has_deletions_cached=true; fi
-      if [[ $git_status =~ ($'\n'|^)[MAD] && ! $git_status =~ ($'\n'|^).[MAD\?] ]]; then ready_to_commit=true; fi
-
-      local number_of_untracked_files=$(\grep -c "^??" <<< "${git_status}")
-      if [[ $number_of_untracked_files -gt 0 ]]; then has_untracked_files=true; fi
-
-      tag_at_current_commit=$(git describe --exact-match --tags $SCM_CHANGE 2> /dev/null)
-      if [[ -n $tag_at_current_commit ]]; then is_on_a_tag=true; fi
-
-      if [[ $has_upstream == true ]]; then
-          local commits_diff="$(git log --pretty=oneline --topo-order --left-right ${SCM_CHANGE}...${upstream} 2> /dev/null)"
-          commits_ahead=$(\grep -c "^<" <<< "$commits_diff")
-          commits_behind=$(\grep -c "^>" <<< "$commits_diff")
-      fi
-
-      if [[ $commits_ahead -gt 0 && $commits_behind -gt 0 ]]; then has_diverged=true; fi
-      if [[ $has_diverged == false && $commits_ahead -gt 0 ]]; then should_push=true; fi
-
-      will_rebase=$(git config --get branch.${SCM_BRANCH}.rebase 2> /dev/null)
-
-      local number_of_stashes="$(git stash list -n1 2> /dev/null | wc -l)"
-      if [[ $number_of_stashes -gt 0 ]]; then has_stashes=true; fi
+  if [[ ${number_of_logs} -gt 0 ]]; then
+    SCM_ACTION="$(get_current_action)"
+    SCM_WILL_REBASE=$(git config --get branch.${SCM_BRANCH}.rebase 2> /dev/null)
   fi
 }
 
