@@ -71,7 +71,7 @@ if brew_contains_element "dnsmasq"; then
   function daemon-dnsmasq() {
     case "$#" in
       0)
-        echo >&2 "Usage: daemon-dnsmasq [restart|start|stop]"
+        echo >&2 "Usage: daemon-dnsmasq [restart|on|off]"
         ;;
       *)
         cmd="$1"
@@ -82,14 +82,14 @@ if brew_contains_element "dnsmasq"; then
             sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
             sudo launchctl load -w /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
             ;;
-          start)
+          on)
             sudo launchctl load -w /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
             ;;
-          stop)
+          off)
             sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
             ;;
           *)
-            echo >&2 "Usage: daemon-dnsmasq [restart|start|stop]"
+            echo >&2 "Usage: daemon-dnsmasq [restart|on|off]"
             ;;
         esac
     esac
@@ -106,7 +106,7 @@ fi
 #
 # user=username
 # no-cert-check
-# script INTERNAL_IP4_DNS="127.0.0.1" /usr/local/etc/vpnc-script
+# script INTERNAL_IP4_DNS="127.0.0.1" /usr/local/etc/vpnc/vpnc-script
 # background
 # passwd-on-stdin
 
@@ -114,7 +114,7 @@ if brew_contains_element "openconnect"; then
   function vpn() {
     case "$#" in
       0)
-        echo >&2 "Usage: vpn [connect|destroy]"
+        echo >&2 "Usage: vpn [on|off]"
         ;;
       *)
         cmd="$1"
@@ -123,10 +123,10 @@ if brew_contains_element "openconnect"; then
         if [ ! -d "${HOME}/.pids" ]; then
           mkdir -p "${HOME}/.pids"
         fi
-        __pidfile_oc="${HOME}/.pids/openconnect.pid"
+        local __pidfile_oc="${HOME}/.pids/openconnect.pid"
 
         case "$cmd" in
-          connect)
+          on)
             if [ -z "$OPENCONNECT_URL" ]; then
               echo >&2 "Error: missing environment variable OPENCONNECT_URL"
             else
@@ -136,7 +136,7 @@ if brew_contains_element "openconnect"; then
               echo -n "${__vpn_pass}" | sudo openconnect --config "${HOME}/.openconnect" --pid-file="${__pidfile_oc}" "${OPENCONNECT_URL}"
             fi
             ;;
-          destroy)
+          off)
             if [ -z "$OPENCONNECT_URL" ]; then
               echo >&2 "Error: missing environment variable OPENCONNECT_URL"
             else
@@ -156,7 +156,7 @@ if brew_contains_element "openconnect"; then
             fi
             ;;
           *)
-            echo >&2 "Usage: vpn [connect|destroy]"
+            echo >&2 "Usage: vpn [on|off]"
             ;;
         esac
     esac
