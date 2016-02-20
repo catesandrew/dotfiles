@@ -3,6 +3,14 @@
 # handle the case when editing remote files through emacs
 if [[ "$TERM" != "dumb" ]]; then
 
+# TODO Test these
+# if [[ "$TERM" = "dumb" ]]; then
+#   PS1="> "
+#   return
+# fi
+
+# If not running interactively, don't do anything
+# [ -z "$PS1" ] && return
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
 
 # TODO: Verify inputrc is being read, if not, load it.
@@ -133,6 +141,20 @@ export TERM
 umask 002
 mesg n
 
+# nice things
+shopt -s extglob      # extended globbing capabilities
+shopt -s cmdhist      # store multi-line commands as a single line
+
+# these options are only availabe in Bash4
+if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+  shopt -s autocd       # type 'dir' instead 'cd dir'
+  shopt -s dirspell     # correct typos when tab-completing names
+  shopt -s globstar     # enable **
+fi
+
+# disable completion command names when pressing tab at the start of a line
+shopt -s no_empty_cmd_completion
+
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
 
@@ -147,13 +169,22 @@ shopt -s histappend
 shopt -s nocaseglob
 
 # Use color output for less.
-export LESS=-RXE
+export LESS="-rRSM~gIsw"
 
 # Don't clear the screen after quitting a manual page
 export MANPAGER="less -X"
 
 # Change this to your console based IRC client of choice.
 export IRC_CLIENT='irssi'
+
+# md = mode doublebright (bold), us = underline start, so = standout
+# so is used for the line at the bottom and search highlights
+export LESS_TERMCAP_md=$'\e[31m'
+export LESS_TERMCAP_us=$'\e[32m'
+export LESS_TERMCAP_so=$'\e[44;33m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
 
 export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
 export THEME_BATTERY_PERCENTAGE_CHECK=false
