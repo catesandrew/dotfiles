@@ -1,43 +1,47 @@
 # Some aliases for Homebrew Dupes
-
 if [ "${__dot_system_type}" == "Darwin" ]; then
   if brew_contains_element "ccat"; then
      alias cat='ccat'
   fi
 
-  if brew_contains_element "coreutils" && \
-      [ -f "${HOME}/.dircolors" ]; then
+  if brew_contains_element "grep"; then
+    alias shuf=gshuf
+    alias grep='ggrep --color=always'
+    alias grepno="ggrep --color=never -n -E '.*'"
+    alias egrep='gegrep --color=always'
+    alias fgrep='gfgrep --color=auto'
+  fi
 
-    eval $(gdircolors -b "${HOME}/.dircolors")
-    alias ls="gls -G --color=always"
+  if brew_contains_element "coreutils"; then
+    export COREUTILS_HOME="${__dot_brew_home}/opt/coreutils"
+    path_prepend "${COREUTILS_HOME}/libexec/gnubin"
+    export MANPATH="${COREUTILS_HOME}/libexec/gnuman:$MANPATH"
 
-    # Directory
+    if [ -f "${HOME}/.dircolors" ]; then
+        eval $(gdircolors -b "${HOME}/.dircolors")
+        alias ls="gls -G --color=always"
+    fi
+
+    ## Directory
     alias md='gmkdir -p'             # Create parent directories on demand
     alias mkdir='gmkdir -pv'         # Create parent directories on demand
     alias rd='grmdir'
 
-    # Add safety nets
+    ## Add safety nets
 
-    # do not delete / or prompt if deleting more than 3 files at a time
-    alias rm='grm -I --preserve-root'
+    ### do not delete / or prompt if deleting more than 3 files at a time
+    alias rm='grm -I'
 
-    # confirmation
+    ### confirmation
     alias mv='gmv -i'
     alias cp='gcp -i'
     alias ln='gln -i'
 
-    # Parenting changing perms on /
+    ### Parenting changing perms on /
     alias chown='gchown --preserve-root'
     alias chmod='gchmod --preserve-root'
     alias chgrp='gchgrp --preserve-root'
 
-    if brew_contains_element "grep"; then
-      alias shuf=gshuf
-      alias grep='ggrep --color=always'
-      alias grepno="ggrep --color=never -n -E '.*'"
-      alias egrep='gegrep --color=always'
-      alias fgrep='gfgrep --color=auto'
-    fi
   else
     # colored grep
     export GREP_COLOR='1;33'
