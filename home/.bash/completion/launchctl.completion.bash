@@ -3,6 +3,7 @@
 # launchctl(1) completion
 #
 
+if [ "$__dot_system_type" == "Darwin" ] && [ "${BASH_VERSINFO[0]}" -le 3 ]; then
 _launchctl()
 {
     local cur oslevel
@@ -167,3 +168,4 @@ _launchctl()
     return 0
 }
 complete -F _launchctl $filenames launchctl
+fi
