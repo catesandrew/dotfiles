@@ -11,6 +11,68 @@ set completion-ignore-case on
 # instead of ringing the bell.
 set show-all-if-ambiguous on
 
+# don't ask about displaying all results and don't use a pager
+set completion-query-items 0
+set page-completions off
+
+# don't modify the history list after editing a command selected with previous-history
+# commands selected with history-search-backward are not modified by default
+set revert-all-at-newline on
+
+# complete fi|l to file.txt instead of file.txtl
+# fi|.txt is still completed to file.txt.txt
+# skip-completed-text was added in bash 4.1
+set skip-completed-text on
+
+# don't include files that start with a period
+# set match-hidden-files off
+
+# the Emacs equivalents of cut and copy
+# kill-region is bound to C-w in Emacs
+# "\eq": kill-region
+# "\ew": copy-region-as-kill
+
+# option-left and option-right
+# "\e\e[C": forward-word
+# "\e\e[D": backward-word
+
+# shell-expand-line performs shell expansions, alias expansion, and history expansion
+# I mostly use it to expand command substitutions
+# it is bound to \e\C-e by default
+# "\ee": shell-expand-line
+
+# glob-expand-word inserts the results of a glob expression
+# it is bound to \C-x* by default
+# \eg (glob-complete-word) completes globs
+"\C-g": glob-expand-word
+
+# You can also bind a key to glob-expand-word which will take a bash glob --
+# say * -- and replace the glob with all the files that match that glob.
+# "\C-x*": glob-expand-word
+
+# history-expand-line expands history designators like !* and !-1
+# it is bound to \e^ by default
+"\eh": history-expand-line
+
+# insert the zeroth and first argument
+# "\em": "\e0\e."
+# "\e,": "\e1\e."
+
+# run the previous command again and insert its output
+# \e\C-e (shell-expand-line) is used to expand the command substitution
+# "\eo": "$(!!)\e\C-e"
+
+# replace the current line with output
+# "\er": "\C-a$(\C-e)\e\C-e"
+
+# complete words from the history list
+# dabbrev-expand was added in bash 4.0
+# "\e/": dabbrev-expand
+
+
+
+
+
 # If set to on, tilde expansion is performed when readline attempts word
 # completion.
 set expand-tilde on
@@ -20,11 +82,14 @@ set expand-tilde on
 set visible-stats on
 set colored-stats on
 
-# Make TAB cycle through possible completions
-# "\t": menu-complete
+# make option-tab and shift-tab cycle through completions
+# menu-complete-backward was added in bash 4.1
+"\e\t": menu-complete
+"\e[Z": menu-complete-backward
 
+# Make TAB cycle through possible completions
 # Make SHIFT-TAB reverse cycle through possible completions
-# Only supported in bash > 4.0
+# "\t": menu-complete
 # "\e[Z": "\e-1\C-i"
 
 # Use the string that has already been typed as the prefix for searching
@@ -47,15 +112,10 @@ set colored-stats on
 # first / character. This makes fixing thinigs a bit easier. It also works
 # within a path.
 "\C-w": unix-filename-rubout
-"": unix-filename-rubout
 
 # You may also want to set mark-symlinked-directories as -- by default -- bash
 # doesn't put a / after symlinks when doing autocomplete. This fixes that.
 set mark-symlinked-directories on
-
-# You can also bind a key to glob-expand-word which will take a bash glob --
-# say * -- and replace the glob with all the files that match that glob.
-"\C-x*": glob-expand-word
 
 # set bind-tty-special-chars on
 
