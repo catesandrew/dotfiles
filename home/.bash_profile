@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# If not running interactively, don't do anything
+[[ $- != *i*  ]] && return
+
 # TODO: rewrite these and put into .inputrc
 # http://unix.stackexchange.com/questions/76566
 

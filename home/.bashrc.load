@@ -12,6 +12,7 @@ if [[ "$TERM" != "dumb" ]]; then
 # If not running interactively, don't do anything
 # [ -z "$PS1" ] && return
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
+[[ $- != *i*  ]] && return
 
 # TODO: Verify inputrc is being read, if not, load it.
 # bind -f "$HOME/.inputrc"
