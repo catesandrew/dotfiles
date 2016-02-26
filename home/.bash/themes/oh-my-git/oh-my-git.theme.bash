@@ -103,26 +103,107 @@ function powerline_virtualenv_prompt {
     fi
 }
 
+# light bulb 
+# repo 
+# repo forked 
+# repo push 
+# repo pull 
+# book 
+# cloud download 
+# cloud upload 
+# tag 
+# git pull request 
+# git commit 
+# git branch 
+# git merge 
+# git compare 
+# mirror 
+# issue opened 
+# issue reopened 
+# issue closed 
+# star 
+# comment 
+# alert 
+# gear 
+# tools 
+# signout 
+# rocket 
+# organization 
+# unfold 
+# fold 
+# check 
+# arrow up , , , 
+# pin 
+# graph 
+# left 
+# clock 
+# key 
+# repo force push 
+# repo clone 
+# diff 
+# eye 
+# dot 
+# square 
+# pencil 
+# info 
+# right 
+# link 
+# plus 
+# three bars 
+# code 
+# list unordered 
+# versions 
+# lock 
+# diff added 
+# diff removed 
+# diff modified 
+# diff renamed 
+# diff ignored 
+# milestone 
+# history 
+# external link 
+# x 
+# pulse 
+# sync 
+# home 
+# stop 
+# bug 
+# ellipsis 
+# hubot 
+# up , , 
+# package 
+# terminal 
+# dash 
+# inbox 
+# trashcan 
+# flame 
+# law 
+# up 
+# down 
 function powerline_scm_prompt {
-  local omg_is_a_git_repo_symbol=''
-  local omg_has_untracked_files_symbol=''        #                ?    
-  local omg_has_adds_symbol=''
-  local omg_has_deletions_symbol=''
-  local omg_has_cached_deletions_symbol=''
-  local omg_has_modifications_symbol=''
-  local omg_has_cached_modifications_symbol=''
-  local omg_ready_to_commit_symbol=''            #   →
-  local omg_is_on_a_tag_symbol=''                #   
+  local omg_is_a_git_repo_symbol=''
+  local omg_has_untracked_files_symbol=''
+  local omg_has_adds_symbol=''
+  local omg_has_deletions_symbol=''
+  local omg_has_cached_deletions_symbol=''
+  local omg_has_modifications_symbol=''
+  local omg_has_cached_modifications_symbol=''
+  local omg_ready_to_commit_symbol=''
+  local omg_is_on_a_tag_symbol=''
   # local omg_needs_to_merge_symbol='ᄉ'
-  local omg_detached_symbol=''
-  local omg_can_fast_forward_symbol=''
-  local omg_has_diverged_symbol=''               #   
-  local omg_not_tracked_branch_symbol=''
-  local omg_rebase_tracking_branch_symbol=''     #   
-  local omg_merge_tracking_branch_symbol=''      #  
-  local omg_should_push_symbol=''                #    
-  local omg_has_stashes_symbol=''
-  local omg_space='　'
+  local omg_detached_symbol=''
+  local omg_can_fast_forward_symbol=''
+  local omg_has_diverged_symbol=''
+  local omg_not_tracked_branch_symbol=''
+  local omg_rebase_tracking_branch_symbol=''
+  local omg_merge_tracking_branch_symbol=''
+  local omg_should_push_symbol=''
+  local omg_has_stashes_symbol=''
+  local omg_thin_space=' ' # thin space
+  local omg_hair_space=' ' # hair space
+  local omg_punc_space=' ' # punctuation space
+  local omg_figure_space=' ' # figure space
+  local omg_space=$omg_thin_space
 
   scm_prompt_vars
   if [[ "${SCM_NONE_CHAR}" != "${SCM_CHAR}" ]]; then
