@@ -2,6 +2,7 @@
 open-connect skip
 Library recurse
 Documents recurse
+fonts skip
 indent.pro skip
 .fonts recurse
 .hammerspoon recurse
