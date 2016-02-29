@@ -195,7 +195,7 @@ function powerline_scm_prompt {
   local omg_can_fast_forward_symbol=''
   local omg_has_diverged_symbol=''
   local omg_not_tracked_branch_symbol=''
-  local omg_rebase_tracking_branch_symbol=''
+  local omg_rebase_tracking_branch_symbol=' '
   local omg_merge_tracking_branch_symbol=''
   local omg_should_push_symbol=''
   local omg_has_stashes_symbol=''
