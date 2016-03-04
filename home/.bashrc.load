@@ -144,27 +144,32 @@ mesg n
 
 # nice things
 shopt -s extglob      # extended globbing capabilities
-shopt -s cmdhist      # store multi-line commands as a single line
 
 # these options are only availabe in Bash4
 if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-  shopt -s autocd       # type 'dir' instead 'cd dir'
+  # Prepend cd to directory names automatically, type 'dir' instead 'cd dir'
+  shopt -s autocd 2> /dev/null
   shopt -s dirspell     # correct typos when tab-completing names
   shopt -s globstar     # enable **
+  # Correct spelling errors in arguments supplied to cd
+  shopt -s cdspell 2> /dev/null
 fi
+
+# This defines where cd looks for targets
+# Add the directories you want to have fast access to, separated by colon
+# Ex: CDPATH=".:~:~/projects" will look for targets in the current working directory, in home and in the ~/projects folder
+CDPATH="."
+
+# This allows you to bookmark your favorite places across the file system
+# Define a variable containing a path and you will be able to cd into it regardless of the directory you're in
+shopt -s cdable_vars
 
 # disable completion command names when pressing tab at the start of a line
 shopt -s no_empty_cmd_completion
 
-# Autocorrect typos in path names when using `cd`
-shopt -s cdspell
-
 # Check the window size after each command and, if necessary, update the values
 # of LINES and COLUMNS.
 shopt -s checkwinsize
-
-# Append to the Bash history file, rather than overwriting it
-shopt -s histappend
 
 # Case-insensitive globbing (used in pathname expansion)
 shopt -s nocaseglob
@@ -191,9 +196,16 @@ export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
 export THEME_BATTERY_PERCENTAGE_CHECK=false
 export THEME_CLOCK_CHECK=false
 
+# Prevent file overwrite on stdout redirection
+set -o noclobber
+
+# Automatically trim long paths in the prompt (requires Bash 4.x)
+PROMPT_DIRTRIM=2
+
+## THEMES
+
 if [ -z "$INSIDE_EMACS" ]; then
   # Lock and load a custom theme file location /.bash/themes/
-  # export BASH_IT_THEME='oh-my-git-pure'
   export BASH_IT_THEME='oh-my-git'
   # . /usr/local/share/liquidprompt
 else

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Tunnelling privilege ports requires sudo. However, when you run `sudo ssh` it
 # uses the ~.ssh/config file from the root user. No problem, pass `-F
 # ~/.ssh/config` and it works. Further expanding on the solution, pass `-E` with

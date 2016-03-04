@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 SCM_THEME_PROMPT_DIRTY=''
 SCM_THEME_PROMPT_CLEAN=''
 SCM_GIT_CHAR="${bold_cyan}±${normal}"

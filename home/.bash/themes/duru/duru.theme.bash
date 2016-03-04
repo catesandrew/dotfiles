@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 SCM_THEME_PROMPT_PREFIX="${cyan} on ${green}"
 SCM_THEME_PROMPT_SUFFIX=""
 SCM_THEME_PROMPT_DIRTY=" ${red}with changes"

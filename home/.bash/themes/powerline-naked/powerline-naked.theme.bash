@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 THEME_PROMPT_SEPARATOR=""
 
 SHELL_SSH_CHAR=" "

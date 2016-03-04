@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 prompt_setter() {
   # Save history
   history -a

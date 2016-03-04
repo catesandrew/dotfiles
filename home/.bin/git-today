@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # git-today
 # Written by: Gianni Chiappetta <gianni@runlevel6.org>
 # Requires: git 1.7.5+, zsh 4.3.11+

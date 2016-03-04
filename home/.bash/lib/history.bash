@@ -1,7 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# append to bash_history if Terminal.app quits
+# Append to the Bash history file, rather than overwriting it
 shopt -s histappend
+
+# store multi-line commands as a single line
+shopt -s cmdhist
 
 # history handling
 #
@@ -10,16 +13,25 @@ shopt -s histappend
 # Make commands preceeded by a space not show up in history.
 HISTCONTROL=ignoreboth:erasedups
 
-# Increase the maximum number of commands to remember
-# (default is 500)
-HISTSIZE=10000
-
-# Increase the maximum number of lines contained in the history file
-# (default is 500)
+# Huge history. Doesn't appear to slow things down, so why not?
+# - Increase the maximum number of commands to remember (default is 500)
+HISTSIZE=500000
+# - Increase the maximum number of lines contained in the history file (default is 500)
 HISTFILESIZE=200000
 
-# make single-word commands not show up in history, along with anything dash or double dash help
-HISTIGNORE="npm ls:cd -:mvim .:em .:* --+(h|he|hel|help):* -+(h|he|hel|help):+([-%+.0-9@A-Z_a-z])"
+# Don't record some commands
+# - `npm +(ls|install|view|update)` will not record `npm ls`, `npm install`, etc.
+# - `ncu -+(a)` will not record `ncu -a`
+# - `* --+(h|he|hel|help)` will not record a single-word command followed by
+#   double dash `--h`, `--he`, etc.
+# - `* -+(h|he|hel|help)` will not record a single-word command followed by
+#   single dash `-h`, `-he`, etc.
+# - `+([-%+.0-9@A-Z_a-z])` - the best one by far since it will not record any
+#   single-word commands, or basically any command executed without parameters.
+HISTIGNORE="npm +(ls|install|view|update):ncu -+(a):cd -:mvim .:em .:* --+(h|he|hel|help):* -+(h|he|hel|help):+([-%+.0-9@A-Z_a-z])"
+
+# Useful timestamp format
+HISTTIMEFORMAT='%F %T '
 
 export AUTOFEATURE=true autotest
 

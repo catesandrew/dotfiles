@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # zitron theme by Florian Baumann <flo@noqqe.de>
 
 ## git-theme

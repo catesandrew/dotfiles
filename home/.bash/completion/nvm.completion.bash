@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # bash completion for Node Version Manager (NVM)
 

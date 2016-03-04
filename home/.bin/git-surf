@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 # utility / setup functions
 logerr() { echo "$@" 1>&2; }

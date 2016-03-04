@@ -1,9 +1,24 @@
-#!/bin/bash
 # https://github.com/netj/dotfiles/blob/master/.inputrc
+# http://unix.stackexchange.com/questions/21788/how-to-delete-part-of-a-path-in-an-interactive-shell/
+
+# I hate noise
+set bell-style visible
+
+# If set to on, tilde expansion is performed when readline attempts word
+# completion.
+set expand-tilde on
+
+# If  set to on, a character denoting a file's type as reported by stat(2) is
+# appended to the filename when listing possible completions.
+set visible-stats on
+set colored-stats on
 
 # Use case-insensitive TAB autocompletion. If set to On, readline performs
 # filename matching and completion in a case-insensitive fashion.
 set completion-ignore-case on
+
+# Treat hyphens and underscores as equivalent
+set completion-map-case on
 
 # Auto list tab completions (use instead of TAB-cycling). This alters the
 # default behavior of the completion functions. If set to on, words which have
@@ -24,11 +39,20 @@ set revert-all-at-newline on
 # skip-completed-text was added in bash 4.1
 set skip-completed-text on
 
+# You may also want to set mark-symlinked-directories as -- by default -- bash
+# doesn't put a / after symlinks when doing autocomplete. This fixes that.
+set mark-symlinked-directories on
+
+# set bind-tty-special-chars on
+
 # don't include files that start with a period
 # set match-hidden-files off
 
-# the Emacs equivalents of cut and copy
-# kill-region is bound to C-w in Emacs
+## EMACS
+
+set keymap emacs
+
+# the Emacs equivalents of cut and copy kill-region is bound to C-w in Emacs
 # "\eq": kill-region
 # "\ew": copy-region-as-kill
 
@@ -69,19 +93,6 @@ set skip-completed-text on
 # dabbrev-expand was added in bash 4.0
 # "\e/": dabbrev-expand
 
-
-
-
-
-# If set to on, tilde expansion is performed when readline attempts word
-# completion.
-set expand-tilde on
-
-# If  set to on, a character denoting a file's type as reported by stat(2) is
-# appended to the filename when listing possible completions.
-set visible-stats on
-set colored-stats on
-
 # make option-tab and shift-tab cycle through completions
 # menu-complete-backward was added in bash 4.1
 "\e\t": menu-complete
@@ -113,10 +124,51 @@ set colored-stats on
 # within a path.
 "\C-w": unix-filename-rubout
 
-# You may also want to set mark-symlinked-directories as -- by default -- bash
-# doesn't put a / after symlinks when doing autocomplete. This fixes that.
-set mark-symlinked-directories on
+# Switch to VI Mode
+"\ev": vi-editing-mode          # Meta-V: go to vi editing
 
-# set bind-tty-special-chars on
+## VI Mode
+
+# http://www.lugod.org/mailinglists/archives/vox-tech/2003-06/msg00182.html
+# For those who want to use Vi bindings in bash, this corrects a
+# few annoyances:
+#
+# 1) up and down arrows retrieve history lines even in insert mode
+# 2) left and right arrows work in insert mode
+# 3) Ctrl-A and Ctrl-E work how you expect if you have had to
+#    live in Emacs mode in the past.
+# 4) So does Ctrl-D.
+# 5) And Ctrl-L.
+
+## Command-mode bindings
+set keymap vi-command
+"\C-a": vi-insert-beg           # Ctrl-A or Home: insert at line beginning like
+                                # in emacs mode
+"\C-e": vi-append-eol           # Ctrl-E or End: append at line end like in
+                                # emacs mode
+"ZZ": emacs-editing-mode        # to switch to emacs editing mode
+
+## Insert-mode bindings
+set keymap vi-insert
+"\M-[5~": ""             # up arrow or PgUp: append to previous history line
+"\M-[A": ""
+"\M-[B": ""                 # dn arrow or PGDNA: append to next history line
+"\M-[6~": ""
+
+# "\C-p": previous-history        # ^p check for partial match in history
+"\C-p": dynamic-complete-history
+# "\C-n": next-history            # ^n cycle through the list of partial matches
+"\C-n": menu-complete
+
+"\C-a": beginning-of-line      # Ctrl-A: insert at line start like in emacs mode
+"\C-e": end-of-line            # Ctrl-E: append at line end like in emacs mode
+"\C-d": delete-char            # Ctrl-D: delete character
+"\C-l": clear-screen           # Ctrl-L: clear screen
+
+## Specify vi editing mode
+# set -o vi
+
+# Switch to EMACS Mode
+"\ev": emacs-mode          # Meta-V: go to vi editing
 
 $include $HOME/.inputrc.local

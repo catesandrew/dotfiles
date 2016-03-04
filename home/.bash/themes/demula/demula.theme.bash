@@ -1,5 +1,3 @@
-#!/usr/bin/env bash 
-
 # Theme inspired on:
 #  - Ronacher's dotfiles (mitsuhikos) - http://github.com/mitsuhiko/dotfiles/tree/master/bash/
 #  - Glenbot - http://theglenbot.com/custom-bash-shell-for-development/

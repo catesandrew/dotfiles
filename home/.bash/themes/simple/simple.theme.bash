@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # prompt themeing
 
 #added TITLEBAR for updating the tab and window titles with the pwd

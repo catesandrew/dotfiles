@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Simplistic one-liner theme to display source control management info beside
 # the ordinary bash prompt.
 

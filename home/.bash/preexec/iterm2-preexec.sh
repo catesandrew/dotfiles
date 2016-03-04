@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # This is based on "preexec.bash" but is customized for iTerm2.
 
 # Note: this module requires 2 bash features which you must not otherwise be

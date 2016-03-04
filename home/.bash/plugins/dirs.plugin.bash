@@ -93,4 +93,5 @@ R () {
 
 alias U='source ~/.dirs' 	# Update BOOKMARK stack
 # set the bash option so that no '$' is required when using the above facility
-shopt -s cdable_vars
+# SET in bashrc.load
+# shopt -s cdable_vars

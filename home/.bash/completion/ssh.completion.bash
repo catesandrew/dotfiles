@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Bash completion support for ssh.
 
 export COMP_WORDBREAKS=${COMP_WORDBREAKS/\:/}

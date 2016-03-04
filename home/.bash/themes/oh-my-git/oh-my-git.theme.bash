@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 THEME_PROMPT_SEPARATOR=""
 THEME_PROMPT_LEFT_SEPARATOR=""
 
