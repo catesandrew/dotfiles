@@ -14,15 +14,10 @@ if [[ "$TERM" != "dumb" ]]; then
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
 [[ $- != *i*  ]] && return
 
-# TODO: Verify inputrc is being read, if not, load it.
-# bind -f "$HOME/.inputrc"
-
 # While `mvim` is running it keeps calling my login shell, do not know why, till
 # then, lets just disable it the best way we know how to. If MYVIMRC environment
 # variable does not work, there is also VIMRUNTIME to check for.
-if [ -n "$MYVIMRC" ]; then
-  exit 0
-fi
+[[ -n "$MYVIMRC" ]] && return
 
 # exec into bash >= 4, when available (for login shells)
 if [[ $0 = -bash ]] && shopt -qp login_shell && [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
@@ -145,6 +140,9 @@ mesg n
 # nice things
 shopt -s extglob      # extended globbing capabilities
 
+# Prevent file overwrite on stdout redirection
+set -o noclobber
+
 # these options are only availabe in Bash4
 if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
   # Prepend cd to directory names automatically, type 'dir' instead 'cd dir'
@@ -153,6 +151,9 @@ if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
   shopt -s globstar     # enable **
   # Correct spelling errors in arguments supplied to cd
   shopt -s cdspell 2> /dev/null
+
+  # Automatically trim long paths in the prompt (requires Bash 4.x)
+  PROMPT_DIRTRIM=2
 fi
 
 # This defines where cd looks for targets
@@ -196,18 +197,13 @@ export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
 export THEME_BATTERY_PERCENTAGE_CHECK=false
 export THEME_CLOCK_CHECK=false
 
-# Prevent file overwrite on stdout redirection
-set -o noclobber
 
-# Automatically trim long paths in the prompt (requires Bash 4.x)
-PROMPT_DIRTRIM=2
 
 ## THEMES
 
 if [ -z "$INSIDE_EMACS" ]; then
   # Lock and load a custom theme file location /.bash/themes/
   export BASH_IT_THEME='oh-my-git'
-  # . /usr/local/share/liquidprompt
 else
   unset PROMPT_COMMAND
   export BASH_IT_THEME='oh-my-git-pure'
