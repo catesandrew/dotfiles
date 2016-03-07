@@ -4,7 +4,7 @@ SCM_THEME_PROMPT_PREFIX="(${yellow}"
 SCM_THEME_PROMPT_SUFFIX="${normal})"
 
 GIT_THEME_PROMPT_DIRTY=" ${red}✗"
-GIT_THEME_PROMPT_CLEAN=" ${bold_green}✓"
+SCM_GIT_PROMPT_CLEAN=" ${bold_green}✓"
 GIT_THEME_PROMPT_PREFIX="(${yellow}"
 GIT_THEME_PROMPT_SUFFIX="${normal})"
 
