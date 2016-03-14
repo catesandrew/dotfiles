@@ -123,6 +123,8 @@
 
   scrum = "!git ll --since='yesterday' --author=\"`git config user.name`\""
 
+  dsf = "!f() { [ \"$GIT_PREFIX\" != \"\" ] && cd "$GIT_PREFIX"; git diff --color $@ | diff-so-fancy | less --tabs=2 -RFX; }; f"
+
   #  ticket = "!f() { git checkout -b `echo $1|tr 'A-Z' 'a-z'` origin/master }; f "
   #
 
@@ -131,23 +133,28 @@
   autosetuprebase = always
 [difftool]
   prompt = false
-[diff]
-  tool = vimdiff
-  renamelimit = 3000
 [color]
   diff = auto
   status = auto
   branch = auto
   sh = auto
+  ui = auto
 [color "branch"]
   current = yellow reverse
   local = yellow
   remote = green
 [color "diff"]
   meta = yellow bold
+  commit = green bold
   frag = magenta bold
   old = red bold
   new = green bold
+  whitespace = red reverse
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = "red bold 52"
+  newNormal = "green bold"
+  newHighlight = "green bold 22"
 [color "status"]
   added = yellow
   changed = green
@@ -165,8 +172,6 @@
 [mergetool]
   keepBackup = true
   prompt = false
-[mergetool "mvimdiff"]
-  cmd="/Applications/MacVim.app/Contents/MacOS/Vim -d -g -c 'wincmd J'  $MERGED $LOCAL $BASE $REMOTE"
 [gitflow "prefix"]
   feature = feature/
   bugfix = bugfix/
