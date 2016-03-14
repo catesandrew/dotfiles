@@ -3,7 +3,7 @@
 ## git-theme
 # feel free to change git chars.
 GIT_THEME_PROMPT_DIRTY="${bold_yellow}*${normal}"
-GIT_THEME_PROMPT_CLEAN=""
+SCM_GIT_PROMPT_CLEAN=""
 GIT_THEME_PROMPT_PREFIX=""
 GIT_THEME_PROMPT_SUFFIX=""
 

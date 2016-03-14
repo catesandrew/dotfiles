@@ -6,7 +6,6 @@ SHELL_THEME_PROMPT_COLOR_SUDO=202
 
 SCM_NONE_CHAR=""
 SCM_GIT_CHAR=${POWERLINE_SCM_GIT_CHAR:=" "}
-TRUNCATED_SYMBOL="…"
 
 SCM_THEME_PROMPT_CLEAN=""
 SCM_THEME_PROMPT_DIRTY=""
@@ -21,41 +20,24 @@ CWD_THEME_PROMPT_COLOR=240
 
 LAST_STATUS_THEME_PROMPT_COLOR=196
 
-function oh_my_git_scm_prompt {
-  # SCM_THEME_PROMPT_DIRTY=' ✗'
-  # SCM_THEME_PROMPT_CLEAN=' ✓'
-  # SCM_THEME_PROMPT_PREFIX=' |'
-  # SCM_THEME_PROMPT_SUFFIX='|'
-  # SCM_THEME_BRANCH_PREFIX=''
-  # SCM_THEME_TAG_PREFIX='tag:'
-  # SCM_THEME_DETACHED_PREFIX='detached:'
-  # SCM_THEME_BRANCH_TRACK_PREFIX=' → '
-  # SCM_THEME_BRANCH_GONE_PREFIX=' ⇢ '
-  # SCM_GIT_CHAR='±'
-  # SCM_GIT_DETACHED_CHAR='⌿'
-  # SCM_GIT_AHEAD_CHAR="↑"
-  # SCM_GIT_BEHIND_CHAR="↓"
-  # SCM_GIT_UNTRACKED_CHAR="?:"
-  # SCM_GIT_UNSTAGED_CHAR="U:"
-  # SCM_GIT_STAGED_CHAR="S:"
+SCM_GIT_PROMPT_STASHED="{bold_blue}⚑ ${reset_color}"
+SCM_GIT_PROMPT_UNTRACKED="${cyan}…${reset_color}"
+SCM_GIT_PROMPT_CHANGED="{blue}✚${reset_color}"
+SCM_GIT_PROMPT_DELETED="${red}-${reset_color}"
+SCM_GIT_PROMPT_DELETED_CACHED="${red}-${reset_color}"
 
-  local omg_is_a_git_repo_symbol='±'
-  local omg_has_untracked_files_symbol='?:'
+function oh_my_git_scm_prompt {
   local omg_has_adds_symbol='↑'
-  local omg_has_deletions_symbol='↓'
-  local omg_has_cached_deletions_symbol=''
-  local omg_has_modifications_symbol='✗'
   local omg_has_cached_modifications_symbol='✓'
   local omg_ready_to_commit_symbol=''
   local omg_is_on_a_tag_symbol='tag:'
-  local omg_detached_symbol='detached:'
+  local omg_detached_symbol='⌿'
   local omg_can_fast_forward_symbol='ff:'
   local omg_has_diverged_symbol=''
   local omg_not_tracked_branch_symbol=''
   local omg_rebase_tracking_branch_symbol=''
   local omg_merge_tracking_branch_symbol=''
   local omg_should_push_symbol=''
-  local omg_has_stashes_symbol='s:'
   local omg_space='　'
 
   scm_prompt_vars
@@ -71,80 +53,8 @@ function oh_my_git_scm_prompt {
     fi
 
     if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
-      # on filesystem
-      SCM_PROMPT="${omg_is_a_git_repo_symbol}${omg_space}"
-
-      if [[ $SCM_ACTION ]]; then
-        SCM_PROMPT+="${SCM_ACTION}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_STASHES ]]; then
-        SCM_PROMPT+="${omg_has_stashes_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_UNTRACKED_FILES ]]; then
-        SCM_PROMPT+="${omg_has_untracked_files_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_MODIFICATIONS ]]; then
-        SCM_PROMPT+="${omg_has_modifications_symbol}"
-      fi
-
-      if [[ $SCM_HAS_DELETIONS ]]; then
-        SCM_PROMPT+="${omg_has_deletions_symbol}${omg_space}"
-      fi
-
-      # ready
-      if [[ $SCM_HAS_ADDS ]]; then
-        SCM_PROMPT+="${omg_has_adds_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_MODIFICATIONS_CACHED ]]; then
-        SCM_PROMPT+="${omg_has_cached_modifications_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_DELETIONS_CACHED ]]; then
-        SCM_PROMPT+="${omg_has_cached_deletions_symbol}${omg_space}"
-      fi
-
-      # next operation
-      if [[ $SCM_READY_TO_COMMIT ]]; then
-        SCM_PROMPT+="${omg_ready_to_commit_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_GIT_DETACHED == true ]]; then
-        SCM_PROMPT+="${omg_detached_symbol}${omg_space}"
-        SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"
-      else
-        if [[ $SCM_HAS_UPSTREAM == false ]]; then
-          SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}"
-          SCM_PROMPT+="${omg_space}—${omg_space}(${SCM_CURRENT_BRANCH})${omg_space}"
-        else
-          if [[ $SCM_WILL_REBASE == true ]]; then
-            local type_of_upstream=$omg_rebase_tracking_branch_symbol
-          else
-            local type_of_upstream=$omg_merge_tracking_branch_symbol
-          fi
-
-          if [[ $SCM_HAS_DIVERGED == true ]]; then
-            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}"
-            SCM_PROMPT+="${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-          else
-            if [[ $SCM_COMMITS_BEHIND -gt 0 ]]; then
-              SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
-            fi
-            if [[ $SCM_SHOULD_PUSH == true ]]; then
-              SCM_PROMPT+="—${omg_space}${omg_should_push_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-            fi
-            if [[ $SCM_COMMITS_AHEAD == 0 && $SCM_COMMITS_BEHIND == 0 ]]; then
-              SCM_PROMPT+="${omg_space}—${omg_space}—${omg_space}"
-            fi
-
-          fi
-          SCM_PROMPT+="(${SCM_CURRENT_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_CURRENT_BRANCH/})"
-        fi
-      fi
-      if [[ ${SCM_IS_ON_A_TAG} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit}"; fi
+      scm_oh_my_git_prompt
+      SCM_PROMPT="${SCM_PROMPT_GIT}"
     fi
 
     SCM_PROMPT="[${SCM_PROMPT}]"

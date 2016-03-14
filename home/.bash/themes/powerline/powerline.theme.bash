@@ -64,7 +64,8 @@ function powerline_scm_prompt {
             SCM_PROMPT="$(set_rgb_color ${SCM_THEME_PROMPT_CLEAN_COLOR} ${SCM_THEME_PROMPT_COLOR})"
         fi
         if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
-            SCM_PROMPT+=" ${SCM_CHAR}${SCM_BRANCH}${SCM_STATE}"
+          scm_powerline_git_prompt
+          SCM_PROMPT+=" ${SCM_CHAR}${SCM_PROMPT_GIT}${SCM_STATE}"
         fi
         SCM_PROMPT="$(set_rgb_color ${LAST_THEME_COLOR} ${SCM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${SCM_PROMPT} ${normal}"
         LAST_THEME_COLOR=${SCM_THEME_PROMPT_COLOR}

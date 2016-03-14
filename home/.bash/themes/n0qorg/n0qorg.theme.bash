@@ -13,7 +13,7 @@ PROMPT_COMMAND=prompt_command;
 ## git-theme
 # feel free to change git chars.
 GIT_THEME_PROMPT_DIRTY="${bold_blue}*${bold_white}"
-GIT_THEME_PROMPT_CLEAN=""
+SCM_GIT_PROMPT_CLEAN=""
 GIT_THEME_PROMPT_PREFIX="${bold_blue}(${bold_white}"
 GIT_THEME_PROMPT_SUFFIX="${bold_blue})"
 

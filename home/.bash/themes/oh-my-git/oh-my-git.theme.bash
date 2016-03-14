@@ -12,7 +12,6 @@ VIRTUALENV_THEME_PROMPT_COLOR=35
 SCM_NONE_CHAR=""
 SCM_GIT_CHAR=${POWERLINE_SCM_GIT_CHAR:=" "}
 PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:="❯"}
-TRUNCATED_SYMBOL="…"
 
 SCM_THEME_PROMPT_CLEAN=""
 SCM_THEME_PROMPT_DIRTY=""
@@ -61,52 +60,13 @@ function powerline_shell_prompt {
     (( SEGMENT_AT_RIGHT += 1 ))
 }
 
-function powerline_rvm_prompt {
-    local environ=""
-
-    if command_exists rvm; then
-        rvm_prompt=$(rvm_version_prompt)
-        if [[ "${rvm_prompt}" != $(rvm strings default) ]]; then
-            RVM_PROMPT="$(set_rgb_color - ${RVM_THEME_PROMPT_COLOR}) ${RVM_CHAR}${rvm_prompt} ${normal}"
-            if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
-                RVM_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${RVM_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${RVM_PROMPT}
-            fi
-            LAST_THEME_COLOR=${RVM_THEME_PROMPT_COLOR}
-            (( SEGMENT_AT_LEFT += 1 ))
-        else
-            RVM_PROMPT=""
-        fi
-    fi
-}
-
-function powerline_virtualenv_prompt {
-    local environ=""
-
-    if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
-        environ="$CONDA_DEFAULT_ENV"
-        VIRTUALENV_CHAR=${CONDA_VIRTUALENV_CHAR}
-    elif [[ -n "$VIRTUAL_ENV" ]]; then
-        environ=$(basename "$VIRTUAL_ENV")
-    fi
-
-    if [[ -n "$environ" ]]; then
-        VIRTUALENV_PROMPT="$(set_rgb_color - ${VIRTUALENV_THEME_PROMPT_COLOR}) ${VIRTUALENV_CHAR}$environ ${normal}"
-        if [[ "${SEGMENT_AT_LEFT}" -gt 0 ]]; then
-            VIRTUALENV_PROMPT=$(set_rgb_color ${LAST_THEME_COLOR} ${VIRTUALENV_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}${VIRTUALENV_PROMPT}
-        fi
-        LAST_THEME_COLOR=${VIRTUALENV_THEME_PROMPT_COLOR}
-        (( SEGMENT_AT_LEFT += 1 ))
-    else
-        VIRTUALENV_PROMPT=""
-    fi
-}
-
 # light bulb 
 # repo 
 # repo forked 
 # repo push 
 # repo pull 
-# book 
+# repo force push 
+# repo clone 
 # cloud download 
 # cloud upload 
 # tag 
@@ -115,10 +75,11 @@ function powerline_virtualenv_prompt {
 # git branch 
 # git merge 
 # git compare 
-# mirror 
 # issue opened 
 # issue reopened 
 # issue closed 
+# mirror 
+# book 
 # star 
 # comment 
 # alert 
@@ -136,8 +97,6 @@ function powerline_virtualenv_prompt {
 # left 
 # clock 
 # key 
-# repo force push 
-# repo clone 
 # diff 
 # eye 
 # dot 
@@ -178,31 +137,35 @@ function powerline_virtualenv_prompt {
 # law 
 # up 
 # down 
-function powerline_scm_prompt {
-  local omg_is_a_git_repo_symbol=''
-  local omg_has_untracked_files_symbol=''
-  local omg_has_adds_symbol=''
-  local omg_has_deletions_symbol=''
-  local omg_has_cached_deletions_symbol=''
-  local omg_has_modifications_symbol=''
-  local omg_has_cached_modifications_symbol=''
-  local omg_ready_to_commit_symbol=''
-  local omg_is_on_a_tag_symbol=''
-  # local omg_needs_to_merge_symbol='ᄉ'
-  local omg_detached_symbol=''
-  local omg_can_fast_forward_symbol=''
-  local omg_has_diverged_symbol=''
-  local omg_not_tracked_branch_symbol=''
-  local omg_rebase_tracking_branch_symbol=' '
-  local omg_merge_tracking_branch_symbol=''
-  local omg_should_push_symbol=''
-  local omg_has_stashes_symbol=''
-  local omg_thin_space=' ' # thin space
-  local omg_hair_space=' ' # hair space
-  local omg_punc_space=' ' # punctuation space
-  local omg_figure_space=' ' # figure space
-  local omg_space=$omg_thin_space
 
+SCM_GIT_CHAR=""
+SCM_GIT_PROMPT_SYMBOLS_TAG=""
+SCM_GIT_PROMPT_SYMBOLS_PREHASH=""
+SCM_GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING=""
+SCM_GIT_PROMPT_SYMBOLS_AHEAD="↑·"
+SCM_GIT_PROMPT_SYMBOLS_BEHIND="↓·"
+
+SCM_GIT_PROMPT_STASHED="${cyan}${reset_color} _STASHED_ "
+SCM_GIT_PROMPT_UNTRACKED="${purple}${reset_color} _UNTRACKED_ "
+SCM_GIT_PROMPT_CHANGED="${blue}${reset_color} _CHANGED_ "
+SCM_GIT_PROMPT_CHANGED_CACHED="${bold_blue}${reset_color} _CHANGED_CACHED_ "
+SCM_GIT_PROMPT_DELETED="${red}${reset_color} _DELETED_ "
+SCM_GIT_PROMPT_DELETED_CACHED="${bold_red}${reset_color} _DELETED_CACHED_ "
+SCM_GIT_PROMPT_ADDS="${bold_blue}${reset_color} _ADDS_ "
+SCM_GIT_PROMPT_CONFLICTS="${red}${reset_color} _CONFLICTS_ "
+SCM_GIT_PROMPT_STAGED="${red}${reset_color} _STAGED_ "
+SCM_GIT_PROMPT_TAG="${SCM_GIT_PROMPT_SYMBOLS_TAG} _TAG_"
+SCM_GIT_PROMPT_PREHASH="${SCM_GIT_PROMPT_SYMBOLS_PREHASH}  (_PREHASH_)"
+SCM_GIT_PROMPT_BRANCH_DIVERGED="${SCM_GIT_PROMPT_SYMBOLS_BEHIND}_BEHIND_  ${SCM_GIT_PROMPT_SYMBOLS_AHEAD}_AHEAD_"
+SCM_GIT_PROMPT_BRANCH_FF="${SCM_GIT_PROMPT_SYMBOLS_BEHIND}_BEHIND_  "
+SCM_GIT_PROMPT_BRANCH_PUSH="   ${SCM_GIT_PROMPT_SYMBOLS_AHEAD}_AHEAD_"
+SCM_GIT_PROMPT_BRANCH_CLEAN="   "
+SCM_GIT_PROMPT_REBASE=" (_BRANCH_  _UPSTREAM_)"
+SCM_GIT_PROMPT_MERGE=" (_BRANCH_  _UPSTREAM_)"
+SCM_GIT_PROMPT_NO_REMOTE=" ${SCM_GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING}  "
+SCM_GIT_PROMPT_NO_UPSTREAM=" (_BRANCH_)"
+
+function oh_my_git_scm_prompt {
   scm_prompt_vars
   if [[ "${SCM_NONE_CHAR}" != "${SCM_CHAR}" ]]; then
     if [[ "${SCM_DIRTY}" -eq 3 ]]; then
@@ -216,87 +179,8 @@ function powerline_scm_prompt {
     fi
 
     if [[ "${SCM_GIT_CHAR}" == "${SCM_CHAR}" ]]; then
-      # on filesystem
-      SCM_PROMPT="${omg_is_a_git_repo_symbol}${omg_space}"
-
-      if [[ $SCM_ACTION ]]; then
-        SCM_PROMPT+="${SCM_ACTION}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_STASHES ]]; then
-        SCM_PROMPT+="${omg_has_stashes_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_UNTRACKED_FILES ]]; then
-        SCM_PROMPT+="${omg_has_untracked_files_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_MODIFICATIONS ]]; then
-        SCM_PROMPT+="${omg_has_modifications_symbol}"
-      fi
-
-      if [[ $SCM_HAS_DELETIONS ]]; then
-        SCM_PROMPT+="${omg_has_deletions_symbol}${omg_space}"
-      fi
-
-      # ready
-      if [[ $SCM_HAS_ADDS ]]; then
-        SCM_PROMPT+="${omg_has_adds_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_MODIFICATIONS_CACHED ]]; then
-        SCM_PROMPT+="${omg_has_cached_modifications_symbol}${omg_space}"
-      fi
-
-      if [[ $SCM_HAS_DELETIONS_CACHED ]]; then
-        SCM_PROMPT+="${omg_has_cached_deletions_symbol}${omg_space}"
-      fi
-
-      # next operation
-      if [[ $SCM_READY_TO_COMMIT ]]; then
-        SCM_PROMPT+="${omg_ready_to_commit_symbol}${omg_space}"
-      fi
-
-      # where
-      SCM_PROMPT="$(set_rgb_color - ${CWD_THEME_PROMPT_COLOR})${SCM_PROMPT}  ${normal}"
-      SCM_PROMPT+="$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} -)${normal}"
-      SCM_PROMPT+="$(set_rgb_color ${CWD_THEME_PROMPT_COLOR} ${SCM_THEME_PROMPT_COLOR})"
-      SCM_PROMPT+="${THEME_PROMPT_SEPARATOR} ${normal}"
-      SCM_PROMPT+="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})"
-
-      if [[ $SCM_GIT_DETACHED == true ]]; then
-        SCM_PROMPT+="${omg_detached_symbol}${omg_space}"
-        SCM_PROMPT+="(${SCM_CHANGE})${omg_space}"
-      else
-        if [[ $SCM_HAS_UPSTREAM == false ]]; then
-          SCM_PROMPT+="—${omg_space}${omg_not_tracked_branch_symbol}"
-          SCM_PROMPT+="${omg_space}—${omg_space}(${SCM_CURRENT_BRANCH})${omg_space}"
-        else
-          if [[ $SCM_WILL_REBASE == true ]]; then
-            local type_of_upstream=$omg_rebase_tracking_branch_symbol
-          else
-            local type_of_upstream=$omg_merge_tracking_branch_symbol
-          fi
-
-          if [[ $SCM_HAS_DIVERGED == true ]]; then
-            SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}"
-            SCM_PROMPT+="${omg_has_diverged_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-          else
-            if [[ $SCM_COMMITS_BEHIND -gt 0 ]]; then
-              SCM_PROMPT+="-${SCM_COMMITS_BEHIND}${omg_space}${omg_can_fast_forward_symbol}${omg_space}—"
-            fi
-            if [[ $SCM_SHOULD_PUSH == true ]]; then
-              SCM_PROMPT+="—${omg_space}${omg_should_push_symbol}${omg_space}+${SCM_COMMITS_AHEAD}"
-            fi
-            if [[ $SCM_COMMITS_AHEAD == 0 && $SCM_COMMITS_BEHIND == 0 ]]; then
-              SCM_PROMPT+="${omg_space}—${omg_space}—${omg_space}"
-            fi
-
-          fi
-          SCM_PROMPT+=" (${SCM_CURRENT_BRANCH} ${type_of_upstream} ${upstream//\/$SCM_CURRENT_BRANCH/}) "
-        fi
-      fi
-      if [[ ${SCM_IS_ON_A_TAG} ]]; then SCM_PROMPT+="${omg_is_on_a_tag_symbol} ${tag_at_current_commit} "; fi
+      scm_oh_my_git_powerline_prompt
+      SCM_PROMPT="${SCM_PROMPT_GIT}"
     fi
 
     SCM_PROMPT="$(set_rgb_color - ${SCM_THEME_PROMPT_COLOR})${SCM_PROMPT} ${normal}"
@@ -313,7 +197,7 @@ function powerline_cwd_prompt {
   local short_pwd=''
   local trunc_short_pwd=''
   local working_dir=''
-  local sud_sorking_dir=''
+  local sub_working_dir=''
   local git_dir=''
   local sub_git_dir=''
 
@@ -327,12 +211,23 @@ function powerline_cwd_prompt {
     sub_git_dir="${git_dir##*/}"
   fi
 
+  local half_len=$((${COLUMNS:-80}/2))  # 40
+  local final_max_len=$((half_len))     # 30
+  local max_len=$((half_len-6))         # 20
+  local npm_prompt_len=${#npm_prompt}
+  if [ "$npm_prompt_len" -gt 0 ]; then
+    local tenth_len=$((${COLUMNS:-80}/8)) # 10
+    local final_max_len=$((${COLUMNS:-80}-(tenth_len*2))) # 60
+    local final_max_len=$((final_max_len-npm_prompt_len))
+    local max_len=$((final_max_len-6)) # 20
+  fi
+
   if [[ ! -z "${npm_root}" ]]; then
     # strip the package.json filename
     npm_root=$(dirname "${npm_root}")
-    rootable_limited_pwd "$npm_root" "$working_dir" 24 short_pwd 30 trunc_short_pwd
+    rootable_limited_pwd "$npm_root" "$working_dir" $max_len short_pwd $final_max_len trunc_short_pwd
   else
-    rootable_limited_pwd '' "$working_dir" 24 short_pwd 30 trunc_short_pwd
+    rootable_limited_pwd '' "$working_dir" $max_len short_pwd $final_max_len trunc_short_pwd
   fi
 
   if [[ ! -z "${npm_root}" ]]; then
@@ -354,28 +249,29 @@ function powerline_cwd_prompt {
 }
 
 function powerline_last_status_prompt {
-    if [[ "$1" -eq 0 ]]; then
-        LAST_STATUS_PROMPT=""
-    else
-        LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -) ${LAST_STATUS} ${normal}"
-    fi
+  if [[ "$1" -eq 0 ]]; then
+    LAST_STATUS_PROMPT=""
+  else
+    LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -) ${LAST_STATUS} ${normal}"
+  fi
 }
 
 function powerline_clock_prompt {
-    if [[ -z "${THEME_PROMPT_CLOCK_FORMAT}" ]]; then
-        CLOCK_PROMPT=""
-    else
-        local CLOCK=" $(date +"${THEME_PROMPT_CLOCK_FORMAT}") "
+  if [[ -z "${THEME_PROMPT_CLOCK_FORMAT}" ]]; then
+    CLOCK_PROMPT=""
+  else
+    local clock
+    clock=" $(date +"${THEME_PROMPT_CLOCK_FORMAT}") "
 
-        CLOCK_PROMPT=$(set_rgb_color - ${CLOCK_THEME_PROMPT_COLOR})${CLOCK}${normal}
-        if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
-            CLOCK_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${CLOCK_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
-            (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT - 1 ))
-        fi
-        RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#CLOCK} ))
-        LAST_THEME_COLOR=${CLOCK_THEME_PROMPT_COLOR}
-        (( SEGMENT_AT_RIGHT += 1 ))
+    CLOCK_PROMPT=$(set_rgb_color - ${CLOCK_THEME_PROMPT_COLOR})${clock}${normal}
+    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
+      CLOCK_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${CLOCK_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT - 1 ))
     fi
+    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#clock} ))
+    LAST_THEME_COLOR=${CLOCK_THEME_PROMPT_COLOR}
+    (( SEGMENT_AT_RIGHT += 1 ))
+  fi
 }
 
 function findup_npm_root {
@@ -445,15 +341,13 @@ function powerline_prompt_command() {
     npm_prompt "$local_npm_root" local_npm_prompt
 
     ## left prompt ##
-    powerline_scm_prompt
+    oh_my_git_scm_prompt
     local_git_root="$(find_git_root)"
 
-    # powerline_virtualenv_prompt
-    # powerline_rvm_prompt
     powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
     powerline_last_status_prompt LAST_STATUS
 
-    LEFT_PROMPT="${SCM_PROMPT}${VIRTUALENV_PROMPT}${RVM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
+    LEFT_PROMPT="${SCM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
 
     ## right prompt ##
     LAST_THEME_COLOR="-"

@@ -11,8 +11,7 @@ if brew_contains_element "fasd" || \
     hash fasd 2>/dev/null; then
 
   _fasd_ps1_func() {
-    { eval "fasd --proc $(fasd --sanitize $(fc -nl -1))"; } \
-      >> "/dev/null" 2>&1
+    eval "fasd --proc $(fasd --sanitize "$(fc -nl -1)")" >> "/dev/null" 2>&1
   }
 
   case $PS1 in
@@ -21,8 +20,7 @@ if brew_contains_element "fasd" || \
   esac
 
   _fasd_prompt_func() {
-    eval "fasd --proc $(fasd --sanitize $(history 1 | \
-    sed "s/^[ ]*[0-9]*[ ]*//"))" >> "/dev/null" 2>&1
+    eval "fasd --proc $(fasd --sanitize "$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//")")" >> "/dev/null" 2>&1
   }
 
   # add bash hook
@@ -42,15 +40,15 @@ if brew_contains_element "fasd" || \
       -A|-D) COMPREPLY=( $(compgen -o default $cur) ) && return;;
     esac
     # get completion results using expanded aliases
-    local RESULT=$( fasd --complete "$(alias -p $COMP_WORDS \
-    2>> "/dev/null" | sed -n "\$s/^.*'\\(.*\\)'/\\1/p")
-    ${COMP_LINE#* }" | while read -r line; do
-                      quote_readline "$line" 2>/dev/null || \
-                        printf %q "$line" 2>/dev/null  && \
-                          printf \\n
+    local RESULT=$(fasd --complete "$(alias -p "${COMP_WORDS}" 2>> /dev/null | sed -n "\$s/^.*'\\(.*\\)'/\\1/p") ${COMP_LINE#* }" \
+                     | while read -r line; do
+                     quote_readline "$line" 2>/dev/null || \
+                       printf %q "$line" 2>/dev/null  && \
+                         printf \\n
                     done)
     local IFS=$'\n'; COMPREPLY=( $RESULT )
   }
+
   _fasd_bash_hook_cmd_complete() {
     for cmd in $*; do
       complete -F _fasd_bash_cmd_complete $cmd
