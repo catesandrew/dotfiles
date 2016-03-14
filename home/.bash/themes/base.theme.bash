@@ -136,6 +136,7 @@ export SCM_GIT_UNTRACKED
 export SCM_GIT_STASHED
 export SCM_GIT_CLEAN
 export SCM_GIT_ACTION
+export SCM_GIT_UPSTREAM_SHORT
 export SCM_GIT_HAS_DIVERGED
 export SCM_GIT_HAS_UPSTREAM
 export SCM_GIT_SHOULD_PUSH
@@ -522,6 +523,7 @@ function git_prompt_vars {
   SCM_GIT_PREHASH=${git_status_fields[19]}
 
   SCM_GIT_ACTION=
+  SCM_GIT_UPSTREAM_SHORT=$SCM_GIT_UPSTREAM
   SCM_GIT_HAS_DIVERGED=false
   SCM_GIT_HAS_UPSTREAM=false
   SCM_GIT_SHOULD_PUSH=false
@@ -555,6 +557,13 @@ function git_prompt_vars {
 
   if [[ -n "$GIT_PROMPT_SHOW_UPSTREAM" && "$SCM_GIT_UPSTREAM" != "^" ]]; then
     SCM_GIT_HAS_UPSTREAM=true
+
+    local arr=(${SCM_GIT_UPSTREAM//\// })
+    if [ ${#arr[*]} -eq 2 ]; then
+      if [ "${arr[1]}" = "$SCM_GIT_BRANCH" ]; then
+        SCM_GIT_UPSTREAM_SHORT=${arr[0]}
+      fi
+    fi
   fi
 
   # Ahead, Behind
@@ -781,12 +790,13 @@ function scm_oh_my_git_powerline_prompt {
           SCM_PROMPT_GIT+="${SCM_GIT_PROMPT_BRANCH_CLEAN}"
         fi
       fi
+
       if [[ "$SCM_GIT_WILL_REBASE" = true ]]; then
         SCM_PROMPT_GIT+="${SCM_GIT_PROMPT_REBASE//_BRANCH_/${SCM_GIT_BRANCH}}"
-        SCM_PROMPT_GIT="${SCM_PROMPT_GIT//_UPSTREAM_/${SCM_GIT_UPSTREAM}}"
+        SCM_PROMPT_GIT="${SCM_PROMPT_GIT//_UPSTREAM_/${SCM_GIT_UPSTREAM_SHORT}}"
       else
         SCM_PROMPT_GIT+="${SCM_GIT_PROMPT_MERGE//_BRANCH_/${SCM_GIT_BRANCH}}"
-        SCM_PROMPT_GIT="${SCM_PROMPT_GIT//_UPSTREAM_/${SCM_GIT_UPSTREAM}}"
+        SCM_PROMPT_GIT="${SCM_PROMPT_GIT//_UPSTREAM_/${SCM_GIT_UPSTREAM_SHORT}}"
       fi
     else
       SCM_PROMPT_GIT+="${SCM_GIT_PROMPT_NO_REMOTE}"
