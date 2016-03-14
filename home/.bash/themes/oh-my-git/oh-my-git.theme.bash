@@ -37,24 +37,6 @@ CLOCK_THEME_PROMPT_COLOR=240
 
 THEME_PROMPT_CLOCK_FORMAT=${THEME_PROMPT_CLOCK_FORMAT:="%H:%M:%S"}
 
-function powerline_shell_prompt {
-  SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
-  CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1 | grep "load" | wc -l)
-  if [ ${CAN_I_RUN_SUDO} -gt 0 ]; then
-    SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR_SUDO}
-  fi
-  SEGMENT_AT_RIGHT=0
-  if [[ -n "${SSH_CLIENT}" ]]; then
-    SHELL_PROMPT="${SHELL_SSH_CHAR}${USER}@${HOSTNAME}"
-  else
-    SHELL_PROMPT=""
-  fi
-  RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#SHELL_PROMPT} + 2 ))
-  SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
-  LAST_THEME_COLOR=${SHELL_PROMPT_COLOR}
-  (( SEGMENT_AT_RIGHT += 1 ))
-}
-
 # light bulb 
 # repo 
 # repo forked 
@@ -192,30 +174,27 @@ function oh_my_git_powerline_cwd_prompt {
   local short_pwd=''
   local trunc_short_pwd=''
   local working_dir=''
-  local sub_working_dir=''
   local git_dir=''
   local sub_git_dir=''
+
+  local num_left_prompt=0
+  local num_npm_prompt=0
+  local final_max_len=0
+  local max_len=0
 
   npm_root="$1"
   npm_prompt="$2"
   git_dir="$3"
   working_dir=$(pwd)
-  sub_working_dir="${working_dir##*/}"
 
   if [[ ! -z "${git_dir}" ]]; then
     sub_git_dir="${git_dir##*/}"
   fi
 
-  local half_len=$((${COLUMNS:-80}/2))  # 40
-  local final_max_len=$((half_len))     # 30
-  local max_len=$((half_len-6))         # 20
-  local npm_prompt_len=${#npm_prompt}
-  if [ "$npm_prompt_len" -gt 0 ]; then
-    local tenth_len=$((${COLUMNS:-80}/8)) # 10
-    local final_max_len=$((${COLUMNS:-80}-(tenth_len*2))) # 60
-    local final_max_len=$((final_max_len-npm_prompt_len))
-    local max_len=$((final_max_len-6)) # 20
-  fi
+  num_left_prompt=$(string_length $SCM_PROMPT)
+  num_npm_prompt=$(string_length $npm_prompt)
+  final_max_len=$((${COLUMNS:-80} - num_left_prompt - num_npm_prompt))
+  max_len=$((final_max_len - 6))
 
   if [[ ! -z "${npm_root}" ]]; then
     # strip the package.json filename
@@ -251,57 +230,94 @@ function powerline_last_status_prompt {
   fi
 }
 
-function powerline_clock_prompt {
-  if [[ -z "${THEME_PROMPT_CLOCK_FORMAT}" ]]; then
-    CLOCK_PROMPT=""
-  else
-    local clock
-    clock=" $(date +"${THEME_PROMPT_CLOCK_FORMAT}") "
-
-    CLOCK_PROMPT=$(set_rgb_color - ${CLOCK_THEME_PROMPT_COLOR})${clock}${normal}
-    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
-      CLOCK_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${CLOCK_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
-      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT - 1 ))
-    fi
-    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#clock} ))
-    LAST_THEME_COLOR=${CLOCK_THEME_PROMPT_COLOR}
-    (( SEGMENT_AT_RIGHT += 1 ))
+function powerline_shell_prompt {
+  local shell_length
+  SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
+  CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1 | grep "load" | wc -l)
+  if [[ ${CAN_I_RUN_SUDO} -gt 0 ]]; then
+    SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR_SUDO}
   fi
+  SEGMENT_AT_RIGHT=0
+  SHELL_PROMPT=""
+  if [[ -n "${SSH_CLIENT}" ]]; then
+    SHELL_PROMPT=${SHELL_SSH_CHAR}${USER}@${HOSTNAME}
+  fi
+  shell_length=$(string_length $SHELL_PROMPT)
+  RIGHT_PROMPT_LENGTH=$(( RIGHT_PROMPT_LENGTH + shell_length + 2 ))
+  SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
+  LAST_THEME_COLOR=${SHELL_PROMPT_COLOR}
+  (( SEGMENT_AT_RIGHT += 1 ))
+}
+
+function powerline_clock_prompt {
+  local clock
+  local clock_length=0
+  local num_left_prompt=0
+  local final_max_len=0
+
+  num_left_prompt=$(string_length $SCM_PROMPT)
+  final_max_len=$((${COLUMNS:-80} - num_left_prompt - $RIGHT_PROMPT_LENGTH))
+
+  if [[ -z "${THEME_PROMPT_CLOCK_FORMAT}" ]] || [[ $final_max_len -lt 12 ]]; then
+    clock=" "
+    clock_length=-2
+  else
+    clock=" $(date +"${THEME_PROMPT_CLOCK_FORMAT}") "
+    clock_length=$(string_length $clock)
+  fi
+
+  CLOCK_PROMPT=$(set_rgb_color - ${CLOCK_THEME_PROMPT_COLOR})${clock}${normal}
+  if [[ $SEGMENT_AT_RIGHT -gt 0 ]]; then
+    CLOCK_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${CLOCK_THEME_PROMPT_COLOR})
+    CLOCK_PROMPT+=${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+    (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT - 1 ))
+  fi
+
+  if [ $SEGMENT_AT_RIGHT -eq 1 ]; then
+    ## 1 → 3
+    RIGHT_PROMPT_LENGTH=$(( 3 + RIGHT_PROMPT_LENGTH + clock_length ))
+  else
+    ## 2 → 2
+    RIGHT_PROMPT_LENGTH=$(( 2 + RIGHT_PROMPT_LENGTH + clock_length ))
+  fi
+
+  LAST_THEME_COLOR=${CLOCK_THEME_PROMPT_COLOR}
+  (( SEGMENT_AT_RIGHT += 1 ))
 }
 
 function powerline_prompt_command() {
-    RIGHT_PROMPT_LENGTH=1
-    local LAST_STATUS="$?"
-    local MOVE_CURSOR_RIGHTMOST='\033[500C'
-    local local_npm_root
-    local local_git_root
-    local local_npm_prompt
+  RIGHT_PROMPT_LENGTH=1
+  local LAST_STATUS="$?"
+  local MOVE_CURSOR_RIGHTMOST='\033[500C'
+  local local_npm_root
+  local local_git_root
+  local local_npm_prompt
 
-    local_npm_root="$(findup_npm_root)"
-    npm_prompt "$local_npm_root" local_npm_prompt
+  local_npm_root="$(findup_npm_root)"
+  npm_prompt "$local_npm_root" local_npm_prompt
 
-    ## left prompt ##
-    oh_my_git_scm_prompt
-    local_git_root="$(find_git_root)"
+  ## left prompt ##
+  oh_my_git_scm_prompt
+  local_git_root="$(find_git_root)"
 
-    oh_my_git_powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
-    powerline_last_status_prompt LAST_STATUS
+  oh_my_git_powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
+  powerline_last_status_prompt $LAST_STATUS
 
-    LEFT_PROMPT="${SCM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
+  LEFT_PROMPT="${SCM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
 
-    ## right prompt ##
-    LAST_THEME_COLOR="-"
+  ## right prompt ##
+  LAST_THEME_COLOR="-"
 
-    powerline_shell_prompt
-    powerline_npm_version_prompt "$local_npm_prompt"
-    powerline_clock_prompt
+  powerline_shell_prompt
+  powerline_npm_version_prompt "$local_npm_prompt"
+  powerline_clock_prompt
 
-    [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
+  [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
 
-    RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
-    RIGHT_PROMPT+="${CLOCK_PROMPT}${NPM_VERSION_PROMPT}${SHELL_PROMPT}${normal}"
+  RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
+  RIGHT_PROMPT+="${CLOCK_PROMPT}${NPM_VERSION_PROMPT}${SHELL_PROMPT}${normal}"
 
-    PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
+  PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
 }
 
 PROMPT_COMMAND=powerline_prompt_command

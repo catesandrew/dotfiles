@@ -155,38 +155,61 @@ export SCM_GIT_PREHASH
 
 # Functions
 
-function current_git_action () {
-  local info
-  local action
-
-  info="$(git rev-parse --git-dir 2>/dev/null)"
-  if [ -n "$info" ]; then
-    if [ -f "$info/rebase-merge/interactive" ]; then
-      action=${is_rebasing_interactively:-"rebase -i"}
-    elif [ -d "$info/rebase-merge" ]; then
-      action=${is_rebasing_merge:-"rebase -m"}
-    else
-      if [ -d "$info/rebase-apply" ]; then
-        if [ -f "$info/rebase-apply/rebasing" ]; then
-          action=${is_rebasing:-"rebase"}
-        elif [ -f "$info/rebase-apply/applying" ]; then
-          action=${is_applying_mailbox_patches:-"am"}
-        else
-          action=${is_rebasing_mailbox_patches:-"am/rebase"}
-        fi
-      elif [ -f "$info/MERGE_HEAD" ]; then
-        action=${is_merging:-"merge"}
-      elif [ -f "$info/CHERRY_PICK_HEAD" ]; then
-        action=${is_cherry_picking:-"cherry-pick"}
-      elif [ -f "$info/BISECT_LOG" ]; then
-        action=${is_bisecting:-"bisect"}
-      fi
-    fi
-
-    if [[ -n $action ]]; then
-      echo -e "$action"
+function has_jshon() {
+  if [[ -z "$_jshon_command" ]]; then
+    if command -v jshon > /dev/null; then
+      _jshon_command=jshon
     fi
   fi
+
+  if [[ -n "$_jshon_command" ]]; then
+    return 0
+  fi
+
+  echo >&2
+  echo "WARNING: Install `jshon` through homebrew to enable this feature." >&2
+  echo >&2
+  return 1
+}
+
+# some versions of sed do not have -r
+_have_sed_r=1
+
+function string_length() {
+  local matches
+  local size
+  local find_exit_code
+
+  if [[ -z "$_sed_command" ]]; then
+    if command -v gsed > /dev/null; then
+      _sed_command=gsed
+    else
+      _sed_command=sed
+    fi
+  fi
+
+  # http://www.commandlinefu.com/commands/view/3584/remove-color-codes-special-characters-with-sed
+  if [[ "$_have_sed_r" = 1 ]]; then
+    matches=$(echo "$1" | "$_sed_command" -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" 2> /dev/null)
+    find_exit_code="$?"
+    if [[ -n "$matches" ]]; then
+      size=${#matches}
+      echo $size
+      return 0
+    else
+      if [[ "$find_exit_code" != 0 ]]; then
+        _have_sed_r=0
+      else
+        echo 0
+        return 1
+      fi
+    fi
+  fi
+
+  echo >&2
+  echo "WARNING: a sed that supports -r (such as GNU sed) is not available." >&2
+  echo >&2
+  return 1
 }
 
 # some versions of find do not have -mmin
@@ -225,6 +248,61 @@ function older_than_minutes() {
   return 1
 }
 
+function prompt_callback_default {
+  return
+}
+
+# Use exit status from declare command to determine whether input argument is a
+# bash function
+function is_function {
+  declare -Ff "$1" >/dev/null;
+}
+
+# Git Functions
+
+function replace_git_symbols() {
+  local VALUE=${1//_AHEAD_/${SCM_GIT_PROMPT_SYMBOLS_AHEAD}}
+  local VALUE1=${VALUE//_BEHIND_/${SCM_GIT_PROMPT_SYMBOLS_BEHIND}}
+  local VALUE2=${VALUE1//_NO_REMOTE_TRACKING_/${SCM_GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING}}
+  local VALUE3=${VALUE2//_TAG_/${SCM_GIT_PROMPT_SYMBOLS_TAG}}
+
+  echo "${VALUE3//_PREHASH_/${SCM_GIT_PROMPT_SYMBOLS_PREHASH}}"
+}
+
+function current_git_action () {
+  local info
+  local action
+
+  info="$(git rev-parse --git-dir 2>/dev/null)"
+  if [ -n "$info" ]; then
+    if [ -f "$info/rebase-merge/interactive" ]; then
+      action=${is_rebasing_interactively:-"rebase -i"}
+    elif [ -d "$info/rebase-merge" ]; then
+      action=${is_rebasing_merge:-"rebase -m"}
+    else
+      if [ -d "$info/rebase-apply" ]; then
+        if [ -f "$info/rebase-apply/rebasing" ]; then
+          action=${is_rebasing:-"rebase"}
+        elif [ -f "$info/rebase-apply/applying" ]; then
+          action=${is_applying_mailbox_patches:-"am"}
+        else
+          action=${is_rebasing_mailbox_patches:-"am/rebase"}
+        fi
+      elif [ -f "$info/MERGE_HEAD" ]; then
+        action=${is_merging:-"merge"}
+      elif [ -f "$info/CHERRY_PICK_HEAD" ]; then
+        action=${is_cherry_picking:-"cherry-pick"}
+      elif [ -f "$info/BISECT_LOG" ]; then
+        action=${is_bisecting:-"bisect"}
+      fi
+    fi
+
+    if [[ -n $action ]]; then
+      echo -e "$action"
+    fi
+  fi
+}
+
 function check_git_upstream() {
   local repo
   repo="$(git rev-parse --show-toplevel 2> /dev/null)"
@@ -238,65 +316,6 @@ function check_git_upstream() {
       )
     fi
   fi
-}
-
-function scm {
-  if [[ "$SCM_CHECK" = false ]]; then SCM=$SCM_NONE
-  elif [[ -f .git/HEAD ]]; then SCM=$SCM_GIT
-  elif hash git 2> /dev/null && [[ -n "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]]; then SCM=$SCM_GIT
-  elif [[ -d .hg ]]; then SCM=$SCM_HG
-  elif hash hg 2> /dev/null && [[ -n "$(hg root 2> /dev/null)" ]]; then SCM=$SCM_HG
-  elif [[ -d .svn ]]; then SCM=$SCM_SVN
-  else SCM=$SCM_NONE
-  fi
-}
-
-function scm_prompt_char {
-  if [[ -z $SCM ]]; then scm; fi
-  if [[ $SCM == "$SCM_GIT" ]]; then SCM_CHAR=$SCM_GIT_CHAR
-  elif [[ $SCM == "$SCM_HG" ]]; then SCM_CHAR=$SCM_HG_CHAR
-  elif [[ $SCM == "$SCM_SVN" ]]; then SCM_CHAR=$SCM_SVN_CHAR
-  else SCM_CHAR=$SCM_NONE_CHAR
-  fi
-}
-
-function scm_prompt_vars {
-  scm
-  scm_prompt_char
-  SCM_DIRTY=0
-  SCM_STATE=''
-  [[ $SCM == "$SCM_GIT" ]] && git_prompt_vars && return
-  [[ $SCM == "$SCM_HG" ]] && hg_prompt_vars && return
-  [[ $SCM == "$SCM_SVN" ]] && svn_prompt_vars && return
-}
-
-function scm_prompt_info {
-  scm
-  scm_prompt_char
-  SCM_DIRTY=0
-  SCM_STATE=''
-  [[ $SCM == "$SCM_GIT" ]] && git_prompt_info && return
-  [[ $SCM == "$SCM_HG" ]] && hg_prompt_info && return
-  [[ $SCM == "$SCM_SVN" ]] && svn_prompt_info && return
-}
-
-function prompt_callback_default {
-  return
-}
-
-# Use exit status from declare command to determine whether input argument is a
-# bash function
-function is_function {
-  declare -Ff "$1" >/dev/null;
-}
-
-function replace_symbols() {
-  local VALUE=${1//_AHEAD_/${SCM_GIT_PROMPT_SYMBOLS_AHEAD}}
-  local VALUE1=${VALUE//_BEHIND_/${SCM_GIT_PROMPT_SYMBOLS_BEHIND}}
-  local VALUE2=${VALUE1//_NO_REMOTE_TRACKING_/${SCM_GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING}}
-  local VALUE3=${VALUE2//_TAG_/${SCM_GIT_PROMPT_SYMBOLS_TAG}}
-
-  echo "${VALUE3//_PREHASH_/${SCM_GIT_PROMPT_SYMBOLS_PREHASH}}"
 }
 
 function git_status() {
@@ -477,6 +496,51 @@ function git_status() {
          $prehash
 }
 
+
+# Generic SCM Functions
+
+function scm {
+  if [[ "$SCM_CHECK" = false ]]; then SCM=$SCM_NONE
+  elif [[ -f .git/HEAD ]]; then SCM=$SCM_GIT
+  elif hash git 2> /dev/null && [[ -n "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]]; then SCM=$SCM_GIT
+  elif [[ -d .hg ]]; then SCM=$SCM_HG
+  elif hash hg 2> /dev/null && [[ -n "$(hg root 2> /dev/null)" ]]; then SCM=$SCM_HG
+  elif [[ -d .svn ]]; then SCM=$SCM_SVN
+  else SCM=$SCM_NONE
+  fi
+}
+
+function scm_prompt_char {
+  if [[ -z $SCM ]]; then scm; fi
+  if [[ $SCM == "$SCM_GIT" ]]; then SCM_CHAR=$SCM_GIT_CHAR
+  elif [[ $SCM == "$SCM_HG" ]]; then SCM_CHAR=$SCM_HG_CHAR
+  elif [[ $SCM == "$SCM_SVN" ]]; then SCM_CHAR=$SCM_SVN_CHAR
+  else SCM_CHAR=$SCM_NONE_CHAR
+  fi
+}
+
+function scm_prompt_vars {
+  scm
+  scm_prompt_char
+  SCM_DIRTY=0
+  SCM_STATE=''
+  [[ $SCM == "$SCM_GIT" ]] && git_prompt_vars && return
+  [[ $SCM == "$SCM_HG" ]] && hg_prompt_vars && return
+  [[ $SCM == "$SCM_SVN" ]] && svn_prompt_vars && return
+}
+
+function scm_prompt_info {
+  scm
+  scm_prompt_char
+  SCM_DIRTY=0
+  SCM_STATE=''
+  [[ $SCM == "$SCM_GIT" ]] && git_prompt_info && return
+  [[ $SCM == "$SCM_HG" ]] && hg_prompt_info && return
+  [[ $SCM == "$SCM_SVN" ]] && svn_prompt_info && return
+}
+
+# Prompt Functions
+
 function git_prompt_vars {
   if is_function prompt_callback; then
     prompt_callback="prompt_callback"
@@ -497,8 +561,8 @@ function git_prompt_vars {
   # printf 'branch: %s\n' $SCM_GIT_BRANCH
   # printf 'remote: %s\n' $SCM_GIT_REMOTE
   # printf 'upstream: %s\n' $SCM_GIT_UPSTREAM
-  # SCM_GIT_BRANCH=$(replace_symbols "$SCM_GIT_BRANCH")
-  # SCM_GIT_REMOTE=$(replace_symbols "$SCM_GIT_REMOTE")
+  # SCM_GIT_BRANCH=$(replace_git_symbols "$SCM_GIT_BRANCH")
+  # SCM_GIT_REMOTE=$(replace_git_symbols "$SCM_GIT_REMOTE")
   # printf 'branch (after): %s\n' $SCM_GIT_BRANCH
   # printf 'remote (after): %s\n' $SCM_GIT_REMOTE
 
@@ -534,7 +598,7 @@ function git_prompt_vars {
 
   if [[ "$SCM_GIT_DETACHED" = true ]]; then
     # SCM_BRANCH="(no branch)"
-    SCM_BRANCH=$(replace_symbols "$SCM_GIT_BRANCH")
+    SCM_BRANCH=$(replace_git_symbols "$SCM_GIT_BRANCH")
   else
     SCM_BRANCH=$SCM_GIT_BRANCH
 
@@ -639,8 +703,8 @@ function git_prompt_vars {
 function scm_bash_git_prompt () {
   git_prompt_vars
 
-  SCM_GIT_BRANCH=$(replace_symbols "$SCM_GIT_BRANCH")
-  SCM_GIT_REMOTE=$(replace_symbols "$SCM_GIT_REMOTE")
+  SCM_GIT_BRANCH=$(replace_git_symbols "$SCM_GIT_BRANCH")
+  SCM_GIT_REMOTE=$(replace_git_symbols "$SCM_GIT_REMOTE")
 
   local LAST_COMMAND_INDICATOR
   local EMPTY_PROMPT
@@ -1291,23 +1355,6 @@ function npm_prompt {
     npm_name=$(jshon -e "name" < "$1")
     eval "$2=${npm_name}@${npm_version}"
   fi
-}
-
-function has_jshon() {
-  if [[ -z "$_jshon_command" ]]; then
-    if command -v jshon > /dev/null; then
-      _jshon_command=jshon
-    fi
-  fi
-
-  if [[ -n "$_jshon_command" ]]; then
-    return 0
-  fi
-
-  echo >&2
-  echo "WARNING: Install `jshon` through homebrew to enable this feature." >&2
-  echo >&2
-  return 1
 }
 
 function powerline_npm_version_prompt {
