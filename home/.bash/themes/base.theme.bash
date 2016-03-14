@@ -1266,6 +1266,68 @@ function find_git_root() {
   fi
 }
 
+function findup_npm_root {
+  local current_dir
+  current_dir=$(pwd)
+
+  while [ "$current_dir" != "/" ]; do
+    if [ -f "$current_dir/package.json" ]; then
+      echo "$current_dir/package.json"
+      return
+    elif [ -d "$current_dir/.git" ]; then
+      return
+    fi
+
+    current_dir=$(dirname "$current_dir")
+  done
+}
+
+function npm_prompt {
+  local npm_name
+  local npm_version
+
+  if [[ -f "$1" ]] && has_jshon; then
+    npm_version=$(jshon -e "version" < "$1")
+    npm_name=$(jshon -e "name" < "$1")
+    eval "$2=${npm_name}@${npm_version}"
+  fi
+}
+
+function has_jshon() {
+  if [[ -z "$_jshon_command" ]]; then
+    if command -v jshon > /dev/null; then
+      _jshon_command=jshon
+    fi
+  fi
+
+  if [[ -n "$_jshon_command" ]]; then
+    return 0
+  fi
+
+  echo >&2
+  echo "WARNING: Install `jshon` through homebrew to enable this feature." >&2
+  echo >&2
+  return 1
+}
+
+function powerline_npm_version_prompt {
+  local npm_prompt
+  npm_prompt="$1"
+
+  if [[ ! -z "${npm_prompt}" ]]; then
+    NPM_VERSION_PROMPT="$(set_rgb_color - ${NPM_THEME_PROMPT_COLOR}) ${npm_prompt} "
+    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
+      NPM_VERSION_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${NPM_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
+    fi
+    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#npm_prompt} + 2 ))
+    LAST_THEME_COLOR=${NPM_THEME_PROMPT_COLOR}
+    (( SEGMENT_AT_RIGHT += 1 ))
+  else
+    NPM_VERSION_PROMPT=""
+  fi
+}
+
 function async_run() {
   {
     eval "$@" &> /dev/null

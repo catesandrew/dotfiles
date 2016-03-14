@@ -35,29 +35,24 @@ LAST_STATUS_THEME_PROMPT_COLOR=196
 
 CLOCK_THEME_PROMPT_COLOR=240
 
-BATTERY_AC_CHAR="⚡"
-BATTERY_STATUS_THEME_PROMPT_GOOD_COLOR=70
-BATTERY_STATUS_THEME_PROMPT_LOW_COLOR=208
-BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR=160
-
 THEME_PROMPT_CLOCK_FORMAT=${THEME_PROMPT_CLOCK_FORMAT:="%H:%M:%S"}
 
 function powerline_shell_prompt {
-    SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
-    CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1 | grep "load" | wc -l)
-    if [ ${CAN_I_RUN_SUDO} -gt 0 ]; then
-        SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR_SUDO}
-    fi
-    SEGMENT_AT_RIGHT=0
-    if [[ -n "${SSH_CLIENT}" ]]; then
-        SHELL_PROMPT="${SHELL_SSH_CHAR}${USER}@${HOSTNAME}"
-    else
-        SHELL_PROMPT=""
-    fi
-    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#SHELL_PROMPT} + 2 ))
-    SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
-    LAST_THEME_COLOR=${SHELL_PROMPT_COLOR}
-    (( SEGMENT_AT_RIGHT += 1 ))
+  SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
+  CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1 | grep "load" | wc -l)
+  if [ ${CAN_I_RUN_SUDO} -gt 0 ]; then
+    SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR_SUDO}
+  fi
+  SEGMENT_AT_RIGHT=0
+  if [[ -n "${SSH_CLIENT}" ]]; then
+    SHELL_PROMPT="${SHELL_SSH_CHAR}${USER}@${HOSTNAME}"
+  else
+    SHELL_PROMPT=""
+  fi
+  RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#SHELL_PROMPT} + 2 ))
+  SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
+  LAST_THEME_COLOR=${SHELL_PROMPT_COLOR}
+  (( SEGMENT_AT_RIGHT += 1 ))
 }
 
 # light bulb 
@@ -191,7 +186,7 @@ function oh_my_git_scm_prompt {
   fi
 }
 
-function powerline_cwd_prompt {
+function oh_my_git_powerline_cwd_prompt {
   local npm_root=''
   local npm_prompt=''
   local short_pwd=''
@@ -274,61 +269,6 @@ function powerline_clock_prompt {
   fi
 }
 
-function findup_npm_root {
-  local current_dir
-  current_dir=$(pwd)
-
-  while [ "$current_dir" != "/" ]; do
-    if [ -f "$current_dir/package.json" ]; then
-      echo "$current_dir/package.json"
-      return
-    elif [ -d "$current_dir/.git" ]; then
-      return
-    fi
-
-    current_dir=$(dirname "$current_dir")
-  done
-}
-
-function npm_prompt {
-  local npm_root
-  local npm_name
-  local npm_version
-  local package_json
-
-  if hash JSON.sh 2> /dev/null; then
-    npm_root="$1"
-
-    if [[ -f "${npm_root}" ]]; then
-      package_json=$(JSON.sh < "${npm_root}")
-      npm_version=$(echo "${package_json}" | grep -e '^\[\"version\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
-      npm_name=$(echo "${package_json}" | grep -e '^\[\"name\"\]' | cut -d " " -f2 | awk -F\" '{print $(NF-1)}')
-      eval "$2=${npm_name}@${npm_version}"
-    fi
-  fi
-}
-
-function powerline_npm_version_prompt {
-  # if hash npm 2> /dev/null; then
-  #   npm_prompt="$(npm show . version 2> /dev/null)"
-
-  local npm_prompt
-  npm_prompt="$1"
-
-  if [[ ! -z "${npm_prompt}" ]]; then
-    NPM_VERSION_PROMPT="$(set_rgb_color - ${NPM_THEME_PROMPT_COLOR}) ${npm_prompt} "
-    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
-      NPM_VERSION_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${NPM_THEME_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
-      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
-    fi
-    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#npm_prompt} + 2 ))
-    LAST_THEME_COLOR=${NPM_THEME_PROMPT_COLOR}
-    (( SEGMENT_AT_RIGHT += 1 ))
-  else
-    NPM_VERSION_PROMPT=""
-  fi
-}
-
 function powerline_prompt_command() {
     RIGHT_PROMPT_LENGTH=1
     local LAST_STATUS="$?"
@@ -344,7 +284,7 @@ function powerline_prompt_command() {
     oh_my_git_scm_prompt
     local_git_root="$(find_git_root)"
 
-    powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
+    oh_my_git_powerline_cwd_prompt "$local_npm_root" "$local_npm_prompt" "$local_git_root"
     powerline_last_status_prompt LAST_STATUS
 
     LEFT_PROMPT="${SCM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
