@@ -7,5 +7,4 @@
 BASH_NO=no . /etc/profile
 
 export PYTHONIOENCODING=utf-8
-# python -m premailer --remove-classes --strip-important --disable-validation --pretty
-python -m premailer --disable-validation --pretty
+python -m premailer --remove-classes --strip-important --disable-validation --pretty
