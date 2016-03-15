@@ -193,8 +193,8 @@ function oh_my_git_powerline_cwd_prompt {
 
   num_left_prompt=$(string_length $SCM_PROMPT)
   num_npm_prompt=$(string_length $npm_prompt)
-  final_max_len=$((${COLUMNS:-80} - num_left_prompt - num_npm_prompt))
-  max_len=$((final_max_len - 6))
+  max_len=$((${COLUMNS:-80} - num_left_prompt - num_npm_prompt))
+  final_max_len=$((max_len - 8))
 
   if [[ ! -z "${npm_root}" ]]; then
     # strip the package.json filename
