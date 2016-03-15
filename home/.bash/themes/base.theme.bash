@@ -1237,18 +1237,18 @@ function rootable_limited_pwd() {
 
   # treat root dirs as starting point of filesystem, like npm roots
   if [[ ! -z "${root_dir}" ]]; then
-    offset="${#root_dir}"
-    if [ "${offset}" -gt 0 ]; then
+    offset=${#root_dir}
+    if [[ $offset -gt 0 ]]; then
       end=${end:$offset}
     fi
-  elif [[ "$end" =~ $HOME ]]; then
+  elif [[ $end =~ $HOME ]]; then
     in_home=1
-    end="${end#$HOME}"          #strip /home/username from start of string
-    begin="$HOME"               #start expansion from the right spot
+    end=${end#$HOME}          #strip /home/username from start of string
+    begin=$HOME               #start expansion from the right spot
   fi
 
-  end="${end#/}"                # Strip the first /
-  local shortened_path="$end"   # The whole path, to check the length.
+  end=${end#/}                # Strip the first /
+  local shortened_path=$end   # The whole path, to check the length.
   end_basename=$(basename "${end}")
   max_length=$((max_length-${#end_basename}))
 
