@@ -450,7 +450,7 @@
 .markdown code:before,
 .markdown code:after {
   letter-spacing: -0.2em;
-  content: "\00a0";
+  content: " ";
 }
 
 .markdown pre>code {
@@ -473,7 +473,6 @@
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
-  background-color: #f7f7f7;
   border-radius: 3px;
 }
 
