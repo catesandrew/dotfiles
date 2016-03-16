@@ -1,7 +1,7 @@
 {
         author        = 'Github';
-        comment       = 'Github White';
-        name          = 'Github White';
+        comment       = 'Chaos';
+        name          = 'Chaos';
         css           = '
 
 .markdown {
@@ -504,128 +504,60 @@
 }
 
 .highlight, .ace_editor {
-  background: #002b36 !important;
-  color: #93a1a1 !important;
+  background-color: #161616 !important;
+  color: #E6E1DC !important;
 }
 
-.pl-c /* comment */ {
-  color: #969896;
-}
+.pl-c, .pl-c span     { color: #555    !important; font-style: italic !important; } /* comment */
+.pl-c1                { color: #FDC251 !important; } /* constant */
+.pl-e                 { color: #997744 !important; } /* entity */
+.pl-en                { color: #997744 !important; } /* entity.name */
+.pl-ent               { color: #997744 !important; } /* entity.name.tag */
+.pl-k                 { color: #00698F !important; } /* keyword */
+.pl-mb                { color: #1EDAFB !important; font-weight: bold !important; } /* markup.bold */
+.pl-mdh               { color: #00698F !important; } /* meta.diff.header */
+.pl-mdr               { color: #00698F !important; } /* meta.diff.range */
+.pl-mh                { color: #FDC251 !important; } /* markup.heading */
+.pl-mh .pl-en         { color: #FDC251 !important; font-weight: bold !important; } /* markup.heading entity.name */
+.pl-mi                { color: #00698F !important; font-style: italic !important; } /* markup.italic */
+.pl-ml                { color: #00698F !important; } /* markup.list */
+.pl-mm                { color: #00698F !important; } /* meta.module-reference */
+.pl-mo                { color: #00698F !important; } /* meta.output */
+.pl-mp                { color: #00698F !important; } /* meta.property-name */
+.pl-mq                { color: #555    !important; } /* markup.quote */
+.pl-mr                { color: #00698F !important; } /* meta.require */
+.pl-ms                { color: #00698F !important; } /* meta.selector */
+.pl-pds               { color: #58C554 !important; } /* punctuation.definition.string */
+.pl-s                 { color: #997744 !important; } /* storage */
+.pl-s1                { color: #58C554 !important; } /* string */
+.pl-s1 .pl-pse .pl-s2 { color: #58C554 !important; } /* string punctuation.section.embedded source */
+.pl-s1 .pl-s2         { color: #1EDAFB !important; } /* string source */
+.pl-s1 .pl-v          { color: #00698F !important; } /* string variable */
+.pl-s3                { color: #00698F !important; } /* support */
+.pl-sc                { color: #999999 !important; } /* support.class */
+.pl-smi               { color: #BE53E6 !important; } /* storage.modifier.import */
+.pl-smp               { color: #BE53E6 !important; } /* storage.modifier.package */
+.pl-sr                { color: #FF308F !important; } /* string.regexp */
+.pl-sr .pl-cce        { color: #FDC251 !important; } /* constant.character.escape */
+.pl-sr .pl-sra        { color: #FF308F !important; } /* string.regexp string.regexp.arbitrary-repetition */
+.pl-sr .pl-sre        { color: #FF308F !important; } /* string.regexp source.ruby.embedded */
+.pl-src               { color: #FF308F !important; } /* string.regexp.character-class */
+.pl-st                { color: #E6E1DC !important; } /* support.type */
+.pl-stj               { color: #BE53E6 !important; } /* storage.type.java */
+.pl-sv                { color: #1EDAFB !important; } /* support.variable */
+.pl-v                 { color: #997744 !important; } /* variable */
+.pl-vo                { color: #BE53E6 !important; } /* variable.other */
+.pl-vpf               { color: #997744 !important; } /* variable.parameter.function */
 
-.pl-c1       /* constant */,
-.pl-mdh      /* meta.diff.header */,
-.pl-mm       /* meta.module-reference */,
-.pl-mp       /* meta.property-name */,
-.pl-mr       /* markup.raw */,
-.pl-s .pl-v  /* string variable */,
-.pl-s1 .pl-v /* string variable */,
-.pl-s3       /* support */,
-.pl-sc       /* support.constant */,
-.pl-sv       /* support.variable */ {
-  color: #0086b3;
-}
-
-.pl-e  /* entity */,
-.pl-en /* entity.name */ {
-  color: #795da3;
-}
-
-.pl-s  .pl-s1 /* string source */,
-.pl-s1 .pl-s2 /* string source */,
-.pl-smi       /* storage.modifier.import */,
-.pl-smp       /* storage.modifier.package */,
-.pl-stj       /* storage.type.java */,
-.pl-vo        /* variable.other */,
-.pl-vpf       /* variable.parameter.function */ {
-  color: #333;
-}
-
-.pl-ent /* entity.name.tag */ {
-  color: #63a35c;
-}
-
-.pl-k  /* keyword */,
-.pl-s  /* storage */,
-.pl-st /* storage.type */ {
-  color: #a71d5d;
-}
-
-.pl-pds               /* punctuation.definition.string */,
-.pl-s                 /* string */,
-.pl-s .pl-pse .pl-s1  /* string punctuation.section.embedded source */,
-.pl-sr                /* string.regexp */,
-.pl-sr .pl-cce        /* string.regexp constant.character.escape */,
-.pl-sr .pl-sra        /* string.regexp string.regexp.arbitrary-repitition */,
-.pl-sr .pl-sre        /* string.regexp source.ruby.embedded */,
-.pl-src               /* string.regexp.character-class */ {
-  color: #183691;
-}
-
-.pl-v /* variable */ {
-  color: #ed6a43;
-}
-
-.pl-id /* invalid.deprecated */ {
-  color: #b52a1d;
-}
-
-.pl-ii /* invalid.illegal */ {
-  background-color: #b52a1d;
-  color: #f8f8f8;
-}
-
-.pl-sr .pl-cce /* string.regexp constant.character.escape */ {
-  color: #63a35c;
-  font-weight: bold;
-}
-
-.pl-ml /* markup.list */ {
-  color: #693a17;
-}
-.pl-mh .pl-en /* markup.heading entity.name */,
-.pl-ms        /* meta.separator */ {
-  color: #1d3e81;
-  font-weight: bold;
-}
-
-.pl-mq /* markup.quote */ {
-  color: #008080;
-}
-
-.pl-mi /* markup.italic */ {
-  color: #333;
-  font-style: italic;
-}
-
-.pl-mb /* markup.bold */ {
-  color: #333;
-  font-weight: bold;
-}
-
-.pl-md   /* markup.deleted */,
-.pl-mdhf /* meta.diff.header.from-file */ {
-  background-color: #ffecec;
-  color: #bd2c00;
-}
-
-.pl-mdht /* meta.diff.header.to-file */,
-.pl-mi1  /* markup.inserted */ {
-  background-color: #eaffea;
-  color: #55a532;
-}
-
-.pl-mdr /* meta.diff.range */ {
-  color: #795da3;
-  font-weight: bold;
-}
-
-.pl-mo /* meta.output */ {
-  color: #1d3e81;
-}
-
-
+/* Diff - Example: https://gist.github.com/silverwind/904159f1e71e2e626375 */
+.pl-mi1               { color: #FFFFFF !important; background: rgba(0,64,0,.5) !important; } /* markup.inserted */
+.pl-mdht              { color: #FFFFFF !important; background: rgba(0,64,0,.5) !important; } /* meta.diff.header.to-file */
+.pl-md                { color: #FFFFFF !important; background: #990000 !important; } /* markup.deleted */
+.pl-mdhf              { color: #FFFFFF !important; background: #990000 !important; } /* meta.diff.header.from-file */
+.pl-id                { color: #FFFFFF !important; background: #990000 !important; } /* invalid.deprecated */
+.pl-ii                { color: #FFFFFF !important; background: #990000 !important; } /* invalid.illegal */
 
 
 ';
-        uuid          = '1D953D33-939F-4341-B607-3D1597E2702A';
+        uuid          = '561c2e6f-352c-4c8d-b732-eed061db0b1f';
 }

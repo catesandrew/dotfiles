@@ -1,7 +1,7 @@
 {
         author        = 'Github';
-        comment       = 'Github White';
-        name          = 'Github White';
+        comment       = 'Terminal';
+        name          = 'Terminal';
         css           = '
 
 .markdown {
@@ -504,128 +504,70 @@
 }
 
 .highlight, .ace_editor {
-  background: #002b36 !important;
-  color: #93a1a1 !important;
+  background-color: black !important;
+  color: #DEDEDE !important;
 }
 
-.pl-c /* comment */ {
-  color: #969896;
-}
+.pl-c, .pl-c span     { color: orangered !important; font-style: italic !important; } /* comment */
+.pl-c1                { color: #E78C45 !important; } /* constant */
+.pl-e                 { color: #D54E53 !important; } /* entity */
+.pl-en                { color: #DEDEDE !important; } /* entity.name */
+.pl-ent               { color: tomato !important; } /* entity.name.tag */
+.pl-k                 { color: tomato !important; } /* keyword */
+.pl-mb                { color: #E78C45 !important; font-weight: bold !important; } /* markup.bold */
+.pl-mdh               { color: tomato !important; } /* meta.diff.header */
+.pl-mdr               { color: tomato !important; } /* meta.diff.range */
+.pl-mh                { color: #B9CA4A !important; } /* markup.heading */
+.pl-mh .pl-en         { color: #B9CA4A !important; font-weight: bold !important; } /* markup.heading entity.name */
+.pl-mi                { color: tomato !important; font-style: italic !important; } /* markup.italic */
+.pl-ml                { color: tomato !important; } /* markup.list */
+.pl-mm                { color: tomato !important; } /* meta.module-reference */
+.pl-mo                { color: tomato !important; } /* meta.output */
+.pl-mp                { color: tomato !important; } /* meta.property-name */
+.pl-mq                { color: orangered !important; } /* markup.quote */
+.pl-mr                { color: tomato !important; } /* meta.require */
+.pl-ms                { color: tomato !important; } /* meta.selector */
+.pl-pds               { color: #B9CA4A !important; } /* punctuation.definition.string */
+.pl-s                 { color: tomato !important; } /* storage */
+.pl-s1                { color: #B9CA4A !important; } /* string */
+.pl-s1 .pl-pse .pl-s2 { color: #E78C45 !important; } /* string punctuation.section.embedded source */
+.pl-s1 .pl-s2         { color: #7AA6DA !important; } /* string source */
+.pl-s1 .pl-v          { color: tomato !important; } /* string variable */
+.pl-s3                { color: #D54E53 !important; } /* support */
+.pl-sc                { color: #DEDEDE !important; } /* support.class */
+.pl-smi               { color: #7AA6DA !important; } /* storage.modifier.import */
+.pl-smp               { color: #7AA6DA !important; } /* storage.modifier.package */
+.pl-sr                { color: #D54E53 !important; } /* string.regexp */
+.pl-sr .pl-cce        { color: #B9CA4A !important; } /* constant.character.escape */
+.pl-sr .pl-sra        { color: #D54E53 !important; } /* string.regexp string.regexp.arbitrary-repetition */
+.pl-sr .pl-sre        { color: #D54E53 !important; } /* string.regexp source.ruby.embedded */
+.pl-src               { color: #D54E53 !important; } /* string.regexp.character-class */
+.pl-st                { color: tomato !important; } /* support.type */
+.pl-stj               { color: #7AA6DA !important; } /* storage.type.java */
+.pl-sv                { color: #E78C45 !important; } /* support.variable */
+.pl-v                 { color: #D54E53 !important; } /* variable */
+.pl-vo                { color: #7AA6DA !important; } /* variable.other */
+.pl-vpf               { color: #E78C45 !important; } /* variable.parameter.function */
 
-.pl-c1       /* constant */,
-.pl-mdh      /* meta.diff.header */,
-.pl-mm       /* meta.module-reference */,
-.pl-mp       /* meta.property-name */,
-.pl-mr       /* markup.raw */,
-.pl-s .pl-v  /* string variable */,
-.pl-s1 .pl-v /* string variable */,
-.pl-s3       /* support */,
-.pl-sc       /* support.constant */,
-.pl-sv       /* support.variable */ {
-  color: #0086b3;
-}
+/* Diff - Example: https://gist.github.com/silverwind/904159f1e71e2e626375 */
+.pl-mi1               { color: #DEDEDE !important; background: rgba(0,64,0,.5) !important; } /* markup.inserted */
+.pl-mdht              { color: #DEDEDE !important; background: rgba(0,64,0,.5) !important; } /* meta.diff.header.to-file */
+.pl-md                { color: #DEDEDE !important; background: red !important; } /* markup.deleted */
+.pl-mdhf              { color: #DEDEDE !important; background: red !important; } /* meta.diff.header.from-file */
+.pl-id                { color: #CED2CF !important; background: #B798BF !important; } /* invalid.deprecated */
+.pl-ii                { color: yellow !important; background: red !important; } /* invalid.illegal */
 
-.pl-e  /* entity */,
-.pl-en /* entity.name */ {
-  color: #795da3;
-}
-
-.pl-s  .pl-s1 /* string source */,
-.pl-s1 .pl-s2 /* string source */,
-.pl-smi       /* storage.modifier.import */,
-.pl-smp       /* storage.modifier.package */,
-.pl-stj       /* storage.type.java */,
-.pl-vo        /* variable.other */,
-.pl-vpf       /* variable.parameter.function */ {
-  color: #333;
-}
-
-.pl-ent /* entity.name.tag */ {
-  color: #63a35c;
-}
-
-.pl-k  /* keyword */,
-.pl-s  /* storage */,
-.pl-st /* storage.type */ {
-  color: #a71d5d;
-}
-
-.pl-pds               /* punctuation.definition.string */,
-.pl-s                 /* string */,
-.pl-s .pl-pse .pl-s1  /* string punctuation.section.embedded source */,
-.pl-sr                /* string.regexp */,
-.pl-sr .pl-cce        /* string.regexp constant.character.escape */,
-.pl-sr .pl-sra        /* string.regexp string.regexp.arbitrary-repitition */,
-.pl-sr .pl-sre        /* string.regexp source.ruby.embedded */,
-.pl-src               /* string.regexp.character-class */ {
-  color: #183691;
-}
-
-.pl-v /* variable */ {
-  color: #ed6a43;
-}
-
-.pl-id /* invalid.deprecated */ {
-  color: #b52a1d;
-}
-
-.pl-ii /* invalid.illegal */ {
-  background-color: #b52a1d;
-  color: #f8f8f8;
-}
-
-.pl-sr .pl-cce /* string.regexp constant.character.escape */ {
-  color: #63a35c;
-  font-weight: bold;
-}
-
-.pl-ml /* markup.list */ {
-  color: #693a17;
-}
-.pl-mh .pl-en /* markup.heading entity.name */,
-.pl-ms        /* meta.separator */ {
-  color: #1d3e81;
-  font-weight: bold;
-}
-
-.pl-mq /* markup.quote */ {
-  color: #008080;
-}
-
-.pl-mi /* markup.italic */ {
-  color: #333;
-  font-style: italic;
-}
-
-.pl-mb /* markup.bold */ {
-  color: #333;
-  font-weight: bold;
-}
-
-.pl-md   /* markup.deleted */,
-.pl-mdhf /* meta.diff.header.from-file */ {
-  background-color: #ffecec;
-  color: #bd2c00;
-}
-
-.pl-mdht /* meta.diff.header.to-file */,
-.pl-mi1  /* markup.inserted */ {
-  background-color: #eaffea;
-  color: #55a532;
-}
-
-.pl-mdr /* meta.diff.range */ {
-  color: #795da3;
-  font-weight: bold;
-}
-
-.pl-mo /* meta.output */ {
-  color: #1d3e81;
-}
-
-
-
+/* language tweaks */
+.highlight-source-css .pl-k     { color: #DEDEDE !important; } /* keyword */
+.highlight-source-css .pl-s3    { color: #E7C547 !important; } /* support */
+.highlight-source-css .pl-sc    { color: #E7C547 !important; } /* support.class */
+.highlight-source-css .pl-ent   { color: #DEDEDE !important; } /* entity.name.tag */
+.highlight-text-html-basic .pl-ent  { color: #D54E53 !important; } /* entity.name.tag */
+.highlight-source-js .pl-k      { color: deeppink !important; } /* keyword */
+.highlight-text-html-php .pl-s3    { color: #7AA6DA !important; } /* support */
+.highlight-text-html-php .pl-vo    { color: #D54E53 !important; } /* variable.other */
+.highlight-source-python .pl-s3 { color: #7AA6DA !important; } /* support */
 
 ';
-        uuid          = '1D953D33-939F-4341-B607-3D1597E2702A';
+        uuid          = '38e4ee2f-9fdd-4ae4-9806-972d803f8717';
 }

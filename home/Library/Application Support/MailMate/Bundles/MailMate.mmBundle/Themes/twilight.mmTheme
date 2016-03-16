@@ -1,0 +1,672 @@
+{
+        author        = 'Github';
+        comment       = 'Twilight';
+        name          = 'Twilight';
+        css           = '
+
+.markdown {
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.markdown a {
+  background-color: transparent;
+}
+
+.markdown a:active,
+.markdown a:hover {
+  outline: 0;
+}
+
+.markdown strong {
+  font-weight: bold;
+}
+
+.markdown h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown img {
+  border: 0;
+}
+
+.markdown hr {
+  box-sizing: content-box;
+  height: 0;
+}
+
+.markdown pre {
+  overflow: auto;
+}
+
+.markdown code,
+.markdown kbd,
+.markdown pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+.markdown html input[disabled] {
+  cursor: default;
+}
+
+.markdown input {
+  line-height: normal;
+}
+
+.markdown input[type="checkbox"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown td,
+.markdown th {
+  padding: 0;
+}
+
+.markdown * {
+  box-sizing: border-box;
+}
+
+.markdown input {
+  font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.markdown a {
+  color: #4078c0;
+  text-decoration: none;
+}
+
+.markdown a:hover,
+.markdown a:active {
+  text-decoration: underline;
+}
+
+.markdown hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.markdown hr:before {
+  display: table;
+  content: "";
+}
+
+.markdown hr:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+.markdown h1 {
+  font-size: 30px;
+}
+
+.markdown h2 {
+  font-size: 21px;
+}
+
+.markdown h3 {
+  font-size: 16px;
+}
+
+.markdown h4 {
+  font-size: 14px;
+}
+
+.markdown h5 {
+  font-size: 12px;
+}
+
+.markdown h6 {
+  font-size: 11px;
+}
+
+.markdown blockquote {
+  margin: 0;
+}
+
+.markdown ul,
+.markdown ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown ol ol,
+.markdown ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown ul ul ol,
+.markdown ul ol ol,
+.markdown ol ul ol,
+.markdown ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown dd {
+  margin-left: 0;
+}
+
+.markdown code {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+.markdown pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown .select::-ms-expand {
+  opacity: 0;
+}
+
+.markdown:before {
+  display: table;
+  content: "";
+}
+
+.markdown:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown a:not([href]) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.markdown .anchor {
+  display: inline-block;
+  padding-right: 2px;
+  margin-left: -18px;
+}
+
+.markdown .anchor:focus {
+  outline: none;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.markdown h1:hover .anchor,
+.markdown h2:hover .anchor,
+.markdown h3:hover .anchor,
+.markdown h4:hover .anchor,
+.markdown h5:hover .anchor,
+.markdown h6:hover .anchor {
+  text-decoration: none;
+}
+
+.markdown h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown h1 .anchor {
+  line-height: 1;
+}
+
+.markdown h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown h2 .anchor {
+  line-height: 1;
+}
+
+.markdown h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+.markdown h3 .anchor {
+  line-height: 1.2;
+}
+
+.markdown h4 {
+  font-size: 1.25em;
+}
+
+.markdown h4 .anchor {
+  line-height: 1.2;
+}
+
+.markdown h5 {
+  font-size: 1em;
+}
+
+.markdown h5 .anchor {
+  line-height: 1.1;
+}
+
+.markdown h6 {
+  font-size: 1em;
+  color: #777;
+}
+
+.markdown h6 .anchor {
+  line-height: 1.1;
+}
+
+.markdown p,
+.markdown blockquote,
+.markdown ul,
+.markdown ol,
+.markdown dl,
+.markdown table,
+.markdown pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+
+.markdown ul,
+.markdown ol {
+  padding-left: 2em;
+}
+
+.markdown ul ul,
+.markdown ul ol,
+.markdown ol ol,
+.markdown ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown li>p {
+  margin-top: 16px;
+}
+
+.markdown dl {
+  padding: 0;
+}
+
+.markdown dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+
+.markdown blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.markdown table th {
+  font-weight: bold;
+}
+
+.markdown table th,
+.markdown table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+.markdown table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.markdown table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+.markdown img {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: #fff;
+}
+
+.markdown .task-list-item {
+  list-style-type: none;
+}
+
+.markdown .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown .task-list-item input {
+  margin: 0 0.35em 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+.markdown :checked+.radio-label {
+  z-index: 1;
+  position: relative;
+  border-color: #4078c0;
+}
+
+.markdown kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 10px;
+  color: #555;
+  vertical-align: middle;
+  background-color: #fcfcfc;
+  border: solid 1px #ccc;
+  border-bottom-color: #bbb;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #bbb;
+}
+
+.markdown code {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.markdown code:before,
+.markdown code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+.markdown pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown .highlight {
+  margin-bottom: 16px;
+}
+
+.markdown .highlight pre,
+.markdown pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.markdown .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown pre {
+  word-wrap: normal;
+}
+
+.markdown pre code {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown pre code:before,
+.markdown pre code:after {
+  content: normal;
+}
+
+.highlight, .ace_editor {
+  background: #141414 !important;
+  color: #ccc !important;
+}
+
+.pl-c, .pl-c span{ color: #5F5A60 !important; font-style: italic !important; } /* comment */
+.pl-c1           { color: #CF6A4C !important; } /* constant */
+.pl-cce          { color: #CF6A4C !important; font-weight: normal !important; } /* constant.character.escape */
+.pl-cn           { color: #CF6A4C !important; } /* constant.numeric */
+.pl-coc          { color: #CF6A4C !important; } /* constant.other.color */
+.pl-cos          { color: #8F9D6A !important; } /* constant.other.symbol */
+.pl-e            { color: #AC885B !important; } /* entity */
+.pl-ef           { color: #AC885B !important; } /* entity.function */
+.pl-en           { color: #AC885B !important; } /* entity.name */
+.pl-enc          { color: #CF6A4C !important; } /* entity.name.class */
+.pl-enf          { color: #AC885B !important; } /* entity.name.function */
+.pl-enm          { color: #AC885B !important; } /* entity.name.method-name */
+.pl-ens          { color: #CF6A4C !important; } /* entity.name.section */
+.pl-ent          { color: #CDA869 !important; } /* entity.name.tag */
+.pl-entc         { color: #AC885B !important; } /* entity.name.type.class */
+.pl-enti         { color: #AC885B !important; font-weight: bold !important; } /* entity.name.type.instance */
+.pl-entm         { color: #7587A6 !important; } /* entity.name.type.module */
+.pl-eoa          { color: #CDA869 !important; } /* entity.other.attribute-name */
+.pl-eoac         { color: #7587A6 !important; } /* entity.other.attribute-name.class */
+.pl-eoac .pl-pde { color: #7587A6 !important; } /* punctuation.definition.entity */
+.pl-eoai         { color: #CDA869 !important; } /* entity.other.attribute-name.id */
+.pl-eoai .pl-pde { color: #CDA869 !important; } /* punctuation.definition.entity */
+.pl-eoi          { color: #AC885B !important; } /* entity.other.inherited-class */
+.pl-k            { color: #CDA869 !important; } /* keyword */
+.pl-ko           { color: #CDA869 !important; } /* keyword.operator */
+.pl-kolp         { color: #CDA869 !important; } /* keyword.operator.logical.python */
+.pl-kos          { color: #CF6A4C !important; } /* keyword.other.special-method */
+.pl-kou          { color: #CF6A4C !important; } /* keyword.other.unit */
+.pl-mai .pl-sf   { color: #7587A6 !important; } /* support.function */
+.pl-mb           { color: #8F9D6A !important; font-weight: bold !important; } /* markup.bold */
+.pl-mc           { color: #CDA869 !important; } /* markup.changed */
+.pl-mh           { color: #CF6A4C !important; font-weight: normal !important; } /* markup.heading */
+.pl-mh .pl-pdh   { color: #CF6A4C !important; } /* markup.heading punctuation.definition.heading */
+.pl-mi           { color: #CDA869 !important; font-style: italic !important; } /* markup.italic */
+.pl-ml           { color: #8F9D6A !important; } /* markup.list */
+.pl-mm           { color: #7587A6 !important; } /* meta.module-reference */
+.pl-mp           { color: #C5AF75 !important; } /* meta.property-name */
+.pl-mp1 .pl-sf   { color: #DAD085 !important; } /* meta.property-value support.function */
+.pl-mq           { color: #CF6A4C !important; } /* markup.quote */
+.pl-mr           { color: #CDA869 !important; } /* meta.require */
+.pl-ms           { color: #CDA869 !important; } /* meta.selector */
+.pl-pdb          { color: #8F9D6A !important; font-weight: bold !important; } /* punctuation.definition.bold */
+.pl-pdc          { color: #5F5A60 !important; font-style: italic !important; } /* punctuation.definition.comment */
+.pl-pdc1         { color: #CF6A4C !important; } /* punctuation.definition.constant */
+.pl-pde          { color: #CF6A4C !important; } /* punctuation.definition.entity */
+.pl-pdi          { color: #CDA869 !important; font-style: italic !important; } /* punctuation.definition.italic */
+.pl-pds          { color: #8F9D6A !important; } /* punctuation.definition.string */
+.pl-pdv          { color: #7587A6 !important; } /* punctuation.definition.variable */
+.pl-pse          { color: #CF6A4C !important; } /* punctuation.section.embedded */
+.pl-pse .pl-s2   { color: #CF6A4C !important; } /* punctuation.section.embedded source */
+.pl-s            { color: #F9EE98 !important; } /* storage */
+.pl-s1           { color: #8F9D6A !important; } /* string */
+.pl-s2           { color: #ccc    !important; } /* source */
+.pl-mp .pl-s3    { color: #CDA869 !important; } /* support */
+.pl-s3           { color: #DAD085 !important; } /* support */
+.pl-sc           { color: #DAD085 !important; } /* support.class */
+.pl-scp          { color: #CF6A4C !important; } /* support.constant.property-value */
+.pl-sf           { color: #DAD085 !important; } /* support.function */
+.pl-smc          { color: #AC885B !important; } /* storage.modifier.c */
+.pl-smi          { color: #ccc    !important; } /* storage.modifier.import */
+.pl-smp          { color: #ccc    !important; } /* storage.modifier.package */
+.pl-sok          { color: #CDA869 !important; } /* support.other.keyword */
+.pl-sol          { color: #8F9D6A !important; } /* string.other.link */
+.pl-som          { color: #7587A6 !important; } /* support.other.module */
+.pl-sr           { color: #7587A6 !important; } /* string.regexp */
+.pl-sra          { color: #CDA869 !important; } /* string.regexp string.regexp.arbitrary-repetition */
+.pl-src          { color: #CDA869 !important; } /* string.regexp.character-class */
+.pl-sre          { color: #CDA869 !important; } /* string.regexp source.ruby.embedded */
+.pl-st           { color: #CDA869 !important; } /* support.type */
+.pl-stj          { color: #7587A6 !important; } /* storage.type.java */
+.pl-stp          { color: #9B859D !important; } /* support.type.property-name */
+.pl-sv           { color: #9B859D !important; } /* support.variable */
+.pl-v            { color: #9B859D !important; } /* variable */
+.pl-vi           { color: #CF6A4C !important; } /* variable.interpolation */
+.pl-vo           { color: #AC885B !important; } /* variable.other */
+.pl-vpf          { color: #7587A6 !important; } /* variable.parameter.function */
+/* Diff - Example: https://gist.github.com/silverwind/904159f1e71e2e626375 */
+.pl-mi1          { color: #55A532 !important; background: #020 !important; } /* markup.inserted */
+.pl-mdht         { color: #55A532 !important; background: #020 !important; } /* meta.diff.header.to-file */
+.pl-md           { color: #BD2C00 !important; background: #200 !important; } /* markup.deleted */
+.pl-mdhf         { color: #BD2C00 !important; background: #200 !important; } /* meta.diff.header.from-file */
+.pl-mdr          { color: #CF6A4C !important; font-weight: normal !important;} /* meta.diff.range */
+.pl-mdh          { color: #7587A6 !important; font-weight: normal !important;} /* meta.diff.header */
+.pl-mdi          { color: #7587A6 !important; font-weight: normal !important;} /* meta.diff.index */
+/* TODO: Fix unstyled classes below */
+.pl-ib           { background-color: #f93 !important; } /* invalid.broken */
+.pl-id           { background-color: #a31515 !important; color: #fff !important; } /* invalid.deprecated */
+.pl-ii           { background-color: #df5000 !important; color: #fff !important; } /* invalid.illegal */
+.pl-iu           { background-color: #b4b7b4 !important; } /* invalid.unimplemented */
+.pl-mo           { color: #969896 !important; } /* meta.output */
+.pl-mri          { color: #008080 !important; } /* markup.raw.inline */
+.pl-ms1          { background-color: #f5f5f5 !important; } /* meta.separator */
+.pl-va           { color: #008080 !important; } /* variable.assignment */
+.pl-vpu          { color: #008080 !important; } /* variable.parameter.url */
+.pl-entl         { color: #ccc    !important; } /* entity.name.tag.label */
+
+/* Jupyter Notebooks */
+/*! Twilight; https://gist.github.com/dansimpson/803005 */
+#notebook .highlight table { background: #181818 !important; color: #F8F8F8 !important; }
+#notebook .highlight *, .api .highlight * { color: #F8F8F8 !important; }
+.highlight .hll { background-color: #ffc !important; }
+.highlight .c { color: #5F5A60 !important; font-style: italic !important; } /* Comment */
+.highlight .err { border:#B22518 !important; } /* Error */
+.highlight .k { color: #CDA869 !important; } /* Keyword */
+.highlight .cm { color: #5F5A60 !important; font-style: italic !important; } /* Comment.Multiline */
+.highlight .cp { color: #5F5A60 !important; } /* Comment.Preproc */
+.highlight .c1 { color: #5F5A60 !important; font-style: italic !important; } /* Comment.Single */
+.highlight .cs { color: #5F5A60 !important; font-style: italic !important; } /* Comment.Special */
+.highlight .gd { background: #420E09 !important; } /* Generic.Deleted */
+.highlight .ge { font-style: italic !important; } /* Generic.Emph */
+.highlight .gr { background: #B22518 !important; } /* Generic.Error */
+.highlight .gh { color: #000080 !important; font-weight: bold !important; } /* Generic.Heading */
+.highlight .gi { background: #253B22 !important; } /* Generic.Inserted */
+.highlight .go { } /* Generic.Output */
+.highlight .gp { font-weight: bold !important; } /* Generic.Prompt */
+.highlight .gs { font-weight: bold !important; } /* Generic.Strong */
+.highlight .gu { color: #800080 !important; font-weight: bold !important; } /* Generic.Subheading */
+.highlight .gt { } /* Generic.Traceback */
+.highlight .kc { } /* Keyword.Constant */
+.highlight .kd { color: #e9df8f !important; } /* Keyword.Declaration */
+.highlight .kn { } /* Keyword.Namespace */
+.highlight .kp { color: #9B703F !important; } /* Keyword.Pseudo */
+.highlight .kr { } /* Keyword.Reserved */
+.highlight .kt { } /* Keyword.Type */
+.highlight .m { } /* Literal.Number */
+.highlight .s { } /* Literal.String */
+.highlight .na { color: #F9EE98 !important; } /* Name.Attribute */
+.highlight .nb { color: #CDA869 !important; } /* Name.Builtin */
+.highlight .nc { color: #9B859D !important; font-weight: bold !important; } /* Name.Class */
+.highlight .no { color: #9B859D !important; } /* Name.Constant */
+.highlight .nd { color: #7587A6 !important; } /* Name.Decorator */
+.highlight .ni { color: #CF6A4C !important; font-weight: bold !important; } /* Name.Entity */
+.highlight .nf { color: #9B703F !important; font-weight: bold !important; } /* Name.Function */
+.highlight .nn { color: #9B859D !important; font-weight: bold !important; } /* Name.Namespace */
+.highlight .nt { color: #CDA869 !important; font-weight: bold !important; } /* Name.Tag */
+.highlight .nv { color: #7587A6 !important; } /* Name.Variable */
+.highlight .ow { color: #a2f !important; font-weight: bold !important; } /* Operator.Word */
+.highlight .w { color: #141414 !important; } /* Text.Whitespace */
+.highlight .mf { color: #CF6A4C !important; } /* Literal.Number.Float */
+.highlight .mh { color: #CF6A4C !important; } /* Literal.Number.Hex */
+.highlight .mi { color: #CF6A4C !important; } /* Literal.Number.Integer */
+.highlight .mo { color: #CF6A4C !important; } /* Literal.Number.Oct */
+.highlight .sb { color: #8F9D6A !important; } /* Literal.String.Backtick */
+.highlight .sc { color: #8F9D6A !important; } /* Literal.String.Char */
+.highlight .sd { color: #8F9D6A !important; font-style: italic !important; } /* Literal.String.Doc */
+.highlight .s2 { color: #8F9D6A !important; } /* Literal.String.Double */
+.highlight .se { color: #F9EE98 !important; font-weight: bold !important; } /* Literal.String.Escape */
+.highlight .sh { color: #8F9D6A !important; } /* Literal.String.Heredoc */
+.highlight .si { color: #DAEFA3 !important; font-weight: bold !important; } /* Literal.String.Interpol */
+.highlight .sx { color: #8F9D6A !important; } /* Literal.String.Other */
+.highlight .sr { color: #E9C062 !important; } /* Literal.String.Regex */
+.highlight .s1 { color: #8F9D6A !important; } /* Literal.String.Single */
+.highlight .ss { color: #CF6A4C !important; } /* Literal.String.Symbol */
+.highlight .bp { color: #0aa !important; } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #7587A6 !important; } /* Name.Variable.Class */
+.highlight .vg { color: #7587A6 !important; } /* Name.Variable.Global */
+.highlight .vi { color: #7587A6 !important; } /* Name.Variable.Instance */
+.highlight .il { color: #099 !important; } /* Literal.Number.Integer.Long */
+
+';
+        uuid          = '9bb482e0-2acd-4616-a515-62d73862c92e';
+}

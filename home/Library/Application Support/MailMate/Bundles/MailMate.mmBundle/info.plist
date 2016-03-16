@@ -1,6 +1,6 @@
 {	"contactEmailRot13" = "catesandrew@gmail.com";
 	contactName = "Andrew Cates";
-	description = "Github theme";
+        description = "MailMate Themes";
 	name = "MailMate";
-	uuid = "F515C8A5-3D98-4336-B8E6-6492DDA0F5C0";
+        uuid = "6b8daf07-d056-461e-a297-d5115f7edf75";
 }
