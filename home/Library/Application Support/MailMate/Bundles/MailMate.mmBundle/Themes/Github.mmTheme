@@ -1,14 +1,9 @@
 {
-	author        = 'Benny Kjær Nielsen';
-	comment       = 'Based on how MailMate looked before themes.';
-	// ToDo: Text editor color/font? settings?
-	name          = 'Classic';
-	css           = '
-
-@font-face {
-  font-family: octicons-link;
-  src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
-}
+        author        = 'Benny Kjær Nielsen';
+        comment       = 'Based on how MailMate looked before themes.';
+        // ToDo: Text editor color/font? settings?
+        name          = 'Classic';
+        css           = '
 
 body {
   -webkit-text-size-adjust: 100%;
@@ -202,23 +197,6 @@ pre {
   opacity: 0;
 }
 
-.octicon {
-  font: normal normal normal 16px/1 octicons-link;
-  display: inline-block;
-  text-decoration: none;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.octicon-link:before {
-  content: "\f05c";
-}
-
 body:before {
   display: table;
   content: "";
@@ -265,17 +243,6 @@ h6 {
   line-height: 1.4;
 }
 
-h1 .octicon-link,
-h2 .octicon-link,
-h3 .octicon-link,
-h4 .octicon-link,
-h5 .octicon-link,
-h6 .octicon-link {
-  color: #000;
-  vertical-align: middle;
-  visibility: hidden;
-}
-
 h1:hover .anchor,
 h2:hover .anchor,
 h3:hover .anchor,
@@ -283,15 +250,6 @@ h4:hover .anchor,
 h5:hover .anchor,
 h6:hover .anchor {
   text-decoration: none;
-}
-
-h1:hover .anchor .octicon-link,
-h2:hover .anchor .octicon-link,
-h3:hover .anchor .octicon-link,
-h4:hover .anchor .octicon-link,
-h5:hover .anchor .octicon-link,
-h6:hover .anchor .octicon-link {
-  visibility: visible;
 }
 
 h1 {
@@ -450,6 +408,39 @@ img {
   background-color: #fff;
 }
 
+.task-list-item {
+  list-style-type: none;
+}
+
+.task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.task-list-item input {
+  margin: 0 0.35em 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+:checked+.radio-label {
+  z-index: 1;
+  position: relative;
+  border-color: #4078c0;
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 10px;
+  color: #555;
+  vertical-align: middle;
+  background-color: #fcfcfc;
+  border: solid 1px #ccc;
+  border-bottom-color: #bbb;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #bbb;
+}
+
 code {
   padding: 0;
   padding-top: 0.2em;
@@ -477,6 +468,8 @@ pre>code {
 }
 
 .highlight {
+  background: #002b36 !important;
+  color: #93a1a1 !important;
   margin-bottom: 16px;
 }
 
@@ -516,152 +509,130 @@ pre code:after {
   content: normal;
 }
 
-kbd {
-  display: inline-block;
-  padding: 3px 5px;
-  font-size: 11px;
-  line-height: 10px;
-  color: #555;
-  vertical-align: middle;
-  background-color: #fcfcfc;
-  border: solid 1px #ccc;
-  border-bottom-color: #bbb;
-  border-radius: 3px;
-  box-shadow: inset 0 -1px 0 #bbb;
-}
-
-.pl-c {
+.c,
+.cm,
+.c1,
+.sb,
+.pl-c /* comment */ {
   color: #969896;
 }
 
-.pl-c1,
-.pl-s .pl-v {
+.pl-c1       /* constant */,
+.pl-mdh      /* meta.diff.header */,
+.pl-mm       /* meta.module-reference */,
+.pl-mp       /* meta.property-name */,
+.pl-mr       /* markup.raw */,
+.pl-s .pl-v  /* string variable */,
+.pl-s1 .pl-v /* string variable */,
+.pl-s3       /* support */,
+.pl-sc       /* support.constant */,
+.pl-sv       /* support.variable */ {
   color: #0086b3;
 }
 
-.pl-e,
-.pl-en {
+.pl-e  /* entity */,
+.pl-en /* entity.name */ {
   color: #795da3;
 }
 
-.pl-s .pl-s1,
-.pl-smi {
+.pl-s  .pl-s1 /* string source */,
+.pl-s1 .pl-s2 /* string source */,
+.pl-smi       /* storage.modifier.import */,
+.pl-smp       /* storage.modifier.package */,
+.pl-stj       /* storage.type.java */,
+.pl-vo        /* variable.other */,
+.pl-vpf       /* variable.parameter.function */ {
   color: #333;
 }
 
-.pl-ent {
+.pl-ent /* entity.name.tag */ {
   color: #63a35c;
 }
 
-.pl-k {
+.pl-k  /* keyword */,
+.pl-s  /* storage */,
+.pl-st /* storage.type */ {
   color: #a71d5d;
 }
 
-.pl-pds,
-.pl-s,
-.pl-s .pl-pse .pl-s1,
-.pl-sr,
-.pl-sr .pl-cce,
-.pl-sr .pl-sra,
-.pl-sr .pl-sre {
+.pl-pds               /* punctuation.definition.string */,
+.pl-s                 /* string */,
+.pl-s .pl-pse .pl-s1  /* string punctuation.section.embedded source */,
+.pl-sr                /* string.regexp */,
+.pl-sr .pl-cce        /* string.regexp constant.character.escape */,
+.pl-sr .pl-sra        /* string.regexp string.regexp.arbitrary-repitition */,
+.pl-sr .pl-sre        /* string.regexp source.ruby.embedded */,
+.pl-src               /* string.regexp.character-class */ {
   color: #183691;
 }
 
-.pl-v {
+.pl-v /* variable */ {
   color: #ed6a43;
 }
 
-.pl-id {
+.pl-id /* invalid.deprecated */ {
   color: #b52a1d;
 }
 
-.pl-ii {
+.pl-ii /* invalid.illegal */ {
   background-color: #b52a1d;
   color: #f8f8f8;
 }
 
-.pl-sr .pl-cce {
+.pl-sr .pl-cce /* string.regexp constant.character.escape */ {
   color: #63a35c;
   font-weight: bold;
 }
 
-.pl-ml {
+.pl-ml /* markup.list */ {
   color: #693a17;
 }
 
-.pl-mh,
-.pl-mh .pl-en,
-.pl-ms {
+.pl-mh        /* markup.heading */,
+.pl-mh .pl-en /* markup.heading entity.name */,
+.pl-ms        /* meta.separator */ {
   color: #1d3e81;
   font-weight: bold;
 }
 
-.pl-mq {
+.pl-mq /* markup.quote */ {
   color: #008080;
 }
 
-.pl-mi {
+.pl-mi /* markup.italic */ {
   color: #333;
   font-style: italic;
 }
 
-.pl-mb {
+.pl-mb /* markup.bold */ {
   color: #333;
   font-weight: bold;
 }
 
-.pl-md {
+.pl-md   /* markup.deleted */,
+.pl-mdhf /* meta.diff.header.from-file */ {
   background-color: #ffecec;
   color: #bd2c00;
 }
 
-.pl-mi1 {
+.pl-mdht /* meta.diff.header.to-file */,
+.pl-mi1  /* markup.inserted */ {
   background-color: #eaffea;
   color: #55a532;
 }
 
-.pl-mdr {
+.pl-mdr /* meta.diff.range */ {
   color: #795da3;
   font-weight: bold;
 }
 
-.pl-mo {
+.pl-mo /* meta.output */ {
   color: #1d3e81;
 }
 
-kbd {
-  display: inline-block;
-  padding: 3px 5px;
-  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  line-height: 10px;
-  color: #555;
-  vertical-align: middle;
-  background-color: #fcfcfc;
-  border: solid 1px #ccc;
-  border-bottom-color: #bbb;
-  border-radius: 3px;
-  box-shadow: inset 0 -1px 0 #bbb;
-}
 
-.task-list-item {
-  list-style-type: none;
-}
 
-.task-list-item+.task-list-item {
-  margin-top: 3px;
-}
-
-.task-list-item input {
-  margin: 0 0.35em 0.25em -1.6em;
-  vertical-align: middle;
-}
-
-:checked+.radio-label {
-  z-index: 1;
-  position: relative;
-  border-color: #4078c0;
-}
 
 ';
-	uuid          = '1D953D33-939F-4341-B607-3D1597E2702A';
+        uuid          = '1D953D33-939F-4341-B607-3D1597E2702A';
 }
