@@ -1,0 +1,19 @@
+#!/bin/sh
+
+##
+# set-automatic: set this bundle as the default editor when entering the
+#                email composer
+#
+# Original author: O'Shaughnessy Evans <shaug+mailmate@wumpus.org>
+##
+
+bundle_plist=$(dirname $0)/../../info.plist
+uuid=$(plutil -convert json -r -o - "$bundle_plist" |awk '$1=="\"uuid\"" { print $3 }' |sed 's,"\([^"].*\)".*,\1,')
+
+if [[ "$1" == "off" ]]; then
+    echo "Disabling this bundle as automatic editor."
+    defaults delete com.freron.MailMate MmBundleCommandLaunchedOnTab
+else
+    echo "Enabling this bundle as automatic editor."
+    defaults write com.freron.MailMate MmBundleCommandLaunchedOnTab -string "$uuid"
+fi
