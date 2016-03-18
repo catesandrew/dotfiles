@@ -6,12 +6,12 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.ubersicht</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>sh</string>
-      <string>-c</string>
-      <string>sleep 10 &amp;&amp; /Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
+	</array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
