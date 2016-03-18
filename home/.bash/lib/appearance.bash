@@ -2,21 +2,25 @@
 
 # Load the theme
 if [[ $BASH_IT_THEME ]]; then
-    . "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+  . "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
 fi
 
 [[ -n "$INSIDE_EMACS"  ]] && return
 
-# Make commands in one terminal instantly available to commands in another.
-# export PROMPTED=false
-# export PROMPT_COMMAND="if [[ \$PROMPTED = true ]]; then echo ''; fi; export PROMPTED=true; $PROMPT_COMMAND"
-
 # Record each line as it gets issued
-if [ -n "${PROMPT_COMMAND}" ]; then
-  PROMPT_COMMAND="history -a; ${PROMPT_COMMAND}"
-else
-  PROMPT_COMMAND='history -a'
-fi
+install_prompt 'history -a'
+
+# NOTE: `install_prompt` is used over appending to `precmd_functions` because
+# the latter can not be passed arguments, so you would have to wrap `history -a`
+# in a function and pass that to `precmd_functions` (which would be preferable
+# when you would want to call more than _just_ `history -a`).
+#
+# function history_cmd {
+#   history -a
+#   history -c
+#   history -r
+# }
+# precmd_functions+=(history_cmd)
 
 # If we want to have bash immediately add commands to our history instead of
 # waiting for the end of each session (to enable commands in one terminal to be
@@ -36,5 +40,3 @@ fi
 # else
 #   PROMPT_COMMAND='history -a; history -c; history -r'
 # fi
-
-export PROMPT_COMMAND
