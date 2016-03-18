@@ -19,16 +19,23 @@
 # variable does not work, there is also VIMRUNTIME to check for.
 [[ -n "$MYVIMRC" ]] && return
 
+function osx_upgrade_bash4 {
+  local new_version
+  new_version=$(bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
+  if [[ $new_version > $BASH_VERSION ]]; then
+    echo "Found Bash v$new_version"
+    # and try preserving all the invocation options
+    exec -l bash -l${-//[chimBH]/} # "$@"
+  fi
+}
+
 # exec into bash >= 4, when available (for login shells)
-if [[ $0 = -bash ]] && shopt -qp login_shell && [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
-    newVersion=$(bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
-    if [[ $newVersion > $BASH_VERSION ]]; then
-        echo "Found Bash v$newVersion"
-        # and try preserving all the invocation options
-        exec -l bash -l${-//[chimBH]/} # "$@"
-    fi
-    unset newVersion
-    #exec bash -$- "${@:-$BASH_EXECUTION_STRING}" # for non-interactive
+if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
+  if [[ -n $INSIDE_EMACS ]]; then
+    osx_upgrade_bash4
+  elif [[ $0 = -bash ]] && shopt -qp login_shell; then
+    osx_upgrade_bash4
+  fi
 fi
 
 if hash gdate 2>/dev/null; then
@@ -44,6 +51,7 @@ function add_on_exit() {
   local n=${#on_exit_items[*]}
   on_exit_items[$n]="$*"
 }
+add_on_exit osx_upgrade_bash4
 
 # No dependency, simple and useful utilities
 . "${BASH_IT}/lib/vars.sh"
