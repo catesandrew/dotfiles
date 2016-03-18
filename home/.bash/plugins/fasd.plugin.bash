@@ -24,10 +24,7 @@ if brew_contains_element "fasd" || \
   }
 
   # add bash hook
-  case $PROMPT_COMMAND in
-    *_fasd_prompt_func*) ;;
-    *) PROMPT_COMMAND="_fasd_prompt_func;$PROMPT_COMMAND";;
-  esac
+  precmd_functions+=(_fasd_prompt_func)
 
   # bash command mode completion
   _fasd_bash_cmd_complete() {
