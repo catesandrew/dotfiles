@@ -2,7 +2,10 @@
 
 # Test whether we're in a git repo
 is_git_repo() {
-    $(git rev-parse --is-inside-work-tree &> /dev/null)
+  if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
+    echo 1
+  fi
+  echo 0
 }
 add_on_exit is_git_repo
 
