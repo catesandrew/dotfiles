@@ -39,7 +39,7 @@ if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
 fi
 
 if hash gdate 2>/dev/null; then
-    tic=$(($(gdate +%s%N)/1000000))
+  tic=$(($(gdate +%s%N)/1000000))
 fi
 
 # Path to the bash it configuration
@@ -49,6 +49,7 @@ export DFM_REPO="${HOME}/.dotfiles"
 declare -a preexec_functions
 declare -a precmd_functions
 declare -a on_exit_items
+
 function add_on_exit() {
   local n=${#on_exit_items[*]}
   on_exit_items[$n]="$*"
@@ -207,14 +208,13 @@ export THEME_PROMPT_CLOCK_FORMAT="%l:%M"
 export THEME_BATTERY_PERCENTAGE_CHECK=false
 export THEME_CLOCK_CHECK=false
 
-
-
 ## THEMES
 
 if [ -z "$INSIDE_EMACS" ]; then
   # Lock and load a custom theme file location /.bash/themes/
   export BASH_IT_THEME='oh-my-git'
 else
+  # Apple Terminal drops `update_terminal_cwd` to PROMPT_COMMAND in /etc/bashrc
   unset PROMPT_COMMAND
   export BASH_IT_THEME='oh-my-git-pure'
 fi
@@ -373,13 +373,13 @@ if [ -z "$INSIDE_EMACS" ]; then
     fi
 fi
 
-. ${BASH_IT}/lib/custom.sh
+. "${BASH_IT}/lib/custom.sh"
 
 if hash gdate 2>/dev/null; then
     toc=$(($(gdate +%s%N)/1000000))
-    delta=$(($toc - $tic))
+    delta=$((toc - tic))
     LC_NUMERIC=C LC_COLLATE=C
-    printf 'Bash loaded in %g secs\n' $(bc <<< "scale=3; ${delta}/1000")
+    printf 'Bash loaded in %g secs\n' "$(bc <<< "scale=3; ${delta}/1000")"
     unset tic toc delta
 else
     echo "Bash loaded in $SECONDS secs"
