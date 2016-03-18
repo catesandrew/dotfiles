@@ -88,3 +88,31 @@ cask_contains_element() {
   return $e
 }
 add_on_exit cask_contains_element
+
+function install_prompt {
+  # if [ -z "$OLD_PROMPT" ]; then
+  #   OLD_PROMPT=$PS1
+  # fi
+
+  # if [ -z "$PROMPT_OLD_DIR_WAS_GIT" ]; then
+  #   PROMPT_OLD_DIR_WAS_GIT=$(is_git_repo)
+  # fi
+
+  if [ -z "$PROMPT_COMMAND" ]; then
+    PROMPT_COMMAND="$1"
+  else
+    PROMPT_COMMAND=${PROMPT_COMMAND%% }; # remove trailing spaces
+    PROMPT_COMMAND=${PROMPT_COMMAND%\;}; # remove trailing semi-colon
+
+    case ";$PROMPT_COMMAND;" in
+      *";$1;"*)
+        # echo "PROMPT_COMMAND already contains: $1"
+        :;;
+      *)
+        PROMPT_COMMAND="$PROMPT_COMMAND;$1"
+        # echo "PROMPT_COMMAND does not contain: $1"
+        ;;
+    esac
+  fi
+}
+add_on_exit install_prompt
