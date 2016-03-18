@@ -19,4 +19,4 @@ function prompt_command() {
     PS1="$blue\W/$bold_blue$(rvm_version_prompt)$bold_green$(__git_ps1 " (%s)") ${normal}$ "
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

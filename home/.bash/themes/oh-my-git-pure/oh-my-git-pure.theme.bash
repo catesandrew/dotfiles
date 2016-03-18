@@ -98,10 +98,10 @@ function oh_my_git_cwd_prompt {
 }
 
 function oh_my_git_last_status_prompt {
-  if [[ "$1" -eq 0 ]]; then
+  if [[ "$ret_value" -eq 0 ]]; then
     LAST_STATUS_PROMPT=""
   else
-    LAST_STATUS_PROMPT=" ${LAST_STATUS} "
+    LAST_STATUS_PROMPT=" ${ret_value} "
   fi
 }
 
@@ -133,7 +133,7 @@ scm_prompt() {
   fi
 }
 
-function oh_my_git_pure_prompt() {
+function _oh_my_git_pure_prompt() {
   # ps_host="${bold_blue}\h${normal}";
   # ps_user="${green}\u${normal}";
   # ps_user_mark="${green} $ ${normal}";
@@ -150,14 +150,13 @@ function oh_my_git_pure_prompt() {
   # esac
 
   RIGHT_PROMPT_LENGTH=1
-  local LAST_STATUS="$?"
   local local_git_root
 
   ## left prompt ##
   oh_my_git_scm_prompt
   local_git_root="$(find_git_root)"
   oh_my_git_cwd_prompt "$local_git_root"
-  oh_my_git_last_status_prompt LAST_STATUS
+  oh_my_git_last_status_prompt
 
   LEFT_PROMPT="${SCM_PROMPT}:${CWD_PROMPT}"
 
@@ -167,4 +166,6 @@ function oh_my_git_pure_prompt() {
   PS1="${LEFT_PROMPT}${LAST_STATUS_PROMPT}${green} $ ${normal}"
 }
 
-PROMPT_COMMAND=oh_my_git_pure_prompt;
+# PROMPT_COMMAND=_oh_my_git_pure_prompt;
+# install_prompt _oh_my_git_pure_prompt
+precmd_functions+=(_oh_my_git_pure_prompt)

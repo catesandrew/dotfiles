@@ -25,4 +25,4 @@ function prompt_command() {
       $arrow $prompt"
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

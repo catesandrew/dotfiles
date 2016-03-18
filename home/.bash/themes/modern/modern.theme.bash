@@ -51,6 +51,4 @@ ${bold_red}└─▪${normal} "
 
 PS2="└─▪ "
 
-
-
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt)

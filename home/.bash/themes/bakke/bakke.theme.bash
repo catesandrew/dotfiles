@@ -18,4 +18,4 @@ function prompt_command() {
     PS1="\n${cyan}\h: ${reset_color} ${yellow}\w ${green}$(scm_prompt_info)\n${reset_color}→ "
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

@@ -38,10 +38,6 @@ doubletime_scm_prompt() {
 }
 
 function prompt_setter() {
-  # Save history
-  history -a
-  history -c
-  history -r
   if [[ -z "$THEME_PROMPT_CLOCK_FORMAT" ]]
   then
       clock="\t"
@@ -55,7 +51,7 @@ $(doubletime_scm_prompt)$reset_color $ "
   PS4='+ '
 }
 
-PROMPT_COMMAND=prompt_setter
+precmd_functions+=(prompt_setter)
 
 git_prompt_status() {
   local git_status_output

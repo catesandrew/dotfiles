@@ -177,4 +177,4 @@ function prompt() {
     PS4='+ '
 }
 
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt)

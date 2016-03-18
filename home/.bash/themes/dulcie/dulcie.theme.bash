@@ -5,4 +5,4 @@ prompt() {
   PS1="${reset_color}[\u@\h$(scm_prompt_info)${reset_color} \W]\$ "
 }
 
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt)

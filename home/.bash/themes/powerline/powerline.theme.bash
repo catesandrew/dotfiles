@@ -80,24 +80,21 @@ function powerline_cwd_prompt {
 }
 
 function powerline_last_status_prompt {
-    if [[ "$1" -eq 0 ]]; then
+    if [[ "$ret_value" -eq 0 ]]; then
         LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
     else
-        LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_THEME_COLOR} ${LAST_STATUS_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}$(set_rgb_color - ${LAST_STATUS_THEME_PROMPT_COLOR}) ${LAST_STATUS} ${normal}$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
+        LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_THEME_COLOR} ${LAST_STATUS_THEME_PROMPT_COLOR})${THEME_PROMPT_SEPARATOR}${normal}$(set_rgb_color - ${LAST_STATUS_THEME_PROMPT_COLOR}) ${ret_value} ${normal}$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -)${THEME_PROMPT_SEPARATOR}${normal}"
     fi
 }
 
 function powerline_prompt_command() {
-    local LAST_STATUS="$?"
-
     powerline_shell_prompt
     powerline_virtualenv_prompt
     powerline_scm_prompt
     powerline_cwd_prompt
-    powerline_last_status_prompt LAST_STATUS
+    powerline_last_status_prompt
 
     PS1="${SHELL_PROMPT}${VIRTUALENV_PROMPT}${SCM_PROMPT}${CWD_PROMPT}${LAST_STATUS_PROMPT} "
 }
 
-PROMPT_COMMAND=powerline_prompt_command
-
+precmd_functions+=(powerline_prompt_command)

@@ -1,10 +1,6 @@
 source "$BASH_IT/themes/doubletime/doubletime.theme.bash"
 
 function prompt_setter() {
-  # Save history
-  history -a
-  history -c
-  history -r
   if [[ -z "$THEME_PROMPT_CLOCK_FORMAT" ]]
   then
       clock="\t"
@@ -19,4 +15,4 @@ $(doubletime_scm_prompt)$reset_color $ "
   PS4='+ '
 }
 
-PROMPT_COMMAND=prompt_setter
+precmd_functions+=(prompt_setter)

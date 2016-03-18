@@ -123,6 +123,4 @@ ${D_INTERMEDIATE_COLOR}$ ${D_DEFAULT_COLOR}"
   PS2="${D_INTERMEDIATE_COLOR}$ ${D_DEFAULT_COLOR}"
 }
 
-# Runs prompt (this bypasses bash_it $PROMPT setting)
-PROMPT_COMMAND=prompt
-
+precmd_functions+=(prompt)

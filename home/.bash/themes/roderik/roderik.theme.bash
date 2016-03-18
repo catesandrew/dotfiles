@@ -12,4 +12,4 @@ function prompt_command() {
     fi
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

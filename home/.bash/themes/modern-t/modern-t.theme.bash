@@ -53,4 +53,4 @@ PS2="└─▪ "
 
 
 
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt)

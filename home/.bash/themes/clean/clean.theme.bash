@@ -17,4 +17,4 @@ function prompt_command() {
     RPROMPT='[\t]'
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

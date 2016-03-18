@@ -149,10 +149,10 @@ function powerline_cwd_prompt {
 }
 
 function powerline_last_status_prompt {
-    if [[ "$1" -eq 0 ]]; then
+    if [[ "$ret_value" -eq 0 ]]; then
         LAST_STATUS_PROMPT=""
     else
-        LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -) ${LAST_STATUS} ${normal}"
+        LAST_STATUS_PROMPT="$(set_rgb_color ${LAST_STATUS_THEME_PROMPT_COLOR} -) ${ret_value} ${normal}"
     fi
 }
 
@@ -216,7 +216,6 @@ function powerline_in_vim_prompt {
 
 
 function powerline_prompt_command() {
-    local LAST_STATUS="$?"
     local MOVE_CURSOR_RIGHTMOST='\033[500C'
     SEGMENT_AT_LEFT=0
     SEGMENT_AT_RIGHT=0
@@ -228,7 +227,7 @@ function powerline_prompt_command() {
     powerline_virtualenv_prompt
     powerline_rvm_prompt
     powerline_cwd_prompt
-    powerline_last_status_prompt LAST_STATUS
+    powerline_last_status_prompt
 
     LEFT_PROMPT="${SCM_PROMPT}${VIRTUALENV_PROMPT}${RVM_PROMPT}${CWD_PROMPT}${MOVE_CURSOR_RIGHTMOST}"
 
@@ -249,4 +248,4 @@ function powerline_prompt_command() {
     PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
 }
 
-PROMPT_COMMAND=powerline_prompt_command
+precmd_functions+=(powerline_prompt_command)

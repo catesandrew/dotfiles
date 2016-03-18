@@ -20,4 +20,4 @@ function prompt_command() {
     PS1="${no_color}\u:$(hostname)${normal}:${bold_yellow}\W/${normal} $(git_prompt_info)${reset_color}$ "
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)

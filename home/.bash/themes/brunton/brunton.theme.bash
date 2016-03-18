@@ -31,4 +31,4 @@ ${white}>${normal} "
 
 }
 
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt_command)

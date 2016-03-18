@@ -40,4 +40,4 @@ pure_prompt() {
     esac
 }
 
-PROMPT_COMMAND=pure_prompt;
+precmd_functions+=(pure_prompt)

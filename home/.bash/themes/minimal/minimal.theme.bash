@@ -7,4 +7,4 @@ prompt() {
   PS1="$(scm_prompt_info)${reset_color} ${cyan}\W${reset_color} "
 }
 
-PROMPT_COMMAND=prompt
+precmd_functions+=(prompt)

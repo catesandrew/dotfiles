@@ -52,4 +52,4 @@ function prompt_command() {
     PS1="${prompt_info}${green}${wrap_char}→${reset_color} "
 }
 
-PROMPT_COMMAND=prompt_command;
+precmd_functions+=(prompt_command)
