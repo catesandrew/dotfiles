@@ -6,5 +6,12 @@
 
 BASH_NO=no . /etc/profile
 
+TMPFILE=$(mktemp -t premailer_data) || exit 1
+# The `sed` command removes `<o:p></o:p>` which appears to not work well with `premailer`.
+#  These tags are described here: http://stackoverflow.com/questions/7808968/what-do-op-elements-do-anyway
+cat | perl -pe 's,</?o:[^>]*>,,g' >${TMPFILE}
+
 export PYTHONIOENCODING=utf-8
-python -m premailer --remove-classes --strip-important --disable-validation --pretty
+if ! (cat ${TMPFILE} | python -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses) ; then
+  cat ${TMPFILE} | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | python -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses
+fi
