@@ -1,13 +1,12 @@
 # Reload Library
 alias reload='source ~/.bash_profile'
 
-# List directory contents
-alias sl=ls
-
 # Compact view, show hidden
 alias la='ls -AF'
 # Use a long listing format ##
-alias ll='ls -al'
+# alias ll='ls -al'
+# Converts the symbolic permissions to octal (ie: numbers)
+alias ll="ls -al | sed -e 's/--x/1/g' -e 's/-w-/2/g' -e 's/-wx/3/g' -e 's/r--/4/g' -e 's/r-x/5/g' -e 's/rw-/6/g' -e 's/rwx/7/g' -e 's/---/0/g'"
 # extra info compared to "l"
 #alias ll='ls -lhrt'
 alias l='ls -a'
@@ -18,8 +17,6 @@ alias l1='ls -1'
 # Long form no user group, color
 # alias l="ls -oG"
 
-# Order by last modified, long form no user group, color
-# alias lt="ls -toG"
 # List all except . and ..., color, mark file types, long form no user group, file size
 #alias la="ls -AGFoh"
 # List all except . and ..., color, mark file types, long form no use group, order by last modified, file size
@@ -28,6 +25,29 @@ alias lat="ls -AGFoth"
 alias l.='ls -d .*'
 # list directories
 alias lld='ls -lUd */'
+
+# There are other switches to GNU ls which are less frequently used, some of
+# which turn out to be very useful for programming:
+# -S — Sort by filesize.
+
+# List files in order of last modification date, newest first. This is useful
+# for very large directories when you want to get a quick list of the most
+# recent files changed, maybe piped through head or sed 10q. Probably most
+# useful combined with -l. If you want the oldest files, you can add -r to
+# reverse the list.
+alias lt='ls -tl'
+# Order by last modified, long form no user group
+alias lt="ls -toG"
+# Group files by extension; handy for polyglot code, to group header files and
+# source files separately, or to separate source files from directories or build
+# files.
+alias lx='ls -X'
+# Naturally sort version numbers in filenames.
+alias lv='ls -v'
+# List files recursively. This one is good combined with -l and pipedthrough a
+# pager like less.
+alias lr='ls -Rl'
+alias lxr='ls -XRl'
 
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
@@ -41,7 +61,6 @@ alias irc="$IRC_CLIENT"
 alias cd..='cd ..'
 
 # a quick way to get out of current directory
-alias ..='cd ..'
 alias ..='cd ..'                # Go up one directory
 alias ...='cd ../../../'
 # alias ...='cd ../..'            # Go up two directories
@@ -100,3 +119,5 @@ alias headerc='curl -I --compress' # find out if remote server supports gzip /
                                    # mod_deflate or not #
 
 alias wget='wget -c'            # Resume wget by default
+
+alias ct='column -t'
