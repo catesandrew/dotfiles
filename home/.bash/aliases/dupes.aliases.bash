@@ -22,6 +22,10 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     alias xargs='gxargs'
   fi
 
+  if brew_contains_element "gnu-sed"; then
+    alias sed='gsed'
+  fi
+
   if brew_contains_element "coreutils"; then
     export COREUTILS_HOME="${__dot_brew_home}/opt/coreutils"
     export MANPATH="${COREUTILS_HOME}/libexec/gnuman:$MANPATH"
