@@ -39,12 +39,6 @@ if [ "$(uname)" == "Darwin"  ]; then
                 vim "$@"
             fi
             ;;
-        *.md )
-            /usr/local/bin/mmdc "$1"
-            ;;
-        *.txt )
-            /usr/local/bin/mmdc "$1"
-            ;;
         * )
             if hash mvim 2>/dev/null; then
                 mvim -f -c "au VimLeave * maca hide:" "$@"
@@ -60,12 +54,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux"  ]; then
         *_EDITMSG|*MERGE_MSG|*_TAGMSG )
             vim "$@"
             # vim "$1"
-            ;;
-        *.md )
-            mmdc "$1"
-            ;;
-        *.txt )
-            mmdc "$1"
             ;;
         * )
             vim "$@"
