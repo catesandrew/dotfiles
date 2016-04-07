@@ -92,3 +92,37 @@ yell() { echo "$0: $*" >&2; }
 die() { yell "$*"; exit 111; }
 try() { "$@" || die "cannot $*"; }
 asuser() { sudo su - "$1" -c "${*:2}"; }
+
+# Sort the Body of Output While Leaving the Header on the First Line Intact
+#
+# I find myself wanting to sort the output of commands that contain headers.
+# After the sort is performed the header ends up sorted right along with the
+# rest of the content. This function will keep the header line intact and allow
+# sorting of the remaining lines of output. Here are some examples to illustrate
+# the usage of this function:
+# command | body sort
+# cat file | body sort
+
+body() {
+  IFS= read -r header
+  printf '%s\n' "$header"
+  "$@"
+}
+
+# Get an excuse in a single command...
+excuse() {
+  # echo `telnet bofh.jeffballard.us 666 2>/dev/null` |grep --color -o "Your excuse is:.*$"
+  # Created by Ben Okopnik on Mon Apr  1 04:12:39 EST 2002
+  line=$(($RANDOM%`grep -c '$' $BASH_IT/excuses`))
+
+  cat -n $BASH_IT/excuses|while read a b
+  do
+    [ "$a" = "$line" ] && { echo "Your excuse is: $b"; break; }
+  done
+}
+
+# Use the one liner below to relocate a file or directory, but keep it
+# accessible on the old location through a symlink.
+lmv() {
+  [ -e "$1" -a -d "$2" ] && mv "$1" "$2"/ && ln -s "$2"/"$(basename "$1")" "$(dirname "$1")";
+}
