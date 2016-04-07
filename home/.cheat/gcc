@@ -17,5 +17,36 @@ gcc -m64
 # With this option, no warning / error will be reported for the files in {/usr/include/myPersonnal/lib/}
 gcc -isystem /usr/include/myPersonnal/lib/
 
+# C files and headers can be explicitly included in a compilation call with the -I parameter:
+gcc -I/usr/include/somelib.h example.c -o example
+
+# Similarly, if the code needs to be dynamically linked against a compiled
+# system library available in common locations like /lib or /usr/lib, such as
+# ncurses, that can be included with the -l parameter:
+gcc -lncurses example.c -o example
+
+# If you have a lot of necessary inclusions and links in your compilation
+# process, it makes sense to put this into environment variables:
+export CFLAGS=-I/usr/include/somelib.h
+export CLIBS=-lncurses
+gcc $CFLAGS $CLIBS example.c -o example
+
 # Build a GUI for windows (Mingw) (Will disable the term/console)
 gcc -mwindows
+
+# You can compile object code from a C source file like so:
+gcc -c example.c -o example.o
+
+# Assuming it’s a valid C program, this will generate an unlinked binary object
+# file called example.o in the current directory, or tell you the reasons it
+# can’t. You can inspect its assembler contents with the objdump tool:
+objdump -D example.o
+
+# Alternatively, you can get gcc to output the appropriate assembly code for the
+# object directly with the -S parameter:
+gcc -c -S example.c -o example.s
+
+# This kind of assembly output can be particularly instructive, or at least
+# interesting, when printed inline with the source code itself, which you can do
+# with:
+gcc -c -g -Wa,-a,-ad example.c > example.lst

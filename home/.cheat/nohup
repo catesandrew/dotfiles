@@ -1,0 +1,10 @@
+# Normally when you start a job in the background and log out of your session
+# the job gets killed. One way to ensure a command keeps running after you
+# disconnect from the host is to use the nohup command. No hup stands for no
+# hang up. By default the output of the command is stored in a file named
+# "nohup.out" in the directory the program was launched in. You can examine the
+# contents of this file later to see the output of the command. To use a
+# different filename, employ redirection.
+
+# Run a Command Immune to Hangups, Allowing the Job to Run after You Disconnect
+nohup /usr/local/bin/upgradedb.sh &

@@ -21,3 +21,7 @@ diff -s version1 version2
 
 # To diff the output of two commands or scripts:
 diff <(command1) <(command2)
+
+# multiple command output into a single program:
+# Will show you a diff of files in the root of dir_1 and dir_2
+diff -u <(ls -c1 dir_1) <(ls -c1 dir_2)

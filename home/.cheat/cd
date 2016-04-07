@@ -1,0 +1,10 @@
+# Change to the Previous Working Directory
+cd -
+
+# Running a second command with the same arguments as the previous command, use
+# `!*` to repeat all arguments or `!:2` to use the second argument. `!$` uses
+# the final argument.
+cd /home/user/foo
+# => cd: /home/user/foo: No such file or directory
+mkdir !*
+# => mkdir /home/user/foo

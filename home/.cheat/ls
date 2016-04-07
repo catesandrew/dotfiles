@@ -5,7 +5,7 @@ ls path/to/the/target/directory
 ls -a
 
 # Displays all files, along with the size (with unit suffixes) and timestamp
-ls -lh 
+ls -lh
 
 # Display files, sorted by size
 ls -S
@@ -15,3 +15,29 @@ ls -d */
 
 # Display directories only, include hidden
 ls -d .*/ */
+
+# Using ls is probably one of the first commands an administrator will learn for
+# getting a simple list of the contents of the directory. Most administrators
+# will also know about the -a and -l switches, to show all files including dot
+# files and to show more detailed data about files in columns, respectively.
+#
+# There are other switches to GNU ls which are less frequently used, some of
+# which turn out to be very useful for programming:
+#
+# -t List files in order of last modification date, newest first. This is
+#    useful for very large directories when you want to get a quick list of the
+#    most recent files changed, maybe piped through head or sed 10q. Probably
+#    most useful combined with -l. If you want the oldest files, you can add -r
+#    to reverse the list.
+# -X Group files by extension; handy for polyglot code, to group header files
+#    and source files separately, or to separate source files from directories
+#    or build files.
+# -v Naturally sort version numbers in filenames.
+# -S Sort by filesize.
+# -R List files recursively. This one is good combined with -l and pipedthrough
+#    a pager like less.
+#
+# Since the listing is text like anything else, you could, for example, pipe the
+# output of this command into a vim process, so you could add explanations of
+# what each file is for and save it as an inventory file or add it to a README:
+ls -XR | vim -

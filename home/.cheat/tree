@@ -1,0 +1,8 @@
+# View Files and Directories in a Tree Format
+tree
+tree -d
+tree -L number
+
+# The tree command displays files and directories in a tree like format. If you
+# only want to see the directory structure, use the -d option. To limit the
+# depth of the tree, use the -L option followed by a number.

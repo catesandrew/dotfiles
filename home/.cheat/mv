@@ -1,0 +1,19 @@
+### Quickly Change a File's Extension
+mv file{.old,.new}
+
+# You can use brace expansion to quickly create a backup copy of a file. Brace
+# expansion allows you to create multiple command line arguments from a single
+# argument. The single argument is combined with all the strings that are given
+# within the braces and creates as many new arguments as brace strings. Values
+# in the braces can either be comma separated strings or a sequence expression.
+# Examples of sequence expressions include {1..5} and {a..z}.
+
+# To rename a file with a new extension employ brace expansion. This example
+# changes a ".txt" file to a ".doc" file.
+
+ls report
+# report.txt
+
+mv report.{txt,doc}
+# ls report
+#    report.doc

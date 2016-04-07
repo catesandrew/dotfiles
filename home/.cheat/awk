@@ -1,3 +1,4 @@
+# Useful awk programs are often short, just a line or two.
 # sum integers from a file or stdin, one integer per line:
 printf '1\n2\n3\n' | awk '{ sum += $1} END {print sum}'
 
@@ -9,3 +10,97 @@ seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR,
 
 # Specify output separator character
 printf '1 2 3' | awk 'BEGIN {OFS=":"}; {print $1,$2,$3}'
+
+# Here is a collection of useful, short programs to get you started. Some of
+# these programs contain constructs that haven't been covered yet.
+
+# This program prints the maximum number of fields on any input line.
+awk '{ if (NF > max) max = NF }
+     END { print max }'
+
+# This program prints every line longer than 80 characters. The sole rule has a
+# relational expression as its pattern, and has no action (so the default
+# action, printing the record, is used).
+awk 'length($0) > 80'
+
+# This program prints every line that has at least one field. This is an easy
+# way to delete blank lines from a file (or rather, to create a new file similar
+# to the old file but from which the blank lines have been deleted).
+awk 'NF > 0'
+
+# This program also prints every line that has at least one field. Here we allow
+# the rule to match every line, then decide in the action whether to print.
+awk '{ if (NF > 0) print }'
+
+# This program prints 7 random numbers from 0 to 100, inclusive.
+awk 'BEGIN { for (i = 1; i <= 7; i++)
+               print int(101 * rand()) }'
+
+# This program prints the total number of bytes used by files.
+ls -l files | awk '{ x += $4 } ; END { print "total bytes: " x }'
+
+# This program prints the maximum line length of file. The input is piped
+# through the expand program to change tabs into spaces, so the widths compared
+# are actually the right-margin columns.
+expand file | awk '{ if (x < length()) x = length() }
+                  END { print "maximum line length is " x }'
+
+# This program prints a sorted list of the login names of all users.
+awk 'BEGIN { FS = ":" }
+     { print $1 | "sort" }' /etc/passwd
+
+# This programs counts lines in a file.
+awk '{ nlines++ }
+     END { print nlines }'
+
+# This program also counts lines in a file, but lets awk do the work.
+awk 'END { print NR }'
+
+# This program adds line numbers to all its input files, similar to `cat -n'.
+awk '{ print NR, $0 }'
+
+# CSV parsing, prints 3rd field
+awk -F "\"*,\"*" '{print $3}' file.csv
+
+# Grab the Last Word on a Line of Output
+awk '{print $NF}' file
+cat file | awk '{print $NF}'
+
+# You can have awk print fields by using $FIELD_NUMBER notation. To print the
+# first field use $1, to print the second use $2, etc. However, if you don't
+# know the number of fields, or don't care to count them, use $NF which
+# represents the total number of fields. Awk separates fields on spaces, but you
+# can use the -F argument to change that behavior. Here is how to print all the
+# shells that are in use on the system. Use a colon as the field separator and
+# then print the last field.
+awk -F: '{print $NF}' /etc/passwd | sort -u
+
+# If you want to display the shell for each user on the system you can do this.
+awk -F: '{print $1,$NF}' /etc/passwd | sort | column -t
+
+# Display a Block of Text between Two Strings
+awk '/start-pattern/,/stop-pattern/' file.txt
+command | awk '/start-pattern/,/stop-pattern/'
+
+# The grep command is great at extracting a single line of text. But what if you
+# need to capture an entire block of text? Use awk and provide it a start and
+# stop pattern. The pattern can simply be a string or even a regular expression.
+sudo dmidecode | awk /Processor/,/Manuf/
+awk '/worker.c/,/^$/' httpd.conf
+
+# Sum All the Numbers in a given Column of a Text
+
+awk '{ sum += $1 } END { print sum }' file
+cat file | awk '{ sum += $1 } END { print sum }'
+
+# awk can be used to tally up a column of values. You can use this trick to add
+# up all the disk space used across all the file systems on a given system, for
+# example:
+df -mt ext4
+df -mt ext4 | awk '{ sum += $3 } END {print sum}'
+sudo dmidecode --type memory
+sudo dmidecode --type memory | grep 'Size:' | awk '{sum+=$2} END {print sum}'
+
+# Extract the Nth Line from a File
+awk 'NR==N'
+awk 'NR==74' deploy.sh

@@ -1,3 +1,13 @@
+# Delete a Block of Text between Two Strings
+sed '/start-pattern/,/stop-pattern/d' file
+command | sed '/start-pattern/,/stop-pattern/d' file
+
+# You can delete a block of text with the sed command by providing it a start
+# and stop pattern and telling it to delete that entire range. The patterns can
+# be strings or regular expressions. This example deletes the first seven
+# lines since "#" matches the first line and "^$" matches the seventh line.
+sed '/#/,/^$/d' ports.conf
+
 # To replace all occurrences of "day" with "night" and write to stdout:
 sed 's/day/night/g' file.txt
 
@@ -15,3 +25,21 @@ sed '/^$/d' file.txt
 
 # To replace newlines in multiple lines
 sed ':a;N;$!ba;s/\n//g'  file.txt
+
+# To replace non breaking space
+# octal 240 = decimal 160 = hex A0
+printf '\xA0\n' | sed 's/\xA0//g'
+printf '\xA0\n' | tr '\240' ''
+# U+00A0
+printf '\x00\xA0\n' | sed 's/\x00\xA0//g'
+# UTF-8
+printf '\xC2\xA0\n' | sed 's/\xC2\xA0//g'
+
+# Example: Replace non-breaking space in a file
+sed -i -r 's/\xC2\xA0//g' command-line-fu.md
+
+# To replace &amp; with &
+sed -i -r 's/&amp;/\&/g'
+
+# Replace a String in Multiple Files
+find /path -type f -exec sed -i.bak 's/string/replacement/g' {} \;

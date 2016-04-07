@@ -33,3 +33,8 @@ curl http://ifconfig.me/all/json
 
 # Limit the rate of a download
 curl --limit-rate 1000B -O http://path.to.the/file
+
+# Get Your Public IP from the Command Line Using Curl
+curl ifconfig.me
+curl ifconfig.me/ip
+curl ifconfig.me/host

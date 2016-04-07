@@ -1,0 +1,9 @@
+# Search Wikipedia from the Command Line
+dig +short txt <string>.wp.dg.cx
+host -t txt <string>.wp.dg.cx
+
+# If you need to quickly look up some information on a subject, you can search
+# wikipedia using DNS. The name server returns wikipedia article summaries as
+# TXT records.
+dig +short txt linux.wp.dg.cx
+host -t txt bash_shell.wp.dg.cx

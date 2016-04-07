@@ -1,0 +1,17 @@
+# Use the column command to format text into multiple columns. By using the -t
+# option, column will count the number of columns the input contains and create
+# a table with that number of columns. This can really make the output of many
+# command easier to read. I find myself using this so often that I created an
+# alias for the command.
+
+# alias ct='column -t
+
+echo -e 'one two\nthree four' | ct
+
+# one   two
+# three four
+
+mount -t ext4 | ct
+
+# /dev/vda2 on /     type ext4 (rw)
+# /dev/vda1 on /boot type ext4 (rw)

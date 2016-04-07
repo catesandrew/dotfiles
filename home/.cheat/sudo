@@ -1,8 +1,7 @@
-# To tee stdout to a file:
-ls | tee outfile.txt
+# Let user foo run command /sbin/bar as root, no password prompt:
+/etc/sudoers
 
-# To tee stdout and append to a file:
-ls | tee -a outfile.txt
+foo ALL=NOPASSWD: /sbin/bar
 
 # Append Text to a File Using sudo
 echo text | sudo tee -a file

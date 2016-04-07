@@ -1,6 +1,6 @@
 #replace : with new line
 echo $PATH|tr ":" "\n" #equivalent with:
-echo $PATH|tr -t ":" \n 
+echo $PATH|tr -t ":" \n
 
 #remove all occurance of "ab"
 echo aabbcc |tr -d "ab"
@@ -16,7 +16,55 @@ echo aabbccd |tr -c "ab\n" 1
 #output: aabb111 with new line
 
 #Preserve all alpha(-c). ":-[:digit:] etc" will be translated to "\n". sequeeze mode.
-echo $PATH|tr -cs "[:alpha:]" "\n" 
+echo $PATH|tr -cs "[:alpha:]" "\n"
 
 #ordered list to unordered list
 echo "1. /usr/bin\n2. /bin" |tr -cs " /[:alpha:]\n" "+"
+
+# Create a list of the words in file1, one per line, where a word is taken to be
+# a maximal string of letters.
+tr -cs "[:alpha:]" "\n" < file1
+
+echo "Round\t the\brugged" | tr -cs "[:alpha:]" "\n"
+
+# Translate the contents of file1 to upper-case.
+tr "[:lower:]" "[:upper:]" < file1
+
+# A less locale-portable, but very common way to translate lowercase to upper case.
+echo "hello world" | tr a-z A-Z
+
+# Strip out non-printable characters from file1.
+tr -cd "[:print:]" < file1
+
+# Remove diacritical marks from all accented variants of the letter `e'
+tr "[=e=]" "e"
+
+# Change the Case of a String
+tr [:upper:] [:lower:]
+tr [:lower:] [:upper:]
+
+# When you need to change the case of a string, use the tr command. You can
+# supply ranges to tr like "tr a-z A-Z" or use "tr [:lower:][:upper]".
+echo "PRODUCTION" | tr [:upper:] [:lower:]
+
+# Display Your Command Search Path in a Human Readable Format
+echo $PATH | tr ':' '\n'
+
+# Remove a Character or set of Characters from a String or Line of Output
+cat file | tr -d "X"
+cat file | tr -d [set]
+
+# The tr command is typically used to translate characters, but with the -d
+# option it deletes characters. This example shows how to get rid of quotes.
+
+# cat cities.csv
+#
+# 1,"Chicago","USA","IL"
+# 2,"Austin","USA","TX"
+# 3,"Santa Cruz","USA","CA"
+cat cities.csv | cut -d, -f2
+cat cities.csv | cut -d, -f2 | tr -d '"'
+
+# You can also let tr delete a group of characters. This example removes all the
+# vowels from the output.
+cat cities.csv | cut -d, -f2 | tr -d [aeiou]

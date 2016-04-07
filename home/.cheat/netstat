@@ -1,7 +1,20 @@
-# WARNING ! netstat is deprecated. Look below.
+# Here are the descriptions of the netstat options used in order to get a list
+# of programs and the ports that they are listening on.
+# -n show numerical addresses instead of determining symbolic names
+# -u include the UDP protocol
+# -t include the TCP protocol
+# -l show only listening sockets
+# -p show the PID and program name
 
-# To view which users/processes are listening to which ports:
-sudo netstat -lnptu
+# Find out Which Programs Are Listening on Which Ports
+sudo netstat -nutlp
+
+# NOTE: Mac OS X cannot display PIDs. Use one of these instead. Substitute $PORT
+# with the port number or a comma-separated list of port number.
+sudo lsof -n -i4TCP:$PORT | grep LISTEN
+sudo lsof -n -iTCP:$PORT | grep LISTEN
+sudo lsof -n -i:$PORT | grep LISTEN
+sudo lsof -i -n -P | grep TCP
 
 # To view routing table (use -n flag to disable DNS lookups):
 netstat -r

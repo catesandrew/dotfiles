@@ -1,0 +1,4 @@
+# The file tool gives you a one-line summary of what kind of file you’re looking
+# at, based on its extension, headers and other cues. This is very handy used
+# with find when examining a set of unfamiliar files:
+find -exec file {} \;

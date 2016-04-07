@@ -1,0 +1,24 @@
+# Quickly Make a Backup of a File
+cp file{,.bak}
+
+# You can use brace expansion to quickly create a backup copy of a file. Brace
+# expansion allows you to create multiple command line arguments from a single
+# argument. The single argument is combined with all the strings that are given
+# within the braces and creates as many new arguments as brace strings. Values
+# in the braces can either be comma separated strings or a sequence expression.
+# Examples of sequence expressions include {1..5} and {a..z}.
+
+sudo cp /etc/passwd{,.bak}
+# ls /etc/passwd
+#    /etc/passwd /etc/passwd.bak
+
+mkdir -p ~/my-app/{bin,lib,log}
+# ls ~/my-app/
+#    bin lib log
+
+echo 10.0.0.{0..7}
+# 10.0.0.0 10.0.0.1 10.0.0.2 10.0.0.3 10.0.0.4 10.0.0.5 10.0.0.6 10.0.0.7
+
+# Using expansion to move a file aside without having to type the file name
+# twice
+cp ReallyLongFileNameYouDontWantToTypeTwice{,.orig}

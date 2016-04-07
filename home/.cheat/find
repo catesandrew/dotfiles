@@ -1,3 +1,15 @@
+# find has a complex filtering syntax all of its own; the following examples
+# show some of the most useful filters you can apply to retrieve lists of
+# certain files:
+# -name '*.c': Find files with names matching a shell-style pattern.
+# -iname for a case-insensitive search.
+# -path '*test*': Find files with paths matching a shell-style pattern.
+# -ipath for a case-insensitive search.
+# -mtime -5: Find files edited within the last five days. You can use +5 instead
+#   to find files edited before five days ago.
+# -newer server.c: Find files more recently modified than server.c.
+# -type d: Find directories. For files, use -type f; for symbolic links, use -type l.
+
 # To find files by case-insensitive extension (ex: .jpg, .JPG, .jpG):
 find . -iname "*.jpg"
 
@@ -42,3 +54,85 @@ find . ! -iwholename '*.git*' -type f
 
 # Find all files that have the same node (hard link) as MY_FILE_HERE
 find . -type f -samefile MY_FILE_HERE 2>/dev/null
+
+# To search current directory and sub directories for a specific file:
+find . -name "rc.conf" -print
+
+# Same, but case insensitive:
+find . -iname "rc.conf" -print
+
+# Search for both mpg & avi:
+find . -iname '*.mpg' -o -iname '*.avi'
+
+# Same, but files only:
+find . -type f -name "rc.conf" -print
+
+# To search the entire filesystem for a specific file:
+find / -name "rc.conf" -print
+
+# To search for content inside files:
+find . -name "*.css" -exec grep -l "#content" {} \;
+
+# To replace content inside files:
+find . -name "*.css" -exec sed -i -r 's/#(FF0000|F00)\b/#0F0/' {} \;
+# (replaces #FF0000 red w/ #00FF00 green )
+
+# To find files changed in the last 1 day
+find . -ctime -1 -type f
+
+# To find files larger than 1 Mb in /tmp
+find /tmp -size 1M -type f
+
+# To find files newer than main.css in ~/src
+find ~/src -newer main.css
+
+# To execute a command on every file/dir
+find [expression..] -exec [command..] '{}' \;
+
+# Example: find all files/dirs named CVS and delete them:
+find -name CVS -exec rm -Rf '{}' \;
+
+# Example: find all files containing a string:
+find * -exec grep -l '<string>' {} \;
+
+# To search only on the given directory:
+find [directory..] -maxdepth 1
+
+# Example: find all directories modified in the past day and permission 755:
+find . -type d -mtime 1 -perm 755
+
+# Example: find and fix all files that have permission o+w:
+find -type f -perm /002 -exec chmod o-w '{}' \;
+
+# Example: to find C source files edited in the last two days:
+find -name '*.c' -mtime -2
+
+# It’s usually a good idea to pipe it through sort:
+find | sort
+
+# If you want an ls -l style listing, you can add -ls as the action to find results:
+find -ls | sort -k 11
+
+# Find the Files That Are Using the Most Disk Space
+find / -type f -exec wc -c {} \; | sort -n
+
+# Delete Empty Directories
+find . -type d -empty -delete
+
+# An Easy-to-Read Recursive File Listing
+find . -type f -ls
+
+# Replace a String in Multiple Files
+find /path -type f -exec sed -i.bak 's/string/replacement/g' {} \;
+
+# To delete a file who's file name is a pain to define (eg. ^H^H^H) find it's
+# inode number with the command "ls -il". Use the line below to find and delete
+# the file.
+find . -inum 12345 | xargs rm
+
+# Note: on using xargs with find results. In most cases this should not really
+# be necessary, and it’s more robust to handle filenames with whitespace using
+# -exec or a while read -r loop
+find -name '*.c' | while IFS= read -r file; do
+  head "$file"
+done

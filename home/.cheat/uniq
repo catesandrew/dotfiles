@@ -1,4 +1,11 @@
-# show all lines without duplication
+# The `uniq` command omits adjacent duplicate lines from files. Since `uniq`
+# doesn't examine an entire file or stream of input for unique lines, only
+# unique adjacent lines, it is typically preceded by the `sort` command via a
+# pipe. You can have the `uniq` command count the unique occurrences of a string
+# by using the `-c` option. This comes in useful if you are trying to look
+# through log files for occurrences of the same message, PID, status code,
+# username, etc.
+
 # `sort -u` and `uniq` is the same effect.
 sort file | uniq
 
@@ -16,3 +23,19 @@ sort file | uniq -uc
 
 # count only duplicated lines
 sort file | uniq -dc
+
+# Let's find the all of the unique HTTP status codes in an apache web server log
+# file named access.log. To do this, print out the ninth item in the log file
+# with the `awk` command.
+tail -1 access.log
+tail -1 access.log | awk '{print $9}'
+awk '{print $9}' access.log | sort | uniq
+
+# Let's take it another step forward and count how many of each status code we have.
+awk '{print $9}' access.log | sort | uniq -c | sort -nr
+
+# Now let's see extract the status code and hour from the access.log file and
+# count the unique occurrences of those combinations. Next, lets sort them by
+# number of occurrences. This will show us the hours during which the website
+# was most active.
+cat access.log | awk '{print $9, $4}' | cut -c 1-4,18-19 | uniq -c | sort -n | tail

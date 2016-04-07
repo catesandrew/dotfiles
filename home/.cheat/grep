@@ -13,6 +13,20 @@ grep -f pattern_file file
 # Find lines NOT containing pattern
 grep -v pattern file
 
+# Don’t forget the case insensitivity flag either, since by default grep works
+# with fixed case:
+grep -iR somevar .
+
+# Also, you can print a list of files that match without printing the matches
+# themselves with `grep -l`:
+grep -lR someVar .
+
+# If you write scripts or batch jobs using the output of the above, use a while
+# loop with read to handle spaces and other special characters in filenames:
+grep -lR someVar | while IFS= read -r file; do
+  head "$file"
+done
+
 # You can grep with regular expressions
 grep "^00" file  #Match lines starting with 00
 grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" file  #Find IP add
@@ -27,3 +41,30 @@ ps aux | grep '[h]ttpd'
 
 # Colour in red {bash} and keep all other lines
 ps aux | grep -E --color 'bash|$'
+
+# Count the number of functions in all JS files
+grep -c function *.js
+
+# Print lines that DO NOT have "function"
+grep -v function *.js
+
+# List processes that match "pidgin" (non-Windows)
+#+ Use [] around the first letter to omit the 'grep' process.
+ps -ef | grep [p]idgin
+
+# Print a list of: function <function-name> and sort it
+grep -Eho "^\s*function \w+" *.js | sort
+
+# Print filenames, line #s, and lines that start with "(white space)function"
+grep -EHn "^\s*(function \w+|\w+ \= function)" *.js
+
+# Print only duplicate function names
+grep -hEo "^\s*function \w+" *.js | sort | uniq -d
+
+# Print a List of Files That Contain a given String
+grep -rl string .
+
+# Place a filename at the beginning of the line to make it easier to edit the search at the end of the command.
+</var/log/messages grep foo
+</var/log/messages grep bar
+</var/log/messages grep user1

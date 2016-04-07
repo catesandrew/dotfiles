@@ -21,3 +21,54 @@ lsof -c <command-name>
 
 # See this primer: http://www.danielmiessler.com/study/lsof/
 # for a number of other useful lsof tips
+
+# Show all connections
+lsof -i
+
+# Show only TCP connections (works the same for UDP)
+lsof -iTCP
+
+# -i :port shows all networking related to a given port
+lsof -i :22
+
+# To show connections to a specific host, use @host
+lsof -i@192.168.1.5
+
+# Show connections based on the host and the port using @host:port
+lsof -i@192.168.1.5:22
+
+# Grepping for "LISTEN" shows what ports your system is waiting for connections on
+lsof -i| grep LISTEN
+
+# Grepping for "ESTABLISHED" shows current active connections
+lsof -i| grep ESTABLISHED
+
+# Show what a given user has open using -u
+lsof -u ecable
+
+# See what files and network connections a command is using with -c
+lsof -c syslog-ng
+
+# Pointing to a file shows what's interacting with that file
+lsof /var/log/messages
+
+# The -p switch lets you see what a given process ID has open, which is good for learning more about unknown processes
+lsof -p 10075
+
+# The -t option returns just a PID
+lsof -t -c Mail
+
+# Using-a allows you to combine search terms, so the query below says, "show me everything running as daniel connected to 1.1.1.1"
+lsof -a -u ecable -i @1.1.1.1
+
+# Using the -t and -c options together you can HUP processes
+kill -HUP `lsof -t -c sshd`
+
+# You can also use the -t with -u to kill everything a user has open
+kill -9 `lsof -t -u daniel`
+
+# lsof +L1 shows you all open files that have a link count less than 1, often indicative of a cracker trying to hide something
+lsof +L1
+
+# Show Open Network Connections
+sudo lsof -Pni

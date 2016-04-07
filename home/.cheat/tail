@@ -12,3 +12,10 @@ tail -c N file
 
 # To show the last 10 lines of file and to wait for file to grow
 tail -f file
+
+# Watch Multiple Log Files at the Same Time
+sudo multitail /var/log/syslog /var/log/kern.log
+
+# To merge multiple files into one window, use the "-I" option. This intermixes
+# the output of both of the files. This can aid in troubleshooting a problem.
+sudo multitail /var/log/syslog -I /var/log/kern.log

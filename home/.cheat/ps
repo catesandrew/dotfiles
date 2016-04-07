@@ -13,3 +13,9 @@ ps -eo pid,user,command
 # Exclude grep from your grepped output of ps.
 # Add [] to the first letter. Ex: sshd -> [s]shd
 ps aux | grep '[h]ttpd'
+
+# List Processes, Sorted by Memory Usage
+ps aux | sort -nk 4
+
+# List Processes, Sorted by CPU Usage
+ps aux | sort -nk 3

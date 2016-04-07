@@ -9,3 +9,8 @@ sort -r file
 
 # To sort a file randomly:
 sort -R file
+
+df -h | body sort -k 5
+ps -eo pid,%cpu | head -1
+ps -eo pid,%cpu | sort -nrk2 | head
+ps -eo pid,%cpu | body sort -nrk2 | head
