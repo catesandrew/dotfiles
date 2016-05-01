@@ -4,6 +4,7 @@
         name          = 'Idle Fingers';
         css           = '
 
+.plaintext,
 .markdown {
   color: #333;
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -11,37 +12,48 @@
   line-height: 1.6;
 }
 
+.plaintext a,
 .markdown a {
   background-color: transparent;
 }
 
+.plaintext a:active,
+.plaintext a:hover,
 .markdown a:active,
 .markdown a:hover {
   outline: 0;
 }
 
+.plaintext strong,
 .markdown strong {
   font-weight: bold;
 }
 
+.plaintext h1,
 .markdown h1 {
   font-size: 2em;
   margin: 0.67em 0;
 }
 
+.plaintext img,
 .markdown img {
   border: 0;
 }
 
+.plaintext hr,
 .markdown hr {
   box-sizing: content-box;
   height: 0;
 }
 
+.plaintext pre,
 .markdown pre {
   overflow: auto;
 }
 
+.plaintext code,
+.plaintext kbd,
+.plaintext pre,
 .markdown code,
 .markdown kbd,
 .markdown pre {
@@ -49,53 +61,66 @@
   font-size: 1em;
 }
 
+.plaintext input,
 .markdown input {
   color: inherit;
   font: inherit;
   margin: 0;
 }
 
+.plaintext html input[disabled],
 .markdown html input[disabled] {
   cursor: default;
 }
 
+.plaintext input,
 .markdown input {
   line-height: normal;
 }
 
+.plaintext input[type="checkbox"],
 .markdown input[type="checkbox"] {
   box-sizing: border-box;
   padding: 0;
 }
 
+.plaintext table,
 .markdown table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
+.plaintext td,
+.plaintext th,
 .markdown td,
 .markdown th {
   padding: 0;
 }
 
+.plaintext *,
 .markdown * {
   box-sizing: border-box;
 }
 
+.plaintext input,
 .markdown input {
   font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
+.plaintext a,
 .markdown a {
   color: #4078c0;
   text-decoration: none;
 }
 
+.plaintext a:hover,
+.plaintext a:active,
 .markdown a:hover,
 .markdown a:active {
   text-decoration: underline;
 }
 
+.plaintext hr,
 .markdown hr {
   height: 0;
   margin: 15px 0;
@@ -105,17 +130,25 @@
   border-bottom: 1px solid #ddd;
 }
 
+.plaintext hr:before,
 .markdown hr:before {
   display: table;
   content: "";
 }
 
+.plaintext hr:after,
 .markdown hr:after {
   display: table;
   clear: both;
   content: "";
 }
 
+.plaintext h1,
+.plaintext h2,
+.plaintext h3,
+.plaintext h4,
+.plaintext h5,
+.plaintext h6,
 .markdown h1,
 .markdown h2,
 .markdown h3,
@@ -127,34 +160,43 @@
   line-height: 1.1;
 }
 
+.plaintext h1,
 .markdown h1 {
   font-size: 30px;
 }
 
+.plaintext h2,
 .markdown h2 {
   font-size: 21px;
 }
 
+.plaintext h3,
 .markdown h3 {
   font-size: 16px;
 }
 
+.plaintext h4,
 .markdown h4 {
   font-size: 14px;
 }
 
+.plaintext h5,
 .markdown h5 {
   font-size: 12px;
 }
 
+.plaintext h6,
 .markdown h6 {
   font-size: 11px;
 }
 
+.plaintext blockquote,
 .markdown blockquote {
   margin: 0;
 }
 
+.plaintext ul,
+.plaintext ol,
 .markdown ul,
 .markdown ol {
   padding: 0;
@@ -162,11 +204,17 @@
   margin-bottom: 0;
 }
 
+.plaintext ol ol,
+.plaintext ul ol,
 .markdown ol ol,
 .markdown ul ol {
   list-style-type: lower-roman;
 }
 
+.plaintext ul ul ol,
+.plaintext ul ol ol,
+.plaintext ol ul ol,
+.plaintext ol ol ol,
 .markdown ul ul ol,
 .markdown ul ol ol,
 .markdown ol ul ol,
@@ -174,59 +222,74 @@
   list-style-type: lower-alpha;
 }
 
+.plaintext dd,
 .markdown dd {
   margin-left: 0;
 }
 
+.plaintext code,
 .markdown code {
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
 }
 
+.plaintext pre,
 .markdown pre {
   margin-top: 0;
   margin-bottom: 0;
   font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
+.plaintext .select::-ms-expand,
 .markdown .select::-ms-expand {
   opacity: 0;
 }
 
+.plaintext:before,
 .markdown:before {
   display: table;
   content: "";
 }
 
+.plaintext:after,
 .markdown:after {
   display: table;
   clear: both;
   content: "";
 }
 
+.plaintext>*:first-child,
 .markdown>*:first-child {
   margin-top: 0 !important;
 }
 
+.plaintext>*:last-child,
 .markdown>*:last-child {
   margin-bottom: 0 !important;
 }
 
+.plaintext a:not([href]),
 .markdown a:not([href]) {
   color: inherit;
   text-decoration: none;
 }
 
+.plaintext .anchor,
 .markdown .anchor {
   display: inline-block;
-  padding-right: 2px;
-  margin-left: -18px;
 }
 
+.plaintext .anchor:focus,
 .markdown .anchor:focus {
   outline: none;
 }
 
+.plaintext h1,
+.plaintext h2,
+.plaintext h3,
+.plaintext h4,
+.plaintext h5,
+.plaintext h6,
 .markdown h1,
 .markdown h2,
 .markdown h3,
@@ -239,6 +302,12 @@
   line-height: 1.4;
 }
 
+.plaintext h1:hover .anchor,
+.plaintext h2:hover .anchor,
+.plaintext h3:hover .anchor,
+.plaintext h4:hover .anchor,
+.plaintext h5:hover .anchor,
+.plaintext h6:hover .anchor,
 .markdown h1:hover .anchor,
 .markdown h2:hover .anchor,
 .markdown h3:hover .anchor,
@@ -248,6 +317,7 @@
   text-decoration: none;
 }
 
+.plaintext h1,
 .markdown h1 {
   padding-bottom: 0.3em;
   font-size: 2.25em;
@@ -255,10 +325,12 @@
   border-bottom: 1px solid #eee;
 }
 
+.plaintext h1 .anchor,
 .markdown h1 .anchor {
   line-height: 1;
 }
 
+.plaintext h2,
 .markdown h2 {
   padding-bottom: 0.3em;
   font-size: 1.75em;
@@ -266,44 +338,60 @@
   border-bottom: 1px solid #eee;
 }
 
+.plaintext h2 .anchor,
 .markdown h2 .anchor {
   line-height: 1;
 }
 
+.plaintext h3,
 .markdown h3 {
   font-size: 1.5em;
   line-height: 1.43;
 }
 
+.plaintext h3 .anchor,
 .markdown h3 .anchor {
   line-height: 1.2;
 }
 
+.plaintext h4,
 .markdown h4 {
   font-size: 1.25em;
 }
 
+.plaintext h4 .anchor,
 .markdown h4 .anchor {
   line-height: 1.2;
 }
 
+.plaintext h5,
 .markdown h5 {
   font-size: 1em;
 }
 
+.plaintext h5 .anchor,
 .markdown h5 .anchor {
   line-height: 1.1;
 }
 
+.plaintext h6,
 .markdown h6 {
   font-size: 1em;
   color: #777;
 }
 
+.plaintext h6 .anchor,
 .markdown h6 .anchor {
   line-height: 1.1;
 }
 
+.plaintext p,
+.plaintext blockquote,
+.plaintext ul,
+.plaintext ol,
+.plaintext dl,
+.plaintext table,
+.plaintext pre,
 .markdown p,
 .markdown blockquote,
 .markdown ul,
@@ -311,10 +399,15 @@
 .markdown dl,
 .markdown table,
 .markdown pre {
-  margin-top: 0;
-  margin-bottom: 16px;
+  /* !important is needed here because Hotmail/Outlook.com uses !important to
+     kill the margin in <p>. We need this to win. */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 16px !important;
 }
 
+.plaintext hr,
 .markdown hr {
   height: 4px;
   padding: 0;
@@ -323,11 +416,17 @@
   border: 0 none;
 }
 
+.plaintext ul,
+.plaintext ol,
 .markdown ul,
 .markdown ol {
   padding-left: 2em;
 }
 
+.plaintext ul ul,
+.plaintext ul ol,
+.plaintext ol ol,
+.plaintext ol ul,
 .markdown ul ul,
 .markdown ul ol,
 .markdown ol ol,
@@ -336,14 +435,17 @@
   margin-bottom: 0;
 }
 
+.plaintext li>p,
 .markdown li>p {
   margin-top: 16px;
 }
 
+.plaintext dl,
 .markdown dl {
   padding: 0;
 }
 
+.plaintext dl dt,
 .markdown dl dt {
   padding: 0;
   margin-top: 16px;
@@ -352,25 +454,30 @@
   font-weight: bold;
 }
 
+.plaintext dl dd,
 .markdown dl dd {
   padding: 0 16px;
   margin-bottom: 16px;
 }
 
+.plaintext blockquote,
 .markdown blockquote {
   padding: 0 15px;
   color: #777;
   border-left: 4px solid #ddd;
 }
 
+.plaintext blockquote>:first-child,
 .markdown blockquote>:first-child {
   margin-top: 0;
 }
 
+.plaintext blockquote>:last-child,
 .markdown blockquote>:last-child {
   margin-bottom: 0;
 }
 
+.plaintext table,
 .markdown table {
   display: block;
   width: 100%;
@@ -379,50 +486,61 @@
   word-break: keep-all;
 }
 
+.plaintext table th,
 .markdown table th {
   font-weight: bold;
 }
 
+.plaintext table th,
+.plaintext table td,
 .markdown table th,
 .markdown table td {
   padding: 6px 13px;
   border: 1px solid #ddd;
 }
 
+.plaintext table tr,
 .markdown table tr {
   background-color: #fff;
   border-top: 1px solid #ccc;
 }
 
+.plaintext table tr:nth-child(2n),
 .markdown table tr:nth-child(2n) {
   background-color: #f8f8f8;
 }
 
+.plaintext img,
 .markdown img {
   max-width: 100%;
   box-sizing: content-box;
   background-color: #fff;
 }
 
+.plaintext .task-list-item,
 .markdown .task-list-item {
   list-style-type: none;
 }
 
+.plaintext .task-list-item+.task-list-item,
 .markdown .task-list-item+.task-list-item {
   margin-top: 3px;
 }
 
+.plaintext .task-list-item input,
 .markdown .task-list-item input {
   margin: 0 0.35em 0.25em -1.6em;
   vertical-align: middle;
 }
 
+.plaintext :checked+.radio-label,
 .markdown :checked+.radio-label {
   z-index: 1;
   position: relative;
   border-color: #4078c0;
 }
 
+.plaintext kbd,
 .markdown kbd {
   display: inline-block;
   padding: 3px 5px;
@@ -437,6 +555,7 @@
   box-shadow: inset 0 -1px 0 #bbb;
 }
 
+.plaintext code,
 .markdown code {
   padding: 0;
   padding-top: 0.2em;
@@ -445,14 +564,18 @@
   font-size: 85%;
   background-color: rgba(0,0,0,0.04);
   border-radius: 3px;
+  white-space: pre-wrap;
 }
 
+.plaintext code:before,
+.plaintext code:after,
 .markdown code:before,
 .markdown code:after {
   letter-spacing: -0.2em;
   content: " ";
 }
 
+.plaintext pre>code,
 .markdown pre>code {
   padding: 0;
   margin: 0;
@@ -463,10 +586,13 @@
   border: 0;
 }
 
+.plaintext .highlight,
 .markdown .highlight {
   margin-bottom: 16px;
 }
 
+.plaintext .highlight pre,
+.plaintext pre,
 .markdown .highlight pre,
 .markdown pre {
   padding: 16px;
@@ -476,15 +602,18 @@
   border-radius: 3px;
 }
 
+.plaintext .highlight pre,
 .markdown .highlight pre {
   margin-bottom: 0;
   word-break: normal;
 }
 
+.plaintext pre,
 .markdown pre {
   word-wrap: normal;
 }
 
+.plaintext pre code,
 .markdown pre code {
   display: inline;
   max-width: initial;
@@ -497,6 +626,8 @@
   border: 0;
 }
 
+.plaintext pre code:before,
+.plaintext pre code:after,
 .markdown pre code:before,
 .markdown pre code:after {
   content: normal;
