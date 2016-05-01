@@ -6,7 +6,10 @@ alias la='ls -AF'
 # Use a long listing format ##
 # alias ll='ls -al'
 # Converts the symbolic permissions to octal (ie: numbers)
-alias ll="ls -al | sed -e 's/--x/1/g' -e 's/-w-/2/g' -e 's/-wx/3/g' -e 's/r--/4/g' -e 's/r-x/5/g' -e 's/rw-/6/g' -e 's/rwx/7/g' -e 's/---/0/g'"
+__long_list() {
+  ls -al "$@" | sed -e 's/--x/1/g' -e 's/-w-/2/g' -e 's/-wx/3/g' -e 's/r--/4/g' -e 's/r-x/5/g' -e 's/rw-/6/g' -e 's/rwx/7/g' -e 's/---/0/g'
+}
+alias ll=__long_list
 # extra info compared to "l"
 #alias ll='ls -lhrt'
 alias l='ls -a'
