@@ -1,0 +1,6 @@
+{
+    isDisabled    = 0;
+    name          = 'Use Sundown Renderer';
+    uuid          = '6C5E2E0D-39F1-4B7A-B135-5DABB80942F3';
+    command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/sundown"\n';
+}

@@ -1,0 +1,6 @@
+{
+    isDisabled    = 0;
+    name          = 'Use Updated HTML 2 Text and Tidy';
+    uuid          = 'C5104995-95B5-40CF-BD00-BAA5647C260B';
+    command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/markdown-reply"\n';
+}
