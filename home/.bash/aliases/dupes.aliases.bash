@@ -108,7 +108,7 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     alias pinky='gpinky'
     alias pr='gpr'
     alias printenv='gprintenv'
-    alias printf='gprintf'
+    # alias printf='gprintf'
     alias ptx='gptx'
     alias pwd='gpwd'
     alias readlink='greadlink'

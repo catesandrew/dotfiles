@@ -17,7 +17,7 @@ BASH_NO=no . /etc/profile
 TMPFILE=\$(mktemp -t html2text_data) || exit 1
 cat | perl -pe 's,</?o:[^>]*>,,g' >\${TMPFILE}
 
-cat \${TMPFILE} | tidy -quiet yes -bare -clean -wrap 0 -utf8 --force-output 1 --show-warnings no | html2text --body-width=0 --dash-unordered-list --images-with-size --protect-links --reference-links --no-wrap-links
+cat \${TMPFILE} | tidy -quiet yes -bare -clean -wrap 0 -utf8 --force-output 1 --show-warnings no | html2text --body-width=0 --dash-unordered-list --images-with-size --protect-links --no-wrap-links
 EOT
   chmod +x "${DIR}/html2text.py"
 fi
