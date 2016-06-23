@@ -13,6 +13,8 @@ if [ ! -f "${DIR}/sundown-github" ]; then
   cat <<EOT >> "${DIR}/sundown-github"
 #!/bin/bash
 
+BASH_NO=no . /etc/profile
+
 TMPFILE=\$(mktemp -t sundown_data) || exit 1
 cat | perl -pe 's,</?o:[^>]*>,,g' >\${TMPFILE}
 

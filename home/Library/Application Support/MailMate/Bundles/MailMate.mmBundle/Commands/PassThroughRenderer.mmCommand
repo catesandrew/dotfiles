@@ -1,0 +1,6 @@
+{
+    isDisabled    = 0;
+    name          = 'Use Pass Through Renderer';
+    uuid          = 'BDD43B03-4A22-4CAE-A330-5F76BED008CA';
+    command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/pass-through"\n';
+}
