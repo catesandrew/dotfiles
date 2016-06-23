@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Path to the bash it configuration
+export BASH_IT="${HOME}/.bash"
+
 # handle the case when editing remote files through emacs
-[[ "$TERM" = "dumb" ]] && return
+if [[ "$TERM" == "dumb" ]]; then
+    . "${BASH_IT}/lib/custom.sh"
+    return
+fi
 
 # TODO Test these
 # if [[ "$TERM" = "dumb" ]]; then
@@ -42,8 +48,7 @@ if hash gdate 2>/dev/null; then
   tic=$(($(gdate +%s%N)/1000000))
 fi
 
-# Path to the bash it configuration
-export BASH_IT="${HOME}/.bash"
+# Path to the dfm repo configuration
 export DFM_REPO="${HOME}/.dotfiles"
 
 declare -a preexec_functions
