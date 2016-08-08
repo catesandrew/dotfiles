@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>419</string>
+	<key>AMApplicationVersion</key>
+	<string>2.6</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<dict/>
+					<key>CheckedForUserDefaultShell</key>
+					<dict/>
+					<key>inputMethod</key>
+					<dict/>
+					<key>shell</key>
+					<dict/>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run Shell Script.action</string>
+				<key>ActionName</key>
+				<string>Run Shell Script</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<string>#!/usr/bin/env ruby
+require 'csv'
+
+# md - Tables - Create from CSV
+# v1.0 2016-07-27
+# From the Markdown Service Tools &lt;http://brettterpstra.com/projects/markdown-service-tools/&gt;
+# Converts CSV style input to MultiMarkdown tables
+
+# Tables "cleaned" automatically
+# Use CSV formatting, cells separated by commas
+#   - Two commas in a row creates a blank cell
+#   - No trailing comma
+#   - To use a comma within a cell, surround the cell contents in double quotes
+#   - Whitespace surrounding cell data is generally ignored
+# First row (required) should be column headers
+#   - Headers are always centered in output
+# Second row (optional) should use &lt;, &gt;, and = (only) to define left, right, and center column justification
+#   - Must contain the same number of cells as the longest row
+#   - Defaults to centered if row is omitted
+# Empty (blank) rows are stripped
+#   - To force an empty row, use a single comma
+#   - To force a single-cell empty row, use &gt;&gt; alone on the line
+# To make a cell span multiple columns, use a single &gt; in the following cell(s)
+#  e.g.
+#      one,&gt;,two,&gt;,&gt;
+#  creates:
+#      |  one  ||  two  |||
+# A line beginning with == at the beginning or the end of the CSV input will create a table caption
+
+
+# Example input
+#
+# ==Title
+# one, "two, and a half", three and a quarter
+# &gt;, =, =, =, &lt;
+# four, five,,, six
+# hell, hath, no, fury
+
+def class_exists?(class_name)
+  klass = Module.const_get(class_name)
+  return klass.is_a?(Class)
+rescue NameError
+  return false
+end
+
+if class_exists? 'Encoding'
+  Encoding.default_external = Encoding::UTF_8 if Encoding.respond_to?('default_external')
+  Encoding.default_internal = Encoding::UTF_8 if Encoding.respond_to?('default_internal')
+end
+
+begin
+  input = STDIN.read.strip.force_encoding('utf-8')
+rescue
+  input = STDIN.read.strip
+end
+
+class Array
+  def alignment_row?
+    alignment_chars = ["&lt;","&gt;","="]
+    chars = self.uniq.strip_cells
+    is_align = true
+    chars.each do |c|
+      is_align = false unless alignment_chars.include?(c)
+    end
+    return is_align
+  end
+
+  def to_aligmnent_row(counts)
+    result = []
+    self.each_with_index do |cell, i|
+      output = case cell
+      when '&lt;'
+        ':'.ljust(counts[i],'-')
+      when '='
+        ':'.ljust(counts[i]-1,'-') + ':'
+      when '&gt;'
+        ':'.rjust(counts[i],'-')
+      end
+      result.push(output)
+    end
+
+    '| ' + result.join(' | ') + ' |'
+  end
+
+  def to_header_row(counts, max_cells)
+    output = "|"
+    self.each_with_index do |cell, i|
+      output += cell.center(counts[i] + 2," ") + "|"
+    end
+    if self.length &lt; max_cells
+      counter = self.length
+      while counter &lt; counts.length
+        output += " " + "".ljust(counts[counter]," ") + ' |'
+        counter += 1
+      end
+    end
+    output
+  end
+
+  def strip_cells
+    self.map! {|cell|
+      unless cell.nil?
+        cell.strip
+      else
+        "     "
+      end
+    }
+  end
+
+  def strip_cells!
+    replace(strip_cells)
+  end
+
+  def longest_row
+    count = 0
+    self.each do |row|
+      l = row.length
+      count = l if l &gt; count
+    end
+    count
+  end
+
+  def measure_cells
+    cell_count = self.longest_row
+    counts = Array.new(cell_count, 5)
+    self.each do |row|
+      row.each_with_index do |cell, i|
+        if cell.nil?
+          counts[i] ||= 5
+        elsif cell.length &gt; counts[i]
+          counts[i] = cell.length
+        end
+      end
+    end
+    counts
+  end
+
+  def pad_rows(counts,alignment)
+    output = self.dup
+    output.map!.with_index do |cell, i|
+      case alignment[i]
+      when nil?
+        ''.ljust(counts[i],' ')
+      when '&lt;'
+        cell.ljust(counts[i],' ')
+      when '='
+        cell.center(counts[i],' ')
+      when '&gt;'
+        cell.rjust(counts[i],' ')
+      end
+    end
+  end
+
+  def pad_rows!(counts,alignment)
+    replace(pad_rows(counts,alignment))
+  end
+end
+
+class String
+  def pad_cell(padding, alignment, char=" ")
+    case alignment
+    when 'left'
+      return self.ljust(padding,char)
+    when 'right'
+      return self.rjust(padding,char)
+    else
+      return self.center(padding,char)
+    end
+  end
+
+  def csv_quotes
+    self.gsub(/,\s+"/,',"').gsub(/"\s+,/,'",')
+  end
+end
+
+def process(input)
+  rows = []
+  title = nil
+  header = []
+
+  input.each_line do |line|
+    if line =~ /^\s*==\s*\w+/
+      title = line.sub(/^\s*==\s*/,'').strip
+    else
+      row = line.csv_quotes.parse_csv.strip_cells
+      next if row.join('') == ''
+      rows.push(row)
+    end
+  end
+
+  max_cells = rows.longest_row
+  counts = rows.measure_cells
+
+  header = rows.slice!(0)
+
+  if rows[0].alignment_row?
+    alignments = rows.slice!(0)
+  else
+    alignments = Array.new(max_cells,'=')
+  end
+
+  if alignments.length != max_cells
+    $stderr.puts "Alignment row has wrong number of cells"
+    Process.exit 1
+  end
+
+  $stdout.puts header.to_header_row(counts, max_cells)
+  $stdout.puts alignments.to_aligmnent_row(counts)
+
+  rows.each_with_index do |row, i|
+    out = ''
+    if row.join(',').strip =~ /^&gt;&gt;$/
+      out = '|'
+      counts.length.times do
+        out += '|'
+      end
+    else
+      row.pad_rows!(counts, alignments)
+      out = '| ' + row.join(' | ') + ' |'
+      if row.length &lt; max_cells
+        # count = counts.length - row.length
+        # print ''.ljust(count,'|')
+        counter = row.length
+        while counter &lt; counts.length
+          out += " " + "".ljust(counts[counter]," ") + ' |'
+          counter += 1
+        end
+      end
+    end
+    out.gsub!(/(\|\s*&gt;\s*)+/) {|m|
+      len = m.length
+      pipes = m.scan(/\|/).join
+      pipes.rjust(m.length," ")
+    }
+    # out.gsub!(/(?&lt;!\w)((\s*)&gt;(\s*)\|)/,'| \2\3')
+    $stdout.puts out
+
+  end
+
+  $stdout.puts "[#{title}]" if title
+end
+
+process(input)
+</string>
+					<key>CheckedForUserDefaultShell</key>
+					<true/>
+					<key>inputMethod</key>
+					<integer>0</integer>
+					<key>shell</key>
+					<string>/usr/bin/ruby</string>
+					<key>source</key>
+					<string></string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.RunShellScript</string>
+				<key>CFBundleVersion</key>
+				<string>2.0.3</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunShellScriptAction</string>
+				<key>InputUUID</key>
+				<string>2E7D8FCB-2A8D-4EDC-84BF-0945DE3E726B</string>
+				<key>Keywords</key>
+				<array>
+					<string>Shell</string>
+					<string>Script</string>
+					<string>Command</string>
+					<string>Run</string>
+					<string>Unix</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>1A1E450B-6653-4510-BF2D-D842E428BA73</string>
+				<key>ShowWhenRun</key>
+				<false/>
+				<key>UUID</key>
+				<string>21F662CE-9745-46AC-A54C-5AFF2D5D3ED2</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<integer>0</integer>
+						<key>name</key>
+						<string>inputMethod</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+					<key>2</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>CheckedForUserDefaultShell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>2</string>
+					</dict>
+					<key>3</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>COMMAND_STRING</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>3</string>
+					</dict>
+					<key>4</key>
+					<dict>
+						<key>default value</key>
+						<string>/bin/sh</string>
+						<key>name</key>
+						<string>shell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>4</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<true/>
+				<key>location</key>
+				<string>369.000000:433.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<true/>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict/>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>serviceInputTypeIdentifier</key>
+		<string>com.apple.Automator.text</string>
+		<key>serviceOutputTypeIdentifier</key>
+		<string>com.apple.Automator.text</string>
+		<key>serviceProcessesInput</key>
+		<integer>0</integer>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.servicesMenu</string>
+	</dict>
+</dict>
+</plist>
