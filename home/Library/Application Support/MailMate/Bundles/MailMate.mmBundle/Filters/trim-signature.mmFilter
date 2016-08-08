@@ -1,0 +1,8 @@
+{	name    = 'Trim Signature';
+	input   = 'canonical';
+        output  = 'canonical';
+        script  = "#!/bin/bash
+BASH_NO=no . /etc/profile
+talon -m 0 -l 0 -b";
+        uuid    = 'A51A781D-A0D3-4632-AFBB-BE65B5CEA465';
+}

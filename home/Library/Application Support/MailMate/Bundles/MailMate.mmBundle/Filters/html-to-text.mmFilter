@@ -1,0 +1,6 @@
+{	name    = 'HTML to Canonical';
+	input   = 'html';
+	output  = 'canonical';
+        script  = '#!/bin/bash\ntidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | "${MM_BUNDLE_SUPPORT}/bin/html2text"\n';
+        uuid    = 'EA4E45C7-556E-48EC-B69C-3471C22EC627';
+}
