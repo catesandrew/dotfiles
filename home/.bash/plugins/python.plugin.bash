@@ -1,5 +1,10 @@
 # alias "http" to SimpleHTTPServer
 
+# In order to work with ycmd, python *must* be built as a shared library. The
+# most compatible way to do this on OS X is with --enable-framework. This is
+# set via the PYTHON_CONFIGURE_OPTS option.
+export PYTHON_CONFIGURE_OPTS="--enable-framework"
+
 # Start an HTTP server from a directory, optionally specifying the port
 function server() {
   # Get port (if specified)
