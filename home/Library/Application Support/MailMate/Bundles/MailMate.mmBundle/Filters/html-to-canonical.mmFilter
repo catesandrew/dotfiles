@@ -1,0 +1,8 @@
+{	name    = 'HTML to Canonical';
+        input   = 'html';
+        output  = 'canonical';
+        script  = '#!/bin/bash
+BASH_NO=no . /etc/profile
+tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text';
+        uuid    = '26C634A1-DB44-49B2-9E96-4B53CD62EFB5';
+}

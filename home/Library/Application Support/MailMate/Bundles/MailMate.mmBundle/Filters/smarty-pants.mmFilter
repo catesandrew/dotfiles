@@ -1,6 +1,8 @@
 {	name    = 'SmartyPants';
         input   = 'html';
         output  = 'html';
-        script  = '#!/usr/bin/env bash\n"$MM_SHARED_SUPPORT/bin/smartypants"\n';
+        script  = '#!/bin/bash
+BASH_NO=no . /etc/profile
+smartypants';
         uuid    = 'FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34';
 }

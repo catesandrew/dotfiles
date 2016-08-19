@@ -2,5 +2,8 @@
     isDisabled    = 0;
     name          = 'Use Github Renderer';
     uuid          = '5E861840-842D-4282-AD64-1806A84CFE2F';
-    command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/github"\n';
+    command       = '#!/bin/bash\n
+    defaults write com.freron.MailMate MmGithubMarkdownEnabled -bool YES
+    defaults write com.freron.MailMate MmGithubMarkdownDisabled -bool NO
+';
 }

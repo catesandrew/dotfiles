@@ -4,5 +4,5 @@
         script  = "#!/bin/bash
 BASH_NO=no . /etc/profile
 gsed '/./,$!d'";
-        uuid    = 'B51A781D-A0D3-4632-AFBB-BE65B5CEA465';
+        uuid    = '8B8FC125-AB01-4C67-ADDA-97C39FCC2A05';
 }

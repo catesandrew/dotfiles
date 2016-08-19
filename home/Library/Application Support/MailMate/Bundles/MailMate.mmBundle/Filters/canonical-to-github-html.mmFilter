@@ -10,8 +10,10 @@ if [ -z "${MM_MARKDOWN}" ]; then
                 "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links
         fi
 else
-        echo "<div class=\\"markdown\\">"\n"$MM_SHARED_SUPPORT/bin/sundown"\necho "</div>"
+  echo "<div class=\\"markdown\\">"
+    curl -X POST -H "Content-Type: text/plain" --data-binary @- "https://api.github.com/markdown/raw?access_token=\$GITHUB_TOKEN"
+  echo "</div>"
 fi
 ';
-        uuid    = '1822B5B3-38C7-4736-980A-CF620078F9B8';
+        uuid    = '43FEABB7-E715-4803-B4C8-EF0540D3D959';
 }

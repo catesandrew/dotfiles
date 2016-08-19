@@ -1,9 +1,0 @@
-#!/bin/bash
-
-BASH_NO=no . /etc/profile
-
-DIR="/Applications/MailMate.app/Contents/SharedSupport/bin"
-
-if [ -f "${DIR}/sundown-orig" ]; then
-  cp "${DIR}/sundown-orig" "${DIR}/sundown"
-fi
