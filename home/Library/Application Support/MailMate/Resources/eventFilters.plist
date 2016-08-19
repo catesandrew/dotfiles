@@ -1,0 +1,40 @@
+{
+	version = 1;
+	events = {
+		"canonical_to_html_alternative" = {
+			filters = (
+				{
+					uuid = "1822B5B3-38C7-4736-980A-CF620078F9B8";
+				},
+				{
+					uuid = "FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34";
+					"defaultsVariableEnabled" = MmSmartyPantsEnabled;
+				},
+			);
+		};
+		"canonical_to_html_display" = {
+			filters = (
+				{
+					uuid = "78A877F5-F80C-4127-8380-ACBC7FE09663";
+				},
+				{
+					uuid = "1822B5B3-38C7-4736-980A-CF620078F9B8";
+				},
+			);
+		};
+		"sanitize_canonical" = {
+			filters = (
+				{
+					uuid = "A51A781D-A0D3-4632-AFBB-BE65B5CEA465";
+				},
+			);
+		};
+		"html_to_text" = {
+			filters = (
+				{
+					uuid = "FEDE3122-0975-4B47-8788-5FDD7D157F37";
+				},
+			);
+		};
+	};
+}

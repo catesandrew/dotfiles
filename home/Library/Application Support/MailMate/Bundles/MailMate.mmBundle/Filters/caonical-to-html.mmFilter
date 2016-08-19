@@ -1,0 +1,17 @@
+{	name    = 'Canonical to HTML';
+        input   = 'canonical';
+        output  = 'html';
+        script  = '#!/bin/bash
+BASH_NO=no . /etc/profile
+if [ -z "${MM_MARKDOWN}" ]; then
+        if [ -z "${MM_NO_LINKS}" ]; then
+                "$MM_SHARED_SUPPORT/bin/canonical_to_html"
+        else
+                "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links
+        fi
+else
+        echo "<div class=\\"markdown\\">"\n"$MM_SHARED_SUPPORT/bin/sundown"\necho "</div>"
+fi
+';
+        uuid    = '1822B5B3-38C7-4736-980A-CF620078F9B8';
+}
