@@ -1,0 +1,7 @@
+.DS_Store skip
+README.md skip
+templates recurse
+slidy recurse
+slideous recurse
+s5 recurse
+citeproc-preamble recurse
