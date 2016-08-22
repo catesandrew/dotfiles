@@ -7,3 +7,14 @@ pdftk 1.pdf 2.pdf 3.pdf cat output 123.pdf
 # Concatenate pages 1 to 5 of first.pdf with page 3 of second.pdf
 pdftk A=fist.pdf B=second.pdf cat A1-5 B3 output new.pdf
 
+# To embed external files into a PDF. Try this:
+pdftk \
+  original.pdf \
+  attach_files file1.docx file2.xls file3.html \
+  to_page 3 \
+  output file-with-attachments.pdf
+
+# To de-tach the files embedded in a PDF, try this:
+pdftk file-with-attachments.pdf \
+  unpack_files \
+  output /usr/local

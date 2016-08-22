@@ -1,0 +1,2 @@
+# Reset Application Cache Settings
+killall cfprefsd

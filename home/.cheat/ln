@@ -6,3 +6,13 @@ ln -sf /some/dir/exec /usr/bin/exec
 
 # To create a symbolic link:
 ln -s /original/file /new/symbolic/link
+
+# Mass Reset Symbolic Links
+find . -lname '*CloudStation*' | while IFS= read -r file; do
+  orig=$(readlink "$file") && \
+  link=$(echo "$orig" | sed -e 's/CloudStation/ownCloud/') && \
+  echo "orig: $orig" && \
+  echo "link: $link" && \
+  echo "file: $file" && \
+  # rm "$file" && \
+  ln -sf "$link" "$file"; done

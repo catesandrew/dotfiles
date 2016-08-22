@@ -17,3 +17,13 @@ for file in `ls original/image/path/`;
     new_file=`basename $new_path`;
     convert $file -resize 150 conerted/image/path/$new_file.png;
 done
+
+# Convert PDF to image with high resolution
+convert          \
+  -verbose       \
+  -density 300   \
+  -trim          \
+   input.pdf     \
+  -quality 100   \
+  -sharpen 0x1.0 \
+   output.png
