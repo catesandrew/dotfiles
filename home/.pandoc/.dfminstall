@@ -4,4 +4,5 @@ templates recurse
 slidy recurse
 slideous recurse
 s5 recurse
+csl recurse
 citeproc-preamble recurse
