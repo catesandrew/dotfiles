@@ -364,6 +364,7 @@ function iterm2_preexec_hook() {
 # https://github.com/rcaloras/bash-preexec
 # TODO: Migrate to brew `bash-preexec`
 . "${BASH_IT}/preexec/bash-preexec.sh"
+. "${BASH_IT}/preexec/npm-preexec.sh"
 
 if [ -z "$INSIDE_EMACS" ]; then
     if [ "${TERM_PROGRAM:-""}" != "" ]; then

@@ -110,6 +110,7 @@ __bp_in_prompt_command() {
 
     local trimmed_arg
     trimmed_arg=$(__bp_trim_whitespace "$1")
+    export __bp_trimmed_arg=$trimmed_arg
 
     local command
     for command in "${prompt_command_array[@]}"; do
