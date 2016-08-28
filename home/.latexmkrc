@@ -1,6 +1,6 @@
 # Use xelatex instead of pdflatex
-$pdflatex = 'xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S';
-# $pdflatex = "pdflatex -interaction=nonstopmode -synctex=1 %O %S";
+$pdflatex = "xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S";
+# $pdflatex = "pdflatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S";
 
 # Always create PDFs
 $pdf_mode = 1;

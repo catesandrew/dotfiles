@@ -1,0 +1,3 @@
+#! /bin/sh
+
+osascript ~/Library/Scripts/acrodist.scpt $1
