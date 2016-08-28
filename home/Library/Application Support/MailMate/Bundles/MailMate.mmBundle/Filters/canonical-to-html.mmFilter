@@ -11,6 +11,10 @@ if [ -z "${MM_MARKDOWN}" ]; then
         fi
 else
   echo "<div class=\\"markdown\\">"\n"$MM_SHARED_SUPPORT/bin/sundown"\necho "</div>"
+  echo "<p dir=\\"auto\\">-- <br/>Andrew Cates</p>"
+  echo "<div class=\\"markdown\\"><blockquote><p>"
+  fortune
+  echo "</p></blockquote></div>"
 fi
 ';
         uuid    = '1822B5B3-38C7-4736-980A-CF620078F9B8';

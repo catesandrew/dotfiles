@@ -13,6 +13,10 @@ else
   echo "<div class=\\"markdown\\">"
     curl -X POST -H "Content-Type: text/plain" --data-binary @- "https://api.github.com/markdown/raw?access_token=\$GITHUB_TOKEN"
   echo "</div>"
+  echo "<p dir=\\"auto\\">-- <br/>Andrew Cates</p>"
+  echo "<div class=\\"markdown\\"><blockquote><p>"
+  fortune
+  echo "</p></blockquote></div>"
 fi
 ';
         uuid    = '43FEABB7-E715-4803-B4C8-EF0540D3D959';
