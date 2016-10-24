@@ -2,15 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Disabled</key>
-	<false/>
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
-	<string>osx.app.better-touch-tool</string>
-	<key>Program</key>
-	<string>/Applications/BetterTouchTool.app/Contents/MacOS/BetterTouchTool</string>
+	<string>osx.app.karabiner-elements</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Applications/Karabiner-Elements.app/Contents/MacOS/Karabiner-Elements</string>
+    </array>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 </dict>
 </plist>

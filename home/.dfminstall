@@ -5,6 +5,7 @@ Documents recurse
 fonts skip
 indent.pro skip
 .fonts recurse
+.karabiner.d recurse
 .hammerspoon recurse
 .gitconfig-local.template skip
 .gitconfig-private.template skip

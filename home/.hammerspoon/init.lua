@@ -7,8 +7,271 @@ local fnutils = require "hs.fnutils"
 local alert = require "hs.alert"
 local screen = require "hs.screen"
 local grid = require "hs.grid"
+local osascript = require "hs.osascript"
 local hints = require "hs.hints"
 local appfinder = require "hs.appfinder"
+
+-- Previous Seil Keybindings
+-- Caps Lock (51) → Left Control (59)
+-- Left Control (59) → F19 (80)
+
+-- Brett's Binding
+-- Caps Lock → F18
+-- A global variable for the Hyper Mode
+k = hotkey.modal.new({}, "F17")
+
+-- Trigger existing hyper key shortcuts
+-- Hyper+key for all the below are setup somewhere
+hyperBindings = {'z', 'd', 'h', 'c', 'l', 'r', 'y', 'p', ';', 'w'}
+
+for i,key in ipairs(hyperBindings) do
+  k:bind({}, key, nil, function() hs.eventtap.keyStroke({'cmd','alt','shift','ctrl'}, key)
+    k.triggered = true
+  end)
+end
+
+-- build our own
+
+launchSingle = function(appname)
+  hs.application.launchOrFocus(appname)
+  k.triggered = true
+end
+
+-- Single keybinding for app launch
+singleapps = {
+  -- {'z', ''}, was saved for menu pop
+  {'x', 'Safari'},
+  -- {'c', ''}, no action
+  -- {'v', ''}, macvim
+  -- {'b', ''}, google chrome canary
+  -- {'n', ''}, napkin
+  -- {'m', ''}, mailmate
+  -- {'a', ''}, busy contacts
+  -- {'s', ''}, sonos
+  -- {'d', ''}, saved for dash
+  -- {'f', ''}, finder
+  -- {'g', ''}, tower
+  -- {'h', ''}, saved for launchbar
+  -- {'j', ''}, jump desktop
+  -- {'k', ''}, fantastical
+  -- {'l', ''}, no action
+  -- {';', ''}, daylite
+  -- {'q', ''}, quiver
+  -- {'w', ''}, saved for moom
+  -- {'e', ''}, emacs
+  -- {'r', ''}, saved for fantastical 2
+  -- {'t', ''}, iTerm
+  -- {'y', ''}, no action
+  -- {'u', ''}, calcbot
+  -- {'i', ''}, messages
+  -- {'o', ''}, omnifocus
+  -- {'p', ''}, saved for snippets lab
+}
+
+for i, app in ipairs(singleapps) do
+  k:bind({}, app[1], function() launchSingle(app[2]); k:exit(); end)
+end
+
+-- apple scripts
+
+appWorkflow = [[
+  set appName to "%s"
+  set startIt to false
+  tell application "System Events"
+  	if not (exists process appName) then
+  		set startIt to true
+  	else if frontmost of process appName then
+  		set visible of process appName to false
+  	else
+  		set frontmost of process appName to true
+  	end if
+  end tell
+  if startIt then
+  	tell application appName to activate
+  end if
+]]
+
+launchAppleScript = function(appName)
+  str = string.format(appWorkflow, appName)
+  osascript.applescript(str)
+  k.triggered = true
+end
+
+oascripts = {
+  -- {'z', ''}, was saved for menu pop
+  -- {'x', ''}, safari
+  {'c', 'Google Chrome Canary'},
+  {'v', 'MacVim'},
+  {'b', 'Google Chrome'},
+  {'n', 'Napkin'},
+  {'m', 'MailMate'},
+  {'a', 'BusyContacts'},
+  {'s', 'Sonos'},
+  -- {'d', ''}, saved for dash
+  {'f', 'Finder'},
+  {'g', 'Tower'},
+  -- {'h', ''}, saved for launchbar
+  {'j', 'Jump Desktop'},
+  {'k', 'Fantastical 2'},
+  -- {'l', ''}, no action
+  -- {';', ''}, daylite
+  {'q', 'Quiver'},
+  -- {'w', ''}, saved for moom
+  {'e', 'Emacs'},
+  -- {'r', ''}, saved for fantastical 2
+  -- {'t', 'iTerm'},
+  -- {'y', ''}, no action
+  {'u', 'Calcbot'},
+  {'i', 'Messages'},
+  {'o', 'OmniFocus'},
+  -- {'p', ''}, saved for snippets lab
+}
+
+for i, app in ipairs(oascripts) do
+  k:bind({}, app[1], function() launchAppleScript(app[2]); k:exit(); end)
+end
+
+-- double identity apps
+
+doubleapps = {
+  {'t', 'iTerm2', 'iTerm'},
+}
+
+launchDouble = function(appName1, appName2)
+  local app = hs.application.find(appName1)
+  if (app and hs.application.isRunning(app)) then
+    launchAppleScript(appName1)
+  else
+    hs.application.launchOrFocus(appName2)
+    k.triggered = true
+  end
+end
+
+for i, app in ipairs(doubleapps) do
+  k:bind({}, app[1], function() launchDouble(app[2], app[3]); k:exit(); end)
+end
+
+-- Sequential keybindings, e.g. Hyper-a,f for Finder
+-- a = hs.hotkey.modal.new({}, "F16")
+-- apps = {
+--   {'d', 'Twitter'},
+--   {'f', 'Finder'},
+--   {'s', 'Skype'},
+-- }
+-- for i, app in ipairs(apps) do
+--   a:bind({}, app[1], function() launch(app[2]); a:exit(); end)
+-- end
+--
+-- pressedA = function() a:enter() end
+-- releasedA = function() end
+-- k:bind({}, 'a', nil, pressedA, releasedA)
+
+-- Enter Hyper Mode when F18 (Hyper/Capslock) is pressed
+-- pressedF18 = function()
+--   k.triggered = false
+--   k:enter()
+-- end
+--
+-- -- Leave Hyper Mode when F18 (Hyper/Capslock) is pressed,
+-- --   send ESCAPE if no other keys are pressed.
+-- releasedF18 = function()
+--   k:exit()
+--   if not k.triggered then
+--     hs.eventtap.keyStroke({}, 'ESCAPE')
+--   end
+-- end
+
+-- Bind the Hyper key
+-- f18 = hotkey.bind({}, 'F18', pressedF18, releasedF18)
+
+
+ -- Enter Hyper Mode when F19 (hyper/left control) is pressed
+pressedF19 = function()
+  k.triggered = false
+  k:enter()
+end
+
+-- Leave Hyper Mode when F19 (hyper/left control) is pressed,
+--   send ESCAPE if no other keys are pressed.
+releasedF19 = function()
+  k:exit()
+  if not k.triggered then
+    hs.eventtap.keyStroke({}, 'ESCAPE')
+  end
+end
+
+--
+
+-- lc = hotkey.modal.new({}, 'F17')
+-- leftCtrlBindings = {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'}
+--
+-- for i,key in ipairs(hyperBindings) do
+--   lc:bind({}, key, nil, function() hs.eventtap.keyStroke({'ctrl'}, key)
+--     lc.triggered = true
+--   end)
+-- end
+--
+-- -- Enter when LeftCtrl (Capslock) is pressed
+-- pressedLeftCtrl = function()
+--   lc.triggered = false
+--   lc:enter()
+-- end
+--
+-- -- Leave when LeftCtrl (Capslock) is pressed,
+-- --   send ESCAPE if no other keys are pressed.
+-- releasedLeftCtrl = function()
+--   lc:exit()
+--   if not lc.triggered then
+--     hs.eventtap.keyStroke({}, 'ESCAPE')
+--   end
+-- end
+
+-- Bind the Hyper key
+function createHyper()
+  f19 = hotkey.bind({}, 'F19', pressedF19, releasedF19)
+  -- leftControl = hotkey.bind({}, 59, 'left control', pressedLeftCtrl, releasedLeftCtrl)
+end
+
+
+
+-- Cursor locator
+
+local mouseCircle = nil
+local mouseCircleTimer = nil
+
+function mouseHighlight()
+  size = 150
+    -- Delete an existing highlight if it exists
+    if mouseCircle then
+        mouseCircle:delete()
+        mouseCircle2:delete()
+        if mouseCircleTimer then
+            mouseCircleTimer:stop()
+        end
+    end
+    -- Get the current co-ordinates of the mouse pointer
+    mousepoint = hs.mouse.getAbsolutePosition()
+    -- Prepare a big red circle around the mouse pointer
+    mouseCircle = hs.drawing.circle(hs.geometry.rect(mousepoint.x-(size/2), mousepoint.y-(size/2), size, size))
+    mouseCircle2 = hs.drawing.circle(hs.geometry.rect(mousepoint.x-(size/4), mousepoint.y-(size/4), size/2, size/2))
+    mouseCircle:setStrokeColor({["red"]=1,["blue"]=0,["green"]=0,["alpha"]=1})
+    mouseCircle2:setStrokeColor({["red"]=1,["blue"]=0,["green"]=0,["alpha"]=1})
+    mouseCircle:setFill(false)
+    mouseCircle2:setFill(false)
+    mouseCircle:setStrokeWidth(3)
+    mouseCircle2:setStrokeWidth(5)
+    mouseCircle:show()
+    mouseCircle2:show()
+
+    -- Set a timer to delete the circle after 3 seconds
+    mouseCircleTimer = hs.timer.doAfter(1, function() mouseCircle:delete() mouseCircle2:delete() end)
+end
+-- hotkey.bind({"cmd","alt","shift"}, "D", mouseHighlight)
+
+
+
+
+
 
 local tabs = require "tabs"
 
@@ -84,9 +347,10 @@ function applyLayout(layout)
 end
 
 function init()
-  createHotkeys()
-  keycodes.inputSourceChanged(rebindHotkeys)
-  tabs.enableForApp("Emacs")
+  createHyper()
+  -- createHotkeys()
+  -- keycodes.inputSourceChanged(rebindHotkeys)
+  -- tabs.enableForApp("Emacs")
 
   alert.show("Hammerspoon, at your service.")
 end

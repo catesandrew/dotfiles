@@ -5,12 +5,14 @@
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
-	<string>osx.app.karabiner</string>
+	<string>osx.app.hammerspoon</string>
     <key>ProgramArguments</key>
     <array>
-      <string>/Applications/Karabiner.app/Contents/MacOS/Karabiner</string>
-    </array>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 4 &amp;&amp; /Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon</string>
+	</array>
 	<key>RunAtLoad</key>
-    <false/>
+	<true/>
 </dict>
 </plist>
