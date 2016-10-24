@@ -124,3 +124,6 @@ alias headerc='curl -I --compress' # find out if remote server supports gzip /
 alias wget='wget -c'            # Resume wget by default
 
 alias ct='column -t'
+
+# For URL encoding, we are going to use a slick method developed by Ruslan Spivak.
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
