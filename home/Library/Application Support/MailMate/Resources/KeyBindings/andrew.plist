@@ -2,49 +2,105 @@
     // Andrew's person key bindings for MailMate
 
     // Email Creation
-    "c" = "newMessage:";
-    "r" = "replyAll:";
-    "R" = "replySender:";
+    "r" = "replySender:";
+    "R" = "replyAll:";
     "f" =  "forwardMessage:";
 
     // Sending
     "@\U000A" = "send:"; // ⌘+return
     "@\U000D" = "send:"; // ⌘+enter
     "\U007F" = ( "setTag:", "\\Seen", "deleteMessage:" ); // ⌫ delete and mark as read
-    "@\\" = ( "sendAndMoveParentToMailbox:", "/Delegated" );
 
     // Filtering
     "s" = "moveToJunk:";
-    "h" = (
-        "copyToMailbox:", "/Spam.TrainGood",
-        "moveToMailbox:", "INBOX" );
-    "x" = "deleteMessage:";
-    "X" = ( "moveThreadToMailbox:", "trash" );
     "m" = "moveToMailbox:";
     "M" = "moveThreadToMailbox:";
-    "d" = ( "moveToMailbox:", "/Deferred" );
-    "D" = ( "moveThreadToMailbox:", "/Deferred" );
-    "e" = ( "moveToMailbox:", "/Delegated" );
-    "E" = ( "moveThreadToMailbox:", "/Delegated" );
 
-    // One arguably strange behavior in MailMate is that when you archive
-    // a message, other messages in the thread can stay in your inbox.
+    // Tag as postponed
+    "p" = ( "toggleTag:", "postponed" );
+    "P" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "toggleTag:", "postponed" );
+    // Tag as delegated
+    "d" = ( "toggleTag:", "delegated" );
+    "D" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "toggleTag:", "delegated" );
+    // Tag as waitingOnReply
+    "w" = ( "toggleTag:", "waitingOnReply" );
+    "W" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "toggleTag:", "waitingOnReply" );
 
-    // Fortunately, it's possible to re-map the archive keyboard shortcut to
-    // archive all messages in a thread. Using the instructions for adding
-    // custom keybindings, add the following:
+    // Archive
     "a" = ( "setTag:", "\\Seen", "archive:"); // archive and mark read
     "A" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "setTag:", "\\Seen", "archive:" ); // Select whole thread, mark as read and archive
 
+    // Delete
+    "x" = {
+       // Delete by from address
+       "f" = ( "selectWithFilter:", "from.address = '${from.address}'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete the thread in the inbox, but leave filed items alone
+       "i" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path = 'INBOX'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete thread except mail that was mine (I sent)
+       "m" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path != 'Sent Messages' and #source.path != 'Sent Items'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete thread except the stuff in inbox or sent (other)
+       "o" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path != 'INBOX' and #source.path != 'Sent Messages' and #source.path != 'Sent Items'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete any mail to this recipient
+       "r" = ( "selectWithFilter:", "#recipient.address = '${#recipient.address}'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete the subject
+       "s" = ( "selectWithFilter:", "subject = '${subject}'", "setTag:", "\\Seen", "deleteMessage:" );
+       // Delete entire thread
+       "t" = ( "selectThread:", "setTag:", "\\Seen", "deleteMessage:" );
+       // delete and mark as read
+       "x" = ( "setTag:", "\\Seen", "deleteMessage:" );
+       // Select whole thread, mark as read and delete
+       "X" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "setTag:", "\\Seen", "deleteMessage:" );
+    };
 
-    // Selecting messages
+    // select commands (good if you aren't sure what the delete in thread action is going to do!)
     "*" = {
-        "a" = "selectAll:";
-        "n" = "deselectAll:";
-        "r" = ( "selectWithFilter:", "#flags.flag = '\\Seen'"); // Selects all mail you've read.
-        "u" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Seen'"); // Selects all unread mail.
-        "s" = ( "selectWithFilter:", "#flags.flag = '\\Flagged'"); // Selects all starred mail.
-        "t" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Flagged'"); // Selects all unstarred mail.
+       // Select an entire thread
+       "t" = "selectThread:";
+       // Select just the items in the thread that are in my inbox, leaving filed messages alone
+       "i" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path = 'INBOX'" );
+       // Select thread except mail that was mine (I sent)
+       "m" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path != 'Sent Messages' and #source.path != 'Sent Items'" );
+       // Select thread except the stuff in inbox or sent (other)
+       "o" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.path != 'INBOX' and #source.path != 'Sent Messages' and #source.path != 'Sent Items'" );
+       // Select the subject
+       "s" = ( "selectWithFilter:", "subject = '${subject}'" );
+       // Select by from address
+       "f" = ( "selectWithFilter:", "from.address = '${from.address}'" );
+       // Select any mail to this recipient (warning, I've had this crash MailMate)
+       "r" = ( "selectWithFilter:", "#recipient.address = '${#recipient.address}'" );
+       // "m" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and #source.mailto !=[x] \\$SENT.source.mailto" );
+       // "m" = ( "selectWithFilter:", "#thread-id = ${#thread-id} and from.address !=[x] \\$SENT.from.address" );
+    };
+
+    // Navigation
+    "g" = {
+        // gg jumps to first message in message list
+        "g" = ( "makeFirstResponder:", "mainOutline", "selectFirstMessageRow:");
+        // g. jumps to root of thread
+        "." = "rootOfThread:";
+        // g, jumps to last of thread
+        "," = "lastOfThread:";
+    };
+    // G jumps to last message in list
+    "G" = ( "makeFirstResponder:", "mainOutline", "selectLastMessageRow:");
+
+    "z" = {
+        "p" = "goToMailbox:"; // Prompt
+        "1" = ( "makeFirstResponder:", "mailboxesOutline" );
+        "2" = ( "makeFirstResponder:", "mainOutline" );
+        "3" = ( "makeFirstResponder:", "messageView" );
+        "a" = ( "goToMailbox:", "ARCHIVE" );
+        "A" = ( "goToMailbox:", "ALL_MESSAGES" );
+        // "p" = ( "goToMailbox:", "DD86095A-ABB6-4599-BC36-EA36B001D82C" ); // postponed
+        // "d" = ( "goToMailbox:", "C7AC6F38-C415-4DB9-A7B6-66DA0CAB8C2C" ); // delegated
+        "f" = ( "goToMailbox:", "FLAGGED" );
+        "g" = ( "goToMailbox:", "INBOX:catesandrew@imap.gmail.com", "makeFirstResponder:", "mainOutline" ); // Gmail
+        "l" = "goToMailbox:";
+        "i" = ( "goToMailbox:", "INBOX"); // Inbox
+        "s" = ( "goToMailbox:", "SENT" );
+        // "w" = ( "goToMailbox:", "INBOX:tsidomain%5Cacates@imap.ibaset.com", "makeFirstResponder:", "mainOutline" ); // ibaset
+        // "r" = ( "goToMailbox:", "6C6FE5E3-540B-4320-AB0D-00C0DBEEFB84" ); // waitingOnReply
+        "z" = "centerSelectionInVisibleArea:";
     };
 
     // Composer
@@ -53,47 +109,40 @@
     "@]" = "increaseQuoteLevel:";
     "@[" = "decreaseQuoteLevel:";
 
-    // Markdown shortcuts thanks to Brett Terpstra: https://github.com/ttscoff/KeyBindings/
-    // bold selection
-    "@b" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "**", yank:, insertText:, " ", moveLeft:, insertText:, "**", moveRight:, deleteBackward:);
-    // italicize selection
-    "@i" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "*", yank:, insertText:, " ", moveLeft:, insertText:, "*", moveRight:, deleteBackward:);
-    // ` selection
-    "@k" = (selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "`", yank:, insertText:, " ", moveLeft:, insertText:, "`", moveRight:, deleteBackward:);
+    // Markdown shortcut: bold selection
+    "@b" = ( selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "**", yank:, insertText:, " ", moveLeft:, insertText:, "**", moveRight:, deleteBackward:);
+    // Markdown shortcut: italicize selection
+    "@i" = ( selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "*", yank:, insertText:, " ", moveLeft:, insertText:, "*", moveRight:, deleteBackward:);
+    // Markdown shortcut: ` selection
+    "@k" = ( selectWord:, setMark:, swapWithMark:, deleteToMark:, insertText:, "`", yank:, insertText:, " ", moveLeft:, insertText:, "`", moveRight:, deleteBackward:);
 
     // Navigation
-    "." = "rootOfThread:";
-    "," = "lastOfThread:";
     "/" = "searchAllMessages:";
-    "j" = "nextMessage:";
-    "k" = "previousMessage:";
+
+    "j" = ( "setTag:", "\\Seen", "nextMessage:");
+    "k" = ( "setTag:", "\\Seen", "previousMessage:");
     "J" = "nextThread:";
     "K" = "previousThread:";
 
-    // Two of my favorite MailMate keybindings, thanks to Brett Terpstra
-    //
-    // g,g jumps to first message in message list
-    // G jumps to last message in list
-	"g" = {
-		"g" = ( "makeFirstResponder:", "mainOutline", "selectFirstMessageRow:");
-	};
-	"G" = ( "makeFirstResponder:", "mainOutline", "selectLastMessageRow:");
+    "→" = ( "setTag:", "\\Seen", "nextMessage:");           // \U2193 - Swipe right
+    "←" = ( "setTag:", "\\Seen", "previousMessage:");       // \U2190 - Swipe left
+    "↑" = "previousThread:";        // \U2192 - Swipe up
+    "↓" = "nextThread:";            // \U2191 - Swipe down
 
-    "z" = {
-        "p" = "goToMailbox:"; // Prompt
-        "1" = ( "makeFirstResponder:", "mailboxesOutline" );
-        "2" = ( "makeFirstResponder:", "mainOutline" );
-        "3" = ( "makeFirstResponder:", "messageView" );
-        " " = ( "goToMailbox:", "INBOX"); // Inbox
-        "g" = ( "goToMailbox:", "INBOX:catesandrew@imap.gmail.com", "makeFirstResponder:", "mainOutline" ); // Gmail
-        "i" = ( "goToMailbox:", "INBOX:tsidomain%5Cacates@imap.ibaset.com", "makeFirstResponder:", "mainOutline" ); // ibaset
-        "f" = ( "goToMailbox:", "FLAGGED" );
-        "a" = ( "goToMailbox:", "ALL_MESSAGES" );
-        "A" = ( "goToMailbox:", "ARCHIVE" );
-        "d" = ( "goToMailbox:", "DD86095A-ABB6-4599-BC36-EA36B001D82C" ); // Deferred
-        "e" = ( "goToMailbox:", "C7AC6F38-C415-4DB9-A7B6-66DA0CAB8C2C" ); // Delegated
-        "w" = ( "goToMailbox:", "6C6FE5E3-540B-4320-AB0D-00C0DBEEFB84" ); // Waiting on Reply
-        "s" = ( "goToMailbox:", "Spam" );
+    "^→" = "nextUnreadMessage:";
+    "^←" = "previousUnreadMessage:";
+    "^↑" = "previousUnreadThread:";
+    "^↓" = "nextUnreadThread:";
+
+    "F" = {
+        "0" = ( "removeTag:", "\\Flagged", "removeTag:", "$MailFlagBit0", "removeTag:", "$MailFlagBit1", "removeTag:", "$MailFlagBit2" );
+        "1" = (    "setTag:", "\\Flagged", "removeTag:", "$MailFlagBit0", "removeTag:", "$MailFlagBit1", "removeTag:", "$MailFlagBit2" );
+        "2" = (    "setTag:", "\\Flagged",    "setTag:", "$MailFlagBit0", "removeTag:", "$MailFlagBit1", "removeTag:", "$MailFlagBit2" );
+        "3" = (    "setTag:", "\\Flagged", "removeTag:", "$MailFlagBit0",    "setTag:", "$MailFlagBit1", "removeTag:", "$MailFlagBit2" );
+        "4" = (    "setTag:", "\\Flagged",    "setTag:", "$MailFlagBit0",    "setTag:", "$MailFlagBit1", "removeTag:", "$MailFlagBit2" );
+        "5" = (    "setTag:", "\\Flagged", "removeTag:", "$MailFlagBit0", "removeTag:", "$MailFlagBit1",    "setTag:", "$MailFlagBit2" );
+        "6" = (    "setTag:", "\\Flagged",    "setTag:", "$MailFlagBit0", "removeTag:", "$MailFlagBit1",    "setTag:", "$MailFlagBit2" );
+        "7" = (    "setTag:", "\\Flagged", "removeTag:", "$MailFlagBit0",    "setTag:", "$MailFlagBit1",    "setTag:", "$MailFlagBit2" );
     };
 
     // Message State
@@ -103,6 +152,6 @@
 
     // Miscellaneous
     "u" = "undo:";
-    /* "z" = "redo:"; */
+    "^r" = "redo:";
     "o" = "showThread:";
 }
