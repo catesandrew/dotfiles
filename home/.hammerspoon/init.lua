@@ -11,6 +11,101 @@ local osascript = require "hs.osascript"
 local hints = require "hs.hints"
 local appfinder = require "hs.appfinder"
 
+-- Watch for Minimizing Windows and/or Applications
+
+local appWatcherStarted = false
+local appWatches = {}
+
+-- Toggle an application between being the frontmost app, and being hidden
+function toggleApplication(appName)
+    local app = hs.appfinder.appFromName(appName)
+    if not app then
+        return
+    end
+
+    local mainWin = app:mainWindow()
+    if mainWin then
+        if mainWin == hs.window.focusedWindow() then
+            mainWin:application():hide()
+        else
+            mainWin:application():activate(true)
+            mainWin:application():unhide()
+            mainWin:focus()
+        end
+    end
+end
+
+local function manageWindow(win, app)
+  if not win:isStandard() then return end
+
+  -- only trigger on focused window movements otherwise the reshuffling triggers itself
+  local newWatch = win:newWatcher(function(el,ev,wat,ud)
+      if el == app:focusedWindow() then
+          -- reshuffle(app)
+      end
+  end)
+
+  newWatch:start({hs.uielement.watcher.windowMoved, hs.uielement.watcher.windowResized, hs.uielement.watcher.elementDestroyed})
+  local redrawWatch = win:newWatcher(function (el,ev,wat,ud)
+      -- drawTabs(app)
+  end)
+
+  redrawWatch:start({hs.uielement.watcher.elementDestroyed, hs.uielement.watcher.titleChanged})
+end
+
+local function watchApp(app)
+  for i,win in ipairs(app:allWindows()) do
+    manageWindow(win, app)
+  end
+
+  local winWatch = app:newWatcher(function(el,ev,wat,appl)
+      manageWindow(el,appl)
+  end, app)
+  winWatch:start({hs.uielement.watcher.windowCreated})
+
+  local redrawWatch = app:newWatcher(function (el,ev,wat,ud)
+      _animationDuration = hs.window.animationDuration
+      hs.window.animationDuration = 0
+      el:unminimize()
+      launchAppleScript(el:application():name())
+      hs.window.animationDuration = _animationDuration
+  end)
+
+  redrawWatch:start({hs.uielement.watcher.windowMinimized})
+  -- reshuffle(app)
+end
+
+function enableForApp(app)
+  if type(app) == 'string' then
+    appWatches[app] = true
+    app = hs.application.get(app)
+  end
+
+  -- might already be running
+  if app then
+    watchApp(app)
+  end
+
+  -- set up a watcher to catch any watched app launching or terminating
+  if appWatcherStarted then return end
+  appWatcherStarted = true
+
+  local appWatcher = hs.application.watcher.new(function(appName, eventType, appObject)
+    if (eventType == hs.application.watcher.activated) then
+      -- Bring all Finder windows forward when one gets activated
+      if (appName == 'Finder') then
+        appObject:selectMenuItem({'Window', 'Bring All to Front'})
+      end
+    elseif (eventType == hs.application.watcher.launched and appWatches[appName]) then
+      watchApp(appObject)
+    elseif (eventType == hs.application.watcher.terminated) then
+      -- trashTabs(appObject:pid())
+    end
+  end)
+  appWatcher:start()
+end
+
+
 -- Previous Seil Keybindings
 -- Caps Lock (51) → Left Control (59)
 -- Left Control (59) → F19 (80)
@@ -131,6 +226,11 @@ for i, app in ipairs(oascripts) do
   k:bind({}, app[1], function() launchAppleScript(app[2]); k:exit(); end)
 end
 
+for i, app in ipairs(oascripts) do
+  k:bind({}, app[1], function() launchAppleScript(app[2]); k:exit(); end)
+  enableForApp(app[2])
+end
+
 -- double identity apps
 
 doubleapps = {
@@ -149,6 +249,7 @@ end
 
 for i, app in ipairs(doubleapps) do
   k:bind({}, app[1], function() launchDouble(app[2], app[3]); k:exit(); end)
+  enableForApp(app[2])
 end
 
 -- Sequential keybindings, e.g. Hyper-a,f for Finder
