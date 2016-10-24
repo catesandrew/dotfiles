@@ -14,7 +14,7 @@ local appfinder = require "hs.appfinder"
 -- Watch for Minimizing Windows and/or Applications
 
 local appWatcherStarted = false
-local appWatches = {}
+local appWatchers = {}
 
 -- Toggle an application between being the frontmost app, and being hidden
 function toggleApplication(appName)
@@ -35,49 +35,27 @@ function toggleApplication(appName)
     end
 end
 
-local function manageWindow(win, app)
-  if not win:isStandard() then return end
-
-  -- only trigger on focused window movements otherwise the reshuffling triggers itself
-  local newWatch = win:newWatcher(function(el,ev,wat,ud)
-      if el == app:focusedWindow() then
-          -- reshuffle(app)
-      end
-  end)
-
-  newWatch:start({hs.uielement.watcher.windowMoved, hs.uielement.watcher.windowResized, hs.uielement.watcher.elementDestroyed})
-  local redrawWatch = win:newWatcher(function (el,ev,wat,ud)
-      -- drawTabs(app)
-  end)
-
-  redrawWatch:start({hs.uielement.watcher.elementDestroyed, hs.uielement.watcher.titleChanged})
-end
-
 local function watchApp(app)
-  for i,win in ipairs(app:allWindows()) do
-    manageWindow(win, app)
-  end
+  if appWatchers[app:pid()] then return end
 
-  local winWatch = app:newWatcher(function(el,ev,wat,appl)
-      manageWindow(el,appl)
-  end, app)
-  winWatch:start({hs.uielement.watcher.windowCreated})
-
-  local redrawWatch = app:newWatcher(function (el,ev,wat,ud)
+  local watcher = app:newWatcher(function (el,ev,wat,ud)
+    if ev == hs.uielement.watcher.windowMinimized.windowCreated then
+        -- watchWindow(el)
+    elseif ev == hs.uielement.watcher.windowMinimized then
       _animationDuration = hs.window.animationDuration
       hs.window.animationDuration = 0
       el:unminimize()
       launchAppleScript(el:application():name())
       hs.window.animationDuration = _animationDuration
+    end
   end)
 
-  redrawWatch:start({hs.uielement.watcher.windowMinimized})
-  -- reshuffle(app)
+  appWatchers[app:pid()] = {watcher = watcher}
+  watcher:start({hs.uielement.watcher.windowMinimized})
 end
 
 function enableForApp(app)
   if type(app) == 'string' then
-    appWatches[app] = true
     app = hs.application.get(app)
   end
 
@@ -96,15 +74,20 @@ function enableForApp(app)
       if (appName == 'Finder') then
         appObject:selectMenuItem({'Window', 'Bring All to Front'})
       end
-    elseif (eventType == hs.application.watcher.launched and appWatches[appName]) then
+    elseif (eventType == hs.application.watcher.launched) then
       watchApp(appObject)
     elseif (eventType == hs.application.watcher.terminated) then
-      -- trashTabs(appObject:pid())
+      -- Clean up
+      local appWatch = appWatchers[appObject:pid()]
+      if appWatch then
+        appWatch.watcher:stop()
+        appWatchers[appObject:pid()] = nil
+      end
     end
   end)
+
   appWatcher:start()
 end
-
 
 -- Previous Seil Keybindings
 -- Caps Lock (51) → Left Control (59)
@@ -451,7 +434,6 @@ function init()
   createHyper()
   -- createHotkeys()
   -- keycodes.inputSourceChanged(rebindHotkeys)
-  -- tabs.enableForApp("Emacs")
 
   alert.show("Hammerspoon, at your service.")
 end
