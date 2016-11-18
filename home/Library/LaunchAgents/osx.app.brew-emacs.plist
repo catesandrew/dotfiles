@@ -8,9 +8,9 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/opt/emacs/bin/emacs --daemon</string>
+		<string>sleep 10 &amp;&amp; BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --daemon</string>
 	</array>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
