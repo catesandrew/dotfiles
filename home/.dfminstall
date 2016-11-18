@@ -20,3 +20,4 @@ Quiver-settings.json skip
 provision skip
 .mackup recurse
 .pandoc recurse
+.kwm recurse
