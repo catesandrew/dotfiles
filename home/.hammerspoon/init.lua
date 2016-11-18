@@ -55,13 +55,11 @@ local function watchApp(app)
 end
 
 function enableForApp(app)
-  if type(app) == 'string' then
-    app = hs.application.get(app)
-  end
+  local appObject = hs.application.get(app)
 
   -- might already be running
-  if app then
-    watchApp(app)
+  if appObject then
+    watchApp(appObject)
   end
 
   -- set up a watcher to catch any watched app launching or terminating
@@ -73,6 +71,10 @@ function enableForApp(app)
       -- Bring all Finder windows forward when one gets activated
       if (appName == 'Finder') then
         appObject:selectMenuItem({'Window', 'Bring All to Front'})
+      elseif (appName == 'Fantastical') then
+        appObject:selectMenuItem({'Window', 'Full Calendar Window'})
+      else
+        -- appObject:selectMenuItem({'Window', 'Bring All to Front'})
       end
     elseif (eventType == hs.application.watcher.launched) then
       watchApp(appObject)
@@ -110,48 +112,6 @@ end
 
 -- build our own
 
-launchSingle = function(appname)
-  hs.application.launchOrFocus(appname)
-  k.triggered = true
-end
-
--- Single keybinding for app launch
-singleapps = {
-  -- {'z', ''}, was saved for menu pop
-  {'x', 'Safari'},
-  -- {'c', ''}, no action
-  -- {'v', ''}, macvim
-  -- {'b', ''}, google chrome canary
-  -- {'n', ''}, napkin
-  -- {'m', ''}, mailmate
-  -- {'a', ''}, busy contacts
-  -- {'s', ''}, sonos
-  -- {'d', ''}, saved for dash
-  -- {'f', ''}, finder
-  -- {'g', ''}, tower
-  -- {'h', ''}, saved for launchbar
-  -- {'j', ''}, jump desktop
-  -- {'k', ''}, fantastical
-  -- {'l', ''}, no action
-  -- {';', ''}, daylite
-  -- {'q', ''}, quiver
-  -- {'w', ''}, saved for moom
-  -- {'e', ''}, emacs
-  -- {'r', ''}, saved for fantastical 2
-  -- {'t', ''}, iTerm
-  -- {'y', ''}, no action
-  -- {'u', ''}, calcbot
-  -- {'i', ''}, messages
-  -- {'o', ''}, omnifocus
-  -- {'p', ''}, saved for snippets lab
-}
-
-for i, app in ipairs(singleapps) do
-  k:bind({}, app[1], function() launchSingle(app[2]); k:exit(); end)
-end
-
--- apple scripts
-
 appWorkflow = [[
   set appName to "%s"
   set startIt to false
@@ -175,9 +135,14 @@ launchAppleScript = function(appName)
   k.triggered = true
 end
 
+launchSingle = function(appname)
+  hs.application.launchOrFocus(appname)
+  k.triggered = true
+end
+
 oascripts = {
   -- {'z', ''}, was saved for menu pop
-  -- {'x', ''}, safari
+  {'x', 'Safari'},
   {'c', 'Google Chrome Canary'},
   {'v', 'MacVim'},
   {'b', 'Google Chrome'},
@@ -190,7 +155,7 @@ oascripts = {
   {'g', 'Tower'},
   -- {'h', ''}, saved for launchbar
   {'j', 'Jump Desktop'},
-  {'k', 'Fantastical 2'},
+  -- {'k', 'Fantastical 2'},
   -- {'l', ''}, no action
   -- {';', ''}, daylite
   {'q', 'Quiver'},
@@ -218,13 +183,16 @@ end
 
 doubleapps = {
   {'t', 'iTerm2', 'iTerm'},
+  {'k', 'Fantastical', 'Fantastical 2'},
 }
 
 launchDouble = function(appName1, appName2)
   local app = hs.application.find(appName1)
   if (app and hs.application.isRunning(app)) then
+    -- alert(string.format('found running app: %s', appName1))
     launchAppleScript(appName1)
   else
+    -- alert(string.format('launching app: %s', appName2))
     hs.application.launchOrFocus(appName2)
     k.triggered = true
   end
