@@ -51,7 +51,7 @@ __npm_bash_precmd() {
     if [[ -n "${node_modules_found}" ]]
     then
       # exclude the node_modules directory from time machine
-      tmutil addexclusion "node_modules"
+      local __nm=$(readlink -f "node_modules") && tmutil addexclusion "$__nm"
     fi
     node_modules_found=""
   fi
