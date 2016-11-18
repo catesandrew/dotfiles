@@ -1,7 +1,7 @@
 # load grc, if you are using it
 
 if brew_contains_element "grc"; then
-  # . "${__dot_brew_home}/etc/grc.bashrc"
+  # . "${BREW_HOME}/etc/grc.bashrc"
   GRC=`which grc`
   if [ "$TERM" != dumb  ] && [ -n "$GRC"  ]
   then

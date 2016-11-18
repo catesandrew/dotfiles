@@ -27,7 +27,7 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
   fi
 
   if brew_contains_element "coreutils"; then
-    export COREUTILS_HOME="${__dot_brew_home}/opt/coreutils"
+    export COREUTILS_HOME="${BREW_HOME}/opt/coreutils"
     export MANPATH="${COREUTILS_HOME}/libexec/gnuman:$MANPATH"
 
     if [ -f "${HOME}/.dircolors" ]; then

@@ -1,7 +1,7 @@
 # load fzf, if you are using it
 
 if brew_contains_element "fzf"; then
-    export FZF_TARGET="$__dot_brew_home/opt/fzf"
+    export FZF_TARGET="${BREW_HOME}/opt/fzf"
 
     # Auto-completion
     [[ $- == *i* ]] && source "${FZF_TARGET}/shell/completion.bash" 2> /dev/null

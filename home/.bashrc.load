@@ -5,8 +5,8 @@ export BASH_IT="${HOME}/.bash"
 
 # handle the case when editing remote files through emacs
 if [[ "$TERM" == "dumb" ]]; then
-    . "${BASH_IT}/lib/custom.sh"
-    return
+  . "${BASH_IT}/lib/custom.sh"
+  return
 fi
 
 # TODO Test these
@@ -69,25 +69,36 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     ulimit -n 65536 65536
 
     if hash brew 2>/dev/null; then
-        __dot_brew_home="$(brew --prefix)"
-        BREW_HOME=$__dot_brew_home
+
+      brew_cache="${HOME}/.brew-init-bash"
+      if [ -f "$brew_cache" ]; then
+        . "$brew_cache"
+        __unserialise __dot_brew_list "$__dot_brew_list"
+        __unserialise __dot_brew_taps "$__dot_brew_taps"
+        __unserialise __dot_cask_list "$__dot_cask_list"
+      else
+        BREW_HOME="$(brew --prefix)"
         export BREW_HOME
-        HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=/usr/local/caskroom"
-        export HOMEBREW_CASK_OPTS
 
         __dot_brew_list=($(brew list | sed 's/:.*//'))
         __dot_brew_taps=($(brew tap | sed 's/:.*//'))
         __dot_cask_list=($(brew cask list --caskroom=/usr/local/caskroom | sed 's/:.*//'))
+      fi
+      unset brew_cache
+
+      HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=${BREW_HOME}/caskroom"
+      export HOMEBREW_CASK_OPTS
+
     fi
 
     if brew_contains_element "bash-completion"; then
-        BASH_COMP_TARGET="$__dot_brew_home/etc/bash_completion"
+        BASH_COMP_TARGET="$BREW_HOME/etc/bash_completion"
         if [ "${BASH_VERSINFO[0]}" -le 3 ] && [ -f "${BASH_COMP_TARGET}" ]; then
           . "${BASH_COMP_TARGET}"
         fi
         unset BASH_COMP_TARGET
     elif brew_contains_element "bash-completion2"; then
-        BASH_COMP_TARGET="$__dot_brew_home/share/bash-completion/bash_completion"
+        BASH_COMP_TARGET="$BREW_HOME/share/bash-completion/bash_completion"
 
         if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ -f "${BASH_COMP_TARGET}" ]; then
           . "${BASH_COMP_TARGET}"
@@ -251,7 +262,7 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     export PERL5LIB="${HOME}/perl5/lib/perl5:$PERL5LIB";
 
     if brew_contains_element "openconnect"; then
-        export VPNC_SCRIPT="${__dot_brew_home}/etc/vpnc-script"
+        export VPNC_SCRIPT="${BREW_HOME}/etc/vpnc-script"
     fi
 
     if cask_contains_element "vagrant"; then
@@ -265,11 +276,11 @@ elif [ "$__dot_system_type" == "Linux" ]; then
     path_munge "/usr/local/linuxbrew/bin"
 
     # if [ ${#__dot_brew_list[@]} -gt 0 ]; then
-    if [ -n "$__dot_brew_home" ]; then
+    if [ -n "$BREW_HOME" ]; then
         # Fix checks for gcc compiler when not present when `--env=inherit` specified
-        export HOMEBREW_TEMP="${__dot_brew_home}/tmp"
-        export MANPATH="${__dot_brew_home}/share/man:$MANPATH"
-        export INFOPATH="${__dot_brew_home}/share/info:$INFOPATH"
+        export HOMEBREW_TEMP="${BREW_HOME}/tmp"
+        export MANPATH="${BREW_HOME}/share/man:$MANPATH"
+        export INFOPATH="${BREW_HOME}/share/info:$INFOPATH"
     fi
 
     dpkg -s vagrant &>/dev/null || {

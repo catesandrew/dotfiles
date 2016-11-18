@@ -116,3 +116,26 @@ function install_prompt {
   fi
 }
 add_on_exit install_prompt
+
+__serialise() {
+  set -- "${@//\\/\\\\}" # \
+    set -- "${@//${FS:-;}/\\${FS:-;}}" # ; - our field separator
+    set -- "${@//${RS:-:}/\\${RS:-:}}" # ; - our record separator
+    local IFS="${FS:-;}"
+    printf ${SERIALIZE_TARGET:+-v"$SERIALIZE_TARGET"} "%s" "$*${RS:-:}"
+}
+add_on_exit __serialise
+
+__serialise_to() {
+  SERIALIZE_TARGET="$1" __serialise "${@:2}"
+}
+add_on_exit __serialise_to
+
+__unserialise() {
+  local IFS="${FS:-;}"
+  if test -n "$2"
+  then read -d "${RS:-:}" -a "$1" <<<"${*:2}"
+  else read -d "${RS:-:}" -a "$1"
+  fi
+}
+add_on_exit __unserialise

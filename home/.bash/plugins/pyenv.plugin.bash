@@ -7,7 +7,7 @@ if brew_contains_element "pyenv" || \
   export PYENV_SHELL=bash
 
   if brew_contains_element "pyenv"; then
-    export PYENV_HOME="${__dot_brew_home}/opt/pyenv"
+    export PYENV_HOME="${BREW_HOME}/opt/pyenv"
   fi
 
   # Instead of `eval $(pyenv init -)`, lets run it directly here.

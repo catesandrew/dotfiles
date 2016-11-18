@@ -8,7 +8,7 @@ if brew_contains_element "rbenv" || \
   export RBENV_SHELL=bash
 
   if brew_contains_element "rbenv"; then
-    RBENV_HOME="${__dot_brew_home}/opt/rbenv"
+    RBENV_HOME="${BREW_HOME}/opt/rbenv"
     export RBENV_HOME
   fi
 

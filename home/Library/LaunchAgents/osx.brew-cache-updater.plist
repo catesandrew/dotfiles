@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false/>
+	<key>Label</key>
+        <string>osx.brew-cache-updater</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+                <string>-c</string>
+                <string>BASH_NO=no . /etc/profile &amp;&amp; sleep 4 &amp;&amp; $HOME/.bin/brew-cache-update.sh</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict>
+			<key>Hour</key>
+			<integer>10</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>Hour</key>
+			<integer>15</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+	</array>
+</dict>
+</plist>
