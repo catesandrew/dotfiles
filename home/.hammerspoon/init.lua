@@ -146,7 +146,7 @@ oascripts = {
   {'c', 'Google Chrome Canary'},
   {'v', 'MacVim'},
   {'b', 'Google Chrome'},
-  {'n', 'Napkin'},
+  {'n', 'NotePlan'},
   {'m', 'MailMate'},
   {'a', 'BusyContacts'},
   {'s', 'Sonos'},
