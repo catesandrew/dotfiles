@@ -812,6 +812,8 @@ autocmd FileType xhtml setlocal textwidth=0
 " }}}
 " CSS, Stylus, and LessCSS {{{
 
+au Filetype stylus let anyfold_activate=1
+
 " (tab width 2 chr, wrap at 79th char)
 autocmd FileType css,stylus setlocal sw=2
 autocmd FileType css,stylus setlocal ts=2
@@ -877,6 +879,8 @@ autocmd FileType javascript setlocal sts=2
 autocmd FileType javascript setlocal textwidth=0
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 
+
+au Filetype javascript let anyfold_activate=1
 au FileType javascript nnoremap <buffer> <C-c>  :<C-u>call WriteJSDocComment()<CR>
 au FileType javascript call JavaScriptFold()
 au FileType javascript setl fen
