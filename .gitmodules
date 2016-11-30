@@ -365,3 +365,6 @@
 [submodule "home/.tmux/plugins/tpm"]
 	path = home/.tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "home/.vim/bundle/vim-anyfold"]
+	path = home/.vim/bundle/vim-anyfold
+	url = https://github.com/pseewald/vim-anyfold.git
