@@ -4,19 +4,26 @@
         name          = 'Vibrant Ink';
         css           = '
 
+.fontify {
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.signature,
 .plaintext,
 .markdown {
   color: #333;
-  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 16px;
   line-height: 1.6;
 }
 
+.signature a,
 .plaintext a,
 .markdown a {
   background-color: transparent;
 }
 
+.signature a:active,
+.signature a:hover,
 .plaintext a:active,
 .plaintext a:hover,
 .markdown a:active,
@@ -24,22 +31,26 @@
   outline: 0;
 }
 
+.signature strong,
 .plaintext strong,
 .markdown strong {
   font-weight: bold;
 }
 
+.signature h1,
 .plaintext h1,
 .markdown h1 {
   font-size: 2em;
   margin: 0.67em 0;
 }
 
+.signature img,
 .plaintext img,
 .markdown img {
   border: 0;
 }
 
+.signature hr,
 .plaintext hr,
 .markdown hr {
   box-sizing: content-box;
