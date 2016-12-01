@@ -33,3 +33,9 @@ wget -S --spider -O - http://google.com
 
 # Change the User-Agent to 'User-Agent: toto'
 wget -U 'toto' http://google.com
+
+# Scrape: download single but complete pages (articles etc…)
+wget --page-requisites --adjust-extension --convert-links
+
+# Scrape: download complete sites
+wget --mirror –w 2 --page-requisites --adjust-extension –-convert-links –P /home/user/sitecopy/
