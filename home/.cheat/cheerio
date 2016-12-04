@@ -1,0 +1,18 @@
+# Simple Query
+$ curl -s https://github.com/mlwmlw/cheerio-cli | cheerio -s span[itemprop=title]
+> mlwmlw
+
+# First Element
+$ curl -s https://github.com/mlwmlw/cheerio-cli/commits/master | cheerio -s ".commit:last-child a:eq(1)"
+> 07b0406
+
+# Output Query Elements Size
+$ curl -s https://github.com/mlwmlw/cheerio-cli/commits/master | cheerio -s .commit -e size
+> 6',
+
+# Query Element Attribute
+$ curl -s https://github.com/mlwmlw/cheerio-cli/commits/master | cheerio -s meta[name=hostname] -a content
+> github.com
+
+# Piping Output
+$ curl -s https://github.com/mlwmlw/cheerio-cli | cheerio -s #readme | cheerio -s h2
