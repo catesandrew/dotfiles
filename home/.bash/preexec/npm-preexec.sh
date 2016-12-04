@@ -37,23 +37,30 @@ __npm_bash_precmd() {
     return
   fi
 
-  local node_modules_found
+  local __node_modules_found
+  local __nm_dir
 
   IFS=' ' read -ra args <<< "$__bp_trimmed_arg"
   if [[ "${args[0]}" = 'npm' ]]
   then
     for arg in "${args[1]}"; do
       if [ "$arg" = "install" ]; then
-        node_modules_found="yes"
+        __node_modules_found="yes"
       fi
     done
 
-    if [[ -n "${node_modules_found}" ]]
+    if [[ -n "${__node_modules_found}" ]]
     then
       # exclude the node_modules directory from time machine
-      local __nm=$(readlink -f "node_modules") && tmutil addexclusion "$__nm"
+      __nm_dir=$(readlink -f "node_modules")
+      tmutil addexclusion "$__nm_dir"
+      # prevent spotlight by creating an empty file .metadata_never_index inside the folder
+      # (eg with touch folder/.metadata_never_index)
+      touch "${__nm_dir}/.metadata_never_index"
     fi
-    node_modules_found=""
+
+    unset __node_modules_found
+    unset __nm_dir
   fi
 }
 
