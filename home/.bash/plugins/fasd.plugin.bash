@@ -24,7 +24,9 @@ if brew_contains_element "fasd" || \
   }
 
   # add bash hook
-  precmd_functions+=(_fasd_prompt_func)
+  if ! contains_element _fasd_prompt_func "${precmd_functions[@]}"; then
+      precmd_functions+=(_fasd_prompt_func)
+  fi
 
   # bash command mode completion
   _fasd_bash_cmd_complete() {
