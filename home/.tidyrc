@@ -1,19 +1,54 @@
-char-encoding: utf8
-doctype: html5
-indent: yes
-tidy-mark: no
-indent-spaces: 2
-wrap: 160
-markup: yes
-output-xml: no
-output-html: yes
-input-xml: no
-show-warnings: yes
 numeric-entities: yes
-quote-marks: yes
-quote-nbsp: yes
-quote-ampersand: no
-break-before-br: no
 uppercase-tags: no
 uppercase-attributes: no
-show-body-only: no
+
+#based on http://tidy.sourceforge.net/docs/quickref.html
+#HTML, XHTML, XML Options Reference
+anchor-as-name: no  #?
+# doctype: html5
+doctype: omit
+drop-empty-paras: yes
+fix-backslash: no
+fix-bad-comments: yes
+fix-uri:no
+hide-endtags: no   #?
+#input-xml: yes     #?
+join-styles: no
+literal-attributes: yes
+lower-literals: no
+merge-divs: no
+merge-spans: no
+output-html: yes
+preserve-entities: yes
+quote-ampersand: no
+quote-nbsp: no
+quote-marks: no
+show-body-only: auto
+
+#Diagnostics Options Reference
+show-errors: 0
+show-warnings: 0
+
+#Pretty Print Options Reference
+break-before-br: yes
+indent: yes
+indent-attributes: no   #default
+indent-spaces: 2
+tab-size: 2
+wrap: 0
+wrap-asp: no
+wrap-jste: no
+wrap-php: no
+wrap-sections: no
+wrap-attributes: no
+wrap-script-literals: no
+
+#Character Encoding Options Reference
+char-encoding: utf8
+
+#Miscellaneous Options Reference
+force-output: yes
+quiet: yes
+tidy-mark: no
+
+ascii-chars: yes
