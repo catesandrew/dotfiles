@@ -20,7 +20,8 @@ if brew_contains_element "fasd" || \
   esac
 
   _fasd_prompt_func() {
-    eval "fasd --proc $(fasd --sanitize "$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//")")" >> "/dev/null" 2>&1
+    # If the HISTTIMEFORMAT environment variable is set when using bash, then the _fasd_prompt_func function will not detect directory changes.
+    eval "fasd --proc $(fasd --sanitize $(HISTTIMEFORMAT= history 1 | sed "s/^[ ]*[0-9]*[ ]*//"))" >> "/dev/null" 2>&1
   }
 
   # add bash hook
