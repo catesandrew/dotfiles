@@ -15,9 +15,9 @@ HISTCONTROL=ignoreboth:erasedups
 
 # Huge history. Doesn't appear to slow things down, so why not?
 # - Increase the maximum number of commands to remember (default is 500)
-HISTSIZE=500000
+HISTSIZE=50000000
 # - Increase the maximum number of lines contained in the history file (default is 500)
-HISTFILESIZE=200000
+HISTFILESIZE=50000000
 
 # Don't record some commands
 # - `npm +(ls|install|view|update)` will not record `npm ls`, `npm install`, etc.
