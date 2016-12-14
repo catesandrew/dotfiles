@@ -68,6 +68,9 @@ add_on_exit osx_upgrade_bash4
 if [ "$__dot_system_type" == "Darwin" ]; then
     ulimit -n 65536 65536
 
+    export DICPATH=$HOME/Library/Spelling
+    export DICTIONARY=en_US
+
     if hash brew 2>/dev/null; then
 
       brew_cache="${HOME}/.brew-init-bash"
