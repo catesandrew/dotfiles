@@ -16,3 +16,33 @@ $ curl -s https://github.com/mlwmlw/cheerio-cli/commits/master | cheerio -s meta
 
 # Piping Output
 $ curl -s https://github.com/mlwmlw/cheerio-cli | cheerio -s #readme | cheerio -s h2
+
+
+cheerio file.html --prune -s p --eval "eldred ocr"
+cheerio file.html --prune -s h2 --eval "eldred ocr" -o file.html
+cheerio file.html --prune -s h2 --eval "eldred ocr" -o file.html
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --prune -s p --eval "eldred ocr" -o "$file"; done
+cheerio test.html --prune -s p --eval "eldred ocr" -o file.html
+cheerio file.html --prune -s p --eval "eldred ocr" -o file.html
+cheerio file.html --prune -s p --eval "eldred ocr"
+cheerio file.html --prune -s p --eval "eldred ocr"
+cheerio file.html --prune -s p --eval "eldred ocr"
+cheerio file.html --prune -s "p" --eval "eldred ocr" -o file.html
+cheerio test.html --prune -s "p" --eval "eldred ocr" -o test.html
+cheerio test.html -r - -p -s "p" --eval "eldred ocr" -o test.html
+cheerio test.html -p -r - -s "p" --eval "eldred ocr" -o test.html
+cheerio test.html -p -r 'andrew' -s "p" --eval "eldred ocr"
+cheerio test.html -p -r  -s "p" --eval "eldred ocr"
+cheerio test.html -p -s "p" --eval "eldred ocr"
+cheerio test.html -s "p" --eval "eldred ocr"
+cheerio test.html -p -r - -s "p" --eval "eldred ocr"
+cheerio file.html - -r - -s "p" --eval "eldred ocr" -o file.html
+cheerio file.html --synchronous -p -r - -s "p" --eval "eldred ocr" -o file.html
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s p --eval "eldred ocr" -o "$file"; done
+cheerio file.html --synchronous -p -r - -s li --eval "eldred ocr" -o file.html
+cheerio file.html --synchronous -p -r - -s p --eval "eldred ocr" -o file.html
+cheerio file.html --synchronous -p -r - -s p --eval "eldred ocr" -o file.html
+cheerio file.html --synchronous -p -r - -s h3 --eval "titlecase" -o file.html
+cheerio file.html --synchronous -p -r - -s h2 --eval "titlecase" -o file.html
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h2 --eval "titlecase" -o "$file"; done
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h3 --eval "titlecase" -o "$file"; done
