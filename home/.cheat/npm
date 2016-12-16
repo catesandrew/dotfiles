@@ -1,0 +1,22 @@
+# list all globally installed modules (non-symlinked
+#   note: has to be ran while in node_modules folder
+\ls -F . | gsed -n 's/[^@]$//p' | xargs npm ll --no-color -pg --depth=0 | gawk '{gsub(/\/.*\//,"",$1); print}' | ggrep --color=no -o ":.*:" | sed 's/.$//; s/^.//'
+
+# list all globally installed modules (non-symlinked) and install them again
+#   note: has to be ran while in node_modules folder
+for package in $(\ls -F . | sed -n 's/[^@]$//p' | xargs npm ll --no-color -pg --depth=0 | awk '{gsub(/\/.*\//,"",$1); print}' | \grep -o ":.*:" | sed 's/.$//; s/^.//'); do IFS= read -r pkg <<< "${package}" && npm install -g "$pkg"; done
+
+# list of all globally installed packages (not symlinked)
+\ls -F ${NPM_CONFIG_PREFIX}/lib/node_modules | gsed -n 's/[^@]$//p' | xargs npm list -g --parseable --depth=0 | awk '{gsub(/\/.*\//,"",$1); print}'| sort -u
+
+# list of non-symlinked packages in node_modules
+\ls -F ${NPM_CONFIG_PREFIX}/lib/node_modules | gsed -n 's/[^@]$//p'
+
+# list of symlinked packages in node_modules
+\ls -F ${NPM_CONFIG_PREFIX}/lib/node_modules | gsed -n 's/@$//p'
+
+# list of globally installed packages
+npm list -g --parseable --depth=0 | awk '{gsub(/\/.*\//,"",$1); print}'| sort -u
+
+# Downgrade npm to v2
+npm install -g npm@latest-2
