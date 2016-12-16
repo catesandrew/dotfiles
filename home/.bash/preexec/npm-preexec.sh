@@ -37,31 +37,51 @@ __npm_bash_precmd() {
     return
   fi
 
-  local __node_modules_found
+  local __node_cmd_i
   local __nm_dir
 
   IFS=' ' read -ra args <<< "$__bp_trimmed_arg"
-  if [[ "${args[0]}" = 'npm' ]]
-  then
-    for arg in "${args[1]}"; do
-      if [ "$arg" = "install" ]; then
-        __node_modules_found="yes"
+  if [[ "${args[0]}" = 'npm' ]]; then
+      if [ "${args[1]}" = "install" ] || [ "${args[1]}" = "i" ]; then
+        __node_cmd_i="yes"
+
+        if [ ${#args[@]} -gt 2 ]; then
+          while getopts ":g-:" optchar "${args[@]:2}"; do
+            case "${optchar}" in
+              -)
+                case "${OPTARG}" in
+                  global)
+                    unset __node_cmd_i
+                    ;;
+                esac;;
+              g)
+                unset __node_cmd_i
+                ;;
+            esac
+          done
+        fi
       fi
-    done
 
-    if [[ -n "${__node_modules_found}" ]]
-    then
-      # exclude the node_modules directory from time machine
-      __nm_dir=$(readlink -f "node_modules")
-      tmutil addexclusion "$__nm_dir"
-      # prevent spotlight by creating an empty file .metadata_never_index inside the folder
-      # (eg with touch folder/.metadata_never_index)
-      touch "${__nm_dir}/.metadata_never_index"
-    fi
+      if [ -n "${__node_cmd_i}" ]; then
+        # exclude the node_modules directory from time machine
+        __nm_dir="$(readlink -f "node_modules")"
+        if [ -d "$__nm_dir" ]; then
+          tmutil addexclusion "${__nm_dir}"
+          # prevent spotlight by creating an empty file .metadata_never_index inside the folder
+          # (eg with touch folder/.metadata_never_index)
+          touch "${__nm_dir}/.metadata_never_index"
+        fi
+      fi
 
-    unset __node_modules_found
-    unset __nm_dir
+      unset __node_cmd_i
+      unset __nm_dir
   fi
+
+  # for arg in "${args[1]}"; do
+  #   if [ "$arg" = "install" ]; then
+  #     __node_modules_found="yes"
+  #   fi
+  # done
 }
 
 __npm_setup
