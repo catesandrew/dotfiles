@@ -285,50 +285,49 @@ Here is a copy of my `/etc/profile.d/environmeht.sh` file:
 
 
 ```bash
+#!/bin/bash
+
 if ! [ -d "$BREW_HOME" ]; then
     if hash brew 2>/dev/null; then
-        BREW_HOME="`brew --prefix`"
+        BREW_HOME=$(brew --prefix)
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
-
-        # Cask installation
-        if ! [ -d "$CASK_HOME" ]; then
-            if [ x"" != x"$(brew ls --versions cask)"  ]; then
-                CASK_HOME="`brew --prefix cask`"
-                export CASK_HOME
-                launchctl setenv CASK_HOME "$CASK_HOME"
-            fi
-        fi
     fi
 fi
 
 if ! [ -d "$NVM_DIR" ]; then
-  if [ -d /usr/local/nvm ]; then
-    NVM_DIR=/usr/local/nvm
-  elif [ -d "$HOME" ]; then
-    NVM_DIR="$HOME"/.nvm
-  fi
+    if [ -d /usr/local/nvm ]; then
+        NVM_DIR=/usr/local/nvm
+    elif [ -d "$HOME" ]; then
+        NVM_DIR="$HOME"/.nvm
+    fi
 
-  export NVM_DIR
-  launchctl setenv NVM_DIR "$NVM_DIR"
+    export NVM_DIR
+    launchctl setenv NVM_DIR "$NVM_DIR"
 fi
 
 if [ -d "$NVM_DIR" ]; then
     if [ -f "${NVM_DIR}/alias/default" ]; then
-        NVM_VERSION=`cat ${NVM_DIR}/alias/default`
-        PATH="./node_modules/.bin:${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:${PATH}"
+        NVM_VERSION=$(cat "${NVM_DIR}/alias/default")
+        PATH="./bin:./node_modules/.bin:${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:${PATH}"
         NVM_BIN="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin"
         NVM_PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node"
+        # NPM_CONFIG_PREFIX="${NVM_DIR}/versions/node/v${NVM_VERSION}"
+        export NPM_VERSION
         export NVM_BIN
         export NVM_PATH
+        # export NPM_CONFIG_PREFIX
         launchctl setenv NVM_VERSION "$NVM_VERSION"
         launchctl setenv NVM_BIN "$NVM_BIN"
         launchctl setenv NVM_PATH "$NVM_PATH"
+        # launchctl setenv NPM_CONFIG_PREFIX "$NPM_CONFIG_PREFIX"
     fi
 fi
 
 export PATH
 launchctl setenv PATH "$PATH"
 ```
+
+Note: The `NPM_CONFIG_PREFIX` env var is commented out because if you are using nvm then it gets in the way when you switch node versions.
 
 And through all these files and commands I have the correct node path from nvm loaded into the gloabl environment. Now obviously I doubt this would work once you update the version of node and a reboot or logoff/login will be required for the changes to take effect. But that’s ok with me since I typically only update node once every couple months.
