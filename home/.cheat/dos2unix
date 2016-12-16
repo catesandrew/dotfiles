@@ -1,0 +1,2 @@
+# find and convert files not in node_modules or .git dirs
+find . -type f ! -path './node_modules*' ! -path './.git' -exec dos2unix  -k -s -o {} \;
