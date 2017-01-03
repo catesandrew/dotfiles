@@ -324,10 +324,27 @@ function mouseHighlight()
 end
 -- hotkey.bind({"cmd","alt","shift"}, "D", mouseHighlight)
 
+-- USB events
 
+local usbWatcher = nil
 
+function usbDeviceCallback(data)
+  if (data["productName"] == "ScanSnap S1500M") then
+    if (data["eventType"] == "added") then
+      hs.application.launchOrFocus("ScanSnap Manager")
+    elseif (data["eventType"] == "removed") then
+      app = hs.appfinder.appFromName("ScanSnap Manager")
+      app:kill()
+    end
+  end
+end
 
+function createUsbWatcher()
+  usbWatcher = hs.usb.watcher.new(usbDeviceCallback)
+  usbWatcher:start()
+end
 
+-- tabs
 
 local tabs = require "tabs"
 
@@ -404,6 +421,7 @@ end
 
 function init()
   createHyper()
+  createUsbWatcher()
   -- createHotkeys()
   -- keycodes.inputSourceChanged(rebindHotkeys)
 
