@@ -8,7 +8,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>sleep 10 &amp;&amp; BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --daemon</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 6 &amp;&amp; /usr/local/bin/emacs --daemon</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
