@@ -171,11 +171,11 @@ oascripts = {
 }
 
 for i, app in ipairs(oascripts) do
-  k:bind({}, app[1], function() launchAppleScript(app[2]); k:exit(); end)
-end
-
-for i, app in ipairs(oascripts) do
-  k:bind({}, app[1], function() launchAppleScript(app[2]); k:exit(); end)
+  k:bind({}, app[1], function()
+      launchAppleScript(app[2])
+                     end, nil, function()
+      launchAppleScript(app[2])
+  end)
   enableForApp(app[2])
 end
 
@@ -199,7 +199,11 @@ launchDouble = function(appName1, appName2)
 end
 
 for i, app in ipairs(doubleapps) do
-  k:bind({}, app[1], function() launchDouble(app[2], app[3]); k:exit(); end)
+  k:bind({}, app[1], function()
+      launchDouble(app[2], app[3])
+                     end, nil, function ()
+      launchDouble(app[2], app[3])
+  end)
   enableForApp(app[2])
 end
 
