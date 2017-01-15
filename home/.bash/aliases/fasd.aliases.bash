@@ -5,11 +5,11 @@ if brew_contains_element "fasd" || \
   alias v='f -t -e vim -b viminfo'
   alias o='a -e open' # quick opening files with open
   alias a='fasd -a'
-  alias s='fasd -si'
+  # alias s='fasd -si'
   alias sd='fasd -sid'
   alias sf='fasd -sif'
-  alias d='fasd -d'
-  alias f='fasd -f'
+  # alias d='fasd -d'
+  # alias f='fasd -f'
 
   # function to execute built-in cd
   fasd_cd() {

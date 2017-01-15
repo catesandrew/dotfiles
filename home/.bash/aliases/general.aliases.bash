@@ -12,7 +12,7 @@ __long_list() {
 alias ll=__long_list
 # extra info compared to "l"
 #alias ll='ls -lhrt'
-alias l='ls -a'
+# alias l='ls -a'
 alias l1='ls -1'
 
 # My previous shortcuts
