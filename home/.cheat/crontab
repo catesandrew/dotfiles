@@ -11,10 +11,200 @@ SHELL=/bin/bash
 | +------- hour (0 - 23)
 +--------- minute (0 - 59)
 
-# example entries
+# - If the day-of-month or day-of-week part _starts_ with a *, they form an
+#   intersection. Otherwise they form a union. `* * 3 * 1` runs on the 3rd day
+#   of the month and on Wednesday (union), whereas `* * */2 * 1` runs on every
+#   second day of the month only if it's also a Monday (intersection). The
+#   manpage is incorrect about this detail.
+# - Cron jobs can break. Don't rely just on email to find out because the root
+#   cause can be outside of cron. Monitor each cronjob with a watchdog timer.
+# - Run your servers including the cron process in UTC timezone. See Why
+#   http://yellerapp.com/posts/2015-01-12-the-worst-server-setup-you-can-make.html
+# - Some cron implementations allow to specify years and seconds. However, cron
+#   is not the best tool if you need to operate at those levels, which is also
+#   why crontab.guru doesn't support them.</p>
+# - Don't use @reboot because it has too many issues:
+#   http://unix.stackexchange.com/questions/109804/crontabs-reboot-only-works-for-root
+# - More difficult schedules can be realized by combining multiple cron
+#   expressions. For example, if you need to run X every 90 minutes, create one
+#   crontab entry that runs X every 3 hours on the hour `0 */3 * * *`, and a
+#   second crontab entry that runs X every 3 hours with an offset `30 1/3 * * *`
+# - Another alternative for complicated schedules is Mcron.
+
 # every 15 min
 */15 * * * * /home/user/command.sh
+
 # every midnight
 0 * * * * /home/user/command.sh
+
 # every Saturday at 8:05 AM
 5 8 * * 6 /home/user/command.sh
+
+# every 1 hour
+0 * * * *
+
+# every 1 minute
+* * * * *
+
+# every 10 minutes
+*/10 * * * *
+
+# every 12 hours
+0 */12 * * *
+
+# every 2 hours
+0 */2 * * *
+
+# every 2 minutes
+*/2 * * * *
+
+# every 20 minutes
+*/20 * * * *
+
+# every 3 hours
+0 */3 * * *
+
+# every 3 minutes
+*/3 * * * *
+
+# every 30 minutes
+*/30 * * * *
+
+# every 4 hours
+0 */4 * * *
+
+# every 4 minutes
+*/4 * * * *
+
+# every 5 minutes
+*/5 * * * *
+
+# every 6 hours
+0 */6 * * *
+
+# every 6 minutes
+*/6 * * * *
+
+# every 6 months
+0 0 1 */6 *
+
+# every 60 minutes
+0 * * * *
+
+# every 7 days
+0 0 * * 0
+
+# every 8 hours
+0 */8 * * *
+
+# every day 8am
+0 8 * * *
+
+# every day at 1am
+0 1 * * *
+
+# every day at 2am
+0 2 * * *
+
+# every day at midnight
+0 0 * * *
+
+# every day
+0 0 * * *
+
+# every even hour
+0 */2 * * *
+
+# every even minute
+*/2 * * * *
+
+# every five minutes
+*/5 * * * *
+
+# every friday at midnight
+0 0 * * FRI
+
+# every friday
+0 0 * * FRI
+
+# every half hour
+*/30 * * * *
+
+# every hour at 30 minutes
+30 * * * *
+
+# every hour
+0 * * * *
+
+# every midnight
+0 0 * * *
+
+# every minute
+* * * * *
+
+# every monday
+0 0 * * MON
+
+# every month
+0 0 1 * *
+
+# every morning
+0 9 * * *
+
+# every night at midnight
+0 0 * * *
+
+# every night
+0 0 * * *
+
+# every other hour
+0 */2 * * *
+
+# every other month
+0 0 1 */2 *
+
+# every quarter hour
+*/15 * * * *
+
+# every quarter
+0 0 1 */3 *
+
+# every saturday
+0 0 * * SAT
+
+# every six hours
+0 */6 * * *
+
+# every sunday
+0 0 * * SUN
+
+# every ten minutes
+*/10 * * * *
+
+# every three hours
+0 */3 * * *
+
+# every thursday
+0 0 * * THU
+
+# every tuesday
+0 0 * * TUE
+
+# every two hours
+0 */2 * * *
+
+# every uneven minute
+1-59/2 * * * *
+
+# every wednesday
+0 0 * * WED
+
+# every week
+0 0 * * 0
+
+# every weekday
+0 0 * * 1-5
+
+# every year
+0 0 1 1 *
+
