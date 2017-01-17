@@ -1,7 +1,28 @@
 {
     "profiles": [
         {
-            "devices": [],
+            "devices": [
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": false,
+                        "product_id": 632,
+                        "vendor_id": 1452
+                    },
+                    "ignore": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": false,
+                        "product_id": 34304,
+                        "vendor_id": 1452
+                    },
+                    "ignore": true
+                }
+            ],
             "fn_function_keys": {
                 "f1": "vk_consumer_brightness_down",
                 "f10": "mute",
@@ -22,8 +43,13 @@
                 "caps_lock": "left_control",
                 "left_control": "f19"
             },
+            "standalone_keys": {
+                "caps_lock": "escape"
+            },
             "virtual_hid_keyboard": {
-                "keyboard_type": "ansi"
+                "caps_lock_delay_milliseconds": 200,
+                "keyboard_type": "ansi",
+                "standalone_keys_delay_milliseconds": 100
             }
         },
         {
