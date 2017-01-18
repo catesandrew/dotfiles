@@ -47,9 +47,7 @@
                 "caps_lock": "escape"
             },
             "virtual_hid_keyboard": {
-                "caps_lock_delay_milliseconds": 200,
-                "keyboard_type": "ansi",
-                "standalone_keys_delay_milliseconds": 100
+                "keyboard_type": "ansi"
             }
         },
         {
