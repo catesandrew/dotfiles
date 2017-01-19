@@ -127,3 +127,5 @@ alias ct='column -t'
 
 # For URL encoding, we are going to use a slick method developed by Ruslan Spivak.
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
+
+alias lsusers="cut -d: -f1 /etc/passwd"

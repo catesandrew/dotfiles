@@ -1,6 +1,6 @@
 # Bundler Commands
-alias be='bundle exec'
-alias bi='bundle install'
-alias bl='bundle list'
-alias bu='bundle update'
-alias bp='bundle package'
+alias rbe='bundle exec'
+alias rbi='bundle install'
+alias rbl='bundle list'
+alias rbu='bundle update'
+alias rbp='bundle package'

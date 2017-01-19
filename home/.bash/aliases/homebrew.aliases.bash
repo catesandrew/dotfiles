@@ -11,9 +11,9 @@ elif [ "$(uname)" = "Linux" ]; then
 fi
 
 alias bout='brew outdated'
-alias bin='brew install'
+alias bi='brew install'
 alias brm='brew uninstall'
 alias bls='brew list'
-alias bsr='brew search'
-alias binf='brew info'
+alias bs='brew search'
+alias bn='brew info'
 alias bdr='brew doctor'
