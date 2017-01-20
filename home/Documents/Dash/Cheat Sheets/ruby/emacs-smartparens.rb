@@ -680,11 +680,11 @@ Examples:
 
 |foo (bar (baz quux)) -> foo (bar (|baz quux)) ;; 2
 
-|foo (bar (baz (quux) blab)) -> foo (bar (baz (|quux) blab)) ;; [universal-argument]
+|foo (bar (baz (quux) blab)) -> foo (bar (baz (|quux) blab)) ;; `C-u`
 
 (foo (bar baz) |quux) -> (|foo (bar baz) quux)
 
-(blab foo |(bar baz) quux) -> (|blab foo (bar baz) quux) ;; [universal-argument] [universal-argument]
+(blab foo |(bar baz) quux) -> (|blab foo (bar baz) quux) ;; `C-u` `C-u`
 ```
 END
 end
@@ -706,11 +706,11 @@ foo (bar (baz quux))| -> foo (bar (baz quux)|)
 
 (bar (baz quux)) foo| -> (bar (baz quux|)) foo ;; 2
 
-foo (bar (baz (quux) blab))| -> foo (bar (baz (quux|) blab)) ;; [universal-argument]
+foo (bar (baz (quux) blab))| -> foo (bar (baz (quux|) blab)) ;; `C-u`
 
 (foo| (bar baz) quux) -> (foo (bar baz) quux|)
 
-(foo (bar baz) |quux blab) -> (foo (bar baz) quux blab|) ;; [universal-argument] [universal-argument]
+(foo (bar baz) |quux blab) -> (foo (bar baz) quux blab|) ;; `C-u` `C-u`
 ```
 END
 end
@@ -724,49 +724,98 @@ Jump to beginning of the sexp the point is in.
 The beginning is the point after the opening delimiter.
 
 With no argument, this is the same as calling
-\\[universal-argument] \\[universal-argument] `sp-down-sexp'END'
+`C-u` `C-u` `sp-down-sexp`
 
 Examples:
 
+```common-lisp
+  (foo (bar baz) quux (blab glob)) ;; =>
+;;                   ¯
+  (foo (bar baz) quux (blab glob))
+;; ¯
+
+  (foo (bar baz) quux (blab glob)) ;; =>
+;;             ¯
+  (foo (bar baz) quux (blab glob))
+;;      ¯
+
+  (foo) (bar) (baz quux) ;; => `C-u` `3`
+;; ¯
+  (foo) (bar) (baz quux)
+;;             ¯
+
+  (foo bar) (baz) (quux) ;; => `C-u` `-3`
+;;                     ¯
+  (foo bar) (baz) (quux)
+;; ¯
+
+  ((foo bar) (baz quux) blab) ;; => `C-u`
+;;                ¯
+  ((foo bar) (baz quux) blab)
+;; ¯
 ```
-(foo (bar baz) quux| (blab glob)) -> (|foo (bar baz) quux (blab glob))
 
-(foo (bar baz|) quux (blab glob)) -> (foo (|bar baz) quux (blab glob))
+If you want to move point to the start of the string, use `C-S-d`:
 
-(|foo) (bar) (baz quux) -> (foo) (bar) (|baz quux) ;; 3
-
-(foo bar) (baz) (quux|) -> (|foo bar) (baz) (quux) ;; -3
-
-((foo bar) (baz |quux) blab) -> (|(foo bar) (baz quux) blab) ;; [universal-argument]
+```common-lisp
+  (let [x "foo bar baz ... blah"]) ;; =>
+;;                         ¯
+  (let [x "foo bar baz ... blah"])
+;;         ¯
 ```
+
   END
 end
 
 entry do
   name 'sp-end-of-sexp'
   command 'C-S-a'
-  notes "
+  notes <<-END
 Jump to end of the sexp the point is in.
 
 The end is the point before the closing delimiter.
 
 With no argument, this is the same as calling
-\\[universal-argument] \\[universal-argument] `sp-backward-down-sexp'.
+`C-u` `C-u` `sp-backward-down-sexp`.
 
 Examples:
 
+```common-lisp
+  (foo (bar baz) quux (blab glob)) ;; =>
+;;     ¯
+  (foo (bar baz) quux (blab glob))
+;;                               ¯
+
+  (foo (bar baz) quux (blab glob)) ;; =>
+;;      ¯
+  (foo (bar baz) quux (blab glob))
+;;             ¯
+
+  (foo) (bar) (baz quux) ;; =>
+;; ¯
+  (foo) (bar) (baz quux) ;; `C-u` `3`
+;;                     ¯
+
+  (foo bar) (baz) (quux) ;; =>
+;;                     ¯
+  (foo bar) (baz) (quux) ;; `C-u` `-3`
+;;        ¯
+
+  ((foo bar) (baz quux) blab) ;; =>
+;;      ¯
+  ((foo bar) (baz quux) blab) ;; `C-u`
+;;                          ¯
 ```
-(foo |(bar baz) quux (blab glob)) -> (foo (bar baz) quux (blab glob)|)
 
-(foo (|bar baz) quux (blab glob)) -> (foo (bar baz|) quux (blab glob))
+If you want to move point to the end of the string, use `C-S-a`:
 
-(|foo) (bar) (baz quux) -> (foo) (bar) (baz quux|) ;; 3
-
-(foo bar) (baz) (quux|) -> (foo bar|) (baz) (quux) ;; -3
-
-((foo |bar) (baz quux) blab) -> ((foo bar) (baz quux) blab|) ;; [universal-argument]
+```common-lisp
+  (let [x "foo bar baz blah"]) ;; =>
+;;                     ¯
+  (let [x "foo bar baz blah"])
+;;                         ¯
 ```
-  "
+  END
 end
 
 entry do
@@ -864,14 +913,14 @@ With ARG being positive number N, repeat that many times.
 With ARG being Negative number -N, repeat that many times in
 backward direction.
 
-With ARG being raw prefix [universal-argument], kill all the expressions from
-point up until the end of current list.  With raw prefix [negative-argument] [universal-argument],
+With ARG being raw prefix `C-u`, kill all the expressions from
+point up until the end of current list.  With raw prefix [negative-argument] `C-u`,
 kill all the expressions from beginning of current list up until
 point.  If point is inside a symbol, this is also killed.  If
 there is no expression after/before the point, just delete the
 whitespace up until the closing/opening delimiter.
 
-With ARG being raw prefix [universal-argument] [universal-argument], kill current list (the list
+With ARG being raw prefix `C-u` `C-u`, kill current list (the list
 point is inside).
 
 With ARG numeric prefix 0 (zero) kill the insides of the current
@@ -890,17 +939,17 @@ Examples:
 
 (foo (bar) | baz) -> |           ;; 2
 
-(foo |(bar) baz)  -> |           ;; [universal-argument] [universal-argument]
+(foo |(bar) baz)  -> |           ;; `C-u` `C-u`
 
-(1 |2 3 4 5 6)    -> (1|)        ;; [universal-argument]
+(1 |2 3 4 5 6)    -> (1|)        ;; `C-u`
 
 (1 |2 3 4 5 6)    -> (1 | 5 6)   ;; 3
 
 (1 2 3 4 5| 6)    -> (1 2 3 | 6) ;; -2
 
-(1 2 3 4| 5 6)    -> (|5 6)      ;; - [universal-argument]
+(1 2 3 4| 5 6)    -> (|5 6)      ;; - `C-u`
 
-(1 2 |   )        -> (1 2|)      ;; [universal-argument], kill useless whitespace
+(1 2 |   )        -> (1 2|)      ;; `C-u`, kill useless whitespace
 
 (1 2 3 |4 5 6)    -> (|)         ;; 0
 ```
@@ -1011,7 +1060,7 @@ Examples:
 
 [(foo |bar) baz]      -> [(foo |bar baz)]
 
-((|foo) bar baz quux) -> ((|foo bar baz quux)) ;; with [universal-argument]
+((|foo) bar baz quux) -> ((|foo bar baz quux)) ;; with `C-u`
 
 \"foo| bar\" \"baz quux\" -> \"foo| bar baz quux\"
 ```
@@ -1033,7 +1082,7 @@ Examples: (prefix arg in comment)
 
 (foo| [bar baz]) -> (foo|) [bar baz] ;; 1
 
-(1 2 3| 4 5 6)   -> (1 2 3|) 4 5 6   ;; [universal-argument] (or numeric prefix 3)
+(1 2 3| 4 5 6)   -> (1 2 3|) 4 5 6   ;; `C-u` (or numeric prefix 3)
 
 (foo bar| baz)   -> foo (bar| baz)   ;; -1
 ```
@@ -1062,7 +1111,7 @@ foo [(bar| baz)]      -> [foo (bar| baz)]
 
 [foo (bar| baz)]      -> [(foo bar| baz)]
 
-(foo bar baz (|quux)) -> ((foo bar baz |quux)) ;; with [universal-argument]
+(foo bar baz (|quux)) -> ((foo bar baz |quux)) ;; with `C-u`
 
 \"foo bar\" \"baz |quux\" -> \"foo bar baz |quux\"
 ```
@@ -1085,7 +1134,7 @@ Examples:
 
 ([foo bar] |baz) -> [foo bar] (|baz)
 
-(1 2 3 |4 5 6) -> 1 2 3 (|4 5 6) ;; [universal-argument] (or 3)
+(1 2 3 |4 5 6) -> 1 2 3 (|4 5 6) ;; `C-u` (or 3)
 ```
   "
 end
@@ -1124,7 +1173,7 @@ Examples:
 ```
 
 Note that to kill only the content and not the enclosing
-delimiters you can use \\[universal-argument] \\[sp-kill-sexp].
+delimiters you can use `C-u` `sp-kill-sexp`.
 See `sp-kill-sexp' for more information.
   "
 end
@@ -1151,7 +1200,7 @@ Examples:
 ```
 
 Note that to kill only the content and not the enclosing
-delimiters you can use \\[universal-argument] \\[sp-backward-kill-sexp].
+delimiters you can use `C-u` `sp-backward-kill-sexp`.
 See `sp-backward-kill-sexp' for more information.
 
   "
@@ -1167,7 +1216,7 @@ Note that the behaviour with the prefix argument seems to be
 reversed.  This is because the backward variant is much more
 common and hence deserve shorter binding.
 
-If ARG is raw prefix argument [universal-argument] [universal-argument] raise the expression the point
+If ARG is raw prefix argument `C-u` `C-u` raise the expression the point
 is inside of.  This is the same as `sp-backward-up-sexp' followed by
 `sp-splice-sexp-killing-around'.
 
@@ -1180,7 +1229,7 @@ Examples:
 
 (- (car x) |a 3)      -> (car x)|   ;; with arg = -1
 
-(foo (bar |baz) quux) -> |(bar baz) ;; with arg = [universal-argument] [universal-argument]
+(foo (bar |baz) quux) -> |(bar baz) ;; with arg = `C-u` `C-u`
 ```
   "
 end
@@ -1224,7 +1273,7 @@ entry do
   command 'C-M-SPC'
   notes <<-END
 Set mark ARG balanced expressions from point.
-The place mark goes is the same place \\[sp-forward-sexp] would
+The place mark goes is the same place `sp-forward-sexp` would
 move to with the same argument.
 Interactively, if this command is repeated
 or (in Transient Mark mode) if the mark is active,
