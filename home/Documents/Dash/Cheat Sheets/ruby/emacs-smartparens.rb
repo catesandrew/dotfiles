@@ -621,22 +621,41 @@ entry do
   notes <<-END
 Move forward across one balanced expression.
 
-With `sp-navigate-consider-symbols' symbols and strings are also
+With `sp-navigate-consider-symbols` symbols and strings are also
 considered balanced expressions.
 
 Examples: (prefix arg in comment)
 
+```common-lisp
+(foo bar baz) ;; =>
+̅
+(foo bar baz)
+             ̅
+
+(foo bar baz) ;; =>
+ ̅
+(foo bar baz)
+    ̅
+
+(foo bar baz) ;; => `C-u` `2`
+ ̅
+(foo bar baz)
+        ̅
+
+(foo (bar baz)) ;; =>
+             ̅
+(foo (bar baz))
+              ̅
 ```
 
-|(foo bar baz)   -> (foo bar baz)|
+If you want to move point after **]**, use `C-M-f`:
 
-(|foo bar baz)   -> (foo| bar baz)
-
-(|foo bar baz)   -> (foo bar| baz) ;; 2
-
-(foo (bar baz|)) -> (foo (bar baz)|)
+```common-lisp
+(:require [clojure.string :as s]) ;; =>
+          ̅
+(:require [clojure.string :as s])
+                                ̅
 ```
-
   END
 end
 
@@ -646,19 +665,40 @@ entry do
   notes <<-END
 Move backward across one balanced expression (sexp).
 
-With `sp-navigate-consider-symbols' symbols and strings are also
+With `sp-navigate-consider-symbols` symbols and strings are also
 considered balanced expressions.
 
 Examples: (prefix arg in comment)
 
+```common-lisp
+(foo bar baz) ;; =>
+             ̅
+(foo bar baz)
+̅
+
+(foo bar baz) ;; =>
+    ̅
+(foo bar baz)
+ ̅
+
+(foo bar baz) ;; => `C-u` `2`
+        ̅
+(foo bar baz)
+ ̅
+
+((foo bar) baz) ;; =>
+ ̅
+((foo bar) baz)
+  ̅
 ```
-(foo bar baz)|   -> |(foo bar baz)
 
-(foo| bar baz)   -> (|foo bar baz)
+If you want to move point after **[**, use `C-M-b`:
 
-(foo bar| baz)   -> (|foo bar baz) ;; 2
-
-(|(foo bar) baz) -> ((|foo bar) baz)
+```common-lisp
+(:require [clojure.string :as s]) ;; =>
+          ̅
+(:require [clojure.string :as s])
+          ̅
 ```
   END
 end
@@ -675,16 +715,44 @@ backwards, jump to end of current one.
 
 Examples:
 
+```common-lisp
+foo (bar (baz quux)) ;; =>
+̅
+foo (bar (baz quux))
+     ̅
+
+foo (bar (baz quux)) ;; => `C-u` `2`
+̅
+foo (bar (baz quux))
+          ̅
+
+foo (bar (baz (quux) blab)) ;; => `C-u`
+̅
+foo (bar (baz (quux) blab))
+               ̅
+
+(foo (bar baz) quux) ;; =>
+               ̅
+(foo (bar baz) quux)
+ ̅
+
+(blab foo (bar baz) quux) ;; => `C-u` `C-u`
+          ̅
+(blab foo (bar baz) quux)
+ ̅
 ```
-|foo (bar (baz quux)) -> foo (|bar (baz quux))
 
-|foo (bar (baz quux)) -> foo (bar (|baz quux)) ;; 2
+If you want to move point to **insert**, use `C-M-d`:
 
-|foo (bar (baz (quux) blab)) -> foo (bar (baz (|quux) blab)) ;; `C-u`
-
-(foo (bar baz) |quux) -> (|foo (bar baz) quux)
-
-(blab foo |(bar baz) quux) -> (|blab foo (bar baz) quux) ;; `C-u` `C-u`
+```common-lisp
+(defun format-date (format)
+  (let ((system-time-locale "en_US.UTF-8"))
+    (insert (format-time-string format)))) ̅
+;; =>
+(defun format-date (format)
+  (let ((system-time-locale "en_US.UTF-8"))
+    (insert (format-time-string format))))
+     ̅
 ```
 END
 end
@@ -701,16 +769,40 @@ jump to beginning of current one.
 
 Examples:
 
+```common-lisp
+foo (bar (baz quux)) ;; =>
+                    ̅
+foo (bar (baz quux))
+                   ̅
+
+(bar (baz quux)) foo ;; => `C-u` `2`
+                    ̅
+(bar (baz quux)) foo
+              ̅
+
+foo (bar (baz (quux) blab)) ;; => `C-u`
+                           ̅
+foo (bar (baz (quux) blab))
+                   ̅
+
+(foo (bar baz) quux) ;; =>
+    ̅
+(foo (bar baz) quux)
+                   ̅
+
+(foo (bar baz) quux blab) ;; => `C-u` `C-u`
+               ̅
+(foo (bar baz) quux blab)
+                        ̅
 ```
-foo (bar (baz quux))| -> foo (bar (baz quux)|)
 
-(bar (baz quux)) foo| -> (bar (baz quux|)) foo ;; 2
+If you want to move point after **]**, use `C-M-a`:
 
-foo (bar (baz (quux) blab))| -> foo (bar (baz (quux|) blab)) ;; `C-u`
-
-(foo| (bar baz) quux) -> (foo (bar baz) quux|)
-
-(foo (bar baz) |quux blab) -> (foo (bar baz) quux blab|) ;; `C-u` `C-u`
+```common-lisp
+(defn foo [bar] (let [x 0] x)) ;; =>
+                ̅
+(defn foo [bar] (let [x 0] x))
+              ̅
 ```
 END
 end
@@ -729,39 +821,39 @@ With no argument, this is the same as calling
 Examples:
 
 ```common-lisp
-  (foo (bar baz) quux (blab glob)) ;; =>
-;;                   ¯
-  (foo (bar baz) quux (blab glob))
-;; ¯
+(foo (bar baz) quux (blab glob)) ;; =>
+                   ¯
+(foo (bar baz) quux (blab glob))
+ ¯
 
-  (foo (bar baz) quux (blab glob)) ;; =>
-;;             ¯
-  (foo (bar baz) quux (blab glob))
-;;      ¯
+(foo (bar baz) quux (blab glob)) ;; =>
+             ¯
+(foo (bar baz) quux (blab glob))
+      ¯
 
-  (foo) (bar) (baz quux) ;; => `C-u` `3`
-;; ¯
-  (foo) (bar) (baz quux)
-;;             ¯
+(foo) (bar) (baz quux) ;; => `C-u` `3`
+ ¯
+(foo) (bar) (baz quux)
+             ¯
 
-  (foo bar) (baz) (quux) ;; => `C-u` `-3`
-;;                     ¯
-  (foo bar) (baz) (quux)
-;; ¯
+(foo bar) (baz) (quux) ;; => `C-u` `-3`
+                     ¯
+(foo bar) (baz) (quux)
+ ¯
 
-  ((foo bar) (baz quux) blab) ;; => `C-u`
-;;                ¯
-  ((foo bar) (baz quux) blab)
-;; ¯
+((foo bar) (baz quux) blab) ;; => `C-u`
+                ¯
+((foo bar) (baz quux) blab)
+ ¯
 ```
 
 If you want to move point to the start of the string, use `C-S-d`:
 
 ```common-lisp
-  (let [x "foo bar baz ... blah"]) ;; =>
-;;                         ¯
-  (let [x "foo bar baz ... blah"])
-;;         ¯
+(let [x "foo bar baz ... blah"]) ;; =>
+                         ¯
+(let [x "foo bar baz ... blah"])
+         ¯
 ```
 
   END
@@ -781,39 +873,39 @@ With no argument, this is the same as calling
 Examples:
 
 ```common-lisp
-  (foo (bar baz) quux (blab glob)) ;; =>
-;;     ¯
-  (foo (bar baz) quux (blab glob))
-;;                               ¯
+(foo (bar baz) quux (blab glob)) ;; =>
+     ¯
+(foo (bar baz) quux (blab glob))
+                               ¯
 
-  (foo (bar baz) quux (blab glob)) ;; =>
-;;      ¯
-  (foo (bar baz) quux (blab glob))
-;;             ¯
+(foo (bar baz) quux (blab glob)) ;; =>
+      ¯
+(foo (bar baz) quux (blab glob))
+             ¯
 
-  (foo) (bar) (baz quux) ;; =>
-;; ¯
-  (foo) (bar) (baz quux) ;; `C-u` `3`
-;;                     ¯
+(foo) (bar) (baz quux) ;; => `C-u` `3`
+ ¯
+(foo) (bar) (baz quux)
+                     ¯
 
-  (foo bar) (baz) (quux) ;; =>
-;;                     ¯
-  (foo bar) (baz) (quux) ;; `C-u` `-3`
-;;        ¯
+(foo bar) (baz) (quux) ;; => `C-u` `-3`
+                     ¯
+(foo bar) (baz) (quux)
+        ¯
 
-  ((foo bar) (baz quux) blab) ;; =>
-;;      ¯
-  ((foo bar) (baz quux) blab) ;; `C-u`
-;;                          ¯
+((foo bar) (baz quux) blab) ;; => `C-u`
+      ¯
+((foo bar) (baz quux) blab)
+                          ¯
 ```
 
 If you want to move point to the end of the string, use `C-S-a`:
 
 ```common-lisp
-  (let [x "foo bar baz blah"]) ;; =>
-;;                     ¯
-  (let [x "foo bar baz blah"])
-;;                         ¯
+(let [x "foo bar baz blah"]) ;; =>
+                     ¯
+(let [x "foo bar baz blah"])
+                         ¯
 ```
   END
 end
@@ -821,88 +913,167 @@ end
 entry do
   name 'sp-up-sexp'
   command 'C-M-e'
-  notes "
+  notes <<-END
 Move forward out of one level of parentheses.
 
-If `sp-navigate-close-if-unbalanced' is non-nil, close the
+If `sp-navigate-close-if-unbalanced` is non-nil, close the
 unbalanced expressions automatically.
 
 Examples:
 
-```
-(foo |(bar baz) quux blab) -> (foo (bar baz) quux blab)|
+```common-lisp
+(foo (bar baz) quux blab) ;; =>
+     ¯
+(foo (bar baz) quux blab)
+                         ¯
 
-(foo (bar |baz) quux blab) -> (foo (bar baz) quux blab)| ;; 2
+(foo (bar baz) quux blab) ;; => `2`
+          ¯
+(foo (bar baz) quux blab)
+                         ¯
 
-(foo bar |baz              -> (foo bar baz)| ;; re-indent the expression
+(foo bar baz              ;; => re-indent the expression
+         ¯
  )
+(foo bar baz)
+             ¯
 
-(foo  |(bar baz)           -> (foo)| (bar baz) ;; close unbalanced expr.
+(foo  (bar baz)           ;; => close unbalanced expr.
+      ¯
+(foo) (bar baz)
+     ¯
 ```
-"
+
+If you want to move point after **)**, use `C-M-e`:
+
+```common-lisp
+(str "foo" "bar baz qux") ;; =>
+    ̅
+(str "foo" "bar baz qux")
+                         ̅
+```
+
+  END
 end
 
 entry do
   name 'sp-backward-up-sexp'
   command 'C-M-u'
-  notes "
+  notes <<-END
 Move backward out of one level of parentheses.
 
 Examples:
 
-```
-(foo (bar baz) quux| blab) -> |(foo (bar baz) quux blab)
+```common-lisp
+(foo (bar baz) quux blab) ;; =>
+                   ¯
+(foo (bar baz) quux blab)
+¯
 
-(foo (bar |baz) quux blab) -> |(foo (bar baz) quux blab) ;; 2
+(foo (bar baz) quux blab) ;; => `C-u` `2`
+          ¯
+(foo (bar baz) quux blab)
+¯
 
-(                  -> |(foo bar baz)
-  foo |bar baz)
+(foo bar baz) ;; =>
+      ¯
+(foo bar baz)
+¯
 ```
-  "
+
+If you want to move point to **(format**, use `C-M-u`:
+
+```common-lisp
+(insert (format-time-string format)) ;; =>
+                           ̅
+(insert (format-time-string format))
+        ̅
+```
+  END
 end
 
 entry do
   name 'sp-next-sexp'
   command 'C-M-n'
-  notes "
+  notes <<-END
 Move forward to the beginning of next balanced expression.
 
-With `sp-navigate-consider-symbols' symbols and strings are also
+With `sp-navigate-consider-symbols` symbols and strings are also
 considered balanced expressions.
 
 Examples:
 
-```
-((foo) |bar (baz quux)) -> ((foo) bar |(baz quux))
+```common-lisp
+((foo) bar (baz quux)) ;; =>
+       ¯
+((foo) bar (baz quux))
+           ¯
 
-((foo) bar |(baz quux)) -> |((foo) bar (baz quux))
+((foo) bar (baz quux)) ;; =>
+           ¯
+((foo) bar (baz quux))
+¯
 ```
-  "
+
+If you want to move point to **[**, use `C-M-n`:
+
+```common-lisp
+(defn blah
+  "Returns blah of foo."
+  [foo]                 ̅
+  ) ;; =>
+
+(defn blah
+  "Returns blah of foo."
+  [foo]
+  ̅)
+```
+  END
 end
 
 entry do
   name 'sp-previous-sexp'
   command 'C-M-p'
-  notes "
+  notes <<-END
 Move backward to the end of previous balanced expression.
 
-With `sp-navigate-consider-symbols' symbols and strings are also
+With `sp-navigate-consider-symbols` symbols and strings are also
 considered balanced expressions.
 
 Examples:
 
-```
-((foo) bar| (baz quux)) -> ((foo)| bar (baz quux))
+```common-lisp
+((foo) bar (baz quux)) ;; =>
+          ¯
+((foo) bar (baz quux))
+      ¯
 
-((foo)| bar (baz quux)) -> ((foo) bar (baz quux))|
+((foo) bar (baz quux)) ;; =>
+      ¯
+((foo) bar (baz quux))
+                      ¯
 ```
-  "
+
+If you want to move point after **foo."**, use `C-M-p`:
+
+```common-lisp
+(defn blah
+  "Returns blah of foo."
+  [foo]
+  ̅) ;; =>
+
+(defn blah
+  "Returns blah of foo."
+  [foo]                 ̅
+  )
+```
+  END
 end
 
 entry do
   name 'sp-kill-sexp'
   command 'C-M-k'
-  notes "
+  notes <<-END
 Kill the balanced expression following point.
 
 If point is inside an expression and there is no following
@@ -929,76 +1100,137 @@ before the closing delimiter.
 
 If ARG is nil, default to 1 (kill single expression forward)
 
-With `sp-navigate-consider-symbols', symbols and strings are also
+With `sp-navigate-consider-symbols`, symbols and strings are also
 considered balanced expressions.
 
 Examples:
 
+```common-lisp
+(foo (abc) bar) ;; => nil, defaults to 1
+     ¯
+(foo  bar)
+     ¯
+
+(foo (bar)  baz) ;; => `C-u` `2`
+           ¯
+¯
+
+(foo (bar) baz) ;; => `C-u` `C-u`
+     ¯
+¯
+
+(1 2 3 4 5 6) ;; => `C-u`
+   ¯
+(1)
+  ¯
+
+(1 2 3 4 5 6) ;; => `C-u` `3`
+   ¯
+(1  5 6)
+   ¯
+
+(1 2 3 4 5 6) ;; => `C-u` `-2`
+          ¯
+(1 2 3  6)
+       ¯
+
+(1 2 3 4 5 6) ;; => `C-u` `-` `C-u`
+        ¯
+(5 6)
+ ¯
+
+(1 2    ) ;; => `C-u`, kill useless whitespace
+     ¯
+(1 2)
+    ¯
+
+(1 2 3 4 5 6) ;; => `C-u` `0`
+       ¯
+()
+ ¯
 ```
-(foo |(abc) bar)  -> (foo | bar) ;; nil, defaults to 1
 
-(foo (bar) | baz) -> |           ;; 2
+If you want to kill **y yy yyy**, use `C-M-k`:
 
-(foo |(bar) baz)  -> |           ;; `C-u` `C-u`
-
-(1 |2 3 4 5 6)    -> (1|)        ;; `C-u`
-
-(1 |2 3 4 5 6)    -> (1 | 5 6)   ;; 3
-
-(1 2 3 4 5| 6)    -> (1 2 3 | 6) ;; -2
-
-(1 2 3 4| 5 6)    -> (|5 6)      ;; - `C-u`
-
-(1 2 |   )        -> (1 2|)      ;; `C-u`, kill useless whitespace
-
-(1 2 3 |4 5 6)    -> (|)         ;; 0
+```common-lisp
+(let [x "xxx" y "y yy yyy" z 0]) ;; =>
+               ̅
+(let [x "xxx" y z 0])
+               ̅
 ```
 
-Note: prefix argument is shown after the example. Assumes `sp-navigate-consider-symbols' equal to t.
-  "
+
+Note: prefix argument is shown after the example. Assumes `sp-navigate-consider-symbols` equal to t.
+  END
 end
 
 entry do
   name 'sp-copy-sexp'
   command 'C-M-w'
-  notes "
+  notes <<-END
 Copy the following ARG expressions to the kill-ring.
 
-This is exactly like calling `sp-kill-sexp' with second argument
+This is exactly like calling `sp-kill-sexp` with second argument
 t.  All the special prefix arguments work the same way.
-  "
+  END
 end
 
 entry do
   name 'sp-transpose-sexp'
   command ''
-  notes "
+  notes <<-END
 Transpose the expressions around point.
 
 The operation will move the point after the transposed block, so
-the next transpose will \"drag\" it forward.
+the next transpose will "drag" it forward.
 
 Examples:
 
+```common-lisp
+foo bar baz ;; =>
+    ¯
+bar foo baz
+       ¯
+
+foo bar baz ;; => `C-u` `2`
+    ¯
+bar baz foo
+           ¯
+
+(foo) (bar baz) ;; =>
+      ¯
+(bar baz) (foo)
+               ¯
+
+(foo bar)     ;; => keeps the formatting
+  (baz quux)
+  ¯
+
+(baz quux)
+  (foo bar)
+  ¯
+
+foo bar baz     ;; => `C-u` `-1`
+           ¯
+foo baz bar
+       ¯
 ```
-foo |bar baz     -> bar foo| baz
 
-foo |bar baz     -> bar baz foo| ;; 2
+If you want to **foo** and **bar** to switchplaces, use ``:
 
-(foo) |(bar baz) -> (bar baz) (foo)|
-
-(foo bar)        ->    (baz quux)   ;; keeps the formatting
-  |(baz quux)            |(foo bar)
-
-foo bar baz|     -> foo baz| bar ;; -1
+```common-lisp
+"foo" "bar" ;; =>
+      ̅
+"bar" "foo"
+      ̅
 ```
-  "
+  END
 end
 
 entry do
   name 'sp-unwrap-sexp'
   command 'M-<delete>'
-  notes "
+  notes <<-END
 Unwrap the following expression.
 
 Return the information about the just unwrapped expression.  Note
@@ -1007,38 +1239,76 @@ buffer.
 
 Examples:
 
-```
-|(foo bar baz)     -> |foo bar baz
+```common-lisp
+(foo bar baz)     ;; =>
+¯
+foo bar baz
+¯
 
-(foo bar| baz)     -> foo bar| baz
+(foo bar baz)     ;; =>
+        ¯
+foo bar baz
+       ¯
 
-|(foo) (bar) (baz) -> |(foo) bar (baz) ;; 2
+(foo) (bar) (baz) ;; => `C-u` `2`
+¯
+(foo) bar (baz)
+¯
 ```
-  "
+
+If you want to unwrap the **bar** expression,
+removing the parentheses around **bar*, use `M-<delete>`:
+
+```common-lisp
+(foo (bar x y z)) ;; =>
+     ̅
+(foo bar x y z)
+     ̅
+```
+
+  END
 end
 
 entry do
   name 'sp-backward-unwrap-sexp'
   command 'M-<backspace>'
-  notes "
+  notes <<-END
 Unwrap the previous expression.
 
 Examples:
 
-```
-(foo bar baz)|     -> foo bar baz|
+```common-lisp
+(foo bar baz)     ;; =>
+             ¯
+foo bar baz
+           ¯
 
-(foo bar)| (baz)   -> foo bar| (baz)
+(foo bar) (baz)   ;; =>
+         ¯
+foo bar (baz)
+       ¯
 
-(foo) (bar) (baz)| -> foo (bar) (baz) ;; 3
+(foo) (bar) (baz)  ;; => `C-u` `3`
+                 ¯
+foo (bar) (baz)
 ```
-  "
+
+If you want to unwrap the **bar** expression,
+removing the parentheses around **foo*, use `M-<backspace>`:
+
+```common-lisp
+(foo (bar x y z)) ;; =>
+     ̅
+foo (bar x y z)
+    ̅
+```
+  END
 end
 
 entry do
   name 'sp-forward-slurp-sexp'
   command 'C-<right>'
-  notes "
+  notes <<-END
 Add sexp following the current list in it by moving the closing delimiter.
 
 If the current list is the last in a parent list, extend that
@@ -1048,51 +1318,97 @@ or end of file).
 If both the current expression and the expression to be slurped
 are strings, they are joined together.
 
-See also `sp-slurp-hybrid-sexp' which is similar but handles
+See also `sp-slurp-hybrid-sexp` which is similar but handles
 C-style syntax better.
 
 Examples:
 
+```common-lisp
+(foo bar) baz        ;; =>
+     ¯
+(foo bar baz)
+     ¯
+
+[(foo bar)] baz      ;; =>
+      ¯
+[(foo bar) baz]
+      ¯
+
+[(foo bar) baz]      ;; =>
+      ¯
+[(foo bar baz)]
+      ¯
+
+((foo) bar baz quux) ;; => with `C-u`
+  ¯
+((foo bar baz quux))
+  ¯
+
+"foo bar" "baz quux" ;; =>
+    ¯
+"foo bar baz quux"
+    ¯
 ```
-(foo |bar) baz        -> (foo |bar baz)
 
-[(foo |bar)] baz      -> [(foo |bar) baz]
+If you want **baz** to be part of **foo** and **bar**, use `C-<right>`:
 
-[(foo |bar) baz]      -> [(foo |bar baz)]
-
-((|foo) bar baz quux) -> ((|foo bar baz quux)) ;; with `C-u`
-
-\"foo| bar\" \"baz quux\" -> \"foo| bar baz quux\"
+```common-lisp
+[foo bar] baz ;; =>
+        ̅
+[foo bar baz]
+        ̅
 ```
-  "
+  END
 end
 
 entry do
   name 'sp-forward-barf-sexp'
   command 'C-<left>'
-  notes "
+  notes <<-END
 Remove the last sexp in the current list by moving the closing delimiter.
 
 If the current list is empty, do nothing.
 
 Examples: (prefix arg in comment)
 
+```common-lisp
+(foo bar baz)   ;; => nil (defaults to 1)
+        ¯
+(foo bar) baz
+        ¯
+
+(foo [bar baz]) ;; => `C-u` `1`
+    ¯
+(foo) [bar baz]
+    ¯
+
+(1 2 3 4 5 6) ;; => `C-u` (or numeric prefix 3)
+      ¯
+(1 2 3) 4 5 6
+      ¯
+
+(foo bar baz) ;; => `C-u` `-1`
+        ¯
+foo (bar baz)
+        ¯
 ```
-(foo bar| baz)   -> (foo bar|) baz   ;; nil (defaults to 1)
 
-(foo| [bar baz]) -> (foo|) [bar baz] ;; 1
+If you want to remove **baz**, use `C-<left>`:
 
-(1 2 3| 4 5 6)   -> (1 2 3|) 4 5 6   ;; `C-u` (or numeric prefix 3)
-
-(foo bar| baz)   -> foo (bar| baz)   ;; -1
+```common-lisp
+[foo bar baz] ;; =>
+        ̅
+[foo bar] baz
+        ̅
 ```
-  "
+
+  END
 end
 
 entry do
   name 'sp-backward-slurp-sexp'
   command 'C-M-<left>'
-  notes "
+  notes <<-END
 Add the sexp preceding the current list in it by moving the opening delimiter.
 
 If the current list is the first in a parent list, extend that
@@ -1104,112 +1420,180 @@ are strings, they are joined together.
 
 Examples:
 
+```common-lisp
+foo (bar baz) ;; =>
+        ¯
+(foo bar baz)
+        ¯
+
+foo [(bar baz)] ;; =>
+         ¯
+[foo (bar baz)]
+         ¯
+
+[foo (bar baz)] ;; =>
+         ¯
+[(foo bar baz)]
+         ¯
+
+(foo bar baz (quux)) ;; => with `C-u`
+              ¯
+((foo bar baz quux))
+              ¯
+
+"foo bar" "baz quux" ;; =>
+               ¯
+"foo bar baz quux"
+             ¯
 ```
-foo (bar| baz)        -> (foo bar| baz)
 
-foo [(bar| baz)]      -> [foo (bar| baz)]
+If you want **blah** to be part of **foo** and **bar**, use `C-M-<left>`:
 
-[foo (bar| baz)]      -> [(foo bar| baz)]
-
-(foo bar baz (|quux)) -> ((foo bar baz |quux)) ;; with `C-u`
-
-\"foo bar\" \"baz |quux\" -> \"foo bar baz |quux\"
+```common-lisp
+blah [foo bar] ;; =>
+             ̅
+[blah foo bar]
+             ̅
 ```
-  "
+  END
 end
 
 entry do
   name 'sp-backward-barf-sexp'
   command 'C-M-<right>'
-  notes "
-This is exactly like calling `sp-forward-barf-sexp' with minus ARG.
+  notes <<-END
+This is exactly like calling `sp-forward-barf-sexp` with minus ARG.
 In other words, instead of contracting the closing pair, the
 opening pair is contracted.  For more information, see the
-documentation of `sp-forward-barf-sexp'.
+documentation of `sp-forward-barf-sexp`.
 
 Examples:
 
-```
-(foo bar| baz) -> foo (bar| baz)
+```common-lisp
+(foo bar baz) ;; =>
+        ¯
+foo (bar baz)
+        ¯
 
-([foo bar] |baz) -> [foo bar] (|baz)
+([foo bar] baz) ;; =>
+           ¯
+[foo bar] (baz)
+           ¯
 
-(1 2 3 |4 5 6) -> 1 2 3 (|4 5 6) ;; `C-u` (or 3)
+(1 2 3 4 5 6) ;; => `C-u` (or 3)
+       ¯
+1 2 3 (4 5 6)
+       ¯
 ```
-  "
+
+If you want to remove **blah**, use `C-M-<right>`:
+
+```common-lisp
+[blah foo bar] ;; =>
+             ̅
+blah [foo bar]
+             ̅
+```
+  END
 end
 
 entry do
   name 'sp-splice-sexp'
   command 'M-D'
-  notes "
+  notes <<-END
 Unwrap the current list.
 
 Examples:
 
-```
-(foo (bar| baz) quux) -> (foo bar| baz quux)
+```common-lisp
+(foo (bar baz) quux) ;; =>
+         ¯
+(foo bar baz quux)
+        ¯
 
-(foo |(bar baz) quux) -> foo |(bar baz) quux
+(foo (bar baz) quux) ;; =>
+     ¯
+foo (bar baz) quux
+    ¯
 
-(foo (bar| baz) quux) -> foo (bar| baz) quux ;; 2
+(foo (bar baz) quux) ;; => `C-u` `2`
+         ¯
+foo (bar baz) quux
+        ¯
 ```
-  "
+  END
 end
 
 entry do
   name 'sp-splice-sexp-killing-forward'
   command 'C-M-<delete>'
-  notes "
+  notes <<-END
 Unwrap the current list and kill all the expressions between
 the point and the end of this list.
 
 Examples:
 
-```
-(a (b c| d e) f) -> (a b c| f)
+```common-lisp
+(a (b c d e) f) ;; =>
+       ¯
+(a b c f)
+      ¯
 
-(+ (x |y z) w)   -> (+ x| w)
+(+ (x y z) w) ;; =>
+      ¯
+(+ x w)
+    ¯
 ```
 
 Note that to kill only the content and not the enclosing
 delimiters you can use `C-u` `sp-kill-sexp`.
-See `sp-kill-sexp' for more information.
-  "
+See `sp-kill-sexp` for more information.
+  END
 end
 
 entry do
   name 'sp-splice-sexp-killing-backward'
   command 'C-M-<backspace>'
-  notes "
+  notes <<-END
 Unwrap the current list and kill all the expressions
 between start of this list and the point.
 
 Examples:
 
-```
-(foo (let ((x 5)) |(sqrt n)) bar)  -> (foo |(sqrt n) bar)
+```common-lisp
+(foo (let ((x 5)) (sqrt n)) bar) ;; =>
+                  ¯
+(foo (sqrt n) bar)
+     ¯
 
-(when ok|                             |(perform-operation-1)
-  (perform-operation-1)            ->  (perform-operation-2)
-  (perform-operation-2))
+(when ok
+        ¯
+  (perform-operation-1)
+  (perform-operation-2)) ;; =>
 
-(save-excursion                    -> |(awesome-stuff-happens) ;; 2
+(perform-operation-1)
+¯
+ (perform-operation-2)
+
+(save-excursion
   (unless (test)
-    |(awesome-stuff-happens)))
+    (awesome-stuff-happens))) ;; => `C-u` `2`
+    ¯
+
+(awesome-stuff-happens)
+¯
 ```
 
 Note that to kill only the content and not the enclosing
 delimiters you can use `C-u` `sp-backward-kill-sexp`.
-See `sp-backward-kill-sexp' for more information.
-
-  "
+See `sp-backward-kill-sexp` for more information.
+  END
 end
 
 entry do
   name 'sp-splice-sexp-killing-around'
   command 'C-S-<backspace>'
-  notes "
+  notes <<-END
 Unwrap the current list and kill everything inside except next expression.
 
 Note that the behaviour with the prefix argument seems to be
@@ -1218,42 +1602,54 @@ common and hence deserve shorter binding.
 
 If ARG is raw prefix argument `C-u` `C-u` raise the expression the point
 is inside of.  This is the same as `sp-backward-up-sexp' followed by
-`sp-splice-sexp-killing-around'.
+`sp-splice-sexp-killing-around`.
 
 Examples:
 
+```common-lisp
+(a b (c d) e f) ;; => `C-u` `1`
+     ¯
+(c d)
+¯
+
+(a b c d e f) ;; => `C-u` `2`
+     ¯
+c d
+¯
+
+(- (car x) a 3) ;; => `C-u` `-1`
+           ¯
+(car x)
+       ¯
+
+(foo (bar baz) quux) ;; => `C-u` `C-u`
+          ¯
+(bar baz)
+¯
 ```
-(a b |(c d) e f)      -> |(c d)     ;; with arg = 1
-
-(a b |c d e f)        -> |c d       ;; with arg = 2
-
-(- (car x) |a 3)      -> (car x)|   ;; with arg = -1
-
-(foo (bar |baz) quux) -> |(bar baz) ;; with arg = `C-u` `C-u`
-```
-  "
+  END
 end
 
 entry do
   name 'sp-select-next-thing-exchange'
   command 'C-]'
-  notes "
-Just like `sp-select-next-thing' but run `exchange-point-and-mark' afterwards.
-  "
+  notes <<-END
+Just like `sp-select-next-thing` but run `exchange-point-and-mark` afterwards.
+  END
 end
 
 entry do
   name 'sp-select-next-thing'
   command 'C-M-]'
   notes <<-END
-Set active region over next thing as recognized by `sp-get-thing'.
+Set active region over next thing as recognized by `sp-get-thing`.
 
 If POINT is non-nil, it is assumed it's a point inside the buffer
 from which the selection extends, either forward or backward,
 depending on the value of ARG.
 
 If the currently active region contains a balanced expression,
-following invocation of `sp-select-next-thing' will select the
+following invocation of `sp-select-next-thing` will select the
 inside of this expression. Therefore calling this function
 twice with no active region will select the inside of the next
 expression.
@@ -1263,7 +1659,7 @@ prefix is ignored.  For example, '|(foo) would only select (foo)
 and not include ' in the selection.  If you wish to also select
 the prefix, you have to move the point backwards.
 
-With `sp-navigate-consider-symbols' symbols and strings are also
+With `sp-navigate-consider-symbols` symbols and strings are also
 considered balanced expressions.
   END
 end
@@ -1292,17 +1688,34 @@ A symbol is any sequence of characters that are in either the
 word constituent or symbol constituent syntax class.  Current
 symbol only extend to the possible opening or closing delimiter
 as defined by `sp-add-pair' even if part of this delimiter
-would match \"symbol\" syntax classes.
+would match "symbol" syntax classes.
 
 Examples:
 
+```common-lisp
+foo bar baz ;; =>
+¯
+foo bar baz
+   ¯
+
+foo (bar (baz)) ;; => `C-u` `2`
+¯
+foo (bar (baz))
+        ¯
+
+foo (bar (baz) quux) ;; => `C-u` `4`
+¯
+foo (bar (baz) quux)
+                   ¯
 ```
-|foo bar baz          -> foo| bar baz
 
-|foo (bar (baz))      -> foo (bar| (baz)) ;; 2
+If you want to move point just after **(let**, use `M-F`:
 
-|foo (bar (baz) quux) -> foo (bar (baz) quux|) ;; 4
-
+```common-lisp
+(defn blah [] (let [x 0 y 1] (+ x 1))) ;; =>
+            ̅
+(defn blah [] (let [x 0 y 1] (+ x 1)))
+                  ̅
 ```
   END
 end
@@ -1316,23 +1729,39 @@ Move point to the next position that is the beginning of a symbol.
 A symbol is any sequence of characters that are in either the word
 constituent or symbol constituent syntax class.  Current symbol only
 extend to the possible opening or closing delimiter as defined by
-`sp-add-pair' even if part of this delimiter would match \"symbol\"
+`sp-add-pair` even if part of this delimiter would match "symbol"
 syntax classes.
 
 Examples:
 
+```common-lisp
+foo bar baz ;; =>
+       ¯
+foo bar baz
+    ¯
+
+((foo bar) baz) ;; => `C-u` `2`
+               ¯
+((foo bar) baz)
+      ¯
+
+(quux ((foo) bar) baz) ;; => `C-u` `4`
+                      ¯
+(quux ((foo) bar) baz)
+ ¯
 ```
-foo bar| baz            -> foo |bar baz
 
-((foo bar) baz)|        -> ((foo |bar) baz) ;; 2
+If you want to move point to **blah**, use `M-B`:
 
-(quux ((foo) bar) baz)| -> (|quux ((foo) bar) baz) ;; 4
+```common-lisp
+(defn blah [] (let [x 0 y 1] (+ x 1))) ;; =>
+               ̅
+(defn blah [] (let [x 0 y 1] (+ x 1)))
+      ̅
 ```
     END
 end
-
   end
-
 
   notes <<-END
     * Created by [andrew](https://github.com/catesandrew).
