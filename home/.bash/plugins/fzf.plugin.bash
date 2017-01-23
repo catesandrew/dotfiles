@@ -2,6 +2,7 @@
 
 if brew_contains_element "fzf"; then
     export FZF_TARGET="${BREW_HOME}/opt/fzf"
+    export FZF_TMUX_HEIGHT=${FZF_TMUX_HEIGHT:-80%}
 
     # Auto-completion
     [[ $- == *i* ]] && source "${FZF_TARGET}/shell/completion.bash" 2> /dev/null
