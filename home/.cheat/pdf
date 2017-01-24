@@ -1,0 +1,11 @@
+# Convert PDF to image, requires `imagemagick`
+convert -density 300 -trim input.pdf -quality 100 -sharpen 0x1.0 output.png
+
+# Convert image(s) in PDF, requires `poppler` and `imagemagick`. Where
+# `input.pdf` is your input PDF. The output files are written to
+# `image-000.png`, `image-001.png`, etc. This gives you the original size of all
+# the contained images of that PDF.
+pdfimages -png input.pdf image && for file in $(find . -name "image-*.png"); do identify "$file"; done
+
+# Output images in a PDF, requires `poppler`
+pdfimages -list input.pdf
