@@ -119,6 +119,11 @@ ddaemon() {
 }
 __docker_complete ddaemon _docker_daemon
 
+# Show docker disk usage, including space reclaimable by pruning
+ddf() {
+    __docker_c system df
+}
+
 # Inspect changes on a container's filesystem
 ddi() {
     __docker_c diff "$@"
@@ -276,7 +281,7 @@ drmi() {
 }
 __docker_complete drmi _docker_rmi
 
-# Remove image specified by $1 or remove all untagged images
+# Remove image specified by $1
 dri() {
     if [ $# -eq 0 ]; then
         local _name=$(basename "$PWD")
@@ -297,6 +302,8 @@ driu() {
    # line passed to it.
    local images
    images="$(__docker_c images | grep "^<none>" | awk '{print $3}')"
+   # or
+   # images="$(__docker_c images -q -f dangling=true)"
 
    echo "Remove all untagged images: $images"
    read -p "Are you sure? " -n 1 -r
@@ -362,6 +369,19 @@ dbash() {
     # __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$1"
 }
 __docker_complete dbash  __docker_complete_images
+
+# run sh for any image
+# dsh is particularly useful when diagnosing a failed `docker build`. Just
+# dsh the last generated image and re-run the failed command
+dsh() {
+    if [ $# -eq 0 ]; then
+        local _name=$(basename "$PWD")
+        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$_name"
+    else
+        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$1"
+    fi
+}
+__docker_complete dsh  __docker_complete_images
 
 # Save one or more images to a tar archive (streamed to STDOUT by default)
 dsave() {
@@ -697,4 +717,3 @@ dstale() {
 	  fi
   done
 }
-
