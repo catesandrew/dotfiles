@@ -1,0 +1,55 @@
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'body' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'body' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'body' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s p --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+cheerio --sanitize 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html | pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i -o 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+cheerio --sanitize 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html | pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html --verbose
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html -o 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
+
+cheerio 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i -o 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+cheerio 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o 10-yr-old-son-that-has-loved-the-game-for-5-years-says-he-still-does-but-is-lethargic-on-the-flield.html
+
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'p' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
