@@ -28,6 +28,7 @@ sed ':a;N;$!ba;s/\n//g'  file.txt
 
 # To replace non breaking space
 # octal 240 = decimal 160 = hex A0
+# use UTF-8, check http://apps.timwhitlock.info/unicode
 printf '\xA0\n' | sed 's/\xA0//g'
 printf '\xA0\n' | tr '\240' ''
 # U+00A0
