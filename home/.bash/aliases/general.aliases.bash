@@ -129,3 +129,7 @@ alias ct='column -t'
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
 
 alias lsusers="cut -d: -f1 /etc/passwd"
+
+me() {
+    echo $(id -u $(whoami)):$(id -g $(whoami))
+}
