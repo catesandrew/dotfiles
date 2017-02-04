@@ -36,13 +36,13 @@ __docker_complete dl _docker_ps
 
 # Get process included stop container
 dpa() {
-    __docker_c ps -a "$@"
+    __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' -a "$@"
 }
 __docker_complete dpa _docker_ps
 
 # Get container process
 dps() {
-    __docker_c ps "$@"
+    __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' "$@"
 }
 __docker_complete dps _docker_ps
 
@@ -150,8 +150,6 @@ dent() {
     else
         __docker_c exec --interactive --tty "$1" /bin/bash
     fi
-
-    # __docker_c exec --interactive --tty "$1" /bin/bash
 }
 __docker_complete dent __docker_complete_containers_running
 
@@ -300,16 +298,24 @@ driu() {
    # repository column. Then to extract the id out of the third column we
    # pipe it to awk "{print $3}" which will print the third column of each
    # line passed to it.
+   # local images
    local images
-   images="$(__docker_c images | grep "^<none>" | awk '{print $3}')"
+   IFS=$'\n'
+   images=($(__docker_c images | grep "^<none>" | awk '{print $3}'))
+   # eval "b=($a)" # or b=($(echo "$a"))
+   unset IFS
    # or
    # images="$(__docker_c images -q -f dangling=true)"
 
-   echo "Remove all untagged images: $images"
-   read -p "Are you sure? " -n 1 -r
-   echo    # (optional) move to a new line
-   if [[ $REPLY =~ ^[Yy]$ ]]; then
-       __docker_c rmi "$images"
+   if [ ${#images[@]} -eq 0 ]; then
+       echo "No unstaged images"
+   else
+       printf 'Remove all untagged images: %s\n' "${images[@]}"
+       read -p "Are you sure? " -n 1 -r
+       echo    # (optional) move to a new line
+       if [[ $REPLY =~ ^[Yy]$ ]]; then
+           __docker_c rmi "${images[@]}"
+       fi
    fi
 }
 
@@ -365,8 +371,6 @@ dbash() {
     else
         __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$1"
     fi
-
-    # __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$1"
 }
 __docker_complete dbash  __docker_complete_images
 
@@ -502,6 +506,62 @@ dvrm() {
     __docker_c volume rm "$@"
 }
 __docker_complete dvrm _docker_volume_rm
+
+# backup files from a docker volume into /tmp/backup.tar.gz
+dvcb() {
+  local name
+  if [ $# -eq 0 ]; then
+    _name=$(basename "$PWD")
+  else
+    _name="$1"
+  fi
+
+  __docker run --rm -v /tmp:/backup --volumes-from "$_name" debian:jessie tar -czvf /backup/backup.tar.gz "${@:2}"
+}
+__docker_complete dvbc _docker_run
+
+# restore files from /tmp/backup.tar.gz into a docker volume
+dvcr() {
+  local name
+  if [ $# -eq 0 ]; then
+    _name=$(basename "$PWD")
+  else
+    _name="$1"
+  fi
+
+  __docker_c run --rm -v /tmp:/backup --volumes-from "$_name" debian:jessie tar -xzvf /backup/backup.tar.gz "${@:2}"
+  echo "Double checking files..."
+  __docker_c run --rm -v /tmp:/backup --volumes-from "$_name" debian:jessie ls -lh "${@:2}"
+}
+__docker_complete dvrc _docker_run
+
+# backup files from a docker volume into /tmp/backup.tar
+dvb() {
+  local name
+  if [ $# -eq 0 ]; then
+    _name=$(basename "$PWD")
+  else
+    _name="$1"
+  fi
+
+  __docker_c run --rm -v /tmp:/backup --volumes-from "$_name" busybox tar -cvf /backup/backup.tar "${@:2}"
+}
+__docker_complete dvb _docker_run
+
+# restore files from /tmp/backup.tar into a docker volume
+dvr() {
+  local name
+  if [ $# -eq 0 ]; then
+    _name=$(basename "$PWD")
+  else
+    _name="$1"
+  fi
+
+  __docker_c run --rm -v /tmp:/backup --volumes-from "$_name" busybox tar -xvf /backup/backup.tar "${@:2}"
+  echo "Double checking files..."
+  __docker_c run --rm -v /tmp:/backup --volumes-from "$_name" busybox ls -lh "${@:2}"
+}
+__docker_complete dvr _docker_run
 
 # Block until a container stops, then print its exit code
 dwait() {
