@@ -599,6 +599,7 @@ case $response in
     print_status "Found version ${VBOX_MAJOR_MINOR}"
     exec_sudo_cmd "echo 'deb http://download.virtualbox.org/virtualbox/debian ${DISTRO} contrib' > /etc/apt/sources.list.d/virtualbox.list"
     wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+    wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc -O- | sudo apt-key add -
     exec_sudo_cmd "apt-get update"
     exec_sudo_cmd "apt-get -y install dkms virtualbox-${VBOX_MAJOR_MINOR}"
 
