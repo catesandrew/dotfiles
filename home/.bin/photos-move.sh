@@ -19,7 +19,7 @@
 # Defaults
 TOOLS=(exiftool jq trash rsync) # Also change settings below if changing this, the output should be in the format YYYY:MM:DD
 DEFAULTDIR="$HOME/ownCloud/Photos"
-MAXDEPTH="1"
+MAXDEPTH="9"
 #MAXDEPTH=''
 # activate debugging from here
 #set -o xtrace
