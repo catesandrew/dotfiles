@@ -146,8 +146,8 @@ function _purge_line {
         t=$(mktemp -t bashmarks.XXXXXX) || exit 1
         trap "/bin/rm -f -- '$t'" EXIT
 
-        # purge line
-        sed "/$2/d" "$1" > "$t"
+        # purge line (>| for noclobber)
+        sed "/$2/d" "$1" >| "$t"
         /bin/mv "$t" "$1"
 
         # cleanup temp file
