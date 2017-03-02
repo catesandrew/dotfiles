@@ -58,6 +58,28 @@ drm() {
 }
 __docker_complete drm _docker_rm
 
+# Remove all recently exited containers
+drmu() {
+   __docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second"
+   # This works by using rmi with a list of container ids. To get the container
+   # ids we call docker ps then pipe it to grep "minutes ago".
+   local ids
+   IFS=$'\n'
+   ids=($(__docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second" | awk '{print $1}'))
+   unset IFS
+
+   if [ ${#ids[@]} -eq 0 ]; then
+       echo "No recentlyed exited containers"
+   else
+       printf 'Remove all recently exited containers: %s\n' "${ids[@]}"
+       read -p "Are you sure? " -n 1 -r
+       echo    # (optional) move to a new line
+       if [[ $REPLY =~ ^[Yy]$ ]]; then
+           __docker_c rm "${ids[@]}"
+       fi
+   fi
+}
+
 # Start one or more stopped containers
 dstart() {
     __docker_c start "$@"
@@ -225,6 +247,10 @@ dlogs() {
 }
 __docker_complete dlogs _docker_logs
 
+dtail() {
+    __docker_c logs --tail all --follow "$@"
+}
+
 # Manage Docker networks
 dnet() {
     __docker_c network "$@"
@@ -302,7 +328,6 @@ driu() {
    local images
    IFS=$'\n'
    images=($(__docker_c images | grep "^<none>" | awk '{print $3}'))
-   # eval "b=($a)" # or b=($(echo "$a"))
    unset IFS
    # or
    # images="$(__docker_c images -q -f dangling=true)"
