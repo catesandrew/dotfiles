@@ -8,7 +8,9 @@
 	<string>osx.app.pop-clip</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Applications/PopClip.app/Contents/MacOS/PopClip</string>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 6 &amp;&amp; /Applications/PopClip.app/Contents/MacOS/PopClip</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
