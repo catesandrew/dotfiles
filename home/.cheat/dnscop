@@ -1,0 +1,21 @@
+# Generate list for dnsmasq with NXDOMAIN
+dnscop -o dnsmasq-nx.conf --block-at-psl --mode 2 --dest-ip ''
+
+# Generate list for dnsmasq with 0.0.0.0.0
+dnscop -o dnsmasq.conf --block-at-psl --mode 2 --dest-ip '0.0.0.0'
+
+# Generate list for /etc/hosts
+dnscop -o hosts --mode 1 --dest-ip '0.0.0.0'
+
+# Generate list for lua with NXDOMAIN
+dnscop -o blocklist.lua --block-at-psl --mode 3 --dest-ip ''
+
+# Generate separte extension blocklists for powerdns
+dnscop -o news-blocklist.lua --block-at-psl --mode 3 --dest-ip '' --ext 'news' --no-inc-sources --no-inc-whites --no-inc-blacks
+dnscop -o fakenews-blocklist.lua --block-at-psl --mode 3 --dest-ip '' --ext 'fakenews' --no-inc-sources --no-inc-whites --no-inc-blacks
+dnscop -o gambling-blocklist.lua --block-at-psl --mode 3 --dest-ip '' --ext 'gambling' --no-inc-sources --no-inc-whites --no-inc-blacks
+dnscop -o porn-blocklist.lua --block-at-psl --mode 3 --dest-ip '' --ext 'porn' --no-inc-sources --no-inc-whites --no-inc-blacks
+dnscop -o social-blocklist.lua --block-at-psl --mode 3 --dest-ip '' --ext 'social' --no-inc-sources --no-inc-whites --no-inc-blacks
+
+# Generate blacklist for Privoxy
+dnscop -o dns.cop.action --block-at-psl --mode 4 --dest-ip '0.0.0.0'
