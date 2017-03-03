@@ -252,10 +252,10 @@ dtail() {
 }
 
 # Manage Docker networks
-dnet() {
+dn() {
     __docker_c network "$@"
 }
-__docker_complete dnet _docker_network
+__docker_complete dn _docker_network
 
 # Manage Docker Swarm nodes
 dnode() {
