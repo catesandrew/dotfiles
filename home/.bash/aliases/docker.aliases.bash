@@ -35,16 +35,100 @@ dl() {
 __docker_complete dl _docker_ps
 
 # Get process included stop container
-dpa() {
-    __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' -a "$@"
-}
-__docker_complete dpa _docker_ps
+# dpa() {
+#    # __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' -a "$@"
+#    dps -a "$@";
+# }
+#
+# # Get container process
+# dps() {
+#     # __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' "$@"
+#     # __docker_c ps -q | xargs docker inspect --format '{{printf "%.12s\t%s" .Id .Config.Cmd}}'
+#     __docker_c ps --format 'table {{printf "%.6s - %.22s\t%.22s\t%.8s - %.10s" .ID .Names .Image .RunningFor .Status}}' "$@"
+# }
+# __docker_complete dps _docker_ps
 
-# Get container process
-dps() {
-    __docker_c ps --format 'table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.RunningFor}} ago\t{{.Status}}\t{{.Command}}' "$@"
+dps()  {
+ __docker_c ps "$@" | awk '
+ NR==1{
+   FIRSTLINEWIDTH=length($0)
+   IDPOS=index($0,"CONTAINER ID");
+   IMAGEPOS=index($0,"IMAGE");
+   COMMANDPOS=index($0,"COMMAND");
+   CREATEDPOS=index($0,"CREATED");
+   STATUSPOS=index($0,"STATUS");
+   PORTSPOS=index($0,"PORTS");
+   NAMESPOS=index($0,"NAMES");
+   UPDATECOL();
+ }
+ function UPDATECOL () {
+   # ID=substr($0,IDPOS,IMAGEPOS-IDPOS-1);
+   # IMAGE=substr($0,IMAGEPOS,COMMANDPOS-IMAGEPOS-1);
+   # COMMAND=substr($0,COMMANDPOS,CREATEDPOS-COMMANDPOS-1);
+   # CREATED=substr($0,CREATEDPOS,STATUSPOS-CREATEDPOS-1);
+   # STATUS=substr($0,STATUSPOS,PORTSPOS-STATUSPOS-1);
+   # PORTS=substr($0,PORTSPOS,NAMESPOS-PORTSPOS-1);
+   # NAMES=substr($0, NAMESPOS);
+   ID=substr($0,IDPOS,6);
+   IMAGE=substr($0,IMAGEPOS,24);
+   COMMAND=substr($0,COMMANDPOS,22);
+   CREATED=substr($0,CREATEDPOS,10);
+   STATUS=substr($0,STATUSPOS,10);
+   PORTS=substr($0,PORTSPOS,12);
+   NAMES=substr($0,NAMESPOS);
+ }
+ function PRINT () {
+   # print ID"|"NAMES"|"IMAGE"|"STATUS"|"CREATED"|"COMMAND"|"PORTS;
+   print ID"|"NAMES"|"IMAGE"|"CREATED"|"STATUS;
+ }
+ NR==2{
+   NAMES=sprintf("%s%*s",NAMES,length($0)-FIRSTLINEWIDTH,"");
+   PRINT();
+ }
+ NR>1{
+   UPDATECOL();
+   PRINT();
+ }' | column -t -s \|;
 }
-__docker_complete dps _docker_ps
+dpa() { dps -a "$@"; }
+
+dports()  {
+ __docker_c ps "$@" | awk '
+ NR==1{
+   FIRSTLINEWIDTH=length($0)
+   IDPOS=index($0,"CONTAINER ID");
+   IMAGEPOS=index($0,"IMAGE");
+   COMMANDPOS=index($0,"COMMAND");
+   CREATEDPOS=index($0,"CREATED");
+   STATUSPOS=index($0,"STATUS");
+   PORTSPOS=index($0,"PORTS");
+   NAMESPOS=index($0,"NAMES");
+   UPDATECOL();
+ }
+ function UPDATECOL () {
+   ID=substr($0,IDPOS,6);
+   PORTS=substr($0,PORTSPOS,NAMESPOS-PORTSPOS-1);
+   NAMES=substr($0,NAMESPOS,22);
+ }
+ function PRINT () {
+   print ID"|"NAMES"|"PORTS;
+ }
+ NR==2{
+   PORTS=sprintf("%s%*s",PORTS,length($0)-FIRSTLINEWIDTH,"");
+   PRINT();
+ }
+ NR>1{
+   UPDATECOL();
+   PRINT();
+ }' | column -t -s \|;
+}
+dportsa() { dports -a "$@"; }
+
+dcmds()  {
+ __docker_c ps -q \
+     | xargs docker inspect --format '{{printf "%.8s|%s|%s" .Id .Path .Args}}' \
+     | column -t -s \|
+}
 
 # Attach to a running container
 da() {
@@ -189,8 +273,47 @@ dh() {
 __docker_complete dh _docker_history
 
 # List images
-dls() {
-    __docker_c images "$@"
+# dls() {
+#     __docker_c images "$@"
+# }
+# __docker_complete dls _docker_images
+
+dls()  {
+ __docker_c images "$@" | awk '
+ NR==1{
+   FIRSTLINEWIDTH=length($0)
+   REPOPOS=index($0,"REPOSITORY");
+   TAGPOS=index($0,"TAG");
+   IDPOS=index($0,"IMAGE ID");
+   CREATEDPOS=index($0,"CREATED");
+   SIZEPOS=index($0,"SIZE");
+   UPDATECOL();
+ }
+ function UPDATECOL () {
+   # REPO=substr($0,REPOPOS,TAGPOS-REPOPOS-1);
+   # TAG=substr($0,TAGPOS,IDPOS-TAGPOS-1);
+   # ID=substr($0,IDPOS,CREATEDPOS-IDPOS-1);
+   # CREATED=substr($0,CREATEDPOS,SIZEPOS-CREATEDPOS-1);
+   # SIZE=substr($0,SIZEPOS);
+
+   REPO=substr($0,REPOPOS,TAGPOS-REPOPOS-1);
+   TAG=substr($0,TAGPOS,16);
+   ID=substr($0,IDPOS,6);
+   CREATED=substr($0,CREATEDPOS,8);
+   SIZE=substr($0,SIZEPOS,8);
+ }
+ function PRINT () {
+   # print ID"|"NAMES"|"IMAGE"|"STATUS"|"CREATED"|"COMMAND"|"PORTS;
+   print ID"|"REPO"|"TAG"|"CREATED"|"SIZE;
+ }
+ NR==2{
+   REPO=sprintf("%s%*s",REPO,length($0)-FIRSTLINEWIDTH,"");
+   PRINT();
+ }
+ NR>1{
+   UPDATECOL();
+   PRINT();
+ }' | column -t -s \|;
 }
 __docker_complete dls _docker_images
 
