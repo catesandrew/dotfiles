@@ -585,10 +585,35 @@ dsearch() {
 __docker_complete dsearch _docker_search
 
 # Manage Docker services
-dsrv() {
+ds() {
     __docker_c service "$@"
 }
-__docker_complete dsrv _docker_service
+__docker_complete ds _docker_service
+
+dsip() {
+  __docker_c service inspect --format="{{json .Endpoint.Spec.Ports}}" "$@"
+}
+__docker_complete dsip __docker_complete_services
+
+dsc() {
+  __docker_c service create "$@"
+}
+__docker_complete dsc _docker_service_create
+
+dsi() {
+  __docker_c service inspect "$@"
+}
+__docker_complete dsi _docker_service_inspect
+
+# dslogs() {
+#   __docker_c service  "$@"
+# }
+# __docker_complete dslogs _docker_service_logs
+
+dsrm() {
+  __docker_c service rm "$@"
+}
+__docker_complete dsrm _docker_service_rm
 
 # Display a live stream of container(s) resource usage statistics
 dstats() {
