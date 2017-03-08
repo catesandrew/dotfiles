@@ -306,7 +306,7 @@ __docker_complete dh _docker_history
 # __docker_complete dls _docker_images
 
 dls()  {
- __docker_c images "$@" | awk '
+  __docker_c images "$@" | awk -v cols=$COLUMNS '
  NR==1{
    FIRSTLINEWIDTH=length($0)
    REPOPOS=index($0,"REPOSITORY");
@@ -317,20 +317,30 @@ dls()  {
    UPDATECOL();
  }
  function UPDATECOL () {
-   # REPO=substr($0,REPOPOS,TAGPOS-REPOPOS-1);
-   # TAG=substr($0,TAGPOS,IDPOS-TAGPOS-1);
-   # ID=substr($0,IDPOS,CREATEDPOS-IDPOS-1);
-   # CREATED=substr($0,CREATEDPOS,SIZEPOS-CREATEDPOS-1);
-   # SIZE=substr($0,SIZEPOS);
-
    REPO=substr($0,REPOPOS,TAGPOS-REPOPOS-1);
-   TAG=substr($0,TAGPOS,16);
-   ID=substr($0,IDPOS,6);
-   CREATED=substr($0,CREATEDPOS,8);
-   SIZE=substr($0,SIZEPOS,8);
+   TAG=substr($0,TAGPOS,IDPOS-TAGPOS-1);
+   # ID=substr($0,IDPOS,CREATEDPOS-IDPOS-1);
+   ID=substr($0,IDPOS,7);
+   CREATED=substr($0,CREATEDPOS,SIZEPOS-CREATEDPOS-1);
+   SIZE=substr($0,SIZEPOS);
+
+
+   sub(/ ago/, "", CREATED)
+   sub(/ minutes?/, "m", CREATED)
+   sub(/ hours?/, "h", CREATED)
+   sub(/ days?/, "d", CREATED)
+   sub(/ weeks?/, "w", CREATED)
+   sub(/ seconds?/, "s", CREATED)
+   sub(/ months?/, "mos", CREATED)
+   sub(/ years?/, "y", CREATED)
+   length(CREATED) > 3 && CREATED=substr(CREATED,0,4);
+   length(SIZE) > 7 && SIZE=substr(SIZE,0,8);
+   length(TAG) > 15 && TAG=substr(TAG,0,16);
+   sub(/hub\.cates\.io/, "hub", REPO)
  }
  function PRINT () {
-   # print ID"|"NAMES"|"IMAGE"|"STATUS"|"CREATED"|"COMMAND"|"PORTS;
+   WLEN=cols-(length(ID)+length(TAG)+length(CREATED)+length(SIZE))
+   REPO=substr(REPO,0,WLEN);
    print ID"|"REPO"|"TAG"|"CREATED"|"SIZE;
  }
  NR==2{
