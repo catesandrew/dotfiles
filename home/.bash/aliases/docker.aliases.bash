@@ -441,12 +441,6 @@ dpull() {
 }
 __docker_complete dpull _docker_pull
 
-# Push an image or a repository to a registry
-dpush() {
-    __docker_c push "$@"
-}
-__docker_complete dpush _docker_push
-
 # Rename a container
 drename() {
     __docker_c rename "$@"
@@ -696,6 +690,24 @@ dtag() {
 
 }
 __docker_complete dtag _docker_tag
+
+# Push an image or a repository to a registry
+dpush() {
+  if [ $# -eq 0 ]; then
+    local _name result id
+    _name=$(basename "$PWD")
+    result=$(docker images -q | xargs docker inspect -f "{{if ((eq (len .RepoDigests) 0) and (eq (len .RepoTags) 2))}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
+    if [ -n "${result##+([[:space:]])}" ]; then
+      printf "Found:  %s\n" "$_name"
+      __docker_c push "hub.cates.io/${_name}"
+    else
+      printf "Did not find candidate: %s\n" "$_name"
+    fi
+  else
+    __docker_c push "$@"
+  fi
+}
+__docker_complete dpush _docker_push
 
 # Display the running processes of a container
 dtap() {
