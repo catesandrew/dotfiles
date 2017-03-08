@@ -661,7 +661,39 @@ __docker_complete dswarm _docker_service
 
 # Tag an image into a repository
 dtag() {
-    __docker_c tag "$@"
+  if [ $# -eq 0 ]; then
+      local _name result id
+      _name=$(basename "$PWD")
+      result=$(docker images -q | xargs docker inspect -f "{{if eq (len .RepoTags) 1}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
+      if [ -n "${result##+([[:space:]])}" ]; then
+        id=$(echo "$result" | awk '{print $1}')
+        id=$(echo "$id" | awk -F':' '{print $2}')
+        echo "id: $id"
+        printf "Found image:  %.8s\n" "$id"
+        if [ -n "$id" ]; then
+          __docker_c tag "$id" "hub.cates.io/${_name}:latest"
+        fi
+      else
+        printf "Did not find candidate: %s\n" "$_name"
+      fi
+  else
+      __docker_c tag "$@"
+  fi
+
+    # result_id=$(dsrv ls -q | xargs docker service inspect -f "{{if eq .Spec.Name \"$name\"}}{{.Spec.Name}} {{.ID}}{{end}}")
+
+    # if [ -n "$result_id" ]; then
+    #   srv_id=$(echo "$result_id" | awk '{print $2}')
+
+    #   replicas=$(dsrv inspect $srv_id -f '{{.Spec.Mode.Replicated.Replicas}}')
+
+    #   # result_name=$(docker ps -aq | xargs docker inspect -f
+    #   # "{{if eq (index .Config.Labels \"com.docker.swarm.service.id\") \"$srv_id\"}}{{.Id}} {{index .Config.Labels \"com.docker.swarm.task.name\"}}{{end}}")
+    #   # if [ -n "$result_name" ]; then
+    #   #   task_name=$(echo "$result_name" | awk '{print $2}')
+    #   # fi
+    # fi
+
 }
 __docker_complete dtag _docker_tag
 
