@@ -49,7 +49,9 @@ __docker_complete dl _docker_ps
 # __docker_complete dps _docker_ps
 
 dps()  {
- __docker_c ps "$@" | awk '
+ # tput cols
+ # $COLUMNS
+ __docker_c ps "$@" | awk -v cols=$COLUMNS '
  NR==1{
    FIRSTLINEWIDTH=length($0)
    IDPOS=index($0,"CONTAINER ID");
@@ -63,22 +65,47 @@ dps()  {
  }
  function UPDATECOL () {
    # ID=substr($0,IDPOS,IMAGEPOS-IDPOS-1);
-   # IMAGE=substr($0,IMAGEPOS,COMMANDPOS-IMAGEPOS-1);
+   IMAGE=substr($0,IMAGEPOS,COMMANDPOS-IMAGEPOS-1);
    # COMMAND=substr($0,COMMANDPOS,CREATEDPOS-COMMANDPOS-1);
-   # CREATED=substr($0,CREATEDPOS,STATUSPOS-CREATEDPOS-1);
-   # STATUS=substr($0,STATUSPOS,PORTSPOS-STATUSPOS-1);
+   CREATED=substr($0,CREATEDPOS,STATUSPOS-CREATEDPOS-1);
+   STATUS=substr($0,STATUSPOS,PORTSPOS-STATUSPOS-1);
    # PORTS=substr($0,PORTSPOS,NAMESPOS-PORTSPOS-1);
    # NAMES=substr($0, NAMESPOS);
-   ID=substr($0,IDPOS,6);
-   IMAGE=substr($0,IMAGEPOS,24);
+   ID=substr($0,IDPOS,7);
+   # IMAGE=substr($0,IMAGEPOS,24);
    COMMAND=substr($0,COMMANDPOS,22);
-   CREATED=substr($0,CREATEDPOS,10);
-   STATUS=substr($0,STATUSPOS,10);
+   # CREATED=substr($0,CREATEDPOS,10);
+   # STATUS=substr($0,STATUSPOS,10);
    PORTS=substr($0,PORTSPOS,12);
    NAMES=substr($0,NAMESPOS);
+
+   sub(/hub\.cates\.io/, "hub", IMAGE)
+   IMAGE=substr(IMAGE,0,24);
+
+   sub(/ ago/, "", CREATED)
+   sub(/ minutes?/, "m", CREATED)
+   sub(/ hours?/, "h", CREATED)
+   sub(/ days?/, "d", CREATED)
+   sub(/ weeks?/, "w", CREATED)
+   sub(/ seconds?/, "s", CREATED)
+   sub(/ months?/, "mos", CREATED)
+   sub(/ years?/, "y", CREATED)
+   length(CREATED) > 3 && CREATED=substr(CREATED,0,4);
+
+   sub(/Up /, "", STATUS)
+   sub(/ minutes?/, "m", STATUS)
+   sub(/ hours?/, "h", STATUS)
+   sub(/ days?/, "d", STATUS)
+   sub(/ weeks?/, "w", STATUS)
+   sub(/ seconds?/, "s", STATUS)
+   sub(/ months?/, "mos", STATUS)
+   sub(/ years?/, "y", STATUS)
+   length(STATUS) > 3 && STATUS=substr(STATUS,0,4);
  }
  function PRINT () {
    # print ID"|"NAMES"|"IMAGE"|"STATUS"|"CREATED"|"COMMAND"|"PORTS;
+   WLEN=cols-(length(ID)+length(IMAGE)+length(CREATED)+length(STATUS))
+   NAMES=substr(NAMES,0,WLEN);
    print ID"|"NAMES"|"IMAGE"|"CREATED"|"STATUS;
  }
  NR==2{
