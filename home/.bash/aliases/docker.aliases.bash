@@ -752,7 +752,22 @@ dvls() {
 __docker_complete dvls _docker_volume_ls
 
 dvcleanup() {
-  __docker_c volume rm $(__docker_c volume ls -qf dangling=true)
+  local ids
+  ids=( $(__docker_c volume ls -qf dangling=true | xargs docker volume inspect -f "{{.Name}}") )
+
+   if [ ${#ids[@]} -eq 0 ]; then
+       echo "No dangling volumes"
+   elif [ ${#ids[@]} -gt 0 ]; then
+       echo "Dangling Volumes:"
+       printf "* %s\n" "${ids[@]}"
+       echo "Remove all dangling volumes?"
+       echo
+       read -p "Are you sure? " -n 1 -r
+       echo
+       if [[ $REPLY =~ ^[Yy]$ ]]; then
+           __docker_c volume rm "${ids[@]}"
+       fi
+   fi
 }
 
 # remove one or more volumes
