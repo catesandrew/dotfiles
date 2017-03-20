@@ -6,11 +6,11 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.droplr</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Droplr.app/Contents/MacOS/Droplr</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Droplr.app/Contents/MacOS/Droplr</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
