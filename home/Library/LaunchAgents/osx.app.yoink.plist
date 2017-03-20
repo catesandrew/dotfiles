@@ -6,11 +6,11 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.yoink</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Yoink.app/Contents/MacOS/Yoink</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Yoink.app/Contents/MacOS/Yoink</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
