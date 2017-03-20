@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 # converts HTML from a URL, file, or stdin to markdown
 # uses an available program to fetch URL and tidy to normalize it first
 
@@ -208,7 +208,8 @@ htmlinput=$THIS_TEMPDIR/htmlinput
 if [ -z "$argument" ]; then
     to_utf8 > $htmlinput                # read from STDIN
 elif [ -f "$argument" ]; then
-    to_utf8 "$argument" > $htmlinput    # read from file
+    # purge line (>| for noclobber)
+    to_utf8 "$argument" >| $htmlinput    # read from file
 else
     err "File '$argument' not found."
     exit 1
@@ -232,6 +233,7 @@ URL_PATH="$(echo $URL | grep / | cut -d/ -f2-)"
 #echo "  host: $HOST"
 #echo "  path: $PATH"
 
+URL_PATH=$(echo "$URL_PATH" | awk '{ sub(/\/$/, "", $1) } 1')
 FILE=/$URL_PATH
 HTML_FILE=${FILE##/*/}
 #echo ${FILE#/*/}  # ==> user/src/prog.c
@@ -244,8 +246,7 @@ HTML_FILE=${FILE##/*/}
 # cat test.md | gfm > 
 # rm test.md
 
-
-cat $htmlinput | html2text -b 0 -d "$@" > "./${HTML_FILE}.md"
+cat $htmlinput | html2text --unicode-snob --body-width=0 --dash-unordered-list >| "./${HTML_FILE}.md"
 # if ! cat $htmlinput | pandoc --ignore-args -r html -w markdown "$@" ; then
 #     err "Failed to parse HTML.  Trying again with tidy..."
 #     tidy -q -asxhtml -utf8 $htmlinput | \
