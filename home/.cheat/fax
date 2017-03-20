@@ -1,0 +1,35 @@
+# http://stackoverflow.com/questions/8885483/can-i-use-ghostscript-to-overlay-a-text-fax-header-onto-a-pdf-and-or-tiff
+
+gs -o header.pdf -sDEVICE=pdfwrite -c "/Courier findfont 12 scalefont setfont" -c "50 780 moveto (header text) show showpage"
+
+pdftk scan0001.pdf background header.pdf output goofy-with-header.pdf
+
+gs -o header.pdf -sDEVICE=pdfwrite -c "/Courier findfont 10 scalefont setfont" -c "50 783 moveto (09/28/2016  13:35     19492883733                CATES) show showpage"
+
+gs -o header.pdf -sDEVICE=pdfwrite -c "/Courier findfont 10 scalefont setfont" -c "50 783 moveto (04/13/2012  04:03     15624360220              SOCAL SUBPOENA) show showpage"
+
+pdftk pos.pdf stamp header.pdf output pos-with-header.pdf
+
+
+# I had this problem too and it was killing me. To top it off, Adobe Acrobat,
+# would not allow me to print and save as a pdf. In Preview you can print and
+# save as a pdf which basically gives you a read only view of the pdf, which
+# I like to send people. So what I ended up doing was using Adobe Acrobat to save
+# as PNG's. Then with a little imagemagick I converted the png's into pdfs.
+
+for i in *.png; do convert "${i}" "${i}.pdf"; done
+
+# Now I had x amount of pdf files, one for each page. I needed to merge them back
+# again. At first I tried using imagemagick to do this, but the results were less
+# that stellar.
+
+final="";for i in *.pdf; do final="$final ${i}"; done; convert "${final}" my-final.pdf
+
+# Reading superuser gave me a solution. From the
+# http://superuser.com/questions/54041/how-to-merge-pdfs-using-imagemagick-resolut
+# ion-problem post I came up with the following that worked great.
+
+final="";for i in *.pdf; do final="$final ${i}"; done; pdftk $final cat output my-final.pdf
+
+# Yeah, its a bit lengthy of a process but you know what, it works and I'm okay
+# with the command line so, its a solution if you're a risk taker

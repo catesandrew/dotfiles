@@ -1,0 +1,6 @@
+# clone all repos from a github organization
+# https://gist.github.com/caniszczyk/3856584
+curl -s https://api.github.com/orgs/indiehosters/repos\?per_page\=200 | perl -ne 'print "$1\n" if (/"ssh_url": "([^"]+)/)' | xargs -n 1 git clone
+
+# public clone url
+curl -s https://api.github.com/orgs/indiehosters/repos\?per_page\=200 | perl -ne 'print "$1\n" if (/"clone_url": "([^"]+)/)' | xargs -n 1 git clone
