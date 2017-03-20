@@ -9,6 +9,6 @@
 	<key>Program</key>
 	<string>/Applications/GhostNote.app/Contents/MacOS/GhostNote</string>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
