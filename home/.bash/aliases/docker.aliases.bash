@@ -82,6 +82,7 @@ dps()  {
    sub(/hub\.cates\.io/, "hub", IMAGE)
    IMAGE=substr(IMAGE,0,24);
 
+   sub(/About /, "", CREATED)
    sub(/ ago/, "", CREATED)
    sub(/ minutes?/, "m", CREATED)
    sub(/ hours?/, "h", CREATED)
@@ -105,7 +106,7 @@ dps()  {
  function PRINT () {
    # print ID"|"NAMES"|"IMAGE"|"STATUS"|"CREATED"|"COMMAND"|"PORTS;
    WLEN=cols-(length(ID)+length(IMAGE)+length(CREATED)+length(STATUS))
-   NAMES=substr(NAMES,0,WLEN);
+   NAMES=substr(NAMES,0,WLEN-8);
    print ID"|"NAMES"|"IMAGE"|"CREATED"|"STATUS;
  }
  NR==2{
@@ -324,7 +325,7 @@ dls()  {
    CREATED=substr($0,CREATEDPOS,SIZEPOS-CREATEDPOS-1);
    SIZE=substr($0,SIZEPOS);
 
-
+   sub(/About /, "", CREATED)
    sub(/ ago/, "", CREATED)
    sub(/ minutes?/, "m", CREATED)
    sub(/ hours?/, "h", CREATED)
@@ -340,7 +341,7 @@ dls()  {
  }
  function PRINT () {
    WLEN=cols-(length(ID)+length(TAG)+length(CREATED)+length(SIZE))
-   REPO=substr(REPO,0,WLEN);
+   REPO=substr(REPO,0,WLEN-12);
    print ID"|"REPO"|"TAG"|"CREATED"|"SIZE;
  }
  NR==2{
@@ -417,6 +418,41 @@ dn() {
 }
 __docker_complete dn _docker_network
 
+dncn() {
+    __docker_c network connect "$@"
+}
+__docker_complete dncn _docker_network_connect
+
+dndc() {
+    __docker_c network disconnect "$@"
+}
+__docker_complete dndc _docker_network_disconnect
+
+dnc() {
+    __docker_c network create "$@"
+}
+__docker_complete dnc _docker_network_create
+
+dni() {
+    __docker_c network inspect "$@"
+}
+__docker_complete dni _docker_network_inspect
+
+dnp() {
+    __docker_c network prune "$@"
+}
+__docker_complete dnp _docker_network_prune
+
+dnsn() {
+  docker network inspect --format="{{range .IPAM.Config}}{{index . \"Subnet\"}}{{end}}"  "$@"
+}
+__docker_complete dnsn __docker_complete_networks
+
+dngw() {
+  docker network inspect --format="{{range .IPAM.Config}}{{index . \"Gateway\"}}{{end}}"  "$@"
+}
+__docker_complete dngw __docker_complete_networks
+
 # Manage Docker Swarm nodes
 dnode() {
     __docker_c node "$@"
@@ -480,11 +516,11 @@ driu() {
    # line passed to it.
    # local images
    local images
-   IFS=$'\n'
-   images=($(__docker_c images | grep "^<none>" | awk '{print $3}'))
-   unset IFS
+   # IFS=$'\n'
+   # images=($(__docker_c images | grep "<none>" | awk '{print $3}'))
+   # unset IFS
    # or
-   # images="$(__docker_c images -q -f dangling=true)"
+   images=($(__docker_c images -q -f dangling=true))
 
    if [ ${#images[@]} -eq 0 ]; then
        echo "No unstaged images"
