@@ -6,11 +6,11 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.sip</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Sip.app/Contents/MacOS/Sip</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Sip.app/Contents/MacOS/Sip</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
