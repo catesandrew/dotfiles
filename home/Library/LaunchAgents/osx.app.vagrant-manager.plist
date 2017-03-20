@@ -6,13 +6,13 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.vagrant-manager</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>sh</string>
-      <string>-c</string>
-      <string>sleep 10 &amp;&amp; /Applications/Vagrant\ Manager.app/Contents/MacOS/Vagrant\ Manager</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>sh</string>
+		<string>-c</string>
+		<string>sleep 10 &amp;&amp; /Applications/Vagrant\ Manager.app/Contents/MacOS/Vagrant\ Manager</string>
+	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
