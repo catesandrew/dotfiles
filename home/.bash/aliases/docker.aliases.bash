@@ -82,6 +82,7 @@ dps()  {
    sub(/hub\.cates\.io/, "hub", IMAGE)
    IMAGE=substr(IMAGE,0,24);
 
+   sub(/About an hour/, "1 hour", CREATED)
    sub(/About /, "", CREATED)
    sub(/ ago/, "", CREATED)
    sub(/ minutes?/, "m", CREATED)
@@ -93,6 +94,7 @@ dps()  {
    sub(/ years?/, "y", CREATED)
    length(CREATED) > 3 && CREATED=substr(CREATED,0,4);
 
+   sub(/Up About an hour/, "1 hour", STATUS)
    sub(/Up /, "", STATUS)
    sub(/ minutes?/, "m", STATUS)
    sub(/ hours?/, "h", STATUS)
