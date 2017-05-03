@@ -45,10 +45,10 @@ BASEDIR=${1:-$DEFAULTDIR}
 for FILE in $(find "$(pwd -P)" -maxdepth "$MAXDEPTH" -not -wholename "*._*" -iname "*.JPG" -or -iname "*.JPEG" -or -iname "*.CRW" -or -iname "*.THM" -or -iname "*.RW2" -or -iname '*.ARW' -or -iname "*AVI" -or -iname "*MOV" -or -iname "*MP4"  -or -iname "*MTS" -or -iname "*PNG") 
 do
 	INPUT=${FILE}
-	DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -DateTimeOriginal "${INPUT}" | jq --raw-output '.[].DateTimeOriginal')
+	DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -DateTimeOriginal "${INPUT}" | jq --raw-output '.[].DateTimeOriginal.val')
 	if [ "$DATE" == "null" ]  # If exif extraction with DateTimeOriginal failed
 	then
-		DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -MediaCreateDate "${INPUT}" | jq --raw-output '.[].MediaCreateDate')
+		DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -MediaCreateDate "${INPUT}" | jq --raw-output '.[].MediaCreateDate.val')
 	fi
 	if [ -z "$DATE" ] || [ "$DATE" == "null" ] # If exif extraction failed
 	then
