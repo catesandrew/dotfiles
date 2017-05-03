@@ -9,10 +9,17 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
 
   if brew_contains_element "gnu-time"; then
     alias time='gtime'
+    _completion_loader gtime
+  fi
+
+  if brew_contains_element "make"; then
+    alias make='gmake'
+    _completion_loader gmake
   fi
 
   if brew_contains_element "gnu-which"; then
     alias which='gwhich'
+    _completion_loader gwhich
   fi
 
   if brew_contains_element "findutils"; then
@@ -20,10 +27,15 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     alias locate='glocate'
     alias updatedb='gupdatedb'
     alias xargs='gxargs'
+    _completion_loader gfind
+    _completion_loader glocate
+    _completion_loader gxargs
+    _completion_loader gupdatedb
   fi
 
   if brew_contains_element "gnu-sed"; then
     alias sed='gsed'
+    _completion_loader gsed
   fi
 
   if brew_contains_element "coreutils"; then
@@ -35,12 +47,14 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
         alias ls="gls -G --color=always"
     else
       alias ls='gls'
+      _completion_loader gls
     fi
 
     if brew_contains_element "ccat"; then
       alias cat='ccat'
     else
       alias cat='gcat'
+      _completion_loader gcat
     fi
 
     ## Directory
