@@ -206,6 +206,12 @@ dstop() {
 }
 __docker_complete dstop _docker_stop
 
+# Restart one or more running containers
+drestart() {
+    __docker_c restart "$@"
+}
+__docker_complete drestart _docker_restart
+
 # Stop and Remove all containers
 drmf() {
     local _ps
@@ -368,6 +374,12 @@ dip() {
     __docker_c inspect --format '{{ .NetworkSettings.IPAddress }}' "$@"
 }
 __docker_complete dip __docker_complete_containers_all
+
+dstatus() {
+  # __docker_c inspect --format  '{{json .State.Health }}' "$@"
+  __docker_c inspect --format  '{{json .State.Health.Status }}' "$@"
+}
+__docker_complete dstatus __docker_complete_containers_all
 
 # Return low-level information on a container, image or task
 di() {
