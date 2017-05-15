@@ -1,0 +1,23 @@
+# The name  fasd comes  from  the default  suggested aliases
+# f(files), a(files/directories), s(show/search/select), d(directories).
+
+# list frecent files matching foo
+f foo
+
+# list frecent files and directories matching foo and bar
+a foo bar
+
+# list frecent files that ends in js
+f js$
+
+# run vim on the most frecent file matching foo
+f -e vim foo
+
+# run mplayer on the most frecent file matching bar
+mplayer `f bar`
+
+# cd into the most frecent directory matching foo
+z foo
+
+# interactively select a file matching pdf and launch `open`
+open `sf pdf`
