@@ -12,13 +12,14 @@ if brew_contains_element "rbenv" || \
     export RBENV_HOME
   fi
 
-  # Instead of `eval $(rbenv init -)`, lets run it directly here.
-  # eval "$(rbenv init -)"
-  path_munge "${RBENV_ROOT}/shims" "after"
-
   # lazy load rbenv
   rbenv() {
     echo "Lazy loading rbenv..."
+
+    # Instead of `eval $(rbenv init -)`, lets run it directly here.
+    # eval "$(rbenv init -)"
+    path_munge "${RBENV_ROOT}/shims"
+
     command rbenv rehash 2>/dev/null
 
     rbenv() {

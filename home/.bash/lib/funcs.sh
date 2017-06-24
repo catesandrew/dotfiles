@@ -64,7 +64,6 @@ path_munge() {
     fi
   fi
 }
-add_on_exit path_munge
 
 # Checks if an item is installed in homebrew.
 #

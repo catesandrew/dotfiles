@@ -10,10 +10,6 @@ if brew_contains_element "pyenv" || \
     export PYENV_HOME="${BREW_HOME}/opt/pyenv"
   fi
 
-  # Instead of `eval $(pyenv init -)`, lets run it directly here.
-  # eval "$(pyenv init -)"
-  path_munge "${PYENV_ROOT}/shims" "after"
-
   HAS_VIRTUALENV=0
   if brew_contains_element "pyenv-virtualenv" || \
       hash pyenv-virtualenv-init 2>/dev/null; then
@@ -23,6 +19,11 @@ if brew_contains_element "pyenv" || \
   # lazy load pyenv
   pyenv() {
     echo "Lazy loading pyenv..."
+
+    # Instead of `eval $(pyenv init -)`, lets run it directly here.
+    # eval "$(pyenv init -)"
+    path_munge "${PYENV_ROOT}/shims"
+
     command pyenv rehash 2>/dev/null
     pyenv() {
       local command
