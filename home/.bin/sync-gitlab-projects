@@ -1,0 +1,281 @@
+ #!/usr/bin/env bash
+
+# Documentation
+# https://docs.gitlab.com/ce/api/projects.html#list-projects
+#
+# Refactored $PROJECT_SELECTION and $PROJECT_PROJECTION for easier modification
+# For example: To only sync non-archived projects, use PROJECT_SELECTION="select(.namespace.name == \"$NAMESPACE\" and .archived == false)"
+
+# CONSTANTS & VARIABLES (Common)
+
+# Project Root Dir
+readonly PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Level Colors
+readonly LEVEL_COLORS=(39 31 31 33 32 36)
+
+# CONSTANTS & VARIABLES (Project)
+
+# Script version
+readonly VERSION=0.0.1
+
+# List of requieed tools, example: REQUIRED_TOOLS=(git ssh)
+readonly REQUIRED_TOOLS=(jq git curl)
+
+# Long Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly LONG_OPTS=(help version namespace: url: search: selection: projection: token: git:)
+
+# Short Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly SHORT_OPTS=hvn:u:s:p:t:g:
+
+# Script name
+readonly SCRIPT_NAME=${0##*/}
+
+## CORE
+
+# NAMESPACE="indiehosters"
+# BASE_PATH="https://gitlab.cates.io/"
+# PROJECT_SEARCH_PARAM="indiehosters"
+# PROJECT_SELECTION="select(.namespace.name == \"$NAMESPACE\")"
+# PROJECT_PROJECTION="{ "path": .path, "git": .ssh_url_to_repo }"
+
+readonly NAMESPACE_DEFAULT=
+declare namespace="$NAMESPACE_DEFAULT"
+
+readonly URL_DEFAULT=${GITLAB_BASE_PATH:-}
+declare url="$URL_DEFAULT"
+
+readonly SEARCH_DEFAULT=
+declare search="$SEARCH_DEFAULT"
+
+readonly SELECTION_DEFAULT='select(.namespace.name == \"${namespace}\")'
+declare selection="$SELECTION_DEFAULT"
+
+readonly PROJECTION_DEFAULT='{ "path": .path, "git": .ssh_url_to_repo }'
+declare projection="$PROJECTION_DEFAULT"
+
+readonly TOKEN_DEFAULT=${GITLAB_PRIVATE_TOKEN:-}
+declare token="$TOKEN_DEFAULT"
+
+readonly GIT_SSH_NAME_DEFAULT=${GITLAB_SSH_NAME:-}
+declare git_ssh_name="$GIT_SSH_NAME_DEFAULT"
+
+# FUNCTIONS
+
+# Print out messages to STDERR.
+function ech() { echo -e "$@" >&2; }
+
+# Print out error messages to STDERR.
+function err() { echo -e "\033[0;31mERROR: $@\033[0m" >&2; }
+
+# Shows an error if required tools are not installed.
+function required {
+  local e=0
+  for tool in "$@"; do
+    type $tool >/dev/null 2>&1 || {
+      e=1 && err "$tool is required for running this script. Please install $tool and try again."
+    }
+  done
+  [[ $e < 1 ]] || exit 2
+}
+
+# help command
+function help_command() {
+  cat <<END;
+
+USAGE:
+  $SCRIPT_NAME [options] <command>
+
+OPTIONS:
+  --run <level>, -r       Run a docker command
+  --help, -h              help
+  --version, -v           version
+  --namespace, -n         namespace
+  --url, -u               url to gitlab
+  --search, -s            project search
+  --selection             project selection
+  --projection, -p        project projection
+  --token, -t             gitlab api token
+  --git, -g               git ssh name
+  --
+
+COMMANDS:
+  help                    Display detailed help
+  version                 Print version information.
+  sync                    Sync the projects
+
+END
+  exit 1
+}
+
+# version command
+function version_command() {
+  echo "$SCRIPT_NAME version $VERSION"
+}
+
+# default command
+function default_command() {
+  if [ -z "$token" ]; then
+    echo "Please set the environment variable GITLAB_PRIVATE_TOKEN"
+    echo "See ${url}/profile/account"
+    exit 1
+  fi
+
+  if [ -z "$namespace" ]; then
+    echo "Please set the namespace variable"
+    exit 1
+  fi
+
+  if [ -z "$search" ]; then
+    search=$namespace
+  fi
+
+  FILENAME="repos.json"
+
+  trap "{ rm -f $FILENAME; }" EXIT
+
+  # echo $url
+  # echo $token
+  # echo $search
+  # echo $selection
+  eval "selection=\"$selection\""
+  # echo $selection
+  # echo $projection
+  # echo $git_ssh_name
+  curl -s "${url}/api/v3/projects?private_token=${token}&search=${search}&per_page=999" \
+    | jq --raw-output --compact-output ".[] | ${selection} | ${projection}" > "$FILENAME"
+
+  while read repo; do
+    THEPATH=$(echo "$repo" | jq -r ".path")
+    GIT=$(echo "$repo" | jq -r ".git")
+
+    if [ -n "${git_ssh_name}" ]; then
+      GIT=$(echo $GIT | sed -e "s/git@gitlab.cates.io/git@${git_ssh_name}.gitlab.cates.io/g")
+    fi
+
+    if [ ! -d "$THEPATH" ]; then
+      echo "Cloning $THEPATH ( $GIT )"
+      git clone "$GIT" --quiet
+      # git pull --all --quiet
+      # (cd "$THEPATH" && git pull --all --quiet)
+      (cd "$THEPATH" && for branch in $(git branch --all | grep '^\s*remotes' | egrep --invert-match '(:?HEAD|develop)$'); do git branch --track "${branch##*/}" "$branch"; done)
+    else
+      echo "Pulling $THEPATH"
+      (cd "$THEPATH" && git pull --all --quiet)
+    fi
+  done < "$FILENAME"
+
+  wait
+}
+
+function namespace_command() {
+  namespace="$1"
+}
+
+function url_command() {
+  url="$1"
+}
+
+function search_command() {
+  search="$1"
+}
+
+function selection_command() {
+  selection="$1"
+}
+
+function projection_command() {
+  projection="$1"
+}
+
+function token_command() {
+  token="$1"
+}
+
+function git_ssh_name_command() {
+  git_ssh_name="$1"
+}
+
+# MAIN
+function main() {
+  # Required tools
+  required $REQUIRED_TOOLS
+
+  # Parse options
+  while [[ $# -ge $OPTIND ]] && eval opt=\${$OPTIND} || break
+        [[ $opt == -- ]] && shift && break
+        if [[ $opt == --?* ]]; then
+          opt=${opt#--}; shift
+
+          # Argument to option ?
+          OPTARG=;local has_arg=0
+          [[ $opt == *=* ]] && OPTARG=${opt#*=} && opt=${opt%=$OPTARG} && has_arg=1
+
+          # Check if known option and if it has an argument if it must:
+          local state=0
+          for option in "${LONG_OPTS[@]}"; do
+            [[ "$option" == "$opt" ]] && state=1 && break
+            [[ "${option%:}" == "$opt" ]] && state=2 && break
+          done
+          # Param not found
+          [[ $state = 0 ]] && OPTARG=$opt && opt='?'
+          # Param with no args, has args
+          [[ $state = 1 && $has_arg = 1 ]] && OPTARG=$opt && opt=::
+          # Param with args, has no args
+          if [[ $state = 2 && $has_arg = 0 ]]; then
+            [[ $# -ge $OPTIND ]] && eval OPTARG=\${$OPTIND} && shift || { OPTARG=$opt; opt=:; }
+          fi
+
+          # for the while
+          true
+        else
+          getopts ":$SHORT_OPTS" opt
+        fi
+
+  do
+    case "$opt" in
+      # List of options
+      v|version)    version_command; exit 0; ;;
+      h|help)       help_command ;;
+      n|namespace)  namespace_command "$OPTARG" ;;
+      u|url)        url_command "$OPTARG" ;;
+      s|search)     search_command "$OPTARG" ;;
+      selection)    selection_command "$OPTARG" ;;
+      p|projection) projection_command "$OPTARG" ;;
+      t|token)      token_command "$OPTARG" ;;
+      g|git)        git_ssh_name_command "$OPTARG" ;;
+      # Errors
+      ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
+      :)	err "Missing argument to option '$OPTARG'"; exit 2; ;;
+      \?)	err "Unknown option '$OPTARG'"; exit 2; ;;
+      *)	err "Internal script error, unmatched option '$opt'"; exit 2; ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # No more arguments -> call default command
+  [[ -z "$1" ]] && default_command
+
+  # Set command and arguments
+  command="$1" && shift
+  args="$@"
+
+  # Execute the command
+  case "$command" in
+    # help
+    help)     help_command ;;
+
+    # version
+    version)  version_command ;;
+
+    # sync
+    sync)      default_command ;;
+
+    # Unknown command
+    *)        err "Unknown command '$command'"; exit 2; ;;
+  esac
+}
+
+main "$@"
