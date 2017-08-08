@@ -21,3 +21,4 @@ provision skip
 .mackup recurse
 .pandoc recurse
 .kwm recurse
+.gradle recurse
