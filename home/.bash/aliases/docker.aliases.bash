@@ -708,7 +708,8 @@ dtag() {
   if [ $# -eq 0 ]; then
       local _name result id
       _name=$(basename "$PWD")
-      result=$(docker images -q | xargs docker inspect -f "{{if eq (len .RepoTags) 1}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
+      result=$(docker images -q | xargs docker inspect -f "{{if gt (len .RepoTags) 0}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
+      echo "Found: $result"
       if [ -n "${result##+([[:space:]])}" ]; then
         id=$(echo "$result" | awk '{print $1}')
         id=$(echo "$id" | awk -F':' '{print $2}')
