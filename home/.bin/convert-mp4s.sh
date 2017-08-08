@@ -26,7 +26,7 @@ function walk_tree {
                 fi
 
                 of="`basename "$filename" | sed 's/\(.*\)\..*/\1/'`.m4v"
-                ts HandBrakeCLI -Z "AppleTV 2" -m -i "$f" -o "${HOME}/Movies/after/$of" > /dev/null
+                ts HandBrakeCLI -Z "Apple 1080p60 Surround" -m -i "$f" -o "${HOME}/Movies/after/$of" > /dev/null
                 ts -dn mv "${HOME}/Movies/after/$of" "${HOME}/Documents/Videos/$of" > /dev/null
                 ts -dn trash "$f" > /dev/null
             done
@@ -45,7 +45,7 @@ function walk_tree {
             fi
 
             of="`basename "$filename" | sed 's/\(.*\)\..*/\1/'`.m4v"
-            ts HandBrakeCLI -Z "AppleTV 2" -m -i "$i" -o "${HOME}/Movies/after/$of" > /dev/null
+            ts HandBrakeCLI -Z "Apple 1080p60 Surround" -m -i "$i" -o "${HOME}/Movies/after/$of" > /dev/null
             ts -dn mv "${HOME}/Movies/after/$of" "${HOME}/Documents/Videos/$of" > /dev/null
             ts -dn trash "$i" > /dev/null
         fi
