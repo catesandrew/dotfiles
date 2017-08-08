@@ -1,17 +1,4 @@
 --sort=yes
---c-kinds=+p
---c++-kinds=+p
---fields=+iaS
---extra=+q
---python-kinds=cfm --javascript-kinds=cm
---fields=-s
---fields=+l
---fields=+n
-
---languages=-html
---languages=-javascript
-
---exclude=flowplayer
 --exclude=.hg
 --exclude=.git
 --exclude=.ropeproject
@@ -26,8 +13,6 @@
 --exclude=*.min.js
 --exclude=vendors
 --langmap=Lisp:+.clj
-
--I __THROW,__NTH,__wur,__warnattr,__nonnull,__attribute_malloc__,__attribute_pure__,__attribute_used__,__attribute_noinline__,__attribute_deprecated__,__attribute_format_arg__,__attribute_format_strfmon__,__attribute_warn_unused_result__,__always_inline,__extern_inline,__extension__,__restrict,PR_IMPLEMENT,XPT_PUBLIC_API,NSPR_API
 
 --langdef=latex
 --langmap=latex:.tex
@@ -51,15 +36,6 @@
 --regex-latex=/\\label[[:space:]]*\{([^}]+)\}/\1/l,label/
 --regex-latex=/\\ref[[:space:]]*\{([^}]+)\}/\1/r,ref/
 --regex-latex=/\\pageref[[:space:]]*\{([^}]+)\}/\1/p,pageref/
-
---langdef=xpidl
---langmap=xpidl:.idl
---regex-xpidl=/^[[:blank:]]*interface[[:space:]]+([a-zA-Z0-9_]+);$/\1/p,prototype/
---regex-xpidl=/^[[:blank:]]*interface[[:space:]]+([a-zA-Z0-9_]+)[[:space:]]+(:[[:space:]]*[^{]+[[:space:]]*)?/\1/i,interface/
---regex-xpidl=/^.*[[:blank:]]+attribute[[:space:]]+([a-zA-Z0-9_]+)[[:space:]]+([a-zA-Z0-9_]+);/\2/a,attribute/
---regex-xpidl=/^.*native[[:blank:]]+([a-zA-Z0-9_]+)\(/\1/t,type/
---regex-xpidl=/^.*(void|boolean|octet|short|long|long[[:blank:]]+long|unsigned[[:blank:]]+short|unsigned[[:blank:]]+long|unsigned[[:blank:]]+long[[:blank:]]+long|float|double|char|wchar|string|wstring|nsrefcnt)[[:blank:]]+([a-zA-Z0-9_]+)\(/\2/o,operation/
-
 
 --langdef=js
 --langmap=js:.js
@@ -118,12 +94,3 @@
 --regex-less=/^[ t]*#([A-Za-z0-9_-]+)/1/i,id,ids/
 --regex-less=/^[ t]*(([A-Za-z0-9_-]+[ tn,]+)+){/1/t,tag,tags/
 --regex-less=/^[ t]*@medias+([A-Za-z0-9_-]+)/1/m,media,medias/
-
---langdef=js
---langmap=js:.js
---regex-js=/([A-Za-z0-9._$]+)[ t]*[:=][ t]*{/1/,object/
---regex-js=/([A-Za-z0-9._$()]+)[ t]*[:=][ t]*function[ t]*(/1/,function/
---regex-js=/function[ t]+([A-Za-z0-9._$]+)[ t]*(([^)]))/1/,function/
---regex-js=/([A-Za-z0-9._$]+)[ t]*[:=][ t]*[/1/,array/
---regex-js=/([^= ]+)[ t]*=[ t]*[^"]'[^']*/1/,string/
---regex-js=/([^= ]+)[ t]*=[ t]*[^']"[^"]*/1/,string/
