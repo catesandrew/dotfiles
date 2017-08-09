@@ -85,11 +85,11 @@ if [ "$__dot_system_type" == "Darwin" ]; then
 
         __dot_brew_list=($(brew list | sed 's/:.*//'))
         __dot_brew_taps=($(brew tap | sed 's/:.*//'))
-        __dot_cask_list=($(brew cask list --caskroom=/usr/local/caskroom | sed 's/:.*//'))
+        __dot_cask_list=($(brew cask list | sed 's/:.*//'))
       fi
       unset brew_cache
 
-      HOMEBREW_CASK_OPTS="--appdir=/Applications --caskroom=${BREW_HOME}/caskroom"
+      HOMEBREW_CASK_OPTS="--appdir=/Applications"
       export HOMEBREW_CASK_OPTS
 
     fi
