@@ -94,10 +94,6 @@
 	path = home/.vim/bundle/vim-jade
 	url = git://github.com/digitaltoad/vim-jade.git
 	ignore = untracked
-[submodule "home/vim/bundle/vim-csharp"]
-	path = home/.vim/bundle/vim-csharp
-	url = git://github.com/xandox/vim-csharp.git
-	ignore = untracked
 [submodule "home/vim/bundle/vim-figlet"]
 	path = home/.vim/bundle/vim-figlet
 	url = https://github.com/vim-scripts/Figlet.vim
