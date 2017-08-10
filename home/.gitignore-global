@@ -119,7 +119,8 @@ tags
 .perforce
 
 node_modules/**
-
+lerna-debug.log
+.vs/
 
 # XCode-4 #
 ######################
