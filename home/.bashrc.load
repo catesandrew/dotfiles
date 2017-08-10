@@ -27,11 +27,11 @@ fi
 
 function osx_upgrade_bash4 {
   local new_version
-  new_version=$(bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
+  new_version=$(/usr/local/bin/bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
   if [[ $new_version > $BASH_VERSION ]]; then
     echo "Found Bash v$new_version"
     # and try preserving all the invocation options
-    exec -l bash -l${-//[chimBH]/} # "$@"
+    exec -l /usr/local/bin/bash -l${-//[chimBH]/} # "$@"
   fi
 }
 
