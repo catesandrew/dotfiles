@@ -108,4 +108,7 @@ alias nud='npm update'
 alias nus='npm uninstall --save'
 
 nv() { __npm_c view "$@"; }
+
+ns() { __npm_c start "$@"; }
+
 # __npm_complete nv npm
