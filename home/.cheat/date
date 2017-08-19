@@ -3,3 +3,9 @@ date +"%Y%m%d_%H%M%S"
 
 # Convert Unix timestamp to Date
 date -d @1440359821
+
+date
+ -> Wed 28 Oct 2009 09:32:43 PDT
+
+date +'%Y/%m/%d'
+ -> 2009/10/28

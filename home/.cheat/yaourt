@@ -1,6 +1,6 @@
 # All pacman commands are working the same way with yaourt.
 # Just check the pacman cheatsheet.
-# For instance, to install a package : 
+# For instance, to install a package :
 pacman -S <package name>
 yaourt -S <package name>
 # The difference is that yaourt will also query the Arch User Repository,
@@ -11,13 +11,12 @@ yaourt -S <package name>
 # To search for a package and install it
 yaourt <package name>
 
-# To update the local package base and upgrade all out of date package, including the ones from 
+# To update the local package base and upgrade all out of date package, including the ones from
 AUR and the packages based on development repos (git, svn, hg...)
 yaourt -Suya --devel
 
-# For all of the above commands, if you want yaourt to stop asking constantly for confirmations, 
+# For all of the above commands, if you want yaourt to stop asking constantly for confirmations,
 use the option --noconfirm
 
 # To build a package from source
 yaourt -Sb <package name>
-

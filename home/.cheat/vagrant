@@ -14,7 +14,7 @@ config.vm.network "public_network"
 # Add provision script to vagrant file
 config.vm.provision :shell, path: "provision.sh"
 
-# Start vm 
+# Start vm
 vagrant up
 
 # Connect to started instance

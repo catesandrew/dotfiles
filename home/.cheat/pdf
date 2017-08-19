@@ -5,7 +5,12 @@ convert -density 300 -trim input.pdf -quality 100 -sharpen 0x1.0 output.png
 # `input.pdf` is your input PDF. The output files are written to
 # `image-000.png`, `image-001.png`, etc. This gives you the original size of all
 # the contained images of that PDF.
-pdfimages -png input.pdf image && for file in $(find . -name "image-*.png"); do identify "$file"; done
+pdfimages -png input.pdf image && for file in $(find . -name "image-*.png"); \
+  do identify "$file"; done
 
 # Output images in a PDF, requires `poppler`
 pdfimages -list input.pdf
+
+# Merge PDFs on OSX
+gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=merged.pdf \
+  source1.pdf source2.pdf source3.pdf etc.pdf

@@ -11,6 +11,15 @@ SHELL=/bin/bash
 | +------- hour (0 - 23)
 +--------- minute (0 - 59)
 
+# To edit the crontab of the current user:
+crontab -e
+
+# To display the crontab of the current user:
+crontab -l
+
+# To remove the crontab of the current user:
+crontab -r
+
 # - If the day-of-month or day-of-week part _starts_ with a *, they form an
 #   intersection. Otherwise they form a union. `* * 3 * 1` runs on the 3rd day
 #   of the month and on Wednesday (union), whereas `* * */2 * 1` runs on every
@@ -207,4 +216,3 @@ SHELL=/bin/bash
 
 # every year
 0 0 1 1 *
-

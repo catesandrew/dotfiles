@@ -1,3 +1,5 @@
+# grep searches for lines matching a pattern.
+
 # Search a file for a pattern
 grep pattern file
 

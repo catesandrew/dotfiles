@@ -6,4 +6,3 @@ mkdir -p foo/{bar,baz}
 
 # Create the foo/bar, foo/baz, foo/baz/zip and foo/baz/zap directories
 mkdir -p foo/{bar,baz/{zip,zap}}
-

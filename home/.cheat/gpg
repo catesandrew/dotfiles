@@ -1,6 +1,6 @@
 # Create a key
 
- gpg --gen-key
+gpg --gen-key
 
 
 # Show keys
@@ -73,7 +73,7 @@
 
 # Signing and Verifying files
 
-  If you're uploading files to launchpad you may also want to include
+  If youre uploading files to launchpad you may also want to include
   a GPG signature file.
 
     gpg -ba filename

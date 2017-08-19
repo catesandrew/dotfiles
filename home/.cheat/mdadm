@@ -55,4 +55,3 @@ cat /proc/mdstat
 # Rename a device
 # (SHOULD after hostname change; eg. name="$(hostname -s)")
 mdadm --assemble /dev/md${M} /dev/sd{a,b,c,d,e}${P} --name="${name}:${M}" --update=name
-

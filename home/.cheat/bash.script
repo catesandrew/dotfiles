@@ -1,0 +1,204 @@
+-z "string"      String has zero length
+-n "string"   String has non-zero length
+
+# Note: To check whether a variable is set and not blank, use -n "${BLAH}"
+# rather than -n $BLAH. The latter will cause problems in some situations if the
+# variable is unset.
+
+# Integer Comparison in bash
+#
+# The general form of integer comparisons is int1 -operator int2. The following
+# are available:
+#
+# Operator  Purpose
+# -eq   Integer equality
+# -ne   Integer inequality
+# -lt   Integer less than
+# -le   Integer less than or equal to
+# -gt   Integer greater than
+# -ge   Integer greater than or equal to
+
+# File Tests in bash
+
+# The general form of a file test is -operator "filename". The following are
+# available (lifted from man bash):
+#
+# Operator  Purpose
+# -a file   Exists (use -e instead)
+# -b file   Exists and is a block special file
+# -c file   Exists and is a character special file
+# -d file   Exists and is a directory
+# -e file   Exists
+# -f file   Exists and is a regular file
+# -g file   Exists and is set-group-id
+# -h file   Exists and is a symbolic link
+# -k file   Exists and its sticky bit is set
+# -p file   Exists and is a named pipe (FIFO)
+# -r file   Exists and is readable
+# -s file   Exists and has a size greater than zero
+# -t fd           Descriptor fd is open and refers to a terminal
+# -u file   Exists and its set-user-id bit is set
+# -w file   Exists and is writable
+# -x file   Exists and is executable
+# -O file   Exists and is owned by the effective user id
+# -G file   Exists and is owned by the effective group id
+# -L file   Exists and is a symbolic link
+# -S file   Exists and is a socket
+# -N file   Exists and has been modified since it was last read
+
+# File Comparison in bash
+
+# The general form of a file comparison is "file1" -operator "file2". The
+# following are available (lifted from man bash):
+#
+# Operator  Purpose
+# file1 -nt file2   file1 is newer (according to modification date) than file2, or if file1 exists and file2 does not.
+# file1 -ot file2   file1 is older than file2, or if file2 exists and file1 does not.
+# file1 -ef file2   file1 and file2 refer to the same device and inode numbers.
+# Boolean Algebra in bash
+
+# There are constructs available for boolean algebra ('and', 'or' and 'not').
+# These are used outside of the [[ ]] blocks. For operator precedence, use ( ).
+#
+# Construct   Effect
+# first || second   first or second (short circuit)
+# first && second   first and second (short circuit)
+# ! condition   not condition
+
+# Note These will also sometimes work inside [[ ]] constructs, and using !
+# before a test is fairly common. [[ ! -foo ]] && bar is fine. However, there
+# are catches -- [[ -f foo && bar ]] will not work properly, since commands
+# cannot be run inside [[ ]] blocks.
+
+# Inside [ ] blocks, several -test style boolean operators are available. These
+# should be avoided in favour of [[ ]] and the above operators.
+
+# To download files that have zero-padded filenames (bob002.jpg etc. in this example):
+
+for i in `seq -f "%03g" 1 100`; do wget http://www.example.com/bob$i.jpg; done
+
+# Change the seq formatting options for more or less padding.
+
+## Select Menus
+
+PS3='Choose one word: '
+select word in "linux" "bash" "scripting" "tutorial"
+do
+  echo "The word you have selected is: $word"
+  break
+done
+
+# 1) linux
+# 2) bash
+# 3) scripting
+# 4) tutorial
+
+# Choose one word: 3
+# The word you have selected is: scripting
+
+## Case Menu
+
+echo "What is your preferred programming / scripting language"
+echo "1) bash"
+echo "2) perl"
+echo "3) phyton"
+echo "4) c++"
+echo "5) I do not know !"
+read lang;
+case $lang in
+    1) echo "You selected bash";;
+    2) echo "You selected perl";;
+    3) echo "You selected phyton";;
+    4) echo "You selected c++";;
+    5) exit
+esac
+
+## Substitution
+
+# Add /opt/bin to $PATH for duration of the script
+PATH=${PATH}:/opt/bin
+
+# Default username to whoami output
+echo ${username-`whoami`}
+
+# Default even when set, but null
+echo ${username:-`whoami`}
+
+# Output closest match 'smile.png'
+NAME=path/to/icon.smile.png
+echo "${NAME#*.}"
+
+# Ouput furthest match 'png'
+NAME=path/to/icon.smile.png
+echo "${NAME##*.}"
+
+# Remove the furthest match 'path/to/icon'
+NAME=path/to/icon.smile.png
+echo "${NAME%%.*}"
+
+# Remove the closest match 'path/to/icon.smile'
+NAME=path/to/icon.smile.png
+echo "${NAME%.*}"
+
+# Echo '/to/icon.smile.png' using the given index
+NAME=path/to/icon.smile.png
+echo "${NAME:4}"
+
+# Echo 'to' using the given index / length
+NAME=path/to/icon.smile.png
+echo "${NAME:5:2}"
+
+# Replace first 'foo' with 'bar'
+NAME="foo foobar foo"
+echo "${NAME/foo/bar}"
+
+# Replace all 'foo' with 'bar'
+NAME="foo foobar foo"
+echo "${NAME//foo/bar}"
+
+# Replace prefix 'foo' with 'bar'
+NAME="foo foobar foo"
+echo "${NAME/#foo/bar}"
+
+# Replace suffix 'foo' with 'bar'
+NAME="foo foobar foo"
+echo "${NAME/%foo/bar}"
+
+## Special Globals
+
+# $*
+# Expands to the positional parameters, starting from one. When the expansion
+# occurs within double quotes, it expands to a single word with the value of
+# each parameter separated by the first character of the IFS special variable.
+
+# $@
+# Expands to the positional parameters, starting from one. When the expansion
+# occurs within double quotes, each parameter expands to a separate word.
+
+# $#
+# Expands to the number of positional parameters in decimal.
+
+# $?
+# Expands to the exit status of the most recently executed foreground pipeline.
+
+# $-
+# A hyphen expands to the current option flags as specified upon invocation, by
+# the set built-in command, or those set by the shell itself (such as the -i).
+
+# $$
+# Expands to the process ID of the shell.
+
+# $!
+# Expands to the process ID of the most recently executed background
+# (asynchronous) command.
+
+# $0
+# Expands to the name of the shell or shell script.
+
+# $_
+# The underscore variable is set at shell startup and contains the absolute
+# file name of the shell or script being executed as passed in the argument
+# list. Subsequently, it expands to the last argument to the previous command,
+# after expansion. It is also set to the full pathname of each command executed
+# and placed in the environment exported to that command. When checking mail,
+# this parameter holds the name of the mail file.

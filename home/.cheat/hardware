@@ -10,7 +10,7 @@ find /lib/modules/$(uname -r) -type f -iname "*.ko"
 # Load a module into kernel
 modprobe modulename
 
-# Remove a module from kernel 
+# Remove a module from kernel
 modprobe -r modulename
 
 # List devices connected via pci bus

@@ -1,0 +1,26 @@
+# Mustache
+
+# Variables
+
+{{name}}         Escaped
+{{{name}}}       Unescaped
+
+# Booleans
+
+{{#exists}}
+  <p>Yay! I exist</p>
+{{/exists}}
+
+# Enumeration
+
+{{#user}}
+  <title>{{name}}</title>
+{{/user}}
+
+# Comments
+
+{{! Ignore me }}
+
+# Partials
+
+{{> foo}}

@@ -1,2 +1,5 @@
 # Reset Application Cache Settings
 killall cfprefsd
+
+# Flush DNS Cache
+sudo killall -HUP mDNSResponder

@@ -1,0 +1,17 @@
+# OCR Tools
+# unpaper, pdf2ppm, convert, pdfsandwich
+
+pdftotext document.pdf
+
+pdftoppm transcript.pdf ppm
+unpaper ppm-%02d.ppm output-%02d.ppm
+
+pdfsandwich
+pdfsandwich transcript.pdf
+
+pdfsandwich -layout single transcript.pdf
+pdfsandwich -layout none transcript.pdf
+
+convert output-*.ppm mydoc.pdf
+pdftotext mydoc.pdf
+pdfbox et --html mydoc.pdf -o mydoc.html

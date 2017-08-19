@@ -9,7 +9,8 @@ lpq
 
 # Remove print job from queue
 lprm 545
-or
+
+# or
 lprm -
 
 # Print log location

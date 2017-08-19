@@ -84,7 +84,7 @@ sed '/./=' filename | sed '/./N; s/\n/ /'
 # count lines (emulates "wc -l")
 sed -n '$='
 
-# EXT CONVERSION AND SUBSTITUTION:
+# TEXT CONVERSION AND SUBSTITUTION:
 
 # IN UNIX ENVIRONMENT: convert DOS newlines (CR/LF) to Unix format.
 sed 's/.$//'               # assumes that all lines end with CR/LF
@@ -379,4 +379,3 @@ gsed '/./{H;d};x;y/\n/\v/' file | sort | sed '1s/\v//;y/\v/\n/'
 # (under DOS: the "dir /b" switch returns bare filenames in all caps).
 echo @echo off >zipup.bat
 dir /b *.txt | sed "s/^\(.*\)\.TXT/pkzip -mo \1 \1.TXT/" >>zipup.bat
-

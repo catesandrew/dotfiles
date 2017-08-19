@@ -11,7 +11,7 @@ curl -O URLOfFirstFile -O URLOfSecondFile
 curl http://example.com/pic[1-24].jpg
 
 # Download a file and pass HTTP Authentication
-curl -u username:password URL 
+curl -u username:password URL
 
 # Download a file with a Proxy
 curl -x proxysever.server.com:PORT http://addressiwantto.access
@@ -38,3 +38,25 @@ curl --limit-rate 1000B -O http://path.to.the/file
 curl ifconfig.me
 curl ifconfig.me/ip
 curl ifconfig.me/host
+
+# Command line internet/network loader tool and ajax test tool. Read the
+# contents of a URL, dump the results to the stdout. Basic USE:
+
+curl [options] [URL...]
+
+# To see if a site is alive, just get the headers:
+curl --head www.yahoo.com
+
+# A live response returns status, cookies, content length, etc.
+
+# To send custom headers (anything you want!) use:
+curl --header "User-Agent: something-special" google.com
+
+# To return the entire page:
+curl www.google.com
+
+# The view the man page:
+curl --manual | less
+
+# To retrieve data with POST:
+curl -d "name=dpw" www.google.com

@@ -25,8 +25,8 @@ journalctl _COMM=sshd
 # Filter by Command and time period
 journalctl _COMM=crond --since '10:00' --until '11:00'
 
-# List all available boots 
+# List all available boots
 journalctl --list-boots
 
-# Filter by specific User ID e.g., user id 1000 
+# Filter by specific User ID e.g., user id 1000
 journalctl _UID=1000

@@ -25,8 +25,8 @@ ip route add default via 192.168.1.1
 # Add route via interface
 ip route add 192.168.0.0/24 dev eth0
 
-# Change your mac address 
+# Change your mac address
 ip link set dev eth0 address aa:bb:cc:dd:ee:ff
 
-# View neighbors (using ARP and NDP) 
+# View neighbors (using ARP and NDP)
 ip neighbor show

@@ -24,7 +24,7 @@ systemctl disable foo.service
 
 # List the dependencies of a service
 # when no service name is specified, lists the dependencies of default.target
-systemctl list-dependencies foo.service 
+systemctl list-dependencies foo.service
 
 # List currently loaded targets
 systemctl list-units --type=target

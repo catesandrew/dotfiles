@@ -16,8 +16,8 @@ ldd
 # Standard (usual) library file location
 /lib
 
-# Sofware-accessible source for library info 
-/etc/ld.so.cache 	# (binary)
+# Sofware-accessible source for library info
+/etc/ld.so.cache  # (binary)
 
 # Human-readable source for library info
-/etc/ld.so.conf 	# (points to /etc/ld.so.conf.d)
+/etc/ld.so.conf   # (points to /etc/ld.so.conf.d)

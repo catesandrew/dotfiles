@@ -1,14 +1,14 @@
 find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'body' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
 
-pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html
 
 find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s 'body' --eval "pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i" -o "$file"; done
 
-pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html
 
 pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i
 
-pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html 
+pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i 01-drafting-your-team.html
 
 pomona --remove-unneeded-spaces --remove-unneeded-periods --fix-invalid-italic-tags --fix-missing-spaces --fix-unknown-words --fix-ocr-errors --fix-uppercase-i
 

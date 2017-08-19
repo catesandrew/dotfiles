@@ -1,0 +1,63 @@
+# Bitwise Operators
+
+## NOT ~
+~ 0111
+= 1000
+
+## OR |
+
+  0010
+| 1000
+= 1010
+
+## XOR ^
+
+  0010
+^ 1010
+= 1000
+
+## AND &
+
+  0101
+& 0011
+= 0001
+
+## Shifts
+
+0011 << 1
+0110
+
+0110 >> 1
+0011
+
+# Base Examples
+
+BINARY (2)    OCTAL (8)   DECIMAL (10)   HEX (16)
+0000001       0001        1              0x001
+0000010       0002        2              0x002
+0000100       0004        4              0x004
+0001000       0010        8              0x008
+0010000       0020        16             0x010
+0100000       0040        32             0x020
+1000000       0100        64             0x040
+
+## Permission Bitflag Example
+
+VIEW_USERS = 1       0001
+EDIT_USERS = 2       0010
+DELETE_USERS = 4     0100
+
+Admin = VIEW_USERS | EDIT_USERS | DELETE_USERS  0111
+Anonymous = VIEW_USERS                          0001
+user.role = Anonymous
+
+### Check Permissions
+
+if (user.role & VIEW_USERS) ;   This will pass
+if (user.role & EDIT_USERS) ;   This will fail
+if (user.role & DELETE_USERS) ; This will fail
+
+### Remove Role Permissions
+
+Anonymous ^= VIEW_USERS   0000
+Admin ^= DELETE_USERS     0011

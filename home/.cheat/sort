@@ -14,3 +14,10 @@ df -h | body sort -k 5
 ps -eo pid,%cpu | head -1
 ps -eo pid,%cpu | sort -nrk2 | head
 ps -eo pid,%cpu | body sort -nrk2 | head
+
+# Sort
+  -t  # use a particular symbol as the separator
+  -k  # specify which column you would like to sort by
+  -g  # fixes numeric sorting
+
+sort -t : -k 4 -k 1 -g /etc/passwd | more
