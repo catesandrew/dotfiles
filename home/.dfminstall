@@ -22,3 +22,4 @@ provision skip
 .pandoc recurse
 .kwm recurse
 .gradle recurse
+fortunes skip

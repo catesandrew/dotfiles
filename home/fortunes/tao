@@ -1,0 +1,1452 @@
+I can get another if I break it, so a clay cup trumps a grail. - Mirza Asadullah Khan Ghalib, classical Urdu and Persian poet from the Mughal Empire
+%
+Rule of Zero, One or Infinity (ZOI): Arbitrary limits on the number of instances of a particular entity should not be allowed. - Willem van der Poel
+%
+Worse is better: Design for simplicity. - Richard P. Gabriel, 'Lisp: Good News, Bad News, How to Win Big' (1989)
+%
+Uniform Access Principle: Services should be offered through uniform interfaces, regardless of internal implementation. - Bertrand Meyer
+%
+Rule of Least Power: Use the least powerful language possible for a given problem. Prefer declarative languages over procedural.
+%
+Rule 3.14: Nothing gets standardised until there are multiple instances of running code. - RFC1958 (1996)
+%
+Optimization considered harmful: In particular, optimization introduces complexity, and as well as introducing tighter coupling between components and layers. - RFC3439
+%
+Law of Diminishing Returns: If one factor of production is increased while the others remain constant, the overall returns will relatively decrease after a certain point. - W. J. Spillman and E. Lang (1924)
+%
+Upgrade cost of network complexity: The Internet has smart edges ... and a simple core. Adding an new Internet service is just a matter of distributing an application ... Compare this to voice, where one has to upgrade the entire core. - RFC3439 (2002)
+%
+Lest men suspect your tale untrue, keep probability in view. - John Gay (1727)
+%
+For every proverb, there is an equal and opposite proverb. - Philip Wadler (2011-03-23)
+%
+Fast, cheap, and reliable: choose two. - Old engineering proverb
+%
+Freedom, security, and convenience: choose two. - Unknown
+%
+Trust is the availability of effective recourse. - Dan Geer (2014)
+%
+Security engineering is about tolerable failure modes. Determine which failure modes are tolerable and which are not, and design around not having the intolerable ones. - Dan Geer (2014)
+%
+CIA triad: Confidentiality, Integrity, Availability. - Famous summary of computer security concerns.
+%
+Some people when faced with a problem think: "I know, I'll use distributed computing". Now they have N^2 problems. - @jamesiry
+%
+Software Architecture Paradox #1: Flexibility breeds complexity. We aim to design flexible software; yet, in doing so, we see an undesirable increase in complexity. - Kirk Knoernschild (2012)
+%
+Software Architecture Paradox #2: Reuse complicates use. We strive to develop reusable software, only to impair the software's ease of use. - Kirk Knoernschild (2012)
+%
+Software Architecture Paradox #3: Evolution impedes survival. We design a software system that can evolve, but in doing so hasten its death. - Kirk Knoernschild (2012)
+%
+Design up front for reuse is, in essence, premature optimization. - AnimalMuppet
+%
+S-Programs are programs whose function is formally defined by and derivable from a specification. P-Programs [are problems] that can be precisely formulated but whose solution must inevitably reflect an approximation of the real world. E-Programs are inherently even more change prone. They are programs that mechanize a human or societal activity. - Meir M. Lehman, Proceedings of the IEEE, Vol. 68, No. 9, September 1980.
+%
+All problems in computer science can be solved by another level of indirection, except of course for the problem of too many indirections. - David Wheeler
+%
+If you have too many special cases, you're doing it wrong. - Craig Zerouni
+%
+One person's constant is another person's variable. - Susan Gerhart
+%
+One person's data is another person's program. - Guy L. Steele, Jr.
+%
+The RPC fallacy: making remote/slow/independent things pretend to be local/fast/fate-shared. - Wes Felter
+%
+Sometimes the problem is to discover what the problem is. - Gordon Glegg, 'The Design of Design' (1969)
+%
+In practice, designing seems to proceed by oscillating between sub-solution and sub-problem areas, as well as by decomposing the problem and combining sub-solutions. - Nigel Cross
+%
+Any attempt to formulate all possible requirements at the start of a project will fail and would cause considerable delays. - Pahl and Beitz, 'Engineering Design' (2007)
+%
+If a design, particularly a team design, is to have conceptual integrity, one should name the scarce resource explicitly, track it publicly, control it firmly. - Frederick P. Brooks, 'The Design of Design: Essays from a Computer Scientist' (2010)
+%
+A general-purpose product is harder to design well than a special-purpose one. - Frederick P. Brooks, 'The Design of Design: Essays from a Computer Scientist' (2010)
+%
+Firmitas, utilitas, venusitas. ("Firmness, utility, delight") - Marcus Vitruvius, 'De Architectura' (22BCE)
+%
+The besetting mistake of expert designers is not designing the thing wrong, but designing the wrong thing. - Frederick P. Brooks, 'The Design of Design: Essays from a Computer Scientist' (2010)
+%
+The central tension in the software process comes from the fact that we must go from an informally identified need that exists in-the-world to a formal model that operates in-the-computer. - Bruce Blum, 'Beyond Programming' (1996)
+%
+UML - Unnecessary Management Lingo. - @iamdevloper
+%
+There are only two hard things in Computer Science: off by one errors, cache invalidation and naming things. - Phil Karlton
+%
+Functions in particular are a programming language construct and as such not easily extended across programming languages, processes and networks, mostly due to different type systems and error states [...] it's not an accident or historical vestige that Unix philosophy uses the word 'program'. It has technical as well as social implications that have barely changed in the past 50 years. - fauigerzigerk
+%
+Most of it's bullshit but there is a core of good ideas you have to pay attention to. - Joseph Henry Condon on cognitive engineering (a 1970s predecessor to the Unix Philosophy)
+%
+Any piece of engineering design is a statement. By the designer without the user. - MSM
+%
+The major thing that we found was that you had to look at the whole problem. - Joseph Henry Condon, Bell Labs
+%
+People write programs around here because they want to use them. - Joseph Henry Condon, Bell Labs
+%
+There is no excellent beauty which hath not some strangeness in the proportion. - Francis Bacon
+%
+Don't pick the right tool for the job, pick the right framework which secures you extra work for being a tool. - @iamdevloper
+%
+I cannot paint until I have the complete picture in my mind. - René Magritte, surrealist
+%
+Everything tends to make one think that there is little relation between an object and that which represents it. - René Magritte, surrealist
+%
+Scissors, paste, images, and genius in effect superseded brushes, paints, models, style, sensibility, and that famous sincerity demanded of artists. - René Magritte, surrealist, on collage
+%
+I leave to others the business of causing anxiety and terror and mixing everything up. - René Magritte, surrealist
+%
+Our secret desire is for a change in the order of things. - René Magritte, surrealist
+%
+Ship of Theseus: All of the parts are new, and yet it is the same ship.
+%
+I came to the conclusion that the designer of a new system must not only be the implementor and the first large-scale user; the designer should also write the first user manual. - Donald E. Knuth, 'The Errors of TeX' (1989)
+%
+The height of cleverness is to be able to conceal it. - Francois de la Rochefoucauld (1613-1680)
+%
+It from Bit. [Information gives rise to] every it - every particle, every field of force, even the spacetime continuum itself. - 'Oracular monosyllables' of Archibald Wheeler, last surviving collaborator of Einstein and Bohr
+%
+What we call reality arises in the last analysis from the posing of yes-no questions. - Archibald Wheeler
+%
+TMI: Too Much Information (popular saying at the turn of the 21st century)
+%
+Shannon's maxim: One ought to design systems under the assumption that the enemy will immediately gain full familiarity with them.
+%
+If you want creativity, take a zero off your budget. If you want sustainability, take off two zeros. - Jaime Lerner
+%
+Keep your code absolutely simple. Keep looking at your functions and figure out how you simplify further. - John Romero, id Software
+%
+We are our own best testing team and should never allow anyone else to experience bugs [...] Don't waste others' time. Test thoroughly before checking in your code. - John Romero, id Software
+%
+As soon as you see a bug, you fix it. Do not continue on. If you don’t fix your bugs your new code will be built on a buggy codebase and ensure an unstable foundation. - John Romero, id Software
+%
+Encapsulate functionality to ensure design consistency. This minimizes mistakes and saves design time. - John Romero, id Software
+%
+No worthy problem is ever solved in the plane of its original conception. - Albert Einstein
+%
+A distributed system is one where the failure of a machine you've never heard of stops you from getting any work done. - Leslie Lamport
+%
+Success really depends on the conception of the problem, the design of the system, not in the details of how it's coded. - Leslie Lamport
+%
+You're not going to come up with a simple design through any kind of coding techniques or any kind of programming language concepts. Simplicity has to be achieved above the code level before you get to the point which you worry about how you actually implement this thing in code. - Leslie Lamport
+%
+UML - I know next to nothing about UML - but what I do know is the language was invented first and then people came around and tried to give semantics to the language. Well, in other words what that means is that the language was invented first and it really didn't mean anything. And then, later on, people came around to try to figure out what it meant. Well, that's not the way to design a specification language. The importance of a specification language is to specify something precisely, and therefore what you write - the specification you write - has to have a precise, rigorous meaning. - Leslie Lamport
+%
+UML: a language that was invented first and then people came around to try to get semantics. - Leslie Lamport
+%
+UML: fuzzy pictures of boxes and arrows. - Leslie Lamport
+%
+People use UML, things like UML, to model programs, but it's not clear how to translate them in to sequences of states, for concurrency. If you cannot translate them in to sequences of states, it means you don't understand them, and it may mean that there's nothing there. You know, there are lots of people selling snake-oil, drawing boxes and arrows that make you feel good, but ultimately have no real meaning. If something is really meaningful you should be able to express it in mathematics. - Leslie Lamport
+%
+The benefit of using [a formal specification language] is that it teaches you to think rigorously, to think precisely, and the important point is the precise thinking. So what you need to avoid at all costs is any language that's all syntax and no semantics. - Leslie Lamport
+%
+A lot of the problems that exist in software, a lot of the problems that one encounters in writing... in building a system, in writing a program: those are problems that are caused by not thinking about what you are doing before starting to code. - Leslie Lamport
+%
+If you're building a complicated system, the battle is won or lost before a single piece of code is written. - Leslie Lamport
+%
+You're not going to find the best algorithm in terms of computational complexity by coding. - Leslie Lamport
+%
+You could decide that you want to do something - the what - and then when it comes to programming it you discover that you can't - that is, you don't know how or the how is too expensive or something like that. So I don't mean to imply that what you should first do is thinking completely abstractly about what something is supposed to do and then, only then do you think about how you do it. Part of engineering is understanding what you can do in practice and what you can't. But, given that caveat, you really should understand what the system is doing before you try to implement it. - Leslie Lamport
+%
+There are two separate things you want to specify about a program or a system: what it does, and how it should do it. - Leslie Lamport
+%
+It's really important to understand what something is supposed to do before you start to do it. Very often, once you've decided precisely what something is supposed to do, implementing it - the coding, the how - is quite trivial, and it hardly needs a specification at all or might be so simple that you really can just start coding without writing any precise description of how it does it, beyond the specification of what it's supposed to do. - Leslie Lamport
+%
+First of all, there are lots of different things that can go by the name of specification. I use all of them. Sometimes a specification I write is a few English sentences. Sometimes, it's a very complicated mathematical description of the object, the what or the how. Which one is appropriate depends on the problem: how hard the problem is, how important it is that it get done correctly, and various things like that. - Leslie Lamport
+%
+Anything you do is an iterative process. You start out by thinking about something, and then you start writing it, and in the course of writing it, you rewrite and you rewrite and you rewrite. - Leslie Lamport
+%
+A lot of programs I write just for my own use and I can live with the bugs and it's not that important that they be absolutely correct, but sometimes I write code for other people to use and I really want it to work right. - Leslie Lamport
+%
+The important thing is not the syntax of what you're writing: the important thing is the precision, the rigor. In order to understand things, you have to write them precisely. I use mathematics because that is precise. - Leslie Lamport
+%
+People who are programmers should be able to think precisely. - Leslie Lamport
+%
+What you need to avoid at all costs is any language that's all syntax and no semantics, because that is not going to get you to think rigorously - that's going to get you to fool yourself in to thinking that you're thinking. - Leslie Lamport
+%
+My basic mode of thinking hasn't changed: basically the idea that I want to understand things, and understand things for me means being able to describe them mathematically. - Leslie Lamport
+%
+To think, you have to write. If you're thinking without writing, you only think you're thinking. - Leslie Lamport
+%
+Writing requires thinking. - Leslie Lamport
+%
+There are two models of reality that I find to be the most useful ones, especially when writing programs. The first is functions, and the second is sequences of states. - Leslie Lamport
+%
+All possible successor states of any state. - Leslie Lamport
+%
+Not knowing what a program should do means we have to think even harder, before we start coding. - Leslie Lamport
+%
+You write a spec to help you think about a problem before you write the code. - Leslie Lamport
+%
+People are so used to thinking at a code level that they can't think at a higher level. - Leslie Lamport
+%
+Why don't programmers write specs? Writing is like running. The less you do it, the slower you are. You have to strengthen your writing muscles. It takes practice. It's easier to find an excuse not to. - Leslie Lamport
+%
+Thinking doesn't guarantee that you won't make mistakes. Not thinking guarantees that you will. - Leslie Lamport
+%
+The right way to think about distributed systems, and I've been doing it for 40 years, is in terms of the state of the system. - Leslie Lamport
+%
+To the extent that [Agile software development] is [an excuse for not thinking], it's a bad thing. - Leslie Lamport
+%
+The essence of computing is discreteness, and I believe that what one will discover is that the essence of perception is discretizing something. That is, perception means receiving this continuous input from the environment and making a discrete categorization of it, and that's the point at which perception happens. - Leslie Lamport
+%
+Generally it doesn't seem to be necessary to deal with Byzantine failures. Using simple techniques like checksums to avoid corruption of data, it's generally felt that that kind of malicious behavior, outside of - where the malice is caused by failure not by hackers - you don't need Byzantine fault tolerance. So, in practice that means if the computers that you're building your system out of are under your control and not under hackers' control then you don't need Byzantine fault tolerance, in which case Paxos is basically the algorithm you should be using. There are different consensus algorithms that have been proposed but the ones that are practical in the sense that they're efficient are all equivalent to Paxos at least in the normal case, and Paxos works: use that. I mean it doesn't solve all your problems, because you still have the problem of optimizing: there are lots of optimization games you can play depending upon the particular nature of the state machine you're trying to implement, but if you understand the basic Paxos algorithm then you'll understand what optimizations can be made to get it to work well for your system. - Leslie Lamport
+%
+If you're not writing a program, you shouldn't use a programming language, because programming languages are really complicated. They get more and more complicated. Now, they're complicated for good reason: they've got a difficult problem to solve, which is to be able to generate efficient code for these complicated machines, but there's a lot simpler way to describe systems, algorithms, whatever, and y'know it's a language that's been developed for a couple of thousand years for saying things precisely. It's mathematics. - Leslie Lamport
+%
+Computation is not just about functions. If computation were about functions then quicksort and bubble-sort were the same because they're computing the same function. As I said a computing device is something that goes through a sequence of states and what an assignment statement is doing is it is telling you here is a new state, and also there's the notion of it's non-determinism, so the new state is not a function of the old state. So functional programming in a sense - functions - don't solve the problem of programming. - Leslie Lamport
+%
+The mathematics of computing - things like sets and functions and logic - are to computing what real numbers are to physics. People who are writing programs should be as facile with that kind of very simple math as physicists are with numbers. - Leslie Lamport
+%
+When you understand something, then you can find the math to express that understanding. The math doesn't provide the understanding. - Leslie Lamport
+%
+Modularity: Write simple parts connected by clean interfaces. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Composition: Design programs to be connected to other programs. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Separation: Separate policy from mechanism; separate interfaces from engines. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Parsimony: Write a big program only when it is clear by demonstration that nothing else will do. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Robustness: Robustness is the child of transparency and simplicity. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Representation: Fold knowledge into data so program logic can be stupid and robust. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Diversity: Distrust all claims for "one true way". - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Extensibility: Design for the future, because it will be here sooner than you think. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Clarity: Clarity is better than cleverness. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Transparency: Design for visibility to make inspection and debugging easier. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Simplicity: Design for simplicity; add complexity only where you must. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Least Surprise: In interface design, always do the least surprising thing. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Silence: When a program has nothing surprising to say, it should say nothing. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Repair: When you must fail, fail noisily and as soon as possible. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Economy: Programmer time is expensive; conserve it in preference to machine time. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Generation: Avoid hand-hacking; write programs to write programs when you can. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Optimization: Prototype before polishing. Get it working before you optimize it. - Eric S. Raymond, The Art of Unix Programming (2003)
+%
+Bliss: Allow your users the luxury of ignorance. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Distractions: Allow your users the luxury of inattention. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Flow: Allow your users the luxury of attention. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Documentation: Documentation is an admission of failure. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Transparency: Every bit of program state that the user has to reason about should be manifest in the interface. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Modelessness: The interface's response to user actions should be consistent and never depend on hidden state. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Seven: Users can hold at most 7±2 things at once in working storage. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Reversibility: Every operation without an undo is a horror story waiting to happen. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Confirmation: Every confirmation prompt should be a surprise. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Failure: All failures should be lessons in how not to fail. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Silence: When a program has nothing surprising to say, it should say nothing. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Automation: Never ask the user for any information that you can autodetect, copy, or deduce. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Defaults: Choose safe defaults, apply them unobtrusively, and let them be overridden if necessary. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Respect: Never mistake keeping things simple for dumbing them down, or vice-versa. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Predictability: Predictability is more important than prettiness. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Reality: The interface isn't finished till the end-user testing is done. - Eric S. Raymond, The Art of Unix Usability (2004)
+%
+Small is beautiful. - Mike Garcanz: The Unix Philosophy
+%
+Make each program do one thing well. - Mike Garcanz: The Unix Philosophy
+%
+Build a prototype as soon as possible. - Mike Garcanz: The Unix Philosophy
+%
+Choose portability [high level] over efficiency [low-level]. - Mike Garcanz: The Unix Philosophy
+%
+Store data in flat text files. - Mike Garcanz: The Unix Philosophy
+%
+Use software leverage to your advantage. - Mike Garcanz: The Unix Philosophy
+%
+Use shell scripts [higher level languages] to increase leverage and portability. - Mike Garcanz: The Unix Philosophy
+%
+Avoid captive user interfaces. - Mike Garcanz: The Unix Philosophy
+%
+Make every program a filter. - Mike Garcanz: The Unix Philosophy
+%
+Those who don't understand Unix are condemned to reinvent it, poorly. - Henry Spencer
+%
+Unix is simple. It just takes a genius to understand its simplicity. - Dennis Ritchie
+%
+Unix was not designed to stop its users from doing stupid things, as that would also stop them from doing clever things. - Doug Gwyn
+%
+Unix never says 'please'. - Rob Pike
+%
+Unix is user-friendly. It just isn't promiscuous about which users it's friendly with. - Steven King
+%
+Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new features. - Doug McIlroy, The Bell System Technical Journal, Unix Time-Sharing System Forward (1978)
+%
+Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don't insist on interactive input. - Doug McIlroy, The Bell System Technical Journal, Unix Time-Sharing System Forward (1978)
+%
+Design and build software, even operating systems, to be tried early, ideally within weeks. Don't hesitate to throw away the clumsy parts and rebuild them. - Doug McIlroy, The Bell System Technical Journal, Unix Time-Sharing System Forward (1978)
+%
+Use tools in preference to unskilled help to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you've finished using them. - Doug McIlroy, The Bell System Technical Journal - Unix Time-Sharing System Forward (1978)
+%
+This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface. - Doug McIlroy (1994)
+%
+The real hero of programming is the one who writes negative code. - Doug McIlroy
+%
+As a programmer, it is your job to put yourself out of business. What you do today can be automated tomorrow. - Doug McIlroy
+%
+Keep it simple, make it general, and make it intelligible. - Doug McIlroy
+%
+When in doubt, use brute force. - Ken Thompson
+%
+One of my most productive days was throwing away 1000 lines of code. - Ken Thompson
+%
+Postel's Prescription: Be liberal in what you accept, and conservative in what you send. - Jon Postel 
+%
+90% of the functionality delivered now is better than 100% of it delivered never. - Kernighan & Plauger
+%
+There are two major products that come out of Berkeley: LSD and UNIX. We don't believe this to be a coincidence. - Jeremy S. Anderson.
+%
+'One thing well' misses the point: it should be 'One thing well AND COMPOSES WELL' - marius eriksen (@marius), October 10, 2012, referring to the 'programs should do one thing and do it well' unix philosophy.
+%
+We have incomplete information about the world. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Use the right kind of probe to see the right level of detail. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Make our comprehension of the world more manageable by limiting the amount of information we have to interact with at any time. Our experience of the world can be made comprehensible, or incomprehensible, by design. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+The effect of limited information is that we perceive and build the world as a collection of containers, patches or environments, separated from one another by limited information flow. These structures define characteristic scales. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+The more details we can see, the less we have a sense of control. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Separation of concerns ... a necessary consequence of loss of resolution due to scale ... a strategy for staying sane. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Certainty = Knowledge + Information. Where knowledge is a relationship to the history of what we've already observed in the past, ie. an expectation of behaviour, and information is evidence of the present: that things are proceeding is expected. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+The way control emerges in a quantum-mechanical sense is in the manipulation of guard-rails or constraining walls, forces called potentials: containers that limit the probable range of electrons to an approximately predictable region. This is not control, but loading the dice by throwing other dice at them. Similarly, when building technologies to deal with uncertainty, we must use similar ideas of constraint. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Strong coupling turns out to be a particular problem in computer based infrastructure. Chaos is easily contained, given the nature of computer-based infrastructure, yet systems are often pushed beyond the brink of instability. We do not escape from uncertainty so easily. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Designers who don't believe in Murphy's Law, that which can happen will happen, are irresponsible. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+The simplest idea of stability is constancy, or invariance. A thing that has no possibility to change is, by definition, immune to external pertubations. [...] Invariance is an important concept, but also one that has been shattered by modern ideas of physics. What was once considered invariant, is usually only apparently invariant on a certain scale. When one looks in more detail, we find that we may only have invariance of an average. - Mark Burgess, In Search of Certainty: The Science of Our Information Infrastructure (2013)
+%
+Wiener's First Law: Every device creates its own opportunity for human error. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Second Law: Exotic devices create exotic problems. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Third Law: Digital devices tune out small errors while creating opportunities for large errors. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Fourth Law: Invention is the mother of necessity. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Fifth Law: Some problems have no solution. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Sixth Law: It takes an airplane to bring out the worst in a pilot. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Seventh Law: Whenever you solve a problem, you usually create one. You can only hope that the one you created is less critical than the one you eliminated. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Wiener's Eighth and Final Law: You can never be too careful about what you put into a digital flight-guidance system. - Earl Wiener, Professor of Engineering, University of Miami (1980)
+%
+Decisiveness is overrated. - Philosophy, University of California, Santa Cruz
+%
+Starfish do not walk in straight lines. - Zoology, University College Dublin
+%
+Rocks that are next to each other in Massachusetts now were also next to each other 400 million years ago. - Geology, Amherst College
+%
+I'm sorry but there's nothing I can do to help. - Information Security, Johns Hopkins University
+%
+Rats will go to great lengths to earn a pellet of sugar, and even more so when on the right kinds of drugs. - Neuroscience, University of California, Los Angeles
+%
+The people don't understand. - Political science, Sciences Po Bordeaux
+%
+Kids with imaginary friends are wicked smaht. - Developmental Psychology, Clark University
+%
+Are We Certain Yet? Towards a Phenomenal Account of Scepticism - Philosophy, University of St Andrews
+%
+Acyclic dependencies principle: Avoid infinite loops.
+%
+Convention over configuration: Simplify normal use cases, without necessarily sacrificing flexibility.
+%
+Everything of importance has been said before by somebody who did not discover it. - Alfred North Whitehead
+%
+Gobbledygook. - Congressman Maury Maverick (1944); grandson of Samuel Augustus Maverick, originator of the term 'maverick'.
+%
+AI is whatever hasn't been done yet. - Douglas Hofstadter (1980)
+%
+The simple things you see are all complicated. - 'Substitute', song by The Who (1966)
+%
+Let us be lazy in everything, except in loving and drinking, except in being lazy. - Gotthold Ephraim Lessing (1729-1781)
+%
+It is the mark of great people to treat trifles as trifles and important matters as important. - Gotthold Ephraim Lessing (1729-1781)
+%
+The worst of superstitions is to think one's own most bearable. - Gotthold Ephraim Lessing (1729-1781), 'Nathan the Wise' (1779), Act IV, scene II
+%
+It is infinitely difficult to know when and where one should stop, and for all but one in thousands the goal of their thinking is the point at which they have become tired of thinking. - Gotthold Ephraim Lessing (1729-1781)
+%
+Laziness is the mother of efficiency. - Marian Propp
+%
+Human nature is above all things lazy. - Harriet Beecher Stowe (1811-1896)
+%
+Law of Communications: The inevitable result of improved and enlarged communications between different levels in a hierarchy is a vastly increased area of misunderstanding.
+%
+Good customer relations double productivity. - Larry Bernstein, Bell Communications Research
+%
+Rule of Defactualization: Information deteriorates upward through bureaucracies.
+%
+Fifth Rule: You have taken yourself too seriously.
+%
+Futility Principle: No experiment is ever a complete failure; it can always serve as a bad example.
+%
+One Page Principle: A specification that will not fit on one page cannot be understood.
+%
+The most powerful dehumanizing machine is not technology but the social machine, ie. The formation of command structures to make humans emulate technology in order to build pyramids and skyscrapers... - Lewis Mumford (1967)
+%
+When things are not going well, until you get the truth out on the table, no matter how ugly, you are not in a position to deal with it. - Bob Seelert, chairman of the global advertising firm Saatchi and Saatchi
+%
+The reasons you get into trouble become the reasons you don't get out of it. - Old saying in the aviation industry.
+%
+It seems that we are locked into a spiral in which poor human performance begets automation, which worsens human performance, which begets increasing automation. The pattern is common to our time but is acute in aviation. Air France 447 was a case in point. - William Langewiesche, 'The Human Factor: Should Airplanes be Flying Themselves?', Vanity Fair, October 2014
+%
+The dynamic has become inevitable. There will still be accidents, but at some point we will have only the machines to blame. - William Langewiesche, 'The Human Factor: Should Airplanes be Flying Themselves?', Vanity Fair, October 2014
+%
+Looking back, I think it was more difficult to see what the problems were than to solve them. - Charles Darwin
+%
+Thoroughly conscious ignorance is the prelude to every real advance in science. - James Clerk Maxwell
+%
+Science produces ignorance at a faster rate than it produces knowledge. - Stuart Firestein, Chair of the Department of Biological Sciences, Columbia University
+%
+The idea we should outsource our memories to the web: it’s a short-cut to stupidity. The less we know, the worse we are at processing new information, and the slower we are to arrive at pertinent inquiry. - Ian Leslie, 'Google makes us all dumber: The Neuroscience of Search Engines', Salon.com (2014)
+%
+Machines are for answers; humans are for questions. - Kevin Kelly, founding executive editor of Wired magazine, former editor/publisher of the Whole Earth Review
+%
+In a world awash in ready-made answers, the ability to pose difficult, even unanswerable questions is more important than ever. - Ian Leslie, 'Google makes us all dumber: The Neuroscience of Search Engines', Salon.com (2014)
+%
+[Computers] are useless. They can only give you answers. - Pablo Picasso (1964) 
+%
+Computers are useless without truly curious humans. - Ian Leslie, 'Google makes us all dumber: The Neuroscience of Search Engines', Salon.com (2014)
+%
+The deep problem with the system was a kind of moral inertia. So long as it served the narrow self-interests of everyone inside it, no one on the inside would ever seek to change it, no matter how corrupt or sinister it became. - Michael Lewis on systematized high frequency trading (HFT) fraud, New York Times Magazine, March 2014.
+%
+If you believe in a principle, never damage it with a poor impression. You must go the whole way. - Charlie Parsons, gentleman scientist
+%
+Let the end of thy first sleep raise thee from thy repose: then hath thy body the best temper, then hath thy soule the least incumbrance; then no noise shall disturbe thine ear; no object shall divert thine eye. - 17th-century English poet Francis Quarles, on the value of night-waking, darkness and silence as aids to internal reflection
+%
+Throw The First One Away: You will understand the problem much better after your first attempt.
+%
+Fail Quickly: This makes evolution less painful and improves testability.
+%
+Minimize Coupling, Maximize Cohesion: It is better to reduce the amount of dependency between modules to make future changes and adaptations easier.
+%
+Make it work first, then make it work fast.
+%
+Data Design > Code Design
+%
+Document 'Why'
+%
+Save early, save often
+%
+Share early, share often
+%
+Avoid spherical cows: Understand the requirements, and anticipate change.
+%
+Reality is that which, when you stop believing in it, doesn't go away. - Philip K. Dick
+%
+Eroom’s law the number of new drugs approved per billion US dollars spent on R&D has halved roughly every nine years since 1950.
+%
+Get your data structures correct first, and the rest of the program will write itself. - David Jones
+%
+For 80 percent of all data sets, 95 percent of the information can be seen in a good graph. - William S. Cleveland, Bell Labs
+%
+The first step in fixing a broken program is getting it to fail repeatably. - Tom Duff, Bell Labs
+%
+If you've made it this far, you'll certainly appreciate this excellent advice. Eschew clever rules. - Joseph Henry Condon, Bell Labs
+%
+A meeting is a refuge from 'the dreariness of labor and the loneliness of thought'. - Bernard Baruch, In Risen, 'A Theory on Meetings' (1970)
+%
+The new electronic interdependence recreates the world in the image of a global village. - Marshall McLuhan, 'The Medium is the Message' (1967)
+%
+Truth will sooner come out of error than from confusion. - Sir Francis Bacon, 'The New Organon' (1620)
+%
+An articulated guess beats an unspoken assumption. - Frederick P. Brooks, 'The Design of Design: Essays from a Computer Scientist' (2010)
+%
+Every man who rises above the common level has received two educations: the first, from his teachers; the second, more personal and important, from himself. - Edward Gibbons, 'Memoirs of My Life and Writings' (1789)
+%
+Hanlon's razor: Never attribute to malice that which is adequately explained by stupidity.
+%
+Hadoop bit too much? Want a simpler syntax now? Use GNU Parallel. - Ole Tange
+%
+Being 'disruptive' used to be a black mark on a school report. Now it's a celebrated personality trait in Silicon Valley. - @iamdevloper
+%
+Experimental epistemology. - Sign on a door, MIT, 1952.
+%
+Discontent arises from a knowledge of the possible, as contrasted with the actual. - Aneurin Bevan (founder, UK NHS)
+%
+The people have spoken ... most of it was complete gibberish. - Linus Torvalds, Linux-4.0-rc1 announcement (2015-02-22)
+%
+Putting yourself in new situations constantly is the only way to ensure that you make your decisions unencumbered by the nature of habit, law, custom or prejudice – and it’s up to you to create the situations. - Crimethinc anarchist collective
+%
+We don't know one millionth of one percent about anything. - Thomas Edison
+%
+The fact that something is silly doesn't mean that it should be ignored. Hitler was silly. The Inquisition was stupid. The great religious wars and persecutions, I would argue, were thoroughly absurd. But they were also very terrible. The beliefs themselves may be silly or harmless, but a resurgence of medieval-type thinking is no laughing matter. - Robert Burnham Jr., Astronomer (1983)
+%
+We are all children. But if we cannot be wise, we can at least be honest. I accept the existence of what I call the all-pervading intelligence of the universe. The Orientals call it the Tao. To me, that is too obvious to need scientific proof. That's my religion - that and the Grand Canyon. And Yosemite. And the surf coming in with the tide. And NGC-6611. - Robert Burnham Jr., Astronomer (1983)
+%
+I would say this: There is no ultimate truth about life or the universe which can be expressed in words. Whatever it is, it has to be experienced directly. Words are symbols, never to be confused with the thing itself. The most that any set of symbols can do is to point the way. Your task is to walk down the road, not to worship the signpost. - Robert Burnham Jr., Astronomer (1983)
+%
+Blind monkey at the typewriter. - Robert Burnham Jr., Astronomer (1983)
+%
+May the ox of journalism always be yoked to the cart of commerce. - Herman Zweibel, [fictional] publisher of 'The Onion' (satire)
+%
+What can we do as a profession? First of all, acknowledge that our view of the benefits of finance is inflated. While there is no doubt that a developed economy needs a sophisticated financial sector, at the current state of knowledge there is no theoretical reason or empirical evidence to support the notion that all the growth of the financial sector in the last forty years has been beneficial to society. In fact, we have both theoretical reasons and empirical evidence to claim that a component has been pure rent seeking. By defending all forms of finance, by being unwilling to separate the wheat from the chaff, we have lost credibility in defending the real contribution of finance. - Luigi Zingales, 'Does Finance Benefit Society?' 2015 American Finance Association Presidential Address.
+%
+We should also be much more transparent on the negative aspects of the financial industry, from rent-seeking behavior to captured regulation, from inefficient boards to outright fraud. - Luigi Zingales, 'Does Finance Benefit Society?' 2015 American Finance Association Presidential Address.
+%
+They will say that because of my lack of book learning, I cannot properly express what I desire to treat of. Do they not know that my subjects require for their exposition experience rather than the words of others? And since experience has been the mistress, and to her in all points make my appeal. - Leonardo Da Vinci
+%
+The plural of anecdote is data. - Raymond Wolfinger (1969)
+%
+EIE_IO: With a SYNC SYNC here... and a SYNC SYNC there... - CP-6 OS's communications software, synchronous-terminal (BISYNC) module source code
+%
+There are three things that no one can advise another person for or against. One is marriage, another is waging war and the third is visiting the Holy Sepulchre. These things often end badly. - Eberhard, Count of Wurttemberg (1480).
+%
+Batch jobs and message queues give me 80% of the benefit of 'microservices' with only 5% of the pain. - daxfohl, Hacker News (2015-10-06)
+%
+Man is at his vilest when he erects a billboard. When I retire from Madison Avenue, I am going to start a secret society of masked vigilantes who will travel around the world on silent motor bicycles, chopping down posters at the dark of the moon. - David Ogilvy
+%
+All old-established national industries have been destroyed or are daily being destroyed. They are dislodged by new industries, whose introduction becomes a life and death question for all civilised nations, by industries that no longer work up indigenous raw material, but raw material drawn from the remotest zones; industries whose products are consumed, not only at home, but in every quarter of the globe. In place of the old wants, satisfied by the production of the country, we find new wants, requiring for their satisfaction the products of distant lands and climes. In place of the old local and national seclusion and self-sufficiency, we have intercourse in every direction, universal inter-dependence of nations. And as in material, so also in intellectual production. The intellectual creations of individual nations become common property. National one-sidedness and narrow-mindedness become more and more impossible, and from the numerous national and local literatures, there arises a world literature. - 'The Communist Manifesto', Karl Marx and Frederick Engels (1848)
+%
+Sometimes paranoia's just having all the facts. - William S. Burroughs
+%
+Go play with it yourself. - Joseph Henry Condon, Bell Labs
+%
+It's a paradox to be an artist working through the medium of machinery - but the paradox is where the sons of bitches have hidden all the oxygen. It may be crazy here, but we can breathe in here. Because the old art is no longer working, and the old science is no longer funded, and politics are a debacle, and the culture is at its wits' end. - Bruce Sterling (1995)
+%
+foo walks into a bar - @iamdevloper
+%
+nomads: people who have larger collections of coffee shop wifi passwords than clothes - @jongold
+%
+The software development process: I can't fix this. *crisis of confidence* *questions career* *questions life* Oh it was a typo, cool. - @iamdevloper
+%
+On the 7th day, God did a sprint retrospective. - @iamdevloper
+%
+What's a dinosaur's favourite file format? .rar - @iamdevloper
+%
+Asking a developer you've approached because of their work to do a code puzzle is like asking a surgeon to complete a game of Operation. - @iamdevloper
+%
+Give a man a fish and you feed him for a day, teach a man to fish and you feed him for a lifetime, give a startup $$ and they'll waste it. - @iamdevloper
+%
+If your commit message is more than 15 words you should probably just write it down and read it to your therapist. - @iamdevloper
+%
+What do we want? ASYNCHRONICITY! When do we want it? THAT'S IRRELEVANT. - @iamdevloper
+%
+What is 2+2? Engineer: 4.000000 Manager: around 4 Accountant:What do you want it to be? - @iamdevloper
+%
+QA teams represent the alienation of product teams from their labor. - Startup Marx
+%
+Values aren't achieved through specialization. Imagine a VP of teamwork. - Startup L. Jackson
+%
+Let's base our entire SDLC off of a product meant for tracking bugs. - David J. Bland
+%
+Days since array index errors: -1 - @iamdevloper
+%
+Programming is like endless detangling of Christmas lights. - Fred Willerup
+%
+$1: Not sure if currency or regex capture group. - @iamdevloper
+%
+1998: Don't get in strangers' cars. Don't meet people from the internet. 2016: Literally summon strangers from internet to get in their car.
+%
+Things that don't exist: Unit tests, DRY, TDD.
+%
+A JavaScript developer walks into a bar. By the time they go to order, the bar is abandoned and out-of-date. - @iamdevloper
+%
+2003: I replaced you with a set of very small shell scripts. 2013: I replaced your scripts with a six-figure enterprise DevOps platform. - @NeckbeardHacker
+%
+What kind of meat comes on the Functional Object Burger? Lamb, duh. - @hipsterhacker
+%
+Erlang is better than yer lang. - @hipsterhacker
+%
+I can't believe your Caps Lock key hasn't been remapped yet. - @hipsterhacker
+%
+They say the dream of the 90's is alive in Portland, but I haven't met a single Java developer here. - @hipsterhacker
+%
+For angel investors: A startup's value is inversely proportional to the # of people wearing business casual. - @hipsterhacker
+%
+Common Lisp is making a comeback like bellbottoms, pubic hair, and the unholy alliance of mustaches and androgyny. - @hipsterhacker
+%
+Android's spellchecker doesn't know the word 'quinoa', but iPhone's does. I'm guessing the same can be said for their respective users. - @hipsterhacker
+%
+Only old people need money to get a startup going. Venture capital? More like denture capital. - @hipsterhacker
+%
+I write world-changing applications in languages you have probably not yet heard of. My code is poetry, meanwhile yours is oh-noetry. - @hipsterhacker
+%
+Comedy: You, trying to launch a startup from scratch using Java. Tragedy: Me, trying to debug 27k lines of legacy Perl that brings $113MM/yr - @NeckbeardHacker
+%
+Did you hear about the C programmer who broke their ARM? They were volatile because they had an unsigned cast. - @silentbicycle
+%
+Q: What LAN protocol was forged in the fires of Mount Doom? A: Tolkien ring. - @aloria
+%
+Best kind of engineers to work with: 40yo parents who actually know how computers work. Worst kind: 22yo kids who love javascript frameworks. - @rogerclark
+%
+CentOS in the streets, Gentoo in the sheets. - @NeckbeardHacker
+%
+What's bower? A package manager, install it with npm. What's npm? A package manager, install it with brew. What's brew? ...  - @ddprtt
+%
+Wait... are you saying that you don't write tests for your shell scripts? How do you know if they're correct? - @NeckbeardHacker
+%
+A machine learning researcher, a crypto-currency expert, and an Erlang programmer walk into a bar. Facebook buys the bar for $27 billion. - @ML_Hipster
+%
+The filth of their mongrel LISPs and NoSQL will foam up about their waists, and their VCs will shout "Save us!" ...and I'll whisper "No." - @NeckbeardHacker
+%
+Works fine for me locally. Sounds like an ops problem. I'm going to lunch. - @hipsterhacker
+%
+Did you know Richard Stallman is developing a free open source Unix-like OS? No? I guess you hadn't...Hurd. - @NeckbeardHacker
+%
+BREAKING: Linux version upgrades still free. - @NeckbeardHacker
+%
+Company seeks Neutral-aligned Level 60 Half-Elf Assassin/Mage for VC-backed, webscale-tier campaign. No munchkins, please. (sponsored tweet) - @NeckbeardHacker
+%
+Those who can't code, sysadmin. And those who can't sysadmin, sysadmin Windows. - @NeckbeardHacker
+%
+Immuteability: The property of functional programmers that prevents them from shutting up about pure functional programming. - @raganwald
+%
+Knowing what to code is more important than knowing how to code. - @pmddomingos
+%
+Optimist: The glass is half full. Pessimist: The glass is half empty. Engineer: The glass is too large. - @pmddomingos
+%
+Telling a programmer there's already a library to do X is like telling a songwriter there's already a song about love. - @petecordell
+%
+boondoggle (n): work or activity that is wasteful or pointless but gives the appearance of having value
+%
+Rule #8: Try not to create and analyze at the same time. They are different processes. - John Cage
+%
+The essence of philosophy is that a man should so live that his happiness shall depend as little as possible on external things. - Ἐπίκτητος/Epictetus, Stoic philosopher born a slave (55-135)
+%
+One argues because one is confused. The man who knows does not argue; the man who argues does not know. - Lin Yutang, 'Pleasures of a Nonconformist' (1962)
+%
+Each thing we see hides something else we want to see. - René Magritte, surrealist
+%
+We are surrounded by curtains. We only perceive the world behind a curtain of semblance. At the same time, an object needs to be covered in order to be recognized at all. - René Magritte, surrealist
+%
+The easiest person to deceive is one's own self. - Edward Bulwer-Lytton
+%
+Beware that you do not lose the substance by grasping at the shadow. - Aesop
+%
+Censorship: panacea of the autocrat, fear of the progressive, joke of the youth. - @ccvannorman
+%
+Heilmeier Catechism: (1) What are you trying to do? Articulate your objectives using absolutely no jargon. What is the problem? Why is it hard? (2) How is it done today, and what are the limits of current practice? (3) What's new in your approach and why do you think it will be successful? (4) Who cares? (5) If you're successful, what difference will it make? What impact will success have? How will it be measured? (6) What are the risks and the payoffs? (7) How much will it cost? (8) How long will it take? (9) What are the midterm and final 'exams' to check for success? How will progress be measured? - George H. Heilmeier, Director of ARPA, 1970s
+%
+Some people never go crazy. What truly horrible lives they must live. - 'Barfly' (1987)
+%
+Anybody can be a nondrunk. It takes a special talent to be a drunk. It takes endurance. Endurance is more important than truth. - 'Barfly' (1987)
+%
+They speak to us with the absolute authority of the computer, and we bow down before them. They are god's own gift to the faker. - Orson Welles on art experts, 'F for Fake' (1973)
+%
+Startups mostly don't compete against each other, they compete against no one giving a shit. - Justin Kan
+%
+Engineers are pretty arrogant. Like, I would never want to hang out with those guys for a minute, outside of work. In most cases, in most jobs I had. - 'Engineered Truth'
+%
+A great many people think they are thinking when they are really rearranging their prejudices. - William James
+%
+Why do we host on AWS? Because if it goes down then our customers are so busy worried about themselves being down that they don't even notice that we're down!
+%
+Banking has always orientated towards cartel structures with high synthetic start-up capital costs, because the good the sector ultimately provides (trust) has a zero marginal cost of production. This renders the industry uniquely vulnerable to undercutting. - Izabella Kaminska, Financial Times
+%
+Why don't computers crash at the same time? Because network connections aren't fast enough. - 1980s computing joke
+%
+Robot, n. A machine that doesn't work yet. (Because if it worked you'd name it after what it does, like a dishwasher or a vacuum cleaner).
+%
+Never underestimate the power of being one of the few people to have a particular set of individually-common skills. If you know molecular biology and group theory, or chemical engineering and architecture, or web design and sign language, or whatever and whatever, there's special opportunities open to you and almost noone else. - @maxander
+%
+A project is complete when it starts working for you, rather than you working for it. - Scott Allen
+%
+Done is better than perfect. - Scott Allen
+%
+Sometimes it takes an expert to point out the obvious. - Scott Allen
+%
+Random chance plays a huge part in everybody's life. - Gary Gygax, inventor of D&D
+%
+The secret we should never let the gamemasters know is that they don't need any rules. - Gary Gygax, inventor of D&D
+%
+I hated school, didn't like the discipline. - Gary Gygax, inventor of D&D
+%
+When I am working on a problem, I never think about beauty but when I have finished, if the solution is not beautiful, I know it is wrong. - R. Buckminster Fuller
+%
+A designer is an emerging synthesis of artist, inventor, mechanic, objective economist and evolutionary strategist. - R. Buckminster Fuller
+%
+How often I found where I should be going only by setting out for somewhere else. - R. Buckminster Fuller
+%
+Don't fight forces, use them. - R. Buckminster Fuller
+%
+One in ten thousand of us can make a technological breakthrough capable of supporting all the rest. The youth of today are absolutely right in recognizing this nonsense of earning a wage. - R. Buckminster Fuller (1960s?)
+%
+What usually happens in the educational process is that the faculties are dulled, overloaded, stuffed and paralyzed so that by the time most people are mature they have lost their innate capabilities. - R. Buckminster Fuller
+%
+We are called to be architects of the future, not its victims. - R. Buckminster Fuller
+%
+There is nothing in a caterpillar that tells you it's going to be a butterfly. - R. Buckminster Fuller
+%
+Search others for their virtue, and yourself for your vices. - R. Buckminster Fuller
+%
+Everyone is born a genius, but the process of living de-geniuses them. - R. Buckminster Fuller
+%
+If you are the master be sometimes blind, if you are the servant be sometimes deaf. - R. Buckminster Fuller
+%
+People should think things out fresh and not just accept conventional terms and the conventional way of doing things. - R. Buckminster Fuller
+%
+Don't undertake a project unless it is manifestly important and nearly impossible. - Edwin Land, founder of Polaroid
+%
+An essential aspect of creativity is not being afraid to fail. - Edwin Land, founder of Polaroid
+%
+Any problem can be solved using the materials in the room. - Edwin Land, founder of Polaroid
+%
+Creativity is the sudden cessation of stupidity. - Edwin Land, founder of Polaroid
+%
+Politeness is the poison of collaboration. - Edwin Land, founder of Polaroid
+%
+Marketing is what you do when your product is no good. - Edwin Land, founder of Polaroid
+%
+Science is a method to keep yourself from kidding yourself. - Edwin Land, founder of Polaroid
+%
+The most important thing about power is to make sure you don't have to use it. - Edwin Land, founder of Polaroid
+%
+It's not that we need new ideas, but we need to stop having old ideas. - Edwin Land, founder of Polaroid
+%
+If you dream of something worth doing and then simply go to work on it and don't think anything of personalities, or emotional conflicts, or of money, or of family distractions; it is amazing how quickly you get through those 5,000 steps. - Edwin Land, founder of Polaroid
+%
+CSCI 2100: Unlearning Object-Oriented Programming - Discover how to create and use variables that aren't inside of an object hierarchy. Learn about 'functions,' which are like methods but more generally useful. Prerequisite: Any course that used the term 'abstract base class.' - James Hague
+%
+CSCI 3300: Classical Software Studies - Discuss and dissect historically significant products, including VisiCalc, AppleWorks, Robot Odyssey, Zork, and MacPaint. Emphases are on user interface and creativity fostered by hardware limitations. - James Hague
+%
+CSCI 4020: Writing Fast Code in Slow Languages - Analyze performance at a high level, writing interpreted Python that matches or beats typical C++ code while being less fragile and more fun to work with. - James Hague
+%
+CSCI 2170: User Experience of Command Line Tools - An introduction to UX principles as applied to command line programs designed as class projects. Core focus is on output relevance, readability, and minimization. UNIX 'ls' tool is a case study in excessive command line switches. - James Hague
+%
+PSYC 4410: Obsessions of the Programmer Mind - Identify and understand tangential topics that software developers frequently fixate on: code formatting, taxonomy, type systems, splitting projects into too many files. Includes detailed study of knee-jerk criticism when exposed to unfamiliar systems. - James Hague
+%
+What idiot called it "deep learning hype" and not "backpropaganda"? - @nsaphra
+%
+You threaten my startup with patents & debt? I've chosen my models carefully. Perhaps you should have done the same. - @ML_Hipster
+%
+Adverserial training = gradient dissent. - @ylecun
+%
+A recent meta-analysis of empirical results in scientific papers showed 36% were 'lies', 27% 'damned lies', and 37% 'other'. - @ML_Hipster
+%
+A good learner is forever walking the narrow path between blindness and hallucination. - @sanderiam
+%
+He who controls the data controls the learner. - @pmddomingos
+%
+Q: Why did the deep net cross the road? A: We don't know. But look, it did it really well... - @cogconfluence
+%
+The Turing test is like saying planes don't fly unless they can fool birds into thinking they're birds. - Peter Norvig
+%
+Using weighted majority to evaluate MOOCs that teach sequential prediction. It's online learning of online learning for online learning. - @ML_Hipster
+%
+Q: How many machine learners does it take to change a lightbulb? A: Isn't that a database thing? - @ML_Hipster
+%
+This ML algorithm is rated R. It contains: Strong assumptions, frequent sampling, and matrix inversions. Restricted to masochistic users. - @ML_Hipster
+%
+Thinking of changing my business cards to read: Freelance Datamancer. - @ML_Hipster
+%
+For me, it all comes down to state power against the people's ability to meaningfully oppose that power. - Edward Snowden, NSA whistleblower
+%
+I remember what the internet was like before it was being watched and there's never been anything in the history of man that's like it. [...] It was free and unrestrained, and we've seen the chilling of that, the cooling of that, the changing of that model towards something in which people self-police their views and they literally make jokes about ending up on 'the list' if they donate to a political cause or if they say something in a discussion, and it's become an expectation that we're being watched. - Edward Snowden, NSA whistleblower
+%
+Technology is increasingly providing us [with] the ability to encode our rights not just in to our laws but in to our systems. So when the failure of black letters on a page becomes apparent, we still have the failsafe of our technological systems, the systems that we surround ourselves [with] and rely upon every day. - Edward Snowden, NSA whistleblower
+%
+Policy is a very weak protection. - Edward Snowden, NSA whistleblower
+%
+Policy is a one-way ratchet that only loosens over time. - Edward Snowden, NSA whistleblower
+%
+Government never places additional restrictions on itself... unprovoked. - Edward Snowden, NSA whistleblower
+%
+Many people I've talked to have told me that they're careful about what they type in to search engines because they know that it's being recorded. That limits the boundaries of their intellectual exploration. - Edward Snowden, NSA whistleblower
+%
+I'm more willing to risk imprisonment (or any other negative outcome) personally than I am willing to risk the curtailment of my intellectual freedom and that of those around me who I care for equally as I do for myself. - Edward Snowden, NSA whistleblower
+%
+I feel good in my human experience to know that I can contribute to the good of others. - Edward Snowden, NSA whistleblower
+%
+I have some strongly held views. - Edward Snowden, NSA whistleblower
+%
+The balance of power between the citizenry and the government is becoming that of the ruling and the ruled, as opposed to the elected and the electorate. - Edward Snowden, NSA whistleblower
+%
+The winds of change originate in the unconscious minds of domain experts. If you're sufficiently expert in a field, any weird idea or apparently irrelevant question that occurs to you is ipso facto worth exploring. - Paul Graham (2014) 
+%
+The people I've met who do great work… generally feel that they're stupid and lazy, that their brain only works properly one day out of ten, and that it’s only a matter of time until they’re found out. - Paul Graham (2004) 
+%
+It's particularly hard for hackers to know how good they are, because it's hard to compare their work. - Paul Graham (2004) 
+%
+When you reach the point where 90% of a group's output is created by 1% of its members, you lose big if something (whether Viking raids, or central planning) drags their productivity down to the average. - Paul Graham (2004)
+%
+I read a quote by Wittgenstein saying that he had no self-discipline and had never been able to deny himself anything, not even a cup of coffee. Now I know a number of people who do great work, and it's the same with all of them. They have little discipline. They're all terrible procrastinators and find it almost impossible to make themselves do anything they're not interested in. - Paul Graham (2005)
+%
+Great hackers also generally insist on using open source software. Not just because it's better, but because it gives them more control. Good hackers insist on control. This is part of what makes them good hackers: when something's broken, they need to fix it. - Paul Graham (2004) 
+%
+We now have several examples to prove that amateurs can surpass professionals, when they have the right kind of system to channel their efforts. Wikipedia may be the most famous. Experts have given Wikipedia middling reviews, but they miss the critical point: it's good enough. And it’s free, which means people actually read it. On the web, articles you have to pay for might as well not exist. Even if you were willing to pay to read them yourself, you can’t link to them. They're not part of the conversation. - Paul Graham (2005) 
+%
+The eccentric university professor is a species that is going extinct fast. - Peter Thiel (2014)
+%
+Most MBA's tend to be high extrovert/low conviction people - a combination that in my experience leads towards extremely herd-like thinking and behavior. - Peter Thiel (2014)
+%
+Most companies are killed by internal infighting, even though it may not seem like it. - Peter Thiel
+%
+He who does not have a past has no present or future. - Arabic proverb
+%
+Man's most prudent counselor is time. - Publilius Syrus (first century BCE)
+%
+There is nothing which the lapse of time will not either extinguish or improve. - Publilius Syrus (first century BCE)
+%
+Those who do not forget the past are masters of the future. - Sima Qian (second century BCE)
+%
+Hanson's Treatment of Time: There are never enough hours in a day, but always too many days before Saturday.
+%
+Of course hardened mariners would have thrashed up through the night without a tremor, hardened mariners would have battled in stinging spray and sodden clothes, hardened mariners would have reached a haven as dawn was breaking. What a terrible affliction, to be a hardened mariner! - W. I. B. Crealock, 'Vagabonding Under Sail' (1951)
+%
+Upon arriving in the capital-F Future, we discover it, invariably, to be the lowercase now. - William Gibson
+%
+Lean back under a tree, put your arms behind your head, wonder at the pass we've come to, smile and remember that the beginnings and ends of man's every great enterprise are untidy. - Sebastian de Grazia (1962)
+%
+Even a broken clock is right twice a day.
+%
+Archiving is the new folk art. - Rick Prelinger
+%
+Abrams' Principle: The shortest distance between two points is off the wall.
+%
+Cahn's Axiom: When all else fails, read the instructions.
+%
+Anthony's Law of Force: Don't force it; get a larger hammer.
+%
+Arnold's Law of Documentation: If it should exist, it doesn't. If it does exist, it's out of date. Only documentation for useless programs transcends the first two laws.
+%
+Atwood's Law: Any software that can be written in JavaScript will eventually be written in JavaScript. - Jeff Atwood
+%
+Boob's Law: You always find something in the last place you look.
+%
+Boren's Laws: When in charge, ponder. When in trouble, delegate. When in doubt, mumble.
+%
+Bradley's Bromide: If computers get too powerful, we can organize them into a committee - that will do them in.
+%
+CAP Theorem (Brewer's Theorem): it is impossible for a distributed computer system to simultaneously provide Consistency (all nodes see the same data at the same time), Availability (a guarantee that every request receives a response about whether it was successful or failed) and Partition tolerance (the system continues to operate despite arbitrary message loss or failure of part of the system) - Eric Brewer, Symposium on Principles of Distributed Computing (PODC) (2000)
+%
+CAP Theorem (Brewer's Theorem) - Clarification 1: Because Partitions are rare, there is little reason to forfeit Consistency or Availability when the system is not partitioned. - Eric Brewer, IEEE Computer Society 'Computer' Magazine (2012)
+%
+CAP Theorem (Brewer's Theorem) - Clarification 2: The choice between Consistency and Availability can occur many times within the same system at very fine granularity; not only can subsystems make different choices, but the choice can change according to the operation or even the specific data or user involved. - Eric Brewer, IEEE Computer Society 'Computer' Magazine (2012)
+%
+CAP Theorem (Brewer's Theorem) - Clarification 3: All three properties (Consistency, Availability, Partition tolerance) are more continuous than binary. Availability is obviously continuous from 0 to 100 percent, but there are also many levels of Consistency, and even Partitions have nuances, including disagreement within the system about whether a Partition exists. - Eric Brewer, IEEE Computer Society 'Computer' Magazine (2012)
+%
+Adding manpower to a late software project makes it later. Nine women can't make a baby in one month. - Fred Brooks, 'The Mythical Man-Month' (1975)
+%
+Classen's Law: Usefulness = log(Technology) - Theo A. C. M. Claasen, CTO of Philips Semiconductors (1999)
+%
+Conway's Law: Organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations. - Melvin Conway, 'National Symposium on Modular Programming', 1968
+%
+The organization of the software and the organization of the software team will be congruent. - Eric S. Raymond, paraphrasing Conway's Law in 'The New Hacker's Dictionary'
+%
+If the parts of an organization (e.g. teams, departments, or subdivisions) do not closely reflect the essential parts of the product, or if the relationship between organizations do not reflect the relationships between product parts, then the project will be in trouble... therefore: Make sure the organization is compatible with the product architecture. - James O. Coplien and Neil B. Harrison, paraphasing Conway's Law (2004)
+%
+Ducharm's Axiom: If you view your problem closely enough you will recognize yourself as part of the problem.
+%
+Dykstra's Observation: If debugging is the process of removing bugs, then programming must be the process of putting them in.
+%
+Farber's Rule: Necessity is the mother of strange bedfellows.
+%
+Farvour's Law of Debugging: There is always one more bug...
+%
+Finagle's First Law: If an experiment works, something has gone wrong.
+%
+Finagle's Second Law: No matter what the anticipated result, there will always be someone eager to (a) misinterpret it, (b) fake it, or (c) believe it happened according to his own pet theory.
+%
+Finagle's Third Law: In any collection of data, the figure most obviously correct, beyond all need of checking, is the mistake.
+%
+Finagle's Fourth Law: Once a job is fouled up, anything done to improve it only makes it worse.
+%
+Fresco's Discovery: If you knew what you were doing you'd probably be bored.
+%
+Geer's Law: Any security technology whose effectiveness can't be empirically determined is indistinguishable from blind luck.
+%
+Glib's Fourth Law of Unreliability: Investment in reliability will increase until it exceeds the probable cost of errors, or until someone insists on getting some useful work done.
+%
+Goodhart's Law (Popular formulation): When a measure becomes a target, it ceases to be a good measure.
+%
+Goodhart's Law (Original formulation): Any observed statistical regularity will tend to collapse once pressure is placed upon it for control purposes. - Charles Goodhart (1975)
+%
+Goodhart's Law (Danielsson's corollary): A risk model breaks down when used for regulatory purposes. (2002)
+%
+If you have a difficult task, give it to a lazy person - they will find an easier way to do it. - Walter Percy Chrysler (1875-1940), American industrialist
+%
+Hoare's Law of Large Problems: Inside every large problem is a small problem struggling to get out.
+%
+Howe's Law: Everyone has a scheme that will not work.
+%
+Kinkler's First Law: Responsibility always exceeds authority.
+%
+Kinkler's Second Law: All the easy problems have been solved.
+%
+Lazlo's Chinese Relativity Axiom: No matter how great your triumphs or how tragic your defeats - approximately one billion Chinese couldn't care less.
+%
+Maier's Law: If the facts do not conform to the theory, they must be disposed of.
+%
+Meskimen's Law: There's never time to do it right, but there's always time to do it over.
+%
+Miller's Law: All discussions of incremental updates will eventually trend towards proposals for large scale redesigns, feature additions or replacements. - Mike Beltzner (after Dave Miller of Bugzilla)
+%
+Moravec's Paradox: Contrary to traditional assumptions, high-level reasoning requires very little computation, but low-level sensorimotor skills require enormous computational resources. - Hans Moravec, Rodney Brooks, Marvin Minsky et al. (1980s)
+%
+Mosher's Law of Software Engineering: Don't worry if it doesn't work right. If everything did, you'd be out of a job.
+%
+Ogden's Law: The sooner you fall behind, the more time you have to catch up.
+%
+Carlson's Conundrum: The sooner you start to code, the longer the program will take.
+%
+Parkinson's Law: Work expands so as to fill the time available for its completion. - Cyril Northcote Parkinson, British civil servant, first published in 'The Economist' (1955)
+%
+Parkinson's Law - Stock-Sanford Corollary: If you wait until the last minute, it only takes a minute to do.
+%
+Parkinson's Law - Data Corollary: Data expands to fill the space available for storage.
+%
+Generalized form of Parkinson's Law: The demand upon a resource tends to expand to match the supply of the resource. The reverse is not true.
+%
+Principle of Comitology: Committees, government cabinets, and other such bodies are created and eventually grow irrelevant (or are initially designed as such). - Cyril Northcote Parkinson, British civil servant
+%
+Parkinson's Conjecture: Committees with a membership exceeding a number between 19.9 and 22.4 are ineffective. - Cyril Northcote Parkinson, British civil servant
+%
+Peter's Law of Substitution: Look after the molehills, and the mountains will look after themselves.
+%
+Roman Rule: The one who says it cannot be done should never interrupt the one who is doing it.
+%
+Shamir's First Law of Security: Absolutely secure systems do not exist.
+%
+Shamir's Second Law of Security: To halve your vulnerability, you have to double your expenditure.
+%
+Shamir's Third Law of Security: Cryptography is typically bypassed, not penetrated.
+%
+Stigler's Law of Eponymy: No scientific discovery is named after its original discoverer. - Stephen Sigler, statistician (but attributed to Robert K. Merton, sociologist)
+%
+Sturgeon's Law: ninety percent of everything is crap. - Theodore Sturgeon, an science fiction author
+%
+Tesler's Law of Conservation of Complexity: Every application has an inherent amount of irreducible complexity. The only question is who will have to deal with it - the user, the application developer, or the platform developer? - Larry Tesler (ca. 1984)
+%
+Wirth's Law: Software gets slower faster than hardware gets faster. - Niklaus Wirth (1995)
+%
+Hofstadter's Law: It always takes longer than you expect, even when you take into account Hofstadter's Law. - Douglas Hofstadter, 'Gödel, Escher, Bach: An Eternal Golden Braid' (1979)
+%
+Zawinski's Law: Every program attempts to expand until it can read mail. Those programs which cannot so expand are replaced by ones which can.
+%
+Zymurgy's First Law of Evolving Systems Dynamics: Once you open a can of worms, the only way to recan them is to use a larger can.
+%
+I like developed arts of all kinds, and these require learning on the part of the beholder, not just bones tossed at puppies. - Alan Kay (2016)
+%
+Children need to learn how to use the 21st century, or there's a good chance they will lose the 21st century. - Alan Kay (2016)
+%
+Television is the last technology we should be allowed to invent without a Surgeon General's warning on it. - Alan Kay
+%
+It used to be the case that people were admonished to "not re-invent the wheel". We now live in an age that spends a lot of time "reinventing the flat tire!" The flat tires come from the reinventors often not being in the same league as the original inventors. This is a symptom of a "pop culture" where identity and participation are much more important than progress... - Alan Kay (2016)
+%
+In the US we are now embedded in a pop culture that has progressed far enough to seriously hurt places that hold "developed cultures". This pervasiveness makes it hard to see anything else, and certainly makes it difficult for those who care what others think to put much value on anything but pop culture norms. - Alan Kay (2016)
+%
+If you start with "desirable process" you can eventually work your way back to the power plug in the wall. If you start with something already plugged in, you might miss a lot of truly desirable processes. - Alan Kay (2016)
+%
+Better and Perfect are the enemies of What-Is-Actually-Needed: The big sin so many people commit in computing is not really paying attention to "What-Is-Actually-Needed"! And not going below that. People are tempted to choose an increment, and will say "at least it's a little better" - but if the threshold isn't actually reached, then it is the opposite of a little better, it's an illusion. - Alan Kay (2016)
+%
+I found getting halfway decent funding since 1980 to be quite a chore. - Alan Kay (2016)
+%
+What is going on now is partly a retreat from real literacy back to oral modes of communication and oral modes of thought (i.e. "texting" is really a transliteration of an oral utterance, not a literary form). This is a disaster. - Alan Kay (2016)
+%
+With a good programming language and interface, one - even children - can create from scratch important simulations of complex non-linear systems that can help one's thinking about them. - Alan Kay (2016)
+%
+What programming language design would help us think a lot better than we do now? (We are currently terrible!) - Alan Kay (2016)
+%
+You could 'hot-edit' Lisp (1.85 at BBN) in the 60s (and there were other such systems). Smalltalk at Parc in the 70s used many of these ideas, and went even further. Development environments should help programmers think (but what if most programmers don't want to think?) - Alan Kay (2016)
+%
+When the first Turing Award winner - Al Perlis - was asked in the 60s "What is Computer Science?", he said "It is the science of processes!". He meant all processes including those on computers, but also in Biology, society, etc. His idea was that computing formed a wonderful facility for making better models of pretty much everything, especially dynamic things (which everything actually is), and that it was also the kind of thing that could really be understood much better by using it to make models of itself. Today, we could still take this as a starting place for "getting 'Computer Science' back from where it was banished". - Alan Kay (2016)
+%
+All languages today annoy me - just put me down as a grump. They seem to be at a very weak level of discourse for the 21st century. (But a few are fun when looked at from the perspectives of the past e.g. Erlang ...) - Alan Kay (2016)
+%
+Are "the good goals of the past" good enough goals for today and tomorrow? - Alan Kay (2016)
+%
+Seymour Cray was a man of few words. I was there for three weeks before I realized he was not the janitor. - Alan Kay (2016)
+%
+We were lucky in the ARPA/PARC communities to have both great funding, and the time to think things through (and even make mistakes that were kept from propagating to create bad defacto standards). - Alan Kay (2016)
+%
+The question you are asking is really a societal one - and about operations that are like strip mining and waste dumping. "Hunters and gatherers" (our genetic heritage) find fertile valleys, strip them dry and move on (this only works on a very small scale). "Civilization" is partly about learning how to overcome our dangerous atavistic tendencies through education and planning. It's what we should be about generally (and the CS part of it is just a symptom of a much larger much more dire situation we are in). - Alan Kay (2016)
+%
+ One of several major mistakes with the web has to do with thinking that the browser is some kind of application "with features" - if you think of the actual scale of the Internet (and they didn't) you realize that at the very least, the browser, etc, has to be more like an operating system, and with as few features as possible: really to safely run encapsulated modules and deal out resources. It is crazy that after more than 20 years of the web that this CS101 principle still can't be done ... and it runs on machines that can do it.... - Alan Kay (2016)
+%
+"What Fools these Mortals be!" Puck meant that we are easy to fool. In fact we like to be fooled - we pay lots of money to be fooled! - Alan Kay (2016)
+%
+I do get depressed - how could one not? - the trick with depression is to not allow it to take you into in-action. - Alan Kay (2016)
+%
+What is "data" without an interpreter (and when we send "data" somewhere, how can we send it so its meaning is preserved?) - Alan Kay (2016)
+%
+There are lots of "old and fundamental" ideas that are not good anymore, if they ever were. - Alan Kay (2016)
+%
+"The objects of the future" have to be ambassadors that can negotiate with other objects they've never seen. Think about this as one of the consequences of massive scaling ... - Alan Kay (2016)
+%
+Advice to CS students: Learn a lot of other things, and at least one real science and one real engineering. This will help to calibrate the somewhat odd lore aka "computing knowledge". I would certainly urge a number of anthropology courses (and social psychology, etc), theater, and so forth. In the right school, I'd suggest "media theory" (of the "Mcluhan", "Innis", "Postman" kind ...) - Alan Kay (2016)
+%
+There's coming up with ideas: learn to dream while you are awake, the ideas are there. There's coming up with a good idea: learn how to not get buried in your ideas (most are mediocre down to bad even for people who have "good idea skills"!) I write down ideas in notebooks to get rid of them. Every once in a while one will capture a different point of view. And, there's the Princeton Tea joke of scientists comparing what they did for ideas. One says "I have them in the middle of the night so I have a pad by my bed". Another says "I have them in the shower so I have a grease pencil to write them on the walls". Einstein was listening and they asked him about his ideas. He said "I don't know, I've only had two!" (Some people are better at filtering than others ...) - Alan Kay (2016)
+%
+Most of my ideas come in "waking dreams" (this is a state that most children indulge in readily, but it can be retained in a more or less useful way - I don't think you quite get into adulthood by retaining it, so it's a tradeoff). Main thing about ideas is that, however they come, most of them are mediocre down to bad - so steps have to be taken to deal with this major problem. - Alan Kay (2016)
+%
+10 years is too close - 30 years out will generally lose the pernicious connection to the present and "how do we get there?". The idea is to "go out there and bring the ideas back" rather than try to go from the present to the future. - Alan Kay (2016)
+%
+Our most unrealistic assumption was that when presented with really good ideas most people will most definitely learn and use them to make progress. In reality, only a tiny percentage can do this, and it is an enormous amount of work to deal with the norms. - Alan Kay (2016)
+%
+The problems with most arguments is that they arguers assume they are in a valid context (this is usually not the case, and this is the central problem of "being rational"). Another way to look at it is "Forget about trying to win an argument - use argumentation to try to understand the issues better and from more perspectives ..." - Alan Kay (2016)
+%
+A good heuristic for designing programming languages is to try to take the largest most complicated kinds of things you want to do, work them out, and then see if there is a "language lurking". Most people make the big mistake of lovingly making small neat examples that are easy to learn - these often don't scale at all well. E.g. "data" in the small "seems natural" but the whole idea scales terribly. And so forth for most of the favorite paradigms around today. - Alan Kay (2016)
+%
+Try to avoid "growing old"! A big problem with the general industry is the lack of subsidized "sabbatical years" - these are a good way to recharge and re-orient. Xerox, amazingly, used to have them for employees. But I haven't heard of any such thing recently. If you think about life as needing "renewables" then you shouldn't allow yourself to be "stripmined" (easier said than done). - Alan Kay (2016)
+%
+Clarke's First Law: When a distinguished but elderly scientist states that something is possible, he is almost certainly right. When he states that something is impossible, he is very probably wrong. - Arthur C. Clarke
+%
+Clarke's First Law - AI Corollary: Any sufficiently advanced benevolence may be indistinguishable from malevolence.
+%
+Grey's Law (corollary to Clarke's First Law): Any sufficiently advanced incompetence is indistinguishable from malice.
+%
+Poe's Law (crollary to Clarke's First Law): Any sufficiently advanced troll is indistinguishable from a genuine kook.
+%
+Clarke's Second Law: The only way of discovering the limits of the possible is to venture a little way past them into the impossible. - Arthur C. Clarke
+%
+Clarke's Third law: Any sufficiently advanced technology is indistinguishable from magic. - Arthur C. Clarke
+%
+If I finish a book a week, I will read only a few thousand books in my lifetime, about a tenth of a percent of the contents of the greatest libraries of our time. The trick is to know which books to read. - Carl Sagan, 'Cosmos' (1980)
+%
+Kranzberg's 1st Law of Technology: Technology is neither good nor bad; nor is it neutral. - Melvin Kranzberg, 'Technology and Culture', Vol. 27, No. 3 (1986)
+%
+Kranzberg's 3rd Law of Technology: Technology comes in packages, big and small. - Melvin Kranzberg, 'Technology and Culture', Vol. 27, No. 3 (1986)
+%
+Kranzberg's 4th Law of Technology: Although technology might be a prime element in many public issues, nontechnical factors take precedence in technology-policy decisions. - Melvin Kranzberg, 'Technology and Culture', Vol. 27, No. 3 (1986)
+%
+Kranzberg's 5th Law of Technology: All history is relevant, but the history of technology is the most relevant. - Melvin Kranzberg, 'Technology and Culture', Vol. 27, No. 3 (1986)
+%
+Kranzberg's 6th Law of Technology: Technology is a very human activity - and so is the history of technology. - Melvin Kranzberg, 'Technology and Culture', Vol. 27, No. 3 (1986)
+%
+Niven's First Law: Never fire a laser at a mirror. - Larry Niven, science fiction author
+%
+Niven's Second Law: Giving up freedom for security is beginning to look naïve. - Larry Niven, science fiction author
+%
+Niven's Third Law: It is easier to destroy than to create. - Larry Niven, science fiction author
+%
+Niven's Fourth Law: Ethics change with technology. - Larry Niven, science fiction author
+%
+Niven's Fifth Law: The only universal message in science fiction: There exist minds that think as well as you do, but differently. - Larry Niven, science fiction author
+%
+Niven's Law of Time Travel: If the universe of discourse permits the possibility of time travel and of changing the past, then no time machine will be invented in that universe.
+%
+Niven's First Law of Writing: Writers who write for other writers should write letters. - Larry Niven, science fiction author (1989)
+%
+Niven's Second Law of Writing: Never be embarrassed or ashamed about anything you choose to write. (Think of this before you send it to a market.) - Larry Niven, science fiction author (1989)
+%
+Niven's Third Law of Writing: Stories to end all stories on a given topic, don't. - Larry Niven, science fiction author (1989)
+%
+Niven's Fourth Law of Writing: It is a sin to waste the reader's time. - Larry Niven, science fiction author (1989)
+%
+Niven's Fifth Law of Writing: If you've nothing to say, say it any way you like. Stylistic innovations, contorted story lines or none, exotic or genderless pronouns, internal inconsistencies, the recipe for preparing your lover as a cannibal banquet: feel free. If what you have to say is important and/or difficult to follow, use the simplest language possible. If the reader doesn't get it then, let it not be your fault. - Larry Niven, science fiction author (1989)
+%
+Niven's Sixth Law of Writing: Everybody talks first draft. - Larry Niven, science fiction author (1989)
+%
+With software, either the users control the program, or the program controls the users. - Richard Stallman
+%
+Americans have shown that they are politically naïve. If you look at how successful plutocratic candidates are in the U.S. - you can get Americans to vote to give their money to the rich. You have to just say certain predictable, silly things to them, and most of them will be fooled. - Richard Stallman
+%
+Even though it’s sad to see people being foolish, there's no use giving up. Nothing good can come of giving up. That just means you lose completely, right away. - Richard Stallman
+%
+90:90 Rule (Rule of Credibility): The first 90 percent of the code accounts for the first 90 percent of the development time. The remaining 10 percent of the code accounts for the other 90 percent of the development time. - Tom Cargill, Bell Labs
+%
+80:20 Rule (Pareto Principle): 80% of the state of the system derives from 20% of the causes. - Italian economist Vilfredo Pareto (1906)
+%
+80:20 Rule (Pareto Principle) - Bug Fixing Corollary: Fixing 20% of the bugs resolves 80% of the issues. - Microsoft
+%
+Law of the Vital Few: 20% of people do 80% of the work. - Anonymous
+%
+20 percent of the code has 80 percent of the errors. Find them, fix them! - Lowell Arthur
+%
+Law of Probability Dispersal: Whatever it is that hits the fan will not be evenly distributed.
+%
+Bystander Effect: a social psychological phenomenon in which individuals do not offer any means of help to a victim when other people are present, and the probability of help is inversely related to the number of bystanders. In other words, the greater the number of bystanders, the less likely it is that any one of them will help. - Wikipedia
+%
+Less than 10 percent of the code has to do with the ostensible purpose of the system; the rest deals with input-output, data validation, data structure maintenance, and other hosuekeeping. - Mary Shaw, Carnegie-Mellon University
+%
+A rolling stone gathers no moss. - Condensed form of Publilius Syrus' (first century BCE) observation that people who are always moving, with no roots in one place, avoid responsibilities and cares. Another interpretation equates 'moss' to 'stagnation'; stagnant people lack fresh ideas and creativity.
+%
+Precautionary Principle: If an action or policy has a suspected risk, in the absence of consensus, the burden of proof that it is not harmful falls upon those taking the action.
+%
+Peter Principle: People will tend to be promoted until they reach their 'position of incompetence'. - After Laurence J. Peter, Raymond Hull's co-author of 'The Peter Princple: Why Things Always Go Wrong' (1975)
+%
+No battle was ever won according to plan, but no battle was ever won without one. - Dwight D. Eisenhower
+%
+Don't keep doing what doesn't work.
+%
+Good judgement comes from experience, and experience comes from bad judgement. - Fred Books, University of North Carolina
+%
+I think I've had milk last longer than some JavaScript frameworks. - @iamdevloper (2014)
+%
+Technological progress was much faster than political progress. - Joseph Henry Condon, Bell Labs
+%
+Those change-over things are really severe. Really severe problems. - Joseph Henry Condon, Bell Labs
+%
+Perhaps we have overrated roots as a psychic need. Maybe the greater urge, the deeper and more ancient is the need, the will, the hunger to be somewhere else. - John Steinbeck
+%
+Wisdom is the accumulation of knowledge and experience, living long enough to reflect on it, make sense of it, and apply it to oneself and others. - Abraham Maslow
+%
+A third of people are really enthusiastic, a third have big eyes, and the other third think we are crazy. That's how it goes with innovations. - Carel De Vries
+%
+We somehow have to start trying to act as if there is going to be a future. - Brian Eno
+%
+Technology does not drive change. It is our collective response to the options and opportunities presented by technology that drives change. - Paul Saffo, Stanford Professor
+%
+This 'telephone' has too many shortcomings to be seriously considered as a practical form of communication. The device is inherently of no value to us. What use could this company make of an electrical toy? - Western Union (1878)
+%
+Radio has no future. - Lord Kelvin, British mathematician and physicist (~1897)
+%
+Heavier-than-air flying machines are impossible. - Lord Kelvin, British mathematician and physicist (~1895)
+%
+What can be more palpably absurd than the prospect held out of locomotives traveling twice as fast as stagecoaches? - The Quarterly Review, England (March 1825)
+%
+There is not the slightest indication that [nuclear energy] will ever be obtainable. It would mean that the atom would have to be shattered at will. - Albert Einstein (1932)
+%
+Airplanes are interesting toys but of no military value. - Marshal Ferdinand Foch, French military strategist (1911)
+%
+Space travel is utter bilge. - Dr. Richard van der Reit Wooley, Astronomer Royal, space advisor to the British government, 1956. (Sputnik orbited the earth the following year.)
+%
+If the world should blow itself up, the last audible voice would be that of an expert saying it can't be done. - Peter Ustinov
+%
+It is difficult to say what is impossible, for the dream of yesterday is the hope of today and the reality of tomorrow. - Robert Goddard (1882-1945)
+%
+As I like to say to my American hedge fund friends, the Hamptons is not a defensible position. - Mark Blyth (professor of Political Economy at Brown University), on the rise in popular rejection of traditional politics (2016)
+%
+Chaos is order yet undeciphered. - 'The Double', José Saramago (2002)
+%
+The isms go, the ist dies, art remains. - Vladimir Nabokov
+%
+Man the food-gatherer reappears incongruously as information-gatherer. In this role, electronic man is no less a nomad than his Paleolithic ancestors. - Marshall McLuhan (1967)
+%
+It is hard to picture the world before Shannon as it seemed to those who lived in it. It is difficult to recover innocence, ignorance, and lack of understanding. - John Robinson Pierce, on the world before Claude Shannon and the information age
+%
+The invention of printing, though ingenious, compared with the invention of letters is no great matter. - Thomas Hobbes, resisting new media hype in the 17th century
+%
+Each new technology turns its predecessor into an art form. - Marshall McLuhan
+%
+With the PC, I could see that computers were fun, and that is the real reason why all innovations come into widespread use. - Leo Beranek, President of BBN, acoustics designer and internet pioneer
+%
+The most amazing achievement of the computer software industry is its continuing cancellation of the steady and staggering gains made by the computer hardware industry. - Henry Petroski
+%
+In 1299, zero was banned in Florence [...] Incredibly it wasn't until the 15th Century that zero, along with all the other Arabic numbers, was finally accepted. Just to put it in context, by then Oxford University in England had been around for centuries and the printing press was just up and running. - Hannah Fry, BBC future
+%
+I am less concerned with Terminator scenarios. If current trends continue, people are going to rise up well before the machines do. - Andrew McAfee, MIT economist on AI (2017)
+%
+To make error is human. To propagate error to all server in automatic way is #devops. - @devopsborat
+%
+In #devops is turtle all way down but at bottom is perl script. - @devopsborat
+%
+Jevons Paradox: As technology progresses, the increase in efficiency with which a resource is used tends to increase (rather than decrease) the rate of consumption of that resource.
+%
+The First Rule of Program Optimization: Don't do it. - Michael Jackson
+%
+The Second Rule of Program Optimization (for experts only): Don't do it yet. - Michael Jackson
+%
+The fastest algorithm can frequently be replaced by one that is almost as fast and much easier to understand. - Douglas W. Jones
+%
+In non I/O-bound programs, a few percent of the source code typically accounts for over half the run time. - Don Knuth
+%
+Before optimizing, using a profiler. - Mike Morton
+%
+To speed up an I/O-bound program, begin by accounting for all I/O. Eliminate that which is unnecessary or redundant, and make the remaining as fast as possible. - David Martin
+%
+The fastest I/O is no I/O. - Nils-Peter Nelson
+%
+The cheapest, fastest and most reliable components of a system are those that aren't there. - Gordon Bell
+%
+Whenever possible, steal code. - Tom Duff, Bell Labs
+%
+Translating a working program to a new language or system takes 10 percent of the original development time or manpower or cost. - Douglas W. Jones, University of Iowa
+%
+Don't use the computer to do things that can be done efficiently by hand. - Richard Hill, Hewlett-Packard
+%
+Don't use hands to do things that can be done efficiently by the computer. - Tom Duff, Bell Labs
+%
+I'd rather write programs to write programs than write programs. - Dick Sites, Digital Equipment Corporation
+%
+Brooks' Law of Prototypes: Plan to throw one away, you will anyhow. - Fred Brooks, University of North Carolina
+%
+Brooks' Law of Prototypes (Zerouni's Carollary): If you plan to throw one away, you will throw away two. - Craig Zerouni
+%
+Prototyping cuts the work to produce a system by 40 percent. - Larry Bernstein, Bell Communications Research
+%
+Furious activity is no substitute for understanding. - H. H. Williams
+%
+Make it work first before you make it work fast. - Bruce Whiteside
+%
+Make it right before you make it faster. - Jon Bentley
+%
+Omit needless words. - Strunk and White, 'The Elements of Style' (1919)
+%
+Spell create with an 'e'. - Ken Thompson (referring to design regrets on the UNIX creat(2) system call and the fallacy of premature optimization)
+%
+Keep it simple to make it faster. - Kernighan and Plauger, 'Elements of Programming Style'
+%
+Do not take shortcuts at the cost of clarity.
+%
+Thomas Edison was already famous for his telegraph technology and his huge hit with the record player. He had made a public show of turning the full focus of his massive laboratory to the question of electric light. A couple of years into the effort a reporter was visiting his lab and asked how close Edison was to coming up with a viable light bulb. Edison replied "We are on bulb number 732!"
+%
+The No Free Lunch theorem: Any two optimization algorithms are equivalent when their performance is averaged across all possible problems (if an algorithm performs well on a certain class of problems then it necessarily pays for that with degraded performance on the set of all remaining problems).
+%
+Access to computers - and anything which might teach you something about the way the world works - should be unlimited and total. Always yield to the Hands-On Imperative! - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+All information should be free. - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+Mistrust authority - promote decentralization. - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+Hackers should be judged by their hacking, not criteria such as degrees, age, race, sex, or position. - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+You can create art and beauty on a computer. - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+Computers can change your life for the better. - Steven Levy, Hackers: Heroes of the Computer Revolution (1984)
+%
+Pike's 1st Rule: You can't tell where a program is going to spend its time. Bottlenecks occur in surprising places, so don't try to second guess and put in a speed hack until you've proven that's where the bottleneck is. - Rob Pike, Notes on C Programming (1989)
+%
+Pike's 2nd Rule: Measure. Don't tune for speed until you've measured, and even then don't unless one part of the code overwhelms the rest. - Rob Pike, Notes on C Programming (1989)
+%
+Pike's 3rd Rule: Fancy algorithms are slow when n is small, and n is usually small. Fancy algorithms have big constants. Until you know that n is frequently going to be big, don't get fancy. - Rob Pike, Notes on C Programming (1989)
+%
+Pike's 4th Rule: Fancy algorithms are buggier than simple ones, and they're much harder to implement. Use simple algorithms as well as simple data structures. - Rob Pike, Notes on C Programming (1989)
+%
+Pike's 5th Rule: Data dominates. If you've chosen the right data structures and organized things well, the algorithms will almost always be self-evident. Data structures, not algorithms, are central to programming. - Rob Pike, Notes on C Programming (1989)
+%
+In general, we're least aware of what our minds do best. - Marvin Minsky, MIT AI lab co-founder
+%
+We're more aware of simple processes that don't work well than of complex ones that work flawlessly. - Marvin Minsky, MIT AI lab co-founder
+%
+The libertinistic rake is anti-authoritarian, anti-normative, and anti-traditional. - Wikipedia on 17th century 'Rake (character)'
+%
+Knowledge will forever govern ignorance, and a people who mean to be their own governors must arm themselves with the power knowledge gives. A popular government without popular information or the means of acquiring it is but a prologue to a farce or a tragedy... or perhaps both. - U.S. Founding Father James Madison
+%
+There was a romantic tradition, in this country at least, of the drifter Typesetters, who were good enough at the craft to find work wherever they traveled. They'd work in one town until they wanted a change and then drift on. They had a reputation for being well read, occasionally hard drinking, strong union men who enjoyed an independence particularly rare in the 19th century. - Clark E. Coffee (founder of Graphion, a phototypesetting company in SF)
+%
+We are at the end of a five-thousand-year-plus historical process during which human society grew in scale while it abandoned the early indigenous wisdom councils and communal decision-making. Power was centralised in the hands of increasingly specialised 'elites' and 'experts' who not only failed to achieve all they promised but used secrecy and the control of information to deceive the public into allowing them to retain power over community resources that they ultimately looted. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+The preconditions of revolution exist in the UK, and most western countries. The number of active pre-conditions is quite stunning, from elite isolation to concentrated wealth to inadequate socialisation and education, to concentrated land holdings to loss of authority to repression of new technologies especially in relation to energy, to the atrophy of the public sector and spread of corruption, to media dishonesty, to mass unemployment of young men and on and on and on. [...] Preconditions are not the same as precipitants. We are waiting for our Tunisian fruit seller. The public will endure great repression, especially when most media outlets and schools are actively aiding the repressive meme of 'you are helpless, this is the order of things.' When we have a scandal so powerful that it cannot be ignored by the average Briton or American, we will have a revolution that overturns the corrupt political systems in both countries, and perhaps puts many banks out of business. Vaclav Havel calls this 'The Power of the Powerless.' One spark, one massive fire. - Robert David Steele, The Guardian, 2014-06-19
+%
+The west has pursued an industrialisation path that allows for the privatisation of wealth from the commons, along with the criminalisation of commons rights of the public, as well as the externalisation of all true costs. Never mind that fracking produces earthquakes and poisons aquifers – corrupt politicians at local, state or province, and national levels are all too happy to take money for looking the other way. Our entire commercial, diplomatic, and informational systems are now cancerous. - Robert David Steele, The Guardian, 2014-06-19
+%
+When trade treaties have secret sections - or are entirely secret - one can be certain the public is being screwed and the secrecy is an attempt to avoid accountability. Secrecy enables corruption. So also does an inattentive public enable corruption. - Robert David Steele, The Guardian, 2014-06-19
+%
+Predatory capitalism is based on the privatisation of profit and the externalisation of cost. It is an extension of the fencing of the commons, of enclosures, along with the criminalisation of prior common customs and rights. What we need is a system that fully accounts for all costs. Whether we call that capitalism or not is irrelevant to me. But doing so would fundamentally transform the dynamic of present day capitalism, by making capital open source. - Robert David Steele, The Guardian, 2014-06-19
+%
+We have over 5 billion human brains that are the one infinite resource available to us going forward. Crowd-sourcing and cognitive surplus are two terms of art for the changing power dynamic between those at the top that are ignorant and corrupt, and those across the bottom that are attentive and ethical. The open source ecology is made up of a wide range of opens – open farm technology, open source software, open hardware, open networks, open money, open small business technology, open patents – to name just a few. The key point is that they must all develop together, otherwise the existing system will isolate them into ineffectiveness. - Robert David Steele, The Guardian, 2014-06-19
+%
+I'm not surprised. Open source everything pretty much undermines everything the national security state stands for. - Nafeez Ahmed, The Guardian, 2014-06-19, on ex-Marine, ex-CIA, Open Source Inteligence expert Robert David Steele's unanswered 2014-05-01 letter to US Vice President Joe Bidden urging the establishment of an Open Source Agency to cut costs and increase accountability.
+%
+The national security state is an expensive, ineffective monstrosity that is simply not fit for purpose. In that sense, the national security state is it's own worst enemy – it's bound to fail. - Robert David Steele, The Guardian, 2014-06-19, summarizing his book 'On Intelligence: Spies and Secrecy in an Open World', with a foreword by Senator David Boren, immediate past chairman of the Senate Select Committee for Intelligence
+%
+The National Security Agency (NSA) has not prevented any terrorist incidents. CIA cannot even get the population of Syria correct and provides no intelligence - decision-support - to most cabinet secretaries, assistant secretaries, and department heads. Indeed General Tony Zinni, when he was commander in chief of the US Central Command as it was at war, is on record as saying that he received, "at best," a meagre 4% of what he needed to know from secret sources and methods. - Robert David Steele, The Guardian, 2014-06-19
+%
+The 1% are simply not as powerful as they, and we, assume them to be. - Robert David Steele, The Guardian, 2014-06-19, as paraphrased by Nafeez Ahmed.
+%
+Open source everything is about the five billion poor coming together to reclaim their collective wealth and mobilise it to transform their lives. There is zero chance of the revolution being put down. Public agency is emergent, and the ability of the public to literally put any bank or corporation out of business overnight is looming. To paraphrase Abe Lincoln, you cannot screw all of the people all of the time. We're there. All we lack is a major precipitant – our Tunisian fruit seller. When it happens the revolution will be deep and lasting. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert in The Guardian, 2014-06-19
+%
+Top down power has failed in a most spectacular manner, and bottom-up consensus power is emergent. "Not in my neighborhood" is beginning to trump "Because I say so." - Robert David Steele, The Guardian, 2014-06-19
+%
+The one unlimited resource we have on the planet is the human brain – the current strategy of 1% capitalism is failing because it is killing the Golden Goose at multiple levels. Unfortunately, the gap between those with money and power and those who actually know what they are talking about has grown catastrophic. The rich are surrounded by sycophants and pretenders whose continued employment demands that they not question the premises. As Larry Summers lectured Elizabeth Warren, 'insiders do not criticise insiders.' - Robert David Steele, The Guardian, 2014-06-19
+%
+The national security state works for the City of London and Wall Street – both are about to be toppled by a combination of Eastern alternative banking and alternative international development capabilities, and individuals who recognise that they have the power to pull their money out of the banks and not buy the consumer goods that subsidise corruption and the concentration of wealth. The opportunity to take back the commons for the benefit of humanity as a whole is open – here and now. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert in The Guardian, 2014-06-19
+%
+My motto, a play on the CIA motto that is disgraced every day, is 'the truth at any cost lowers all other costs'. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert in The Guardian, 2014-06-19
+%
+Others wiser than I have pointed out that nature bats last. We are at the end of an era in which lies can be used to steal from the public and the commons. We are at the beginning of an era in which truth in public service can restore us all to a state of grace. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert in The Guardian, 2014-06-19
+%
+Security can only be attained through pure transparency not secrecy. Intelligence can only be maximally effective if it is open and collective. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Human beings, who had spent centuries evolving away from slavery, were re-commoditized by the Industrial Era. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Secular corruption is made possible by information asymmetries between those in power and the public. In the absence of transparency, truth, and trust, wealth is concentrated and waste is rampant. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+We live in a constellation of complex systems. It is impossible for any single person or even any single organization or nation in isolation to understand complex systems. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+We harness the intelligence at the edge of the network - at the point of impact - and the individual who is face to face with a problem in a microcosm is the tip of the human spear, able both to reach back to all other humans for assistance, and to act on behalf of all humans in the moment. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Sustainability can only be achieved through mass collaboration and the achievement of panarchy - a constellation of co-equal hybrid systems of self-governance in which all individuals freely choose where they wish to be heard, and have full access to all relevant information. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+The goal is to reject money and concentrated, illicitly aggregated and largely phantom wealth in favor of community wealth defined by community knowledge, community sharing of information, and community definition of truth derived in transparency and authenticity, the latter being the ultimate arbiter of shared wealth. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+It is our obligation to speak of what we know as we know it, not dissembling or deceiving. This could be considered the 'moral truth', and ultimately it is what can be validated by others so that a consensus can be arrived at and shared. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Truth does change, both in the mind of man and in the larger reality where man resides. On the one hand, advancing knowledge and paradigm shifts can render old truths sadly insufficient, while bringing forward new, more robust truths. At the same time, actions taken by man while operating under old truths (for example, assuming that the Corps of Engineers can pave over the Mississippi wetlands and levee the largest river in the continental U.S. without having a Katrina-like consequence) create new truths - severe weather events that are not an Act of God but rather an Act of Man acting very badly over time and space. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+E Veritate Potens: From Truth, We (the People) Are Made Powerful - Winston Maike, Australian philosopher and researcher, as quoted by Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Wealth creates a leisure class that 'buys' knowledge and defines irrational authority, thus destroying the ethical basis of civilization. Durant discussed how a civilization may be characterized by its conception of virtue, which led me to some fruitful exploration of how the United States is a culture that has equated wealth with virtue, leading to a political culture that can be bought because it is based on rule by secrecy, using secrecy to avoid accountability. Today, having abdicated concepts of the good, the beautiful, and the true for a model of primitive accumulation and a materialist set of values, we find that our financial system is what journalist Matt Taibbi called 'Griftopia'. The financial interests of Wall Street leverage the two-party system as a theatrical sideshow that legitimizes and legalizes massive fraud against the public interest. This is the primary reason why secrecy is necessary for those in power. - Robert David Steele, 'The Open-source Everything Manifesto'
+%
+Our secret intelligence culture and process is antithetical to democracy, and enabling of plutocracy, neo-fascism, and the total corruption of our government. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert, 'The Open-source Everything Manifesto'
+%
+Durant draws out the importance of not having a standard government-defined education, and of making education fun, exploratory, diverse, and open-ended. I cannot help but recall here how my hacker friends consider schools to be prisons. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert, 'The Open-source Everything Manifesto'
+%
+The Autonomous Internet can be the liberation technology, not only empowering the poor but leveraging the cognitive surplus of the entire human species. - Robert David Steele, ex-Marine, ex-CIA, Open Source Intelligence Expert, 'The Open-source Everything Manifesto'
+%
+I was learning to extend myself, to make imprints of my inner life onto the outer reality of the page. Words had created visual fields for me—allowing endless possibilities for expressing meaning. - Pakistani-American poet Shadab Zeest Hashmi, on his development of calligraphic capacity.
+%
+The relation of language to painting is an infinite relation. - 'Les Mots et les choses: Une archéologie des sciences humaines', Michel Foucault (1966)
+%
+The artist is not the transcriber of the world, he is its rival. - L'Intemporel (Third volume of 'The Metamorphosis of the Gods'), André Malraux (1957)
+%
+Digression is secular revelation. - Adam Phillips, psychoanalyst and author
+%
+A man who lies to himself, and believes his own lies, becomes unable to recognize truth, either in himself or in anyone else. - Fyodor Dostoevsky
+%
+Once you've got some words looking back at you, you can take two or three — or throw them away and look for others. - Bernard Malamud
+%
+Writing is nature's way of letting you know how sloppy your thinking is. - Guindon
+%
+The role of the artist is to ask questions, not answer them. - Anton Checkov
+%
+If you can't write it down in English, you can't code it. - Peter Halpern
+%
+If the code and the comments disagree, then both are probably wrong. - Norm Schryer
+%
+A procedure should fit on a page. - David Tribble
+%
+The Test of Negation: Don't include a sentence in documentation if its negation is obviously false. - Bob Martin, AT&T
+%
+When explaining a command, or language feature, or hardware widget, first describe the problem it is designed to solve. - David Martin
+%
+Write with the door closed, rewrite with the door open. - 'Steven King on pair programming', Peter Hilton
+%
+I find the bigger the monitor, the better the concentration. - 'Anne Rice on development hardware', Peter Hilton
+%
+When writing a novel a writer should create living people; people not characters. A character is a charicature. - 'Ernest Hemingway on user personas', Peter Hilton
+%
+There are three rules for writing the novel. Unfortunately, nobody knows what they are. - 'W. Somerset Maugham on enterprise architecture', Peter Hilton
+%
+When people tell you something's wrong or doesn't work for them they are almost always right. When they tell you exactly what they think is wrong and how to fix it, they are almost always wrong. - 'Neil Gaiman on review feedback', Peter Hilton
+%
+The main rule of writing is that if you do it with enough assurance and confidence, you're allowed to do whatever you like. - 'Neil Gaiman on open source', Peter Hilton
+%
+When I use a word, it means just what I choose it to mean - neither more nor less. - Humpty Dumpty ("in a rather scornful tone"), 'Through the Looking-Glass, and What Alice Found There' (1871), Lewis Carroll
+%
+A rose by any other name will end up as a cabbage. - Sam Gardiner
+%
+Summary of advice from writers: Advice from writers is useful, and not only about naming. Writers have been at it for centuries; programming is merely decades old. Also, their advice is better written. And funnier. - Peter Hilton
+%
+A language is a dialect with an army and a navy. - Max Weinreich
+%
+That's what storytellers are... thieves and liars. - 'Tamaya Drewe' (2010)
+%
+Words build bridges in to unexplored regions. - Adolf Hitler
+%
+Impossible is a word to be found only in the dictionary of fools. - Napoleon Bonaparte
+%
+Programmers and translators are doing similar things; they are both translating one language into another. - Japanese engineer
+%
+I am all for other authors being cads, but not me. - William Empson
+%
+The truth is like poetry, and most people fucking hate poetry. - Overheard in a bar in Washington DC
+%
+The writer is that person who, embarking upon her task, does not know what to do. - Donald Barthelme
+%
+When an artist has no personal vision, what can he communicate on to the canvas? - Clifford Irving, 'F for Fake' (1973)
+%
+Art is a lie that makes us realize truth, at least the truth that is given us to understand. - Pablo Picasso
+%
+When one paints, one loves in a different way. - Séraphine Louis, 'Séraphine' (2008)
+%
+Art: Process of abstraction and representation. - Alex Schniedeman, Black+White Photography (2016)
+%
+There is nothing worse than a sharp image of a fuzzy concept. - Ansel Adams
+%
+This imminence of a revelation which does not occur is, perhaps, the aesthetic phenomenon. - Jorge Luis Borges
+%
+It is well to bear in mind that knowledge is like food, and becomes ours only when it is absorbed, assimilated and digested by the intellect. - 'The Key of Knowledge', Champat Rai Jain (1928)
+%
+A smart machine is a profoundly paradoxical entity, but a paradox is not a supernatural act. A paradox is a symptom of a breakdown in two competing definitional systems. - Bruce Sterling (1995)
+%
+The trouble with the world is that the stupid are cocksure and the intelligent are full of doubt. - Bertrand Russell (1950)
+%
+Ignorance more frequently begets confidence than does knowledge. - Charles Darwin
+%
+The fool doth think he is wise, but the wise man knows himself to be a fool. - William Shakespeare, 'As You Like It' (1559)
+%
+A good educational system should have three purposes: it should provide all who want to learn with access to available resources at any time in their lives; empower all who want to share what they know to find those who want to learn it from them; and, finally, furnish all who want to present an issue to the public with the opportunity to make their challenge known. - Ivan Illich, 'Deschooling Society' (1971)
+%
+Sin #1 - Unnecessary distributed parallelism: It does not always make sense to parallelize a computation. Doing so almost inevitably comes with an additional overhead, both in runtime performance and in engineering time. When designing a parallel implementation, its performance should always be compared to an optimized serial implementation in order to understand the overheads involved. If we satisfy ourselves that parallel processing is necessary, it is also worth considering whether distribution over multiple machines is required. The rapid increase in RAM and CPU cores can make local parallelism economical and worthwhile. Establish the need for distributed parallelism on a case by case basis. - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #2 - Assuming performance homogeneity: Virtualized cloud environments exhibit highly variable and sometimes unpredictable performance. Base reported results on multiple benchmark runs, and report the variance. - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #3 - Picking the low-hanging fruit: It is unsurprising that it is easy to beat a general system by specializing it. Few researchers comment on the composability of their solutions.  - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #4 - Forcing the abstraction: In some application domains, it is unclear if a MapReduce-like approach can offer any benefits, and indeed, some have argued that it is fruitless as a research direction. Ideally, future research should build on [iterative processing, stream processing and graph processing], rather than on the MapReduce paradigm. - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #5 - Unrepresentative workloads: The common assumption in academic research systems is that the cluster workload is relatively homogenous. Most research evaluations measure performance by running a single job on an otherwise idle cluster. - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #6 - Assuming perfect elasticity: The cloud paradigm [...] its promise of an unlimited supply of computation. This is, of course, a fallacy. Workloads do not exhibit infinite parallel speedup. The scalability and supply of compute resources are not infinite. There are limits to the scalability of data center communication infrastructure. Another reason for diminishing returns from parallelization is the increasing likelihood of failures and vulnerability to "straggler" tasks.  - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+Sin #7 - Ignoring fault tolerance: Many recent systems neglect to account for the performance implications of fault tolerance, or indeed of faults occuring. For each system, we should ask whether fault tolerance is relevant or required. If it is, it makes sense to check precisely what level is required, and what faults are to be protected against; consider and ideally quantify the cost. - Schwarzkopf et al, 'The seven deadly sins of cloud computing research' (2014)
+%
+1st Fundamental Truth of Networking: It Has To Work.
+%
+2nd Fundamental Truth of Networking: No matter how hard you push and no matter what the priority, you can't increase the speed of light.
+%
+2nd Fundamental Truth of Networking (corollary): No matter how hard you try, you can't make a baby in much less than 9 months. Trying to speed this up *might* make it slower, but it won't make it happen any quicker.
+%
+3rd Fundamental Truth of Networking: With sufficient thrust, pigs fly just fine. However, this is not necessarily a good idea. It is hard to be sure where they are going to land, and it could be dangerous sitting under them as they fly overhead.
+%
+4th Fundamental Truth of Networking: Some things in life can never be fully appreciated nor understood unless experienced firsthand. Some things in networking can never be fully understood by someone who neither builds commercial networking equipment nor runs an operational network.
+%
+5th Fundamental Truth of Networking: It is always possible to aglutenate multiple separate problems into a single complex interdependent solution. In most cases this is a bad idea.
+%
+6th Fundamental Truth of Networking: It is easier to move a problem around than it is to solve it. (For example, by moving the problem to a different part of the overall network architecture)
+%
+6th Fundamental Truth of Networking (corollary): It is always possible to add another level of indirection.
+%
+7th Fundamental Truth of Networking: It is always something.
+%
+7th Fundamental Truth of Networking (corollary): Good, Fast, Cheap: Pick any two. (You can't have all three)
+%
+8th Fundamental Truth of Networking: It is more complicated than you think.
+%
+9th Fundamental Truth of Networking: For all resources, whatever it is, you need more.
+%
+9th Fundamental Truth of Networking (corollary): Every networking problem always takes longer to solve than it seems like it should.
+%
+10th Fundamental Truth of Networking: One size never fits all.
+%
+11th Fundamental Truth of Networking: Every old idea will be proposed again with a different name and a different presentation, regardless of whether it works.
+%
+12th Fundamental Truth of Networking: In protocol design, perfection has been reached not when there is nothing left to add, but when there is nothing left to take away.
+%
+Object-oriented programming is an exceptionally bad idea which could only have originated in California. - Edsger Dijkstra
+%
+Object-oriented design is the roman numerals of computing. - Rob Pike
+%
+The phrase 'object-oriented' means a lot of things. Half are obvious, and the other half are mistakes. - Paul Graham
+%
+Implementation inheritance causes the same intertwining and brittleness that have been observed when goto statements are overused. As a result, OO systems often suffer from complexity and lack of reuse. - John Ousterhout Scripting, IEEE Computer, March 1998
+%
+Sometimes, the elegant implementation is just a function. Not a method. Not a class. Not a framework. Just a function. - John Carmack
+%
+The problem with object-oriented languages is they've got all this implicit environment that they carry around with them. You wanted a banana but what you got was a gorilla holding the banana and the entire jungle. - Joe Armstrong
+%
+I used to be enamored of object-oriented programming. I’m now finding myself leaning toward believing that it is a plot designed to destroy joy. - Eric Allman
+%
+OO is the 'structured programming' snake oil of the 90's: useful at times, but hardly the 'end all' programing paradigm some like to make out of it. - ESR
+%
+The notion of object oriented programming is completely misunderstood. It's not about objects and classes, it's all about messages. - Alan Kay
+%
+Motto of the Electrical Engineer: Working hardware is a lot like an erect penis; it stays up as long as you don't fuck with it.
+%
+1974: 8080 CPU. 1979: SCHEME-79 chip with hardware GC. 2013: Hundreds of inefficient software GCs running on n-GHz 8080 CPUs. Cool industry. - @garybernhardt
+%
+The outsourcing plan failed very badly: all these different suppliers who were going to build these major sections couldn't actually do it. - Dominic Gates (Seattle Times) on the Boeing 787 'Dreamliner'
+%
+Oh yeah. I'm not flying on a 787 [...] I would definitely avoid flying on a 787. - Cynthia Cole, former 32 year Boeing employee and former President, Boeing Engineers' Union
+%
