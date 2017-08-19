@@ -4,7 +4,7 @@
 
 help=0
 latest=0
-verbose=0
+verbose=1
 status=0
 
 usage() {
@@ -38,25 +38,23 @@ IFS="$oldIFS"
 
 for appdir in /usr/local/caskroom/*
 do
-    echo $appdir
 	[ -d "$appdir" ] || continue
-    echo $appdir
 	app="${appdir##*/}"
 
 	verlocal="$(find "$appdir"/* -type d -print -quit)"
 	verlocal="${verlocal##*/}"
-	verlatest="$(brew cask info "$app" | awk -v app="$app" '$1 == app":" { print $2; exit }')"
+	verlatest="$(brew cask info "$app" | awk -v app="$app" '$1 == app":"{print $2;}')"
 
 	case "$apps" in
 		*"$sentinel$app$sentinel"*)
-			if [ "$verbose" -ne 0 ]
-			then
+			if [ "$verbose" -ne 0 ]; then
 				printf -- ':: found app: %s\n' "$app"
 				printf -- 'local  version: %s\n' "$verlocal"
 				printf -- 'latest version: %s\n' "$verlatest"
 			fi
-			if [ "$latest" -ne 0 ] && [ "$verlocal" = 'latest' ] || [ "$verlocal" != "$verlatest" ]
-			then brew cask install --force "$app" && [ "$verlocal" != "$verlatest" ] && rm -rf "$appdir/$verlocal"
+
+            if [ "$latest" -ne 0 ] && [ "$verlocal" = 'latest' ] || [ "$verlocal" != "$verlatest" ]; then
+                brew cask install --force "$app" && [ "$verlocal" != "$verlatest" ] && rm -rf "${appdir}/${verlocal}"
 			fi
 			;;
 		*)
