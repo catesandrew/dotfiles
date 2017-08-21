@@ -39,19 +39,19 @@ nri() {
   if [ -f package.json ]; then
     no_lock=1
     if [ -f package-lock.json ]; then
-      rm package-lock.json
+      find . -type f -name "package-lock.json" -exec /bin/rm {} \;
       no_lock=0
     fi
 
-    if [ -d node_modules ]; then
-      rm -rf node_modules
-    fi
+    find . -type d -name "node_modules" -exec /bin/rm -rf {} \;
 
     __npm_c install
 
     if [ $no_lock ] && [ -f package-lock.json ]; then
-      rm package-lock.json
+      find . -type f -name "package-lock.json" -exec /bin/rm {} \;
     fi
+
+    find . -type f -name "lerna-debug.log" -exec /bin/rm {} \;
   fi
 }
 
@@ -73,8 +73,6 @@ ni() {
     fi
   fi
 }
-
-ni() { __npm_c install "$@"; }
 __npm_complete ni npm
 
 nid() { __npm_c install --save-dev "$@"; }
