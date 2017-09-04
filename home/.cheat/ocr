@@ -1,5 +1,5 @@
 # OCR Tools
-# unpaper, pdf2ppm, convert, pdfsandwich
+# unpaper, pdf2ppm, convert, pdfsandwich, exact-image
 
 pdftotext document.pdf
 
@@ -15,3 +15,30 @@ pdfsandwich -layout none transcript.pdf
 convert output-*.ppm mydoc.pdf
 pdftotext mydoc.pdf
 pdfbox et --html mydoc.pdf -o mydoc.html
+
+pdfsandwich -lang eng -layout single -pagesize original -rgb -distill -verbose transcript.pdf
+pdfsandwich -lang eng -layout single -pagesize original -rgb -toppm -verbose transcript.pdf
+pdfsandwich -lang eng -layout single -pagesize original -rgb -distill -toppm -verbose transcript.pdf
+
+# We can tell pdfsandwich explicitly about the layout of the page:
+pdfsandwich -layout double galton.pdf
+
+# This tells unpaper to search for two separate sub-pages on the page and to
+# apply preprocessing procedures to each of them separately.
+#
+# The layout specification, which is switched off by default, allows the options
+# _single_ for each pdf page containing a single scanned page, and _double_. If
+# the wrong layout specifications are provided, whole sub-pages might get
+# filtered out, or figures might be considered visual noise and disappear. If
+# the scan quality is good, it is advisable to completely switch off
+# preprocessing by the -nopreproc option. Note that simple deskewing of a
+# rotated page (without sub-pages) can be obtained by _convert_, without any
+# involvement of unpaper. A useful convert option for this is, for instance:
+
+pdfsandwich -coo "-deskew 40%" scanned_file.pdf
+
+# Both _convert_ and _unpaper_ provide a large number of potentially useful
+# preprocessing options which can be specified by -coo and -unpo, respectively.
+# You might want to have a look at the [convert online
+# manual](<http://www.imagemagick.org/script/convert.php>) or at the man page of
+# unpaper.
