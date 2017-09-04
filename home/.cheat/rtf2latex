@@ -1,0 +1,17 @@
+# text conversion options
+# -t1  font size
+# -t2  font color
+# -t4  font formatting
+# -t8  replace tabs with spaces
+
+# paragraph conversion options
+# -p1  'heading 1' style -> '\section{}'
+# -p2  indenting
+# -p4  space between paragraphs
+# -p8  line spacing
+# -p16 margins
+# -p32 alignment
+
+find . -type f -name "*.rtf" ! -path './.git' -exec rtf2latex2e -p 33 -t 14 {} \;
+
+find . -type f -name "*.rtf" ! -path './.git' -exec rtf2latex2e -p 33 -t 1 {} \;
