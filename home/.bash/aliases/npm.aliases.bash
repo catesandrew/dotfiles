@@ -34,8 +34,15 @@ __npm_c() {
 
 _completion_loader npm
 
+__npm_clean() {
+  if [ -f package.json ]; then
+    find . -type d -name "node_modules" -exec /bin/rm -rf {} \;
+  fi
+}
+
 # npm reinstall
 nri() {
+  __npm_clean
   if [ -f package.json ]; then
     no_lock=1
     if [ -f package-lock.json ]; then
@@ -43,9 +50,7 @@ nri() {
       no_lock=0
     fi
 
-    find . -type d -name "node_modules" -exec /bin/rm -rf {} \;
-
-    __npm_c install
+    __npm_clean
 
     if [ $no_lock ] && [ -f package-lock.json ]; then
       find . -type f -name "package-lock.json" -exec /bin/rm {} \;
@@ -108,5 +113,27 @@ alias nus='npm uninstall --save'
 nv() { __npm_c view "$@"; }
 
 ns() { __npm_c start "$@"; }
+
+rnc() {
+  if [ -d ios ]; then
+    /bin/rm -rf ./ios
+  fi
+
+  if [ -d android ]; then
+    /bin/rm -rf ./android
+  fi
+
+  if hash react-native 2>/dev/null; then
+    react-native eject
+  fi
+
+  if hash watchman 2>/dev/null; then
+    watchman watch-del-all
+  fi
+
+  __npm_clean
+
+  /bin/rm -rf $TMPDIR/react-*
+}
 
 # __npm_complete nv npm
