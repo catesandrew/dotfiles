@@ -1,0 +1,26 @@
+find . -maxdepth 5 -name package.json | while IFS= read -r file; do cat "$file" | grep titlecase; done
+find . -maxdepth 5 -name package.json | while IFS= read -r file; do cat "$file" | grep -EHn titlecase; done
+find . -maxdepth 5 -name package.json | while IFS= read -r file; dogrep -EHn titlecase "$file"; done
+find . -maxdepth 5 -name package.json | while IFS= read -r file; do grep -EHn titlecase "$file"; done
+find . -maxdepth 5 -name package.json | while IFS= read -r file; do grep -EHn titlecase "$file"; done
+find . -maxdepth 2 -name *.js | while IFS= read -r file; do grep -EHn titlecase "$file"; done
+find . -maxdepth 7 -name *.js | while IFS= read -r file; do grep -EHn titlecase "$file"; done
+find . -maxdepth 3 -name "*.js" | while IFS= read -r file; do grep -EHn titlecase "$file"; done
+mkdir titlecase-cli
+echo 'cat in the hat' | titlecase
+echo 'cat in the hat' | titlecase-cli 
+echo 'cat in the hat' | titlecase-cli -l
+echo 'For Step-by-Step Directions Email someone@gmail.com' | titlecase-cli -l
+echo 'For Step-by-Step Directions Email someone@gmail.com' | titlecase-cli
+echo 'Notes and observations regarding Apple’s announcements from ‘The Beat Goes On’ special event' | titlecase-cli
+cheerio 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html --synchronous -p -r - -s h2 --eval "titlecase" -o 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html 
+cheerio 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html --synchronous -p -r - -s h3 --eval "titlecase" -o 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html 
+cheerio 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html --synchronous -p -r - -s h2 --eval "titlecase" -o 08-offensive-and-defensive-strategies-for-runners-on-first-and-third.html 
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h2 --eval "titlecase" -o "$file"; done
+find . -maxdepth 4 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h3 --eval "titlecase" -o "$file"; done
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h4 --eval "titlecase" -o "$file"; done
+find . -maxdepth 1 -type f -name "*.html" | while IFS= read -r file; do cheerio "$file" --synchronous -p -r - -s h3 --eval "titlecase" -o "$file"; done
+cd titlecase-cli
+git remote add origin git@andrew.gitlab.cates.io:vine/titlecase-cli.git
+links=(aeon-cli cheerio-cli dnscop-cli eldred-cli express-app-links foothill generator-gleaves generator-lakewood normandie pdfbox-cli pomona pomona-cli rosecrans simple-inherits talon talon-cli titlecase-cli watch watch-cli)
+links=(aeon-cli cheerio-cli dnscop-cli eldred-cli express-app-links foothill generator-gleaves generator-lakewood normandie pdfbox-cli pomona pomona-cli rosecrans simple-inherits talon talon-cli titlecase-cli watch watch-cli)
