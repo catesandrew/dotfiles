@@ -61,8 +61,11 @@ complete -F _complete_alias kl
 alias ko='k options'
 complete -F _complete_alias ko
 
-alias kr='k replace'
+alias kr='k run'
 complete -F _complete_alias kr
+
+alias krp='k replace'
+complete -F _complete_alias krp
 
 alias krm='k delete'
 complete -F _complete_alias krm
