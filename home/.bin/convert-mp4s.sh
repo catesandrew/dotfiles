@@ -2,6 +2,7 @@
 function walk_tree {
       local directory="$1"
       local filename
+      local dirname
       local base
       local ext
       local of
@@ -15,6 +16,9 @@ function walk_tree {
             echo "Directory: $i"
             cd "$i"
 
+            dirname="${i##*/}"
+            mkdir -p "${HOME}/Documents/Videos/$dirname"
+
             for f in *;
             do
                 filename="${f##*/}"
@@ -27,7 +31,7 @@ function walk_tree {
 
                 of="`basename "$filename" | sed 's/\(.*\)\..*/\1/'`.m4v"
                 ts HandBrakeCLI -Z "Apple 1080p60 Surround" -m -i "$f" -o "${HOME}/Movies/after/$of" > /dev/null
-                ts -dn mv "${HOME}/Movies/after/$of" "${HOME}/Documents/Videos/$of" > /dev/null
+                ts -dn mv "${HOME}/Movies/after/$of" "${HOME}/Documents/Videos/$i/$of" > /dev/null
                 ts -dn trash "$f" > /dev/null
             done
 
