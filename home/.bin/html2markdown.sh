@@ -66,7 +66,7 @@ grab_url_with () {
 
     if [ -z "$prog" ]; then
 	# Locate a sensible web grabber (note the order).
-	for p in wget lynx w3m curl links w3c; do
+	for p in phantomjs swget lynx w3m curl links w3c; do
 		if pathfind $p; then
 		    prog=$p
 		    break
@@ -88,7 +88,105 @@ grab_url_with () {
     # Setup proper base options for known grabbers.
     base_opts=
     case "$prog" in
-    wget)  base_opts="-O-" ;;
+
+    phantomjs)
+      # phantomjs save_page.js http://example.com > page.html
+      grabber_js=$THIS_TEMPDIR/grabber.js
+      # echo "var system = require('system'), page = require('webpage').create(); page.open(system.args[1], function() { console.log(page.content); phantom.exit(); });" >| "${grabber_js}"
+
+# var page = require('webpage').create(),
+#     system = require('system'),
+#     url = system.args[1];
+#
+# function onPageReady() {
+#     var htmlContent = page.evaluate(function () {
+#         return document.documentElement.outerHTML;
+#     });
+#
+#     console.log(htmlContent);
+#     phantom.exit();
+# }
+#
+# page.open(url, function (status) {
+#     function checkReadyState() {
+#         setTimeout(function () {
+#             var readyState = page.evaluate(function () {
+#                 return document.readyState;
+#             });
+#
+#             if ('complete' === readyState) {
+#                 onPageReady();
+#             } else {
+#                 checkReadyState();
+#             }
+#         });
+#     }
+#
+#     checkReadyState();
+# });
+
+    # echo "var page = require('webpage').create(), system = require('system'), url = system.args[1];" >| "${grabber_js}"
+    # echo "function onPageReady() { var htmlContent = page.evaluate(function () { return document.documentElement.outerHTML; }); console.log(htmlContent); phantom.exit(); }" >> "${grabber_js}"
+    # echo "page.open(url, function (status) { function checkreadystate() { setTimeout(function () { var readystate = page.evaluate(function () { return document.readystate; }); if ('complete' === readystate) { onpageready(); } else { checkreadystate(); } }); } checkreadystate(); });" >> "${grabber_js}"
+
+# var page = require('webpage').create(),
+#     system = require('system'),
+#     url = system.args[1];
+#
+# page.open(url, function (status) { if (status !== 'success') {
+#     console.log('unable to load the address!');
+#     phantom.exit();
+#   } else {
+#     window.settimeout(function () {
+#       console.log(page.content);
+#       phantom.exit();
+#     }, 1000);
+#   }
+# });
+
+    # echo "var page = require('webpage').create(), system = require('system'), url = system.args[1];" >| "${grabber_js}"
+    # echo "function onPageReady() { var htmlContent = page.evaluate(function () { return document.documentElement.outerHTML; }); console.log(htmlContent); phantom.exit(); }" >> "${grabber_js}"
+    # echo "page.open(url, function (status) { if (status !== 'success') { console.error('unable to load the address!'); phantom.exit(); } else { window.setTimeout(function () { onPageReady(); /*console.log(page.content); phantom.exit();*/ }, 1000); } });" >> "${grabber_js}"
+
+# var page = require('webpage').create(),
+#     system = require('system'),
+#     url = system.args[1];
+#
+# var requestsArray = [];
+#
+# page.onResourceRequested = function(requestData, networkRequest) {
+#   requestsArray.push(requestData.id);
+# };
+#
+# page.onResourceReceived = function(response) {
+#   var index = requestsArray.indexOf(response.id);
+#   requestsArray.splice(index, 1);
+# };
+#
+# page.open(url, function(status) {
+#
+#   var interval = setInterval(function () {
+#     if (requestsArray.length === 0) {
+#       clearInterval(interval);
+#       var content = page.content;
+#       console.log(content);
+#       page.render('yourLoadedPage.png');
+#       phantom.exit();
+#     }
+#   }, 500);
+# });
+
+
+    echo "var page = require('webpage').create(), system = require('system'), url = system.args[1];" >| "${grabber_js}"
+    echo "page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2'" >> "${grabber_js}"
+    echo "var requestsArray = [];" >> "${grabber_js}"
+    echo "page.onResourceRequested = function(requestData, networkRequest) { requestsArray.push(requestData.id); };" >> "${grabber_js}"
+    echo "page.onResourceReceived = function(response) { var index = requestsArray.indexOf(response.id); requestsArray.splice(index, 1); };" >> "${grabber_js}"
+    echo "page.open(url, function(status) { var interval = setInterval(function () { if (requestsArray.length === 0) { clearInterval(interval); console.log(page.content); phantom.exit(); } }, 5000); });" >> "${grabber_js}"
+
+      base_opts="${grabber_js}"
+    ;;
+    wget)  base_opts="-o-" ;;
     lynx)  base_opts="-source" ;;
     w3m)   base_opts="-dump_source" ;;
     curl)  base_opts="" ;;
