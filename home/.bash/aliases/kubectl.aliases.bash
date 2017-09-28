@@ -1,14 +1,45 @@
+__kubectl_func_wrap () {
+  local cur words cword prev
+  _get_comp_words_by_ref -n =: cur words cword prev
+
+  $1
+  __handle_word
+  if [ $# -eq 2 ]; then
+    $2
+  fi
+}
+
+__kubectl_complete () {
+  if [ $# -eq 3 ]; then
+    local wrapper="__kubectl_wrap${2}_${3}"
+    eval "$wrapper () { __kubectl_func_wrap $2 $3 ; }"
+  else
+    local wrapper="__kubectl_wrap${2}"
+    eval "$wrapper () { __kubectl_func_wrap $2 ; }"
+  fi
+
+  complete -o bashdefault -o default -o nospace -F "$wrapper" "$1" 2>/dev/null \
+    || complete -o default -o nospace -F "$wrapper" "$1"
+}
+
+_completion_loader kubectl
+
 # This command is used ALOT both below and in daily life
 alias k=kubectl
 complete -F _complete_alias k
 
+## Apply
 alias ka='k apply'
 complete -F _complete_alias ka
 
+## Cluster Info
+alias kci='k cluster-info'
+
+## Config
 alias kc='k config'
 complete -F _complete_alias kc
 
-# Manage configuration quickly to switch contexts between local, dev ad staging.
+## Manage configuration quickly to switch contexts between local, dev ad staging.
 alias kcuc='k config use-context'
 complete -F _complete_alias kcuc
 
@@ -21,167 +52,350 @@ complete -F _complete_alias kcdc
 alias kccc='k config current-context'
 complete -F _complete_alias kccc
 
+### Setting the namespace preference
+
+### You can permanently save the namespace for
+### all subsequent kubectl commands in that context.
+ksetns() {
+  if [ $# -eq 0 ]; then
+    kc set-context $(kc current-context) --namespace='default'
+  else
+    kc set-context $(kc current-context) --namespace="$@"
+  fi
+}
+
+### Validate it
+kgetns() {
+  kc view | grep namespace | awk '{ print $2 }';
+}
+
+## Copy
 alias kcp='k copy'
 complete -F _complete_alias kcp
 
+## Create
 alias kcr='k create'
 complete -F _complete_alias kcr
 
-alias kd='k describe'
-complete -F _complete_alias kd
-
-alias ked='k edit'
-complete -F _complete_alias ked
-
-alias kex='k exec'
-complete -F _complete_alias kex
-
-# Drop into an interactive terminal on a container
-alias kexti='kex -ti'
-complete -F _complete_alias kexti
-
-alias kep='k explain'
-complete -F _complete_alias kep
-
-alias keo='k expose'
-complete -F _complete_alias keo
-
-alias kg='k get'
-complete -F _complete_alias kg
-
-# Pod management.
-alias kgp='kg pods'
-
-alias kls='kg'
-complete -F _complete_alias kls
-
-alias kl='k logs'
-complete -F _complete_alias kl
-
-alias ko='k options'
-complete -F _complete_alias ko
-
-alias kr='k run'
-complete -F _complete_alias kr
-
-alias krp='k replace'
-complete -F _complete_alias krp
-
+## Delete
 alias krm='k delete'
 complete -F _complete_alias krm
 
-alias ks='k set'
-complete -F _complete_alias ks
+alias krmp='krm pod'
+alias krms='krm svc'
+alias krmd='krm deployment'
+alias krmsec='krm secret'
+
+## Describe
+alias kd='k describe'
+complete -F _complete_alias kd
+
+alias kdp='kd pod'
+alias kds='kd svc'
+alias kdn='kd node'
+alias kdd='kd deployment'
+alias kdsec='kd secret'
+
+## Edit
+alias ked='k edit'
+complete -F _complete_alias ked
+
+alias kedp='ked pod'
+alias keds='ked svc'
+alias kedd='ked deployment'
+
+## Exec
+alias kex='k exec'
+complete -F _complete_alias kex
+
+### Drop into an interactive terminal on a container
+alias kexti='kex -ti'
+complete -F _complete_alias kexti
 
 alias kx='kex'
 complete -F _complete_alias kx
 function kssh() { ssh -A core@"$(kg node -o wide | grep "$@" | awk '{ print $4}')"; }
 function kxsh() { kex -ti "$@" sh; }
 function kxbash() { kex -ti "$@" bash; }
+function kxbusy() {
+  if k get pod --selector run=busybox 2>/dev/null | grep busybox > /dev/null 2>&1; then
+    kxsh busybox
+  else
+    k run -ti busybox --image=busybox --generator="run-pod/v1" "$@";
+  fi
+}
 
+## Explain
+alias kep='k explain'
+complete -F _complete_alias kep
+
+## Expose
+alias keo='k expose'
+complete -F _complete_alias keo
+
+## Get
+__kubectl_get_svc() {
+  __kubectl_parse_get "svc"
+}
+
+__kubectl_get_deploy() {
+  __kubectl_parse_get "deploy"
+}
+
+__kubectl_get_node() {
+  __kubectl_parse_get "node"
+}
+
+__kubectl_get_pod() {
+  __kubectl_parse_get "pod"
+}
+
+__kubectl_get_ns() {
+  __kubectl_parse_get "namespace"
+}
+
+__kubectl_get_ep() {
+  __kubectl_parse_get "endpoints"
+}
+
+#### general get
+function kg() {
+  # alias kg='k get -o wide'
+  # complete -F _complete_alias kg
+  k get -o wide "$@"
+}
+__kubectl_complete kg _kubectl_get
+
+function kgj() {
+  k get -o json "$@" | jq
+}
+__kubectl_complete kgj _kubectl_get
+
+#### get namespaces
+function kgns() {
+  kg namespace "$@"
+}
+__kubectl_complete kgns _kubectl_get __kubectl_get_ns
+
+function kgjns() {
+  kgj namespace "$@"
+}
+__kubectl_complete kgjns _kubectl_get __kubectl_get_ns
+
+#### get pods
+function kgp() {
+  kg pod "$@"
+}
+__kubectl_complete kgp _kubectl_get __kubectl_get_pod
+
+function kgjp() {
+  kgj pod "$@"
+}
+__kubectl_complete kgjp _kubectl_get __kubectl_get_pod
+
+#### get endpoints
+function kgep() {
+  kg endpoints "$@"
+}
+__kubectl_complete kgep _kubectl_get __kubectl_get_ep
+
+function kgjep() {
+  kgj endpoints "$@"
+}
+__kubectl_complete kgjep _kubectl_get __kubectl_get_ep
+
+#### get nodes
+function kgn() {
+  kg node "$@"
+}
+__kubectl_complete kgn _kubectl_get __kubectl_get_node
+
+function kgjn() {
+  kgj node "$@"
+}
+__kubectl_complete kgjn _kubectl_get __kubectl_get_node
+
+#### get services
+function kgs() {
+  kg svc "$@"
+}
+__kubectl_complete kgs _kubectl_get __kubectl_get_svc
+
+function kgjs() {
+  kgj svc "$@"
+}
+__kubectl_complete kgjs _kubectl_get __kubectl_get_svc
+
+#### get deployments
+function kgd() {
+  kg deploy "$@"
+}
+__kubectl_complete kgd _kubectl_get __kubectl_get_deploy
+
+function kgjd() {
+  kgj deploy "$@"
+}
+__kubectl_complete kgjd kubectl_get __kubectl_get_deploy
+
+### Rollout management.
+alias kgrs='kg rs'
+alias kgsec='kg secret'
+
+kls() {
+  if [ $# -eq 0 ]; then
+    # kg -o wide all
+
+    for cmd in pods services deployments replicasets jobs endpoints ingress; do
+      if ! k get $cmd 2>&1 | grep 'No resources found' > /dev/null 2>&1; then
+        echo ""
+        echo "$cmd:"
+        k get -o wide $cmd
+      fi
+    done
+
+    # if ! k get endpoints 2>&1 | grep 'No resources found' > /dev/null 2>&1; then
+    #   echo ""
+    #   k get endpoints
+    # fi
+
+
+    # if ! k get ingress 2>&1 | grep 'No resources found' > /dev/null 2>&1; then
+    #   echo ""
+    #   k get ingress
+    # fi
+  else
+    kg -o wide "$@"
+  fi
+}
+
+kll() {
+  if [ $# -eq 0 ]; then
+    kg -o yaml all
+  else
+    kg -o yaml "$@"
+  fi
+}
+
+## Logs
+alias kl='k logs'
+complete -F _complete_alias kl
+
+alias klp='kl pods'
+alias klf='kl --tail=200 -f'
+complete -F _complete_alias klf
+
+alias klogs='kl'
+complete -F _complete_alias klogs
+
+## Options
+alias ko='k options'
+complete -F _complete_alias ko
+
+## Run
+alias krun='k run'
+complete -F _complete_alias krun
+
+## Replace
+alias krp='k replace'
+complete -F _complete_alias krp
+
+## Rollout
+alias kro='k rollout'
+complete -F _complete_alias kro
+
+### Rollout management.
+alias krosd='kro status deployment'
+alias kroh='kro history'
+alias krou='kro undo'
+
+## Scale
+alias ksc='k scale'
+complete -F _complete_alias ksc
+
+alias kscd='ksc deployment'
+
+## Set
+alias kset='k set'
+complete -F _complete_alias kset
+
+## Version
 alias kv='k version'
 complete -F _complete_alias kv
 
-# # alias kgp='kubectl get pod -o wide'
-# alias klp='k logs pods'
-# alias kep='k edit pods'
-# alias kdp='k describe pods'
-# # alias kdp='kubectl describe pod'
-# alias kdelp='k delete pods'
+function oldkpp() {
+  kgp | \grep "$@" | head -1 | awk '{ print $1 }' | xargs -i k port-forward {} 8080:8080 > /dev/null 2>&1 &
+  sleep 2;
 
-# # Service management.
-# alias kgs='k get svc'
-# # alias kgs='kubectl get service -o wide'
-# alias kes='k edit svc'
-# alias kds='k describe svc'
-# # alias kds='kubectl describe service'
-# alias kdels='k delete svc'
+  if hash xdg-open 2>/dev/null; then
+    xdg-open http://localhost:8080/__health > /dev/null 2>&1;
+  elif hash open 2>/dev/null; then
+    open http://localhost:8080/__health > /dev/null 2>&1;
+  fi
+}
 
-# # Secret management
-# alias kgsec='k get secret'
-# alias kdsec='k describe secret'
-# alias kdelsec='k delete secret'
+function kstat() {
+  for node in  $(kgn | tail -n +2 | awk '{ print $1}'); do
+    echo "node: $node"
+    echo -e "$(kubectl describe node $node | grep -A 4 "Allocated resources")\n";
+  done
+}
 
-# # Deployment management.
-# alias kgd='k get deployment'
-# # alias kgd='kubectl get deployment -o wide'
-# alias ked='k edit deployment'
-# alias kdd='k describe deployment'
-# # alias kdd='kubectl describe deployment'
-# alias kdeld='k delete deployment'
-# alias ksd='k scale deployment'
-# alias krsd='k rollout status deployment'
+function kreach(){
+  for public_ip in  $(kgn -o wide | tail -n +2 | awk '{ print $5 }'); do
+    echo "public ip: $public_ip"
+    echo -e "$(ssh "core@${public_ip}" date)\n"
+  done
+}
 
-# # Rollout management.
-# alias kgrs='k get rs'
-# alias krh='k rollout history'
-# alias kru='k rollout undo'
+function kready() {
+  for node in  $(kgn | tail -n +2 | awk '{ print $1 }'); do
+    echo "node: $node"
+    echo -e "$(kdn "${node}" | grep  "Ready")\n";
+  done
+}
 
-# alias klf='kubectl logs --tail=200  -f'
-# alias kgn='kubectl get node -o wide'
-# alias kdf='kubectl delete -f'
-# alias kaf='kubectl apply -f'
-# alias kci='kubectl cluster-info'
-
-# function kpp() {
-#   kgp | grep "$@" | head -1 | awk '{ print $1}' | xargs -i kubectl port-forward {} 8080:8080 > /dev/null 2>&1 &
-#   sleep 2;
-#   xdg-open http://localhost:8080/__health > /dev/null 2>&1;
-# }
-
-# function kfp() { kubectl get pod -o wide| grep "$@"; }
-# function kfs() { kubectl get service -o wide| grep "$@"; }
-# function kfd() { kubectl get deployment -o wide | grep "$@"; }
-# function kres() {
-#   echo "Scaling $1"
-#   desired_replicas=$(kubectl get deployments --selector=app="$1" -o jsonpath='{$.items[0].spec.replicas}');
-#   echo "Desired nf or replicas: $desired_replicas";
-#         echo "Scaling deployment $1 down to 0 replicas...";
-#         kubectl scale --replicas=0 deployments/$1;
-#   current_replicas=$(kubectl get deployments --selector=app="$1" -o jsonpath='{$.items[0].status.availableReplicas}')
-#   while [ ! -z "$current_replicas" ]; do
-#     sleep 1;
-#           current_replicas=$(kubectl get deployments --selector=app="$1" -o jsonpath='{$.items[0].status.availableReplicas}')
-#   done;
-#   echo "Scaling deployment $1 up to $desired_replicas replicas...";
-#   kubectl scale --replicas=$desired_replicas deployments/$1;
-#   if [ "$2" == "skipCheck" ]; then
-#     echo "Skipping healthchecks"
-#     return
-#   fi
-
-#   default_sleep=10
-#   initial_sleep=$(kubectl get deployments --selector=app=$1 -o jsonpath='{$.items[0].spec.template.spec.containers[0].readinessProbe.initialDelaySeconds}')
-#   initial_sleep=${initial_sleep:-10}
-#   echo "Waiting $initial_sleep seconds for the first readiness probe check..."
-#         sleep $initial_sleep
-#     period_sleep=$(kubectl get deployments --selector=app=$1 -o jsonpath='{$.items[0].spec.template.spec.containers[0].readinessProbe.periodSeconds}')
-#   period_sleep=${period_sleep:-10}
-#   while [ "$current_replicas" != "$desired_replicas" ]; do
-#     echo "Waiting $period_sleep seconds until checking the node count"
-#     sleep $period_sleep
-#     current_replicas=$(kubectl get deployments --selector=app=$1 -o jsonpath='{$.items[0].status.availableReplicas}')
-#                 current_replicas=${current_replicas:-0}
-#                 echo "Current nr of replicas: $current_replicas"
-#         done;
-#   echo "$1 restarted"
-# }
-# function kgnt() { for machine in $(kcgn | tail -n +2 | awk '{ print $1 }' ); do echo -n "${machine}: "; echo $(kc describe node $machine | grep -i taints); done | sort -k 2; }
-# function kstat() {
-#   for node in  $(kubectl get nodes | tail -n +2 | awk '{print $1}'); do
-#     echo $node
-#     echo -e "$(kubectl describe node $node | grep -A 4 "Allocated resources")\n";
+# logs for pod
+# function klp () {
+#   local r="$1" p
+#   [[ $PAGER ]] || PAGER=more
+#   # match full pod name, pod in replica, or pod in deployment
+#   for p in $(kg pods | awk "\$1 == \"$r\" || \$1 ~ /^$r-[a-z0-9]{5}$/ || \$1 ~ /^$r-[0-9]{1,10}-[a-z0-9]{5}$/ { print \$1 }"); do
+#     echo "===> $p <==="
+#     k logs "$p" | $PAGER
 #   done
 # }
-# function kreach(){
-#   for public_ip in  $(kubectl get nodes -o wide | tail -n +2 | awk '{print $4}'); do
-#                 echo $public_ip
-#                 echo -e "$(ssh core@$public_ip date)\n"
-#         done
-# }
-# function kready() {
-#         for node in  $(kubectl get nodes | tail -n +2 | awk '{print $1}'); do
-#                 echo $node
-#                 echo -e "$(kubectl describe node $node | grep  "Ready")\n";
-#         done
-# }
+
+# ssh into each host
+function kssh () {
+  local conf="ssh_config"
+  local h
+  for h in $(awk '/^Host / { print $2 }' "$conf"); do
+    echo "$h"
+    ssh -F "$conf" "$h" "$@"
+  done
+}
+
+### Run some pods
+# krun hostnames --image=gcr.io/google_containers/serve_hostname --labels=app=hostnames --port=9376 --replicas=3
+
+### Confirm your Pods are running
+# kg pod --selector app=hostnames
+
+### Is there a hostname (Run from another Pod)?
+# wget -qO- hostnames
+
+### First thing to check is whether that Service actually exists
+# kg svc hostnames
+
+### So we have a culprit, let’s create the Service
+# keo deployment hostnames --port=80 --target-port=9376
+
+### Does the Service work by DNS (Run from another Pod)?
+# nslookup hostnames
+
+### Does any Service exist in DNS (Run from another Pod)?
+# nslookup kubernetes.default
+
+### Does the Service have any Endpoints?
+# kg endpoints
+# kg endpoints hostnames
