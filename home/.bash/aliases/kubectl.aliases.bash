@@ -22,9 +22,33 @@ __kubectl_complete () {
     || complete -o default -o nospace -F "$wrapper" "$1"
 }
 
+__kubectl_get_svc() {
+  __kubectl_parse_get "svc"
+}
+
+__kubectl_get_deploy() {
+  __kubectl_parse_get "deploy"
+}
+
+__kubectl_get_node() {
+  __kubectl_parse_get "node"
+}
+
+__kubectl_get_pod() {
+  __kubectl_parse_get "pod"
+}
+
+__kubectl_get_ns() {
+  __kubectl_parse_get "namespace"
+}
+
+__kubectl_get_ep() {
+  __kubectl_parse_get "endpoints"
+}
+
 _completion_loader kubectl
 
-# This command is used ALOT both below and in daily life
+## This command is used ALOT both below and in daily life
 alias k=kubectl
 complete -F _complete_alias k
 
@@ -33,11 +57,23 @@ alias ka='k apply'
 complete -F _complete_alias ka
 
 ## Cluster Info
+
+### * Get a list of services started on a cluster by kube system with the
+### cluster-info command
 alias kci='k cluster-info'
 
 ## Config
 alias kc='k config'
 complete -F _complete_alias kc
+
+## * Check the location and credentials known about with this command:
+alias kcv='kc view'
+
+# Get the public IP address of one of your nodes. Either, `kubectl
+# cluster-info`, or if you are using Google Compute Engine instances, you
+# can use the `gcloud compute instances list` command to see the public
+# addresses of your nodes.
+
 
 ## Manage configuration quickly to switch contexts between local, dev ad staging.
 alias kcuc='k config use-context'
@@ -87,14 +123,52 @@ alias krmd='krm deployment'
 alias krmsec='krm secret'
 
 ## Describe
-alias kd='k describe'
-complete -F _complete_alias kd
 
-alias kdp='kd pod'
-alias kds='kd svc'
-alias kdn='kd node'
-alias kdd='kd deployment'
+
+function kd() {
+  # alias kd='k describe'
+  # complete -F _complete_alias kd
+  k describe "$@"
+}
+__kubectl_complete kd _kubectl_describe
+
 alias kdsec='kd secret'
+
+#### describe namespaces
+function kdns() {
+  kd namespace "$@"
+}
+__kubectl_complete kdns _kubectl_describe __kubectl_get_ns
+
+#### describe pods
+function kdp() {
+  kd pod "$@"
+}
+__kubectl_complete kdp _kubectl_describe __kubectl_get_pod
+
+#### describe endpoints
+function kdep() {
+  kd endpoints "$@"
+}
+__kubectl_complete kdep _kubectl_describe __kubectl_get_ep
+
+#### describe nodes
+function kdn() {
+  kd node "$@"
+}
+__kubectl_complete kdn _kubectl_describe __kubectl_get_node
+
+#### describe services
+function kds() {
+  kd svc "$@"
+}
+__kubectl_complete kds _kubectl_describe __kubectl_get_svc
+
+#### describe deployments
+function kdd() {
+  kd deploy "$@"
+}
+__kubectl_complete kdd _kubectl_describe __kubectl_get_deploy
 
 ## Edit
 alias ked='k edit'
@@ -134,31 +208,6 @@ alias keo='k expose'
 complete -F _complete_alias keo
 
 ## Get
-__kubectl_get_svc() {
-  __kubectl_parse_get "svc"
-}
-
-__kubectl_get_deploy() {
-  __kubectl_parse_get "deploy"
-}
-
-__kubectl_get_node() {
-  __kubectl_parse_get "node"
-}
-
-__kubectl_get_pod() {
-  __kubectl_parse_get "pod"
-}
-
-__kubectl_get_ns() {
-  __kubectl_parse_get "namespace"
-}
-
-__kubectl_get_ep() {
-  __kubectl_parse_get "endpoints"
-}
-
-#### general get
 function kg() {
   # alias kg='k get -o wide'
   # complete -F _complete_alias kg
@@ -235,7 +284,7 @@ __kubectl_complete kgd _kubectl_get __kubectl_get_deploy
 function kgjd() {
   kgj deploy "$@"
 }
-__kubectl_complete kgjd kubectl_get __kubectl_get_deploy
+__kubectl_complete kgjd _kubectl_get __kubectl_get_deploy
 
 ### Rollout management.
 alias kgrs='kg rs'
@@ -373,6 +422,12 @@ function kssh () {
     echo "$h"
     ssh -F "$conf" "$h" "$@"
   done
+}
+
+function kproxy() {
+  local APISERVER=$(kcv | \grep server | cut -f 2- -d ":" | tr -d " ")
+  local TOKEN=$(kd secret $(kg secrets | \grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+  curl $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
 }
 
 ### Run some pods
