@@ -1,0 +1,277 @@
+#!/bin/bash
+
+# SANE Command-Line Scan to PDF
+
+# Sane command-line scanning bash shell script on Linux with OCR and deskew support. The script automates
+# common scan-to-pdf operations for scanners with an automatic document feeder, such as the awesome Fujitsu
+# ScanSnap S1500, with output to PDF files.
+
+# Tested and run regularly on Fedora, but should work on other distributions with the requirements below.
+
+# ## Features
+
+# - Join scanned pages into a single output file, or specify a name for each page
+# - Deskew (if supported by scanner driver, or software-based via unpaper)
+# - Crop (if supported by scanner driver)
+# - Creates searchable PDFs (with tesseract)
+# - Duplex (if scanner supports it)
+# - Specify resolution
+# - Truncate n pages from end of scan e.g. duplex scanning with last page truncated
+# - Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
+
+# ## Requirements
+
+# - bash
+# - pnmtops (netpbm-progs)
+# - ps2pdf (ghostscript)
+
+# ## Optional
+
+# - unpaper (for software deskew)
+# - flock (usually provided by util-linux) (for properly ordered verbose logs)
+
+
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+DEVICE=fujitsu
+OUTPUT=scan.pdf
+USEARRAY=0
+APPEND=0
+RESOLUTION=300
+MODE=Lineart
+SCRIPT="$DIR/scan_perpage"
+DUPLEX=0
+UNPAPER=0
+SEARCHABLE=0
+MAXPAGE=
+TRUNCPAGE=0
+HELP=0
+SIZE=Letter
+PGHEIGHT=
+PGHEIGHTIN=
+PGWIDTH=
+PGWIDTHIN=
+CROP=0
+DESKEW=0
+VERBOSE=0
+
+# Parse command-line options
+while [ $# -gt 0 ]; do
+  case "$1" in
+
+  -v|--verbose) VERBOSE=1 ;;
+
+  -d|--duplex) DUPLEX=1 ;;
+
+  -m|--mode) shift; MODE=$1 ;;
+
+  -r|--resolution) shift; RESOLUTION=$1 ;;
+
+  -a|--append) APPEND=1 ;;
+
+  -e|--max) shift; MAXPAGE=$1 ;;
+
+  -t|--truncate) shift; TRUNCPAGE=$1 ;;
+
+  -h|--help) HELP=1 ;;
+
+  -s|--size) shift; SIZE=$1 ;;
+
+  -ph|--page-height) shift; PGHEIGHT=$1 ;;
+
+  -pw|--page-width) shift; PGWIDTH=$1 ;;
+
+  --crop) CROP=1 ;;
+
+  --deskew) DESKEW=1 ;;
+
+  --unpaper) UNPAPER=1 ;;
+
+  --searchable|--ocr) SEARCHABLE=1 ;;
+
+  -o|--output) shift; OUTPUT="$1" ;;
+
+  -l|--outputlist) shift; USEARRAY=1; OUTPUT=(); OUTPUT+=("$1") ;;
+
+  *) if [ $USEARRAY = 1 ]; then OUTPUT+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
+
+  esac
+  shift   # next option
+done
+
+if [ $HELP -eq 1 ]; then
+  echo "$(basename $0) [OPTIONS]... [OUTPUT]"
+  echo ""
+  echo "OPTIONS"
+  echo " -v, --verbose"
+  echo "   Verbose output (this will slow down the scan due to the need to prevent interleaved output)"
+  echo " -d, --duplex"
+  echo "   Duplex scanning"
+  echo " -m, --mode"
+  echo "   Mode e.g. Lineart (default), Halftone, Gray, Color, etc."
+  echo " -r, --resolution"
+  echo "   Resolution e.g 300 (default)"
+  echo " -a, --append"
+  echo "   Append output to existing scan"
+  echo " -e, --max <pages>"
+  echo "   Max number of pages e.g. 2 (default is all pages)"
+  echo " -t, --truncate <pages>"
+  echo "   Truncate number of pages from end e.g. 1 (default is none)"
+  echo " -s, --size"
+  echo "   Page Size as type e.g. Letter (default), Legal, A4, no effect if --crop is specified"
+  echo " -ph, --page-height"
+  echo "   Custom Page Height in mm"
+  echo " -pw, --page-width"
+  echo "   Custom Page Width in mm"
+  echo " --crop"
+  echo "   Crop to contents (driver must support this)"
+  echo " --deskew"
+  echo "   Run driver deskew (driver must support this)"
+  echo " --unpaper"
+  echo "   Run post-processing deskew and black edge detection (requires unpaper)"
+  echo " --ocr"
+  echo "   Run OCR to make the PDF searchable (requires tesseract)"
+  echo ""
+  echo "OUTPUT"
+  echo " -o, --output <outputfile>"
+  echo "   Output to named file default=scan.pdf"
+  echo " -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append"
+  echo ""
+  exit 0
+fi
+
+if [ $USEARRAY = 0 -a -f "$OUTPUT" -a ! $APPEND = 1 ]; then
+  echo >&2 "Output file $OUTPUT already exists. Delete or specify -a. Aborting."
+  exit 1
+fi
+
+if [ $USEARRAY = 1 -a ! $APPEND = 1 ]; then
+  for o in "${OUTPUT[@]}"; do
+    if [ -f "$o" ]; then
+      echo >&2 "Output file $o already exists. Delete or specify -a. Aborting."
+      exit 1
+    fi
+  done
+fi
+
+SOURCE=""
+if [ $DUPLEX -eq 1 ]; then
+  SOURCE="--source \"ADF Duplex\""
+fi
+
+if [ "$MAXPAGE" != "" ]; then
+  MAXPAGE="-e $MAXPAGE"
+fi
+
+PS2PDF_OPTS=
+
+# Specify non-letter sizes in mm
+case "$SIZE" in
+
+  Letter) PGHEIGHTIN=11; PGWIDTHIN=8.5 ;;
+
+  Legal) PGHEIGHT=355.6; PGWIDTH=215.9 ;;
+
+  A4) PGHEIGHT=297; PGWIDTH=210 ;;
+
+esac
+
+if [ $CROP != 1 -a "$PGHEIGHT" != "" ]; then
+  PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
+  PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
+  PS2PDF_OPTS="-dEPSCrop"
+fi
+
+if [ $CROP != 1 -a "$PGWIDTH" != "" ]; then
+  PGWIDTHIN=$(units --compact -1 "$PGWIDTH mm" 'in')
+  PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
+  PS2PDF_OPTS="-dEPSCrop"
+fi
+
+if [ $CROP = 1 ]; then
+  CROP="--swcrop=yes"
+  PGHEIGHT=
+  PGWIDTH=
+  PGHEIGHTIN=
+  PGWIDTHIN=
+  PS2PDF_OPTS="-dEPSCrop"
+fi
+
+if [ $DESKEW = 1 ]; then
+  DESKEW="--swdeskew=yes"
+fi
+
+export VERBOSE
+export UNPAPER
+export SEARCHABLE
+export RESOLUTION
+export PGWIDTHIN
+export PGHEIGHTIN
+export PS2PDF_OPTS
+
+if [ $VERBOSE = 1 ]; then
+  LOCKFILE=$(mktemp)
+  trap "rm -rf $LOCKFILE" 0
+  export LOCKFILE
+fi;
+
+echo >&2 "Scanning..."
+#eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
+eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
+
+shopt -s extglob nullglob
+pdffiles=(scan-[0-9]*.pdf)
+numscans=${#pdffiles[@]}
+if [ $numscans -gt 0 ]; then
+  echo "Processing $numscans pages"
+  if [ $numscans -gt $TRUNCPAGE -a $TRUNCPAGE -gt 0 ]; then
+    for x in ${pdffiles[@]:$numscans-$TRUNCPAGE:$TRUNCPAGE}; do rm "$x"; done;
+    pdffiles=(${pdffiles[@]:0:$numscans-$TRUNCPAGE})
+    echo "Truncated $TRUNCPAGE pages"
+  fi
+  if [ $numscans -gt 1 -a $USEARRAY = 1 ]; then
+    echo "Naming pdfs based on output list..."
+    output_count=${#OUTPUT[@]}
+    index=0
+    while [ "$index" -lt "$output_count" ]; do
+      let "scanno = $index + 1"
+      if [ -f "${OUTPUT[$index]}" ]; then
+        mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
+        if [ $APPEND -eq 1 ]; then
+          pdffiles=()
+          if [ -f "${OUTPUT[$index]}.orig" ]; then
+            pdffiles+=("${OUTPUT[$index]}.orig")
+          fi
+          pdffiles+=(scan-*(0)$scanno.pdf)
+          pdfunite "${pdffiles[@]}" "${OUTPUT[$index]}" && rm scan-*(0)$scanno.pdf
+        else
+          mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+        fi
+      else
+        mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+      fi
+      let "index = $index + 1"
+    done
+  elif [ $numscans -gt 1 -o $APPEND -eq 1 ]; then
+    echo "Concatenating pdfs..."
+    if [ -f "$OUTPUT" ]; then
+      mv "$OUTPUT" "${OUTPUT}.orig"
+    fi
+    pdffiles=()
+    if [ -f "${OUTPUT}.orig" ]; then
+      pdffiles+=("${OUTPUT}.orig")
+    fi
+    pdffiles+=(scan-[0-9]*.pdf)
+    pdfunite "${pdffiles[@]}" "$OUTPUT" && rm scan-[0-9]*.pdf
+  else
+    if [ $USEARRAY = 1 ]; then
+      mv scan-0*.pdf "${OUTPUT[0]}"
+    else
+      mv scan-0*.pdf "$OUTPUT"
+    fi
+  fi
+  echo ""
+  echo "Done."
+else
+  echo "Found no scans."
+fi

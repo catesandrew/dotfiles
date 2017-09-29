@@ -1,0 +1,615 @@
+#!/usr/bin/env bash
+
+# CONSTANTS & VARIABLES (Common)
+
+# Project Root Dir
+readonly PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Level Colors
+readonly LEVEL_COLORS=(39 31 31 33 32 36)
+
+# CONSTANTS & VARIABLES (Project)
+
+# Script version
+readonly VERSION=0.0.1
+
+# List of requieed tools, example: REQUIRED_TOOLS=(git ssh)
+readonly REQUIRED_TOOLS=(docker)
+
+# Long Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly LONG_OPTS=(help version run: name: data:)
+
+# Short Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly SHORT_OPTS=hvr:n:d:
+
+# Script name
+readonly SCRIPT_NAME=${0##*/}
+
+readonly RUN_LEVELS=(1 2 3 4 5 6 7 8 9 10 11)
+readonly RUN_DEFAULT=1
+declare -i run_level="$RUN_DEFAULT"
+
+## CORE
+
+readonly NAME_DEFAULT=david
+declare name="$NAME_DEFAULT"
+
+# The port of the plantuml server.
+readonly PORT_DEFAULT=8080
+declare port="${PORT_DEFAULT}"
+
+# FUNCTIONS
+
+# Print out messages to STDERR.
+function ech() { echo -e "$@" >&2; }
+
+# Print out error messages to STDERR.
+function err() { echo -e "\033[0;31mERROR: $@\033[0m" >&2; }
+
+# Shows an error if required tools are not installed.
+function required {
+  local e=0
+  for tool in "$@"; do
+    type $tool >/dev/null 2>&1 || {
+      e=1 && err "$tool is required for running this script. Please install $tool and try again."
+    }
+  done
+  [[ $e < 1 ]] || exit 2
+}
+
+# help command
+function help_command() {
+  cat <<END;
+
+USAGE:
+  $SCRIPT_NAME [options] <command>
+
+OPTIONS:
+  --run <level>, -r       Run a docker command
+  --help, -h              help
+  --version, -v           version
+  --
+
+COMMANDS:
+  help                    Display detailed help
+  version                 Print version information.
+
+END
+  exit 1
+}
+
+# version command
+function version_command() {
+  echo "$SCRIPT_NAME version $VERSION"
+}
+
+# default command
+function default_command() {
+  # set default command here
+  run_command
+}
+
+function name_command() {
+  name="$1"
+}
+
+function run_command() {
+  local not_found
+  not_found=true
+
+  for level in "${!RUN_LEVELS[@]}"; do
+    [[ "${RUN_LEVELS[$level]}" = "$1" ]] && run_level="$1" && not_found=false
+  done
+
+  if [ "$not_found" = true ]; then
+     err "Unknown run '$1'" && exit 2
+  fi
+
+  case "$run_level" in
+    1)  run1 ;;
+    2)  run2 ;;
+    3)  run3 ;;
+    4)  run4 ;;
+    5)  run5 ;;
+    6)  run6 ;;
+    7)  run7 ;;
+    8)  run8 ;;
+    9)  run9 ;;
+    10)  run10 ;;
+    11)  run11 ;;
+    *)  err "Unknown run '$run_level'"; exit 2; ;;
+  esac
+}
+
+run1 () {
+    # .git/config
+    # before:
+	# url = git@andrew.git.ibaset.com:apiary/api-sqa.git
+    # after:
+	# url = git@andrew.gitlab.cates.io:apiary/alameda.git
+
+    sed -i '' 's/git.ibaset.com/gitlab.cates.io/g' "$(pwd)/.git/config"
+}
+
+run2 () {
+    echo "*.pdf         binary" >> .gitattributes
+    echo "" >> .gitattributes
+    echo "# LFS" >> .gitattributes
+    echo "assets/*.psd filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.pdf filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.mov filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.mov filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.jpeg filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.jpg filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.png filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "assets/*.gif filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+    echo "" >> .gitattributes
+    echo "# ProTip: Files that can change in random order" >> .gitattributes
+    echo "CHANGELOG.md  merge=union" >> .gitattributes
+}
+
+run3 () {
+
+  if [[ -f README.md ]]; then
+    gsed -i 's/git.ibaset.com/gitlab.cates.io/g' "$(pwd)/README.md"
+    gsed -i 's/\[!\[Build Status (master)\]\[ci-master-status\]\]\[ci-master-url\] //g' "$(pwd)/README.md"
+    gsed -i 's/\[!\[Build Status (develop)\]/\[!\[Build Status\]/g' "$(pwd)/README.md"
+    gsed -i 's/\[!\[Dependency Status\]\[daviddm-url\]\]\[daviddm-image\]/\[!\[Dependency Status\]\[daviddm-image\]\]\[daviddm-url\]/g' "$(pwd)/README.md"
+    gsed -i 's/GitLab Issues/Redmine Issues/g' "$(pwd)/README.md"
+    gsed -i -re 's|npm.ibaset.com/([^/]*)/latest|npm.cates.io/package/\1|g' "$(pwd)/README.md"
+    gsed -i -re 's|badge.fury.io/js/([^.]*).svg|shields.cates.io/npm/v/\1.svg|g' "$(pwd)/README.md"
+
+    local group=$(gsed -n -E 's|\[daviddm-url\]: https://david.ibase.com/([^/]*)/([^.]*)\.svg\?theme=shields\.io|\1|p' "$(pwd)/README.md")
+    local repo=$(gsed -n -E 's|\[daviddm-url\]: https://david.ibase.com/([^/]*)/([^.]*)\.svg\?theme=shields\.io|\2|p' "$(pwd)/README.md")
+
+    gsed -i -E 's|david.ibase.com/([^/]*)/([^.]*)\.svg\?theme=shields\.io|david.cates.io/r/gitlab/\1/\2|g' "$(pwd)/README.md"
+
+    gsed -i -E 's|david.ibaset.com/([^/]*)/(.*)$|david.cates.io/r/gitlab/\1/\2.svg|g' "$(pwd)/README.md"
+    gsed -i -E 's/^\[ci-master-url\].*$//g' "$(pwd)/README.md"
+    gsed -i -E 's/^\[ci-master-status\].*$//g' "$(pwd)/README.md"
+    gsed -i -E "s|git-ci.ibaset.com/projects/([0-9]+)?\?ref=develop|gitlab.cates.io/${group}/${repo}/commits/develop|g" "$(pwd)/README.md"
+    gsed -i -E "s|git-ci.ibaset.com/projects/[^/]*/status\.png\?ref=develop|gitlab.cates.io/${group}/${repo}/badges/develop/build.svg|g" "$(pwd)/README.md"
+
+    gsed -i -E "s/-[ ]+Copyright \(c\) [0-9]+ \[iBASEt\]\[ibaset-url\]//g" "$(pwd)/README.md"
+    gsed -i -E "s/-[ ]+Designed with ❤ and care by \[iBASEt\]\[ibaset-url\]//g" "$(pwd)/README.md"
+
+    gsed -i -E "s/iBASEt private registry: \`npm set registry https:\/\/npm.ibaset.com\`/following private registry: \`npm set registry https:\/\/registry.cates.io\`/g" "$(pwd)/README.md"
+    gsed -i -E "s/iBASEt private registry: \`npm set registry https:\/\/npm.ibaset.com\/\`/following private registry: \`npm set registry https:\/\/registry.cates.io\`/g" "$(pwd)/README.md"
+
+    gsed -i -E "s/\[ibaset-url\]/\[co-url\]/g" "$(pwd)/README.md"
+    gsed -i -E "s/https:\/\/www\.ibaset\.com/https:\/\/www\.cates\.io/g" "$(pwd)/README.md"
+
+    gsed -i -E "s/^\[ibaset-pages-url\].*$//g" "$(pwd)/README.md"
+
+    gsed -i -E "s/apiary\/git-hooks/vine\/git-hooks/g" "$(pwd)/README.md"
+
+    gsed -i -re "s|\[npm-url\]: https://npm.ibaset.com/([^/]*)/([^/]*)/latest|\[npm-url\]: https://npm.cates.io/package/${repo}|g" "$(pwd)/README.md"
+
+    gsed -i -re "s|\[npm-www\]: https://npm.ibaset.com/|\[npm-www\]: https://npm.cates.io/|g" "$(pwd)/README.md"
+  fi
+}
+
+run4 () {
+  if [[ -f CHANGELOG.md ]]; then
+    gsed -i 's/git.ibaset.com/gitlab.cates.io/g' "$(pwd)/CHANGELOG.md"
+  fi
+
+  if [[ -f CODE_OF_CONDUCT.md ]]; then
+    gsed -i 's/team at los angeles/admin/g' "$(pwd)/CODE_OF_CONDUCT.md"
+    gsed -i 's/team-losangeles@ibaset.com/gitlab@cates.io/g' "$(pwd)/CODE_OF_CONDUCT.md"
+  fi
+
+  if [[ -f CONTRIBUTING.md ]]; then
+    gsed -i 's/git.ibaset.com/gitlab.cates.io/g' "$(pwd)/CONTRIBUTING.md"
+  fi
+
+  if [[ -f LICENSE.md ]]; then
+    gsed -i 's/iBASEt, Inc\./Cates IO/g' "$(pwd)/LICENSE.md"
+    gsed -i 's/iBASEt/Cates IO/g' "$(pwd)/LICENSE.md"
+  fi
+
+  if [[ -f README.md ]]; then
+    gsed -i 's/: `npm install /: `npm install @cats\//g' "$(pwd)/README.md"
+    gsed -i -re 's/.*?Note_: Use the following privat.*/- Associate the `@cats` scope using: `npm config set @cats:registry https:\/\/registry.cates.io`/g' "$(pwd)/README.md"
+    gsed -i -re 's/.*?Note:_ Use the following privat.*/- Associate the `@cats` scope using: `npm config set @cats:registry https:\/\/registry.cates.io`/g' "$(pwd)/README.md"
+    gsed -i -re 's/.*?Note:\* Use the following privat.*/- Associate the `@cats` scope using: `npm config set @cats:registry https:\/\/registry.cates.io`/g' "$(pwd)/README.md"
+
+    gsed -i -re "s|\[npm-url\]: https://npm.cates.io/package/([^/]*)|\[npm-url\]: https://npm.cates.io/package/@cats/\1|g" "$(pwd)/README.md"
+    gsed -i -re "s|\[npm-image\]: https://shields.cates.io/npm/v/([^/]*)|\[npm-image\]: https://shields.cates.io/npm/v/@cats/\1|g" "$(pwd)/README.md"
+  fi
+
+  if [[ -f package.json ]]; then
+    gsed -i 's/git.ibaset.com/gitlab.cates.io/g' "$(pwd)/package.json"
+    gsed -i -re 's|"name": "([^/]*)"|"name": "@cats/\1"|g' "$(pwd)/package.json"
+    gsed -i -re 's|"homepage": "https://pages.ibaset.com/pages/([^/]*)/([^/]*)/?"|"homepage": "https://gitlab.cates.io/\1/\2"|g' "$(pwd)/package.json"
+
+    gsed -i -re 's|"name": "@cats/Andrew Cates"|"name": "Andrew Cates"|g' "$(pwd)/package.json"
+    gsed -i -re 's|"email": "catesandrew@gmail.com"|"email": "andrew@cates.io"|g' "$(pwd)/package.json"
+
+    tfn="$(mktemp package.XXXXXX)" && \
+      jq --monochrome-output --raw-output 'del(.publishConfig)' package.json >| "$tfn" && \
+      mv "$tfn" package.json
+  fi
+
+  if [[ -f .eslintrc ]]; then
+    gsed -i -re 's|"extends": \["lakewood"\]|"extends": ["@cats/lakewood"]|g' "$(pwd)/.eslintrc"
+    gsed -i -re 's|"extends": \["rodeo"\]|"extends": ["@cats/rodeo"]|g' "$(pwd)/.eslintrc"
+    gsed -i -re 's|"extends": \["sierra"\]|"extends": ["@cats/sierra"]|g' "$(pwd)/.eslintrc"
+    gsed -i -re 's|"extends": \["soto"\]|"extends": ["@cats/soto"]|g' "$(pwd)/.eslintrc"
+  fi
+
+  if [[ -f .tern-project ]]; then
+    cat <<EOF >| .tern-project
+{
+  "ecmaVersion": 6,
+  "loadEagerly": [
+    "lib/**/*.js"
+  ],
+  "dontLoad": [
+    "node_modules/**"
+  ],
+  "libs": [
+    "browser",
+    "ecmascript",
+    "chai"
+  ],
+  "plugins": {
+    "node": {},
+    "node_resolve": {},
+    "modules": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    },
+    "es_modules": {},
+    "complete_strings": {}
+  }
+}
+EOF
+  fi
+}
+
+readonly packages=(alameda alameda-cli apollo bento bin-proxy boot2docker-vagrant-box brazen chai-moment chai-prop chai-vinyl chalk-console-log chalk-json child-process coldwater demindo denodeify dependencymanager deprecate dhtmlx doc-code-of-conduct doc-contributing doc-editorconfig doc-eslintignore doc-gitattributes doc-gitignore doc-jsbeautifyrc doc-jsdoc doc-license doc-npmignore doc-remarkrc el-segundo el-segundo-common eldred eslint-config-es6 eslint-config-es7 eslint-config-lakewood eslint-config-reset eslint-config-rodeo eslint-config-sierra eslint-config-soto express-app-links express-dux express-ensure-ssl express-expose-flash express-flash-errors express-flash-fields express-flash-local express-flash-messages express-i18n express-live-reload-inject express-read-template express-require-login express-rest express-routes express-validation file foothill foothill-stream gamble-36 generator-apiary-cooker generator-apib generator-gleaves generator-gower generator-lakewood generator-md-doc generator-rodeo generator-sierra generator-soto git-flow git-hooks got-git grunt-drafter grunt-hornet grunt-mock-server grunt-qooxdoo-generate gulp-alameda gulp-combine gulp-i18n hbs-helpers hood hornet jintsu js-par js-par-cli kent la-globals laffey leon leon-config-defaults long-beach make-globals makemate makemate-cli makemate-config-defaults md-inject-cli memo mock-server module-resolver module-wire node-backbone node-backbone-jsonapi node-backbone-relational node-backbone-tastypie node-json-api normandie npm-deps-graph npm-find-prefix npm-in-what npm-latest npm-publish-webhook npm-to-publish npm-to-publish-aio npm-to-publish-cli npm-to-publish-plugin-git-hooks npm-to-publish-plugin-grunt npm-to-publish-plugin-gulp npm-to-publish-plugin-shrinkwrap nubian osx-vm-templates package-diff packer-templates passport-server peer-dependency perth-encoding promise-factory promise-replace qooxdoo qooxdoo-contrib-dialog qooxdoo-contrib-uploadmgr raphael rgraph rosecrans rosemead runt runt-cli script-globals session-manager simple-inherits spawner talon talon-cli template version-gen vinyl-foothill watch watch-cli yura-config)
+
+run5 () {
+  if [[ -f package.json ]]; then
+    for i in ${!packages[@]}; do
+      pkg=${packages[$i]}
+    done
+
+    deps=( $(deps) )
+    dev_deps=( $(dev-deps) )
+
+    for i in ${!deps[@]}; do
+      dep=${deps[$i]}
+      # jq -r '.dependencies + {"@cats/bin-proxy": .["bin-proxy"]} | del(.["bin-proxy"])' package.json
+      # jq -r '.dependencies | with_entries( if .key == "bin-proxy" then .key = "@cats/" + .key else . end)' package.json
+      # jq -r '.dependencies = (.dependencies | with_entries( if .key == "bin-proxy" then .key = "@cats/" + .key else . end))' package.json
+      tfn="$(mktemp package.XXXXXX)" && \
+        jq --monochrome-output --raw-output ".dependencies = (.dependencies | with_entries( if .key == \"$dep\" then .key = \"@cats/\" + .key else . end))" package.json >| "$tfn" && \
+        mv "$tfn" package.json
+
+      gsed -i -re "s|desire\('([^']*)', '$dep'\)|desire('\1', '@cats/$dep')|g" "$(pwd)/lib/index.js"
+
+      find . -name "*.js" ! -path "*node_modules*" | while IFS= read -r file; do
+        gsed -i -re "s|require\('$dep'\)|require('@cats/$dep')|g" "$file"
+      done
+    done
+
+    for i in ${!dev_deps[@]}; do
+      dep=${dev_deps[$i]}
+      tfn="$(mktemp package.XXXXXX)" && \
+        jq --monochrome-output --raw-output ".devDependencies = (.devDependencies | with_entries( if .key == \"$dep\" then .key = \"@cats/\" + .key else . end))" package.json >| "$tfn" && \
+        mv "$tfn" package.json
+
+      gsed -i -re "s|desire\('([^']*)', '$dep'\)|desire('\1', '@cats/$dep')|g" "$(pwd)/lib/index.js"
+      find . -name "*.js" ! -path "*node_modules*" | while IFS= read -r file; do
+        gsed -i -re "s|require\('$dep'\)|require('@cats/$dep')|g" "$file"
+      done
+    done
+  fi
+}
+
+
+run6 () {
+  for i in ${!packages[@]}; do
+    pkg=${packages[$i]}
+    find . -name "*.js" ! -path "*node_modules*" | while IFS= read -r file; do
+      gsed -i -re "s|'$pkg'|'@cats/$pkg'|g" "$file"
+    done
+  done
+}
+
+containsElement () {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+deps () {
+  cat package.json |
+    jq -r '.dependencies | keys | .[]' 2>/dev/null |
+    while read -r key; do
+      containsElement $key ${packages[@]}
+      if [ $? -eq 0 ]; then
+        # yes, list include item
+        echo $key
+      else
+        # echo "did not find $key"
+        true
+      fi
+    done
+}
+
+dev-deps() {
+  cat package.json |
+    jq -r '.devDependencies | keys | .[]' 2>/dev/null |
+    while read -r key; do
+      containsElement $key ${packages[@]}
+      if [ $? -eq 0 ]; then
+        # yes, list include item
+        echo $key
+      else
+        # echo "did not find $key"
+        true
+      fi
+    done
+}
+
+run7 () {
+  if [[ -f package.json ]]; then
+    tfn="$(mktemp package.XXXXXX)" && \
+      jq --monochrome-output --raw-output 'del(.scripts.prepublish)' package.json >| "$tfn" && \
+      mv "$tfn" package.json
+
+    tfn="$(mktemp package.XXXXXX)" && \
+      jq --monochrome-output --raw-output 'del(.scripts.postpublish)' package.json >| "$tfn" && \
+      mv "$tfn" package.json
+  fi
+}
+
+run8 () {
+  folders=( $(\ls -d -- *) )
+  for i in ${!folders[@]}; do
+    folder=${folders[$i]}
+    if [ $folder = "aeon-cli" ]; then continue; fi
+
+    cd $folder
+    tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+    branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+    if [ ! $branch = "develop" ]; then
+      echo "$folder not on 'develop' branch."
+      continne
+    fi
+
+    if [ -d "node_modules" ]; then
+      \rm -rf node_modules
+    fi
+
+    # find version number assignment ("= v1.5.5" for example)
+    # and replace it with newly specified version number
+    # sed -i.backup -E "s/\= v[0-9.]+/\= $versionLabel/" $versionFile $versionFile
+
+    version=$(echo $tag | gsed -E 's/v([0-9\.]+)/\1/g')
+
+
+    printf "%s\t%s\t%s\n" $folder $tag $version
+
+    git checkout "${tag}"
+    run7
+    npm unpublish "@cats/${folder}@${version}" --force 2>/dev/null
+    # type $tool >/dev/null 2>&1 || {
+    npm unpublish "@cats/${folder}@${version}" --force 2>/dev/null
+    npm publish
+    git checkout .
+    git checkout $branch
+
+
+    cd ..
+  done
+
+
+  tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+
+}
+
+run9 () {
+  folders=( $(\ls) )
+  # folders=("alameda" "advisable")
+  for i in ${!folders[@]}; do
+    folder=${folders[$i]}
+
+    # printf "%s\t%s\n" $i $folder
+    cd $folder
+
+    cat package.json |
+      jq -r '.versions | keys | .[]' 2>/dev/null |
+      while read -r key; do
+        # echo $key;
+        # cat package.json | \
+        #   jq -r ".versions[\"$key\"].repository.url" | \
+        #   grep "git.ibaset.com"
+
+        cat package.json |
+          jq -r ".versions[\"$key\"].repository.url" 2>/dev/null |
+          grep -q "git.ibaset.com"
+
+        if [ $? -eq 0 ]
+        then
+          # echo "found $folder v$key"
+          pkg="${folder}-${key}.tgz"
+          if [ -f $pkg ]; then
+            echo "${folder}"
+            # echo "publishing: ${pkg##*/}"
+            # tar -C . -xzf "${pkg##*/}"
+            # cd ./package
+            # run4
+            # npm publish
+            # cd ..
+            # rm -rf ./package
+            break
+          fi
+        else
+          # echo "not found" >&2
+          true
+        fi
+      done
+
+    cd ..
+  done
+}
+
+run10 () {
+  folders=( $(\ls -d -- *) )
+  for i in ${!folders[@]}; do
+    folder=${folders[$i]}
+    if [ $folder = "aeon-cli" ]; then continue; fi
+    if [ $folder = "generator-flux-webapp" ]; then continue; fi
+    if [ $folder = "generator-project-esnow" ]; then continue; fi
+    if [ $folder = "generator-webapp" ]; then continue; fi
+    if [ $folder = "gitlab-ci-yml" ]; then continue; fi
+    if [ $folder = "react-starter-kit" ]; then continue; fi
+
+
+    cd $folder
+    tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+    branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+    if [ ! $branch = "develop" ]; then
+      echo "$folder not on 'develop' branch."
+      continne
+    fi
+
+    if [ -d "node_modules" ]; then
+      \rm -rf node_modules
+    fi
+
+    # find version number assignment ("= v1.5.5" for example)
+    # and replace it with newly specified version number
+    # sed -i.backup -E "s/\= v[0-9.]+/\= $versionLabel/" $versionFile $versionFile
+
+    version=$(echo $tag | gsed -E 's/v([0-9\.]+)/\1/g')
+    retval="$(git diff-index --quiet HEAD --)"
+    if [  $? -eq 0 ]; then
+        printf "%s\t%s\t%s\n" $folder $tag $version
+        run7
+        npm unpublish "@cats/${folder}@${version}" --force 2>/dev/null
+        npm unpublish "@cats/${folder}@${version}" --force 2>/dev/null
+        npm cache clean 2>/dev/null
+        npm publish
+        git checkout .
+    else
+        printf "dirty: %s\t%s\t%s\n" $folder $tag $version
+    fi
+
+    cd ..
+  done
+}
+
+run11 () {
+  group="backbone"
+  folders=( $(\ls -d -- *) )
+  for i in ${!folders[@]}; do
+    folder=${folders[$i]}
+    if [ $folder = "aeon-cli" ]; then continue; fi
+
+    cd $folder
+
+    git checkout .
+    run4
+    run5
+
+    if [[ -f README.md ]]; then
+      echo "" >> $(pwd)/README.md
+      echo "" >> $(pwd)/README.md
+      echo "[![Build Status][ci-develop-status]][ci-develop-url] [![NPM version][npm-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]" >> $(pwd)/README.md
+      echo "" >> $(pwd)/README.md
+      echo "[npm-url]: https://npm.cates.io/package/@cats/${folder}" >> $(pwd)/README.md
+      echo "[npm-image]: https://shields.cates.io/npm/v/@cats/${folder}.svg" >> $(pwd)/README.md
+      echo "[daviddm-url]: https://david.cates.io/r/gitlab/${group}/${folder}" >> $(pwd)/README.md
+      echo "[daviddm-image]: https://david.cates.io/r/gitlab/${group}/${folder}.svg" >>$(pwd)/README.md
+      echo "[ci-develop-url]: https://gitlab.cates.io/${group}/${folder}/commits/develop">> $(pwd)/README.md
+      echo "[ci-develop-status]: https://gitlab.cates.io/${group}/${folder}/badges/develop/build.svg">> $(pwd)/README.md
+    fi
+
+    cd ..
+  done
+}
+
+
+# MAIN
+function main() {
+  # Required tools
+  required $REQUIRED_TOOLS
+
+  # Parse options
+  while [[ $# -ge $OPTIND ]] && eval opt=\${$OPTIND} || break
+        [[ $opt == -- ]] && shift && break
+        if [[ $opt == --?* ]]; then
+          opt=${opt#--}; shift
+
+          # Argument to option ?
+          OPTARG=;local has_arg=0
+          [[ $opt == *=* ]] && OPTARG=${opt#*=} && opt=${opt%=$OPTARG} && has_arg=1
+
+          # Check if known option and if it has an argument if it must:
+          local state=0
+          for option in "${LONG_OPTS[@]}"; do
+            [[ "$option" == "$opt" ]] && state=1 && break
+            [[ "${option%:}" == "$opt" ]] && state=2 && break
+          done
+          # Param not found
+          [[ $state = 0 ]] && OPTARG=$opt && opt='?'
+          # Param with no args, has args
+          [[ $state = 1 && $has_arg = 1 ]] && OPTARG=$opt && opt=::
+          # Param with args, has no args
+          if [[ $state = 2 && $has_arg = 0 ]]; then
+            [[ $# -ge $OPTIND ]] && eval OPTARG=\${$OPTIND} && shift || { OPTARG=$opt; opt=:; }
+          fi
+
+          # for the while
+          true
+        else
+          getopts ":$SHORT_OPTS" opt
+        fi
+  do
+    case "$opt" in
+      # List of options
+      v|version)    version_command; exit 0; ;;
+      h|help)       help_command ;;
+      r|run)        run_command "$OPTARG"; exit 0; ;;
+      n|name)       name_command "$OPTARG" ;;
+      d|data)       data_command "$OPTARG" ;;
+      # Errors
+      ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
+      :)	err "Missing argument to option '$OPTARG'"; exit 2; ;;
+      \?)	err "Unknown option '$OPTARG'"; exit 2; ;;
+      *)	err "Internal script error, unmatched option '$opt'"; exit 2; ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # No more arguments -> call default command
+  [[ -z "$1" ]] && default_command
+
+  # Set command and arguments
+  command="$1" && shift
+  args="$@"
+
+  # Execute the command
+  case "$command" in
+    # help
+    help)     help_command ;;
+
+    # version
+    version)  version_command ;;
+
+    # Unknown command
+    *)        err "Unknown command '$command'"; exit 2; ;;
+  esac
+}
+
+main "$@"

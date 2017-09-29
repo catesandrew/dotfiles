@@ -62,31 +62,54 @@ complete -F _complete_alias ka
 ### cluster-info command
 alias kci='k cluster-info'
 
+# _kubectl_config                  _kubectl_config_get-contexts     _kubectl_config_set-credentials
+# _kubectl_config_current-context  _kubectl_config_rename-context   _kubectl_config_unset
+# _kubectl_config_delete-cluster   _kubectl_config_set              _kubectl_config_use-context
+# _kubectl_config_delete-context   _kubectl_config_set-cluster      _kubectl_config_view
+# _kubectl_config_get-clusters     _kubectl_config_set-context
+
 ## Config
-alias kc='k config'
-complete -F _complete_alias kc
+function kc() {
+  k config "$@"
+}
+__kubectl_complete kc _kubectl_config
 
 ## * Check the location and credentials known about with this command:
-alias kcv='kc view'
+function kcv() {
+  kc view "$@"
+}
+__kubectl_complete kcv _kubectl_config_view
 
 # Get the public IP address of one of your nodes. Either, `kubectl
 # cluster-info`, or if you are using Google Compute Engine instances, you
 # can use the `gcloud compute instances list` command to see the public
 # addresses of your nodes.
 
-
 ## Manage configuration quickly to switch contexts between local, dev ad staging.
-alias kcuc='k config use-context'
-complete -F _complete_alias kcuc
+function kcuc() {
+  kc use-context "$@"
+}
+__kubectl_complete kcuc _kubectl_config_use-context
 
-alias kcsc='k config set-context'
-complete -F _complete_alias kcsc
+function kcsc() {
+  kc set-context "$@"
+}
+__kubectl_complete kcsc _kubectl_config_set-context
 
-alias kcdc='k config delete-context'
-complete -F _complete_alias kcdc
+function kcdc() {
+  kc delete-context "$@"
+}
+__kubectl_complete kcdc _kubectl_config_delete-context
 
-alias kccc='k config current-context'
-complete -F _complete_alias kccc
+function kccc() {
+  kc current-context "$@"
+}
+__kubectl_complete kccc _kubectl_config_current-context
+
+function kcls() {
+  kc get-contexts "$@"
+}
+__kubectl_complete kcls _kubectl_config_get-contexts
 
 ### Setting the namespace preference
 
@@ -220,6 +243,11 @@ function kgj() {
 }
 __kubectl_complete kgj _kubectl_get
 
+function kgy() {
+  k get -o yaml "$@"
+}
+__kubectl_complete kgy _kubectl_get
+
 #### get namespaces
 function kgns() {
   kg namespace "$@"
@@ -294,7 +322,7 @@ kls() {
   if [ $# -eq 0 ]; then
     # kg -o wide all
 
-    for cmd in pods services deployments replicasets jobs endpoints ingress; do
+    for cmd in pods services deployments replicasets replicationcontroller jobs endpoints ingress; do
       if ! k get $cmd 2>&1 | grep 'No resources found' > /dev/null 2>&1; then
         echo ""
         echo "$cmd:"

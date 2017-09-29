@@ -1,0 +1,134 @@
+#!/bin/bash
+# Usage: scan_perpage <imagefile>
+#   where imagefile is the data just scanned
+# (specify this script to scanadf via -S)
+
+# SANE Command-Line Scan to PDF
+
+# Sane command-line scanning bash shell script on Linux with OCR and deskew support. The script automates
+# common scan-to-pdf operations for scanners with an automatic document feeder, such as the awesome Fujitsu
+# ScanSnap S1500, with output to PDF files.
+
+# Tested and run regularly on Fedora, but should work on other distributions with the requirements below.
+
+# ## Features
+
+# - Join scanned pages into a single output file, or specify a name for each page
+# - Deskew (if supported by scanner driver, or software-based via unpaper)
+# - Crop (if supported by scanner driver)
+# - Creates searchable PDFs (with tesseract)
+# - Duplex (if scanner supports it)
+# - Specify resolution
+# - Truncate n pages from end of scan e.g. duplex scanning with last page truncated
+# - Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
+
+# ## Requirements
+
+# - bash
+# - pnmtops (netpbm-progs)
+# - ps2pdf (ghostscript)
+
+# ## Optional
+
+# - unpaper (for software deskew)
+# - flock (usually provided by util-linux) (for properly ordered verbose logs)
+
+
+usage()
+{
+  echo "Usage: $0 <imagefile>"
+  echo "Set the following environment variables:"
+  echo "  UNPAPER"
+  echo "  SEARCHABLE"
+  echo "  RESOLUTION"
+  echo "  PGWIDTHIN"
+  echo "  PGHEIGHTIN"
+  echo "  PS2PDF_OPTS (optional)"
+  echo "  VERBOSE (optional)"
+  echo "  LOCKFILE (required if VERBOSE=1)"
+}
+
+log()
+{
+  if [ $VERBOSE = 1 ]; then
+    echo "scan_perpage: $1"
+  fi
+}
+
+logstdout()
+{
+  if [ $VERBOSE = 1 ]; then
+    cat
+  else
+    cat > /dev/null
+  fi
+}
+
+if [ $# -lt 1 ]; then
+  usage
+  exit 1
+fi
+
+if [ "$UNPAPER" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" ]; then
+  usage
+  exit 1
+fi
+
+IMAGE_FILE=$1
+
+process_page() {
+  log ""
+  log "-------------------------------------------------------------------------------"
+  log "Post-processing scanned page ${IMAGE_FILE}, deskew=$UNPAPER, searchable=$SEARCHABLE..."
+
+  PP_PREFIX=
+  if [ $UNPAPER -eq 1 ]; then
+    log "Applying unpaper post-processing to image data..."
+    PP_PREFIX="unpaper-"
+    if [ $VERBOSE = 1 ]; then
+      UNPAPERVERBOSE="-v"
+    fi
+    #unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
+    unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
+  fi
+  log ""
+  log "-------------------------------------------------------------------------------"
+  log "Converting image data to pdf..."
+  if [ $SEARCHABLE -eq 1 ]; then
+    log "Converting image data to searchable pdf..."
+    tesseract $PP_PREFIX$IMAGE_FILE ${IMAGE_FILE%.*} -l eng pdf | logstdout
+  else
+    log "Converting image data to pdf..."
+    PNMVERBOSE=
+    if [ $VERBOSE = 1 ]; then
+      PNMVERBOSE="-verbose"
+    fi
+    if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
+      PAGEOPTS="-equalpixels -dpi=$RESOLUTION -noturn"
+    else
+      PAGEOPTS="-imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN"
+    fi
+    log "Using page options: $PAGEOPTS"
+    pnmtops $PNMVERBOSE $PAGEOPTS $PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > ${IMAGE_FILE%.*}.pdf | logstdout
+  fi
+  
+  status=$?
+  rm $IMAGE_FILE
+  if [ -f $PP_PREFIX$IMAGE_FILE ]; then
+    rm $PP_PREFIX$IMAGE_FILE
+  fi
+
+  log ""
+  log "Scan processing done, status = $status"
+}
+
+if [ $VERBOSE = 1 ]; then
+  (
+    flock 200
+    process_page
+  ) 200>$LOCKFILE
+else
+  process_page
+fi;
+
+exit $status
