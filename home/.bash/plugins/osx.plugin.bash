@@ -67,8 +67,26 @@ function wifi() {
 }
 
 # brew install dnsmasq
+
+# Query launchd(8) to find out its exit status:
+#
+#     launchctl list | grep mytask
+#
+# this will return a line line this:
+#
+#     <pid> <status> mytask
+#
+# When `pid` is a number, the job is currently running. Otherwise have a look
+# at `status`, which is the exit code of the program, node in your case. An
+# exit code of 0 means either that the program was finished successfully or
+# that is has not been started yet. Positive numbers are returned for program
+# errors, while negative ones mean that the job has terminated due to a signal.
+
 if brew_contains_element "dnsmasq"; then
   function daemon-dnsmasq() {
+    local plist=/Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+    local status
+
     case "$#" in
       0)
         echo >&2 "Usage: daemon-dnsmasq [restart|on|off]"
@@ -76,22 +94,26 @@ if brew_contains_element "dnsmasq"; then
       *)
         cmd="$1"
         shift
-
-        case "$cmd" in
+        if [ -f $plist ]; then
+          case "$cmd" in
           restart)
-            sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
-            sudo launchctl load -w /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+            status=$(sudo launchctl list | grep dnsmasq | awk '{ print $1 }')
+            if [[ "$status" -gt 0 ]]; then
+              sudo launchctl unload "$plist"
+              sudo launchctl load -w "$plist"
+            fi
             ;;
           on)
-            sudo launchctl load -w /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+            sudo launchctl load -w "$plist"
             ;;
           off)
-            sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+            sudo launchctl unload "$plist"
             ;;
           *)
             echo >&2 "Usage: daemon-dnsmasq [restart|on|off]"
             ;;
-        esac
+          esac
+        fi
     esac
   }
 fi
@@ -131,9 +153,10 @@ if brew_contains_element "openconnect"; then
               echo >&2 "Error: missing environment variable OPENCONNECT_URL"
             else
               vpn destroy
-              local __vpn_pass
-              __vpn_pass=$(security find-generic-password -a openconnect-vpn -w)
-              echo -n "${__vpn_pass}" | sudo openconnect --config "${HOME}/.openconnect" --pid-file="${__pidfile_oc}" "${OPENCONNECT_URL}"
+              # local __vpn_pass
+              # __vpn_pass=$(security find-generic-password -a openconnect-vpn -w)
+              # echo -n "${__vpn_pass}" | sudo openconnect --config "${HOME}/.openconnect" --pid-file="${__pidfile_oc}" "${OPENCONNECT_URL}"
+              sudo openconnect --config "${HOME}/.openconnect" --pid-file="${__pidfile_oc}" "${OPENCONNECT_URL}"
             fi
             ;;
           off)
