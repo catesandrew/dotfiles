@@ -123,10 +123,10 @@ ksetns() {
   fi
 }
 
-### Validate it
-kgetns() {
-  kc view | grep namespace | awk '{ print $2 }';
-}
+# ### Validate it
+# kgetns() {
+#   kc view | grep namespace | awk '{ print $2 }';
+# }
 
 ## Copy
 alias kcp='k copy'
