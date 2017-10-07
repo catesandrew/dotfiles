@@ -22,6 +22,11 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     _completion_loader gwhich
   fi
 
+  if brew_contains_element "gnu-tar"; then
+    alias tar='gtar'
+    _completion_loader gtar
+  fi
+
   if brew_contains_element "findutils"; then
     alias find='gfind'
     alias locate='glocate'
@@ -31,6 +36,52 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     _completion_loader glocate
     _completion_loader gxargs
     _completion_loader gupdatedb
+  fi
+
+  if brew_contains_element "curl"; then
+    alias curl='/usr/local/opt/curl/bin/curl'
+    alias curl-config='/usr/local/opt/curl/bin/curl-config'
+  fi
+
+  if brew_contains_element "expat"; then
+    alias xmlwf='/usr/local/opt/expat/bin/xmlwf'
+  fi
+
+  if brew_contains_element "libiconv"; then
+    alias iconv='/usr/local/opt/libiconv/bin/iconv'
+  fi
+
+  if brew_contains_element "libxml2"; then
+    alias xml2-config='/usr/local/opt/libxml2/bin/xml2-config'
+    alias xmlcatalog='/usr/local/opt/libxml2/bin/xmlcatalog'
+    alias xmllint='/usr/local/opt/libxml2/bin/xmllint'
+  fi
+
+  if brew_contains_element "openssl"; then
+    alias openssl='/usr/local/opt/openssl/bin/openssl'
+    alias c_rehash='/usr/local/opt/openssl/bin/c_rehash'
+  fi
+
+  if brew_contains_element "gettext"; then
+    alias gettext='/usr/local/opt/gettext/bin/gettext'
+    alias xgettext='/usr/local/opt/gettext/bin/xgettext'
+  fi
+
+  if brew_contains_element "unzip"; then
+    alias funzip='/usr/local/opt/unzip/bin/funzip'
+    alias unzip='/usr/local/opt/unzip/bin/unzip'
+    alias unzipsfx='/usr/local/opt/unzip/bin/unzipsfx'
+    alias zipgrep='/usr/local/opt/unzip/bin/zipgrep'
+    alias zipinfo='/usr/local/opt/unzip/bin/zipinfo'
+  fi
+
+  if brew_contains_element "jpeg-turbo"; then
+    alias cjpeg='/usr/local/opt/jpeg-turbo/bin/cjpeg'
+    alias djpeg='/usr/local/opt/jpeg-turbo/bin/djpeg'
+    alias jpegtran='/usr/local/opt/jpeg-turbo/bin/jpegtran'
+    alias rdjpgcom='/usr/local/opt/jpeg-turbo/bin/rdjpgcom'
+    alias tjbench='/usr/local/opt/jpeg-turbo/bin/tjbench'
+    alias wrjpgcom='/usr/local/opt/jpeg-turbo/bin/wrjpgcom'
   fi
 
   if brew_contains_element "gnu-sed"; then
