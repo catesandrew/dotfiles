@@ -10,7 +10,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/Keyboard\ Maestro.app/Contents/Resources/Keyboard\ Maestro\ Engine.app/Contents/MacOS/Keyboard\ Maestro\ Engine</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/Keyboard\ Maestro.app/Contents/MacOS/Keyboard\ Maestro\ Engine.app/Contents/MacOS/Keyboard\ Maestro\ Engine</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
