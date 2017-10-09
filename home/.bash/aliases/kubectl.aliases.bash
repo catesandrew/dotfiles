@@ -322,10 +322,11 @@ kls() {
   if [ $# -eq 0 ]; then
     # kg -o wide all
 
-    for cmd in pods services deployments replicasets replicationcontroller jobs endpoints ingress; do
+    for cmd in pods services deployments statefulsets replicasets replicationcontroller jobs endpoints ingress; do
       if ! k get $cmd 2>&1 | grep 'No resources found' > /dev/null 2>&1; then
         echo ""
-        echo "$cmd:"
+        echo "Resource: $cmd"
+        echo ""
         k get -o wide $cmd
       fi
     done
