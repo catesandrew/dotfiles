@@ -109,13 +109,15 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         unset BASH_COMP_TARGET
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
+  if hash shopt 2>/dev/null; then
     if ! shopt -oq posix; then
-        if [ -f /usr/share/bash-completion/bash_completion ]; then
-            . /usr/share/bash-completion/bash_completion
-        elif [ -f /etc/bash_completion ]; then
-            . /etc/bash_completion
-        fi
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+      fi
     fi
+  fi
 fi
 
 # echo "Found ${#__dot_brew_list[@]} installed formulas"
@@ -129,9 +131,11 @@ if [ -z "$INSIDE_EMACS" ]; then
     SESSION_TYPE=remote/ssh
     export SESSION_TYPE
   else
-    case $(ps -o comm= -p $PPID) in
-      sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
-    esac
+    if [ $PPID != 0 ]; then # guard against containers
+      case $(ps -o comm= -p $PPID) in
+        sshd|*/sshd) export SESSION_TYPE=remote/ssh;;
+      esac
+    fi
   fi
 fi
 
