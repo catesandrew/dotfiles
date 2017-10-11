@@ -222,6 +222,14 @@ function kxbusy() {
   fi
 }
 
+function kxandrew() {
+  if k get pod --selector run=andrew 2>/dev/null | grep andrew > /dev/null 2>&1; then
+    kxbash andrew
+  else
+    k run -ti andrew --image=reg.iherb.net/tools/docker-andrew:latest --generator="run-pod/v1" "$@";
+  fi
+}
+
 ## Explain
 alias kep='k explain'
 complete -F _complete_alias kep
