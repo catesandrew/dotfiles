@@ -1,0 +1,341 @@
+ #!/usr/bin/env bash
+
+# Documentation
+# https://docs.gitlab.com/ce/api/projects.html#list-projects
+#
+# Refactored $PROJECT_SELECTION and $PROJECT_PROJECTION for easier modification
+# For example: To only sync non-archived projects, use PROJECT_SELECTION="select(.namespace.name == \"$NAMESPACE\" and .archived == false)"
+
+# CONSTANTS & VARIABLES (Common)
+
+# Project Root Dir
+readonly PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Level Colors
+readonly LEVEL_COLORS=(39 31 31 33 32 36)
+
+# CONSTANTS & VARIABLES (Project)
+
+# Script version
+readonly VERSION=0.0.1
+
+# List of requieed tools, example: REQUIRED_TOOLS=(git ssh)
+readonly REQUIRED_TOOLS=(jq git curl)
+
+# Long Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly LONG_OPTS=(help version name: url: search: selection: projection: token: group: lfs: desc: tags:)
+
+# Short Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly SHORT_OPTS=hvn:u:s:p:t:g:d:
+
+# Script name
+readonly SCRIPT_NAME=${0##*/}
+
+## CORE
+
+readonly NAME_DEFAULT=
+declare name="$NAME_DEFAULT"
+
+readonly TAGS_DEFAULT=
+declare tags="$TAGS_DEFAULT"
+
+readonly LFS_DEFAULT=
+declare lfs="$LFS_DEFAULT"
+
+readonly DESCRIPTION_DEFAULT=
+declare description="$DESCRIPTION_DEFAULT"
+
+readonly URL_DEFAULT=${GITLAB_BASE_PATH:-}
+declare url="$URL_DEFAULT"
+
+readonly USER_DEFAULT=
+declare user="$USER_DEFAULT"
+
+readonly SEARCH_DEFAULT=
+declare search="$SEARCH_DEFAULT"
+
+readonly SELECTION_DEFAULT='select(.namespace.name == \"${namespace}\")'
+declare selection="$SELECTION_DEFAULT"
+
+readonly PROJECTION_DEFAULT='{ "path": .path, "git": .ssh_url_to_repo, "name": .name, "fullPath": .path_with_namespace, "id": .id }'
+declare projection="$PROJECTION_DEFAULT"
+
+readonly TOKEN_DEFAULT=${GITLAB_PRIVATE_TOKEN:-}
+declare token="$TOKEN_DEFAULT"
+
+# FUNCTIONS
+
+# Print out messages to STDERR.
+function ech() { echo -e "$@" >&2; }
+
+# Print out error messages to STDERR.
+function err() { echo -e "\033[0;31mERROR: $@\033[0m" >&2; }
+
+# Shows an error if required tools are not installed.
+function required {
+  local e=0
+  for tool in "$@"; do
+    type $tool >/dev/null 2>&1 || {
+      e=1 && err "$tool is required for running this script. Please install $tool and try again."
+    }
+  done
+  [[ $e < 1 ]] || exit 2
+}
+
+# help command
+function help_command() {
+  cat <<END;
+
+USAGE:
+  $SCRIPT_NAME [options] <command>
+
+OPTIONS:
+  --run <level>, -r       Run a docker command
+  --help, -h              help
+  --version, -v           version
+  --namespace, -n         namespace
+  --url, -u               url to gitlab
+  --search, -s            project search
+  --selection             project selection
+  --projection, -p        project projection
+  --token, -t             gitlab api token
+  --git, -g               git ssh name
+  --
+
+COMMANDS:
+  help                    Display detailed help
+  version                 Print version information.
+  sync                    Sync the projects
+
+END
+  exit 1
+}
+
+# version command
+function version_command() {
+  echo "$SCRIPT_NAME version $VERSION"
+}
+
+# Group Access Levels
+# 10 => Guest access
+# 20 => Reporter access
+# 30 => Developer access
+# 40 => Master access
+# 50 => Owner access
+
+
+# default command
+function default_command() {
+  if [ -z "$token" ]; then
+    echo "Please set the environment variable GITLAB_PRIVATE_TOKEN"
+    echo "See ${url}/profile/account"
+    exit 1
+  fi
+
+  declare -a namespaces
+  declare -a namespaceids
+  trap "{ rm -f namespaces.json; }" EXIT
+  url_namespace="${url}/api/v4/namespaces?per_page=100"
+  if [ -n "$group" ]; then
+    url_namespace="${url_namespace}&search=${group}"
+  fi
+
+  projection='{ "name": .name, "id": .id }'
+   # [{"id":1,"name":"root","path":"root","kind":"user","full_path":"root","parent_id":null}
+  RESULTS=$(curl --header "PRIVATE-TOKEN: ${token}" -s "${url_namespace}")
+  echo "$RESULTS" | jq --raw-output --compact-output ".[] | { \"name\": .name, \"id\": .id }" > "namespaces.json"
+  while read -r namespace; do
+    THENAME=$(echo "$namespace" | jq -r ".name")
+    THEID=$(echo "$namespace" | jq -r ".id")
+    namespaces=("${namespaces[@]}" "${THENAME}")
+    namespaceids=("${namespaceids[@]}" "${THEID}")
+  done < "namespaces.json"
+
+  for i in ${!namespaces[@]}; do
+    f=${namespaces[$i]}
+    echo "namespace: ${namespaceids[$i]}: ${f}"
+
+    # curl --header "PRIVATE-TOKEN: gDGnJwv56z2Xfj2B83Es" -X POST "https://gitlab.com/api/v3/projects?name=foobartest"
+    # curl --header "PRIVATE-TOKEN: gDGnJwv56z2Xfj2B83Es" -X POST "https://gitlab.com/api/v3/projects?name=foobartest&issues_enabled=false"
+    # curl --header "PRIVATE-TOKEN: token" -X POST "https://gitlab.com/api/v3/projects?name=foobartest4&description=This%20is%20a%20description"
+    # curl --header "PRIVATE-TOKEN: <" -X POST "https://gitlab.com/api/v3/projects?name=foobartest8&namespace_id=pyt"
+
+    project_url="${url}/api/v4/projects"
+    if [ "${namespaces[$j]}" == "$group" ]; then
+      project_url="${project_url}?namespace_id=${namespaceids[$i]}&default_branch=develop"
+
+      if [ -n "$name" ]; then
+        project_url="${project_url}&name=${name}"
+      fi
+
+      if [ -n "$description" ]; then
+        project_url="${project_url}&description=$(perl -MURI::Escape -e 'print uri_escape shift, , q{^A-Za-z0-9\-._~/:}' -- "$description")"
+      fi
+
+
+      if [ -n "$tags" ]; then
+        project_url="${project_url}&tag_list=$(perl -MURI::Escape -e 'print uri_escape shift, , q{^A-Za-z0-9\-._~/:}' -- "$tags")"
+      fi
+
+      # curl -G -v "http://localhost:30001/data" --data-urlencode "msg=hello world"
+      # RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${project_url}" --data "")
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${project_url}" --data "")
+      # echo "$RESULTS" | jq --raw-output --compact-output "{ \"name\": .name, \"id\": .id }" >| "namespaces.json"
+      ID=$(echo "$RESULTS" | jq --raw-output --compact-output "{ \"name\": .name, \"id\": .id }" | jq -r .id)
+
+      git remote add origin git@acates.gitlab.internal.iherb.io:${group}/${name}.git
+      git config commit.gpgsign true
+      curl "https://gitlab.internal.iherb.io/pages/${name}" >/dev/null 2>&1
+      open "https://gitlab.internal.iherb.io/${group}/${name}"
+      sleep 3
+      # git add .
+      # git commit -m 'first commit'
+      git push -u origin --all && git push -u origin --tags
+
+      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      if [ ! $BRANCH == "master" ]; then
+        RESULTS=$(curl -X PUT --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}" -d default_branch=$BRANCH)
+      fi
+
+      if [ -n "$lfs" ]; then
+        RESULTS=$(curl -X PUT --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}" -d lfs_enabled=${lfs})
+      fi
+
+      # open "https://gitlab.internal.iherb.io/${group}/${name}/edit"
+      #
+    fi
+  done
+
+}
+
+function tags_command() {
+  tags="$1"
+}
+
+function name_command() {
+  name="$1"
+}
+
+function user_command() {
+  user="$1"
+}
+
+function lfs_command() {
+  lfs="$1"
+}
+
+function group_command() {
+  group="$1"
+}
+
+function url_command() {
+  url="$1"
+}
+
+function search_command() {
+  search="$1"
+}
+
+function selection_command() {
+  selection="$1"
+}
+
+function projection_command() {
+  projection="$1"
+}
+
+function desc_command() {
+  description="$1"
+}
+
+function token_command() {
+  token="$1"
+}
+
+# MAIN
+function main() {
+  # Required tools
+  required $REQUIRED_TOOLS
+
+  # Parse options
+  while [[ $# -ge $OPTIND ]] && eval opt=\${$OPTIND} || break
+        [[ $opt == -- ]] && shift && break
+        if [[ $opt == --?* ]]; then
+          opt=${opt#--}; shift
+
+          # Argument to option ?
+          OPTARG=;local has_arg=0
+          [[ $opt == *=* ]] && OPTARG=${opt#*=} && opt=${opt%=$OPTARG} && has_arg=1
+
+          # Check if known option and if it has an argument if it must:
+          local state=0
+          for option in "${LONG_OPTS[@]}"; do
+            [[ "$option" == "$opt" ]] && state=1 && break
+            [[ "${option%:}" == "$opt" ]] && state=2 && break
+          done
+          # Param not found
+          [[ $state = 0 ]] && OPTARG=$opt && opt='?'
+          # Param with no args, has args
+          [[ $state = 1 && $has_arg = 1 ]] && OPTARG=$opt && opt=::
+          # Param with args, has no args
+          if [[ $state = 2 && $has_arg = 0 ]]; then
+            [[ $# -ge $OPTIND ]] && eval OPTARG=\${$OPTIND} && shift || { OPTARG=$opt; opt=:; }
+          fi
+
+          # for the while
+          true
+        else
+          getopts ":$SHORT_OPTS" opt
+        fi
+
+  do
+    case "$opt" in
+      # List of options
+      v|version)    version_command; exit 0; ;;
+      h|help)       help_command ;;
+      n|name)       name_command "$OPTARG" ;;
+      url)          url_command "$OPTARG" ;;
+      u|user)       user_command "$OPTARG" ;;
+      d|desc)       desc_command "$OPTARG" ;;
+      lfs)          lfs_command "$OPTARG" ;;
+      g|group)      group_command "$OPTARG" ;;
+      s|search)     search_command "$OPTARG" ;;
+      selection)    selection_command "$OPTARG" ;;
+      p|projection) projection_command "$OPTARG" ;;
+      tags)         tags_command  "$OPTARG" ;;
+      t|token)      token_command "$OPTARG" ;;
+      # Errors
+      ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
+      :)	err "Missing argument to option '$OPTARG'"; exit 2; ;;
+      \?)	err "Unknown option '$OPTARG'"; exit 2; ;;
+      *)	err "Internal script error, unmatched option '$opt'"; exit 2; ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # No more arguments -> call default command
+  [[ -z "$1" ]] && default_command
+
+  # Set command and arguments
+  command="$1" && shift
+  args="$@"
+
+  # Execute the command
+  case "$command" in
+    # help
+    help)     help_command ;;
+
+    # version
+    version)  version_command ;;
+
+    # sync
+    sync)      default_command ;;
+
+    # Unknown command
+    *)        err "Unknown command '$command'"; exit 2; ;;
+  esac
+}
+
+main "$@"
