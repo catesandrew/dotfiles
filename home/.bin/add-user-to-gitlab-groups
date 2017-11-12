@@ -1,0 +1,348 @@
+ #!/usr/bin/env bash
+
+# Documentation
+# https://docs.gitlab.com/ce/api/projects.html#list-projects
+#
+# Refactored $PROJECT_SELECTION and $PROJECT_PROJECTION for easier modification
+# For example: To only sync non-archived projects, use PROJECT_SELECTION="select(.namespace.name == \"$NAMESPACE\" and .archived == false)"
+
+# CONSTANTS & VARIABLES (Common)
+
+# Project Root Dir
+readonly PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Level Colors
+readonly LEVEL_COLORS=(39 31 31 33 32 36)
+
+# CONSTANTS & VARIABLES (Project)
+
+# Script version
+readonly VERSION=0.0.1
+
+# List of requieed tools, example: REQUIRED_TOOLS=(git ssh)
+readonly REQUIRED_TOOLS=(jq git curl)
+
+# Long Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly LONG_OPTS=(help version namespace: url: search: selection: projection: token: git:)
+
+# Short Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly SHORT_OPTS=hvn:u:s:p:t:g:
+
+# Script name
+readonly SCRIPT_NAME=${0##*/}
+
+## CORE
+
+readonly NAMESPACE_DEFAULT=
+declare namespace="$NAMESPACE_DEFAULT"
+
+readonly URL_DEFAULT=${GITLAB_BASE_PATH:-}
+declare url="$URL_DEFAULT"
+
+readonly USER_DEFAULT=
+declare user="$USER_DEFAULT"
+
+readonly SEARCH_DEFAULT=
+declare search="$SEARCH_DEFAULT"
+
+readonly SELECTION_DEFAULT='select(.namespace.name == \"${namespace}\")'
+declare selection="$SELECTION_DEFAULT"
+
+readonly PROJECTION_DEFAULT='{ "path": .path, "git": .ssh_url_to_repo, "name": .name, "fullPath": .path_with_namespace, "id": .id }'
+declare projection="$PROJECTION_DEFAULT"
+
+readonly TOKEN_DEFAULT=${GITLAB_PRIVATE_TOKEN:-}
+declare token="$TOKEN_DEFAULT"
+
+# FUNCTIONS
+
+# Print out messages to STDERR.
+function ech() { echo -e "$@" >&2; }
+
+# Print out error messages to STDERR.
+function err() { echo -e "\033[0;31mERROR: $@\033[0m" >&2; }
+
+# Shows an error if required tools are not installed.
+function required {
+  local e=0
+  for tool in "$@"; do
+    type $tool >/dev/null 2>&1 || {
+      e=1 && err "$tool is required for running this script. Please install $tool and try again."
+    }
+  done
+  [[ $e < 1 ]] || exit 2
+}
+
+# help command
+function help_command() {
+  cat <<END;
+
+USAGE:
+  $SCRIPT_NAME [options] <command>
+
+OPTIONS:
+  --run <level>, -r       Run a docker command
+  --help, -h              help
+  --version, -v           version
+  --namespace, -n         namespace
+  --url, -u               url to gitlab
+  --search, -s            project search
+  --selection             project selection
+  --projection, -p        project projection
+  --token, -t             gitlab api token
+  --git, -g               git ssh name
+  --
+
+COMMANDS:
+  help                    Display detailed help
+  version                 Print version information.
+  sync                    Sync the projects
+
+END
+  exit 1
+}
+
+# version command
+function version_command() {
+  echo "$SCRIPT_NAME version $VERSION"
+}
+
+# Group Access Levels
+# 10 => Guest access
+# 20 => Reporter access
+# 30 => Developer access
+# 40 => Master access
+# 50 => Owner access
+
+
+# default command
+function default_command() {
+  if [ -z "$token" ]; then
+    echo "Please set the environment variable GITLAB_PRIVATE_TOKEN"
+    echo "See ${url}/profile/account"
+    exit 1
+  fi
+
+  declare -a users
+  declare -a userids
+  FILENAME="users.json"
+  trap "{ rm -f users.json; }" EXIT
+  url_user="${url}/api/v4/users?per_page=100"
+  if [ -n "$user" ]; then
+    url_user="${url_user}&search=${user}"
+  fi
+
+  projection='{ "name": .name, "id": .id }'
+  RESULTS=$(curl --header "PRIVATE-TOKEN: ${token}" -s "${url_user}")
+  echo "$RESULTS" | jq --raw-output --compact-output ".[] | { \"name\": .name, \"id\": .id }" > "$FILENAME"
+  while read -r user; do
+    THENAME=$(echo "$user" | jq -r ".name")
+    THEID=$(echo "$user" | jq -r ".id")
+    users=("${users[@]}" "${THENAME}")
+    userids=("${userids[@]}" "${THEID}")
+  done < "$FILENAME"
+
+  declare -a groups
+  declare -a groupids
+  FILENAME="groups.json"
+  trap "{ rm -f $FILENAME; }" EXIT
+
+  group_url="${url}/api/v4/groups?per_page=100"
+  if [ -n "$search" ]; then
+    url="${group_url}&search=${search}"
+  fi
+
+  if [ -n "$page" ]; then
+    group_url="${group_url}&page=${page}"
+  fi
+
+  projection='{ "path": .full_path, "name": .full_name, "id": .id }'
+
+  RESULTS=$(curl --header "PRIVATE-TOKEN: ${token}" -s "${group_url}")
+  if [ -n "$projection" ]; then
+    echo "$RESULTS" | jq --raw-output --compact-output ".[] | ${projection}" > "$FILENAME"
+  fi
+
+  while read -r repo; do
+    THEPATH=$(echo "$repo" | jq -r ".path")
+    THENAME=$(echo "$repo" | jq -r ".name")
+    THEID=$(echo "$repo" | jq -r ".id")
+    groups=("${groups[@]}" ${THEPATH})
+    groupids=("${groupids[@]}" ${THEID})
+  done < "$FILENAME"
+
+  projection='{ "path": .path, "git": .ssh_url_to_repo, "name": .name, "fullPath": .path_with_namespace, "id": .id }'
+
+  for i in ${!groups[@]}; do
+    echo ""
+    f=${groups[$i]}
+    echo "group: ${groupids[$i]}: ${f}"
+
+
+    for j in ${!users[@]}; do
+      echo ""
+      echo "user: ${userids[$j]}: ${users[$j]}"
+
+      url_add_user="${url}/api/v4/groups/${groupids[$i]}/members"
+      echo $url_add_user
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${url_add_user}" --data "user_id=${userids[$j]}&access_level=40")
+      echo $RESULTS
+    done
+
+    # namespace="${f}"
+    # selection='select(.namespace.name == \"${f}\")'
+    #
+    # FILENAME="repos.json"
+    #
+    # trap "{ rm -f repos.json; }" EXIT
+    # url="${GITLAB_BASE_PATH:-}/api/v4/projects?search=${f}&per_page=100"
+    #
+    # if [ -n "$page" ]; then
+    #   url="${url}&page=${page}"
+    # fi
+    #
+    # if [ -n "$selection" ]; then
+    #   eval "selection=\"$selection\""
+    # fi
+    #
+    # RESULTS=$(curl --header "PRIVATE-TOKEN: ${token}" -s "${url}")
+    # if [ -n "$selection" ] && [ -n "$projection" ]; then
+    #   echo "$RESULTS" | jq --raw-output --compact-output ".[] | ${selection} | ${projection}" > "$FILENAME"
+    # elif [ -n "$selection" ]; then
+    #   echo "$RESULTS" | jq --raw-output --compact-output ".[] | ${selection}" > "$FILENAME"
+    # elif [ -n "$projection" ]; then
+    #   echo "$RESULTS" | jq --raw-output --compact-output ".[] | ${projection}" > "$FILENAME"
+    # else
+    #   echo "$RESULTS" | jq --raw-output --compact-output ".[]" > "$FILENAME"
+    # fi
+    #
+    # while read -r repo; do
+    #   THEPATH=$(echo "$repo" | jq -r ".path")
+    #   THEFULLPATH=$(echo "$repo" | jq -r ".fullPath")
+    #   THENAME=$(echo "$repo" | jq -r ".name")
+    #   THEID=$(echo "$repo" | jq -r ".id")
+    #   GIT=$(echo "$repo" | jq -r ".git")
+    #   SAFEPATH=$(echo $THEPATH | sed -E 's|/|-|g')
+    #
+    #   echo "# ${THEID} - $THENAME"
+    #   echo "if [[ ! -d \"\${GITLAB_MIRROR_REPO_DIR}/${THEFULLPATH}\" ]]; then"
+    #   echo "  \${GITLAB_MIRROR_INSTALL_DIR}/add_mirror.sh --git --project-name \"${THEFULLPATH}\" --mirror git@gitlab.internal.iherb.io:${THEFULLPATH}.git --no-remote"
+    #   echo "else"
+    #   echo "  (cd \"\${GITLAB_MIRROR_REPO_DIR}/${THEFULLPATH}\" && git pull --all --quiet)"
+    #   echo "fi"
+    #   echo ""
+    # done < "$FILENAME"
+  done
+}
+
+function namespace_command() {
+  namespace="$1"
+}
+
+function user_command() {
+  user="$1"
+}
+
+function url_command() {
+  url="$1"
+}
+
+function search_command() {
+  search="$1"
+}
+
+function selection_command() {
+  selection="$1"
+}
+
+function projection_command() {
+  projection="$1"
+}
+
+function token_command() {
+  token="$1"
+}
+
+# MAIN
+function main() {
+  # Required tools
+  required $REQUIRED_TOOLS
+
+  # Parse options
+  while [[ $# -ge $OPTIND ]] && eval opt=\${$OPTIND} || break
+        [[ $opt == -- ]] && shift && break
+        if [[ $opt == --?* ]]; then
+          opt=${opt#--}; shift
+
+          # Argument to option ?
+          OPTARG=;local has_arg=0
+          [[ $opt == *=* ]] && OPTARG=${opt#*=} && opt=${opt%=$OPTARG} && has_arg=1
+
+          # Check if known option and if it has an argument if it must:
+          local state=0
+          for option in "${LONG_OPTS[@]}"; do
+            [[ "$option" == "$opt" ]] && state=1 && break
+            [[ "${option%:}" == "$opt" ]] && state=2 && break
+          done
+          # Param not found
+          [[ $state = 0 ]] && OPTARG=$opt && opt='?'
+          # Param with no args, has args
+          [[ $state = 1 && $has_arg = 1 ]] && OPTARG=$opt && opt=::
+          # Param with args, has no args
+          if [[ $state = 2 && $has_arg = 0 ]]; then
+            [[ $# -ge $OPTIND ]] && eval OPTARG=\${$OPTIND} && shift || { OPTARG=$opt; opt=:; }
+          fi
+
+          # for the while
+          true
+        else
+          getopts ":$SHORT_OPTS" opt
+        fi
+
+  do
+    case "$opt" in
+      # List of options
+      v|version)    version_command; exit 0; ;;
+      h|help)       help_command ;;
+      n|namespace)  namespace_command "$OPTARG" ;;
+      url)        url_command "$OPTARG" ;;
+      u|user)         user_command "$OPTARG" ;;
+      s|search)     search_command "$OPTARG" ;;
+      selection)    selection_command "$OPTARG" ;;
+      p|projection) projection_command "$OPTARG" ;;
+      t|token)      token_command "$OPTARG" ;;
+      # Errors
+      ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
+      :)	err "Missing argument to option '$OPTARG'"; exit 2; ;;
+      \?)	err "Unknown option '$OPTARG'"; exit 2; ;;
+      *)	err "Internal script error, unmatched option '$opt'"; exit 2; ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # No more arguments -> call default command
+  [[ -z "$1" ]] && default_command
+
+  # Set command and arguments
+  command="$1" && shift
+  args="$@"
+
+  # Execute the command
+  case "$command" in
+    # help
+    help)     help_command ;;
+
+    # version
+    version)  version_command ;;
+
+    # sync
+    sync)      default_command ;;
+
+    # Unknown command
+    *)        err "Unknown command '$command'"; exit 2; ;;
+  esac
+}
+
+main "$@"
