@@ -203,6 +203,10 @@ function default_command() {
         RESULTS=$(curl -X PUT --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}" -d lfs_enabled=${lfs})
       fi
 
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}/variables" --form "key=DOCKER_NAMESPACE" --form "value=tools")
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}/variables" --form "key=DOCKER_REGISTRY" --form "value=reg.iherb.net")
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}/variables" --form "key=DOCKER_REG_PASSWORD" --form 'value=DyQQyH5^u"j8HD}')
+      RESULTS=$(curl --request POST --header "PRIVATE-TOKEN: ${token}" -s "${url}/api/v4/projects/${ID}/variables" --form "key=DOCKER_REG_USER" --form "value=svc-reactpush")
       # open "https://gitlab.internal.iherb.io/${group}/${name}/edit"
       #
     fi
