@@ -305,11 +305,12 @@ fi
 function load_bash_it_files() {
   subdirectory="$1"
   if [ ! -d "${BASH_IT}/${subdirectory}" ]; then
-    continue
+    return
   fi
-  FILES="${BASH_IT}/${subdirectory}/*.bash"
+  FILES="${BASH_IT}/${subdirectory}/*.${subdirectory}.bash"
   for bash_config_file in $FILES; do
     if [ -e "${bash_config_file}" ]; then
+      # echo $bash_config_file
         . $bash_config_file
         # mytime="$(time (source $bash_config_file) 2>&1 1>/dev/null )"
         # echo "${bash_config_file}: ${mytime}"

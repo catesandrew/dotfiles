@@ -42,7 +42,7 @@ if brew_contains_element "fasd" || \
                                 printf \\n
                           done)
           local IFS=$'\n'; COMPREPLY=( $RESULT )
-        }
+    }
 
     _fasd_bash_hook_cmd_complete() {
       for cmd in "$@"; do

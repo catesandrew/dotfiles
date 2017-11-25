@@ -1,3 +1,14 @@
+# if brew_contains_element "kubectl" || \
+#     hash kubectl 2>/dev/null; then
+
+#   # lazy load kubectl into a shell session *as a function*
+#   kubectl() {
+#     echo "Lazy loading kubectl..."
+
+#     kubectl "$@"
+#   }
+# fi
+
 __kubectl_func_wrap () {
   local cur words cword prev
   _get_comp_words_by_ref -n =: cur words cword prev
