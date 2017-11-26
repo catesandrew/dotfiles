@@ -22,26 +22,6 @@ __kubectl_complete () {
     || complete -o default -o nospace -F "$wrapper" "$1"
 }
 
-# __kubectl_get_svc() {
-#   __kubectl_parse_get "svc"
-# }
-
-# __kubectl_get_deploy() {
-#   __kubectl_parse_get "deploy"
-# }
-
-# __kubectl_get_node() {
-#   __kubectl_parse_get "node"
-# }
-
-# __kubectl_get_ns() {
-#   __kubectl_parse_get "namespace"
-# }
-
-# __kubectl_get_ep() {
-#   __kubectl_parse_get "endpoints"
-# }
-
 __kubectl_get_csr() {
   __kubectl_parse_get "certificatesigningrequests"
 }
@@ -154,32 +134,6 @@ __kubectl_get_sc() {
   __kubectl_parse_get "storageclasses"
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 __kubectl_config_users() {
   __kubectl_parse_config "users"
 }
@@ -242,6 +196,19 @@ function kccc() {
 }
 __kubectl_complete kccc _kubectl_config_current-context
 
+function kccl() {
+  local context
+
+  if [ $# -eq 0 ]; then
+    context="$(kccc)"
+  else
+    context="$1"
+  fi
+
+  kc view -o jsonpath="{.contexts[?(@.name == \"${context}\")].context.cluster}"
+}
+__kubectl_complete kccl
+
 #### Manage configuration quickly to switch contexts between local, dev ad staging.
 
 function kcuc() {
@@ -285,7 +252,6 @@ function kcgcns() {
   { [[ -z $namespace ]] && echo "default"; } || echo "$namespace"
 }
 __kubectl_complete kcgcns _kubectl_config_get-contexts __kubectl_config_contexts
-
 
 function kcdc() {
   kc delete-context "$@"
@@ -340,23 +306,30 @@ __kubectl_complete kcu _kubectl_config_unset
 
 function kcls() {
   # list clusters
-  local cluster_names=$(kcgcl | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1}')
-  local context_names=$(kcgc | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1, $2}')
-  local entries=( $(kcgc | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1","$2}') )
+  local cluster_names
+  local context_names
+  local entry_cluster
+  local entry_count
+  local entry_name
+  local entries
+
+  cluster_names=$(kcgcl | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1}')
+  context_names=$(kcgc | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1, $2}')
+  entries=( $(kcgc | tail -n +2 | sed 's/^\*/ /' | awk '{ print $1","$2}') )
   declare -A clusters
   for entry in "${entries[@]}"; do
-    local entryname=$(echo "$entry" | awk -F, '{print $1}');
-    local entrycluster=$(echo "$entry" | awk -F, '{print $2}');
+    entry_name=$(echo "$entry" | awk -F, '{print $1}');
+    entry_cluster=$(echo "$entry" | awk -F, '{print $2}');
 
-    if [ -z ${clusters[count_${entrycluster}]} ]; then
-      clusters[count_${entrycluster}]=0;
+    if [ -z ${clusters[count_${entry_cluster}]} ]; then
+      clusters[count_${entry_cluster}]=0;
     fi;
 
-    local entrycount=${clusters[count_${entrycluster}]};
-    ((++entrycount));
-    clusters[count_${entrycluster}]=$entrycount;
+    entry_count=${clusters[count_${entry_cluster}]};
+    ((++entry_count));
+    clusters[count_${entry_cluster}]=$entry_count;
 
-    clusters["${entrycluster}|${entrycount}"]=$entryname;
+    clusters["${entry_cluster}|${entry_count}"]=$entry_name;
   done
 
   if [ ${#cluster_names[@]} -eq 0 ]; then
@@ -380,6 +353,10 @@ function kcls() {
       ((++j))
     done
   fi
+}
+
+function kcll() {
+  kcls
 }
 
 ## Copy
@@ -643,7 +620,7 @@ __kubectl_complete kdpdb _kubectl_describe __kubectl_get_pdb
 function kdp() {
   kd pods "$@"
 }
-__kubectl_complete kdpo _kubectl_describe __kubectl_get_pod
+__kubectl_complete kdp _kubectl_describe __kubectl_get_pod
 
 function kdpsp() {
   kd podsecuritypolicies "$@"
@@ -689,6 +666,37 @@ function kdsc() {
   kd storageclasses "$@"
 }
 __kubectl_complete kdsc _kubectl_describe __kubectl_get_sc
+
+function kdall() {
+  kdcm "$@"
+  kdcrd "$@"
+  kdcs "$@"
+  kdcsr "$@"
+  kdd "$@"
+  kddeploy "$@"
+  kdds "$@"
+  kdep "$@"
+  kdev "$@"
+  kdhpa "$@"
+  kding "$@"
+  kdlimits "$@"
+  kdnetpol "$@"
+  kdno "$@"
+  kdns "$@"
+  kdp "$@"
+  kdpdb "$@"
+  kdpsp "$@"
+  kdpv "$@"
+  kdpvc "$@"
+  kdquota "$@"
+  kdrc "$@"
+  kdrs "$@"
+  kds "$@"
+  kdsa "$@"
+  kdsc "$@"
+  kdss "$@"
+  kdsvc "$@"
+}
 
 ## Edit
 
@@ -790,7 +798,7 @@ __kubectl_complete kedpdb _kubectl_edit __kubectl_get_pdb
 function kedp() {
   ked pods "$@"
 }
-__kubectl_complete kedpo _kubectl_edit __kubectl_get_pod
+__kubectl_complete kedp _kubectl_edit __kubectl_get_pod
 
 function kedpsp() {
   ked podsecuritypolicies "$@"
@@ -974,7 +982,7 @@ __kubectl_complete keppdb _kubectl_explain
 function kepp() {
   kep pods "$@"
 }
-__kubectl_complete keppo _kubectl_explain
+__kubectl_complete kepp _kubectl_explain
 
 function keppsp() {
   kep podsecuritypolicies "$@"
@@ -1021,6 +1029,37 @@ function kepsc() {
 }
 __kubectl_complete kepsc _kubectl_explain
 
+function kepall() {
+  kepcm "$@"
+  kepcrd "$@"
+  kepcs "$@"
+  kepcsr "$@"
+  kepd "$@"
+  kepdeploy "$@"
+  kepds "$@"
+  kepep "$@"
+  kepev "$@"
+  kephpa "$@"
+  keping "$@"
+  keplimits "$@"
+  kepnetpol "$@"
+  kepno "$@"
+  kepns "$@"
+  kepp "$@"
+  keppdb "$@"
+  keppsp "$@"
+  keppv "$@"
+  keppvc "$@"
+  kepquota "$@"
+  keprc "$@"
+  keprs "$@"
+  keps "$@"
+  kepsa "$@"
+  kepsc "$@"
+  kepss "$@"
+  kepsvc "$@"
+}
+
 ## Expose
 
 function keo() {
@@ -1045,29 +1084,76 @@ function kgy() {
 }
 __kubectl_complete kgy _kubectl_get
 
-#### get namespace of context, defaulting to current-context
-function kgns() {
-  kg namespace "$@"
+function kgcsr() {
+  kg certificatesigningrequests "$@"
 }
-__kubectl_complete kgns _kubectl_get __kubectl_get_ns
+__kubectl_complete kgcsr _kubectl_get __kubectl_get_csr
 
-function kgjns() {
-  kgj namespace "$@"
+function kgjcsr() {
+  kgj certificatesigningrequests "$@"
 }
-__kubectl_complete kgjns _kubectl_get __kubectl_get_ns
+__kubectl_complete kgjcsr _kubectl_get __kubectl_get_csr
 
-#### get pods
-function kgp() {
-  kg pod "$@"
+function kgcs() {
+  kg componentstatuses "$@"
 }
-__kubectl_complete kgp _kubectl_get __kubectl_get_pod
+__kubectl_complete kgcs _kubectl_get __kubectl_get_cs
 
-function kgjp() {
-  kgj pod "$@"
+function kgjcs() {
+  kgj componentstatuses "$@"
 }
-__kubectl_complete kgjp _kubectl_get __kubectl_get_pod
+__kubectl_complete kgjcs _kubectl_get __kubectl_get_cs
 
-#### get endpoints
+function kgcm() {
+  kg configmaps "$@"
+}
+__kubectl_complete kgcm _kubectl_get __kubectl_get_cm
+
+function kgjcm() {
+  kgj configmaps "$@"
+}
+__kubectl_complete kgjcm _kubectl_get __kubectl_get_cm
+
+function kgcrd() {
+  kg customresourcedefinition "$@"
+}
+__kubectl_complete kgcrd _kubectl_get __kubectl_get_crd
+
+function kgjcrd() {
+  kgj customresourcedefinition "$@"
+}
+__kubectl_complete kgjcrd _kubectl_get __kubectl_get_crd
+
+function kgds() {
+  kg daemonsets "$@"
+}
+__kubectl_complete kgds _kubectl_get __kubectl_get_ds
+
+function kgjds() {
+  kgj daemonsets "$@"
+}
+__kubectl_complete kgjds _kubectl_get __kubectl_get_ds
+
+function kgd() {
+  kg deployments "$@"
+}
+__kubectl_complete kgd _kubectl_get __kubectl_get_deploy
+
+function kgjd() {
+  kgj deployments "$@"
+}
+__kubectl_complete kgjd _kubectl_get __kubectl_get_deploy
+
+function kgdeploy() {
+  kg deployments "$@"
+}
+__kubectl_complete kgdeploy _kubectl_get __kubectl_get_deploy
+
+function kgjdeploy() {
+  kgj deployments "$@"
+}
+__kubectl_complete kgjdeploy _kubectl_get __kubectl_get_deploy
+
 function kgep() {
   kg endpoints "$@"
 }
@@ -1078,44 +1164,284 @@ function kgjep() {
 }
 __kubectl_complete kgjep _kubectl_get __kubectl_get_ep
 
-#### get nodes
-function kgn() {
-  kg node "$@"
+function kgev() {
+  kg events "$@"
 }
-__kubectl_complete kgn _kubectl_get __kubectl_get_node
+__kubectl_complete kgev _kubectl_get __kubectl_get_ev
 
-function kgjn() {
-  kgj node "$@"
+function kgjev() {
+  kgj events "$@"
 }
-__kubectl_complete kgjn _kubectl_get __kubectl_get_node
+__kubectl_complete kgjev _kubectl_get __kubectl_get_ev
 
-#### get services
+function kghpa() {
+  kg horizontalpodautoscalers "$@"
+}
+__kubectl_complete kghpa _kubectl_get __kubectl_get_hpa
+
+function kgjhpa() {
+  kgj horizontalpodautoscalers "$@"
+}
+__kubectl_complete kgjhpa _kubectl_get __kubectl_get_hpa
+
+function kging() {
+  kg ingresses "$@"
+}
+__kubectl_complete kging _kubectl_get __kubectl_get_ing
+
+function kgjing() {
+  kgj ingresses "$@"
+}
+__kubectl_complete kgjing _kubectl_get __kubectl_get_ing
+
+function kglimits() {
+  kg limitranges "$@"
+}
+__kubectl_complete kglimits _kubectl_get __kubectl_get_limits
+
+function kgjlimits() {
+  kgj limitranges "$@"
+}
+__kubectl_complete kgjlimits _kubectl_get __kubectl_get_limits
+
+function kgns() {
+  kg namespaces "$@"
+}
+__kubectl_complete kgns _kubectl_get __kubectl_get_ns
+
+function kgjns() {
+  kgj namespaces "$@"
+}
+__kubectl_complete kgjns _kubectl_get __kubectl_get_ns
+
+function kgnetpol() {
+  kg networkpolicies "$@"
+}
+__kubectl_complete kgnetpol _kubectl_get __kubectl_get_netpol
+
+function kgjnetpol() {
+  kgj networkpolicies "$@"
+}
+__kubectl_complete kgjnetpol _kubectl_get __kubectl_get_netpol
+
+function kgno() {
+  kg nodes "$@"
+}
+__kubectl_complete kgno _kubectl_get __kubectl_get_node
+
+function kgjno() {
+  kgj nodes "$@"
+}
+__kubectl_complete kgjno _kubectl_get __kubectl_get_node
+
+function kgpvc() {
+  kg persistentvolumeclaims "$@"
+}
+__kubectl_complete kgpvc _kubectl_get __kubectl_get_pvc
+
+function kgjpvc() {
+  kgj persistentvolumeclaims "$@"
+}
+__kubectl_complete kgjpvc _kubectl_get __kubectl_get_pvc
+
+function kgpv() {
+  kg persistentvolumes "$@"
+}
+__kubectl_complete kgpv _kubectl_get __kubectl_get_pv
+
+function kgjpv() {
+  kgj persistentvolumes "$@"
+}
+__kubectl_complete kgjpv _kubectl_get __kubectl_get_pv
+
+function kgpdb() {
+  kg poddisruptionbudgets "$@"
+}
+__kubectl_complete kgpdb _kubectl_get __kubectl_get_pdb
+
+function kgjpdb() {
+  kgj poddisruptionbudgets "$@"
+}
+__kubectl_complete kgjpdb _kubectl_get __kubectl_get_pdb
+
+function kgp() {
+  kg pods --show-all "$@"
+}
+__kubectl_complete kgp _kubectl_get __kubectl_get_pod
+
+function kgjp() {
+  kgj pods --show-all "$@"
+}
+__kubectl_complete kgjp _kubectl_get __kubectl_get_pod
+
+function kgpsp() {
+  kg podsecuritypolicies "$@"
+}
+__kubectl_complete kgpsp _kubectl_get __kubectl_get_psp
+
+function kgjpsp() {
+  kgj podsecuritypolicies "$@"
+}
+__kubectl_complete kgjpsp _kubectl_get __kubectl_get_psp
+
+function kgrs() {
+  kg replicasets "$@"
+}
+__kubectl_complete kgrs _kubectl_get __kubectl_get_rs
+
+function kgjrs() {
+  kgj replicasets "$@"
+}
+__kubectl_complete kgjrs _kubectl_get __kubectl_get_rs
+
+function kgrc() {
+  kg replicationcontrollers "$@"
+}
+__kubectl_complete kgrc _kubectl_get __kubectl_get_rc
+
+function kgjrc() {
+  kgj replicationcontrollers "$@"
+}
+__kubectl_complete kgjrc _kubectl_get __kubectl_get_rc
+
+function kgquota() {
+  kg resourcequotas "$@"
+}
+__kubectl_complete kgquota _kubectl_get __kubectl_get_quota
+
+function kgjquota() {
+  kgj resourcequotas "$@"
+}
+__kubectl_complete kgjquota _kubectl_get __kubectl_get_quota
+
 function kgs() {
-  kg svc "$@"
+  kg secrets "$@"
 }
-__kubectl_complete kgs _kubectl_get __kubectl_get_svc
+__kubectl_complete kgs _kubectl_get __kubectl_get_secrets
 
 function kgjs() {
-  kgj svc "$@"
+  kgj secrets "$@"
 }
-__kubectl_complete kgjs _kubectl_get __kubectl_get_svc
+__kubectl_complete kgjs _kubectl_get __kubectl_get_secrets
 
-#### get deployments
-function kgd() {
-  kg deploy "$@"
+function kgsa() {
+  kg serviceaccounts "$@"
 }
-__kubectl_complete kgd _kubectl_get __kubectl_get_deploy
+__kubectl_complete kgsa _kubectl_get __kubectl_get_sa
 
-function kgjd() {
-  kgj deploy "$@"
+function kgjsa() {
+  kgj serviceaccounts "$@"
 }
-__kubectl_complete kgjd _kubectl_get __kubectl_get_deploy
+__kubectl_complete kgjsa _kubectl_get __kubectl_get_sa
 
-kls() {
-  local namespaces=( $(kgns | tail -n +2 | awk '{ print $1 }') )
-  local current_namespace=$(kcgcns)
+function kgsvc() {
+  kg services "$@"
+}
+__kubectl_complete kgsvc _kubectl_get __kubectl_get_svc
 
-  local j=0
+function kgjsvc() {
+  kgj services "$@"
+}
+__kubectl_complete kgjsvc _kubectl_get __kubectl_get_svc
+
+function kgss() {
+  kg statefulsets "$@"
+}
+__kubectl_complete kgss _kubectl_get __kubectl_get_ss
+
+function kgjss() {
+  kgj statefulsets "$@"
+}
+__kubectl_complete kgjss _kubectl_get __kubectl_get_ss
+
+function kgsc() {
+  kg storageclasses "$@"
+}
+__kubectl_complete kgsc _kubectl_get __kubectl_get_sc
+
+function kgjsc() {
+  kgj storageclasses "$@"
+}
+__kubectl_complete kgjsc _kubectl_get __kubectl_get_sc
+
+function kgall() {
+  kgsc "$@"
+  kgss "$@"
+  kgsvc "$@"
+  kgsa "$@"
+  kgs "$@"
+  kgquota "$@"
+  kgrc "$@"
+  kgrs "$@"
+  kgpsp "$@"
+  kgp "$@"
+  kgpdb "$@"
+  kgpv "$@"
+  kgpvc "$@"
+  kgno "$@"
+  kgnetpol "$@"
+  kgns "$@"
+  kglimits "$@"
+  kging "$@"
+  kghpa "$@"
+  kgev "$@"
+  kgep "$@"
+  kgdeploy "$@"
+  kgds "$@"
+  kgcrd "$@"
+  kgcm "$@"
+  kgcs "$@"
+  kgcsr "$@"
+  kgss "$@"
+}
+
+function kgjall() {
+  kgjsc "$@"
+  kgjss "$@"
+  kgjsvc "$@"
+  kgjsa "$@"
+  kgjs "$@"
+  kgjquota "$@"
+  kgjrc "$@"
+  kgjrs "$@"
+  kgjpsp "$@"
+  kgjp "$@"
+  kgjpdb "$@"
+  kgjpv "$@"
+  kgjpvc "$@"
+  kgjno "$@"
+  kgjnetpol "$@"
+  kgjns "$@"
+  kgjlimits "$@"
+  kgjing "$@"
+  kgjhpa "$@"
+  kgjev "$@"
+  kgjep "$@"
+  kgjdeploy "$@"
+  kgjds "$@"
+  kgjcrd "$@"
+  kgjcm "$@"
+  kgjcs "$@"
+  kgjcsr "$@"
+}
+
+kgls() {
+  local current_namespace
+  local namespaces
+  local namespace
+  local result
+  local j
+
+  if [ "$1" = "all" ]; then
+    shift
+    namespaces=( $(kgns | tail -n +2 | awk '{ print $1 }') )
+  else
+    namespaces=( $(kcgcns) )
+  fi
+
+  current_namespace=$(kcgcns)
+  j=0
+
   for namespace in "${namespaces[@]}"; do
     if [ $j -gt 0 ]; then
       echo ""
@@ -1130,7 +1456,7 @@ kls() {
 
     if [ $# -eq 0 ]; then
       for cmd in pods deployments daemonsets statefulsets replicasets replicationcontrollers jobs ingress services endpoints persistentvolumeclaims persistentvolumes storageclasses secrets configmaps serviceaccounts; do
-        result=$(k get --namespace=$namespace $cmd 2>&1)
+        result=$(k get --namespace=$namespace $cmd "$@" 2>&1)
         if ! echo "$result" | grep 'No resources found' > /dev/null 2>&1; then
           echo ""
           echo "### $cmd"
@@ -1151,17 +1477,28 @@ kls() {
 }
 __kubectl_complete kls _kubectl_get __kubectl_get_resource
 
-kll() {
-  local namespaces=( $(kgns | tail -n +2 | awk '{ print $1 }') )
-  local current_namespace=$(kcgcns)
+kgll() {
+  local current_namespace
+  local namespaces
+  local namespace
+  local result
+  local j
 
-  local j=0
+  if [ "$1" = "all" ]; then
+    shift
+    namespaces=( $(kgns | tail -n +2 | awk '{ print $1 }') )
+  else
+    namespaces=( $(kcgcns) )
+  fi
+
+  current_namespace=$(kcgcns)
+  j=0
+
   for namespace in "${namespaces[@]}"; do
     if [ $j -gt 0 ]; then
       echo ""
     fi
 
-    local result
     if [ $namespace = $current_namespace ]; then
        echo "## Namespace: ${namespace} *"
     else
@@ -1170,7 +1507,7 @@ kll() {
 
     if [ $# -eq 0 ]; then
       for cmd in pods deployments daemonsets statefulsets replicasets replicationcontrollers jobs ingress services endpoints persistentvolumeclaims persistentvolumes storageclasses secrets configmaps serviceaccounts; do
-        result=$(kg --namespace=$namespace $cmd 2>&1)
+        result=$(kg --namespace=$namespace $cmd "$@" 2>&1)
         if ! echo "$result" | grep 'No resources found' > /dev/null 2>&1; then
           echo ""
           echo "### $cmd"
@@ -1192,6 +1529,18 @@ kll() {
 }
 __kubectl_complete kll _kubectl_get __kubectl_get_resource
 
+function kls() {
+  kcls
+  echo ""
+  kgls "$@"
+}
+
+function kll() {
+  kcll
+  echo ""
+  kgll "$@"
+}
+
 ## Logs
 
 function kl() {
@@ -1205,9 +1554,21 @@ function klf() {
 __kubectl_complete klf _kubectl_logs __kubectl_get_pod
 
 function klogs() {
-  k logs "$@"
+  kl "$@"
 }
 __kubectl_complete klogs _kubectl_logs __kubectl_get_pod
+
+# logs for pod
+function klp () {
+  local r="$1" p
+  [[ $PAGER ]] || PAGER=more
+  # match full pod name, pod in replica, or pod in deployment
+  for p in $(kgp | awk "\$1 == \"$r\" || \$1 ~ /^$r-[a-z0-9]{5}$/ || \$1 ~ /^$r-[0-9][a-z0-9]{1,9}-[a-z0-9]{5}$/ { print \$1 }"); do
+    echo "===> $p <==="
+    kl "$p" | $PAGER
+  done
+}
+__kubectl_complete klp _kubectl_logs __kubectl_get_pod
 
 ## Options
 
@@ -1236,8 +1597,6 @@ function kro() {
   k rollout "$@"
 }
 __kubectl_complete kro _kubectl_rollout
-
-### Rollout management.
 
 function kroh() {
   kro history "$@"
@@ -1285,7 +1644,7 @@ function kv() {
 }
 __kubectl_complete kv _kubectl_version
 
-function oldkpp() {
+function kpp() {
   kgp | \grep "$@" | head -1 | awk '{ print $1 }' | xargs -i k port-forward {} 8080:8080 > /dev/null 2>&1 &
   sleep 2;
 
@@ -1295,38 +1654,28 @@ function oldkpp() {
     open http://localhost:8080/__health > /dev/null 2>&1;
   fi
 }
+__kubectl_complete kpp _kubectl_get __kubectl_get_pod
 
 function kstat() {
-  for node in  $(kgn | tail -n +2 | awk '{ print $1}'); do
+  for node in  $(kgno | tail -n +2 | awk '{ print $1}'); do
     echo "node: $node"
-    echo -e "$(kubectl describe node $node | grep -A 4 "Allocated resources")\n";
+    echo -e "$(kdno $node | \grep -A 4 "Allocated resources")\n";
   done
 }
 
 function kreach(){
-  for public_ip in  $(kgn -o wide | tail -n +2 | awk '{ print $5 }'); do
+  for public_ip in $(kgno -o wide | tail -n +2 | awk '{ print $6 }'); do
     echo "public ip: $public_ip"
     echo -e "$(ssh "core@${public_ip}" date)\n"
   done
 }
 
 function kready() {
-  for node in  $(kgn | tail -n +2 | awk '{ print $1 }'); do
+  for node in  $(kgno | tail -n +2 | awk '{ print $1 }'); do
     echo "node: $node"
-    echo -e "$(kdn "${node}" | grep  "Ready")\n";
+    echo -e "$(kdno "${node}" | \grep "Ready")\n";
   done
 }
-
-# logs for pod
-# function klp () {
-#   local r="$1" p
-#   [[ $PAGER ]] || PAGER=more
-#   # match full pod name, pod in replica, or pod in deployment
-#   for p in $(kg pods | awk "\$1 == \"$r\" || \$1 ~ /^$r-[a-z0-9]{5}$/ || \$1 ~ /^$r-[0-9]{1,10}-[a-z0-9]{5}$/ { print \$1 }"); do
-#     echo "===> $p <==="
-#     k logs "$p" | $PAGER
-#   done
-# }
 
 # ssh into each host
 function kssh () {
@@ -1339,9 +1688,14 @@ function kssh () {
 }
 
 function kproxy() {
-  local APISERVER=$(kcv | \grep server | cut -f 2- -d ":" | tr -d " ")
-  local TOKEN=$(kd secret $(kg secrets | \grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
-  curl $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
+  # from current context find out what cluster it belongs to
+  local current_cluster=$(kccl)
+  # only view the cluster we are interested in for the server ip address
+  local APISERVER=$(kcv -o jsonpath="{.clusters[?(@.name == \"${current_cluster}\")]..server}")
+  local current_secret=$(kgs | \grep "default-token" | cut -f1 -d ' ')
+  local TOKEN=$(kds "${current_secret}" | \grep -E '^token' | cut -f2 -d':' | tr -d '\t' | sed -e 's/^[ \t]*//')
+  echo "${APISERVER}/api --header \"Authorization: Bearer ${TOKEN}\" --insecure"
+  curl "${APISERVER}/api" --header "Authorization: Bearer ${TOKEN}" --insecure
 }
 
 ### Run some pods
