@@ -87,6 +87,12 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         __dot_brew_taps=($(brew tap | sed 's/:.*//'))
         __dot_cask_list=($(brew cask list | sed 's/:.*//'))
       fi
+
+      if [ -z $BREW_HOME ]; then
+        BREW_HOME="$(brew --prefix)"
+        export BREW_HOME
+      fi
+
       unset brew_cache
 
       HOMEBREW_CASK_OPTS="--appdir=/Applications"
@@ -110,19 +116,21 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
   if hash brew 2>/dev/null; then
-
     brew_cache="${HOME}/.brew-init-bash"
     if [ -f "$brew_cache" ]; then
       . "$brew_cache"
       __unserialise __dot_brew_list "$__dot_brew_list"
       __unserialise __dot_brew_taps "$__dot_brew_taps"
     else
-      BREW_HOME="$(brew --prefix)"
-      export BREW_HOME
-
       __dot_brew_list=($(brew list | sed 's/:.*//'))
       __dot_brew_taps=($(brew tap | sed 's/:.*//'))
     fi
+
+    if [ -z $BREW_HOME ]; then
+      BREW_HOME="$(brew --prefix)"
+      export BREW_HOME
+    fi
+
     unset brew_cache
   fi
 
