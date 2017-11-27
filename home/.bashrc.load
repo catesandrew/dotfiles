@@ -109,6 +109,23 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         unset BASH_COMP_TARGET
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
+  if hash brew 2>/dev/null; then
+
+    brew_cache="${HOME}/.brew-init-bash"
+    if [ -f "$brew_cache" ]; then
+      . "$brew_cache"
+      __unserialise __dot_brew_list "$__dot_brew_list"
+      __unserialise __dot_brew_taps "$__dot_brew_taps"
+    else
+      BREW_HOME="$(brew --prefix)"
+      export BREW_HOME
+
+      __dot_brew_list=($(brew list | sed 's/:.*//'))
+      __dot_brew_taps=($(brew tap | sed 's/:.*//'))
+    fi
+    unset brew_cache
+  fi
+
   if hash shopt 2>/dev/null; then
     if ! shopt -oq posix; then
       if [ -f /usr/share/bash-completion/bash_completion ]; then
