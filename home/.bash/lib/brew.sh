@@ -1,90 +1,596 @@
 #!/bin/bash
 
+e_header() {
+  printf "\n$(tput setaf 7)%s$(tput sgr0)\n" "$@"
+}
+
+# Success logging
+e_success() {
+  printf "$(tput setaf 64)✓ %s$(tput sgr0)\n" "$@"
+}
+
+# Error logging
+e_error() {
+  printf "$(tput setaf 1)x %s$(tput sgr0)\n" "$@"
+}
+
+# Warning logging
+e_warning() {
+  printf "$(tput setaf 136)! %s$(tput sgr0)\n" "$@"
+}
+
 # Test whether a Homebrew formula is already installed
 # $1 - formula name (may include options)
 formula_exists() {
-    if $(brew list $1 >/dev/null); then
-        printf "%s already installed.\n" "$1"
-        return 0
-    fi
+  if $(brew list "$1" >/dev/null); then
+    e_success "$1 already installed."
+    return 0
+  fi
 
-    e_warning "Missing formula: $1"
-    return 1
+  e_warning "Missing formula: $1"
+  return 1
 }
 
 # Test whether a command exists
 # $1 - cmd to test
 type_exists() {
-    if [ $(type -P $1) ]; then
-      return 0
-    fi
-    return 1
+  if [ "$(type -P "$1")" ]; then
+    return 0
+  fi
+  return 1
 }
-
 
 run_brew() {
-    # Check for Homebrew
-    if type_exists 'brew'; then
-        e_header "Updating Homebrew..."
-        # Use the latest version of Homebrew
-        brew update
-        [[ $? ]] && e_success "Done"
+  # Check for Homebrew
+  if type_exists 'brew'; then
+    e_header "Updating Homebrew..."
+    # Use the latest version of Homebrew
+    brew update
+    [[ $? ]] && e_success "Done"
 
-        e_header "Updating any existing Homebrew formulae..."
-        # Upgrade any already-installed formulae
-        brew upgrade
-        [[ $? ]] && e_success "Done"
+    e_header "Updating any existing Homebrew taps..."
 
-        e_header "Checking status of desired Homebrew formulae..."
-        local list_formulae
-        local -a missing_formulae
-        local -a desired_formulae=(
-            'coreutils' # GNU core utilities (those that come with OS X are outdated)
-            'git'
-            'ack'
-            'bash'
-            'bash-completion'
-            'ffmpeg'
-            'graphicsmagick'
-            'jpeg'
-            'macvim --override-system-vim'
-            'node'
-            'optipng'
-            'phantomjs'
-            'tree'
-            'wget'
-        )
+    local -a desired_tap=(
+      'caskroom/cask'
+      'caskroom/drivers'
+      'caskroom/fonts'
+      'caskroom/versions'
+      'dart-lang/dart'
+      'homebrew/boneyard'
+      'homebrew/bundle'
+      'homebrew/core'
+      'homebrew/services'
+      'neovim/neovim'
+      'thoughtbot/formulae'
+      'universal-ctags/universal-ctags'
+    )
 
-        for index in ${!desired_formulae[*]}
-        do
-            if ! formula_exists ${desired_formulae[$index]}; then
-                # Store the name (and options) of every missing formula
-                missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
-            fi
-        done
+    for index in ${!desired_tap[*]}; do
+      brew tap "${desired_tap[$index]}" >/dev/null
+    done
 
-        if [[ "$missing_formulae" ]]; then
-            # Convert the array of missing formula into a list of space-separate strings
-            list_formulae=$( printf "%s " "${missing_formulae[@]}" )
+    e_header "Updating any existing Homebrew formulae..."
+    # Upgrade any already-installed formulae
+    brew upgrade
+    [[ $? ]] && e_success "Done"
 
-            e_header "Installing missing Homebrew formulae..."
-            # Install all missing formulae
-            brew install $list_formulae
+    e_header "Checking status of desired Homebrew formulae..."
+    local list_formulae
+    local -a missing_formulae
+    local -a desired_formulae=(
+      'ack'
+      'adns'
+      'ansible'
+      'ansiweather'
+      'ant'
+      'apparix'
+      'archey'
+      'asciidoc'
+      'asciinema'
+      'aspcud'
+      'aspell'
+      'atk'
+      'autoconf'
+      'automake'
+      'awscli'
+      'babel'
+      'bash'
+      'bash-completion@2'
+      'bash-git-prompt'
+      'bashish'
+      'bcrypt'
+      'bdw-gc'
+      'berkeley-db'
+      'bfg'
+      'bibutils'
+      'bind'
+      'binutils'
+      'boost'
+      'boost-python'
+      'boot-clj'
+      'brew-cask-completion'
+      'bzip2'
+      'c-ares'
+      'cabal-install'
+      'cabextract'
+      'cadaver'
+      'cairo'
+      'camlp4'
+      'carthage'
+      'ccat'
+      'cheat'
+      'chicken'
+      'chrome-cli'
+      'chromedriver'
+      'clasp'
+      'clingo'
+      'clisp'
+      'cloc'
+      'cloog'
+      'closure-compiler'
+      'closure-stylesheets'
+      'cmake'
+      'cnats'
+      'codequery'
+      'colordiff'
+      'consul'
+      'consul-template'
+      'coreutils'
+      'cowsay'
+      'cscope'
+      'csv-fix'
+      'cunit'
+      'curl'
+      'curlish'
+      'czmq'
+      'dateutils'
+      'dbus'
+      'dcraw'
+      'deisctl'
+      'dialog'
+      'diction'
+      'diff-pdf'
+      'diff-so-fancy'
+      'diffutils'
+      'direnv'
+      'dirmngr'
+      'django-completion'
+      'djvulibre'
+      'dnsmasq'
+      'docbook'
+      'docbook-xsl'
+      'docker'
+      'docker-clean'
+      'docker-cloud'
+      'docker-compose'
+      'docker-credential-helper'
+      'docker-gen'
+      'docker-machine'
+      'docker-swarm'
+      'docutils'
+      'dos2unix'
+      'doxygen'
+      'drip'
+      'duti'
+      'dvm'
+      'dwdiff'
+      'ecj'
+      'editorconfig'
+      'elinks'
+      'emacs --HEAD --with-cocoa --with-gnutls --with-imagemagick@6 --with-librsvg --with-modules'
+      'exif'
+      'exiftags'
+      'exiftool'
+      'expat'
+      'expect'
+      'faac'
+      'faad2'
+      'fasd'
+      'ffmpeg'
+      'fftw'
+      'figlet'
+      'findutils'
+      'fontconfig'
+      'fontforge'
+      'fortune'
+      'fpp'
+      'freetype'
+      'fswatch'
+      'fzf'
+      'gawk'
+      'gcc'
+      'gd'
+      'gdbm'
+      'gdk-pixbuf'
+      'geoip'
+      'getdns'
+      'gettext'
+      'ghc'
+      'ghostscript'
+      'giflib'
+      'gifsicle'
+      'gist'
+      'git'
+      'git-extras'
+      'git-flow-avh'
+      'git-hooks'
+      'git-lfs'
+      'git-subrepo'
+      'git-tracker'
+      'glib'
+      'global'
+      'gmime'
+      'gmp'
+      'gnu-getopt'
+      'gnu-indent'
+      'gnu-sed'
+      'gnu-tar'
+      'gnu-time'
+      'gnu-which'
+      'gnupg'
+      'gnuplot'
+      'gnutls'
+      'go'
+      'gobject-introspection'
+      'gpac'
+      'gpg-agent'
+      'gradle'
+      'graphicsmagick'
+      'graphite2'
+      'graphviz'
+      'grc'
+      'grep'
+      'gringo'
+      'gsasl'
+      'gtk+'
+      'gts'
+      'gzip'
+      'hachoir-metadata'
+      'handbrake'
+      'haproxy'
+      'harfbuzz'
+      'haskell-stack'
+      'hicolor-icon-theme'
+      'highlight'
+      'html-xml-utils'
+      'htmlcleaner'
+      'httpie'
+      'httrack'
+      'hub'
+      'hunspell'
+      'icu4c'
+      'id3tool'
+      'ilmbase'
+      'imagemagick'
+      'intltool'
+      'irssi'
+      'isl'
+      'jansson'
+      'jasper'
+      'jbig2dec'
+      'jemalloc'
+      'jo'
+      'jpeg'
+      'jpeg-archive'
+      'jpeg-turbo'
+      'jpeginfo'
+      'jpegoptim'
+      'jq'
+      'jshon'
+      'jsonlint'
+      'jsonpp'
+      'juju'
+      'known_hosts'
+      'kubernetes-cli'
+      'lame'
+      'languagetool'
+      'lastpass-cli'
+      'latex2rtf'
+      'latexml'
+      'launchctl-completion'
+      'lcdf-typetools'
+      'ledger'
+      'leiningen'
+      'leptonica'
+      'less'
+      'lesspipe'
+      'libassuan'
+      'libatomic_ops'
+      'libcaca'
+      'libcroco'
+      'libdnet'
+      'libdvdcss'
+      'libev'
+      'libevent'
+      'libexif'
+      'libffi'
+      'libgcrypt'
+      'libgpg-error'
+      'libgphoto2'
+      'libgsf'
+      'libicns'
+      'libiconv'
+      'libidn'
+      'libiscsi'
+      'libksba'
+      'liblqr'
+      'libmpc'
+      'libnfs'
+      'libogg'
+      'libpng'
+      'libpq'
+      'libquvi'
+      'librevenge'
+      'librsvg'
+      'libsigsegv'
+      'libsodium'
+      'libssh'
+      'libssh2'
+      'libsvg'
+      'libsvg-cairo'
+      'libtasn1'
+      'libtermkey'
+      'libtiff'
+      'libtool'
+      'libunistring'
+      'libusb'
+      'libusb-compat'
+      'libuv'
+      'libvo-aacenc'
+      'libvorbis'
+      'libvpx'
+      'libvterm'
+      'libwebm'
+      'libwmf'
+      'libwpd'
+      'libxml2'
+      'libyaml'
+      'libzip'
+      'lighttpd'
+      'liquidprompt'
+      'litmus'
+      'little-cms2'
+      'llvm'
+      'lmdb'
+      'logrotate'
+      'lua'
+      'luajit'
+      'lxc'
+      'lynx'
+      'lzlib'
+      'lzo'
+      'm4'
+      'mackup'
+      'macvim'
+      'mad'
+      'mailutils'
+      'make'
+      'makedepend'
+      'mas'
+      'maven'
+      'md5sha1sum'
+      'mdv'
+      'media-info'
+      'mercurial'
+      'minio-mc'
+      'mobile-shell'
+      'mosh'
+      'mozjpeg'
+      'mpfr'
+      'mr'
+      'msgpack'
+      'mtr'
+      'multimarkdown'
+      'multitail'
+      'mupdf-tools'
+      'mycli'
+      'nasm'
+      'ncdu'
+      'neofetch'
+      'neon'
+      'neovim'
+      'net-snmp'
+      'netcat'
+      'netpbm'
+      'nettle'
+      'nghttp2'
+      'nmap'
+      'node --without-npm'
+      'node@4 --without-npm'
+      'node@6 --without-npm'
+      'notmuch'
+      'npth'
+      'nvm'
+      'ocaml'
+      'ocamlbuild'
+      'oniguruma'
+      'opam'
+      'open-completion'
+      'openconnect'
+      'openexr'
+      'openjpeg'
+      'openssh'
+      'openssl'
+      'optipng'
+      'opus'
+      'orc'
+      'otto'
+      'p11-kit'
+      'p7zip'
+      'packer'
+      'packer-completion'
+      'pandoc'
+      'pango'
+      'par'
+      'parallel'
+      'pcre'
+      'pdfcrack'
+      'pdfgrep'
+      'pgcli'
+      'phantomjs'
+      'pigz'
+      'pinentry'
+      'pinentry-mac'
+      'pixman'
+      'pkg-config'
+      'plantuml'
+      'pmd'
+      'pngcrush'
+      'pngnq'
+      'pngquant'
+      'poco'
+      'poppler'
+      'popt'
+      'poster'
+      'postgresql'
+      'potrace'
+      'protobuf'
+      'pstree'
+      'pth'
+      'purescript'
+      'py2cairo'
+      'pyenv'
+      'pyenv-virtualenv'
+      'pygobject3'
+      'pyqt'
+      'python'
+      'python3'
+      'qpdf'
+      'qscintilla2'
+      'qt'
+      'quvi'
+      'ranger'
+      'rbenv'
+      'rcm'
+      're2c'
+      'readline'
+      'reattach-to-user-namespace'
+      'recode'
+      'redis'
+      'rename'
+      'renameutils'
+      'rethinkdb'
+      'roswell'
+      'rsync'
+      'rtmpdump'
+      'ruby'
+      'ruby-build'
+      'rust'
+      'sane-backends'
+      'sbcl'
+      'scheme48'
+      'scons'
+      'screenresolution'
+      'sdl'
+      'sdl_image'
+      'selecta'
+      'selenium-server-standalone'
+      'serf'
+      'shared-mime-info'
+      'shellcheck'
+      'sip'
+      'sl'
+      'smartypants'
+      'spark'
+      'spdylay'
+      'sphinx-doc'
+      'sqlite'
+      'sqlmap'
+      'ssh-copy-id'
+      'sslmate'
+      'stoken'
+      'stow'
+      'sudolikeaboss'
+      'surfraw'
+      'tag'
+      'taglib'
+      'talloc'
+      'task-spooler'
+      'terminal-notifier'
+      'tesseract'
+      'texi2html'
+      'texinfo'
+      'the_platinum_searcher'
+      'the_silver_searcher'
+      'thefuck'
+      'theora'
+      'tidy-html5'
+      'tmux'
+      'tmuxinator-completion'
+      'tnef'
+      'tor'
+      'transmission'
+      'trash'
+      'tree'
+      'ttfautohint'
+      'tvnamer'
+      'txt2tags'
+      'typescript'
+      'ucl'
+      'unbound'
+      'unibilium'
+      'unison'
+      'unrar'
+      'unrtf'
+      'unzip'
+      'upx'
+      'urlview'
+      'utf8proc'
+      'vagrant-completion'
+      'vault'
+      'vcprompt'
+      'w3m'
+      'watch'
+      'watchman'
+      'wdiff --with-gettext'
+      'webalizer'
+      'webkit2png'
+      'webp'
+      'wget'
+      'wine'
+      'winetricks'
+      'wrk'
+      'wxmac'
+      'x264'
+      'x265'
+      'xapian'
+      'xmlstarlet'
+      'xmlto'
+      'xvid'
+      'xz'
+      'yarn'
+      'yasm'
+      'zeromq'
+      'zlib'
+      'zopfli'
+    )
 
-            [[ $? ]] && e_success "Done"
-        fi
+    for index in ${!desired_formulae[*]}
+    do
+      if ! formula_exists ${desired_formulae[$index]}; then
+        # Store the name (and options) of every missing formula
+        missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
+      fi
+    done
 
-        # use latest rsync rather than out-dated OS X rsync
-        # install separately from the main formulae list to fix gh-19
-        brew install https://raw.github.com/Homebrew/homebrew-dupes/master/rsync.rb
+    if [[ "$missing_formulae" ]]; then
+      # Convert the array of missing formula into a list of space-separate strings
+      list_formulae=$( printf "%s " "${missing_formulae[@]}" )
 
-        # Remove outdated versions from the Cellar
-        brew cleanup
-    else
-        printf "\n"
-        e_error "Error: Homebrew not found."
-        printf "Aborting...\n"
-        exit
+      e_header "Installing missing Homebrew formulae..."
+      # Install all missing formulae
+      brew install $list_formulae
+
+      [[ $? ]] && e_success "Done"
     fi
 
+    # Remove outdated versions from the Cellar
+    brew cleanup
+  else
+    printf "\n"
+    e_error "Error: Homebrew not found."
+    printf "Aborting...\n"
+    exit
+  fi
 }
+run_brew
