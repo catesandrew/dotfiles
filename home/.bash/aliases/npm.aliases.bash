@@ -2,18 +2,30 @@
 
 # alias nup='for package in $(npm -g outdated --parseable --depth=0 | cut -d: -f2); do IFS='@' read -ra splits <<< "${package}" && if [ "${splits[0]}" != "npm" ]; then npm -g install "$package"; fi done'
 
-nup() { NPM_CONFIG_PREFIX="${NVM_DIR}/versions/node/v${NVM_VERSION}"; for package in $(\ls -F "${NPM_CONFIG_PREFIX}/lib/node_modules" | sed -n 's/[^@]$//p' | xargs npm outdated --no-color -pg --depth=0 | awk '{gsub(/\/.*\//,"",$1); print}' | \grep -o ":.*:" | sed 's/.$//; s/^.//'); do IFS=@ read -ra splits <<< "${package}" && if [ "${splits[0]}" != "npm" ]; then npm install -g "${package}"; fi done }
+nup() { NPM_CONFIG_PREFIX="${NVM_DIR}/versions/node/v${NVM_VERSION}"; for package in $(\ls -F "${NPM_CONFIG_PREFIX}/lib/node_modules" | sed -n 's/[^@]$//p' | xargs npm outdated --no-color -pg --depth=0 | awk '{gsub(/\/.*\//,"",$1); print}' | awk -F":" '{print $2}'); do IFS=@ read -ra splits <<< "${package}" && if [ "${splits[0]}" != "npm" ]; then npm install -g "${package}"; fi done }
 
-# Get old globally linked repos
-# links=( $(\ls -F "${NVM_DIR}/versions/node/v4.7.0/lib/node_modules" | sed -n 's/[@]$//p') )
-# for i in ${!links[@]}; do l=${links[$i]} && printf "%s\t%s\n" $i $l && ln -snf $(readlink ${NVM_DIR}/versions/node/v4.7.0/lib/node_modules/$l) ${NVM_DIR}/versions/node/v6.10.3/lib/node_modules/$l; done
+function npm_migrate() {
+  local from_ver repos links
+  from_ver="$1"
 
-# Get old globally installed repos
-# repos=( $(\ls -F "${NVM_DIR}/versions/node/v4.7.0/lib/node_modules" | sed -n 's/[^@]$//p' | sed -n 's/$npm$//p' | sed -n 's/$@npm$//p') )
-# repos=( $(\ls -F "${NVM_DIR}/versions/node/v4.7.0/lib/node_modules" | gsed -n 's/[^@]$//p' | awk '!/^npm$/' | awk '!/^@npm$/') )
-# echo ${repos[@]}
-# Reinstall repos
-# for i in ${!repos[@]}; do r=${repos[$i]} && printf "%s\t%s\n" $i $r && npm install -g $r; done
+  # Get old globally linked repos
+  links=( $(\ls -F "${NVM_DIR}/versions/node/v${from_ver}/lib/node_modules" | sed -n 's/[@]$//p') )
+
+  # Get old globally installed repos
+  if hash gsed 2>/dev/null; then
+    repos=( $(\ls -F "${NVM_DIR}/versions/node/v${from_ver}/lib/node_modules" | gsed -n 's/[^@]$//p' | awk '!/^npm$/' | awk '!/^@/') )
+  else
+    repos=( $(\ls -F "${NVM_DIR}/versions/node/v${from_ver}/lib/node_modules" | sed -n 's/[^@]$//p' | awk '!/^npm$/' | awk '!/^@/') )
+  fi;
+
+  # echo ${repos[@]}
+
+  # Reinstall repos
+  for i in "${!repos[@]}"; do r=${repos[$i]} && printf "%s\t%s\n" "$i" "$r" && npm install -g "$r"; done
+
+  # Relink globally linked repos
+  for i in "${!links[@]}"; do l=${links[$i]} && printf "%s\t%s\n" "$i" "$l" && ln -snf "$(readlink "${NVM_DIR}/versions/node/v${from_ver}/lib/node_modules/$l")" "${NVM_DIR}/versions/node/v${NVM_VERSION}/lib/node_modules/$l"; done
+}
 
 __npm_func_wrap () {
   local cur words cword prev
