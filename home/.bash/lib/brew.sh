@@ -172,7 +172,6 @@ run_brew() {
       'doxygen'
       'drip'
       'duti'
-      'dvm'
       'dwdiff'
       'ecj'
       'editorconfig'
@@ -500,7 +499,6 @@ run_brew() {
       'sslmate'
       'stoken'
       'stow'
-      'sudolikeaboss'
       'surfraw'
       'tag'
       'taglib'
@@ -547,8 +545,6 @@ run_brew() {
       'webkit2png'
       'webp'
       'wget'
-      'wine'
-      'winetricks'
       'wrk'
       'wxmac'
       'x264'
@@ -564,6 +560,8 @@ run_brew() {
       'zlib'
       'zopfli'
     )
+
+    # TODO: Log unfound packages so user may delete them
 
     for index in ${!desired_formulae[*]}
     do
