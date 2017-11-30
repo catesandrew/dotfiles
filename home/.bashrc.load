@@ -131,7 +131,7 @@ elif [ "$__dot_system_type" == "Linux" ]; then
       __dot_brew_list=($(brew list | sed 's/:.*//'))
       __dot_brew_taps=($(brew tap | sed 's/:.*//'))
     fi
-
+    export HOMEBREW_TEMP=/tmp
     if [ -z $BREW_HOME ]; then
       BREW_HOME="$(brew --prefix)"
       export BREW_HOME

@@ -110,6 +110,7 @@ run_brew() {
       'boot-clj'
       'brew-cask-completion'
       'bzip2'
+      'bzr'
       'c-ares'
       'cabal-install'
       'cabextract'
