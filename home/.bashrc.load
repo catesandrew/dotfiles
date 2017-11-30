@@ -20,6 +20,12 @@ fi
 # [[ $- == *i*  ]] && echo 'Interactive' || echo 'Not interactive'
 [[ $- != *i*  ]] && return
 
+# If not runnint interactively, don't do anything
+# case $- in
+#   *i*) ;;
+#   *) return;;
+# esac
+
 # While `mvim` is running it keeps calling my login shell, do not know why, till
 # then, lets just disable it the best way we know how to. If MYVIMRC environment
 # variable does not work, there is also VIMRUNTIME to check for.
@@ -132,6 +138,11 @@ elif [ "$__dot_system_type" == "Linux" ]; then
     fi
 
     unset brew_cache
+  fi
+
+  # set variable identifying the chroot you work in (used in the prompt below)
+  if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
   fi
 
   if hash shopt 2>/dev/null; then
