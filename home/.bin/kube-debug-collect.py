@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# PATH=/bin:/usr/bin && find . -type f -name "*.tar.gz" -print0 -execdir tar xzvf {} \; -delete
 import json
 import os
 import tempfile
