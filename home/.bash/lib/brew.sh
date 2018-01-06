@@ -19,6 +19,14 @@ e_warning() {
   printf "$(tput setaf 136)! %s$(tput sgr0)\n" "$@"
 }
 
+contains_element () {
+  local f="$1"
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && e_success "$e already installed." && return 0; done
+  e_warning "Missing formula: $f" && return 1
+}
+
 # Test whether a Homebrew formula is already installed
 # $1 - formula name (may include options)
 formula_exists() {
@@ -49,6 +57,7 @@ run_brew() {
     [[ $? ]] && e_success "Done"
 
     e_header "Updating any existing Homebrew taps..."
+    local __brew_taps=($(brew tap | sed 's/:.*//'))
 
     local -a desired_tap=(
       'caskroom/cask'
@@ -74,7 +83,12 @@ run_brew() {
     brew upgrade
     [[ $? ]] && e_success "Done"
 
+    # brew cask install 'xquartz'
+
     e_header "Checking status of desired Homebrew formulae..."
+    local __brew_list=($(brew list | sed 's/:.*//'))
+
+    # TODO Build the list so dependencies align properly
     local list_formulae
     local -a missing_formulae
     local -a desired_formulae=(
@@ -82,7 +96,6 @@ run_brew() {
       'adns'
       'ansible'
       'ansiweather'
-      'ant'
       'apparix'
       'archey'
       'asciidoc'
@@ -177,7 +190,7 @@ run_brew() {
       'ecj'
       'editorconfig'
       'elinks'
-      'emacs --HEAD --with-cocoa --with-gnutls --with-imagemagick@6 --with-librsvg --with-modules'
+      'emacs'
       'exif'
       'exiftags'
       'exiftool'
@@ -396,9 +409,9 @@ run_brew() {
       'nettle'
       'nghttp2'
       'nmap'
-      'node --without-npm'
-      'node@4 --without-npm'
-      'node@6 --without-npm'
+      'node'
+      'node@4'
+      'node@6'
       'notmuch'
       'npth'
       'nvm'
@@ -565,24 +578,264 @@ run_brew() {
 
     # TODO: Log unfound packages so user may delete them
 
-    for index in ${!desired_formulae[*]}
-    do
-      if ! formula_exists ${desired_formulae[$index]}; then
+    for index in ${!desired_formulae[*]}; do
+      if ! contains_element "${desired_formulae[$index]}" "${__brew_list[@]}"; then
         # Store the name (and options) of every missing formula
         missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
       fi
     done
 
     if [[ "$missing_formulae" ]]; then
-      # Convert the array of missing formula into a list of space-separate strings
-      list_formulae=$( printf "%s " "${missing_formulae[@]}" )
-
       e_header "Installing missing Homebrew formulae..."
-      # Install all missing formulae
-      brew install $list_formulae
+
+      for item in "${missing_formulae[@]}"; do
+        e_header "Installing $item..."
+        case "$item" in
+          emacs)
+            brew install emacs --HEAD --with-cocoa --with-gnutls --with-imagemagick@6 --with-librsvg --with-modules;
+            ;;
+          node)
+            brew install node --without-npm
+            ;;
+          node@4)
+            brew install node@4 --without-npm
+            ;;
+          node@6)
+            brew install node@6 --without-npm
+            ;;
+          *)
+            brew install $item
+        esac
+      done
+
+      # Convert the array of missing formula into a list of space-separate strings
+      # list_formulae=$( printf "%s " "${missing_formulae[@]}" )
+
+      # e_header "Installing missing Homebrew formulae..."
+      # brew install $list_formulae
 
       [[ $? ]] && e_success "Done"
     fi
+
+    __cask_list=($(brew cask list | sed 's/:.*//'))
+    local cask_list_formulae
+    local -a cask_missing_formulae
+    local -a cask_desired_formulae=(
+      '1password'
+      '1password-cli'
+      'android-sdk'
+      'app-tamer'
+      'atom'
+      'audio-hijack'
+      'bartender'
+      'beamer'
+      'bettertouchtool'
+      'betterzip'
+      'betterzipql'
+      'bitbar'
+      'busycontacts'
+      'butler'
+      'calibre'
+      'charles'
+      'cheatsheet'
+      'clarify'
+      'cloudapp'
+      'coderunner'
+      'commander-one'
+      'controlplane'
+      'curio'
+      'dash'
+      'data-rescue'
+      'deltawalker'
+      'droplr'
+      'eaglefiler'
+      'easysimbl'
+      'electron'
+      'epubmdimporter'
+      'epubquicklook'
+      'fastlane'
+      'firefox'
+      'firefoxdeveloperedition'
+      'flux'
+      'focused'
+      'foldingtext-dev'
+      'font-open-iconic'
+      'font-open-sans'
+      'font-raleway'
+      'font-xits'
+      'fontforge'
+      'forklift'
+      'gas-mask'
+      'genymotion'
+      'ghost'
+      'gitbook-editor'
+      'gitup'
+      'google-chrome-canary'
+      'hammerspoon'
+      'handbrake'
+      'hazel'
+      'houdahspot'
+      'hyper'
+      'iconjar'
+      'ifunbox'
+      'imagealpha'
+      'imagemin'
+      'imageoptim'
+      'istat-menus'
+      'iterm2'
+      'jaikoz'
+      'java'
+      'java6'
+      'java8'
+      'karabiner-elements'
+      'keepassx'
+      'keyboard-maestro'
+      'kindle'
+      'kindlegen'
+      'launchbar'
+      'launchcontrol'
+      'leech'
+      'licecap'
+      'lightpaper'
+      'macpass'
+      'mactex'
+      'mailmate'
+      'maltego-casefile'
+      'maltego-ce'
+      'markdownmdimporter'
+      'mattermost'
+      'mediainfo'
+      'minikube'
+      'moom'
+      'name-mangler'
+      'netspot'
+      'obs'
+      'omnifocus'
+      'omnigraffle'
+      'omnioutliner'
+      'omniplan'
+      'optionspace'
+      'pacifist'
+      'paw'
+      'pdfexpert'
+      'pdfkey-pro'
+      'pdfpenpro'
+      'platypus'
+      'prefs-editor'
+      'provisionql'
+      'psequel'
+      'qlcolorcode'
+      'qlimagesize'
+      'qlmarkdown'
+      'qlnetcdf'
+      'qlprettypatch'
+      'qlrest'
+      'qlstephen'
+      'qlvideo'
+      'querious'
+      'quicklook-csv'
+      'quicklook-json'
+      'quicknfo'
+      'quotefix'
+      'rcdefaultapp'
+      'react-native-debugger'
+      'resolutionator'
+      'scapple'
+      'screenflow'
+      'scrivener'
+      'selfcontrol'
+      'sigil'
+      'skim'
+      'slack'
+      'sonos'
+      'spamsieve'
+      'suspicious-package'
+      'the-escapers-flux'
+      'time-sink'
+      'tower'
+      'transmission'
+      'ttscoff-mmd-quicklook'
+      'tuntap'
+      'vagrant'
+      'vagrant-manager'
+      'virtualbox'
+      'virtualbox-extension-pack'
+      'vlc'
+      'waltr'
+      'webpquicklook'
+      'witch'
+      'xee'
+      'xquartz'
+      'yasu'
+      'zotero'
+    )
+
+    for index in ${!cask_desired_formulae[*]}; do
+      if ! contains_element "${cask_desired_formulae[$index]}" "${__cask_list[@]}"; then
+        cask_missing_formulae=("${cask_missing_formulae[@]}" "${cask_desired_formulae[$index]}")
+      fi
+    done
+
+    if [[ "$cask_missing_formulae" ]]; then
+      e_header "Installing missing Homebrew Cask formulae..."
+
+      for item in "${cask_missing_formulae[@]}"; do
+        e_header "Installing $item..."
+        case "$item" in
+          *)
+            brew cask install $item
+        esac
+      done
+
+      [[ $? ]] && e_success "Done"
+    fi
+
+    # for appdir in /usr/local/caskroom/*; do
+    #   [ -d "$appdir" ] || continue
+    #   app="${appdir##*/}"
+
+    #   verlocal="$(find "$appdir"/* -type d -print -quit)"
+    #   verlocal="${verlocal##*/}"
+    #   verlatest="$(brew cask info "$app" | awk -v app="$app" '$1 == app":"{print $2;}')"
+
+    #   case "$apps" in
+    #     *"$sentinel$app$sentinel"*)
+    #       if [ "$verbose" -ne 0 ]; then
+    #         printf -- ':: found app: %s\n' "$app"
+    #         printf -- 'local  version: %s\n' "$verlocal"
+    #         printf -- 'latest version: %s\n' "$verlatest"
+    #       fi
+
+    #       if [ "$latest" -ne 0 ] && [ "$verlocal" = 'latest' ] || [ "$verlocal" != "$verlatest" ]; then
+    #         brew cask install --force "$app" && [ "$verlocal" != "$verlatest" ] && rm -rf "${appdir}/${verlocal}"
+    #       fi
+    #       ;;
+    #     *)
+    #       printf -- 'app not found: %s\n' "$app"
+    #       ;;
+    #   esac
+    # done
+
+    # function cask_update() {
+    #   rm -rf "$(brew --cache)"
+    #   local caskApps=$(ls $BREW_HOME/caskroom) # Lists the casks in the Caskroom
+
+    #   for app in ${caskApps}; do # For every app there, do this
+    #     appToCheck=$(brew cask list | grep "${app}") # If the app is not present in `brew cask list`, this variable will be empty
+
+    #     if [[ -z "${appToCheck}" ]]; then # If the variable is empty, then
+    #       brew cask install --force "${app}" # Force an install of the app
+    #     fi
+    #   done
+    # }
+
+    # function cask_reinstall() {
+    #   rm -rf "$(brew --cache)"
+
+    #   for app in $(brew cask list); do
+    #     brew cask install --force "${app}"
+    #   done
+    # }
 
     # Remove outdated versions from the Cellar
     brew cleanup
