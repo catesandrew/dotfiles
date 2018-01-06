@@ -37,6 +37,7 @@ function osx_upgrade_bash4 {
   if [[ $new_version > $BASH_VERSION ]]; then
     echo "Found Bash v$new_version"
     # and try preserving all the invocation options
+    export SHELL=/usr/local/bin/bash
     exec -l /usr/local/bin/bash -l${-//[chimBH]/} # "$@"
   fi
 }
