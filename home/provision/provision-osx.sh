@@ -6,15 +6,11 @@
 # Some things taken from here
 # https://github.com/mathiasbynens/dotfiles/blob/master/.osx
 
-#  Reset text attributes to normal + without clearing screen.
-alias Reset="tput sgr0"
-
 # Color-echo.
 # arg $1 = message
 # arg $2 = Color
 cecho() {
   echo "${2}${1}"
-  Reset # Reset to normal.
   return
 }
 
@@ -37,8 +33,8 @@ cecho "understood that it will make changes to your computer? (y/n)" $red
 read -r response
 case $response in
   [yY]) CONTINUE=true
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 if ! $CONTINUE; then
@@ -63,8 +59,8 @@ read -r response
 case $response in
   [yY])
     defaults write -g NSTextKillRingSize -int 3
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 ###############################################################################
@@ -93,27 +89,9 @@ case $response in
 
     sudo -u $USER -H ln -s ${HOMEBREW_PREFIX}/bin/brew ${PREFIX}/bin
 
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
-
-# install homebrew cask
-
-# brew cask install virtualbox
-# https://github.com/caskroom/homebrew-cask/issues/3333
-(
-  cd /tmp;
-  vbox_full_version=$(brew cask info virtualbox | head -1 | cut -d' ' -f2);
-  vbox_short_version=${vbox_full_version/-*};
-  curl -L -O http://download.virtualbox.org/virtualbox/${vbox_short_version}/Oracle_VM_VirtualBox_Extension_Pack-${vbox_full_version}.vbox-extpack;
-  sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-${vbox_full_version}.vbox-extpack;
-  rm *.vbox-extpack;
-)
-
-# brew cask install vagrant
-# brew cask install vagrant-manager
-
-# install homebrew fonts
 
 echo ""
 echo "Would you like to install your dotfiles?  (y/n)"
@@ -130,8 +108,8 @@ case $response in
       exec_cmd 'cp "${DFM_REPO}/home/.gitconfig-private.template ${HOME}/.gitconfig-private"'
 
       print_status 'Edit the .gitconfig-local and .gitconfig-private files'
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 ###############################################################################
@@ -149,8 +127,8 @@ case $response in
       sudo scutil --set HostName $COMPUTER_NAME
       sudo scutil --set LocalHostName $COMPUTER_NAME
       sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $COMPUTER_NAME
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 echo ""
@@ -171,8 +149,8 @@ case $response in
         "/System/Library/CoreServices/Menu Extras/AirPort.menu" \
         "/System/Library/CoreServices/Menu Extras/Battery.menu" \
         "/System/Library/CoreServices/Menu Extras/Clock.menu"
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 echo ""
@@ -181,8 +159,8 @@ read -r response
 case $response in
   [yY])
       sudo chmod 600 /System/Library/CoreServices/Search.bundle/Contents/MacOS/Search
-      break;;
-  *) break;;
+      ;;
+  *) ;;
 esac
 
 echo ""
@@ -210,8 +188,8 @@ read -r response
 case $response in
   [yY])
     defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -233,8 +211,8 @@ case $response in
   [yY])
     defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
     defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -244,8 +222,8 @@ read -r response
 case $response in
   [yY])
     sudo defaults write /Library/Preferences/.GlobalPreferences.plist _HIEnableThemeSwitchHotKey -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
@@ -259,8 +237,8 @@ read -r response
 case $response in
   [yY])
     sudo pmset -a hibernatemode 0
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -274,8 +252,8 @@ case $response in
     sudo touch /Private/var/vm/sleepimage
     echo "and make sure it can't be rewritten"
     sudo chflags uchg /Private/var/vm/sleepimage
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -284,8 +262,8 @@ read -r response
 case $response in
   [yY])
     sudo pmset -a sms 0
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -294,8 +272,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -334,8 +312,8 @@ read -r response
 case $response in
   [yY])
     defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -353,8 +331,8 @@ read -r response
 case $response in
   [yY])
     sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -363,8 +341,8 @@ read -r response
 case $response in
   [yY])
     sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Keyboard Enabled" -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 ###############################################################################
@@ -427,8 +405,8 @@ echo "Show icons for hard drives, servers, and removable media on the desktop? (
 case $response in
   [yY])
     defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -437,8 +415,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.Finder AppleShowAllFiles -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -447,8 +425,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.finder AppleShowAllFiles TRUE
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -457,8 +435,8 @@ read -r response
 case $response in
   [yY])
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -467,8 +445,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.finder ShowStatusBar -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -477,8 +455,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -487,8 +465,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -497,8 +475,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.finder FXPreferredViewStyle Clmv
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -507,8 +485,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -519,8 +497,8 @@ case $response in
     defaults write com.apple.frameworks.diskimages skip-verify -bool true
     defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
     defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -544,8 +522,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.dock persistent-apps -array
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -565,8 +543,8 @@ case $response in
     defaults write com.apple.dock autohide -bool true
     defaults write com.apple.dock autohide-delay -float 0
     defaults write com.apple.dock autohide-time-modifier -float 0
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
@@ -643,8 +621,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -653,8 +631,8 @@ read -r response
 case $response in
   [yY])
     hash tmutil &> /dev/null && sudo tmutil disablelocal
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
@@ -668,8 +646,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -678,8 +656,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 echo ""
@@ -688,8 +666,8 @@ read -r response
 case $response in
   [yY])
     defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
@@ -724,8 +702,8 @@ case $response in
     echo ""
     echo "Hide the legal disclaimer"
     defaults write org.m0k.transmission WarningLegal -bool false
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
@@ -745,8 +723,8 @@ case $response in
     echo ""
     echo "Setting Git to use Sublime Text as default editor"
     git config --global core.editor "subl -n -w"
-    break;;
-  *) break;;
+    ;;
+  *) ;;
 esac
 
 
