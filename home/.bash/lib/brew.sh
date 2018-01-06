@@ -265,6 +265,7 @@ run_brew() {
       'intltool'
       'irssi'
       'isl'
+      'ldapvi'
       'jansson'
       'jasper'
       'jbig2dec'
