@@ -91,26 +91,8 @@ function enableForApp(app)
   appWatcher:start()
 end
 
--- Previous Seil Keybindings
--- Caps Lock (51) → Left Control (59)
--- Left Control (59) → F19 (80)
-
--- Brett's Binding
--- Caps Lock → F18
--- A global variable for the Hyper Mode
-k = hotkey.modal.new({}, "F17")
-
--- Trigger existing hyper key shortcuts
--- Hyper+key for all the below are setup somewhere
-hyperBindings = {'z', 'd', 'h', 'c', 'l', 'r', 'y', 'p', ';', 'w'}
-
-for i,key in ipairs(hyperBindings) do
-  k:bind({}, key, nil, function() hs.eventtap.keyStroke({'cmd','alt','shift','ctrl'}, key)
-    k.triggered = true
-  end)
-end
-
--- build our own
+-- TODO Update keyboard settings from below:
+-- https://github.com/jasonrudolph/keyboard
 
 appWorkflow = [[
   set appName to "%s"
@@ -132,12 +114,10 @@ appWorkflow = [[
 launchAppleScript = function(appName)
   str = string.format(appWorkflow, appName)
   osascript.applescript(str)
-  k.triggered = true
 end
 
 launchSingle = function(appname)
   hs.application.launchOrFocus(appname)
-  k.triggered = true
 end
 
 oascripts = {
@@ -171,9 +151,9 @@ oascripts = {
 }
 
 for i, app in ipairs(oascripts) do
-  k:bind({}, app[1], function()
+  hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app[1], function()
       launchAppleScript(app[2])
-                     end, nil, function()
+        end, nil, function()
       launchAppleScript(app[2])
   end)
   enableForApp(app[2])
@@ -194,100 +174,17 @@ launchDouble = function(appName1, appName2)
   else
     -- alert(string.format('launching app: %s', appName2))
     hs.application.launchOrFocus(appName2)
-    k.triggered = true
   end
 end
 
 for i, app in ipairs(doubleapps) do
-  k:bind({}, app[1], function()
+  hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app[1], function()
       launchDouble(app[2], app[3])
                      end, nil, function ()
       launchDouble(app[2], app[3])
   end)
   enableForApp(app[2])
 end
-
--- Sequential keybindings, e.g. Hyper-a,f for Finder
--- a = hs.hotkey.modal.new({}, "F16")
--- apps = {
---   {'d', 'Twitter'},
---   {'f', 'Finder'},
---   {'s', 'Skype'},
--- }
--- for i, app in ipairs(apps) do
---   a:bind({}, app[1], function() launch(app[2]); a:exit(); end)
--- end
---
--- pressedA = function() a:enter() end
--- releasedA = function() end
--- k:bind({}, 'a', nil, pressedA, releasedA)
-
--- Enter Hyper Mode when F18 (Hyper/Capslock) is pressed
--- pressedF18 = function()
---   k.triggered = false
---   k:enter()
--- end
---
--- -- Leave Hyper Mode when F18 (Hyper/Capslock) is pressed,
--- --   send ESCAPE if no other keys are pressed.
--- releasedF18 = function()
---   k:exit()
---   if not k.triggered then
---     hs.eventtap.keyStroke({}, 'ESCAPE')
---   end
--- end
-
--- Bind the Hyper key
--- f18 = hotkey.bind({}, 'F18', pressedF18, releasedF18)
-
-
- -- Enter Hyper Mode when F19 (hyper/left control) is pressed
-pressedF19 = function()
-  k.triggered = false
-  k:enter()
-end
-
--- Leave Hyper Mode when F19 (hyper/left control) is pressed,
---   send ESCAPE if no other keys are pressed.
-releasedF19 = function()
-  k:exit()
-  if not k.triggered then
-    hs.eventtap.keyStroke({}, 'ESCAPE')
-  end
-end
-
---
-
--- lc = hotkey.modal.new({}, 'F17')
--- leftCtrlBindings = {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'}
---
--- for i,key in ipairs(hyperBindings) do
---   lc:bind({}, key, nil, function() hs.eventtap.keyStroke({'ctrl'}, key)
---     lc.triggered = true
---   end)
--- end
---
--- -- Enter when LeftCtrl (Capslock) is pressed
--- pressedLeftCtrl = function()
---   lc.triggered = false
---   lc:enter()
--- end
---
--- -- Leave when LeftCtrl (Capslock) is pressed,
--- --   send ESCAPE if no other keys are pressed.
--- releasedLeftCtrl = function()
---   lc:exit()
---   if not lc.triggered then
---     hs.eventtap.keyStroke({}, 'ESCAPE')
---   end
--- end
-
--- Bind the Hyper key
-function createHyper()
-  f19 = hotkey.bind({}, 'F19', pressedF19, releasedF19)
-  -- leftControl = hotkey.bind({}, 59, 'left control', pressedLeftCtrl, releasedLeftCtrl)
-end
-
 
 
 -- Cursor locator
@@ -420,7 +317,6 @@ function applyLayout(layout)
 end
 
 function init()
-  createHyper()
   createUsbWatcher()
   -- createHotkeys()
   -- keycodes.inputSourceChanged(rebindHotkeys)
