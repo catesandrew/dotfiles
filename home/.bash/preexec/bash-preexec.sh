@@ -130,6 +130,16 @@ __bp_in_prompt_command() {
 # environment to attempt to detect if the current command is being invoked
 # interactively, and invoke 'preexec' if so.
 __bp_preexec_invoke_exec() {
+    # Save the contents of $_ so that it can be restored later on.
+    # https://stackoverflow.com/questions/40944532/bash-preserve-in-a-debug-trap#40944702
+    __bp_last_argument_prev_command="$1"
+
+    # Checks if the file descriptor is not standard out (i.e. '1')
+    # __bp_delay_install checks if we're in test. Needed for bats to run.
+    # Prevents preexec from being invoked for functions in PS1
+    if [[ ! -t 1 && -z "$__bp_delay_install" ]]; then
+      return
+    fi
 
     if [[ -n "$COMP_LINE" ]]
     then
@@ -176,23 +186,55 @@ __bp_preexec_invoke_exec() {
 
     # For every function defined in our function array. Invoke it.
     local preexec_function
+    local preexec_ret_value=0
     for preexec_function in "${preexec_functions[@]}"; do
 
-        # Only execute each function if it actually exists.
-        # Test existence of function with: declare -[fF]
-        if type -t "$preexec_function" 1>/dev/null; then
-            $preexec_function "$this_command"
-        fi
+      # Only execute each function if it actually exists.
+      # Test existence of function with: declare -[fF]
+      if type -t "$preexec_function" 1>/dev/null; then
+        __bp_set_ret_value $__bp_last_ret_value
+        $preexec_function "$this_command"
+        preexec_ret_value="$?"
+      fi
     done
+
+    # Restore the last argument of the last executed command
+    # Also preserves the return value of the last function executed in preexec
+    # If `extdebug` is enabled a non-zero return value from the last function
+    # in prexec causes the command not to execute
+    # Run `shopt -s extdebug` to enable
+    __bp_set_ret_value "$preexec_ret_value" "$__bp_last_argument_prev_command"
 }
 
-# Execute this to set up preexec and precmd execution.
-__bp_preexec_and_precmd_install() {
+# Returns PROMPT_COMMAND with a semicolon appended
+# if it doesn't already have one.
+__bp_prompt_command_with_semi_colon() {
 
-    # Make sure this is bash that's running this and return otherwise.
-    if [[ -z "$BASH_VERSION" ]]; then
-        return 1;
+    # Trim our existing PROMPT_COMMAND
+    local trimmed
+    trimmed=$(__bp_trim_whitespace "$PROMPT_COMMAND")
+
+    # Take our existing prompt command and append a semicolon to it
+    # if it doesn't already have one.
+    local existing_prompt_command
+    if [[ -n "$trimmed" ]]; then
+        existing_prompt_command=${trimmed%${trimmed##*[![:space:]]}}
+        existing_prompt_command=${existing_prompt_command%;}
+        existing_prompt_command=${existing_prompt_command/%/;}
+    else
+        existing_prompt_command=""
     fi
+
+    echo -n "$existing_prompt_command"
+}
+
+__bp_install() {
+
+    # Remove setting our trap from PROMPT_COMMAND
+    PROMPT_COMMAND="${PROMPT_COMMAND//$__bp_trap_install_string}"
+
+    # Remove this function from our PROMPT_COMMAND
+    PROMPT_COMMAND="${PROMPT_COMMAND//__bp_install;}"
 
     # Exit if we already have this installed.
     if [[ "$PROMPT_COMMAND" == *"__bp_precmd_invoke_cmd"* ]]; then
@@ -202,29 +244,59 @@ __bp_preexec_and_precmd_install() {
     # Adjust our HISTCONTROL Variable if needed.
     __bp_adjust_histcontrol
 
-    # Take our existing prompt command and append a semicolon to it
-    # if it doesn't already have one.
+
+    # Issue #25. Setting debug trap for subshells causes sessions to exit for
+    # backgrounded subshell commands (e.g. (pwd)& ). Believe this is a bug in Bash.
+    #
+    # Disabling this by default. It can be enabled by setting this variable.
+    if [[ -n "$__bp_enable_subshells" ]]; then
+
+        # Set so debug trap will work be invoked in subshells.
+        set -o functrace > /dev/null 2>&1
+        shopt -s extdebug > /dev/null 2>&1
+    fi;
+
+
     local existing_prompt_command
+    existing_prompt_command=$(__bp_prompt_command_with_semi_colon)
 
-    if [[ -n "$PROMPT_COMMAND" ]]; then
-        existing_prompt_command=${PROMPT_COMMAND%${PROMPT_COMMAND##*[![:space:]]}}
-        existing_prompt_command=${existing_prompt_command%;}
-        existing_prompt_command=${existing_prompt_command/%/;}
-    else
-        existing_prompt_command=""
-    fi
-
-    # Finally install our traps.
-    PROMPT_COMMAND="__bp_precmd_invoke_cmd; ${existing_prompt_command} __bp_interactive_mode;"
-    trap '__bp_preexec_invoke_exec' DEBUG;
+    # Install our hooks in PROMPT_COMMAND to allow our trap to know when we've
+    # actually entered something.
+    PROMPT_COMMAND="__bp_precmd_invoke_cmd; ${existing_prompt_command} __bp_interactive_mode"
+    eval "$__bp_trap_install_string"
 
     # Add two functions to our arrays for convenience
     # of definition.
     precmd_functions+=(precmd)
     preexec_functions+=(preexec)
+
+    # Since this is in PROMPT_COMMAND, invoke any precmd functions we have defined.
+    __bp_precmd_invoke_cmd
+    # Put us in interactive mode for our first command.
+    __bp_interactive_mode
+}
+
+# Sets our trap and __bp_install as part of our PROMPT_COMMAND to install
+# after our session has started. This allows bash-preexec to be inlucded
+# at any point in our bash profile. Ideally we could set our trap inside
+# __bp_install, but if a trap already exists it'll only set locally to
+# the function.
+__bp_install_after_session_init() {
+
+    # Make sure this is bash that's running this and return otherwise.
+    if [[ -z "$BASH_VERSION" ]]; then
+        return 1;
+    fi
+
+    local existing_prompt_command
+    existing_prompt_command=$(__bp_prompt_command_with_semi_colon)
+
+    # Add our installation to be done last via our PROMPT_COMMAND. These are
+    # removed by __bp_install when it's invoked so it only runs once.
+    PROMPT_COMMAND="${existing_prompt_command} $__bp_trap_install_string __bp_install;"
 }
 
 # Run our install so long as we're not delaying it.
 if [[ -z "$__bp_delay_install" ]]; then
-    __bp_preexec_and_precmd_install
+    __bp_install_after_session_init
 fi;
