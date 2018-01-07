@@ -194,7 +194,6 @@ run_brew() {
       'aspcud'
       'camlp4'
       'ghostscript'
-      'libjpeg'
       'qpdf'
       'tesseract'
       'unpaper'
@@ -700,12 +699,16 @@ run_brew() {
       [[ $? ]] && e_success "Done"
     fi
 
-    e_header "Checking status of hacking Homebrew formulae..."
-    local __brew_taps=($(brew tap | sed 's/:.*//'))
+    e_header "Updating Homebrew..."
+    # Use the latest version of Homebrew
+    brew update
+    [[ $? ]] && e_success "Done"
+    e_header "Checking status of Homebrew hacking formulae..."
+    __brew_list=($(brew list | sed 's/:.*//'))
 
     # Install some CTF tools; see https://github.com/ctfs/write-ups
-    local -a missing_formulae
-    local -a desired_formulae=(
+    local -a hack_missing_formulae
+    local -a hack_desired_formulae=(
       'aircrack-ng'
       'bfg'
       'binutils'
@@ -728,24 +731,23 @@ run_brew() {
       'tcpreplay'
       'tcptrace'
       'ucspi-tcp'
-      'xpdf'
       'xz'
     )
 
-    for index in ${!desired_formulae[*]}; do
-      if ! contains_element "${desired_formulae[$index]}" "${__brew_list[@]}"; then
-        missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
+    for index in ${!hack_desired_formulae[*]}; do
+      if ! contains_element "${hack_desired_formulae[$index]}" "${__brew_list[@]}"; then
+        hack_missing_formulae=("${hack_missing_formulae[@]}" "${hack_desired_formulae[$index]}")
       fi
     done
 
-    if [[ "$missing_formulae" ]]; then
-      e_header "Installing missing Homebrew formulae..."
+    if [[ "$hack_missing_formulae" ]]; then
+      e_header "Installing missing Homebrew hack formulae..."
 
-      for item in "${missing_formulae[@]}"; do
+      for item in "${hack_missing_formulae[@]}"; do
         e_header "Installing $item..."
         case "$item" in
           *)
-            brew install $item
+            brew install "$item"
         esac
       done
       [[ $? ]] && e_success "Done"
