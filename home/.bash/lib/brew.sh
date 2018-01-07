@@ -104,6 +104,7 @@ run_brew() {
       'aspell'
       'atk'
       'autoconf'
+      'autoconf-archive'
       'automake'
       'awscli'
       'babel'
@@ -111,6 +112,7 @@ run_brew() {
       'bash-completion@2'
       'bash-git-prompt'
       'bashish'
+      'bazaar'
       'bcrypt'
       'bdw-gc'
       'berkeley-db'
@@ -118,12 +120,12 @@ run_brew() {
       'bibutils'
       'bind'
       'binutils'
+      'bison'
       'boost'
       'boost-python'
       'boot-clj'
       'brew-cask-completion'
       'bzip2'
-      'bzr'
       'c-ares'
       'cabal-install'
       'cabextract'
@@ -132,11 +134,14 @@ run_brew() {
       'camlp4'
       'carthage'
       'ccat'
+      'charm'
+      'charm-tools'
       'cheat'
       'chicken'
       'chrome-cli'
       'chromedriver'
       'clasp'
+      'clib'
       'clingo'
       'clisp'
       'cloc'
@@ -147,6 +152,7 @@ run_brew() {
       'cnats'
       'codequery'
       'colordiff'
+      'conjure-up'
       'consul'
       'consul-template'
       'coreutils'
@@ -191,6 +197,8 @@ run_brew() {
       'editorconfig'
       'elinks'
       'emacs'
+      'enscript'
+      'exact-image'
       'exif'
       'exiftags'
       'exiftool'
@@ -203,11 +211,13 @@ run_brew() {
       'fftw'
       'figlet'
       'findutils'
+      'flock'
       'fontconfig'
       'fontforge'
       'fortune'
       'fpp'
       'freetype'
+      'fribidi'
       'fswatch'
       'fzf'
       'gawk'
@@ -227,6 +237,7 @@ run_brew() {
       'git-extras'
       'git-flow-avh'
       'git-hooks'
+      'git-latexdiff'
       'git-lfs'
       'git-subrepo'
       'git-tracker'
@@ -240,13 +251,15 @@ run_brew() {
       'gnu-tar'
       'gnu-time'
       'gnu-which'
-      'gnupg'
+      'gnupg2'
       'gnuplot'
       'gnutls'
       'go'
       'gobject-introspection'
+      'godep'
       'gpac'
       'gpg-agent'
+      'gpgme'
       'gradle'
       'graphicsmagick'
       'graphite2'
@@ -278,7 +291,6 @@ run_brew() {
       'intltool'
       'irssi'
       'isl'
-      'ldapvi'
       'jansson'
       'jasper'
       'jbig2dec'
@@ -294,15 +306,22 @@ run_brew() {
       'jsonlint'
       'jsonpp'
       'juju'
+      'juju-wait'
       'known_hosts'
+      'kops'
       'kubernetes-cli'
+      'kubernetes-helm'
+      'kubetail'
       'lame'
       'languagetool'
       'lastpass-cli'
+      'latex-mk'
       'latex2rtf'
+      'latexdiff'
       'latexml'
       'launchctl-completion'
       'lcdf-typetools'
+      'ldapvi'
       'ledger'
       'leiningen'
       'leptonica'
@@ -324,11 +343,15 @@ run_brew() {
       'libgsf'
       'libicns'
       'libiconv'
+      'libid3tag'
       'libidn'
+      'libidn2'
       'libiscsi'
       'libksba'
       'liblqr'
+      'libmp3splt'
       'libmpc'
+      'libnet'
       'libnfs'
       'libogg'
       'libpng'
@@ -363,6 +386,7 @@ run_brew() {
       'lighttpd'
       'liquidprompt'
       'litmus'
+      'little-cms'
       'little-cms2'
       'llvm'
       'lmdb'
@@ -417,11 +441,13 @@ run_brew() {
       'nvm'
       'ocaml'
       'ocamlbuild'
+      'ocrmypdf'
       'oniguruma'
       'opam'
       'open-completion'
       'openconnect'
       'openexr'
+      'openh264'
       'openjpeg'
       'openssh'
       'openssl'
@@ -437,9 +463,11 @@ run_brew() {
       'pango'
       'par'
       'parallel'
+      'passpie'
       'pcre'
       'pdfcrack'
       'pdfgrep'
+      'pdfjam'
       'pgcli'
       'phantomjs'
       'pigz'
@@ -462,6 +490,7 @@ run_brew() {
       'pstree'
       'pth'
       'purescript'
+      'pwgen'
       'py2cairo'
       'pyenv'
       'pyenv-virtualenv'
@@ -486,6 +515,7 @@ run_brew() {
       'rethinkdb'
       'roswell'
       'rsync'
+      'rtf2latex2e'
       'rtmpdump'
       'ruby'
       'ruby-build'
@@ -519,6 +549,8 @@ run_brew() {
       'taglib'
       'talloc'
       'task-spooler'
+      'tcptrace'
+      'tcptraceroute'
       'terminal-notifier'
       'tesseract'
       'texi2html'
@@ -528,21 +560,26 @@ run_brew() {
       'thefuck'
       'theora'
       'tidy-html5'
+      'tig'
       'tmux'
       'tmuxinator-completion'
       'tnef'
       'tor'
+      'trace2html'
       'transmission'
       'trash'
       'tree'
       'ttfautohint'
       'tvnamer'
+      'two-lame'
       'txt2tags'
       'typescript'
       'ucl'
       'unbound'
       'unibilium'
       'unison'
+      'universal-ctags'
+      'unpaper'
       'unrar'
       'unrtf'
       'unzip'
@@ -555,11 +592,12 @@ run_brew() {
       'w3m'
       'watch'
       'watchman'
-      'wdiff --with-gettext'
+      'wdiff'
       'webalizer'
       'webkit2png'
       'webp'
       'wget'
+      'whatmp3'
       'wrk'
       'wxmac'
       'x264'
@@ -576,14 +614,29 @@ run_brew() {
       'zopfli'
     )
 
-    # TODO: Log unfound packages so user may delete them
-
     for index in ${!desired_formulae[*]}; do
       if ! contains_element "${desired_formulae[$index]}" "${__brew_list[@]}"; then
         # Store the name (and options) of every missing formula
         missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
       fi
     done
+
+    # Log unfound packages so user may uninstall them
+    for index in ${!desired_formulae[*]}; do
+      for (( i=0; i<${#__brew_list[@]}; i++ )); do
+        if [[ ${__brew_list[i]} == "${desired_formulae[$index]}" ]]; then
+          __brew_list=( "${__brew_list[@]:0:$i}" "${__brew_list[@]:$((i + 1))}" )
+        fi
+      done
+    done
+
+    if [[ "$__brew_list" ]]; then
+      e_header "Installed but not desired Homebrew formulae..."
+
+      for (( i=0; i<${#__brew_list[@]}; i++ )); do
+        e_warning "${__brew_list[i]} instlled but not desired."
+      done
+    fi
 
     if [[ "$missing_formulae" ]]; then
       e_header "Installing missing Homebrew formulae..."
@@ -603,13 +656,28 @@ run_brew() {
           node@6)
             brew install node@6 --without-npm
             ;;
+          wdiff)
+            brew install wdiff --with-gettext
+            ;;
+          ffmpeg)
+            brew install ffmpeg --with-fdk-aac --with-freetype --with-libass --with-libvpx --with-x265 --with-fdk-aac --with-openh264 --with-openssl --with-rtmpdump --with-theora --with-tools --with-two-lame --with-webp
+            ;;
+          wget)
+            brew install wget --HEAD --with-gpgme --with-pcre --with-iri
+            ;;
+          macvim)
+            brew install macvim --HEAD --with-override-system-vim --with-lua --with-luajit
+            ;;
+          neovim)
+            brew install neovim --HEAD
+            ;;
           *)
             brew install $item
         esac
       done
 
       # Convert the array of missing formula into a list of space-separate strings
-      # list_formulae=$( printf "%s " "${missing_formulae[@]}" )
+      # local list_formulae=$( printf "%s " "${missing_formulae[@]}" )
 
       # e_header "Installing missing Homebrew formulae..."
       # brew install $list_formulae
@@ -618,7 +686,6 @@ run_brew() {
     fi
 
     __cask_list=($(brew cask list | sed 's/:.*//'))
-    local cask_list_formulae
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
       '1password'
