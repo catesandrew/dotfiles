@@ -1,5 +1,6 @@
 #!/bin/bash
 # This is based on "preexec.bash" but is customized for iTerm2.
+# https://iterm2.com/misc/bash_startup.in
 
 # Note: this module requires 2 bash features which you must not otherwise be
 # using: the "DEBUG" trap, and the "PROMPT_COMMAND" variable.  iterm2_preexec_install
@@ -35,7 +36,7 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
       # set -o functrace > /dev/null 2>&1
       # shopt -s extdebug > /dev/null 2>&1
 
-      local s=$?
+      \local s=$?
       precmd;
       # This is an iTerm2 addition to try to work around a problem in the
       # original preexec.bash.
@@ -70,7 +71,16 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
       fi
 
       # Get the value of the prompt prefix, which will change $?
-      local iterm2_prompt_prefix_value="$(iterm2_prompt_prefix)"
+      \local iterm2_prompt_prefix_value="$(iterm2_prompt_prefix)"
+
+      # Add the mark unless the prompt includes '$(iterm2_prompt_mark)' as a substring.
+      if [[ $ITERM_ORIG_PS1 != *'$(iterm2_prompt_mark)'* ]]
+      then
+        iterm2_prompt_prefix_value="$iterm2_prompt_prefix_value$(iterm2_prompt_mark)"
+      fi
+
+      # Send escape sequences with current directory and hostname.
+      iterm2_print_state_data
 
       # Reset $? to its saved value, which might be used in $ITERM_ORIG_PS1.
       sh -c "exit $s"
@@ -112,19 +122,23 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
     iterm2_end_osc
   }
 
-  # Users can write their own version of this method. It should call
-  # iterm2_set_user_var but not produce any other output.
-  function iterm2_print_user_vars() {
-    true
-  }
+  if [ -z "$(type -t iterm2_print_user_vars)" ] || [ "$(type -t iterm2_print_user_vars)" != function ]; then
+    # iterm2_print_user_vars is not already defined. Provide a no-op default version.
+    #
+    # Users can write their own version of this function. It should call
+    # iterm2_set_user_var but not produce any other output.
+    function iterm2_print_user_vars() {
+      true
+    }
+  fi
 
   function iterm2_prompt_prefix() {
     iterm2_begin_osc
     printf "133;D;\$?"
     iterm2_end_osc
+  }
 
-    iterm2_print_state_data
-
+  function iterm2_prompt_mark() {
     iterm2_begin_osc
     printf "133;A"
     iterm2_end_osc
@@ -138,14 +152,17 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
 
   function iterm2_print_version_number() {
     iterm2_begin_osc
-    printf "1337;ShellIntegrationVersion=3;shell=bash"
+    printf "1337;ShellIntegrationVersion=5;shell=bash"
     iterm2_end_osc
   }
 
-
   # If hostname -f is slow on your system, set iterm2_hostname before sourcing this script.
-  if [ -z "$iterm2_hostname" ]; then
-    iterm2_hostname=$(hostname -f)
+  if [ -z "${iterm2_hostname:-}" ]; then
+    iterm2_hostname=$(hostname -f 2>/dev/null)
+    # some flavors of BSD (i.e. NetBSD and OpenBSD) don't have the -f option
+    if [ $? -ne 0 ]; then
+      iterm2_hostname=$(hostname)
+    fi
   fi
   # iterm2_preexec_install
 
