@@ -2,6 +2,10 @@
 
 # Set Node environment variables
 export NODE_REPL_HISTORY_FILE="$HOME/.node_history"
+# Allow 32³ entries; the default is 1000.
+export NODE_REPL_HISTORY_SIZE='32768'
+# Use sloppy mode by default, matching web browsers.
+export NODE_REPL_MODE='sloppy'
 
 # Strip other version from PATH
 PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
