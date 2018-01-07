@@ -96,7 +96,7 @@ run_brew() {
 
     local -a missing_formulae
     local -a desired_formulae=(
-    'libpng'
+      'libpng'
       'gmp'
       'libffi'
       'libgpg-error'
@@ -918,4 +918,175 @@ run_brew() {
     exit
   fi
 }
+
+run_mas() {
+  if type_exists 'mas'; then
+    e_header "Updating apple store apps..."
+
+    local __mas_apps=($(mas list | awk '{print $1}'))
+    local __mas_app_names=( $(mas list | awk '{print $2}') )
+
+    local -a mas_missing_apps
+    local -a mas_desired_apps=(
+      '891059848'
+      '511114225'
+      '489880259'
+      '607529010'
+      '435989461'
+      '889428659'
+      '516801330'
+      '524141863'
+      '866773894'
+      '917665858'
+      '457622435'
+      '577085396'
+      '590518045'
+      '634833134'
+      '482898991'
+      '413965349'
+      '615916400'
+      '506622388'
+      '967805235'
+      '525319418'
+      '655527594'
+      '626221782'
+      '920404675'
+      '588726889'
+      '716854513'
+      '671951979'
+      '669462988'
+      '771501095'
+      '966457795'
+      '442160773'
+      '411643860'
+      '970502923'
+      '414209656'
+      '409203825'
+      '607596789'
+      '950112142'
+      '581789185'
+      '609341429'
+      '638230527'
+      '740472063'
+      '557536642'
+      '889922906'
+      '1161440621'
+      '980053405'
+      '896450579'
+      '931657367'
+      '768666595'
+      '969418666'
+      '439697913'
+      '520265986'
+      '724472954'
+      '555976136'
+      '935700987'
+      '403504866'
+      '905654078'
+      '420212497'
+      '987247809'
+      '979299240'
+      '593294811'
+      '668208984'
+      '1139976917'
+      '444990433'
+      '445189367'
+      '918207447'
+      '1156018315'
+      '961632517'
+      '429449079'
+      '924891282'
+      '402383384'
+      '847496013'
+      '522090209'
+      '907023335'
+      '467939042'
+      '451907568'
+      '906524969'
+      '975937182'
+      '948786052'
+      '403304796'
+      '409183694'
+      '568494494'
+      '457516296'
+      '462227149'
+      '407963104'
+      '836847379'
+      '692815145'
+      '1023902784'
+      '928871589'
+      '536511979'
+      '720669838'
+      '430798174'
+      '936399985'
+      '409201541'
+      '480623975'
+      '1233861775'
+      '640841706'
+      '459413843'
+      '1090940630'
+      '642220194'
+      '965645209'
+      '497799835'
+      '824171161'
+      '1071676469'
+      '671040216'
+      '644346785'
+      '557090104'
+      '476533227'
+      '1006087419'
+    )
+
+    # Use the following to generally reinstall all apple store applications
+    # for i in ${!__mas_app_names[@]}; do
+    #   printf "%s\t%s\t%s\n" $i ${__mas_apps[$i]} ${__mas_app_names[$i]}
+    #   sudo rm -rf "/Applications/${__mas_app_names[$i]}.app"
+    #   mas install ${__mas_apps[$i]};
+    # done
+
+    for index in ${!mas_desired_apps[*]}; do
+      if ! contains_element "${mas_desired_apps[$index]}" "${__mas_apps[@]}"; then
+        mas_missing_apps=("${mas_missing_apps[@]}" "${mas_desired_apps[$index]}")
+      fi
+    done
+
+    # Log unfound apps so user may uninstall them
+    for index in ${!mas_desired_apps[*]}; do
+      for (( i=0; i<${#__mas_apps[@]}; i++ )); do
+        if [[ ${__mas_apps[i]} == "${mas_desired_apps[$index]}" ]]; then
+          __mas_apps=( "${__mas_apps[@]:0:$i}" "${__mas_apps[@]:$((i + 1))}" )
+          __mas_app_names=( "${__mas_app_names[@]:0:$i}" "${__mas_app_names[@]:$((i + 1))}" )
+        fi
+      done
+    done
+
+    if [[ "$__mas_apps" ]]; then
+      e_header "Installed but not desired apple store apps..."
+
+      for (( i=0; i<${#__mas_apps[@]}; i++ )); do
+        e_warning "${__mas_apps[i]} ${__mas_app_names[i]} installed but not desired."
+      done
+    fi
+
+    if [[ "$mas_missing_apps" ]]; then
+      e_header "Installing missing apple store apps..."
+
+      for item in "${mas_missing_apps[@]}"; do
+        e_header "Installing $item..."
+        case "$item" in
+          *)
+            mas install "$item"
+        esac
+      done
+
+      [[ $? ]] && e_success "Done"
+    fi
+  else
+    printf "\n"
+    e_error "Error: mas not found."
+    printf "Aborting...\n"
+    exit
+  fi
+}
 run_brew
+run_mas
