@@ -72,6 +72,7 @@ run_brew() {
       'neovim/neovim'
       'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
+      'bramstein/webfonttools'
     )
 
     for index in ${!desired_tap[*]}; do
@@ -617,6 +618,12 @@ run_brew() {
       'ansiweather'
       'ansible'
       'ack'
+      'sfnt2woff'
+      'sfnt2woff-zopfli'
+      'woff2'
+      'pv'
+      'rlwrap'
+      'vbindiff'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -676,6 +683,9 @@ run_brew() {
           neovim)
             brew install neovim --HEAD
             ;;
+          imagemagick)
+            brew install imagemagick --with-webp
+            ;;
           *)
             brew install $item
         esac
@@ -687,6 +697,57 @@ run_brew() {
       # e_header "Installing missing Homebrew formulae..."
       # brew install $list_formulae
 
+      [[ $? ]] && e_success "Done"
+    fi
+
+    e_header "Checking status of hacking Homebrew formulae..."
+    local __brew_taps=($(brew tap | sed 's/:.*//'))
+
+    # Install some CTF tools; see https://github.com/ctfs/write-ups
+    local -a missing_formulae
+    local -a desired_formulae=(
+      'aircrack-ng'
+      'bfg'
+      'binutils'
+      'binwalk'
+      'cifer'
+      'dex2jar'
+      'dns2tcp'
+      'fcrackzip'
+      'foremost'
+      'hashpump'
+      'hydra'
+      'john'
+      'knock'
+      'netpbm'
+      'nmap'
+      'pngcheck'
+      'socat'
+      'sqlmap'
+      'tcpflow'
+      'tcpreplay'
+      'tcptrace'
+      'ucspi-tcp'
+      'xpdf'
+      'xz'
+    )
+
+    for index in ${!desired_formulae[*]}; do
+      if ! contains_element "${desired_formulae[$index]}" "${__brew_list[@]}"; then
+        missing_formulae=("${missing_formulae[@]}" "${desired_formulae[$index]}")
+      fi
+    done
+
+    if [[ "$missing_formulae" ]]; then
+      e_header "Installing missing Homebrew formulae..."
+
+      for item in "${missing_formulae[@]}"; do
+        e_header "Installing $item..."
+        case "$item" in
+          *)
+            brew install $item
+        esac
+      done
       [[ $? ]] && e_success "Done"
     fi
 
