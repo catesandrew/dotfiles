@@ -179,6 +179,7 @@ run_brew() {
       'lame'
       'x264'
       'xvid'
+      'gnupg'
       'libogg'
       'gobject-introspection'
       'graphite2'
@@ -197,6 +198,7 @@ run_brew() {
       'leptonica'
       'ffmpeg'
       'gpgme'
+      'flac'
       'libid3tag'
       'libvorbis'
       'mad'
@@ -215,11 +217,13 @@ run_brew() {
       'cabextract'
       'p7zip'
       'unrar'
+      'mktorrent'
       'libidn2'
       'berkeley-db'
       'bdw-gc'
       'ucl'
       'libnet'
+      'libdnet'
       'ruby'
       'net-snmp'
       'libssh2'
@@ -236,6 +240,7 @@ run_brew() {
       'aspcud'
       'camlp4'
       'ghostscript'
+      'libjpeg'
       'qpdf'
       'tesseract'
       'unpaper'
@@ -268,12 +273,14 @@ run_brew() {
       'pango'
       'libusb-compat'
       'faac'
+      'fdk-aac'
       'libvpx'
       'opus'
       'fribidi'
       'boost-python'
       'kubernetes-cli'
       'mozjpeg'
+      'mysql'
       'lua'
       'netpbm'
       'atk'
@@ -284,6 +291,7 @@ run_brew() {
       'unbound'
       'gcc'
       'libexif'
+      'libagg'
       'docker'
       'docker-machine'
       'wxmac'
@@ -298,6 +306,7 @@ run_brew() {
       'mercurial'
       'neon'
       'ghc'
+      'ssdeep'
       'dialog'
       'bash'
       'zopfli'
@@ -307,6 +316,9 @@ run_brew() {
       'xmlstarlet'
       'x265'
       'wrk'
+      'woff2'
+      'winetricks'
+      'wine'
       'whatmp3'
       'wget'
       'webkit2png'
@@ -316,6 +328,7 @@ run_brew() {
       'watch'
       'w3m'
       'vcprompt'
+      'vbindiff'
       'vault'
       'vagrant-completion'
       'utf8proc'
@@ -349,6 +362,8 @@ run_brew() {
       'terminal-notifier'
       'tcptraceroute'
       'tcptrace'
+      'tcpreplay'
+      'tcpflow'
       'task-spooler'
       'taglib'
       'tag'
@@ -361,10 +376,13 @@ run_brew() {
       'sphinx-doc'
       'spdylay'
       'spark'
+      'socat'
       'smartypants'
       'sl'
       'shellcheck'
       'shared-mime-info'
+      'sfnt2woff-zopfli'
+      'sfnt2woff'
       'serf'
       'selenium-server-standalone'
       'selecta'
@@ -378,6 +396,7 @@ run_brew() {
       'rtf2latex2e'
       'rsync'
       'roswell'
+      'rlwrap'
       'rethinkdb'
       'renameutils'
       'rename'
@@ -391,6 +410,7 @@ run_brew() {
       'qscintilla2'
       'pygobject3'
       'pyenv-virtualenv'
+      'pv'
       'purescript'
       'pstree'
       'potrace'
@@ -400,6 +420,7 @@ run_brew() {
       'pngquant'
       'pngnq'
       'pngcrush'
+      'pngcheck'
       'pmd'
       'plantuml'
       'pinentry-mac'
@@ -484,9 +505,10 @@ run_brew() {
       'libicns'
       'libgphoto2'
       'libdvdcss'
-      'libdnet'
       'libcaca'
+      'libav'
       'libatomic_ops'
+      'libass'
       'lesspipe'
       'less'
       'leiningen'
@@ -503,6 +525,7 @@ run_brew() {
       'kubernetes-helm'
       'kops'
       'known_hosts'
+      'knock'
       'jsonpp'
       'jsonlint'
       'jshon'
@@ -510,11 +533,14 @@ run_brew() {
       'jpeginfo'
       'jpeg-turbo'
       'jpeg-archive'
+      'john'
       'jo'
       'jbig2dec'
       'irssi'
       'intltool'
+      'imagemagick@6'
       'id3tool'
+      'hydra'
       'hunspell'
       'hub'
       'httrack'
@@ -522,7 +548,9 @@ run_brew() {
       'htmlcleaner'
       'html-xml-utils'
       'highlight'
+      'hidapi'
       'haskell-stack'
+      'hashpump'
       'haproxy'
       'handbrake'
       'hachoir-metadata'
@@ -562,11 +590,13 @@ run_brew() {
       'fswatch'
       'fpp'
       'fortune'
+      'foremost'
       'fontforge'
       'flock'
       'findutils'
       'figlet'
       'fftw'
+      'fcrackzip'
       'fasd'
       'faad2'
       'expect'
@@ -592,6 +622,7 @@ run_brew() {
       'docker-cloud'
       'docker-clean'
       'dnsmasq'
+      'dns2tcp'
       'djvulibre'
       'django-completion'
       'dirmngr'
@@ -600,6 +631,7 @@ run_brew() {
       'diff-so-fancy'
       'diff-pdf'
       'diction'
+      'dex2jar'
       'deisctl'
       'dcraw'
       'dbus'
@@ -624,6 +656,7 @@ run_brew() {
       'clisp'
       'clib'
       'clasp'
+      'cifer'
       'chromedriver'
       'chrome-cli'
       'chicken'
@@ -637,6 +670,7 @@ run_brew() {
       'brew-cask-completion'
       'boot-clj'
       'bison'
+      'binwalk'
       'binutils'
       'bind'
       'bibutils'
@@ -654,15 +688,12 @@ run_brew() {
       'asciidoc'
       'archey'
       'apparix'
+      'ant'
       'ansiweather'
       'ansible'
+      'aircrack-ng'
+      'ucspi-tcp'
       'ack'
-      'sfnt2woff'
-      'sfnt2woff-zopfli'
-      'woff2'
-      'pv'
-      'rlwrap'
-      'vbindiff'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -736,60 +767,6 @@ run_brew() {
       # e_header "Installing missing Homebrew formulae..."
       # brew install $list_formulae
 
-      [[ $? ]] && e_success "Done"
-    fi
-
-    e_header "Updating Homebrew..."
-    # Use the latest version of Homebrew
-    brew update
-    [[ $? ]] && e_success "Done"
-    e_header "Checking status of Homebrew hacking formulae..."
-    __brew_list=($(brew list | sed 's/:.*//'))
-
-    # Install some CTF tools; see https://github.com/ctfs/write-ups
-    local -a hack_missing_formulae
-    local -a hack_desired_formulae=(
-      'aircrack-ng'
-      'bfg'
-      'binutils'
-      'binwalk'
-      'cifer'
-      'dex2jar'
-      'dns2tcp'
-      'fcrackzip'
-      'foremost'
-      'hashpump'
-      'hydra'
-      'john'
-      'knock'
-      'netpbm'
-      'nmap'
-      'pngcheck'
-      'socat'
-      'sqlmap'
-      'tcpflow'
-      'tcpreplay'
-      'tcptrace'
-      'ucspi-tcp'
-      'xz'
-    )
-
-    for index in ${!hack_desired_formulae[*]}; do
-      if ! contains_element "${hack_desired_formulae[$index]}" "${__brew_list[@]}"; then
-        hack_missing_formulae=("${hack_missing_formulae[@]}" "${hack_desired_formulae[$index]}")
-      fi
-    done
-
-    if [[ "$hack_missing_formulae" ]]; then
-      e_header "Installing missing Homebrew hack formulae..."
-
-      for item in "${hack_missing_formulae[@]}"; do
-        e_header "Installing $item..."
-        case "$item" in
-          *)
-            brew install "$item"
-        esac
-      done
       [[ $? ]] && e_success "Done"
     fi
 
