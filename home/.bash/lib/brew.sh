@@ -59,25 +59,67 @@ run_brew() {
     e_header "Updating any existing Homebrew taps..."
     local __brew_taps=($(brew tap | sed 's/:.*//'))
 
-    local -a desired_tap=(
+    local -a missing_taps
+    local -a desired_taps=(
       'caskroom/cask'
       'caskroom/drivers'
       'caskroom/fonts'
       'caskroom/versions'
       'dart-lang/dart'
+      'discoteq/discoteq'
       'homebrew/boneyard'
       'homebrew/bundle'
       'homebrew/core'
       'homebrew/services'
+      'jbarlow83/ocrmypdf'
+      'johanhaleby/kubetail'
       'neovim/neovim'
       'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
       'bramstein/webfonttools'
     )
 
-    for index in ${!desired_tap[*]}; do
-      brew tap "${desired_tap[$index]}" >/dev/null
+    for index in ${!desired_taps[*]}; do
+      brew tap "${desired_taps[$index]}" >/dev/null
     done
+
+    for index in ${!desired_taps[*]}; do
+      if ! contains_element "${desired_taps[$index]}" "${__brew_taps[@]}"; then
+        missing_taps=("${missing_taps[@]}" "${desired_taps[$index]}")
+      fi
+    done
+
+    # Log unfound taps so user may untap them
+    for index in ${!desired_taps[*]}; do
+      for (( i=0; i<${#__brew_taps[@]}; i++ )); do
+        if [[ ${__brew_taps[i]} == "${desired_taps[$index]}" ]]; then
+          __brew_taps=( "${__brew_taps[@]:0:$i}" "${__brew_taps[@]:$((i + 1))}" )
+        fi
+      done
+    done
+
+    if [[ "$__brew_taps" ]]; then
+      e_header "Installed but not desired Homebrew taps..."
+
+      for (( i=0; i<${#__brew_taps[@]}; i++ )); do
+        e_warning "${__brew_taps[i]} tapped but not desired."
+      done
+    fi
+
+    if [[ "$missing_taps" ]]; then
+      e_header "Tapping missing Homebrew taps..."
+
+      for item in "${missing_taps[@]}"; do
+        e_header "Tapping $item..."
+
+        case "$item" in
+          *)
+            brew tap $item
+        esac
+      done
+
+      [[ $? ]] && e_success "Done"
+    fi
 
     e_header "Updating any existing Homebrew formulae..."
     # Upgrade any already-installed formulae
@@ -238,7 +280,6 @@ run_brew() {
       'hicolor-icon-theme'
       'pth'
       'go'
-      'latexdiff'
       'libidn'
       'unbound'
       'gcc'
@@ -507,7 +548,6 @@ run_brew() {
       'git-tracker'
       'git-subrepo'
       'git-lfs'
-      'git-latexdiff'
       'git-hooks'
       'git-flow-avh'
       'git-extras'
@@ -645,7 +685,7 @@ run_brew() {
       e_header "Installed but not desired Homebrew formulae..."
 
       for (( i=0; i<${#__brew_list[@]}; i++ )); do
-        e_warning "${__brew_list[i]} instlled but not desired."
+        e_warning "${__brew_list[i]} installed but not desired."
       done
     fi
 
@@ -819,8 +859,6 @@ run_brew() {
       'istat-menus'
       'iterm2'
       'jaikoz'
-      'java'
-      'java6'
       'java8'
       'karabiner-elements'
       'keepassx'
