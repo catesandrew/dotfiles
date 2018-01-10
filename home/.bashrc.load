@@ -165,8 +165,7 @@ fi
 if [ -z "$INSIDE_EMACS" ]; then
   # http://unix.stackexchange.com/questions/9605/
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    SESSION_TYPE=remote/ssh
-    export SESSION_TYPE
+    export SESSION_TYPE=remote/ssh
   else
     if [ $PPID != 0 ]; then # guard against containers
       case $(ps -o comm= -p $PPID) in
@@ -377,8 +376,10 @@ unset file_type
 # password for that keychain. Note that "login" is your default keychain. Now
 # you can add your accounts to that keychain.
 if [ "$__dot_system_type" == "Darwin" ]; then
-  export SUDO_ASKPASS="$HOME/.bin/sudo_askpass"
-  alias sudo="sudo -A "
+  if [ -n "$SESSION_TYPE" ]; then
+    export SUDO_ASKPASS="$HOME/.bin/sudo_askpass"
+    alias sudo="sudo -A "
+  fi
 fi
 
 if [[ $PROMPT ]]; then
