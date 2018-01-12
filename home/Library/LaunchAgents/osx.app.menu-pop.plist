@@ -10,7 +10,9 @@
 	<string>osx.app.menu-pop</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Applications/MenuPop.app/Contents/MacOS/MenuPop</string>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>if [ -d "/Applications/MenuPop.app" ]; then /Applications/MenuPop.app/Contents/MacOS/MenuPop; fi</string>
 	</array>
 	<key>RunAtLoad</key>
 	<false/>

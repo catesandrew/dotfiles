@@ -8,8 +8,10 @@
 	<string>osx.app.kwm</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/opt/kwm/kwm</string>
-	</array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>if [ -d "/usr/local/opt/kwm" ]; then /usr/local/opt/kwm/kwm; fi</string>
+  </array>
 	<key>RunAtLoad</key>
 	<false/>
 	<key>Sockets</key>
