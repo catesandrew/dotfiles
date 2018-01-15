@@ -1,9 +1,9 @@
-local log = hs.logger.new('init.lua', 'debug')
+-- local log = hs.logger.new('init.lua', 'debug')
 
 -- Use Control+` to reload Hammerspoon config
-hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, '`', nil, function()
-  hs.reload()
-end)
+-- hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, '`', nil, function()
+--   hs.reload()
+-- end)
 
 keyUpDown = function(modifiers, key)
   -- Un-comment & reload config to log each keystroke that we're triggering
@@ -32,8 +32,8 @@ enableHotkeyForWindowsMatchingFilter = function(windowFilter, hotkey)
 end
 
 require('space-cadet')
-require('markdown')
+-- require('markdown')
 require('super')
-require('windows')
+-- require('windows')
 
 hs.notify.new({title='Hammerspoon', informativeText='Ready to rock 🤘'}):send()
