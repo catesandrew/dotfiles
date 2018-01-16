@@ -60,6 +60,7 @@ export DFM_REPO="${HOME}/.dotfiles"
 
 declare -a preexec_functions
 declare -a precmd_functions
+declare -a iterm2_print_user_vars_functions
 declare -a on_exit_items
 
 function add_on_exit() {

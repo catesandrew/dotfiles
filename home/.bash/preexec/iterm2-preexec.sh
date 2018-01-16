@@ -160,7 +160,16 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
     # Users can write their own version of this function. It should call
     # iterm2_set_user_var but not produce any other output.
     function iterm2_print_user_vars() {
-      true
+      # For every function defined in our function array. Invoke it.
+      local iterm2_function
+      for iterm2_function in "${iterm2_print_user_vars_functions[@]}"; do
+
+        # Only execute this function if it actually exists.
+        # Test existence of functions with: declare -[Ff]
+        if type -t "$iterm2_function" 1>/dev/null; then
+          $iterm2_function
+        fi
+      done
     }
   fi
 
