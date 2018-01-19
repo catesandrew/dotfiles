@@ -139,6 +139,37 @@ case $response in
   *) ;;
 esac
 
+echo ""
+echo "Install pdfjam?  (y/n)"
+read -r response
+case $response in
+  [yY])
+    PDFJAM_VERSION=208
+    wget https://go.warwick.ac.uk/pdfjam/pdfjam_${PDFJAM_VERSION}.tgz -O /tmp/pdfjam-${PDFJAM_VERSION}.tgz
+    tar xvfz /tmp/pdfjam-${PDFJAM_VERSION}.tgz -C /opt
+    rm /tmp/pdfjam-${PDFJAM_VERSION}.tgz
+    ln -s /opt/pdfjam/bin/* /usr/local/bin
+    ln -s /opt/pdfjam/man1/* /usr/local/share/man/man1
+    ;;
+  *) ;;
+esac
+
+echo ""
+echo "Install latex-mk?  (y/n)"
+read -r response
+case $response in
+  [yY])
+    LATEXMK_VERSION=2.1
+    wget https://sourceforge.net/projects/latex-mk/files/latex-mk/latex-mk-${LATEXMK_VERSION}/latex-mk-${LATEXMK_VERSION}.tar.gz/download -O /tmp/latex-mk-${LATEXMK_VERSION}.tar.gz
+    tar xvfz /tmp/latex-mk-${LATEXMK_VERSION}.tar.gz -C /tmp
+    cd /tmp/latex-mk-${LATEXMK_VERSION}
+    configure
+    make
+    make install
+    ;;
+  *) ;;
+esac
+
 ###############################################################################
 # General UI/UX
 ###############################################################################
