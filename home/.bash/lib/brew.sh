@@ -77,6 +77,7 @@ run_brew() {
       'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
       'bramstein/webfonttools'
+      'd12frosted/emacs-plus'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -605,6 +606,7 @@ run_brew() {
       'exact-image'
       'enscript'
       'emacs'
+      'emacs-plus'
       'elinks'
       'editorconfig'
       'ecj'
@@ -726,6 +728,10 @@ run_brew() {
         case "$item" in
           emacs)
             brew install emacs --HEAD --with-cocoa --with-gnutls --with-imagemagick@6 --with-librsvg --with-modules;
+            ;;
+          emacs-plus)
+            brew install emacs-plus --HEAD --with-24bit-color
+            brew linkapps emacs-plus
             ;;
           node)
             brew install node --without-npm
