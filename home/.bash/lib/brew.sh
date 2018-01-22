@@ -771,7 +771,6 @@ run_brew() {
     __cask_list=($(brew cask list | sed 's/:.*//'))
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
-      '1password'
       '1password-cli'
       'android-sdk'
       'app-tamer'
