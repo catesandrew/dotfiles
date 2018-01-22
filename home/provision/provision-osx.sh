@@ -170,6 +170,16 @@ case $response in
   *) ;;
 esac
 
+echo ""
+echo "Install md-cat?  (y/n)"
+read -r response
+case $response in
+  [yY])
+    cargo install mdcat
+    ;;
+  *) ;;
+esac
+
 ###############################################################################
 # General UI/UX
 ###############################################################################
