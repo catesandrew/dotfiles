@@ -694,6 +694,7 @@ run_brew() {
       'aircrack-ng'
       'ucspi-tcp'
       'ack'
+      'm-cli'
     )
 
     for index in ${!desired_formulae[*]}; do
