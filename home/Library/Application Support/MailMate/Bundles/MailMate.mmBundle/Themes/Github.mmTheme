@@ -267,11 +267,6 @@
   margin-top: 0 !important;
 }
 
-.plaintext>*:last-child,
-.markdown>*:last-child {
-  margin-bottom: 0 !important;
-}
-
 .plaintext a:not([href]),
 .markdown a:not([href]) {
   color: inherit;
