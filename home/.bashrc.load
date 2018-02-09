@@ -4,10 +4,10 @@
 export BASH_IT="${HOME}/.bash"
 
 # handle the case when editing remote files through emacs
-if [[ "$TERM" == "dumb" ]]; then
-  . "${BASH_IT}/lib/custom.sh"
-  return
-fi
+# if [[ "$TERM" == "dumb" ]]; then
+#   . "${BASH_IT}/lib/custom.sh"
+#   return
+# fi
 
 # TODO Test these
 # if [[ "$TERM" = "dumb" ]]; then
