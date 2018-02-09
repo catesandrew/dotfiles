@@ -42,7 +42,40 @@ IFS=$(echo -en "\n\b")
 # Use BASEDIR from commandline, or default if none given
 BASEDIR=${1:-$DEFAULTDIR}
 
-for FILE in $(find "$(pwd -P)" -maxdepth "$MAXDEPTH" -not -wholename "*._*" -iname "*.JPG" -or -iname "*.JPEG" -or -iname "*.CRW" -or -iname "*.THM" -or -iname "*.RW2" -or -iname '*.ARW' -or -iname "*AVI" -or -iname "*MOV" -or -iname "*MP4"  -or -iname "*MTS" -or -iname "*PNG") 
+function phashconvert {
+  local infile="$1"
+
+  # syntax: phashconvert imagefile
+
+  # get 42 values from each image and put into arrays
+  # first: grep verbose info to get all lines that include PH
+  # second: sed returns the pairs of comma separated values
+  # third: sed removes all spaces
+  # fourth: tr converts comma to new line so all values are on their own line
+  # then convert list of values to arr
+
+  arr1=(`identify -quiet -verbose -moments -alpha off "$infile[0]" | grep "PH[1-7]" | sed -n 's/.*: \(.*\)$/\1/p' | sed 's/ *//g' | tr "," "\n"`)
+  num1="${#arr1[*]}"
+
+  # test for correct number of values
+  if [ $num1 -ne 42 ]; then
+    echo "--- Number of Phash Values ($num1) is Incorrect --- "
+    exit 1
+  fi
+
+  # convert 42 values into string of 168 digits as hash using 4 digits for each float
+  hash1=""
+  for ((i=0; i<42; i++)); do
+    # bc cannot handle scientific notation; have to change e to 10^
+    val1=`echo "${arr1[$i]}" |\
+      awk ' { printf "%0004d", ($1<0)?100*($1-0.005):100*($1+0.005) } '`
+    hash1="${hash1}${val1}"
+  done
+
+  echo "$hash1"
+}
+
+for FILE in $(find "$(pwd -P)" -maxdepth "$MAXDEPTH" -not -wholename "*._*" -iname "*.JPG" -or -iname "*.JPEG" -or -iname "*.GIF" -or -iname "*.HEIC" -or -iname "*.CRW" -or -iname "*.THM" -or -iname "*.RW2" -or -iname '*.ARW' -or -iname "*AVI" -or -iname "*MOV" -or -iname "*MP4"  -or -iname "*MTS" -or -iname "*PNG" -and -not -iname "*_convertToPNG*")
 do
 	INPUT=${FILE}
 	DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -DateTimeOriginal "${INPUT}" | jq --raw-output '.[].DateTimeOriginal.val')
@@ -68,6 +101,13 @@ do
 			if [ -e "$OUTPUT" ] && ! cmp -s "$INPUT" "$OUTPUT"
 			then
 				echo "WARNING: '$OUTPUT' exists already and is different from '$INPUT'."
+                # input_hash=$(phashconvert "$INPUT")
+                # output_hash=$(phashconvert "$OUTPUT")
+                # echo "HASH: $input_hash"
+                # echo "HASH: $output_hash"
+                open "$INPUT"
+                open "$OUTPUT"
+                break;
 			else
 				echo "Moving '$INPUT' to $OUTPUT"
 				rsync -ah --progress "$INPUT"  "$OUTPUT"
