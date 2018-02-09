@@ -319,6 +319,12 @@ function _oh_my_git_prompt() {
   PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
 }
 
+function iterm2_badges() {
+  iterm2_set_user_var gitBranch $((\git branch 2> /dev/null) | \grep \* | cut -c3-)
+}
+
 # PROMPT_COMMAND=_oh_my_git_prompt
 # install_prompt _oh_my_git_prompt
 precmd_functions+=(_oh_my_git_prompt)
+
+# iterm2_print_user_vars_functions+=(iterm2_badges)
