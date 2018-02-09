@@ -57,6 +57,8 @@ fi
 
 # Path to the dfm repo configuration
 export DFM_REPO="${HOME}/.dotfiles"
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
 
 declare -a preexec_functions
 declare -a precmd_functions
