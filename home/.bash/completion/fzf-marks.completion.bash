@@ -72,4 +72,6 @@ function dmark()  {
     fi
 }
 
-bind '"\C-g":"jump\n"'
+if [ -z "$INSIDE_EMACS" ]; then
+  bind '"\C-g":"jump\n"'
+fi

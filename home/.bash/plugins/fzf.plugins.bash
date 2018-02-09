@@ -1,6 +1,8 @@
 # load fzf, if you are using it
 
-if brew_contains_element "fzf"; then
+if brew_contains_element "fzf" && \
+    [ -z "$INSIDE_EMACS" ]; then
+
     export FZF_TARGET="${BREW_HOME}/opt/fzf"
     export FZF_TMUX_HEIGHT=${FZF_TMUX_HEIGHT:-80%}
 
