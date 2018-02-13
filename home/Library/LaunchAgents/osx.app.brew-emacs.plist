@@ -11,6 +11,6 @@
 		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 6 &amp;&amp; /usr/local/bin/emacs --daemon</string>
 	</array>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
