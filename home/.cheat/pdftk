@@ -18,3 +18,12 @@ pdftk \
 pdftk file-with-attachments.pdf \
   unpack_files \
   output /usr/local
+
+# To rotate odd and even pages, first split, then rotate 1st set
+# clockwise and 2nd set counter-clockwise, finally re-combine.
+pdftk input.pdf cat 1-endeven output input1.pdf && \
+    pdftk input.pdf cat 1-endodd output input2.pdf && \
+    pdftk input1.pdf cat 1-endwest output output1.pdf && \
+    pdftk input2.pdf cat 1-endeast output output2.pdf && \
+    pdftk A=output1.pdf B=output2.pdf shuffle B A output complete.pdf
+
