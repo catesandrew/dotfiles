@@ -86,7 +86,26 @@ case $OSTYPE in
 
     # Alias for opening GitX OR Git Tower
     alias gitx="open -b nl.frim.GitX"
-    alias tower='open -b com.fournova.Tower2 `pwd`'
+
+    function gitup () {
+      local git_root="$(find_git_root)"
+
+      if [[ ! -z "$git_root" ]]; then
+        open -b co.gitup.mac "${git_root}"
+      else
+        echo "No git root found."
+      fi
+    }
+
+    function tower () {
+      local git_root="$(find_git_root)"
+
+      if [[ ! -z "$git_root" ]]; then
+        open -b com.fournova.Tower2 "${git_root}"
+      else
+        echo "No git root found."
+      fi
+    }
     ;;
   *)
     alias gtls='git tag -l | sort -V'
