@@ -53,7 +53,7 @@ oascripts = {
   -- {'h', ''}, saved for launchbar
   {'j', 'Jump Desktop'},
   -- {'k', 'Fantastical 2'},
-  -- {'l', ''}, no action
+  {'l', 'Slack'},
   -- {';', ''}, daylite
   {'q', 'Quiver'},
   -- {'w', ''}, saved for moom
