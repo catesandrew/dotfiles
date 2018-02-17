@@ -7,8 +7,14 @@ fi
 
 [[ -n "$INSIDE_EMACS"  ]] && return
 
-# Record each line as it gets issued
-install_prompt 'history -a'
+# # save persistent history
+# install_prompt 'log_bash_persistent_history'
+
+# # Record each line as it gets issued
+# install_prompt 'history -a'
+
+# Record each line as it gets issued and save persistent history
+install_prompt 'history -a; log_bash_persistent_history'
 
 # NOTE: `install_prompt` is used over appending to `precmd_functions` because
 # the latter can not be passed arguments, so you would have to wrap `history -a`

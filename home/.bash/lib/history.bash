@@ -6,6 +6,21 @@ shopt -s histappend
 # store multi-line commands as a single line
 shopt -s cmdhist
 
+# To remove duplicates
+# /usr/bin/nl ~/.persistent_history | sort -k 2  -k 1,1nr| uniq -f 1 | ^Crt -n | cut -f 2 > unduped_history
+log_bash_persistent_history()
+{
+  [[ $(history 1) =~ ^\ *[0-9]+\ +([^\ ]+\ [^\ ]+)\ +(.*)$ ]]
+  local epoch_part="$(date --date="${BASH_REMATCH[1]}" +%s)"
+  local command_part="${BASH_REMATCH[2]}"
+  command_part="$(echo -e "${command_part}" | sed -e 's/[[:space:]]*$//')"
+  if [ "$command_part" != "$PERSISTENT_HISTORY_LAST" ]; then
+    local hist_part="$(printf "#%s\n%s" "$epoch_part" "$command_part")"
+    echo "$hist_part" >> ~/.persistent_history
+    export PERSISTENT_HISTORY_LAST="$command_part"
+  fi
+}
+
 # history handling
 #
 # Erase duplicates
@@ -13,11 +28,12 @@ shopt -s cmdhist
 # Make commands preceeded by a space not show up in history.
 HISTCONTROL=ignoreboth:erasedups
 
-# Huge history. Doesn't appear to slow things down, so why not?
-# - Increase the maximum number of commands to remember (default is 500)
-HISTSIZE=50000000
-# - Increase the maximum number of lines contained in the history file (default is 500)
-HISTFILESIZE=50000000
+# Eternal bash history.
+# ---------------------
+# Undocumented feature which sets the size to "unlimited".
+# http://stackoverflow.com/questions/9457233/unlimited-bash-history
+HISTFILESIZE=
+HISTSIZE=
 
 # Don't record some commands
 # - `npm +(ls|install|view|update)` will not record `npm ls`, `npm install`, etc.
@@ -31,7 +47,7 @@ HISTFILESIZE=50000000
 HISTIGNORE="npm +(ls|install|view|update):ncu -+(a):cd -:mvim .:em .:* --+(h|he|hel|help):* -+(h|he|hel|help):+([-%+.0-9@A-Z_a-z])"
 
 # Useful timestamp format
-HISTTIMEFORMAT='%F %T '
+HISTTIMEFORMAT="%F %T "
 
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
 # http://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
