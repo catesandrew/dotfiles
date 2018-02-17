@@ -695,6 +695,7 @@ run_brew() {
       'ucspi-tcp'
       'ack'
       'm-cli'
+      'grv'
     )
 
     for index in ${!desired_formulae[*]}; do
