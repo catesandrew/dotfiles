@@ -54,7 +54,7 @@ oascripts = {
   {'j', 'Jump Desktop'},
   -- {'k', 'Fantastical 2'},
   {'l', 'Slack'},
-  -- {';', ''}, daylite
+  {';', 'Keybase'},
   {'q', 'Quiver'},
   -- {'w', ''}, saved for moom
   {'e', 'Emacs'},
