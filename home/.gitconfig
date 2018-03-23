@@ -205,3 +205,5 @@
 [include]
   path = ~/.gitconfig-local
   path = ~/.gitconfig-private
+[includeIf "gitdir:*/wb/"]
+  path = ~/.gitconfig-work
