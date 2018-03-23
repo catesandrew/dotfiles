@@ -4,6 +4,6 @@
   output = 'canonical';
   script = "#!/bin/bash
   BASH_NO=no . /etc/profile
-  gsed '/./,$!d' | gsed -e :a -e '/^\\n*$/N;/\\n$/ba'";
-  uuid = '4931617B-9355-4A5D-98CF-911B35513B68';
+  gsed -r '/\\s+$/s//BLANK_LINE_MARKER/'";
+  uuid = '2EB0AA72-9473-4AEE-80EB-86F1F7084965';
 }

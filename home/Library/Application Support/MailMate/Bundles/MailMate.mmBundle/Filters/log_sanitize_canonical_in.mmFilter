@@ -1,0 +1,9 @@
+{	name    = 'sanitize_canonical_in';
+	input   = 'canonical';
+	output  = 'canonical';
+  script = '#!/bin/bash
+  echo log_sanitize_canonical_in.mmFilter
+"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+';
+	uuid    = '93E01756-BFC7-4E2F-BC4E-54B020E24F93';
+}

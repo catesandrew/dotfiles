@@ -1,19 +1,20 @@
-{	name    = 'Canonical to HTML';
-        input   = 'canonical';
-        output  = 'html';
-        script  = '#!/bin/bash
+{
+  name = 'Canonical to HTML';
+  input = 'canonical';
+  output = 'html';
+  script = '#!/bin/bash
 BASH_NO=no . /etc/profile
 if [ -z "${MM_MARKDOWN}" ]; then
-        if [ -z "${MM_NO_LINKS}" ]; then
-                "$MM_SHARED_SUPPORT/bin/canonical_to_html"
-        else
-                "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links
-        fi
+  if [ -z "${MM_NO_LINKS}" ]; then
+    "$MM_SHARED_SUPPORT/bin/canonical_to_html"
+  else
+    "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links
+  fi
 else
   echo "<div class=\\"markdown\\">$($MM_SHARED_SUPPORT/bin/sundown)</div>"
   echo "<p class=\\"signature\\">-- <br/>Andrew Cates</p>"
   echo "<div class=\\"markdown\\"><blockquote><p>$(fortune -s literature)</p></blockquote></div>"
 fi
 ';
-        uuid    = '1822B5B3-38C7-4736-980A-CF620078F9B8';
+  uuid = '1822B5B3-38C7-4736-980A-CF620078F9B8';
 }

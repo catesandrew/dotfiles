@@ -1,0 +1,9 @@
+{	name    = 'canonical_to_html_display_in';
+	input   = 'canonical';
+	output  = 'canonical';
+  script = '#!/bin/bash
+  echo log_canonical_to_html_display_in.mmFilter
+"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+';
+	uuid    = 'E32FED7D-CB06-4DE2-BCB7-1504DFFD1666';
+}

@@ -1,8 +1,9 @@
-{	name    = 'Delete all trailing blank lines at end of file (only)';
-	input   = 'canonical';
-	output  = 'canonical';
-        script  = "#!/bin/bash
+{
+  name = 'Delete all trailing blank lines at end of file (only)';
+  input = 'canonical';
+  output = 'canonical';
+  script = "#!/bin/bash
 BASH_NO=no . /etc/profile
-gsed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'";
-        uuid    = '79826ECE-6C4A-452F-9531-AD96B36BD280';
+gsed -e :a -e '/^\\n*$/{$d;N;};/\\n$/ba'";
+  uuid = '79826ECE-6C4A-452F-9531-AD96B36BD280';
 }

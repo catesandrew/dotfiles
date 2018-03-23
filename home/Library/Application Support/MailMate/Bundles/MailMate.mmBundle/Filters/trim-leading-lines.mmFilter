@@ -1,8 +1,9 @@
-{	name    = 'Delete all leading blank lines at top of file (only)';
-	input   = 'canonical';
-	output  = 'canonical';
-        script  = "#!/bin/bash
-BASH_NO=no . /etc/profile
-gsed '/./,$!d'";
-        uuid    = '8B8FC125-AB01-4C67-ADDA-97C39FCC2A05';
+{
+  name = 'Delete all leading blank lines at top of file (only)';
+  input = 'canonical';
+  output = 'canonical';
+  script  = "#!/bin/bash
+  BASH_NO=no . /etc/profile
+  gsed '/./,$!d'";
+  uuid = '8B8FC125-AB01-4C67-ADDA-97C39FCC2A05';
 }

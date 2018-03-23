@@ -1,8 +1,9 @@
-{	name    = 'HTML to Canonical';
-        input   = 'html';
-        output  = 'canonical';
-        script  = '#!/bin/bash
+{
+  name = 'HTML to Canonical';
+  input = 'html';
+  output = 'canonical';
+  script = '#!/bin/bash
 BASH_NO=no . /etc/profile
-tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text';
-        uuid    = '26C634A1-DB44-49B2-9E96-4B53CD62EFB5';
+echo html-to-canonical.mmFilter | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text';
+  uuid = '0220B5F9-6A60-4D4C-8C66-CD60EF55533D';
 }

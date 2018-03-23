@@ -1,0 +1,9 @@
+{	name    = 'sanitize_html_out';
+	input   = 'html';
+	output  = 'html';
+  script = '#!/bin/bash
+  echo log_sanitize_html_out.mmFilter
+"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+';
+	uuid    = 'EBB6030E-BCBB-41F0-847D-3950398FD5AB';
+}

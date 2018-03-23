@@ -1,8 +1,9 @@
-{	name    = 'HTML to HTML';
-        input   = 'html';
-        output  = 'html';
-        script  = '#!/bin/bash
+{
+  name = 'HTML to HTML';
+  input = 'html';
+  output = 'html';
+  script = '#!/bin/bash
 BASH_NO=no . /etc/profile
-tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text | "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links';
-        uuid    = 'C7CF5EF2-8089-4880-AD3E-587EA9260D06';
+echo html-to-html.mmFilter | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text | "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links';
+  uuid = '4751C2E4-4D61-42D4-89DB-DC1B3FF677D8';
 }

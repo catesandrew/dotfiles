@@ -1,0 +1,9 @@
+{	name    = 'display_html_in';
+	input   = 'html';
+	output  = 'html';
+  script = '#!/bin/bash
+echo log_display_html_in.mmFilter
+"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+';
+	uuid    = '14905127-19C7-4AB4-B25D-31CC8804EBC3';
+}

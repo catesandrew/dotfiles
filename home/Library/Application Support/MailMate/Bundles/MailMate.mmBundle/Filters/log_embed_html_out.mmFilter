@@ -1,0 +1,9 @@
+{	name    = 'embed_html_out';
+	input   = 'html';
+	output  = 'html';
+  script = '#!/bin/bash
+  echo log_embed_html_out.mmFilter
+"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+';
+	uuid    = 'AEDAD9FD-9002-4731-B892-7C0D59862E8E';
+}

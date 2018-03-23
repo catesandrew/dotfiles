@@ -1,0 +1,9 @@
+{
+  name = 'Unmark Empty Lines';
+  uuid = '56CAA623-E3EF-4A57-9824-75E9BF41E48B';
+  input = 'html';
+  output = 'html';
+  script = "#!/bin/bash
+  BASH_NO=no . /etc/profile
+  gsed -s 's/BLANK_LINE_MARKER/<p dir=\"auto\" class=\"blank-line\">\\&nbsp;<\\/p>/g'";
+}

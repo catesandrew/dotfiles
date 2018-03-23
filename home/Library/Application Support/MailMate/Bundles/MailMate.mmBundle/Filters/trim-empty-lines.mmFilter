@@ -1,8 +1,9 @@
-{	name    = 'Trim Empty Lines';
-	input   = 'canonical';
-	output  = 'canonical';
-        script  = "#!/bin/bash
-BASH_NO=no . /etc/profile
-gsed '/^\s*$/d'";
-        uuid    = 'B51A781D-A0D3-4632-AFBB-BE65B5CEA465';
+{
+  name = 'Trim Empty Lines';
+  uuid = '4A161BEF-8A71-44EC-84A6-28599ED19F4A';
+  input = 'canonical';
+  output = 'canonical';
+  script = "#!/bin/bash
+  BASH_NO=no . /etc/profile
+  gsed '/^\s*$/d'";
 }

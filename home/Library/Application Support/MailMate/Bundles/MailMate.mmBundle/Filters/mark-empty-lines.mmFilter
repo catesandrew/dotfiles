@@ -1,0 +1,9 @@
+{
+  name = 'Mark Empty Lines';
+  uuid = 'DC4C51EC-9A85-4A75-BB10-D9868F442DF4';
+  input = 'canonical';
+  output = 'canonical';
+  script = "#!/bin/bash
+  BASH_NO=no . /etc/profile
+  gsed 's/^\\s*$/BLANK_LINE_MARKER/g'";
+}
