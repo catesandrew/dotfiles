@@ -1,0 +1,30 @@
+# Don't let ripgrep vomit really long lines to my terminal.
+--max-columns=150
+
+# Explicitly show file paths above match groups; default but set it anyway
+--heading
+
+# Always show line numbers for matches
+--line-number
+
+# Do the right thing with color output
+--color=auto
+
+# Ignore case unless there are capital letters present
+--smart-case
+
+# Show context by default
+--context=3
+
+# Add some more types
+--type-add
+clj:include:clojure
+
+# Add my 'web' type.
+--type-add
+web:*.{html,css,js,tmpl}*
+
+--type-add
+gradle:*.gradle
+--type-add
+gr:include:gradle
