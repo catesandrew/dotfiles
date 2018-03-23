@@ -138,3 +138,64 @@ __unserialise() {
   fi
 }
 add_on_exit __unserialise
+
+# __environment_variable_exists() {
+#   eval "value=\"\${$1+x}\""
+#   [ ! -z $value ]
+# }
+
+declare -a cd_functions
+declare -a pushd_functions
+declare -a popd_functions
+
+function __popd_builtin () {
+  builtin popd "$@"
+}
+
+function popd () {
+  # For every function defined in our function array. Invoke it.
+  local popd_function
+  local popd_ret_value=0
+  for popd_function in "${popd_functions[@]}"; do
+    # Test existence of function with: declare -[fF]
+    if type -t "$popd_function" 1>/dev/null; then
+      $popd_function "$@"
+    fi
+  done
+}
+
+function __pushd_builtin () {
+  builtin pushd "$@"
+}
+
+function pushd () {
+  # For every function defined in our function array. Invoke it.
+  local pushd_function
+  local pushd_ret_value=0
+  for pushd_function in "${pushd_functions[@]}"; do
+    # Test existence of function with: declare -[fF]
+    if type -t "$pushd_function" 1>/dev/null; then
+      $pushd_function "$@"
+    fi
+  done
+}
+
+function __cd_builtin () {
+  builtin cd "$@"
+}
+
+function cd () {
+  # For every function defined in our function array. Invoke it.
+  local cd_function
+  local cd_ret_value=0
+  for cd_function in "${cd_functions[@]}"; do
+    # Test existence of function with: declare -[fF]
+    if type -t "$cd_function" 1>/dev/null; then
+      $cd_function "$@"
+    fi
+  done
+}
+
+cd_functions+=(__cd_builtin)
+pushd_functions+=(__pushd_builtin)
+popd_functions+=(__popd_builtin)

@@ -442,6 +442,14 @@ fi
 
 . "${BASH_IT}/lib/custom.sh"
 
+if brew_contains_element "ondir"; then
+  eval "`ondir /`"
+fi
+
+if brew_contains_element "direnv"; then
+  __direnv
+fi
+
 if hash gdate 2>/dev/null; then
     toc=$(($(gdate +%s%N)/1000000))
     delta=$((toc - tic))
