@@ -15,7 +15,7 @@ function __emacs_free
 {
     # start new instances with -n -a
     # (command open -n -a /Applications/Emacs.app "$@") &
-    (/usr/local/bin/emacs "$@") &
+    (/usr/local/bin/emacs "$@" >/dev/null 2>&1) &
 }
 
 function __emacs_client
