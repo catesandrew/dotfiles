@@ -696,6 +696,7 @@ run_brew() {
       'ack'
       'm-cli'
       'grv'
+      'jupyter'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -729,11 +730,12 @@ run_brew() {
         e_header "Installing $item..."
         case "$item" in
           emacs)
-            brew install emacs --HEAD --with-cocoa --with-gnutls --with-imagemagick@6 --with-librsvg --with-modules;
+            # --with-gnutls has issues with gh-api
+            brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
             ;;
           emacs-plus)
-            brew install emacs-plus --HEAD --with-24bit-color
-            brew linkapps emacs-plus
+            # emacs-plus issues with daemon mode, better color emoji support
+            brew install emacs-plus --HEAD --with-24bit-color --without-gnutls
             ;;
           node)
             brew install node --without-npm
