@@ -478,6 +478,11 @@ body,
   margin-top: 0;
 }
 
+.plaintext blockquote > div,
+.markdown blockquote > div {
+  margin-bottom: 8px;
+}
+
 .plaintext blockquote>:last-child,
 .markdown blockquote>:last-child {
   margin-bottom: 0;
