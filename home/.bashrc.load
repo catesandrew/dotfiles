@@ -416,28 +416,37 @@ function iterm2_preexec_hook() {
     preexec_functions+=(__iterm2_preexec)
     precmd_functions+=(__iterm2_precmd)
 
-    # This is necessary so the first command line will have a hostname and current directory.
+    # This is necessary so the first command line will have a hostname and
+    # current directory.
     iterm2_print_state_data
     iterm2_print_version_number
 }
 
-# https://github.com/rcaloras/bash-preexec
-# TODO: Migrate to brew `bash-preexec`
-. "${BASH_IT}/preexec/bash-preexec.sh"
-. "${BASH_IT}/preexec/npm-preexec.sh"
-. "${BASH_IT}/preexec/git-preexec.sh"
+if __environment_variable_exists INSIDE_EMACS; then
+  if [[ $INSIDE_EMACS == *"term"* ]]; then
+    # support for term-mode
+    true
+  elif [[ $INSIDE_EMACS == *"comint"* ]]; then
+    # support for shell-mode
+    true
+  fi
+else
+  # https://github.com/rcaloras/bash-preexec
+  # TODO: Migrate to brew `bash-preexec`
+  . "${BASH_IT}/preexec/bash-preexec.sh"
+  . "${BASH_IT}/preexec/npm-preexec.sh"
+  . "${BASH_IT}/preexec/git-preexec.sh"
 
-if [ -z "$INSIDE_EMACS" ]; then
-    if [ "${TERM_PROGRAM:-""}" != "" ]; then
-        if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
-            iterm2_preexec_hook
-            function title {
-                echo -ne "\033]0;"$*"\007"
-            }
-        fi
-    elif [ -n "$SESSION_TYPE" ]; then
-        iterm2_preexec_hook
+  if [ "${TERM_PROGRAM:-""}" != "" ]; then
+    if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
+      iterm2_preexec_hook
+      function title {
+        echo -ne "\033]0;"$*"\007"
+      }
     fi
+  elif [ -n "$SESSION_TYPE" ]; then
+    iterm2_preexec_hook
+  fi
 fi
 
 . "${BASH_IT}/lib/custom.sh"

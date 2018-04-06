@@ -139,10 +139,11 @@ __unserialise() {
 }
 add_on_exit __unserialise
 
-# __environment_variable_exists() {
-#   eval "value=\"\${$1+x}\""
-#   [ ! -z $value ]
-# }
+__environment_variable_exists() {
+  eval "value=\"\${$1+x}\""
+  [ ! -z $value ]
+}
+add_on_exit __environment_variable_exists
 
 declare -a cd_functions
 declare -a pushd_functions
