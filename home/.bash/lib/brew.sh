@@ -78,6 +78,7 @@ run_brew() {
       'universal-ctags/universal-ctags'
       'bramstein/webfonttools'
       'd12frosted/emacs-plus'
+      'cloudfoundry/tap'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -708,6 +709,7 @@ run_brew() {
       'ansible'
       'aircrack-ng'
       'ack'
+      'cf-cli'
     )
 
     for index in ${!desired_formulae[*]}; do
