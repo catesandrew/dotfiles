@@ -7,7 +7,7 @@
 # Original author: O'Shaughnessy Evans <shaug+mailmate@wumpus.org>
 ##
 
-bundle_plist=$(dirname $0)/../../info.plist
+bundle_plist="$(dirname "$0")/../../info.plist"
 uuid=$(plutil -convert json -r -o - "$bundle_plist" |awk '$1=="\"uuid\"" { print $3 }' |sed 's,"\([^"].*\)".*,\1,')
 
 if [[ "$1" == "off" ]]; then

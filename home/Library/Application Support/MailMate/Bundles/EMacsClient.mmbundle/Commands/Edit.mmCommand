@@ -3,5 +3,5 @@
 	saveForEditing = 1;
 	command       = '#!/bin/bash\n"$MM_BUNDLE_SUPPORT/bin/edit" >/dev/null 2>&1 &';
 	keyEquivalent = "^m";
-	uuid          = "f5e1677a-394a-4843-9c6d-ff45ecc9be08";
+	uuid          = "F5E1677A-394A-4843-9C6D-FF45ECC9BE08";
 }
