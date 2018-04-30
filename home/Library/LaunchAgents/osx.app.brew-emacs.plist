@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Disabled</key>
-	<true/>
+	<false/>
 	<key>Label</key>
 	<string>homebrew.mxcl.emacs</string>
 	<key>ProgramArguments</key>
@@ -13,7 +13,7 @@
 		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --daemon</string>
 	</array>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 	<key>StandardErrorPath</key>
 	<string>/tmp/homebrew.mxcl.emacs.stderr</string>
 	<key>StandardOutPath</key>
