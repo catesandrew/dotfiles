@@ -107,7 +107,7 @@ fix-uri: no
 #   recommends.
 
 # hide-endtags
-hide-endtags: no
+# hide-endtags: no
 # Default: no
 # - This option is an alias for `omit-optional-tags`.
 
