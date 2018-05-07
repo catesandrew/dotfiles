@@ -1,23 +1,23 @@
 __docker_func_wrap () {
-    local cur words cword prev
-    _get_comp_words_by_ref -n =: cur words cword prev
-    $1
+  local cur words cword prev
+  _get_comp_words_by_ref -n =: cur words cword prev
+  $1
 }
 
 # __git_complete gco _git_checkout
 __docker_complete () {
-    local wrapper="__docker_wrap${2}"
-    eval "$wrapper () { __docker_func_wrap $2 ; }"
-    complete -o bashdefault -o default -o nospace -F $wrapper $1 2>/dev/null \
-        || complete -o default -o nospace -F $wrapper $1
+  local wrapper="__docker_wrap${2}"
+  eval "$wrapper () { __docker_func_wrap $2 ; }"
+  complete -o bashdefault -o default -o nospace -F $wrapper $1 2>/dev/null \
+    || complete -o default -o nospace -F $wrapper $1
 }
 
 __docker_c() {
-	local fields=
-	[ "${DOCKER_COMPLETION_TLS}" = yes ]
-      fields='--tls'
+  local fields=
+  [ "${DOCKER_COMPLETION_TLS}" = yes ]
+  fields='--tls'
 
-    docker ${fields} "$@"
+  docker ${fields} "$@"
 }
 
 _completion_loader docker
@@ -30,7 +30,7 @@ _completion_loader docker
 
 # Get latest container ID
 dl() {
-    __docker_c ps -l -q "$@"
+  __docker_c ps -l -q "$@"
 }
 __docker_complete dl _docker_ps
 
@@ -49,9 +49,9 @@ __docker_complete dl _docker_ps
 # __docker_complete dps _docker_ps
 
 dps()  {
- # tput cols
- # $COLUMNS
- __docker_c ps "$@" | awk -v cols=$COLUMNS '
+  # tput cols
+  # $COLUMNS
+  __docker_c ps "$@" | awk -v cols=$COLUMNS '
  NR==1{
    FIRSTLINEWIDTH=length($0)
    IDPOS=index($0,"CONTAINER ID");
@@ -123,7 +123,7 @@ dps()  {
 dpa() { dps -a "$@"; }
 
 dports()  {
- __docker_c ps "$@" | awk '
+  __docker_c ps "$@" | awk '
  NR==1{
    FIRSTLINEWIDTH=length($0)
    IDPOS=index($0,"CONTAINER ID");
@@ -155,156 +155,156 @@ dports()  {
 dportsa() { dports -a "$@"; }
 
 dcmds()  {
- __docker_c ps -q \
-     | xargs docker inspect --format '{{printf "%.8s|%s|%s" .Id .Path .Args}}' \
-     | column -t -s \|
+  __docker_c ps -q \
+    | xargs docker inspect --format '{{printf "%.8s|%s|%s" .Id .Path .Args}}' \
+    | column -t -s \|
 }
 
 # Attach to a running container
 da() {
-    __docker_c attach "$@"
+  __docker_c attach "$@"
 }
 __docker_complete da _docker_attach
 
 # Remove one or more containers
 drm() {
-    __docker_c rm "$@"
+  __docker_c rm "$@"
 }
 __docker_complete drm _docker_rm
 
 # Remove all recently exited containers
 drmu() {
-   __docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second"
-   # This works by using rmi with a list of container ids. To get the container
-   # ids we call docker ps then pipe it to grep "minutes ago".
-   local ids
-   IFS=$'\n'
-   ids=($(__docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second" | awk '{print $1}'))
-   unset IFS
+  __docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second"
+  # This works by using rmi with a list of container ids. To get the container
+  # ids we call docker ps then pipe it to grep "minutes ago".
+  local ids
+  IFS=$'\n'
+  ids=($(__docker_c ps --all --filter "status=exited" | grep -E "minute(s)? ago|second" | awk '{print $1}'))
+  unset IFS
 
-   if [ ${#ids[@]} -eq 0 ]; then
-       echo "No recentlyed exited containers"
-   else
-       printf 'Remove all recently exited containers: %s\n' "${ids[@]}"
-       read -p "Are you sure? " -n 1 -r
-       echo    # (optional) move to a new line
-       if [[ $REPLY =~ ^[Yy]$ ]]; then
-           __docker_c rm "${ids[@]}"
-       fi
-   fi
+  if [ ${#ids[@]} -eq 0 ]; then
+    echo "No recentlyed exited containers"
+  else
+    printf 'Remove all recently exited containers: %s\n' "${ids[@]}"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      __docker_c rm "${ids[@]}"
+    fi
+  fi
 }
 
 # Start one or more stopped containers
 dstart() {
-    __docker_c start "$@"
+  __docker_c start "$@"
 }
 __docker_complete dstart _docker_start
 
 # Stop one or more running containers
 dstop() {
-    __docker_c stop "$@"
+  __docker_c stop "$@"
 }
 __docker_complete dstop _docker_stop
 
 # Restart one or more running containers
 drestart() {
-    __docker_c restart "$@"
+  __docker_c restart "$@"
 }
 __docker_complete drestart _docker_restart
 
 # Stop and Remove all containers
 drmf() {
-    local _ps
-    _ps="$(__docker_c ps -a -q)"
+  local _ps
+  _ps="$(__docker_c ps -a -q)"
 
-    echo "Stop and remove (all containers): $_ps"
-    read -p "Are you sure? " -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        __docker_c stop "$_ps" && __docker_c rm "$_ps"
-    fi
+  echo "Stop and remove (all containers): $_ps"
+  read -p "Are you sure? " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    __docker_c stop "$_ps" && __docker_c rm "$_ps"
+  fi
 }
 
 # Build an image from a Dockerfile
 dbuild() {
-    __docker_c build "$@"
+  __docker_c build "$@"
 }
 __docker_complete dbuild _docker_build
 
 # Dockerfile build, e.g., $dbu tcnksm/test
 dbu() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-         __docker_c build --tag="$_name" .
-    else
-        __docker_c build --tag="$1" .
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c build --tag="$_name" .
+  else
+    __docker_c build --tag="$1" .
+  fi
 
-    # __docker_c build --tag="$1" .
+  # __docker_c build --tag="$1" .
 }
 __docker_complete dbu __docker_complete_image_repos_and_tags
 
 # Create a new image from a container's changes
 dci() {
-    __docker_c commit "$@"
+  __docker_c commit "$@"
 }
 __docker_complete dci _docker_commit
 
 # Copy files/folders between a container and the local filesystem
 dcp() {
-    __docker_c cp "$@"
+  __docker_c cp "$@"
 }
 __docker_complete dcp _docker_cp
 
 ddaemon() {
-    __docker_c daemon "$@"
+  __docker_c daemon "$@"
 }
 __docker_complete ddaemon _docker_daemon
 
 # Show docker disk usage, including space reclaimable by pruning
 ddf() {
-    __docker_c system df
+  __docker_c system df
 }
 
 # Inspect changes on a container's filesystem
 ddi() {
-    __docker_c diff "$@"
+  __docker_c diff "$@"
 }
 __docker_complete ddi _docker_diff
 
 # Get real time events from the server
 de() {
-    __docker_c events "$@"
+  __docker_c events "$@"
 }
 __docker_complete de _docker_events
 
 # Run a command in a running container
 dexec() {
-    __docker_c exec "$@"
+  __docker_c exec "$@"
 }
 __docker_complete dexec _docker_exec
 
 # enter into a running container
 dent() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-         __docker_c exec --interactive --tty "$_name" /bin/bash
-    else
-        __docker_c exec --interactive --tty "$1" /bin/bash
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c exec --interactive --tty "$_name" /bin/bash
+  else
+    __docker_c exec --interactive --tty "$1" /bin/bash
+  fi
 }
 __docker_complete dent __docker_complete_containers_running
 
 
 # Export a container's filesystem as a tar archive
 dexp() {
-    __docker_c export "$@"
+  __docker_c export "$@"
 }
 __docker_complete dexp _docker_export
 
 # Show the history of an image
 dh() {
-    __docker_c history "$@"
+  __docker_c history "$@"
 }
 __docker_complete dh _docker_history
 
@@ -365,13 +365,13 @@ __docker_complete dls _docker_images
 
 # Import the contents from a tarball to create a filesystem image
 dimp() {
-    __docker_c import "$@"
+  __docker_c import "$@"
 }
 __docker_complete dimp _docker_import
 
 # Get container IP
 dip() {
-    __docker_c inspect --format '{{ .NetworkSettings.IPAddress }}' "$@"
+  __docker_c inspect --format '{{ .NetworkSettings.IPAddress }}' "$@"
 }
 __docker_complete dip __docker_complete_containers_all
 
@@ -383,77 +383,77 @@ __docker_complete dstatus __docker_complete_containers_all
 
 # Return low-level information on a container, image or task
 di() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-        __docker_c inspect "$_name"
-    else
-        __docker_c inspect "$@"
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c inspect "$_name"
+  else
+    __docker_c inspect "$@"
+  fi
 }
 __docker_complete di _docker_inspect
 
 # Kill one or more running containers
 dkill() {
-    __docker_c kill "$@"
+  __docker_c kill "$@"
 }
 __docker_complete dkill _docker_kill
 
 # Load an image from a tar archive or STDIN
 dload() {
-    __docker_c load "$@"
+  __docker_c load "$@"
 }
 __docker_complete dload _docker_load
 
 # Log in to a Docker registry.
 dlogin() {
-    __docker_c login "$@"
+  __docker_c login "$@"
 }
 __docker_complete dlogin _docker_login
 
 # Log out from a Docker registry.
 dlogout() {
-    __docker_c logout "$@"
+  __docker_c logout "$@"
 }
 __docker_complete dlogout _docker_logout
 
 # Fetch the logs of a container
 dlogs() {
-    __docker_c logs "$@"
+  __docker_c logs "$@"
 }
 __docker_complete dlogs _docker_logs
 
 dtail() {
-    __docker_c logs --tail all --follow "$@"
+  __docker_c logs --tail 100 --follow "$@"
 }
 
 # Manage Docker networks
 dn() {
-    __docker_c network "$@"
+  __docker_c network "$@"
 }
 __docker_complete dn _docker_network
 
 dncn() {
-    __docker_c network connect "$@"
+  __docker_c network connect "$@"
 }
 __docker_complete dncn _docker_network_connect
 
 dndc() {
-    __docker_c network disconnect "$@"
+  __docker_c network disconnect "$@"
 }
 __docker_complete dndc _docker_network_disconnect
 
 dnc() {
-    __docker_c network create "$@"
+  __docker_c network create "$@"
 }
 __docker_complete dnc _docker_network_create
 
 dni() {
-    __docker_c network inspect "$@"
+  __docker_c network inspect "$@"
 }
 __docker_complete dni _docker_network_inspect
 
 dnp() {
-    __docker_c network prune "$@"
+  __docker_c network prune "$@"
 }
 __docker_complete dnp _docker_network_prune
 
@@ -469,124 +469,124 @@ __docker_complete dngw __docker_complete_networks
 
 # Manage Docker Swarm nodes
 dnode() {
-    __docker_c node "$@"
+  __docker_c node "$@"
 }
 __docker_complete dnode _docker_node
 
 # Pause all processes within one or more containers
 dpause() {
-    __docker_c pause "$@"
+  __docker_c pause "$@"
 }
 __docker_complete dpause _docker_pause
 
 # List port mappings or a specific mapping for the container
 dport() {
-    __docker_c port "$@"
+  __docker_c port "$@"
 }
 __docker_complete dport _docker_port
 
 # Pull an image or a repository from a registry
 dpull() {
-    __docker_c pull "$@"
+  __docker_c pull "$@"
 }
 __docker_complete dpull _docker_pull
 
 # Rename a container
 drename() {
-    __docker_c rename "$@"
+  __docker_c rename "$@"
 }
 __docker_complete drename _docker_rename
 
 # Restart a container
 drestart() {
-    __docker_c restart "$@"
+  __docker_c restart "$@"
 }
 __docker_complete drestart _docker_restart
 
 # Remove one or more images
 drmi() {
-    __docker_c rmi "$@"
+  __docker_c rmi "$@"
 }
 __docker_complete drmi _docker_rmi
 
 # Remove image specified by $1
 dri() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-        __docker_c rmi "$_name"
-    else
-        __docker_c rmi "$@"
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c rmi "$_name"
+  else
+    __docker_c rmi "$@"
+  fi
 }
 __docker_complete dri _docker_rmi
 
 # Remove all untagged images
 driu() {
-   # This works by using rmi with a list of image ids. To get the image
-   # ids we call docker images then pipe it to grep "^<none>". The grep
-   # will filter it down to only lines with the value "<none>" in the
-   # repository column. Then to extract the id out of the third column we
-   # pipe it to awk "{print $3}" which will print the third column of each
-   # line passed to it.
-   # local images
-   local images
-   # IFS=$'\n'
-   # images=($(__docker_c images | grep "<none>" | awk '{print $3}'))
-   # unset IFS
-   # or
-   images=($(__docker_c images -q -f dangling=true))
+  # This works by using rmi with a list of image ids. To get the image
+  # ids we call docker images then pipe it to grep "^<none>". The grep
+  # will filter it down to only lines with the value "<none>" in the
+  # repository column. Then to extract the id out of the third column we
+  # pipe it to awk "{print $3}" which will print the third column of each
+  # line passed to it.
+  # local images
+  local images
+  # IFS=$'\n'
+  # images=($(__docker_c images | grep "<none>" | awk '{print $3}'))
+  # unset IFS
+  # or
+  images=($(__docker_c images -q -f dangling=true))
 
-   if [ ${#images[@]} -eq 0 ]; then
-       echo "No unstaged images"
-   else
-       printf 'Remove all untagged images: %s\n' "${images[@]}"
-       read -p "Are you sure? " -n 1 -r
-       echo    # (optional) move to a new line
-       if [[ $REPLY =~ ^[Yy]$ ]]; then
-           __docker_c rmi "${images[@]}"
-       fi
-   fi
+  if [ ${#images[@]} -eq 0 ]; then
+    echo "No unstaged images"
+  else
+    printf 'Remove all untagged images: %s\n' "${images[@]}"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      __docker_c rmi "${images[@]}"
+    fi
+  fi
 }
 
 # Remove all images
 drif() {
-    local images
-    images="$(__docker_c images -q)"
+  local images
+  images="$(__docker_c images -q)"
 
-    echo "Remove all images: $images"
-    read -p "Are you sure? " -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        __docker_c rmi "$images"
-    fi
+  echo "Remove all images: $images"
+  read -p "Are you sure? " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    __docker_c rmi "$images"
+  fi
 }
 
 # Run a command in a new container
 drun() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-         __docker_c run "$_name"
-    else
-        __docker_c run "$@"
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c run "$_name"
+  else
+    __docker_c run "$@"
+  fi
 }
 __docker_complete drun _docker_run
 
 # Run a command in a new container
 dk() {
-    __docker_c run "$@"
+  __docker_c run "$@"
 }
 __docker_complete dk _docker_run
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
 dkd() {
-    __docker_c run --detach --publish-all "$@"
+  __docker_c run --detach --publish-all "$@"
 }
 __docker_complete dkd __docker_complete_images
 
 # Run interactive container, e.g., $dki base /bin/bash
 dki() {
-    __docker_c run --interactive --tty --publish-all "$@"
+  __docker_c run --interactive --tty --publish-all "$@"
 }
 __docker_complete dki __docker_complete_images
 
@@ -594,12 +594,12 @@ __docker_complete dki __docker_complete_images
 # dbash is particularly useful when diagnosing a failed `docker build`. Just
 # dbash the last generated image and re-run the failed command
 dbash() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$_name"
-    else
-        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$1"
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$_name"
+  else
+    __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint /bin/bash "$1"
+  fi
 }
 __docker_complete dbash  __docker_complete_images
 
@@ -607,30 +607,30 @@ __docker_complete dbash  __docker_complete_images
 # dsh is particularly useful when diagnosing a failed `docker build`. Just
 # dsh the last generated image and re-run the failed command
 dsh() {
-    if [ $# -eq 0 ]; then
-        local _name=$(basename "$PWD")
-        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$_name"
-    else
-        __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$1"
-    fi
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$_name"
+  else
+    __docker_c run --rm --interactive --tty --env TERM=xterm --entrypoint sh "$1"
+  fi
 }
 __docker_complete dsh  __docker_complete_images
 
 # Save one or more images to a tar archive (streamed to STDOUT by default)
 dsave() {
-    __docker_c save "$@"
+  __docker_c save "$@"
 }
 __docker_complete dsave _docker_save
 
 # Search the Docker Hub for images
 dsearch() {
-    __docker_c search "$@"
+  __docker_c search "$@"
 }
 __docker_complete dsearch _docker_search
 
 # Manage Docker services
 ds() {
-    __docker_c service "$@"
+  __docker_c service "$@"
 }
 __docker_complete ds _docker_service
 
@@ -661,7 +661,7 @@ __docker_complete dsrm _docker_service_rm
 
 # Display a live stream of container(s) resource usage statistics
 dstats() {
-    __docker_c stats "$@"
+  __docker_c stats "$@"
 }
 __docker_complete dstats _docker_stats
 
@@ -678,15 +678,15 @@ dx11() {
   local name sound x11
 
   sound=(
-	  --device /dev/snd
+    --device /dev/snd
   )
 
   x11=(
-	  -v /tmp/.X11-unix:/tmp/.X11-unix:ro
-	  -e DISPLAY
-	  --net host # in case of DISPLAY=localhost:*
-	  -v ~/.Xauthority:/home/user/.Xauthority:ro
-	  --ipc host # DevShm errors...
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro
+    -e DISPLAY
+    --net host # in case of DISPLAY=localhost:*
+    -v ~/.Xauthority:/home/user/.Xauthority:ro
+    --ipc host # DevShm errors...
   )
 
   if [ $# -eq 0 ]; then
@@ -699,45 +699,45 @@ dx11() {
 
 # Manage Docker Swarm
 dswarm() {
-    __docker_c swarm "$@"
+  __docker_c swarm "$@"
 }
 __docker_complete dswarm _docker_service
 
 # Tag an image into a repository
 dtag() {
   if [ $# -eq 0 ]; then
-      local _name result id
-      _name=$(basename "$PWD")
-      result=$(docker images -q | xargs docker inspect -f "{{if gt (len .RepoTags) 0}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
-      echo "Found: $result"
-      if [ -n "${result##+([[:space:]])}" ]; then
-        id=$(echo "$result" | awk '{print $1}')
-        id=$(echo "$id" | awk -F':' '{print $2}')
-        echo "id: $id"
-        printf "Found image:  %.8s\n" "$id"
-        if [ -n "$id" ]; then
-          __docker_c tag "$id" "hub.cates.io/${_name}:latest"
-        fi
-      else
-        printf "Did not find candidate: %s\n" "$_name"
+    local _name result id
+    _name=$(basename "$PWD")
+    result=$(docker images -q | xargs docker inspect -f "{{if gt (len .RepoTags) 0}} {{range .RepoTags}} {{if eq . \"${_name}:latest\"}}{{ $.Id }} {{ $.Container }}{{end}} {{end}} {{end}}")
+    echo "Found: $result"
+    if [ -n "${result##+([[:space:]])}" ]; then
+      id=$(echo "$result" | awk '{print $1}')
+      id=$(echo "$id" | awk -F':' '{print $2}')
+      echo "id: $id"
+      printf "Found image:  %.8s\n" "$id"
+      if [ -n "$id" ]; then
+        __docker_c tag "$id" "hub.cates.io/${_name}:latest"
       fi
+    else
+      printf "Did not find candidate: %s\n" "$_name"
+    fi
   else
-      __docker_c tag "$@"
+    __docker_c tag "$@"
   fi
 
-    # result_id=$(dsrv ls -q | xargs docker service inspect -f "{{if eq .Spec.Name \"$name\"}}{{.Spec.Name}} {{.ID}}{{end}}")
+  # result_id=$(dsrv ls -q | xargs docker service inspect -f "{{if eq .Spec.Name \"$name\"}}{{.Spec.Name}} {{.ID}}{{end}}")
 
-    # if [ -n "$result_id" ]; then
-    #   srv_id=$(echo "$result_id" | awk '{print $2}')
+  # if [ -n "$result_id" ]; then
+  #   srv_id=$(echo "$result_id" | awk '{print $2}')
 
-    #   replicas=$(dsrv inspect $srv_id -f '{{.Spec.Mode.Replicated.Replicas}}')
+  #   replicas=$(dsrv inspect $srv_id -f '{{.Spec.Mode.Replicated.Replicas}}')
 
-    #   # result_name=$(docker ps -aq | xargs docker inspect -f
-    #   # "{{if eq (index .Config.Labels \"com.docker.swarm.service.id\") \"$srv_id\"}}{{.Id}} {{index .Config.Labels \"com.docker.swarm.task.name\"}}{{end}}")
-    #   # if [ -n "$result_name" ]; then
-    #   #   task_name=$(echo "$result_name" | awk '{print $2}')
-    #   # fi
-    # fi
+  #   # result_name=$(docker ps -aq | xargs docker inspect -f
+  #   # "{{if eq (index .Config.Labels \"com.docker.swarm.service.id\") \"$srv_id\"}}{{.Id}} {{index .Config.Labels \"com.docker.swarm.task.name\"}}{{end}}")
+  #   # if [ -n "$result_name" ]; then
+  #   #   task_name=$(echo "$result_name" | awk '{print $2}')
+  #   # fi
+  # fi
 
 }
 __docker_complete dtag _docker_tag
@@ -762,43 +762,43 @@ __docker_complete dpush _docker_push
 
 # Display the running processes of a container
 dtap() {
-    __docker_c tap "$@"
+  __docker_c tap "$@"
 }
 __docker_complete dtap _docker_tap
 
 # Unpause all processes within one or more containers
 dunpause() {
-    __docker_c unpause "$@"
+  __docker_c unpause "$@"
 }
 __docker_complete dunpause _docker_unpause
 
 # Update configuration of one or more containers
 dupdate() {
-    __docker_c update "$@"
+  __docker_c update "$@"
 }
 __docker_complete dupdate _docker_update
 
 # Manage Docker volumes
 dv() {
-    __docker_c volume "$@"
+  __docker_c volume "$@"
 }
 __docker_complete dv _docker_volume
 
 # Create a Volume
 dvc() {
-    __docker_c volume create "$@"
+  __docker_c volume create "$@"
 }
 __docker_complete dvc _docker_volume_create
 
 # Display detailed info on one or more volumes
 dvi() {
-    __docker_c volume inspect "$@"
+  __docker_c volume inspect "$@"
 }
 __docker_complete dvi _docker_volume_inspect
 
 # list volumes
 dvls() {
-    __docker_c volume ls "$@"
+  __docker_c volume ls "$@"
 }
 __docker_complete dvls _docker_volume_ls
 
@@ -806,24 +806,24 @@ dvcleanup() {
   local ids
   ids=( $(__docker_c volume ls -qf dangling=true | xargs docker volume inspect -f "{{.Name}}") )
 
-   if [ ${#ids[@]} -eq 0 ]; then
-       echo "No dangling volumes"
-   elif [ ${#ids[@]} -gt 0 ]; then
-       echo "Dangling Volumes:"
-       printf "* %s\n" "${ids[@]}"
-       echo "Remove all dangling volumes?"
-       echo
-       read -p "Are you sure? " -n 1 -r
-       echo
-       if [[ $REPLY =~ ^[Yy]$ ]]; then
-           __docker_c volume rm "${ids[@]}"
-       fi
-   fi
+  if [ ${#ids[@]} -eq 0 ]; then
+    echo "No dangling volumes"
+  elif [ ${#ids[@]} -gt 0 ]; then
+    echo "Dangling Volumes:"
+    printf "* %s\n" "${ids[@]}"
+    echo "Remove all dangling volumes?"
+    echo
+    read -p "Are you sure? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      __docker_c volume rm "${ids[@]}"
+    fi
+  fi
 }
 
 # remove one or more volumes
 dvrm() {
-    __docker_c volume rm "$@"
+  __docker_c volume rm "$@"
 }
 __docker_complete dvrm _docker_volume_rm
 
@@ -885,13 +885,13 @@ __docker_complete dvr _docker_run
 
 # Block until a container stops, then print its exit code
 dwait() {
-    __docker_c wait "$@"
+  __docker_c wait "$@"
 }
 __docker_complete dwait _docker_wait
 
 # Show all alias related docker
 dalias() {
-    alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort;
+  alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort;
 }
 
 dclean() {
@@ -902,43 +902,43 @@ dclean() {
 
   dockerPs=( $(__docker_c ps -aq) )
   if [ ${#dockerPs[@]} -gt 0 ]; then
-	  (
+    (
       echo "PS: "
       echo "${dockerPs[@]}"
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-		  # __docker_c rm "${dockerPs[@]}" || true
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-	  )
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+      # __docker_c rm "${dockerPs[@]}" || true
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+    )
   fi
 
   dockerVolumes=( $(__docker_c volume ls -q) )
   if [ ${#dockerVolumes[@]} -gt 0 ]; then
-	  (
+    (
       echo "VOLUMES:"
       echo "${dockerVolumes[@]}"
       echo ""
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-		  # __docker_c volume rm "${dockerVolumes[@]}" || true
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-	  )
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+      # __docker_c volume rm "${dockerVolumes[@]}" || true
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+    )
   fi
 
   dockerUntaggedImages=( $(__docker_c images -q --filter 'dangling=true') )
   if [ ${#dockerUntaggedImages[@]} -gt 0 ]; then
-	  (
+    (
       echo "UNTAGGED IMAGES:"
       echo "${dockerUntaggedImages[@]}"
       echo ""
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-		  # __docker_c rmi "${dockerUntaggedImages[@]}" || true
-		  # df -hT "$dockerRoot"
-		  # df -hTi "$dockerRoot"
-	  )
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+      # __docker_c rmi "${dockerUntaggedImages[@]}" || true
+      # df -hT "$dockerRoot"
+      # df -hTi "$dockerRoot"
+    )
   fi
 }
 
@@ -1011,8 +1011,8 @@ EOUSAGE
   }
 
   while [ "$#" -gt 0 ]; do
-	  repo="$1"; shift 1
-	  _all "$repo"
+    repo="$1"; shift 1
+    _all "$repo"
   done
 }
 
@@ -1087,13 +1087,13 @@ dstale() {
   unset IFS
 
   for container in "${containers[@]}"; do
-	  name="$(__docker_c inspect --type container --format '{{.Name}}' "$container")"
-	  name="${name#/}"
-	  imageId="$(__docker_c inspect --type container --format '{{.Image}}' "$container")"
-	  image="$(__docker_c inspect --type container --format '{{.Config.Image}}' "$container")"
-	  imageImageId="$(__docker_c inspect --type image --format '{{.Id}}' "$image")"
-	  if [ "$imageId" != "$imageImageId" ]; then
-		  echo "- $name ($image)"
-	  fi
+    name="$(__docker_c inspect --type container --format '{{.Name}}' "$container")"
+    name="${name#/}"
+    imageId="$(__docker_c inspect --type container --format '{{.Image}}' "$container")"
+    image="$(__docker_c inspect --type container --format '{{.Config.Image}}' "$container")"
+    imageImageId="$(__docker_c inspect --type image --format '{{.Id}}' "$image")"
+    if [ "$imageId" != "$imageImageId" ]; then
+      echo "- $name ($image)"
+    fi
   done
 }
