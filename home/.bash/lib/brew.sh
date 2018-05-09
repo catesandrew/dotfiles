@@ -710,6 +710,7 @@ run_brew() {
       'aircrack-ng'
       'ack'
       'cf-cli'
+      'jenv'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -862,6 +863,7 @@ run_brew() {
       'istat-menus'
       'iterm2'
       'jaikoz'
+      'java6'
       'java8'
       'karabiner-elements'
       'keepassx'
@@ -944,6 +946,8 @@ run_brew() {
       'xquartz'
       'yasu'
       'zotero'
+      'android-ndk'
+      'facebook-ios-sdk'
     )
 
     for index in ${!cask_desired_formulae[*]}; do
@@ -958,8 +962,29 @@ run_brew() {
       for item in "${cask_missing_formulae[@]}"; do
         e_header "Installing $item..."
         case "$item" in
+          android-ndk)
+            brew cask intsall android-ndk
+            # accept the licenses
+            yes | sdkmanager --licenses
+            ;;
+          java6)
+            brew cask install java6
+            jenv add $(/usr/libexec/java_home -v1.6)
+            ;;
+          java7)
+            brew cask install java7
+            jenv add $(/usr/libexec/java_home -v1.7)
+            ;;
+          java8)
+            brew cask install java8
+            jenv add $(/usr/libexec/java_home -v1.8)
+            ;;
+          java9)
+            brew cask install java9
+            jenv add $(/usr/libexec/java_home -v9)
+            ;;
           *)
-            brew cask install $item
+            brew cask install "${item}"
         esac
       done
 
