@@ -28,3 +28,5 @@ web:*.{html,css,js,tmpl}*
 gradle:*.gradle
 --type-add
 gr:include:gradle
+
+--type-add=react:*.jsx
