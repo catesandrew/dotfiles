@@ -79,6 +79,7 @@ run_brew() {
       'bramstein/webfonttools'
       'd12frosted/emacs-plus'
       'cloudfoundry/tap'
+      'tavianator/tap'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -711,6 +712,8 @@ run_brew() {
       'ack'
       'cf-cli'
       'jenv'
+      'psgrep'
+      'bfs'
     )
 
     for index in ${!desired_formulae[*]}; do
