@@ -80,6 +80,7 @@ run_brew() {
       'd12frosted/emacs-plus'
       'cloudfoundry/tap'
       'tavianator/tap'
+      'zegervdv/zathura'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -714,6 +715,9 @@ run_brew() {
       'jenv'
       'psgrep'
       'bfs'
+      'meson'
+      'zathura'
+      'zathura-pdf-poppler'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -786,6 +790,20 @@ run_brew() {
             # source, it has been forked  and renamed to Universal Ctags
             # and can be found at universal-ctags/ctags.
             brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+            ;;
+          meson)
+            # A bug in the latest stable version was fixed but has not been released yet.
+            brew install --HEAD meson
+            ;;
+          zathura)
+            brew install zathura
+            # Follow the instructions to link the plugins into place:
+            mkdir -p $(brew --prefix zathura)/lib/zathura
+            ;;
+          zathura-pdf-poppler)
+            brew install zathura-pdf-poppler
+            # Follow the instructions to link the plugins into place:
+            ln -s $(brew --prefix zathura-pdf-poppler)/lib/pdf.dylib $(brew --prefix zathura)/lib/zathura/pdf.so
             ;;
           *)
             brew install $item
