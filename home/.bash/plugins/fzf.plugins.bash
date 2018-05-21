@@ -30,6 +30,20 @@ if brew_contains_element "fzf" && \
     fi
   }
 
+  __fzf_history__() (
+    local line
+    shopt -u nocaseglob nocasematch
+    line=$(
+      { export HISTTIMEFORMAT= && export HISTFILE=${HOME}/.persistent_history && history -cr $HISTFILE && history; } | tac | sort --key=2.1 -bus | sort -n |
+      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
+      command grep '^ *[0-9]') &&
+      if [[ $- =~ H ]]; then
+        sed 's/^ *\([0-9]*\)\** .*/!\1/' <<< "$line"
+      else
+        sed 's/^ *\([0-9]*\)\** *//' <<< "$line"
+      fi
+  )
+
   # view what devices a running process has open `lsof -p 5051`
   complete -o bashdefault -o default -o nospace -F _fzf_complete_kill lsof
   # Viewing memory allocation with pmap (vmmap on osx). You can view the
