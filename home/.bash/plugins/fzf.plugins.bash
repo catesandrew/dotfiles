@@ -35,12 +35,12 @@ if brew_contains_element "fzf" && \
     shopt -u nocaseglob nocasematch
     line=$(
       { export HISTTIMEFORMAT= && export HISTFILE=${HOME}/.persistent_history && history -cr $HISTFILE && history; } | tac | sort --key=2.1 -bus | sort -n |
-      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
+      FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac --sync -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
       command grep '^ *[0-9]') &&
       if [[ $- =~ H ]]; then
-        sed 's/^ *\([0-9]*\)\** .*/!\1/' <<< "$line"
+        sed 's/^ *[0-9]*\** \(.*\)/\1/' <<< "$line"
       else
-        sed 's/^ *\([0-9]*\)\** *//' <<< "$line"
+        sed 's/^ *[0-9]*\** \(*\)//' <<< "$line"
       fi
   )
 
