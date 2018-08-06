@@ -65,7 +65,7 @@ oascripts = {
   {'i', 'Messages'},
   {'o', 'OmniFocus'},
   -- {'p', ''}, saved for snippets lab
-  {'1', '1Password 6'},
+  {'1', '1Password 7'},
 }
 
 for i, app in ipairs(oascripts) do
