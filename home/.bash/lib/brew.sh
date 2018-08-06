@@ -59,6 +59,10 @@ run_brew() {
     e_header "Updating any existing Homebrew taps..."
     local __brew_taps=($(brew tap | sed 's/:.*//'))
 
+    # If you previously installed OCRmyPDF from this tap please switch to the Homebrew version:
+	# brew untap jbarlow83/ocrmypdf
+	# brew reinstall ocrmypdf
+
     local -a missing_taps
     local -a desired_taps=(
       'caskroom/cask'
@@ -71,7 +75,6 @@ run_brew() {
       'homebrew/services'
       'dart-lang/dart'
       'discoteq/discoteq'
-      'jbarlow83/ocrmypdf'
       'johanhaleby/kubetail'
       'neovim/neovim'
       'thoughtbot/formulae'
