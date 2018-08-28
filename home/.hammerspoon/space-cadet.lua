@@ -77,7 +77,7 @@ end
 -- double identity apps
 
 doubleapps = {
-  {'t', 'iTerm2', 'iTerm'},
+  -- {'t', 'iTerm2', 'iTerm'},
   {'k', 'Fantastical', 'Fantastical 2'},
 }
 
