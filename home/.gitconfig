@@ -207,3 +207,9 @@
   path = ~/.gitconfig-private
 [includeIf "gitdir:*/wb/"]
   path = ~/.gitconfig-work
+[magithub]
+	online = false
+[magithub "status"]
+	includeStatusHeader = false
+	includePullRequestsSection = false
+	includeIssuesSection = false
