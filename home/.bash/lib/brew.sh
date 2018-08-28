@@ -759,7 +759,7 @@ run_brew() {
             ;;
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --HEAD --with-24bit-color --without-gnutls
+            brew install emacs-plus --HEAD --with-pdumper --with-modern-icon --without-gnutls
             ;;
           node)
             brew install node --without-npm
