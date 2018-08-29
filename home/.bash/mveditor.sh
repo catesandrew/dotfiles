@@ -40,14 +40,14 @@ if [ "$(uname)" == "Darwin"  ]; then
             fi
             ;;
         *.js)
-            if hash emacsclient 2>/dev/null; then
-              frameVisible=$(/usr/local/bin/emacsclient -e '(<= (length (visible-frame-list)) 2)')
+            if hash ${BREW_HOME}/bin/emacsclient 2>/dev/null; then
+              frameVisible=$(${BREW_HOME}/bin/emacsclient -e '(<= (length (visible-frame-list)) 2)')
               if [ "${frameVisible}" == "t" ]; then
                 # there is a not a visible frame, launch one
-                /usr/local/bin/emacsclient --create-frame --no-wait -e "(progn (find-file \"$1\")(js2-mode))"
+                ${BREW_HOME}/bin/emacsclient --create-frame --no-wait -e "(progn (find-file \"$1\")(js2-mode))"
               else
                 # there is a visible frame, just open a file in exiting one
-                /usr/local/bin/emacsclient --no-wait -e "(progn (find-file \"$1\")(js2-mode))"
+                ${BREW_HOME}/bin/emacsclient --no-wait -e "(progn (find-file \"$1\")(js2-mode))"
               fi
 
               osascript -e 'tell app "EmacsClient" to activate'
