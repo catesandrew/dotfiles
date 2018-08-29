@@ -36,6 +36,54 @@ function pass () {
     echo "Without (use this as the pass): $(echo $pass | tr -d ' ')"
 }
 
+function pickfrom ()
+{
+    about 'picks random line from file'
+    param '1: filename'
+    example '$ pickfrom /usr/share/dict/words'
+    group 'base'
+    local file=$1
+    [ -z "$file" ] && reference $FUNCNAME && return
+    length=$(cat $file | wc -l)
+    n=$(expr $RANDOM \* $length \/ 32768 + 1)
+    head -n $n $file | tail -1
+}
+
+function passgen ()
+{
+    about 'generates random password from dictionary words'
+    param 'optional integer length'
+    param 'if unset, defaults to 4'
+    example '$ passgen'
+    example '$ passgen 6'
+    group 'base'
+    local i passgen length=${1:-4}
+    pass=$(echo $(for i in $(eval echo "{1..$length}"); do pickfrom /usr/share/dict/words; done))
+    echo "With spaces (easier to memorize): $pass"
+    echo "Without (use this as the password): $(echo $pass | tr -d ' ')"
+}
+
+# Create alias pass to passgen when pass isn't installed or
+# BASH_IT_LEGACY_PASS is true.
+if ! command -v pass &>/dev/null || [ "$BASH_IT_LEGACY_PASS" = true ]
+then
+  alias pass=passgen
+fi
+
+function pmdown ()
+{
+    about 'preview markdown file in a browser'
+    param '1: markdown file'
+    example '$ pmdown README.md'
+    group 'base'
+    if command -v markdown &>/dev/null
+    then
+      markdown $1 | browser
+    else
+      echo "You don't have a markdown command installed!"
+    fi
+}
+
 # about 'make a directory and cd into it'
 # param 'path to create'
 # example '$ mkcd foo'
