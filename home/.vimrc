@@ -403,7 +403,8 @@ endif
 " Leader {{{
 
 " Change the mapleader from \ to ,
-let mapleader=","
+nnoremap <SPACE> <Nop>
+let mapleader=" "
 let maplocalleader = "\\"
 
 " map Leader and LocalLeader to 0x00A0 (NO_BREAK_SPACE)
@@ -440,8 +441,8 @@ autocmd BufReadPost * call SetCursorPosition()
 " Searching and movement ------------------------------------------------------ {{{
 
 "clearing highlighted search as well as redraw
-nnoremap <silent> <leader>/ :nohlsearch<CR><C-L>
-inoremap <silent> <leader>/ <C-O>:nohlsearch<CR>
+nnoremap <silent> <leader>sc :nohlsearch<CR><C-L>
+inoremap <silent> <leader>sc <C-O>:nohlsearch<CR>
 nnoremap <BS> :set hlsearch! hlsearch?<cr>
 
 "nmap <silent> <leader>hh :set invhlsearch<CR>
@@ -666,8 +667,8 @@ nnoremap <D-p> "_ddPV`]
 " Folding --------------------------------------------------------------------- {{{
 
 " Space to toggle folds.
-nnoremap <Space> za
-vnoremap <Space> za
+" nnoremap <Space> za
+" vnoremap <Space> za
 
 " Make zO recursively open whatever top level fold we're in, no matter where the
 " cursor happens to be.
@@ -1509,8 +1510,8 @@ if has('gui_running')
     if s:is_macvim
       " set gfn=Anonymous\ Pro\ for\ Powerline:h14
       " set gfn=Hack:h12
-      " set gfn=Pragmata\ Pro:h12
-      set gfn=Hasklig:h12
+      set gfn=PragmataPro:h12
+      " set gfn=Hasklig:h12
       set macligatures
       set transparency=5          " Make the window slightly transparent
     endif
