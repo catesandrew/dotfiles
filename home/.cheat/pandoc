@@ -1,3 +1,5 @@
+pandoc example.md --from markdown --template default --to latex --wrap=none
+
 pandoc example.md -o example.pdf --from markdown --template eisvogel --listings
 
 pandoc example.md -o example.pdf --template eisvogel --number-sections
