@@ -11,11 +11,23 @@ shopt -s cmdhist
 log_bash_persistent_history()
 {
   [[ $(history 1) =~ ^\ *[0-9]+\ +([^\ ]+\ [^\ ]+)\ +(.*)$ ]]
-  local epoch_part="$(date --date="${BASH_REMATCH[1]}" +%s)"
+  local epoch_part
+  local hist_part
+
+  if [ "${__dot_system_type}" == "Darwin" ]; then
+    if brew_contains_element "coreutils" || \
+        hash gdate 2>/dev/null; then
+            epoch_part="$(gdate --date="${BASH_REMATCH[1]}" +%s)"
+    else
+        epoch_part="$(\date -j -f "%Y-%m-%d %H:%M:%S" "${BASH_REMATCH[1]}" "+%s")"
+    fi
+  else
+      epoch_part="$(date --date="${BASH_REMATCH[1]}" +%s)"
+  fi
   local command_part="${BASH_REMATCH[2]}"
   command_part="$(echo -e "${command_part}" | sed -e 's/[[:space:]]*$//')"
   if [ "$command_part" != "$PERSISTENT_HISTORY_LAST" ]; then
-    local hist_part="$(printf "#%s\n%s" "$epoch_part" "$command_part")"
+    hist_part="$(printf "#%s\n%s" "$epoch_part" "$command_part")"
     echo "$hist_part" >> ~/.persistent_history
     export PERSISTENT_HISTORY_LAST="$command_part"
   fi
