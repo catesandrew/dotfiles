@@ -83,7 +83,7 @@
 
   # Find out who is currently active on the repository
   # Displays committers in descending order of number of commits
-  who = shortlog --numbered --summary --email --no-merges --since="3 months"
+  who = !shortlog --numbered --summary --email --no-merges --since="3 months"
 
   # Divergence (commits we added and commits remote added)
   div = divergence
@@ -118,6 +118,9 @@
 
   # codereview
   # http://gitready.com/advanced/2011/10/21/ribbon-and-catchup-reading-new-commits.html
+  #
+  # By the way: If you do not like to read the individual commits in topic branches that
+  # were merged into origin/master, consider adding --first-parent -m to the catchup log command.
   ribbon = tag --force _ribbon origin/master
   catchup = log --patch --reverse --topo-order _ribbon..origin/master
 
@@ -206,7 +209,9 @@
   path = ~/.gitconfig-local
   path = ~/.gitconfig-private
 [includeIf "gitdir:*/wb/"]
-  path = ~/.gitconfig-work
+  path = ~/.gitconfig-wb
+[includeIf "gitdir:*/exp/"]
+  path = ~/.gitconfig-exp
 [magithub]
 	online = false
 [magithub "status"]
