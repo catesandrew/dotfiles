@@ -721,6 +721,9 @@ run_brew() {
       'meson'
       'zathura'
       'zathura-pdf-poppler'
+      'ed'
+      'file-formula'
+      'gpatch'
     )
 
     for index in ${!desired_formulae[*]}; do

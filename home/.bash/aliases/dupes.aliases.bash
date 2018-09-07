@@ -19,6 +19,18 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     alias which='gwhich'
   fi
 
+  if brew_contains_element "file-formula"; then
+    alias file='${BREW_HOME}/opt/file-formula/bin/file'
+  fi
+
+  if brew_contains_element "ed"; then
+    alias ed='ged'
+  fi
+
+  if brew_contains_element "gpatch"; then
+    alias patch='gpatch'
+  fi
+
   if brew_contains_element "gnu-tar"; then
     alias tar='gtar'
   fi
@@ -31,49 +43,49 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
   fi
 
   if brew_contains_element "curl"; then
-    alias curl='/usr/local/opt/curl/bin/curl'
-    alias curl-config='/usr/local/opt/curl/bin/curl-config'
+    alias curl='${BREW_HOME}/opt/curl/bin/curl'
+    alias curl-config='${BREW_HOME}/opt/curl/bin/curl-config'
   fi
 
   if brew_contains_element "expat"; then
-    alias xmlwf='/usr/local/opt/expat/bin/xmlwf'
+    alias xmlwf='${BREW_HOME}/opt/expat/bin/xmlwf'
   fi
 
   if brew_contains_element "libiconv"; then
-    alias iconv='/usr/local/opt/libiconv/bin/iconv'
+    alias iconv='${BREW_HOME}/opt/libiconv/bin/iconv'
   fi
 
   if brew_contains_element "libxml2"; then
-    alias xml2-config='/usr/local/opt/libxml2/bin/xml2-config'
-    alias xmlcatalog='/usr/local/opt/libxml2/bin/xmlcatalog'
-    alias xmllint='/usr/local/opt/libxml2/bin/xmllint'
+    alias xml2-config='${BREW_HOME}/opt/libxml2/bin/xml2-config'
+    alias xmlcatalog='${BREW_HOME}/opt/libxml2/bin/xmlcatalog'
+    alias xmllint='${BREW_HOME}/opt/libxml2/bin/xmllint'
   fi
 
   if brew_contains_element "openssl"; then
-    alias openssl='/usr/local/opt/openssl/bin/openssl'
-    alias c_rehash='/usr/local/opt/openssl/bin/c_rehash'
+    alias openssl='${BREW_HOME}/opt/openssl/bin/openssl'
+    alias c_rehash='${BREW_HOME}/opt/openssl/bin/c_rehash'
   fi
 
   if brew_contains_element "gettext"; then
-    alias gettext='/usr/local/opt/gettext/bin/gettext'
-    alias xgettext='/usr/local/opt/gettext/bin/xgettext'
+    alias gettext='${BREW_HOME}/opt/gettext/bin/gettext'
+    alias xgettext='${BREW_HOME}/opt/gettext/bin/xgettext'
   fi
 
   if brew_contains_element "unzip"; then
-    alias funzip='/usr/local/opt/unzip/bin/funzip'
-    alias unzip='/usr/local/opt/unzip/bin/unzip'
-    alias unzipsfx='/usr/local/opt/unzip/bin/unzipsfx'
-    alias zipgrep='/usr/local/opt/unzip/bin/zipgrep'
-    alias zipinfo='/usr/local/opt/unzip/bin/zipinfo'
+    alias funzip='${BREW_HOME}/opt/unzip/bin/funzip'
+    alias unzip='${BREW_HOME}/opt/unzip/bin/unzip'
+    alias unzipsfx='${BREW_HOME}/opt/unzip/bin/unzipsfx'
+    alias zipgrep='${BREW_HOME}/opt/unzip/bin/zipgrep'
+    alias zipinfo='${BREW_HOME}/opt/unzip/bin/zipinfo'
   fi
 
   if brew_contains_element "jpeg-turbo"; then
-    alias cjpeg='/usr/local/opt/jpeg-turbo/bin/cjpeg'
-    alias djpeg='/usr/local/opt/jpeg-turbo/bin/djpeg'
-    alias jpegtran='/usr/local/opt/jpeg-turbo/bin/jpegtran'
-    alias rdjpgcom='/usr/local/opt/jpeg-turbo/bin/rdjpgcom'
-    alias tjbench='/usr/local/opt/jpeg-turbo/bin/tjbench'
-    alias wrjpgcom='/usr/local/opt/jpeg-turbo/bin/wrjpgcom'
+    alias cjpeg='${BREW_HOME}/opt/jpeg-turbo/bin/cjpeg'
+    alias djpeg='${BREW_HOME}/opt/jpeg-turbo/bin/djpeg'
+    alias jpegtran='${BREW_HOME}/opt/jpeg-turbo/bin/jpegtran'
+    alias rdjpgcom='${BREW_HOME}/opt/jpeg-turbo/bin/rdjpgcom'
+    alias tjbench='${BREW_HOME}/opt/jpeg-turbo/bin/tjbench'
+    alias wrjpgcom='${BREW_HOME}/opt/jpeg-turbo/bin/wrjpgcom'
   fi
 
   if brew_contains_element "gnu-sed"; then
