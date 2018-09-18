@@ -75,7 +75,7 @@ alias .5='cd ../../../../..'    # Go up five dirs
 alias -- -='cd -'               # Go back
 
 # Make a directory and cd into it in one command
-mcd() { mkdir -p "$1"; cd "$1";}
+mcd() { mkdir -p "$@" && cd "$_" || return; }
 # cd into a directory and list its contents
 cls() { cd "$1"; ls;}
 

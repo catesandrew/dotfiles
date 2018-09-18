@@ -84,15 +84,6 @@ function pmdown ()
     fi
 }
 
-# about 'make a directory and cd into it'
-# param 'path to create'
-# example '$ mkcd foo'
-# example '$ mkcd /tmp/img/photos/large'
-function mkcd () {
-    mkdir -p "$*"
-    cd "$*"
-}
-
 # about 'search through directory contents with grep'
 # group 'base'
 function lsgrep () {
