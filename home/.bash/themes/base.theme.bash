@@ -166,9 +166,6 @@ function has_jshon() {
     return 0
   fi
 
-  echo >&2
-  echo "WARNING: Install `jshon` through homebrew to enable this feature." >&2
-  echo >&2
   return 1
 }
 
@@ -206,9 +203,6 @@ function string_length() {
     fi
   fi
 
-  echo >&2
-  echo "WARNING: a sed that supports -r (such as GNU sed) is not available." >&2
-  echo >&2
   return 1
 }
 
@@ -241,9 +235,6 @@ function older_than_minutes() {
     fi
   fi
 
-  echo >&2
-  echo "WARNING: a find that supports -mmin (such as GNU find) is available, disabling remote status checking. Install GNU find as gfind to enable this feature, or set GIT_PROMPT_FETCH_REMOTE_STATUS=0 to disable this warning." >&2
-  echo >&2
   GIT_PROMPT_FETCH_REMOTE_STATUS=0
   return 1
 }
@@ -1351,8 +1342,8 @@ function npm_prompt {
   local npm_version
 
   if [[ -f "$1" ]] && has_jshon; then
-    npm_version=$(jshon -e "version" < "$1")
-    npm_name=$(jshon -e "name" < "$1")
+    npm_version=$(jshon -e "version" < "$1" 2> /dev/null)
+    npm_name=$(jshon -e "name" < "$1" 2> /dev/null)
     eval "$2=${npm_name}@${npm_version}"
   fi
 }
