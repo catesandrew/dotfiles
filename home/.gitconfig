@@ -15,6 +15,15 @@
   user = andrew
   useclientspec = true
 [alias]
+  # ignored = !git ls-files -v | grep "^[[:lower:]]"
+  hide = update-index --assume-unchanged
+  unhide = update-index --no-assume-unchanged
+  unhide-all = update-index --really-refresh
+  hidden = !git ls-files -v | grep \"^[[:lower:]]\"
+  ignored = !git status -s --ignored | grep \"^!!\"
+  # To make it work in subdirectories and support arguments:
+  # hidden = "!f(){ git -C \"$GIT_PREFIX\" ls-files -v \"$@\" | grep \"^[a-z]\";}; f"
+  # ignored = "!f(){ git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\";}; f"
   pu = !"git fetch origin -v; git fetch upstream -v; git merge upstream/develop"
   fp = format-patch --stdout -1
   idiff = "!git diff | idiff"
