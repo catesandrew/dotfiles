@@ -134,6 +134,7 @@ find . -inum 12345 | xargs rm
 # be necessary, and it’s more robust to handle filenames with whitespace using
 # -exec or a while read -r loop
 find -name '*.c' | while IFS= read -r file; do
+  xpath="${file%/*}"; xbase="${file##*/}"; xfext="${xbase##*.}"; xpref="${xbase%.*}";
   head "$file"
 done
 

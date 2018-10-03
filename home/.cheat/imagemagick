@@ -1,0 +1,4 @@
+find -name '*.png' | while IFS= read -r file; do xpath="${file%/*}"; xbase="${file##*/}"; convert "${xbase}" \( +clone -thumbnail '1024x768>' -write "large-${xbase}" +delete \) \( +clone -thumbnail '800x600>' -write "medium-${xbase}" +delete \) \( +clone -thumbnail '300x300!' -write "small-${xbase}" +delete \) -thumbnail 100x100! "tiny-${xbase}"; done
+
+
+montage -verbose -label '%f' -font 'Helvetica' -pointsize 10 -background '#000000' -fill 'gray' -define jpeg:size=200x200 -geometry 200x200+2+2 -auto-orient *.png ../thumbnails-dark.png
