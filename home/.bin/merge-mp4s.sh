@@ -3,6 +3,8 @@
 # Static variables
 readonly VERSION="1.0.0"
 readonly PROG=$(basename "$0")
+WIDTH=1920
+HEIGHT=1080
 
 shopt -s nullglob
 
@@ -39,7 +41,7 @@ function mp4boxduration() {
   mseC=$($SED -En 's/Computed Duration ([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{3}).*/\4/p' "${TAGS}")
   mseC=$(echo "$mseu" | $SED -E 's/^[ \t]*//;s/[ \t]*$//')
 
-  echo "$((msec + (sec * 1000) + (min * 1000 * 60) + (hrs * 1000 * 60 * 60)))"
+  echo "$((10#$msec + (10#$sec * 1000) + (10#$min * 1000 * 60) + (10#$hrs * 1000 * 60 * 60)))"
 }
 
 function mp4boxsize() {
@@ -53,7 +55,7 @@ function mp4boxsize() {
   height=$($SED -En 's/AVC\/H264 Video - Visual Size ([0-9]{3,4}) x ([0-9]{3,4}).*/\2/p' "${TAGS}")
   height=$(echo "$height" | $SED -E 's/^[ \t]*//;s/[ \t]*$//')
 
-  echo "$width $height"
+  echo "$width:$height"
 }
 
 # Creates a nice format of a datetime.timedelta structure, including milliseconds
@@ -75,22 +77,27 @@ function formatTimedelta() {
 # Function to copy tags for supported formats
 function processtags() {
   TAGS=$TMP/$PROG.$RANDOM.tags
-  local FILE="$1"
+  local file="$1"
   local dur
   local wh
   local timecode
 
-  xbase=${FILE##*/}
+  xbase=${file##*/}
   xpref=${xbase%.*}
+  echo $"file: $xbase"
 
   # append chapter name
   CH_NAMES=("${CH_NAMES[@]}" "${xpref}")
 
-  ( $MP4BOX -info -quiet -std "${FILE}" > >(tee "${TAGS}") 2> >(tee "${TAGS}" >&2) ) &>/dev/null
+  ( $MP4BOX -info -quiet -std "${file}" > >(tee "${TAGS}") 2> >(tee "${TAGS}" >&2) ) &>/dev/null
   dur=$(mp4boxduration)
-  echo $"dur: $dur"
+  echo $"duration: $dur"
   wh=$(mp4boxsize)
-  echo $"wh: $wh"
+  echo $"width x height: $wh"
+
+  if [[ "${wh}" != "${WIDTH}:${HEIGHT}" ]]; then
+    resize "${file}"
+  fi
 
   timecode=$(formatTimedelta "${CUM_DUR}")
   # append chapter timecode
@@ -98,8 +105,6 @@ function processtags() {
 
   # Count the cumulative duration
   CUM_DUR=$((CUM_DUR + dur))
-
-  # TITLE=$(awk -F "=" '/NAME/ {print $2}' "$TAGS")
 
   rm "$TAGS"
 }
@@ -129,6 +134,42 @@ function savechaptersfile() {
   echo "${CHAPTERS_FILE}"
 }
 
+function processsrt() {
+  local file="$1"
+
+  xbase=${file##*/}
+  xpref=${xbase%.*}
+
+  ffmpeg -i "${xbase}" -i "${xpref}.srt" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${xpref}-srt.mp4"
+}
+
+function resize() {
+  local file="$1"
+
+  local fullname="${file##*/}"
+  local name="${fullname%.*}"
+  local fullext="${fullname#*.}"
+  local ext="${fullname##*.}"
+  local out="${TMP}/${PROG}.${RANDOM}.${ext}"
+
+  # Pillarboxed Image
+  # Fitting a 640x480 (4:3) input into a 1280x720 (16:9) output.
+  # - This will upscale the image.
+  # - Letterboxing would occur instead if the input aspect ratio is wider than
+  #   the output aspect ratio. For example, an input with a 2.35:1 aspect
+  #   ratio fit into a 16:9 output will result in letterboxing.
+  # ffmpeg -i video1.mp4 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" video02.mp4
+
+  # Without Upscaling
+  # Input into 1920x1080 (16:9) output without upscaling.
+  # ffmpeg -i video1.mp4 -vf "scale='min(1920,iw)':min'(1080,ih)':force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" video03.mp4
+
+  # Crop
+  # ffmpeg -i vieod1.mp4 -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" video04.mp4
+
+  ffmpeg -loglevel quiet -i "${file}" -vf "scale=${WIDTH}:${HEIGHT}:force_original_aspect_ratio=decrease,pad=${WIDTH}:${HEIGHT}:(ow-iw)/2:(oh-ih)/2" "${out}"
+  mv "${out}" "${file}";
+}
 
 function walk_tree {
   # echo "Directory: $1"
@@ -149,6 +190,8 @@ function walk_tree {
 
       # reset
       final=""
+      ffmpegfinal="concat:"
+      isfirst=0
       CUM_DUR=0
       CH_DURS=()
       CH_NAMES=()
@@ -157,7 +200,26 @@ function walk_tree {
       for l in *.mp4 *.m4v;
       do
         processtags "${l}";
-        final+=" -cat \"$l\"";
+        echo ''
+        # processsrt "${l}";
+
+        # if [[ $isfirst == 0 ]]; then
+        #   final+=" -add '${l}'";
+        #   isfirst=1
+        # else
+        #   final+=" -cat '${l}'";
+        # fi
+
+        lbase=${l##*/}
+        lpref=${lbase%.*}
+        ffmpeg -loglevel quiet -i "${l}" -c copy -bsf:v h264_mp4toannexb -f mpegts "${lpref}.ts"
+
+        if [[ $isfirst == 0 ]]; then
+          ffmpegfinal+="${lpref}.ts";
+          isfirst=1
+        else
+          ffmpegfinal+="|${lpref}.ts";
+        fi
       done;
 
       # After all files, add the final chapter as the end for this segment
@@ -172,11 +234,23 @@ function walk_tree {
 
       # echo $final
       if [ -n "$final" ]; then
-        cmd="MP4Box -quiet $final -new \"../${PWD##*/}.m4v\""
+        # cmd="MP4Box -quiet ${final} -new \"../${PWD##*/}.m4v\""
+        cmd="MP4Box -quiet ${final} '../${PWD##*/}.m4v'"
+        echo $cmd
         eval "$cmd"
 
         # cmd="MP4Box -quiet -add \"${chapters}:chap\" \"../${PWD##*/}.mp4\""
-        cmd="MP4Box -chap \"${chapters}\" \"../${PWD##*/}.m4v\""
+        cmd="MP4Box -chap '${chapters}' '../${PWD##*/}.m4v'"
+        # eval "$cmd"
+      fi
+
+      if [ -n "ffmpegfinal" ]; then
+        cmd="ffmpeg -loglevel quiet -i \"${ffmpegfinal}\" -c copy -bsf:a aac_adtstoasc '../${PWD##*/}.m4v'"
+        echo $cmd
+        eval "$cmd"
+        \rm *.ts
+
+        cmd="MP4Box -chap '${chapters}' '../${PWD##*/}.m4v'"
         eval "$cmd"
       fi
 
@@ -199,6 +273,7 @@ function run() {
 }
 
 run
+# resize
 
 # TODO: Generate videosize. The desired maximum w/h size for the output video,
 # default is 1024:576 (in case of multiple sizes for videos then all videos

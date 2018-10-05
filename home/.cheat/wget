@@ -39,3 +39,6 @@ wget -e robots=off --page-requisites --adjust-extension --convert-links
 
 # Scrape: download complete sites
 wget -e robots=off --mirror –w 2 --page-requisites --adjust-extension –-convert-links –P /home/user/sitecopy/
+
+# How to download HTTP directory with all files and sub-directories as they appear on the online files/folders list?
+wget -r -np -nH --cut-dirs=3 -R index.html http://hostname/aaa/bbb/ccc/ddd/
