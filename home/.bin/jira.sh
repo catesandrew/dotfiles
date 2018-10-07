@@ -2,11 +2,89 @@
 
 PROJECT=SWEP
 JIRA_CLI="java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.7.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS}"
-USAGE='[help|title|html2md]'
 
-USAGE='[help|title|html2md] [<moweb-id>]'
-LONG_USAGE='jira help
-        Print this long help message
+# CONSTANTS & VARIABLES (Common)
+
+# Project Root Dir
+readonly PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Level Colors
+readonly LEVEL_COLORS=(39 31 31 33 32 36)
+
+# CONSTANTS & VARIABLES (Project)
+
+# Script version
+readonly VERSION=0.0.1
+
+# List of requieed tools, example: REQUIRED_TOOLS=(git ssh)
+readonly REQUIRED_TOOLS=(jira)
+
+# Long Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly LONG_OPTS=(help version login title: sessionid:)
+
+# Short Options. To expect an argument for an option, just place a : (colon)
+# after the proper option flag.
+readonly SHORT_OPTS=hvlt:
+
+# Script name
+readonly SCRIPT_NAME=${0##*/}
+
+# CORE
+
+readonly JIRA_URL=${JIRA_URL:-}
+declare jira_url="$JIRA_URL"
+
+readonly JIRA_AUTH_URI=/rest/auth/latest/session
+declare jira_auth_uri="$JIRA_AUTH_URI"
+
+readonly JIRA_API_URI=/rest/api/latest/
+declare jira_api_uri="$JIRA_API_URI"
+
+readonly JIRA_LOGIN=${JIRA_LOGIN:-}
+declare jira_login="$JIRA_LOGIN"
+
+readonly JIRA_PASSWORD=${JIRA_PASSWORD:-}
+declare jira_password="$JIRA_PASSWORD"
+
+readonly JIRA_SESSION_ID=${JIRA_SESSION_ID:-}
+declare jira_session_id="$JIRA_SESSION_ID"
+
+# FUNCTIONS
+
+# Print out messages to STDERR.
+function ech() { echo -e "$@" >&2; }
+
+# Print out error messages to STDERR.
+function err() { echo -e "\033[0;31mERROR: $@\033[0m" >&2; }
+
+# Shows an error if required tools are not installed.
+function required {
+  local e=0
+  for tool in "$@"; do
+    type $tool >/dev/null 2>&1 || {
+      e=1 && err "$tool is required for running this script. Please install $tool and try again."
+    }
+  done
+  [[ $e < 1 ]] || exit 2
+}
+
+# help command
+function help_command() {
+  cat <<END;
+
+USAGE:
+  $SCRIPT_NAME [options] <command>
+
+OPTIONS:
+
+login   Login Jira-user login. Will be promted if not specified.
+
+COMMANDS:
+
+desc    TRY to get description of the specified ISSUE(es) from jira. For each
+        ISSUE in list script will ouput the line in the following format:
+        ISSUE_ID — ISSUE_DESC
 
 title
         Copy jira ticket title to clipboard
@@ -21,7 +99,7 @@ add-bug
         Create a bug.
 
 add-task
-        Creaet a task.
+        Create a task.
 
             Task is the designation for changes required to support an
             Enhancement. Task requires a value for Original Estimate and Time
@@ -52,20 +130,77 @@ list-components
 list-versions
         List available versions
 
-Notes
+NOTES:
         All documents which are related to the enhancement/task must be
         referenced or linked to the Jira task. More comprehensive
-        enhancements may require documentation in the iBASEt wiki.
+        enhancements may require documentation in the wiki.
 
         Reported issue has been Fixed/Delivered
             If this is an Enhancement, resolve it as Delivered.
             If this is a bug, resolve it as Fixed.
+END
+  exit 1
+}
 
-'
+function short_help_command() {
+  cat <<END;
 
-die() {
-	echo >&2 "$@"
-	exit 1
+USAGE:
+  $SCRIPT_NAME [-h?] [-l LOGIN] [desc|title|html2md] ISSUE...
+
+END
+  exit 1
+}
+
+# version command
+function version_command() {
+  echo "$SCRIPT_NAME version $VERSION"
+}
+
+# default command
+function default_command() {
+  help_command
+}
+
+function jira_session_command() {
+  jira_session_id="$1"
+}
+
+function jira_login_command() {
+  if [[ -z "${jira_login}" ]]; then
+	  read -rp "Enter your login for JIRA: " jira_login
+    echo ""
+  fi
+
+  # getting password for JIRA
+  if [[ -z "${jira_password}" ]]; then
+    read -rsp "Enter your password for JIRA: " jira_password
+    echo ""
+  fi
+
+  # authentication in JIRA
+  jira_session_id=`curl -s -H "Content-Type: application/json" -d "{\"username\":\"${jira_login}\",\"password\":\"${jira_password}\"}" -X POST ${jira_url}${jira_auth_uri} | gsed -r 's/^.+JSESSIONID","value":"([^"]+).+$/\1/ig'`
+
+  if [[ -n $(echo "${jira_session_id}" | grep error) ]]; then
+	  err "Wrong login or password!"
+  else
+    ech "Logged on ${jira_session_id}"
+  fi
+}
+
+function desc_command() {
+  IFS=' ' read -r -a ISSUES <<< "$1"
+  # printf 'ISSUES: %s\n' "${ISSUES[@]}"
+
+  for ((I=0; I<${#ISSUES[@]}; I++)); do
+	  SED=`curl -s -H "Content-Type: application/json" -b JSESSIONID=${jira_session_id} ${jira_url}${jira_api_uri}issue/${ISSUES[$I]}?fields=summary | gsed -n -re 's@\\\["]([^\\\]+)\\\["]@«\1»@ig' -e 's/^.+key":"([^"]+)".+summary":"([^"]+).+$/\1 - \2\n/igp'`
+	  if [[ -z $SED ]]
+	  then
+		  echo "Issue \"${ISSUES[$I]}\" not found or unknown error has occured!"
+	  else
+		  echo "$SED"
+	  fi
+  done
 }
 
 function title_helper() {
@@ -116,95 +251,117 @@ function html2md_helper() {
     rm .login.html; rm .cookies.txt; rm out.txt; rm out.txt.bak
 }
 
-dashless=$(basename "$0" | sed -e 's/-/ /')
-
-usage() {
-    die "Usage: $dashless $USAGE"
+function bug_add_helper() {
+  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Bug" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --priority "Medium" --environment "" --components "" --summary "Bug Uncaught TypeError: ..."`
+  RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+  echo "Bug created: ${RESULT}"
+  python -mwebbrowser ${RESULT}
 }
 
-if [ -z "$LONG_USAGE" ]
-then
-    LONG_USAGE="Usage: $dashless $USAGE"
-else
-    LONG_USAGE="Usage: $dashless $USAGE
+function task_add_helper() {
+  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Task ..."`
+  RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+  echo "Task created: ${RESULT}"
+  python -mwebbrowser ${RESULT}
+}
 
-$LONG_USAGE"
-fi
+function task_add_master_helper() {
+  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+  RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+  echo "Master Task created: ${RESULT}"
+  python -mwebbrowser ${RESULT}
+}
 
-case "$1" in
-    -h|--h|--he|--hel|--help)
-    echo "$LONG_USAGE"
-    exit
-esac
+function enhancement_add_helper() {
+  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
+  RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+  echo "Enhancement created: ${RESULT}"
+  python -mwebbrowser ${RESULT}
+}
 
-case "$#" in
-    0)
-        usage ;;
-    *)
-        CMD="$1"
+function enhancement_add_master_helper() {
+  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+  RESULT=`echo ${RESULT} | sed s/.*https/https/g`
+  echo "Master Enhancement created: ${RESULT}"
+  python -mwebbrowser ${RESULT}
+}
 
-        case "$CMD" in
-            help)
-                jira -h ;;
-            title)
-                shift
-                title_helper "$@"
-                ;;
-            html2md)
-                shift
-                html2md_helper "$@"
-                ;;
-            cli-help)
-                echo `${JIRA_CLI} --help`
-                ;;
-            add-bug)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Bug" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --priority "Medium" --environment "" --components "" --summary "Bug Uncaught TypeError: ..."`
-                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                echo "Bug created: ${RESULT}"
-                python -mwebbrowser ${RESULT}
-                ;;
-            add-task)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Task ..."`
-                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                echo "Task created: ${RESULT}"
-                python -mwebbrowser ${RESULT}
-                ;;
-            add-master-task)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
-                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                echo "Master Task created: ${RESULT}"
-                python -mwebbrowser ${RESULT}
-                ;;
-            add-enhancement)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
-                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                echo "Enhancement created: ${RESULT}"
-                python -mwebbrowser ${RESULT}
-                ;;
-            add-master-enhancement)
-                RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
-                RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                echo "Master Enhancement created: ${RESULT}"
-                python -mwebbrowser ${RESULT}
-                ;;
-            #add-sub-)
-                #RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --parent "${PROJECT}-" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
-                #RESULT=`echo ${RESULT} | sed s/.*https/https/g`
-                #echo "Master Enhancement created: ${RESULT}"
-                #python -mwebbrowser ${RESULT}
-                #;;
-            delete-issue)
-                echo `${JIRA_CLI} --action deleteIssue --issue "${PROJECT}-"`
-                ;;
-            list-components)
-                echo `${JIRA_CLI} --action getComponentList --project "${PROJECT}"`
-                ;;
-            list-versions)
-                echo `${JIRA_CLI} --action getVersionList --project "${PROJECT}"`
-                ;;
+# MAIN
+function main() {
+  # Required tools
+  required $REQUIRED_TOOLS
 
-            *)
-                `${JIRA_CLI} "${@}"`
-                ;;
-        esac
-esac
+  # Parse options
+  while [[ $# -ge $OPTIND ]] && eval opt=\${$OPTIND} || break
+        [[ $opt == -- ]] && shift && break
+        if [[ $opt == --?* ]]; then
+          opt=${opt#--}; shift
+
+          # Argument to option ?
+          OPTARG=;local has_arg=0
+          [[ $opt == *=* ]] && OPTARG=${opt#*=} && opt=${opt%=$OPTARG} && has_arg=1
+
+          # Check if known option and if it has an argument if it must:
+          local state=0
+          for option in "${LONG_OPTS[@]}"; do
+            [[ "$option" == "$opt" ]] && state=1 && break
+            [[ "${option%:}" == "$opt" ]] && state=2 && break
+          done
+          # Param not found
+          [[ $state = 0 ]] && OPTARG=$opt && opt='?'
+          # Param with no args, has args
+          [[ $state = 1 && $has_arg = 1 ]] && OPTARG=$opt && opt=::
+          # Param with args, has no args
+          if [[ $state = 2 && $has_arg = 0 ]]; then
+            [[ $# -ge $OPTIND ]] && eval OPTARG=\${$OPTIND} && shift || { OPTARG=$opt; opt=:; }
+          fi
+
+          # for the while
+          true
+        else
+          getopts ":$SHORT_OPTS" opt
+        fi
+
+  do
+    case "$opt" in
+      # List of options
+      v|version)    version_command; exit 0; ;;
+      h|help)       help_command ;;
+      l|login)      jira_login_command ;;
+      sessionid)    jira_session_command "$OPTARG" ;;
+      # Errors
+      ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
+      :)	err "Missing argument to option '$OPTARG'"; exit 2; ;;
+      \?)	err "Unknown option '$OPTARG'"; exit 2; ;;
+      *)	err "Internal script error, unmatched option '$opt'"; exit 2; ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # No more arguments -> call default command
+  [[ -z "$1" ]] && default_command
+
+  # Set command and arguments
+  command="$1" && shift
+  args="$@"
+
+  # Execute the command
+  case "$command" in
+    # help
+    help)                   help_command ;;
+    version)                version_command ;;
+    desc)                   desc_command "$args" ;;
+    title)                  title_helper "$args" ;;
+    html2md)                html2md_helper "$args" ;;
+    add-task)               task_add_helper "$args" ;;
+    add-bug)                bug_add_helper "$args" ;;
+    add-master-task)        task_add_master_helper "$args" ;;
+    add-enhancement)        enhancement_add_helper "$args" ;;
+    add-master-enhancement) enhancement_add_master_helper "$args" ;;
+
+    # Unknown command
+    *)        err "Unknown command '$command'"; exit 2; ;;
+  esac
+}
+
+main "$@"
