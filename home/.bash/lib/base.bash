@@ -11,37 +11,24 @@ function ips () {
     fi
 }
 
-# about 'checks whether a website is down for you, or everybody'
+# checks whether a website is down for you, or everybody
 # param '1: website url'
 # example '$ down4me http://www.google.com'
 function down4me () {
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
-# about 'displays your ip address, as seen by the Internet'
+# displays your ip address, as seen by the Internet
 function myip () {
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
-# about 'generates random password from dictionary words'
-# param 'optional integer length'
-# param 'if unset, defaults to 4'
-# example '$ pass'
-# example '$ pass 6'
-function pass () {
-    local i pass length=${1:-4}
-    pass=$(echo $(for i in $(eval echo "{1..$length}"); do pickfrom /usr/share/dict/words; done))
-    echo "With spaces (easier to memorize): $pass"
-    echo "Without (use this as the pass): $(echo $pass | tr -d ' ')"
-}
-
+# picks random line from file
+# param '1: filename'
+# example '$ pickfrom /usr/share/dict/words'
 function pickfrom ()
 {
-    about 'picks random line from file'
-    param '1: filename'
-    example '$ pickfrom /usr/share/dict/words'
-    group 'base'
     local file=$1
     [ -z "$file" ] && reference $FUNCNAME && return
     length=$(cat $file | wc -l)
@@ -49,33 +36,24 @@ function pickfrom ()
     head -n $n $file | tail -1
 }
 
+# generates random password from dictionary words
+# param 'optional integer length'
+# param 'if unset, defaults to 4'
+# example '$ passgen'
+# example '$ passgen 6'
 function passgen ()
 {
-    about 'generates random password from dictionary words'
-    param 'optional integer length'
-    param 'if unset, defaults to 4'
-    example '$ passgen'
-    example '$ passgen 6'
-    group 'base'
     local i passgen length=${1:-4}
     pass=$(echo $(for i in $(eval echo "{1..$length}"); do pickfrom /usr/share/dict/words; done))
     echo "With spaces (easier to memorize): $pass"
     echo "Without (use this as the password): $(echo $pass | tr -d ' ')"
 }
 
-# Create alias pass to passgen when pass isn't installed or
-# BASH_IT_LEGACY_PASS is true.
-if ! command -v pass &>/dev/null || [ "$BASH_IT_LEGACY_PASS" = true ]
-then
-  alias pass=passgen
-fi
-
+# preview markdown file in a browser
+# param '1: markdown file'
+# example '$ pmdown README.md'
 function pmdown ()
 {
-    about 'preview markdown file in a browser'
-    param '1: markdown file'
-    example '$ pmdown README.md'
-    group 'base'
     if command -v markdown &>/dev/null
     then
       markdown $1 | browser
@@ -84,13 +62,13 @@ function pmdown ()
     fi
 }
 
-# about 'search through directory contents with grep'
+# search through directory contents with grep
 # group 'base'
 function lsgrep () {
   ls | grep "$*"
 }
 
-# about 'disk usage per directory, in Mac OS X and Linux'
+# disk usage per directory, in Mac OS X and Linux
 # param '1: directory name'
 function disk_usage () {
     if [ $(uname) = "Darwin" ]; then
@@ -109,7 +87,7 @@ function disk_usage () {
     fi
 }
 
-# about 'checks for existence of a command'
+# checks for existence of a command
 # param '1: command to check'
 # example '$ command_exists ls && echo exists'
 function command_exists () {
@@ -117,12 +95,20 @@ function command_exists () {
 }
 
 # useful for administrators and configs
-# about 'back up file with timestamp'
+
+# back up file with timestamp
 # param 'filename'
 function buf () {
     local filename=$1
     local filetime=$(date +%Y%m%d_%H%M%S)
     cp ${filename} ${filename}_${filetime}
+}
+
+# move files to hidden folder in tmp, that gets cleared on each reboot
+# param 'file or folder to be deleted'
+# example 'del ./file.txt'
+function del() {
+  mkdir -p /tmp/.trash && mv "$@" /tmp/.trash;
 }
 
 # http://stackoverflow.com/questions/1378274
