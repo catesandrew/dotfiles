@@ -1,6 +1,17 @@
 #!/bin/bash
 
-PROJECT=SWEP
+# activate debugging from here
+#set -o xtrace
+#set -o verbose
+
+# Improve error handling
+set -o errexit
+set -o pipefail
+
+# Enable handling of filenames with spaces:
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+
 JIRA_CLI="java -jar /usr/local/lib/jira-cli/lib/jira-cli-3.7.0.jar --server ${JIRA_SERVER} --user ${JIRA_USER} --password ${JIRA_PASS}"
 
 # CONSTANTS & VARIABLES (Common)
@@ -21,11 +32,11 @@ readonly REQUIRED_TOOLS=(jira)
 
 # Long Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
-readonly LONG_OPTS=(help version login file: title: sessionid:)
+readonly LONG_OPTS=(help version login file: project: sessionid:)
 
 # Short Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
-readonly SHORT_OPTS=hvlf:t:
+readonly SHORT_OPTS=hvlp:f:
 
 # Script name
 readonly SCRIPT_NAME=${0##*/}
@@ -54,6 +65,7 @@ readonly JIRA_AUTH_TYPE=${JIRA_AUTH_TYPE:-}
 declare jira_auth_type="$JIRA_AUTH_TYPE"
 
 declare jira_file=
+declare jira_project=
 
 # FUNCTIONS
 
@@ -175,6 +187,10 @@ function jira_file_command() {
   jira_file="$1"
 }
 
+function jira_project_command() {
+  jira_project="$1"
+}
+
 function jira_login_command() {
   if [[ -z "${jira_login}" ]]; then
 	  read -rp "Enter your login for JIRA: " jira_login
@@ -241,6 +257,133 @@ function attachment_command() {
   done
 }
 
+function depth() {
+  gfind "$1" -type d -printf '%d\n' | sort -n | tail -1
+}
+
+function html_helper {
+  # echo "Directory: $1"
+  local dir base file jira_self jira_id jira_filename jira_content jira_thumb
+  local cur_dir="$1"
+  local cur_depth="$2"
+  local top_dir="$3"
+  local max_depth="$4"
+  cur_depth=$((cur_depth+1))
+
+  for dir in "$1"/*; do
+    base="${dir##*/}";
+    file="${base%%.*}";
+
+    if [ "$dir" = . ] || [ "$dir" = .. ]; then
+      continue
+    elif [ "$file" == "desktop" ] || [ "$file" == "mobile" ]; then
+      continue
+    elif [ -d "$dir" ]; then  # Process directory and / or walk-down into directory
+      cd "$dir"
+
+      echo   '  <tr>'
+      for i in $(gseq 1 1 $((cur_depth-1))); do
+			  printf '    <td style="%s"></td>\n' "padding-left: 2px; width: 18px;"
+      done
+			printf '    <td colspan="%d">📂 %s</td>\n' "$((max_depth-cur_depth+2))" "$base"
+		  echo   '  </tr>'
+
+      find . -name '*.png' -maxdepth 1 | while IFS= read -r file; do
+        echo '  <tr>'
+        for i in $(gseq 1 1 $((cur_depth))); do
+			    printf '    <td style="%s"></td>\n' "padding-left: 2px; width: 18px;"
+        done
+        xbase="${file##*/}";
+        xfext="${xbase##*.}";
+        xfile="${xbase%%.*}";
+
+        # posting file into branches
+        output="$(jira attach create wild-1529 "${xbase}")"
+        # -> OK 153275 https://jira.gbl.experiancs.com/secure/attachment/153275/desktop.png
+        jira_id="$(echo -e "${output}" | gsed -r 's/^OK[[:space:]]([0-9]+)[[:space:]].*/\1/g')"
+
+        # output="$(curl -b JSESSIONID="${JIRA_SESSION_ID}" -X POST -H "X-Atlassian-Token: no-check" -F "file=@${xbase}" -s ${JIRA_URL}/rest/api/2/issue/WILD-1529/attachments)"
+        # output="$(echo -e "${output}" | sed -e 's/^[[:space:]]*//')"
+        # jira_self=`echo "$output" | jq --raw-output --compact-output '.[] | .self'`
+        # -> https://jira.gbl.experiancs.com/rest/api/2/attachment/153073
+        # jira_id=`echo "$output" | jq --raw-output --compact-output '.[] | .id'`
+        # -> 153073
+        # jira_filename=`echo "$output" | jq --raw-output --compact-output '.[] | .filename'`
+        # -> home-boost-started.png
+        # jira_content=`echo "$output" | jq --raw-output --compact-output '.[] | .content'`
+        # -> https://jira.gbl.experiancs.com/secure/attachment/153073/home-boost-started.png
+        # jira_thumb=`echo "$output" | jq --raw-output --compact-output '.[] | .thumbnail'`
+        # -> https://jira.gbl.experiancs.com/secure/thumbnail/153073/_thumb_153073.png
+
+			  printf '    <td><a href="https://jira.gbl.experiancs.com/secure/attachment/%s/%s"><img alt="%s" src="https://jira.gbl.experiancs.com/secure/thumbnail/%s/_thumb_%s.%s"/></a></td>\n' "$jira_id" "$xbase" "$xfile" "$jira_id" "$jira_id" "$xfext"
+        for i in $(gseq $((cur_depth+1)) 1 $((max_depth))); do
+			    printf '    <td style="%s"></td>\n' "padding-left: 2px; width: 18px;"
+        done
+		    echo '  </tr>'
+      done
+
+      cd ..
+
+      html_helper "$dir" "$cur_depth" "$top_dir/$base" "$max_depth"
+    else
+      echo "here"
+      continue    # replace continue to process individual file (i.e. echo "$i")
+    fi
+  done
+}
+
+function html_command() {
+  echo '<table border="none" cellspacing="0" cellpadding="0">'
+	echo '  <tbody>'
+
+  max_depth=$(depth "${BASEDIR}")
+  html_helper "${BASEDIR}" 0 "" "$max_depth"
+
+	echo '  </tbody>'
+  echo '</table>'
+}
+
+function image_helper {
+  local directory="$1"
+  local dir
+
+  for dir in "${directory}"/*; do
+    base="${dir##*/}";
+    file="${base%%.*}";
+
+    if [ "$dir" = . ] || [ "$dir" = .. ]; then
+      continue
+    elif [ "$file" != "desktop" ] && [ "$file" != "mobile" ]; then
+    # elif [ "$file" = "desktop" ] || [ "$file" = "mobile" ]; then
+      continue
+    elif [ -d "$dir" ]; then  # Process directory and / or walk-down into directory
+      cd "$dir"
+
+      find . -name '*.png' | while IFS= read -r filename; do
+        xbase="${filename##*/}";
+        xfext="${xbase##*.}";
+        xfile="${xbase%%.*}";
+        convert "${filename}" -resize 50% "${xfile}@1.${xfext}"
+        # convert "${xbase}" \( +clone -thumbnail '1024x768>' -write "large-${xbase}" +delete \) \( +clone -thumbnail '800x600>' -write "medium-${xbase}" +delete \) \( +clone -thumbnail '300x300!' -write "small-${xbase}" +delete \) -thumbnail 100x100! "tiny-${xbase}";
+      done
+
+      montage -verbose -label '%f' -pointsize 10 -background '#ddd' -fill 'transparent' -define png:size=600x800 -tile x1 -geometry +2+1 -auto-orient "*@1.png" "../post-boost-no-trade-all-${file}.png"
+
+      rm ./*@1.png
+
+      cd ..
+
+      image_helper "$dir"
+    else
+      continue
+    fi
+  done
+}
+
+function image_command() {
+  image_helper "${BASEDIR}"
+}
+
 function title_helper() {
     local OUT_HTML="jira-${1}.html"
 
@@ -290,35 +433,35 @@ function html2md_helper() {
 }
 
 function bug_add_helper() {
-  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Bug" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --priority "Medium" --environment "" --components "" --summary "Bug Uncaught TypeError: ..."`
+  RESULT=`${JIRA_CLI} --action createIssue --project "${jira_project}" --type "Bug" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --priority "Medium" --environment "" --components "" --summary "Bug Uncaught TypeError: ..."`
   RESULT=`echo ${RESULT} | sed s/.*https/https/g`
   echo "Bug created: ${RESULT}"
   python -mwebbrowser ${RESULT}
 }
 
 function task_add_helper() {
-  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Task ..."`
+  RESULT=`${JIRA_CLI} --action createIssue --project "${jira_project}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Task ..."`
   RESULT=`echo ${RESULT} | sed s/.*https/https/g`
   echo "Task created: ${RESULT}"
   python -mwebbrowser ${RESULT}
 }
 
 function task_add_master_helper() {
-  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+  RESULT=`${JIRA_CLI} --action createIssue --project "${jira_project}" --type "Task" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
   RESULT=`echo ${RESULT} | sed s/.*https/https/g`
   echo "Master Task created: ${RESULT}"
   python -mwebbrowser ${RESULT}
 }
 
 function enhancement_add_helper() {
-  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
+  RESULT=`${JIRA_CLI} --action createIssue --project "${jira_project}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Enhancement ..."`
   RESULT=`echo ${RESULT} | sed s/.*https/https/g`
   echo "Enhancement created: ${RESULT}"
   python -mwebbrowser ${RESULT}
 }
 
 function enhancement_add_master_helper() {
-  RESULT=`${JIRA_CLI} --action createIssue --project "${PROJECT}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
+  RESULT=`${JIRA_CLI} --action createIssue --project "${jira_project}" --type "Enhancement" --custom 'customfield_10100:11331','customfield_10201:-1','customfield_10200:-1' --assignee "acates" --environment "" --components "" --summary "Collector for ..."`
   RESULT=`echo ${RESULT} | sed s/.*https/https/g`
   echo "Master Enhancement created: ${RESULT}"
   python -mwebbrowser ${RESULT}
@@ -367,6 +510,7 @@ function main() {
       h|help)       help_command ;;
       l|login)      jira_login_command ;;
       f|file)       jira_file_command "$OPTARG" ;;
+      p|project)    jira_project_command "$OPTARG" ;;
       sessionid)    jira_session_command "$OPTARG" ;;
       # Errors
       ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
@@ -398,6 +542,8 @@ function main() {
     add-enhancement)        enhancement_add_helper "$args" ;;
     add-master-enhancement) enhancement_add_master_helper "$args" ;;
     add-attachment)         attachment_command "$args" ;;
+    html)                   html_command "$args" ;;
+    image)                  image_command "$args" ;;
 
     # Unknown command
     *)        err "Unknown command '$command'"; exit 2; ;;
@@ -405,3 +551,6 @@ function main() {
 }
 
 main "$@"
+
+# restore $IFS
+IFS=$SAVEIFS
