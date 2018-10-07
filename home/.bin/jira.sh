@@ -21,11 +21,11 @@ readonly REQUIRED_TOOLS=(jira)
 
 # Long Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
-readonly LONG_OPTS=(help version login title: sessionid:)
+readonly LONG_OPTS=(help version login file: title: sessionid:)
 
 # Short Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
-readonly SHORT_OPTS=hvlt:
+readonly SHORT_OPTS=hvlf:t:
 
 # Script name
 readonly SCRIPT_NAME=${0##*/}
@@ -49,6 +49,11 @@ declare jira_password="$JIRA_PASSWORD"
 
 readonly JIRA_SESSION_ID=${JIRA_SESSION_ID:-}
 declare jira_session_id="$JIRA_SESSION_ID"
+
+readonly JIRA_AUTH_TYPE=${JIRA_AUTH_TYPE:-}
+declare jira_auth_type="$JIRA_AUTH_TYPE"
+
+declare jira_file=
 
 # FUNCTIONS
 
@@ -166,6 +171,10 @@ function jira_session_command() {
   jira_session_id="$1"
 }
 
+function jira_file_command() {
+  jira_file="$1"
+}
+
 function jira_login_command() {
   if [[ -z "${jira_login}" ]]; then
 	  read -rp "Enter your login for JIRA: " jira_login
@@ -178,13 +187,18 @@ function jira_login_command() {
     echo ""
   fi
 
-  # authentication in JIRA
-  jira_session_id=`curl -s -H "Content-Type: application/json" -d "{\"username\":\"${jira_login}\",\"password\":\"${jira_password}\"}" -X POST ${jira_url}${jira_auth_uri} | gsed -r 's/^.+JSESSIONID","value":"([^"]+).+$/\1/ig'`
+  COOKIE_FILE=cookie.txt
+  if [ "${AUTH_TYPE}" = 'cookie' ]; then
+	  curl --cookie-jar ${COOKIE_FILE} -H "Content-Type: application/json" -d '{"username":"'${jira_login}'", "password":"'${jira_password}'" }' -X POST ${jira_url}${jira_auth_uri}
+  elif [ "${AUTH_TYPE}" = 'oauth' ]; then
+    # authentication in JIRA
+    jira_session_id=`curl -s -H "Content-Type: application/json" -d "{\"username\":\"${jira_login}\",\"password\":\"${jira_password}\"}" -X POST ${jira_url}${jira_auth_uri} | gsed -r 's/^.+JSESSIONID","value":"([^"]+).+$/\1/ig'`
 
-  if [[ -n $(echo "${jira_session_id}" | grep error) ]]; then
-	  err "Wrong login or password!"
-  else
-    ech "Logged on ${jira_session_id}"
+    if [[ -n $(echo "${jira_session_id}" | grep error) ]]; then
+	    err "Wrong login or password!"
+    else
+      ech "Logged on ${jira_session_id}"
+    fi
   fi
 }
 
@@ -193,9 +207,33 @@ function desc_command() {
   # printf 'ISSUES: %s\n' "${ISSUES[@]}"
 
   for ((I=0; I<${#ISSUES[@]}; I++)); do
-	  SED=`curl -s -H "Content-Type: application/json" -b JSESSIONID=${jira_session_id} ${jira_url}${jira_api_uri}issue/${ISSUES[$I]}?fields=summary | gsed -n -re 's@\\\["]([^\\\]+)\\\["]@«\1»@ig' -e 's/^.+key":"([^"]+)".+summary":"([^"]+).+$/\1 - \2\n/igp'`
-	  if [[ -z $SED ]]
-	  then
+    # if [ "${jira_auth_type}" = 'cookie' ]; then
+    # elif [ "${jira_auth_type}" = 'basic' ]; then
+    # elif [ "${jira_auth_type}" = 'oauth' ]; then
+	    SED=`curl -s -H "Content-Type: application/json" -b JSESSIONID=${jira_session_id} ${jira_url}${jira_api_uri}issue/${ISSUES[$I]}?fields=summary | gsed -n -re 's@\\\["]([^\\\]+)\\\["]@«\1»@ig' -e 's/^.+key":"([^"]+)".+summary":"([^"]+).+$/\1 - \2\n/igp'`
+    # fi
+
+	  if [[ -z $SED ]]; then
+		  echo "Issue \"${ISSUES[$I]}\" not found or unknown error has occured!"
+	  else
+		  echo "$SED"
+	  fi
+  done
+}
+
+function attachment_command() {
+  IFS=' ' read -r -a ISSUES <<< "$1"
+
+  for ((I=0; I<${#ISSUES[@]}; I++)); do
+    if [ "${jira_auth_type}" = 'cookie' ]; then
+      result=`curl -D- -b ${COOKIE_FILE} -X POST --header "X-Atlassian-Token: no-check" -F "file=@${jira_file}" ${jira_url}${jira_api_uri}issue/${key}/attachments`
+    elif [ "${jira_auth_type}" = 'basic' ]; then
+      result=`curl -D- -u ${jira_login}:${jira_password} -X POST --header "X-Atlassian-Token: no-check" -F "file=@${jira_file}" ${jira_url}${jira_api_uri}issue/${key}/attachments`
+    elif [ "${jira_auth_type}" = 'oauth' ]; then
+	    result=`curl -s -H "Content-Type: application/json" -b JSESSIONID=${jira_session_id} -X POST --header "X-Atlassian-Token: no-check" -F "file=@${jira_file}" ${jira_url}${jira_api_uri}issue/${ISSUES[$I]}/attachments`
+    fi
+
+	  if [[ -z $SED ]]; then
 		  echo "Issue \"${ISSUES[$I]}\" not found or unknown error has occured!"
 	  else
 		  echo "$SED"
@@ -328,6 +366,7 @@ function main() {
       v|version)    version_command; exit 0; ;;
       h|help)       help_command ;;
       l|login)      jira_login_command ;;
+      f|file)       jira_file_command "$OPTARG" ;;
       sessionid)    jira_session_command "$OPTARG" ;;
       # Errors
       ::)	err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
@@ -358,6 +397,7 @@ function main() {
     add-master-task)        task_add_master_helper "$args" ;;
     add-enhancement)        enhancement_add_helper "$args" ;;
     add-master-enhancement) enhancement_add_master_helper "$args" ;;
+    add-attachment)         attachment_command "$args" ;;
 
     # Unknown command
     *)        err "Unknown command '$command'"; exit 2; ;;
