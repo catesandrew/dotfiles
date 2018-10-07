@@ -29,11 +29,7 @@ alias bup='brew update && brew upgrade'
 alias bupc='brew update && brew upgrade && brew cleanup'
 
 # TODO: update to check if cask is installed (Linux)
-if [ "$(uname)" = "Darwin" ]; then
-  alias bup='brew update && brew upgrade && brew cleanup --prune=1 && brew cask cleanup'
-elif [ "$(uname)" = "Linux" ]; then
-  alias bup='brew update && brew upgrade && brew cleanup --prune=1'
-fi
+alias bup='brew update && brew upgrade && brew cleanup --prune=1'
 
 bout() {
     __brew_c outdated "$@"
