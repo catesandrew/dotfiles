@@ -724,6 +724,7 @@ run_brew() {
       'ed'
       'file-formula'
       'gpatch'
+      'go-jira'
     )
 
     for index in ${!desired_formulae[*]}; do
