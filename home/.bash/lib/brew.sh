@@ -727,6 +727,8 @@ run_brew() {
       'go-jira'
       'swaks'
       'keychain'
+      'enca'
+      'uchardet'
     )
 
     for index in ${!desired_formulae[*]}; do
