@@ -725,6 +725,7 @@ run_brew() {
       'file-formula'
       'gpatch'
       'go-jira'
+      'swaks'
     )
 
     for index in ${!desired_formulae[*]}; do
