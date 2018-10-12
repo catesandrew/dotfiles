@@ -13,7 +13,15 @@ max-cache-ttl 604800
 default-cache-ttl-ssh 604800
 max-cache-ttl-ssh 604800
 EOM
+
+    if brew_contains_element "pinentry-mac"; then
+        cat <<EOM >>"${HOME}/.gpg-agent.conf"
+use-standard-socket
+pinentry-program ${BREW_HOME}/bin/pinentry-mac
+EOM
+    fi
   fi
+
 
   if [ -n "${GPG_AGENT_INFO}" ]; then
     nc  -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
