@@ -726,6 +726,7 @@ run_brew() {
       'gpatch'
       'go-jira'
       'swaks'
+      'keychain'
     )
 
     for index in ${!desired_formulae[*]}; do
