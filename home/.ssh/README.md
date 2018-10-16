@@ -71,3 +71,7 @@ communications with other computers (operating system, antivirus, HTTPS
 implementation, password storage...), you have to be able to trust it. (If you
 haven't ever asked yourself that question about the software you already use,
 you should!)
+
+## Transferring
+
+- [How to transfer pgp private&public key to another computer?](https://stackoverflow.com/questions/3174537/how-to-transfer-pgp-privatepublic-key-to-another-computer/3176373#3176373)
