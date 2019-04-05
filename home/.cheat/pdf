@@ -14,3 +14,91 @@ pdfimages -list input.pdf
 # Merge PDFs on OSX
 gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=merged.pdf \
   source1.pdf source2.pdf source3.pdf etc.pdf
+
+
+# Split PDF page into two pages
+A simple case:
+--------------
+
+**Step One:** Split into individual pages
+
+     pdftk clpdf.pdf burst
+
+this produces files `pg_0001.pdf, pg_0002.pdf, ... pg_NNNN.pdf`, one for each page.
+It also produces `doc_data.txt` which contains page dimensions.
+
+
+**Step Two:** Create left and right half pages
+
+      pw=`cat doc_data.txt  | grep PageMediaDimensions | head -1 | awk '{print $2}'`
+      ph=`cat doc_data.txt  | grep PageMediaDimensions | head -1 | awk '{print $3}'`
+      w2=$(( pw / 2 ))
+      w2px=$(( w2*10 ))
+      hpx=$((  ph*10 ))
+      for f in  pg_[0-9]*.pdf ; do
+       lf=left_$f
+       rf=right_$f
+       gs -o ${lf} -sDEVICE=pdfwrite -g${w2px}x${hpx} -c "<</PageOffset [0 0]>> setpagedevice" -f ${f}
+       gs -o ${rf} -sDEVICE=pdfwrite -g${w2px}x${hpx} -c "<</PageOffset [-${w2} 0]>> setpagedevice" -f ${f}
+      done
+
+**Step Three:** Merge left and right in order to produce `newfile.pdf` containing single page .pdf.
+
+      \ls -1 [lr]*_[0-9]*pdf | \sort -n -k3 -t_ > fl
+      pdftk `cat fl`  cat output newfile.pdf
+
+
+----------
+
+
+A more general case:
+--------------------
+
+1. The example above assumes all pages are same size. The `doc_data.txt` file contains size for each split page. If the command 
+
+     `grep PageMediaDimensions <doc_data.txt  | sort | uniq | wc -l`
+
+does not return 1 then the pages have different dimensions and some extra logic is needed in **Step Two**.
+
+2. If the split is not exactly 50:50 then a better formula than `w2=$(( pw / 2 ))`, used in the example above, is needed.
+
+This second example shows how to handle this more general case.
+
+**Step One:** split with `pdftk` as before
+
+**Step Two:** Now create three files that contain the width and height of each pages and a default for the fraction of the split the left page will use.
+
+      grep PageMediaDimensions <doc_data.txt | awk '{print $2}'    >   pws.txt
+      grep PageMediaDimensions <doc_data.txt | awk '{print $3}'    > phs.txt
+      grep PageMediaDimensions <doc_data.txt | awk '{print "0.5"}' > lfrac.txt
+
+the file `lfrac.txt` can be hand edited if information is available for where to split different pages.
+
+**Step Three:** Now create left and right split pages, using the different pages sizes and (if edited) different fractional locations for the split. 
+
+    #!/bin/bash
+    exec 3<pws.txt
+    exec 4<phs.txt
+    exec 5<lfrac.txt
+
+    for f in  pg_[0-9]*.pdf ; do
+     read <&3 pwloc
+     read <&4 phloc
+     read <&5 lfr
+     wl=`echo "($lfr)"'*'"$pwloc" | bc -l`;wl=`printf "%0.f" $wl`
+     wr=$(( pwloc - wl ))
+     lf=left_$f
+     rf=right_$f
+     hpx=$((  phloc*10 ))
+     w2px=$(( wl*10 ))
+     gs -o ${lf} -sDEVICE=pdfwrite -g${w2px}x${hpx} -c "<</PageOffset [0 0]>> setpagedevice" -f ${f}
+     w2px=$(( wr*10 ))
+     gs -o ${rf} -sDEVICE=pdfwrite -g${w2px}x${hpx} -c "<</PageOffset [-${wl} 0]>> setpagedevice" -f ${f}
+    done
+
+
+**Step Four:** This is the same merge step as in the previous, simpler, example.
+
+      ls -1 [lr]*_[0-9]*pdf | sort -n -k3 -t_ > fl
+      pdftk `cat fl`  cat output newfile.pdf
+

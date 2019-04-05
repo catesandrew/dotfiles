@@ -33,7 +33,7 @@ end
 
 require('space-cadet')
 -- require('markdown')
-require('super')
+-- require('super')
 -- require('windows')
 
 hs.notify.new({title='Hammerspoon', informativeText='Ready to rock 🤘'}):send()

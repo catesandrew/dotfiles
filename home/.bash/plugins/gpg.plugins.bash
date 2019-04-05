@@ -19,7 +19,16 @@ EOM
   fi
 
   if [ -n "${GPG_AGENT_INFO}" ]; then
-    nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+    socat - UNIX-CONNECT:"${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+
+    # if [ "$__dot_system_type" == "Darwin" ]; then
+    #   /usr/bin/nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+    # else if brew_contains_element "netcat"; then
+    #   nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+    # else
+    #   nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+    # fi
+
     if [ ! -S "${GPG_AGENT_INFO%%:*}" -o $? != 0 ]; then
       # set passphrase cache so I only have to type my passphrase once a day
       eval $(gpg-agent --options "${HOME}/.gpg-agent.conf" --daemon --log-file "${TMPDIR}/gpg-agent.log" --verbose)

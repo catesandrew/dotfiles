@@ -30,13 +30,11 @@ if hash brew 2>/dev/null; then
   echo "__dot_brew_taps=\"$s\"" >> "${OUTPUT}"
   echo "export __dot_brew_taps" >> "${OUTPUT}"
 
-  if [[ $(brew cask --version 2>/dev/null) ]]; then
-    __dot_cask_list=($(brew cask list | sed 's/:.*//'))
-    __serialise_to s "${__dot_cask_list[@]}"
+  __dot_cask_list=($(brew cask list | sed 's/:.*//'))
+  __serialise_to s "${__dot_cask_list[@]}"
 
-    echo "__dot_cask_list=\"$s\"" >> "${OUTPUT}"
-    echo "export __dot_cask_list" >> "${OUTPUT}"
-  fi
+  echo "__dot_cask_list=\"$s\"" >> "${OUTPUT}"
+  echo "export __dot_cask_list" >> "${OUTPUT}"
 
   unset s
   unset OUTPUT

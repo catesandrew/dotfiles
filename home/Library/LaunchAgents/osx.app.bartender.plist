@@ -6,12 +6,12 @@
 	<false/>
 	<key>Label</key>
 	<string>osx.app.bartender</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>sh</string>
-      <string>-c</string>
-      <string>sleep 10 &amp;&amp; /Applications/Bartender\ 3.app/Contents/MacOS/Bartender\ 3</string>
-    </array>
+	<key>ProgramArguments</key>
+	<array>
+		<string>sh</string>
+		<string>-c</string>
+		<string>sleep 2 &amp;&amp; /Applications/Bartender\ 3.app/Contents/Library/LoginItems/BartenderStartAtLoginHelper.app/Contents/MacOS/BartenderStartAtLoginHelper</string>
+	</array>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
