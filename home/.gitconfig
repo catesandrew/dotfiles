@@ -217,10 +217,8 @@
 [include]
   path = ~/.gitconfig-local
   path = ~/.gitconfig-private
-[includeIf "gitdir:*/wb/"]
-  path = ~/.gitconfig-wb
-[includeIf "gitdir:*/exp/"]
-  path = ~/.gitconfig-exp
+[includeIf "gitdir:*/paciolan/"]
+  path = ~/.gitconfig-paciolan
 [magithub]
 	online = false
 [magithub "status"]

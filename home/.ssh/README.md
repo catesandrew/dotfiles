@@ -12,7 +12,7 @@ which is also checked in at `home\.bin\github-keygen`.
 To generate new keys
 
 ```
-ssh-keygen -t rsa -b 2048 -C make/andrew@cates.io -f id_andrew@cates.io
+ssh-keygen -t rsa -b 4096 -C mako/andrew@cates.io -f id_andrew@cates.io
 ```
 
 Where
