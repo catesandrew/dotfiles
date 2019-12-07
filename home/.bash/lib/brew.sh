@@ -65,14 +65,9 @@ run_brew() {
 
     local -a missing_taps
     local -a desired_taps=(
-      'caskroom/cask'
-      'caskroom/drivers'
-      'caskroom/fonts'
-      'caskroom/versions'
-      'homebrew/boneyard'
-      'homebrew/bundle'
-      'homebrew/core'
-      'homebrew/services'
+      'homebrew/cask-drivers'
+      'homebrew/cask-fonts'
+      'homebrew/cask-versions'
       'dart-lang/dart'
       'discoteq/discoteq'
       'johanhaleby/kubetail'
@@ -84,6 +79,7 @@ run_brew() {
       'cloudfoundry/tap'
       'tavianator/tap'
       'zegervdv/zathura'
+      'adoptopenjdk/openjdk'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -222,7 +218,6 @@ run_brew() {
       'oniguruma'
       'juju'
       'libyaml'
-      'node'
       'docbook-xsl'
       'gnu-getopt'
       'cabextract'
@@ -326,8 +321,6 @@ run_brew() {
       'x265'
       'wrk'
       'woff2'
-      'winetricks'
-      'wine'
       'whatmp3'
       'wget'
       'webkit2png'
@@ -442,7 +435,6 @@ run_brew() {
       'plantuml'
       'pinentry-mac'
       'pigz'
-      'phantomjs'
       'pgcli'
       'pdfgrep'
       'pdfcrack'
@@ -451,7 +443,6 @@ run_brew() {
       'par'
       'packer-completion'
       'packer'
-      'otto'
       'orc'
       'optipng'
       'openssh'
@@ -463,9 +454,6 @@ run_brew() {
       'ondir'
       'ocrmypdf'
       'nvm'
-      'notmuch'
-      'node@6'
-      'node@4'
       'nmap'
       'nghttp2'
       'netcat'
@@ -502,7 +490,6 @@ run_brew() {
       'lmdb'
       'llvm'
       'little-cms'
-      'litmus'
       'liquidprompt'
       'lighttpd'
       'libzip'
@@ -522,11 +509,9 @@ run_brew() {
       'libicns'
       'libgphoto2'
       'libdvdcss'
-      'libcaca'
       'libav'
       'libatomic_ops'
       'libass'
-      'let-alist'
       'lesspipe'
       'less'
       'leiningen'
@@ -571,7 +556,6 @@ run_brew() {
       'hashpump'
       'haproxy'
       'handbrake'
-      'hachoir-metadata'
       'gzip'
       'gts'
       'gtk+'
@@ -581,7 +565,6 @@ run_brew() {
       'grc'
       'graphicsmagick'
       'gradle'
-      'gpg-agent'
       'gpac'
       'godep'
       'gnuplot'
@@ -629,10 +612,8 @@ run_brew() {
       'emacs-plus'
       'elinks'
       'editorconfig'
-      'ecj'
       'dwdiff'
       'duti'
-      'drip'
       'dos2unix'
       'docutils'
       'docker-swarm'
@@ -645,11 +626,9 @@ run_brew() {
       'dns2tcp'
       'djvulibre'
       'django-completion'
-      'dirmngr'
       'direnv'
       'diffutils'
       'diff-so-fancy'
-      'diff-pdf'
       'diction'
       'dex2jar'
       'deisctl'
@@ -678,7 +657,6 @@ run_brew() {
       'clib'
       'clasp'
       'cifer'
-      'chromedriver'
       'chrome-cli'
       'chicken'
       'cheat'
@@ -719,8 +697,6 @@ run_brew() {
       'psgrep'
       'bfs'
       'meson'
-      'zathura'
-      'zathura-pdf-poppler'
       'ed'
       'file-formula'
       'gpatch'
@@ -767,44 +743,30 @@ run_brew() {
             ;;
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --HEAD --with-pdumper --with-modern-icon --without-gnutls
-            ;;
-          node)
-            brew install node --without-npm
-            ;;
-          node@4)
-            brew install node@4 --without-npm
-            ;;
-          node@6)
-            brew install node@6 --without-npm
-            ;;
-          wdiff)
-            brew install wdiff --with-gettext
-            ;;
-          ffmpeg)
-            brew install ffmpeg --with-fdk-aac --with-freetype --with-libass --with-libvpx --with-x265 --with-fdk-aac --with-openh264 --with-openssl --with-rtmpdump --with-theora --with-tools --with-two-lame --with-webp
+            brew install emacs-plus --HEAD --with-pdumper --with-modern-icon
             ;;
           wget)
-            brew install wget --HEAD --with-gpgme --with-pcre --with-iri
+            brew install wget --HEAD
             ;;
           macvim)
-            brew install macvim --HEAD --with-override-system-vim --with-lua --with-luajit
+            # sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+            brew install macvim --HEAD
             ;;
           neovim)
             brew install neovim --HEAD
             ;;
           imagemagick)
-            brew install imagemagick --with-webp
+            brew install imagemagick --HEAD
             ;;
           universal-ctags)
             # Given the lack of activity on the official Exuberant Ctags
             # source, it has been forked  and renamed to Universal Ctags
             # and can be found at universal-ctags/ctags.
-            brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+            brew install universal-ctags/universal-ctags/universal-ctags --HEAD --with-jansson --with-libyaml
             ;;
           meson)
             # A bug in the latest stable version was fixed but has not been released yet.
-            brew install --HEAD meson
+            brew install meson --HEAD
             ;;
           zathura)
             brew install zathura
@@ -835,50 +797,32 @@ run_brew() {
     local -a cask_desired_formulae=(
       '1password-cli'
       'android-sdk'
+      'android-ndk'
+      'chromedriver'
       'app-tamer'
-      'atom'
       'audio-hijack'
       'bartender'
       'beamer'
       'bettertouchtool'
       'betterzip'
-      'betterzipql'
-      'bitbar'
-      'busycontacts'
-      'butler'
-      'calibre'
       'charles'
-      'cheatsheet'
-      'clarify'
       'cloudapp'
       'coderunner'
       'commander-one'
       'controlplane'
       'curio'
       'dash'
-      'data-rescue'
-      'deltawalker'
-      'droplr'
       'eaglefiler'
-      'easysimbl'
       'electron'
       'epubmdimporter'
       'epubquicklook'
       'fastlane'
-      'firefox'
-      'firefoxdeveloperedition'
-      'flux'
-      'focused'
-      'foldingtext-dev'
       'font-open-iconic'
       'font-open-sans'
       'font-raleway'
       'font-xits'
-      'fontforge'
       'forklift'
-      'gas-mask'
       'genymotion'
-      'ghost'
       'gitbook-editor'
       'gitup'
       'google-chrome-canary'
@@ -886,22 +830,16 @@ run_brew() {
       'handbrake'
       'hazel'
       'houdahspot'
-      'hyper'
+      'phantomjs'
       'iconjar'
-      'ifunbox'
       'imagealpha'
       'imagemin'
       'imageoptim'
       'istat-menus'
       'iterm2'
-      'jaikoz'
-      'java6'
-      'java8'
       'karabiner-elements'
       'keepassx'
       'keyboard-maestro'
-      'kindle'
-      'kindlegen'
       'launchbar'
       'launchcontrol'
       'leech'
@@ -910,8 +848,6 @@ run_brew() {
       'macpass'
       'mactex'
       'mailmate'
-      'maltego-casefile'
-      'maltego-ce'
       'markdownmdimporter'
       'mattermost'
       'mediainfo'
@@ -919,11 +855,6 @@ run_brew() {
       'moom'
       'name-mangler'
       'netspot'
-      'obs'
-      'omnifocus'
-      'omnigraffle'
-      'omnioutliner'
-      'omniplan'
       'optionspace'
       'pacifist'
       'paw'
@@ -960,26 +891,21 @@ run_brew() {
       'sonos'
       'spamsieve'
       'suspicious-package'
-      'the-escapers-flux'
-      'time-sink'
       'tower'
-      'transmission'
       'ttscoff-mmd-quicklook'
       'tuntap'
       'vagrant'
       'vagrant-manager'
       'virtualbox'
       'virtualbox-extension-pack'
-      'vlc'
-      'waltr'
       'webpquicklook'
       'witch'
       'xee'
-      'xquartz'
-      'yasu'
-      'zotero'
-      'android-ndk'
       'facebook-ios-sdk'
+      'nextcloud'
+      'adoptopenjdk13'
+      'adoptopenjdk8'
+      'intel-haxm'
     )
 
     for index in ${!cask_desired_formulae[*]}; do
