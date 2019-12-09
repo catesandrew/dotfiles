@@ -743,7 +743,7 @@ run_brew() {
             ;;
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --HEAD --with-pdumper --with-modern-icon
+            brew install emacs-plus --HEAD --with-jansson --with-modern-icon
             ;;
           wget)
             brew install wget --HEAD
@@ -920,26 +920,65 @@ run_brew() {
       for item in "${cask_missing_formulae[@]}"; do
         e_header "Installing $item..."
         case "$item" in
+          android-sdk)
+            # https://stackoverflow.com/questions/46402772/failed-to-install-android-sdk-java-lang-noclassdeffounderror-javax-xml-bind-a
+            brew cask intsall android-sdk
+            # Update 2019-10: Google is working on a new Android SDK
+            # Command-line Tools release that runs on current JVMs (9, 10, 11+)
+            # and does not depend on deprecated JAXB EE modules!
+            #
+            # https://dl.google.com/android/repository/commandlinetools-mac-5842447_latest.zip
+            # You can already download and use the new Android SDK Command-line
+            # Tools on the canary channel inside Android Studio or by manually
+            # downloading them from the Google servers:
+            #
+            # For the latest versions check the URLs inside the
+            # https://dl.google.com/android/repository/repository2-1.xml.
+            ;;
           android-ndk)
             brew cask intsall android-ndk
+            yes | sdkmanager --licenses
+            # Install all of the Android SDK components (you will be prompted to
+            # agree to license info and then this will take a while to run):
+            touch "${HOME}/.android/repositories.cfg"
             # accept the licenses
             yes | sdkmanager --licenses
+            sdkmanager --update
+            sdkmanager --no_https --install emulator
+            sdkmanager --no_https --install platform-tools
+            sdkmanager --no_https --install 'system-images;android-29;google_apis_playstore;x86_64'
+            sdkmanager --no_https --install 'extras;intel;Hardware_Accelerated_Execution_Manager'
+            sdkmanager --no_https --install 'build-tools;29.0.2'
+            sdkmanager --no_https --install 'platforms;android-29'
+            sdkmanager --list
+            ;;
+          adoptopenjdk8)
+            # android-sdk requires Java 8. You can install it with:
+            brew cask install homebrew/cask-versions/adoptopenjdk8
+            jenv add "$(/usr/libexec/java_home -v1.8)"
+            jenv global 1.8
+            # To unset the version `jenv global system`
+            ;;
+          adoptopenjdk13)
+            # android-sdk requires Java 8. You can install it with:
+            brew cask install adoptopenjdk13
+            jenv add "$(/usr/libexec/java_home -v1.13)"
             ;;
           java6)
             brew cask install java6
-            jenv add $(/usr/libexec/java_home -v1.6)
+            jenv add "$(/usr/libexec/java_home -v1.6)"
             ;;
           java7)
             brew cask install java7
-            jenv add $(/usr/libexec/java_home -v1.7)
+            jenv add "$(/usr/libexec/java_home -v1.7)"
             ;;
           java8)
             brew cask install java8
-            jenv add $(/usr/libexec/java_home -v1.8)
+            jenv add "$(/usr/libexec/java_home -v1.8)"
             ;;
           java9)
             brew cask install java9
-            jenv add $(/usr/libexec/java_home -v9)
+            jenv add "$(/usr/libexec/java_home -v9)"
             ;;
           *)
             brew cask install "${item}"
