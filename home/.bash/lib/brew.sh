@@ -295,7 +295,6 @@ run_brew() {
       'gcc'
       'libexif'
       'libagg'
-      'imagemagick@6'
       'librsvg'
       'docker'
       'docker-machine'
@@ -754,9 +753,6 @@ run_brew() {
             ;;
           neovim)
             brew install neovim --HEAD
-            ;;
-          imagemagick)
-            brew install imagemagick --HEAD
             ;;
           universal-ctags)
             # Given the lack of activity on the official Exuberant Ctags
