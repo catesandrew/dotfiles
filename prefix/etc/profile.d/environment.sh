@@ -5,6 +5,34 @@ if ! [ -d "$BREW_HOME" ]; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
+
+    fi
+fi
+
+if [ -d "${HOME}/.bash" ]; then
+    BASH_IT="${HOME}/.bash"
+    export BASH_IT
+    launchctl setenv BASH_IT "$BASH_IT"
+fi
+
+if ! [ -d "$RBENV_HOME" ]; then
+    if [ -d /usr/local/opt/rbenv ]; then
+        RBENV_HOME=/usr/local/opt/rbenv
+    fi
+
+    export RBENV_HOME
+    launchctl setenv RBENV_HOME "$RBENV_HOME"
+fi
+
+if [ -d "$RBENV_ROOT" ]; then
+    if [ -d "${HOME}/.rbenv" ]; then
+        RBENV_ROOT="${HOME}/.rbenv"
+    fi
+    if [ -d "${RBENV_ROOT}" ]; then
+        RBENV_VERSION=$(cat "${RBENV_ROOT}/version")
+        PATH="${RBENV_ROOT}/shims:${PATH}"
+        export RBENV_VERSION
+        launchctl setenv RBENV_VERSION "$RBENV_VERSION"
     fi
 fi
 
@@ -47,7 +75,7 @@ if ! [ -d "$JENV_HOME" ]; then
     export JENV_HOME
     launchctl setenv JENV_HOME "$JENV_HOME"
 
-    JENV_ROOT="$HOME"/.jenv
+    JENV_ROOT="${HOME}/.jenv"
     export JENV_ROOT
     launchctl setenv JENV_ROOT "$JENV_ROOT"
 fi

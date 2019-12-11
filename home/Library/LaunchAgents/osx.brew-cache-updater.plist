@@ -5,12 +5,12 @@
 	<key>Disabled</key>
 	<false/>
 	<key>Label</key>
-        <string>osx.brew-cache-updater</string>
+	<string>osx.brew-cache-updater</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-                <string>-c</string>
-                <string>BASH_NO=no . /etc/profile &amp;&amp; sleep 4 &amp;&amp; $HOME/.bin/brew-cache-update.sh</string>
+		<string>-c</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; SLEEP 4 &amp;&amp; $HOME/.bin/brew-cache-update.sh</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
