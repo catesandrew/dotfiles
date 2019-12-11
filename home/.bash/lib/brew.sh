@@ -778,6 +778,12 @@ run_brew() {
             # Follow the instructions to link the plugins into place:
             ln -s $(brew --prefix zathura-pdf-poppler)/lib/pdf.dylib $(brew --prefix zathura)/lib/zathura/pdf.so
             ;;
+          rbenv)
+            brew install rbenv ruby-build
+            # rbenv install 2.6.5
+            # rbenv global 2.6.5
+            # gem install -n /usr/local/bin fastlane -NV
+            ;;
           *)
             brew install $item
         esac
@@ -816,7 +822,6 @@ run_brew() {
       'electron'
       'epubmdimporter'
       'epubquicklook'
-      'fastlane'
       'font-open-iconic'
       'font-open-sans'
       'font-raleway'
