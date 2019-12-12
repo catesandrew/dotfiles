@@ -216,4 +216,12 @@ function get-icon() {
   fi
 }
 
+# Change MAC address in OS X Yosemite
+function change_mac_address() {
+  # https://apple.stackexchange.com/questions/151986/change-mac-address-in-os-x-yosemite
+  sudo /System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport --disassociate
+  sudo ifconfig en0 ether $(openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/./0/2; s/.$//')
+  networksetup -detectnewhardware
+}
+
 fi
