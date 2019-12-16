@@ -42,4 +42,25 @@ if [ "$__dot_system_type" == "Darwin" ]; then
 
     alias osxup="sudo softwareupdate -i -a"
     alias fixpref='killall -u $USER cfprefsd'
+
+    # Xcode
+
+    ## Open Xcode workspace from terminal.
+    alias xcworkspace='open -a "/Applications/Xcode.app" *.xcworkspace'
+
+    ## Open Xcode project from terminal.
+    alias xcproject='open -a "/Applications/Xcode.app" *.xcodeproj'
+
+    export XCODE_10_PATH='/Applications/Xcode10.3.app'
+    export XCODE_11_PATH='/Applications/Xcode.app'
+
+    xcselect() {
+      sudo xcode-select -s "$1"/Contents/Developer
+      ln -s "$1" /Applications/Xcode.app
+      echo "Selected Xcode: ${1}"
+    }
+
+    alias xcstable="xcselect ${XCODE_11_PATH}"
+    alias xcold="xcselect ${XCODE_10_PATH}"
+    alias xcprint="xcode-select -p"
 fi
