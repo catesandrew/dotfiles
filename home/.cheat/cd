@@ -1,10 +1,11 @@
-# Change to the Previous Working Directory
-cd -
+#Go to the given directory
+cd path/to/directory
 
-# Running a second command with the same arguments as the previous command, use
-# `!*` to repeat all arguments or `!:2` to use the second argument. `!$` uses
-# the final argument.
-cd /home/user/foo
-# => cd: /home/user/foo: No such file or directory
-mkdir !*
-# => mkdir /home/user/foo
+#Go to home directory of current user
+cd
+
+#Go up to the parent of the current directory
+cd ..
+
+#Go to the previously chosen directory
+cd -

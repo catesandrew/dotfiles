@@ -142,6 +142,10 @@ use_nvm() {
   nvm_sh=/usr/local/opt/nvm/nvm.sh
   [ -s "$nvm_sh" ] && \. "$nvm_sh"  # This loads nvm
 
+  if [[ ! -z $node_version ]]; then
+     nvm use $node_version
+  fi
+
   # if [[ -e $nvm_sh ]]; then
   #   source $nvm_sh
   #   nvm use $node_version

@@ -15,7 +15,6 @@ git_pullff = git pull --ff-only
 git_noff = git merge --no-ff
 git_gfa = git fetch -all
 git_pom = git push origin master
-git_pod = git push origin develop
 git_gdi = git diff
 git_gdc = git diff --cached
 git_gds = git diff --stats=160,120

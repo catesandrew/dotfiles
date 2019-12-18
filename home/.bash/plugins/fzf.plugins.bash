@@ -50,6 +50,20 @@ if brew_contains_element "fzf" && \
   # memory allocations for a particular process with pmap (vmmap):
   complete -o bashdefault -o default -o nospace -F _fzf_complete_kill vmmap
 
+
+  if brew_contains_element "cheat" || \
+      hash cheat 2>/dev/null; then
+        # This function enables you to choose a cheatsheet to view by selecting output
+        # from `cheat -l`. `source` it in your shell to enable it. (Consider renaming
+        # or aliasing it to something convenient.)
+
+        # Arguments passed to this function (like --color) will be passed to the second
+        # invokation of `cheat`.
+        function cheat-fzf {
+          eval `cheat -l | tail -n +2 | fzf | awk -v vars="$*" '{ print "cheat " $1 " -t " $3, vars }'`
+        }
+  fi
+
 elif hash fzf 2>/dev/null; then
     true
 fi
