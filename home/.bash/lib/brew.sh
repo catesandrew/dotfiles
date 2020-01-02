@@ -736,6 +736,10 @@ run_brew() {
       for item in "${missing_formulae[@]}"; do
         e_header "Installing $item..."
         case "$item" in
+          hunspell)
+            # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
+            brew install hunspell
+            ;;
           emacs)
             # --with-gnutls has issues with gh-api
             brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
@@ -797,10 +801,13 @@ run_brew() {
     __cask_list=($(brew cask list | sed 's/:.*//'))
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
+      '1password'
       '1password-cli'
-      'android-sdk'
+      'adoptopenjdk13'
+      'adoptopenjdk8'
+      'altair-graphql-client'
       'android-ndk'
-      'chromedriver'
+      'android-sdk'
       'app-tamer'
       'audio-hijack'
       'bartender'
@@ -808,6 +815,7 @@ run_brew() {
       'bettertouchtool'
       'betterzip'
       'charles'
+      'chromedriver'
       'cloudapp'
       'coderunner'
       'commander-one'
@@ -818,24 +826,29 @@ run_brew() {
       'electron'
       'epubmdimporter'
       'epubquicklook'
+      'facebook-ios-sdk'
+      'fastlane'
       'font-open-iconic'
       'font-open-sans'
       'font-raleway'
       'font-xits'
       'forklift'
       'genymotion'
-      'gitbook-editor'
       'gitup'
+      'google-chrome'
       'google-chrome-canary'
+      'graphiql'
+      'graphql-ide'
+      'graphql-playground'
       'hammerspoon'
       'handbrake'
       'hazel'
       'houdahspot'
-      'phantomjs'
       'iconjar'
       'imagealpha'
       'imagemin'
       'imageoptim'
+      'intel-haxm'
       'istat-menus'
       'iterm2'
       'karabiner-elements'
@@ -852,17 +865,18 @@ run_brew() {
       'markdownmdimporter'
       'mattermost'
       'mediainfo'
-      'minikube'
       'moom'
       'name-mangler'
       'netspot'
-      'optionspace'
+      'nextcloud'
       'pacifist'
       'paw'
-      'pdfexpert'
+      'pdf-expert'
       'pdfkey-pro'
       'pdfpenpro'
+      'phantomjs'
       'platypus'
+      'plistedit-pro'
       'prefs-editor'
       'provisionql'
       'psequel'
@@ -878,9 +892,9 @@ run_brew() {
       'quicklook-csv'
       'quicklook-json'
       'quicknfo'
-      'quotefix'
       'rcdefaultapp'
       'react-native-debugger'
+      'reactotron'
       'resolutionator'
       'scapple'
       'screenflow'
@@ -892,7 +906,10 @@ run_brew() {
       'sonos'
       'spamsieve'
       'suspicious-package'
+      'textexpander'
+      'touch-bar-simulator'
       'tower'
+      'transmission'
       'ttscoff-mmd-quicklook'
       'tuntap'
       'vagrant'
@@ -902,11 +919,6 @@ run_brew() {
       'webpquicklook'
       'witch'
       'xee'
-      'facebook-ios-sdk'
-      'nextcloud'
-      'adoptopenjdk13'
-      'adoptopenjdk8'
-      'intel-haxm'
     )
 
     for index in ${!cask_desired_formulae[*]}; do
