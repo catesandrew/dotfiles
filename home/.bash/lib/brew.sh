@@ -819,6 +819,9 @@ run_brew() {
             # rbenv global 2.6.5
             # gem install -n /usr/local/bin fastlane -NV
             ;;
+          moreutils)
+            brew unlink parallel task-spooler && brew install moreutils &&  brew link --overwrite task-spooler parallel
+            ;;
           *)
             brew install $item
         esac
@@ -862,7 +865,6 @@ run_brew() {
       'epubmdimporter'
       'epubquicklook'
       'facebook-ios-sdk'
-      'fastlane'
       'font-open-iconic'
       'font-open-sans'
       'font-raleway'
@@ -954,6 +956,8 @@ run_brew() {
       'webpquicklook'
       'witch'
       'xee'
+      'moreutils'
+      'postman'
     )
 
     for index in ${!cask_desired_formulae[*]}; do
@@ -1247,7 +1251,16 @@ run_mas() {
 
       for item in "${mas_missing_apps[@]}"; do
         e_header "Installing $item..."
+        mas info "$item"
         case "$item" in
+          889428659)
+            # xScope
+            mas install 889428659
+            # Hiding the xScope Dock icon
+            # https://support.iconfactory.com/kb/xscope/hiding-the-xscope-dock-icon
+            defaults write com.iconfactory.mac.xScope generalShowDockIcon 0
+            defaults write com.iconfactory.xScope generalShowDockIcon 0
+            ;;
           *)
             mas install "$item"
         esac
