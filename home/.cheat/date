@@ -1,11 +1,14 @@
-# Print date in format suitable for affixing to file names
+# To print the date in a format suitable for affixing to file names:
 date +"%Y%m%d_%H%M%S"
 
-# Convert Unix timestamp to Date
-date -d @1440359821
-
 date
- -> Wed 28 Oct 2009 09:32:43 PDT
+# -> Wed 28 Oct 2009 09:32:43 PDT
 
 date +'%Y/%m/%d'
- -> 2009/10/28
+# -> 2009/10/28
+
+# To convert a Unix timestamp to Date (Linux)
+date -d @1440359821
+
+# To convert a Unix timestamp to Date (OSX)
+date -r 1440359821

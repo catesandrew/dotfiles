@@ -1,10 +1,8 @@
-# chmod: a Unix utility for managing file permissions
-
 # Add execute for all (myscript.sh)
 chmod a+x myscript.sh
 
 # Set user to read/write/execute, group/global to read only (myscript.sh), symbolic mode
-chmod u=rwx, go=r myscript.sh
+chmod u=rwx, go=r myscript.sh 
 
 # Remove write from user/group/global (myscript.sh), symbolic mode
 chmod a-w myscript.sh
@@ -23,7 +21,7 @@ chmod 666 myscript.sh
 
 # Roles
 u - user (owner of the file)
-g - group (members of files group)
+g - group (members of file's group)
 o - global (all users who are not owner and not part of group)
 a - all (all 3 roles above)
 

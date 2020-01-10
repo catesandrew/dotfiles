@@ -358,18 +358,14 @@ add_on_exit load_bash_it_files
 for file_type in "plugins" "completion" "aliases"; do
   load_bash_it_files $file_type
 done
+unset file_type
+
+# add npm completion
+complete -o default -F _npm_completion npm
 
 path_munge "${HOME}/.bin"
 PATH=$(path_strip "$PATH" "\./bin")
 path_prepend "./bin"
-
-# Load custom aliases, completion, plugins
-for file_type in "plugins" "completion" "aliases"; do
-  if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
-    . "${BASH_IT}/${file_type}/custom.${file_type}.bash"
-  fi
-done
-unset file_type
 
 # Use the Keychain to store your sudo passwords on the cli. Start by adding a
 # new keychain, I choose to name it "Local Accounts" and create a master

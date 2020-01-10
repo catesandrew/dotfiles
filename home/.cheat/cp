@@ -1,4 +1,16 @@
-# Quickly Make a Backup of a File
+# To copy a file:
+cp ~/Desktop/foo.txt ~/Downloads/foo.txt
+
+# To copy a directory:
+cp -r ~/Desktop/cruise_pics/ ~/Pictures/
+
+# To create a copy but ask to overwrite if the destination file already exists:
+cp -i ~/Desktop/foo.txt ~/Documents/foo.txt
+
+# To create a backup file with date:
+cp foo.txt{,."$(date +%Y%m%d-%H%M%S)"}
+
+# To quickly make a backup of a file:
 cp file{,.bak}
 
 # You can use brace expansion to quickly create a backup copy of a file. Brace

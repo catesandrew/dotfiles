@@ -1,15 +1,8 @@
-## Shell Scripting
-# For details visit http://www.gnu.org/software/bash/manual/bashref.html
-
-# A '\' mark before a command will ignore aliases. For example, you have alias
-# alias ls='ls --color=auto', and want use ls without that --color option
-\ls
-
-# Turn on debugging:
-set -x
-
-# Turn off debugging:
-set +x
+# To implement a for loop:
+for file in *;
+do
+  echo $file found;
+done
 
 # To implement a case command:
 case "$1"
@@ -20,15 +13,22 @@ in
   3*) echo "something beginning with 3 found";;
 esac
 
-# Retrieve N-th piped command exit status
+# To turn on debugging:
+set -x
+
+# To turn off debugging:
+set +x
+
+# Retrieve N-th piped command exit status:
 printf 'foo' | fgrep 'foo' | sed 's/foo/bar/'
 echo ${PIPESTATUS[0]}  # replace 0 with N
 
-# To implement a for loop:
-for file in *;
-do
-  echo $file found;
-done
+# To create a lockfile:
+( set -o noclobber; echo > my.lock ) || echo 'Failed to create lock file'
+
+# A '\' mark before a command will ignore aliases. For example, you have alias
+# alias ls='ls --color=auto', and want use ls without that --color option
+\ls
 
 # Use a for Loop at the Command Line
 for VAR in LIST
@@ -212,16 +212,16 @@ $ =2T - Output like ls or dir
 .bash_profile = sourced by login shell,
 .bashrc = sourced by all shells,
 .bash_aliases = should be sourced by .bashrc
-  
+
 # Run something:
 for i in a b c; do $i 'hello'; done
-  
+
 # Do something on a bunch of files:
 for i in *.rb; do echo $i; done
-  
+
 # If syntax:
 if [ -e .ssh ]; then echo "hi"; fi
-  
+
 # file check flags:
 #   -e:  file exists
 #   -f:  regular file (non directory)

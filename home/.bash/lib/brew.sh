@@ -739,6 +739,7 @@ run_brew() {
       'ansible'
       'aircrack-ng'
       'ack'
+      'moreutils'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -821,6 +822,11 @@ run_brew() {
             ;;
           moreutils)
             brew unlink parallel task-spooler && brew install moreutils &&  brew link --overwrite task-spooler parallel
+            ;;
+          node)
+            brew insall node
+            # load npm completion from nvm
+            rm "${BREW_HOME}/etc/bash_completion.d/npm"
             ;;
           *)
             brew install $item
@@ -956,7 +962,6 @@ run_brew() {
       'webpquicklook'
       'witch'
       'xee'
-      'moreutils'
       'postman'
     )
 
