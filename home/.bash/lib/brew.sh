@@ -740,6 +740,7 @@ run_brew() {
       'aircrack-ng'
       'ack'
       'moreutils'
+      'dashing'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -963,6 +964,10 @@ run_brew() {
       'witch'
       'xee'
       'postman'
+      'ios-console'
+      'fliqlo'
+      'aerial'
+      'developerexcuses'
     )
 
     for index in ${!cask_desired_formulae[*]}; do
