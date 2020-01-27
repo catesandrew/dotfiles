@@ -1,3 +1,6 @@
+---
+tags: [ networking ]
+---
 # To release the current IP address:
 sudo dhclient -r
 
@@ -7,4 +10,4 @@ sudo dhclient
 # Running the above in sequence is a common way of refreshing an IP.
 
 # To obtain a new IP address for a specific interface:
-sudo dhclient eth0
+sudo dhclient <interface>
