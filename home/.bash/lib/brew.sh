@@ -476,7 +476,6 @@ run_brew() {
       'pdfgrep'
       'pdfcrack'
       'passpie'
-      'parallel'
       'par'
       'packer-completion'
       'packer'
