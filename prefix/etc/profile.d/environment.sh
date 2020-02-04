@@ -69,13 +69,15 @@ if ! [ -d "$JENV_HOME" ]; then
     if [ -d /usr/local/opt/jenv ]; then
         JENV_HOME=/usr/local/opt/jenv
     elif [ -d "$HOME" ]; then
-        JENV_HOME="$HOME"/.jenv
+        JENV_HOME="$HOME/.jenv"
     fi
 
     export JENV_HOME
     launchctl setenv JENV_HOME "$JENV_HOME"
+fi
 
-    JENV_ROOT="${HOME}/.jenv"
+if [ -d "$JENV_HOME" ]; then
+    JENV_ROOT="$HOME/.jenv"
     export JENV_ROOT
     launchctl setenv JENV_ROOT "$JENV_ROOT"
 fi
