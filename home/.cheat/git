@@ -1,9 +1,12 @@
+---
+tags: [ vcs ]
+---
 # To set your identity:
-git config --global user.name "John Doe"
-git config --global user.email johndoe@example.com
+git config --global user.name <name>
+git config --global user.email <email>
 
 # To set your editor:
-git config --global core.editor emacs
+git config --global core.editor <editor>
 
 # To enable color:
 git config --global color.ui true
@@ -11,8 +14,26 @@ git config --global color.ui true
 # To stage all changes for commit:
 git add --all
 
+# To stash changes locally, this will keep the changes in a separate changelist
+# called stash and the working directory is cleaned. You can apply changes
+# from the stash anytime
+git stash
+
+# To stash changes with a message
+git stash save <message>
+
+# To list all the stashed changes
+git stash list
+
+# To apply the most recent change and remove the stash from the stash list
+git stash pop
+
+# To apply any stash from the list of stashes. This does not remove the stash
+# from the stash list
+git stash apply stash@{6}
+
 # To commit staged changes
-git commit -m "Your commit message"
+git commit -m <message>
 
 # To edit previous commit message
 git commit --amend
@@ -46,30 +67,30 @@ git clean -f -d -x
 git push origin master
 
 # To push to a specified repository:
-git push git@github.com:username/project.git
+git push git@github.com:<username>/<repo>.git
 
 # To delete the branch "branch_name"
-git branch -D branch_name
+git branch -D <branch>
 
 # To make an exisiting branch track a remote branch
 git branch -u upstream/foo
 
 # To see who commited which line in a file
-git blame filename
+git blame <file>
 
 # To sync a fork with the master repo:
-git remote add upstream git@github.com:name/repo.git    # Set a new repo
-git remote -v                                           # Confirm new remote repo
-git fetch upstream                                      # Get branches
-git branch -va                                          # List local - remote branches
-git checkout master                                     # Checkout local master branch
-git checkout -b new_branch                              # Create and checkout a new branch
-git merge upstream/master                               # Merge remote into local repo
-git show 83fb499                                        # Show what a commit did.
-git show 83fb499:path/fo/file.ext                       # Shows the file as it appeared at 83fb499.
-git diff branch_1 branch_2                              # Check difference between branches
-git log                                                 # Show all the commits
-git status                                              # Show the changes from last commit
+git remote add upstream git@github.com:<username>/<repo>.git # Set a new repo
+git remote -v                                                # Confirm new remote repo
+git fetch upstream                                           # Get branches
+git branch -va                                               # List local - remote branches
+git checkout master                                          # Checkout local master branch
+git checkout -b new_branch                                   # Create and checkout a new branch
+git merge upstream/master                                    # Merge remote into local repo
+git show 83fb499                                             # Show what a commit did.
+git show 83fb499:path/fo/file.ext                            # Shows the file as it appeared at 83fb499.
+git diff branch_1 branch_2                                   # Check difference between branches
+git log                                                      # Show all the commits
+git status                                                   # Show the changes from last commit
 
 # Commit history of a set of files
 git log --pretty=email --patch-with-stat --reverse --full-index -- Admin\*.py > Sripts.patch
@@ -337,3 +358,33 @@ GIT_AUTHOR_NAME, GIT_COMMITTER_NAME
 # Your email address to be recorded in any newly created commits. Overrides
 # user.email in .git/config
 GIT_AUTHOR_EMAIL, GIT_COMMITTER_EMAIL
+
+# Other
+# -----
+
+# Create a bare branch (one that has no commits on it)
+git checkout --orphan branch_name
+
+# Checkout a new branch from a different starting point
+git checkout -b master upstream/master
+
+# Remove all stale branches (ones that have been deleted on remote)
+# So if you have a lot of useless branches, delete them on Github and then run this
+git remote prune origin
+
+# The following can be used to prune all remotes at once
+git remote prune $(git remote | tr '\n' ' ')
+
+# Revisions can also be identified with :/text
+# So, this will show the first commit that has "cool" in their message body
+git show :/cool
+
+# Undo parts of last commit in a specific file
+git checkout -p HEAD^ -- /path/to/file
+
+# Revert a commit and keep the history of the reverted change as a separate revert commit
+git revert <commit SHA>
+
+# Pich a commit from a branch to current branch. This is different than merge as
+# this just applies a single commit from a branch to current branch
+git cherry-pick <commit SHA1>

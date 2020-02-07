@@ -31,28 +31,28 @@ find ./path/ -name '*.txt' -exec rm '{}' \;
 # To find files with extension '.txt' and look for a string into them:
 find ./path/ -name '*.txt' | xargs grep 'string'
 
-# To find files with size bigger than 5 Mb and sort them by size:
+# To find files with size bigger than 5 Mebibyte and sort them by size:
 find . -size +5M -type f -print0 | xargs -0 ls -Ssh | sort -z
 
-# To find files bigger thank 2 MB and list them:
-find . -type f -size +20000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'
+# To find files bigger than 2 Megabyte and list them:
+find . -type f -size +200000000c -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'
 
-# To find files modified more than 7 days ago and list file information
+# To find files modified more than 7 days ago and list file information:
 find . -type f -mtime +7d -ls
 
-# To find symlinks owned by a user and list file information
-find . -type l --user=username -ls
+# To find symlinks owned by a user and list file information:
+find . -type l --user=<username> -ls
 
-# To search for and delete empty directories
+# To search for and delete empty directories:
 find . -type d -empty -exec rmdir {} \;
 
-# To search for directories named build at a max depth of 2 directories
+# To search for directories named build at a max depth of 2 directories:
 find . -maxdepth 2 -name build -type d
 
-# To search all files who are not in .git directory
+# To search all files who are not in .git directory:
 find . ! -iwholename '*.git*' -type f
 
-# Find all files that have the same node (hard link) as MY_FILE_HERE
+# To find all files that have the same node (hard link) as MY_FILE_HERE:
 find . -type f -samefile MY_FILE_HERE 2>/dev/null
 
 # To search current directory and sub directories for a specific file:
@@ -138,26 +138,5 @@ find -name '*.c' | while IFS= read -r file; do
   head "$file"
 done
 
-# To search the entire filesystem for a specific file:
-find / -name "rc.conf" -print
-
-# To search current directory and sub directories for a specific file:
-find . -name "rc.conf" -print
-
-# To execute a command on every file/dir
-find [expression..] -exec [command..] '{}' \;
-
-# Example: find all files/dirs named CVS and delete them:
-find -name CVS -exec rm -Rf '{}' \;
-
-# Example: find all files containing a string:
-find * -exec grep -l '<string>' {} \;
-
-# To search only on the given directory:
-find [directory..] -maxdepth 1
-
-# Example: find all directories modified in the past day and permission 755:
-find . -type d -mtime 1 -perm 755
-
-# Example: find and fix all files that have permission o+w:
-find -type f -perm /002 -exec chmod o-w '{}' \;
+# To find all files in the current directory and modify their permissions:
+find . -type f -exec chmod 644 {} \;

@@ -1,8 +1,8 @@
 # To create a symlink:
-ln -s path/to/the/target/directory name-of-symlink
+ln -s <source-location> <symlink-location>
 
-# Symlink, while overwriting existing destination files
-ln -sf /some/dir/exec /usr/bin/exec
+# To symlink, while overwriting existing destination files
+ln -sf <source-location> <symlink-location>
 
 # To create a symbolic link:
 ln -s /original/file /new/symbolic/link
