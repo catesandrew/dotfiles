@@ -80,6 +80,7 @@ run_brew() {
       'tavianator/tap'
       'zegervdv/zathura'
       'adoptopenjdk/openjdk'
+      'prisma/prisma'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -740,6 +741,7 @@ run_brew() {
       'ack'
       'moreutils'
       'dashing'
+      'prisma'
     )
 
     for index in ${!desired_formulae[*]}; do
