@@ -218,14 +218,21 @@ I added my `/usr/local/bin` and `/usr/local/sbin` to the top of the existing pa
 
 ```bash
 /usr/local/bin
-/usr/local/sbin
 /usr/bin
 /bin
+/usr/local/sbin
 /usr/sbin
 /sbin
 ```
 
-### ~/Library/LaunchAgents/environment.plist ###
+### /etc/sysctl.conf
+
+```
+kern.maxfiles=65536
+kern.maxfilesperproc=65536
+```
+
+### ~/Library/LaunchAgents/osx.environment.plist ###
 
 This works but doesn’t set up PATH environment variable. However, it still proved useful for setting up other global variables that can be used later on. Here I’m adding the most important variable, `NVM_DIR`, which I’ll use next.
 
@@ -235,7 +242,7 @@ This works but doesn’t set up PATH environment variable. However, it still pro
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>mako.environment</string>
+  <string>osx.environment</string>
   <key>ProgramArguments</key>
   <array>
     <string>sh</string>
@@ -252,6 +259,7 @@ This works but doesn’t set up PATH environment variable. However, it still pro
 </dict>
 </plist>
 ```
+
 ### /etc/profile ###
 
 # System-wide .profile for sh(1)
@@ -292,6 +300,34 @@ if ! [ -d "$BREW_HOME" ]; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
+
+    fi
+fi
+
+if [ -d "${HOME}/.bash" ]; then
+    BASH_IT="${HOME}/.bash"
+    export BASH_IT
+    launchctl setenv BASH_IT "$BASH_IT"
+fi
+
+if ! [ -d "$RBENV_HOME" ]; then
+    if [ -d /usr/local/opt/rbenv ]; then
+        RBENV_HOME=/usr/local/opt/rbenv
+    fi
+
+    export RBENV_HOME
+    launchctl setenv RBENV_HOME "$RBENV_HOME"
+fi
+
+if [ -d "$RBENV_ROOT" ]; then
+    if [ -d "${HOME}/.rbenv" ]; then
+        RBENV_ROOT="${HOME}/.rbenv"
+    fi
+    if [ -d "${RBENV_ROOT}" ]; then
+        RBENV_VERSION=$(cat "${RBENV_ROOT}/version")
+        PATH="${RBENV_ROOT}/shims:${PATH}"
+        export RBENV_VERSION
+        launchctl setenv RBENV_VERSION "$RBENV_VERSION"
     fi
 fi
 
@@ -321,6 +357,30 @@ if [ -d "$NVM_DIR" ]; then
         launchctl setenv NVM_BIN "$NVM_BIN"
         launchctl setenv NVM_PATH "$NVM_PATH"
         # launchctl setenv NPM_CONFIG_PREFIX "$NPM_CONFIG_PREFIX"
+    fi
+fi
+
+if ! [ -d "$JENV_HOME" ]; then
+    if [ -d /usr/local/opt/jenv ]; then
+        JENV_HOME=/usr/local/opt/jenv
+    elif [ -d "$HOME" ]; then
+        JENV_HOME="$HOME"/.jenv
+    fi
+
+    export JENV_HOME
+    launchctl setenv JENV_HOME "$JENV_HOME"
+
+    JENV_ROOT="${HOME}/.jenv"
+    export JENV_ROOT
+    launchctl setenv JENV_ROOT "$JENV_ROOT"
+fi
+
+if [ -d "$JENV_ROOT" ]; then
+    if [ -f "${JENV_ROOT}/version" ]; then
+        JENV_VERSION=$(cat "${JENV_ROOT}/version")
+        JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
+        export JAVA_HOME
+        export JENV_VERSION
     fi
 fi
 
