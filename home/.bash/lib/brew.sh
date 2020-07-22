@@ -102,7 +102,7 @@ run_brew() {
     done
 
     if [[ "$__brew_taps" ]]; then
-      e_header "Installed but not desired Homebrew taps..."
+      e_header "Installed but not desired Homebrew taps (ignore homebrew/core)..."
 
       for (( i=0; i<${#__brew_taps[@]}; i++ )); do
         e_warning "${__brew_taps[i]} tapped but not desired."
@@ -145,7 +145,6 @@ run_brew() {
       'readline'
       'libpng'
       'gdbm'
-      'openssl@1.1'
       'sqlite'
       'xz'
       'jpeg'
@@ -229,7 +228,6 @@ run_brew() {
       'libmpc'
       'autoconf'
       'pkg-config'
-      'lua@5.1'
       'qt'
       'sip'
       'gd'
@@ -341,7 +339,6 @@ run_brew() {
       'libagg'
       'libcroco'
       'librsvg'
-      'python@2'
       'awscli'
       'jq'
       'juju-wait'
@@ -446,7 +443,6 @@ run_brew() {
       'sbcl'
       'sane-backends'
       'rust'
-      'ruby@2.5'
       'rtf2latex2e'
       'rsync'
       'roswell'
@@ -471,7 +467,6 @@ run_brew() {
       'pth'
       'pstree'
       'psgrep'
-      'protobuf@3.7'
       'potrace'
       'postgresql'
       'poster'
