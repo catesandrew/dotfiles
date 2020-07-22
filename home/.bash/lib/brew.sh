@@ -657,7 +657,7 @@ run_brew() {
       'exact-image'
       'enscript'
       'enca'
-      'emacs-plus'
+      'emacs-plus@27'
       'elinks'
       'editorconfig'
       'ed'
@@ -789,9 +789,9 @@ run_brew() {
             # --with-gnutls has issues with gh-api
             brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
             ;;
-          emacs-plus)
+          emacs-plus@27)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --HEAD --with-jansson --with-modern-icon
+            brew install emacs-plus@27 --HEAD --with-jansson --with-spacemacs-icon
             ;;
           wget)
             brew install wget --HEAD
@@ -858,6 +858,7 @@ run_brew() {
       '1password-cli'
       'adoptopenjdk13'
       'adoptopenjdk8'
+      'aerial'
       'altair-graphql-client'
       'android-ndk'
       'android-sdk'
