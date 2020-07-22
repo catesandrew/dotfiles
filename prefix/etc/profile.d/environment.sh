@@ -85,6 +85,7 @@ fi
 if [ -d "$JENV_ROOT" ]; then
     if [ -f "${JENV_ROOT}/version" ]; then
         JENV_VERSION=$(cat "${JENV_ROOT}/version")
+        # check to verify version is not `system`
         JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
         export JAVA_HOME
         export JENV_VERSION

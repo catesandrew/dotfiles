@@ -268,7 +268,6 @@ run_brew() {
       'utf8proc'
       'libnet'
       'libdnet'
-      'openjdk'
       'net-snmp'
       'libssh2'
       'lz4'
@@ -856,7 +855,7 @@ run_brew() {
     local -a cask_desired_formulae=(
       '1password'
       '1password-cli'
-      'adoptopenjdk13'
+      'adoptopenjdk14'
       'adoptopenjdk8'
       'aerial'
       'altair-graphql-client'
@@ -1021,13 +1020,18 @@ run_brew() {
             # android-sdk requires Java 8. You can install it with:
             brew cask install homebrew/cask-versions/adoptopenjdk8
             jenv add "$(/usr/libexec/java_home -v1.8)"
-            jenv global 1.8
-            # To unset the version `jenv global system`
+            # jenv global 1.8 # To unset the version `jenv global system`
             ;;
-          adoptopenjdk13)
-            # android-sdk requires Java 8. You can install it with:
-            brew cask install adoptopenjdk13
-            jenv add "$(/usr/libexec/java_home -v1.13)"
+          adoptopenjdk14)
+            brew cask install adoptopenjdk14
+            mkdir -p "${HOME}/.jenv/versions"
+            jenv add "$(/usr/libexec/java_home -v14)"
+            jenv global 14 # To unset the version `jenv global system`
+
+            # remove openjdk if installed `brew uninstall --ignore-dependencies openjdk`
+            # but it is required by ant, bfg, boot-clj, closure-compiler,
+            # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
+            # and selenium-server-standalone
             ;;
           java6)
             brew cask install java6
