@@ -257,7 +257,6 @@ run_brew() {
       'protobuf'
       'ocaml'
       'lua'
-      'node'
       'brotli'
       'mktorrent'
       'berkeley-db'
@@ -493,7 +492,6 @@ run_brew() {
       'opam'
       'ondir'
       'ocrmypdf'
-      'nvm'
       'nmap'
       'nghttp2'
       'netcat'
@@ -582,7 +580,6 @@ run_brew() {
       'jpeg-archive'
       'john'
       'jo'
-      'jenv'
       'jbig2dec'
       'irssi'
       'intltool'
@@ -748,6 +745,8 @@ run_brew() {
       'ansible'
       'aircrack-ng'
       'ack'
+      'jenv'
+      'nvm'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -831,10 +830,31 @@ run_brew() {
           moreutils)
             brew unlink parallel task-spooler && brew install moreutils &&  brew link --overwrite task-spooler parallel
             ;;
-          node)
-            brew insall node
+          jenv)
+            brew install jenv
+            # uninstall openjdk because we are going to install adoptopenjdk.
+            # it is required by ant, bfg, boot-clj, closure-compiler,
+            # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
+            # and selenium-server-standalone
+            brew uninstall --ignore-dependencies openjdk
+            ;;
+          nvm)
+            # uninstall node and npm because we are going to install through nvm.
+            brew uninstall --ignore-dependencies node npm
+            brew uninstall --force node
             # load npm completion from nvm
-            rm "${BREW_HOME}/etc/bash_completion.d/npm"
+            # rm "${BREW_HOME}/etc/bash_completion.d/npm"
+
+            # install nvm with latest version of node
+            sudo mkdir -p "${BREW_HOME}/nvm"
+            sudo chmod -R go+w "${BREW_HOME}/nvm"
+            export NVM_DIR="${BREW_HOME}/nvm"
+
+            brew install nvm
+            nvm install node
+            nvm use node
+            node_version=$(node --version | sed 's/[^0-9.]*//g')
+            nvm alias default $node_version
             ;;
           *)
             brew install $item
@@ -1292,5 +1312,10 @@ run_mas() {
     exit
   fi
 }
+
+# Here we go.. ask for the administrator password upfront and run a
+# keep-alive to update existing `sudo` time stamp until script has finished
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 run_brew
 run_mas
