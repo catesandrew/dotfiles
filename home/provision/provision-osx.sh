@@ -19,6 +19,8 @@ osvers=$(sw_vers -productVersion | awk -F. '{print $2}')
 # 11: "El Capitan"
 # 12: "Sierra"
 # 13: "High Sierra"
+# 14:
+# 15: Catalina
 
 # Some things taken from here
 # https://github.com/mathiasbynens/dotfiles/blob/master/.osx
@@ -74,21 +76,14 @@ fi
 # keep-alive to update existing `sudo` time stamp until script has finished
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
 ###############################################################################
 # General Bash
 ###############################################################################
 
 echo ""
 echo "http://brettterpstra.com/2015/02/05/keybindings-for-multiple-clipboards"
-echo "Enable the kill buffer for multiple clipboards?  (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write -g NSTextKillRingSize -int 3
-    ;;
-  *) ;;
-esac
+echo "Enable the kill buffer for multiple clipboards"
+defaults write -g NSTextKillRingSize -int 3
 
 ###############################################################################
 # Homebrew
@@ -234,7 +229,6 @@ esac
 ###############################################################################
 # Spotlight                                                                   #
 ###############################################################################
-
 # Hide Spotlight tray-icon (and subsequent helper)
 #sudo chmod 600 /System/Library/CoreServices/Search.bundle/Contents/MacOS/Search
 # Disable Spotlight indexing for any volume that gets mounted and has not yet
@@ -243,6 +237,15 @@ esac
 sudo defaults write /.Spotlight-V100/VolumeConfiguration Exclusions -array "/Volumes"
 
 # Change indexing order and disable some search results
+# Yosemite-specific search results (remove them if you are using macOS 10.9 or older):
+# 	MENU_DEFINITION
+# 	MENU_CONVERSION
+# 	MENU_EXPRESSION
+# 	MENU_SPOTLIGHT_SUGGESTIONS (send search queries to Apple)
+# 	MENU_WEBSEARCH             (send search queries to Apple)
+# 	MENU_OTHER
+
+if [[ ${osvers} -lt 10 ]]; then
 defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0;"name" = "APPLICATIONS";}' \
   '{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
@@ -260,23 +263,34 @@ defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0;"name" = "PRESENTATIONS";}' \
   '{"enabled" = 0;"name" = "SPREADSHEETS";}' \
   '{"enabled" = 0;"name" = "SOURCE";}'
+fi
 
 if [[ ${osvers} -ge 10 ]]; then
-  # Yosemite-specific search results (remove them if you are using macOS 10.9 or older):
-  #   MENU_DEFINITION
-  #   MENU_CONVERSION
-  #   MENU_EXPRESSION
-  #   MENU_SPOTLIGHT_SUGGESTIONS (send search queries to Apple)
-  #   MENU_WEBSEARCH             (send search queries to Apple)
-  #   MENU_OTHER
-  defaults write com.apple.spotlight orderedItems -array \
-    '{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
-    '{"enabled" = 0;"name" = "MENU_OTHER";}' \
-    '{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
-    '{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
-    '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
-    '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+defaults write com.apple.spotlight orderedItems -array \
+	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
+	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
+	'{"enabled" = 1;"name" = "PDF";}' \
+	'{"enabled" = 1;"name" = "FONTS";}' \
+	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
+	'{"enabled" = 0;"name" = "MESSAGES";}' \
+	'{"enabled" = 0;"name" = "CONTACT";}' \
+	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+	'{"enabled" = 0;"name" = "IMAGES";}' \
+	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+	'{"enabled" = 0;"name" = "MUSIC";}' \
+	'{"enabled" = 0;"name" = "MOVIES";}' \
+	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+	'{"enabled" = 0;"name" = "SOURCE";}' \
+	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
+	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
+	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
+	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
+	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 fi
+
 # Load new settings before rebuilding the index
 killall mds > /dev/null 2>&1
 # Make sure indexing is enabled for the main volume
@@ -299,10 +313,9 @@ echo ""
 echo "Automatically quit printer app once the print jobs complete"
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Try e.g. `cd /tmp; unidecode "\x{0000}" > cc.txt; open -e cc.txt`
 echo ""
 echo "Display ASCII control characters using caret notation in standard text views"
-# Try e.g. `cd /tmp; unidecode "\x{0000}" > cc.txt; open -e cc.txt`
+# echo "Try e.g. `cd /tmp; unidecode "\x{0000}" > cc.txt; open -e cc.txt`\"
 defaults write NSGlobalDomain NSTextShowsControlCharacters -bool true
 
 echo ""
@@ -315,6 +328,9 @@ case $response in
   *) ;;
 esac
 
+echo "Save to disk (not to iCloud) by default"
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
 echo ""
 echo "Reveal IP address, hostname, OS version, etc. when clicking the clock in the login window"
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
@@ -324,24 +340,21 @@ echo "Removing duplicates in the 'Open With' menu"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
 
 echo ""
-echo "Disable smart quotes and smart dashes? (y/n)"
-read -r response
-case $response in
-  [yY])
-    # Disable automatic capitalization as it’s annoying when typing code
-    defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+echo "Disable smart quotes, smart dashes and auto correct"
+# Disable automatic capitalization as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 
-    # Disable smart dashes as they’re annoying when typing code
-    defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+# Disable smart dashes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-    # Disable automatic period substitution as it’s annoying when typing code
-    defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+# Disable automatic period substitution as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
 
-    # Disable smart quotes as they’re annoying when typing code
-    defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-    ;;
-  *) ;;
-esac
+# Disable smart quotes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# Disable auto-correct
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
 echo ""
 echo "Add ability to toggle between Light and Dark mode in Yosemite using ctrl+opt+cmd+t? (y/n)"
@@ -359,62 +372,21 @@ esac
 # General Power and Performance modifications
 ###############################################################################
 
-echo ""
-echo "(SSD Preferred): Disable hibernation? (speeds up entering sleep mode) (y/n)"
-read -r response
-case $response in
-  [yY])
-    # Disable hibernation (speeds up entering sleep mode)
-    sudo pmset -a hibernatemode 0
-    ;;
-  *) ;;
-esac
+# Hibernation mode
+# 0: Disable hibernation (speeds up entering sleep mode)
+# 3: Copy RAM to disk so the system state can still be restored in case of a
+#    power failure.
+sudo pmset -a hibernatemode 0
 
-echo ""
-echo "(SSD Preferred): Remove the sleep image file to save disk space? (y/n)"
-echo "(If you're on a <128GB SSD, this helps but can have adverse affects on performance. You've been warned.)"
-read -r response
-case $response in
-  [yY])
-    # Remove the sleep image file to save disk space
-    sudo rm /private/var/vm/sleepimage
-    # Create a zero-byte file instead…
-    sudo touch /private/var/vm/sleepimage
-    # …and make sure it can’t be rewritten
-    sudo chflags uchg /private/var/vm/sleepimage
-    ;;
-  *) ;;
-esac
+# Remove the sleep image file to save disk space
+sudo rm /private/var/vm/sleepimage
+# Create a zero-byte file instead…
+sudo touch /private/var/vm/sleepimage
+# …and make sure it can’t be rewritten
+sudo chflags uchg /private/var/vm/sleepimage
 
-echo ""
-echo "Disable the sudden motion sensor? (it's not useful for SSDs/current MacBooks) (y/n)"
-read -r response
-case $response in
-  [yY])
-    sudo pmset -a sms 0
-    ;;
-  *) ;;
-esac
-
-echo ""
-echo "Disable system-wide resume? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
-    ;;
-  *) ;;
-esac
-
-echo ""
-echo "Speeding up wake from sleep to 24 hours from an hour"
-# http://www.cultofmac.com/221392/quick-hack-speeds-up-retina-macbooks-wake-from-sleep-os-x-tips/
-sudo pmset -a standbydelay 86400
-
-echo ""
-echo "Disabling the annoying backswipe in Chrome"
-# defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
-
+echo "Disable Resume system-wide"
+defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
 
 ################################################################################
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input
@@ -437,22 +409,7 @@ echo "Setting a blazingly fast keyboard repeat rate"
 # defaults write NSGlobalDomain KeyRepeat -int 1
 # defaults write NSGlobalDomain InitialKeyRepeat -int 10
 defaults write NSGlobalDomain KeyRepeat -float 1.02
-defaults write NSGlobalDomain InitialKeyRepeat -floa 19.98
-
-echo ""
-echo "Disable auto-correct? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-    ;;
-  *) ;;
-esac
-
-echo ""
-echo "Setting trackpad & mouse speed to a reasonable number"
-# defaults write -g com.apple.trackpad.scaling 2
-# defaults write -g com.apple.mouse.scaling 2.5
+defaults write NSGlobalDomain InitialKeyRepeat -float 10.02
 
 echo ""
 echo "Turn off keyboard illumination when computer is not used for 5 minutes"
@@ -481,45 +438,18 @@ esac
 ###############################################################################
 # Screen
 ###############################################################################
-
 echo ""
 echo "Requiring password immediately after sleep or screen saver begins"
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 echo ""
-echo "Where do you want screenshots to be stored? (hit ENTER if you want ~/Desktop as default)"
-# Thanks https://github.com/omgmog
-read screenshot_location
-echo ""
-if [ -z "${screenshot_location}" ]
-then
-  # If nothing specified, we default to ~/Desktop
-  screenshot_location="${HOME}/Desktop"
-else
-  # Otherwise we use input
-  if [[ "${screenshot_location:0:1}" != "/" ]]
-  then
-    # If input doesn't start with /, assume it's relative to home
-    screenshot_location="${HOME}/${screenshot_location}"
-  fi
-fi
-echo "Setting location to ${screenshot_location}"
-defaults write com.apple.screencapture location -string "${screenshot_location}"
+echo "Save screenshots to the desktop"
+defaults write com.apple.screencapture location -string "${HOME}/Desktop"
 
 echo ""
-echo "What format should screenshots be saved as? (hit ENTER for PNG, options: BMP, GIF, JPG, PDF, TIFF) "
-read screenshot_format
-if [ -z "$1" ]
-then
-  echo ""
-  echo "Setting screenshot format to PNG"
-  defaults write com.apple.screencapture type -string "png"
-else
-  echo ""
-  echo "Setting screenshot format to $screenshot_format"
-  defaults write com.apple.screencapture type -string "$screenshot_format"
-fi
+echo "Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)"
+defaults write com.apple.screencapture type -string "png"
 
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool true
@@ -527,7 +457,7 @@ defaults write com.apple.screencapture disable-shadow -bool true
 echo ""
 echo "Enabling subpixel font rendering on non-Apple LCDs"
 # Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
-defaults write NSGlobalDomain AppleFontSmoothing -int 2
+defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
 echo ""
 echo "Enabling HiDPI display modes (requires restart)"
@@ -538,135 +468,50 @@ sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutio
 ###############################################################################
 
 echo ""
-echo "(No*) Show icons for hard drives, servers, and removable media on the desktop? (y/n)"
-case $response in
-  [yY])
-    # Show icons for hard drives, servers, and removable media on the desktop
-    defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-    defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
-    defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
-    defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
-    ;;
-  [nN])
-    # Hide icons for hard drives, servers, and removable media on the desktop
-    defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
-    defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
-    defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
-    defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
-    ;;
-  *) ;;
-esac
+echo "Hide icons for hard drives, servers, and removable media on the desktop"
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
 
 echo ""
-echo "Show hidden files in Finder by default? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.Finder AppleShowAllFiles -bool true
-    ;;
-  [nN])
-    defaults write com.apple.Finder AppleShowAllFiles -bool false
-    ;;
-  *) ;;
-esac
+# echo "Show hidden files in Finder by default"
+# defaults write com.apple.finder AppleShowAllFiles -bool true
 
 echo ""
-echo "Show all filename extensions in Finder by default? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-    ;;
-  [nN])
-    defaults write NSGlobalDomain AppleShowAllExtensions -bool false
-    ;;
-  *) ;;
-esac
+echo "Show all filename extensions in Finder by default"
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 echo ""
-echo "Show status bar in Finder by default? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.finder ShowStatusBar -bool true
-    ;;
-  [nN])
-    defaults write com.apple.finder ShowStatusBar -bool false
-    ;;
-  *) ;;
-esac
+echo "Show status bar in Finder by default"
+defaults write com.apple.finder ShowStatusBar -bool true
 
 echo ""
-echo "Display full POSIX path as Finder window title? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
-    ;;
-  [nN])
-    defaults write com.apple.finder _FXShowPosixPathInTitle -bool false
-    ;;
-  *) ;;
-esac
+echo "Display full POSIX path as Finder window title"
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 echo ""
-echo "Disable the warning when changing a file extension? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-    ;;
-  *) ;;
-esac
+echo "Disable the warning when changing a file extension"
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Use list view in all Finder windows by default
+# Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 
 echo ""
-echo "Use list view in all Finder windows by default? (y/n)"
-read -r response
-case $response in
-  [yY])
-    # defaults write com.apple.finder FXPreferredViewStyle -string Clmv
-
-    # Use list view in all Finder windows by default
-    # Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
-    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-    ;;
-  *) ;;
-esac
+echo "Avoid creation of .DS_Store files on network volumes"
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 echo ""
-echo "Avoid creation of .DS_Store files on network volumes? (y/n)"
-read -r response
-case $response in
-  [yY])
-    # Avoid creating .DS_Store files on network or USB volumes
-    defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-    defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-    ;;
-  *) ;;
-esac
-
-echo ""
-echo "Disable disk image verification? (y/n)"
-read -r response
-case $response in
-  [yY])
-    # Disable disk image verification
-    defaults write com.apple.frameworks.diskimages skip-verify -bool true
-    defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
-    defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
-    ;;
-  *) ;;
-esac
+echo "Disable disk image verification"
+defaults write com.apple.frameworks.diskimages skip-verify -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
 
 echo ""
 echo "Allowing text selection in Quick Look/Preview in Finder by default"
 defaults write com.apple.finder QLEnableTextSelection -bool true
-
-echo ""
-echo "Enabling snap-to-grid for icons on the desktop and in other icon views"
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
 # Show item info near icons on the desktop and in other icon views
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
@@ -675,6 +520,11 @@ echo "Enabling snap-to-grid for icons on the desktop and in other icon views"
 
 # Show item info to the right of the icons on the desktop
 /usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom false" ~/Library/Preferences/com.apple.finder.plist
+
+# Enable snap-to-grid for icons on the desktop and in other icon views
+/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
 # Increase grid spacing for icons on the desktop and in other icon views
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
@@ -686,21 +536,9 @@ echo "Enabling snap-to-grid for icons on the desktop and in other icon views"
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
 
-
-
 ###############################################################################
 # Dock & Mission Control
 ###############################################################################
-
-echo "Wipe all (default) app icons from the Dock? (y/n)"
-echo "(This is only really useful when setting up a new Mac, or if you don't use the Dock to launch apps.)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.dock persistent-apps -array
-    ;;
-  *) ;;
-esac
 
 echo ""
 echo "Setting the icon size of Dock items to 36 pixels for optimal size/screen-realestate"
@@ -715,21 +553,14 @@ defaults write com.apple.dock expose-animation-duration -float 0.1
 defaults write com.apple.dock expose-group-by-app -bool false
 
 echo ""
-echo "Set Dock to auto-hide and remove the auto-hiding delay? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.dock autohide -bool true
-    defaults write com.apple.dock autohide-delay -float 0
-    defaults write com.apple.dock autohide-time-modifier -float 0
-    ;;
-  *) ;;
-esac
+echo "Set Dock to auto-hide and remove the auto-hiding delay"
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0
+defaults write com.apple.dock autohide -bool true
 
 ###############################################################################
 # Mac App Store                                                               #
 ###############################################################################
-
 # Enable the WebKit Developer Tools in the Mac App Store
 defaults write com.apple.appstore WebKitDeveloperExtras -bool true
 
@@ -896,49 +727,36 @@ defaults write com.apple.terminal StringEncodings -array 4
 
 # Use a modified version of the Solarized Dark theme by default in Terminal.app
 osascript <<EOD
-
 tell application "Terminal"
-
-  local allOpenedWindows
-  local initialOpenedWindows
-  local windowID
-  set themeName to "Solarized Dark xterm-256color"
-
-  (* Store the IDs of all the open terminal windows. *)
-  set initialOpenedWindows to id of every window
-
-  (* Open the custom theme so that it gets added to the list
-     of available terminal themes (note: this will open two
-     additional terminal windows). *)
-  do shell script "open '$HOME/init/" & themeName & ".terminal'"
-
-  (* Wait a little bit to ensure that the custom theme is added. *)
-  delay 1
-
-  (* Set the custom theme as the default terminal theme. *)
-  set default settings to settings set themeName
-
-  (* Get the IDs of all the currently opened terminal windows. *)
-  set allOpenedWindows to id of every window
-
-  repeat with windowID in allOpenedWindows
-
-    (* Close the additional windows that were opened in order
-       to add the custom theme to the list of terminal themes. *)
-    if initialOpenedWindows does not contain windowID then
-      close (every window whose id is windowID)
-
-    (* Change the theme for the initial opened terminal windows
-       to remove the need to close them in order for the custom
-       theme to be applied. *)
-    else
-      set current settings of tabs of (every window whose id is windowID) to settings set themeName
-    end if
-
-  end repeat
-
+	local allOpenedWindows
+	local initialOpenedWindows
+	local windowID
+	set themeName to "Solarized Dark xterm-256color"
+	(* Store the IDs of all the open terminal windows. *)
+	set initialOpenedWindows to id of every window
+	(* Open the custom theme so that it gets added to the list
+	   of available terminal themes (note: this will open two
+	   additional terminal windows). *)
+	do shell script "open '$HOME/init/" & themeName & ".terminal'"
+	(* Wait a little bit to ensure that the custom theme is added. *)
+	delay 1
+	(* Set the custom theme as the default terminal theme. *)
+	set default settings to settings set themeName
+	(* Get the IDs of all the currently opened terminal windows. *)
+	set allOpenedWindows to id of every window
+	repeat with windowID in allOpenedWindows
+		(* Close the additional windows that were opened in order
+		   to add the custom theme to the list of terminal themes. *)
+		if initialOpenedWindows does not contain windowID then
+			close (every window whose id is windowID)
+		(* Change the theme for the initial opened terminal windows
+		   to remove the need to close them in order for the custom
+		   theme to be applied. *)
+		else
+			set current settings of tabs of (every window whose id is windowID) to settings set themeName
+		end if
+	end repeat
 end tell
-
 EOD
 
 # Enable “focus follows mouse” for Terminal.app and all X11 apps
@@ -953,67 +771,34 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 # Disable the annoying line marks
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
-# Don’t display the annoying prompt when quitting iTerm
-defaults write com.googlecode.iterm2 PromptOnQuit -bool false
-
-
 ###############################################################################
 # Time Machine
 ###############################################################################
 
 echo ""
-echo "Prevent Time Machine from prompting to use new hard drives as backup volume? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
-    ;;
-  *) ;;
-esac
+echo "Prevent Time Machine from prompting to use new hard drives as backup volume"
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 echo ""
-echo "Disable local Time Machine backups? (This can take up a ton of SSD space on <128GB SSDs) (y/n)"
-read -r response
-case $response in
-  [yY])
-    hash tmutil &> /dev/null && sudo tmutil disablelocal
-    ;;
-  *) ;;
-esac
+echo "Disable local Time Machine backups"
+# Disable local Time Machine backups
+hash tmutil &> /dev/null && sudo tmutil disablelocal
 
 ###############################################################################
 # Messages                                                                    #
 ###############################################################################
 
 echo ""
-echo "Disable automatic emoji substitution in Messages.app? (i.e. use plain text smileys) (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-    ;;
-  *) ;;
-esac
+echo "Disable automatic emoji substitution in Messages.app"
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
 
 echo ""
-echo "Disable smart quotes in Messages.app? (it's annoying for messages that contain code) (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
-    ;;
-  *) ;;
-esac
+echo "Disable smart quotes in Messages.app"
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
 echo ""
-echo "Disable continuous spell checking in Messages.app? (y/n)"
-read -r response
-case $response in
-  [yY])
-    defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
-    ;;
-  *) ;;
-esac
+echo "Disable continuous spell checking in Messages.app"
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
 
 ###############################################################################
 # Transmission.app                                                            #
@@ -1103,13 +888,6 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 ###############################################################################
 # Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
 ###############################################################################
-
-# Enable the debug menu in Address Book
-defaults write com.apple.addressbook ABShowDebugMenu -bool true
-
-# Enable Dashboard dev mode (allows keeping widgets on the desktop)
-defaults write com.apple.dashboard devmode -bool true
-
 # Enable the debug menu in iCal (pre-10.8)
 if [[ ${osvers} -lt 9 ]]; then
   defaults write com.apple.iCal IncludeDebugMenu -bool true
@@ -1139,7 +917,6 @@ defaults write com.operasoftware.OperaDeveloper PMPrintingExpandedStateForPrint2
 ###############################################################################
 # Activity Monitor                                                            #
 ###############################################################################
-
 # Show the main window when launching Activity Monitor
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
 
@@ -1197,14 +974,32 @@ defaults write com.apple.helpviewer DevMode -bool true
 # See https://github.com/mathiasbynens/dotfiles/issues/237
 #echo "0x08000100:0" > ~/.CFUserTextEncoding
 
+# Enable lid wakeup
+sudo pmset -a lidwake 1
+
+# Restart automatically on power loss
+sudo pmset -a autorestart 1
+
 # Restart automatically if the computer freezes
 sudo systemsetup -setrestartfreeze on
 
 # Never go into computer sleep mode
 sudo systemsetup -setcomputersleep Off > /dev/null
 
+# Sleep the display after 15 minutes
+# sudo pmset -a displaysleep 15
+
+# Disable machine sleep while charging
+sudo pmset -c sleep 0
+
+# Set machine sleep to 5 minutes on battery
+sudo pmset -b sleep 5
+
+# Set standby delay to 24 hours (default is 1 hour)
+sudo pmset -a standbydelay 86400
+
 # Disable Notification Center and remove the menu bar icon
-# launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
+launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 # Set a custom wallpaper image. `DefaultDesktop.jpg` is already a symlink, and
 # all wallpapers are in `/Library/Desktop Pictures/`. The default is `Wave.jpg`.
@@ -1250,15 +1045,14 @@ defaults write NSGlobalDomain AppleMetricUnits -bool false
 sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
 
 # Set the timezone; see `sudo systemsetup -listtimezones` for other values
-# sudo systemsetup -settimezone "America/Tijuana" > /dev/null
+sudo systemsetup -settimezone "America/Los_Angeles" > /dev/null
 
 # Stop iTunes from responding to the keyboard media keys
-launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+# launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
 
 ###############################################################################
 # Finder                                                                      #
 ###############################################################################
-
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
 
@@ -1297,10 +1091,10 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
 # Show the ~/Library folder
-# chflags nohidden ~/Library
+chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
 
 # Show the /Volumes folder
-# sudo chflags nohidden /Volumes
+sudo chflags nohidden /Volumes
 
 # Remove Dropbox’s green checkmark icons in Finder
 file=/Applications/Dropbox.app/Contents/Resources/emblem-dropbox-uptodate.icns
@@ -1309,14 +1103,13 @@ file=/Applications/Dropbox.app/Contents/Resources/emblem-dropbox-uptodate.icns
 # Expand the following File Info panes:
 # “General”, “Open with”, and “Sharing & Permissions”
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
-  General -bool true \
-  OpenWith -bool true \
-  Privileges -bool true
+	       General -bool true \
+	       OpenWith -bool true \
+	       Privileges -bool true
 
 ###############################################################################
 # Dock, Dashboard, and hot corners                                            #
 ###############################################################################
-
 # Enable highlight hover effect for the grid view of a stack (Dock)
 defaults write com.apple.dock mouse-over-hilite-stack -bool true
 
@@ -1350,12 +1143,15 @@ defaults write com.apple.dock mru-spaces -bool false
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
 
+# Don’t show recent applications in Dock
+defaults write com.apple.dock show-recents -bool false
+
 # Disable the Launchpad gesture (pinch with thumb and three fingers)
 #defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
 
 # Add iOS & Watch Simulator to Launchpad
-# sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" "/Applications/Simulator.app"
-# sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator (Watch).app" "/Applications/Simulator (Watch).app"
+sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" "/Applications/Simulator.app"
+sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator (Watch).app" "/Applications/Simulator (Watch).app"
 
 # Hot corners
 # Possible values:
@@ -1369,15 +1165,16 @@ defaults write com.apple.dock showhidden -bool true
 # 10: Put display to sleep
 # 11: Launchpad
 # 12: Notification Center
+# 13: Lock Screen
 # Top left screen corner → Mission Control
-# defaults write com.apple.dock wvous-tl-corner -int 2
-# defaults write com.apple.dock wvous-tl-modifier -int 0
-# # Top right screen corner → Desktop
-# defaults write com.apple.dock wvous-tr-corner -int 4
-# defaults write com.apple.dock wvous-tr-modifier -int 0
-# # Bottom left screen corner → Start screen saver
-# defaults write com.apple.dock wvous-bl-corner -int 5
-# defaults write com.apple.dock wvous-bl-modifier -int 0
+defaults write com.apple.dock wvous-tl-corner -int 2
+defaults write com.apple.dock wvous-tl-modifier -int 0
+# Top right screen corner → Desktop
+defaults write com.apple.dock wvous-tr-corner -int 4
+defaults write com.apple.dock wvous-tr-modifier -int 0
+# Bottom left screen corner → Start screen saver
+defaults write com.apple.dock wvous-bl-corner -int 5
+defaults write com.apple.dock wvous-bl-modifier -int 0
 
 ###############################################################################
 # Kill affected applications
@@ -1408,19 +1205,14 @@ for app in "Activity Monitor" \
              "Contacts" \
              "Dock" \
              "Finder" \
-             "Google Chrome Canary" \
              "Google Chrome" \
              "Mail" \
              "Messages" \
-             "Opera" \
              "Photos" \
              "Safari" \
-             "SizeUp" \
-             "Spectacle" \
              "SystemUIServer" \
              "Terminal" \
-             "Transmission" \
-             "iCal"; do
+             "Transmission"; do
   killall "${app}" &> /dev/null
 done
 echo "Done. Note that some of these changes require a logout/restart to take effect."
