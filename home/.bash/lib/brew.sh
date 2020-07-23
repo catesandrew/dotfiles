@@ -1022,7 +1022,7 @@ run_brew() {
             # https://dl.google.com/android/repository/repository2-1.xml.
             ;;
           android-ndk)
-            brew cask intsall android-ndk
+            brew cask install android-ndk
             yes | sdkmanager --licenses
             # Install all of the Android SDK components (you will be prompted to
             # agree to license info and then this will take a while to run):
