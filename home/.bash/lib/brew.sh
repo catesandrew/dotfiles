@@ -667,7 +667,6 @@ run_brew() {
       'docker-gen'
       'docker-credential-helper'
       'docker-compose'
-      'docker-cloud'
       'docker-clean'
       'docker'
       'dnsmasq'
@@ -679,13 +678,11 @@ run_brew() {
       'diff-so-fancy'
       'diction'
       'dex2jar'
-      'deisctl'
       'dcraw'
       'dbus'
       'dateutils'
       'dashing'
       'czmq'
-      'curlish'
       'csv-fix'
       'cowsay'
       'convox'
@@ -710,7 +707,6 @@ run_brew() {
       'cf-cli'
       'ccat'
       'carthage'
-      'camlp4'
       'cadaver'
       'cabextract'
       'cabal-install'
@@ -795,7 +791,10 @@ run_brew() {
             brew install wget --HEAD
             ;;
           macvim)
+            xcode-select --install # Install Command Line Tools if you haven't already.
+            # sudo xcode-select --reset
             # sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+            # sudo xcodebuild -license accept
             brew install macvim --HEAD
             ;;
           neovim)
@@ -828,7 +827,10 @@ run_brew() {
             # gem install -n /usr/local/bin fastlane -NV
             ;;
           moreutils)
-            brew unlink parallel task-spooler && brew install moreutils &&  brew link --overwrite task-spooler parallel
+            brew unlink task-spooler && brew install moreutils &&  brew link --overwrite task-spooler
+            ;;
+          md5sha1sum)
+            brew unlink coreutils && brew install md5sha1sum &&  brew link --overwrite coreutils
             ;;
           jenv)
             brew install jenv
@@ -1317,5 +1319,6 @@ run_mas() {
 # keep-alive to update existing `sudo` time stamp until script has finished
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 run_brew
 run_mas
