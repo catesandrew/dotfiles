@@ -1008,7 +1008,7 @@ run_brew() {
         case "$item" in
           android-sdk)
             # https://stackoverflow.com/questions/46402772/failed-to-install-android-sdk-java-lang-noclassdeffounderror-javax-xml-bind-a
-            brew cask intsall android-sdk
+            brew cask install android-sdk
             # Update 2019-10: Google is working on a new Android SDK
             # Command-line Tools release that runs on current JVMs (9, 10, 11+)
             # and does not depend on deprecated JAXB EE modules!
