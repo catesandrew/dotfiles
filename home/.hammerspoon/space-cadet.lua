@@ -52,7 +52,7 @@ oascripts = {
   {'g', 'Tower'},
   -- {'h', ''}, saved for launchbar
   {'j', 'Jump Desktop'},
-  -- {'k', 'Fantastical 2'},
+  {'k', 'Fantastical'},
   {'l', 'Slack'},
   {';', 'Keybase'},
   {'q', 'Quiver'},
@@ -78,7 +78,7 @@ end
 
 doubleapps = {
   -- {'t', 'iTerm2', 'iTerm'},
-  {'k', 'Fantastical', 'Fantastical 2'},
+  -- {'k', 'Fantastical', 'Fantastical 2'},
 }
 
 launchDouble = function(appName1, appName2)
