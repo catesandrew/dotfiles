@@ -9,7 +9,7 @@
 	<key>Label</key>
 	<string>osx.app.fantastical2</string>
 	<key>Program</key>
-	<string>/Applications/Fantastical 2.app/Contents/MacOS/Fantastical 2</string>
+	<string>/Applications/Fantastical.app/Contents/MacOS/Fantastical</string>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>
