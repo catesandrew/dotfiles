@@ -56,10 +56,12 @@ shopt -s extglob
 
 __docker_q() {
 	local fields=
-	[ "${DOCKER_COMPLETION_TLS}" = yes ]
-      fields='--tls'
 
-    docker ${fields} ${host:+-H "$host"} ${config:+--config "$config"} 2>/dev/null "$@"
+  if [ "${DOCKER_COMPLETION_TLS}" = yes ]; then
+    fields='--tls'
+  fi
+
+  docker ${fields} ${host:+-H "$host"} ${config:+--config "$config"} 2>/dev/null "$@"
 }
 
 __docker_complete_containers_all() {

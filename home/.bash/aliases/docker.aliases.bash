@@ -14,8 +14,9 @@ __docker_complete () {
 
 __docker_c() {
   local fields=
-  [ "${DOCKER_COMPLETION_TLS}" = yes ]
-  fields='--tls'
+  if [ "${DOCKER_COMPLETION_TLS}" = yes ]; then
+     fields='--tls'
+  fi
 
   docker ${fields} "$@"
 }
