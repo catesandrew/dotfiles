@@ -8,7 +8,7 @@ export NODE_REPL_HISTORY_SIZE='32768'
 export NODE_REPL_MODE='sloppy'
 
 # Strip other version from PATH
-PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
+export PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
 
 # Prepend `./node_modules/.bin`
 path_prepend "./node_modules/.bin"

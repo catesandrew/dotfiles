@@ -833,11 +833,15 @@ run_brew() {
             ;;
           jenv)
             brew install jenv
-            # uninstall openjdk because we are going to install adoptopenjdk.
+            mkdir -p "${HOME}/.jenv/versions"
+            mkdir -p "${HOME}/.jenv/plugins"
+            # jenv enable-plugin lein
+            jenv enable-plugin export
             # it is required by ant, bfg, boot-clj, closure-compiler,
             # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
             # and selenium-server-standalone
-            brew uninstall --ignore-dependencies openjdk
+            jenv add "${BREW_HOME}/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+            jenv global 14 # To unset the version `jenv global system`
             ;;
           nvm)
             # uninstall node and npm because we are going to install through nvm.
@@ -876,7 +880,6 @@ run_brew() {
     local -a cask_desired_formulae=(
       '1password'
       '1password-cli'
-      'adoptopenjdk14'
       'adoptopenjdk8'
       'aerial'
       'altair-graphql-client'
@@ -1046,11 +1049,13 @@ run_brew() {
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v14)"
             jenv global 14 # To unset the version `jenv global system`
-
-            # remove openjdk if installed `brew uninstall --ignore-dependencies openjdk`
-            # but it is required by ant, bfg, boot-clj, closure-compiler,
-            # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
-            # and selenium-server-standalone
+            ;;
+          zulu11)
+            brew cask install zulu11
+            mkdir -p "${HOME}/.jenv/versions"
+            unset JAVA_TOOL_OPTIONS
+            jenv add "$(/usr/libexec/java_home -v11)"
+            jenv global 11 # To unset the version `jenv global system`
             ;;
           java6)
             brew cask install java6

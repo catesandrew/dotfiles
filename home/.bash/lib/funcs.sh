@@ -46,7 +46,6 @@ add_on_exit path_prepend
 path_strip() {
   echo "$1" | command sed -e "s#$2[^:]*:##g"
 }
-add_on_exit path_strip
 
 #
 # prevent duplicate directories in you PATH variable
