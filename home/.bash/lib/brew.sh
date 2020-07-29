@@ -1041,6 +1041,7 @@ run_brew() {
           adoptopenjdk8)
             # android-sdk requires Java 8. You can install it with:
             brew cask install homebrew/cask-versions/adoptopenjdk8
+            mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v1.8)"
             # jenv global 1.8 # To unset the version `jenv global system`
             ;;

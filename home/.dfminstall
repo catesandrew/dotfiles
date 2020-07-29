@@ -8,6 +8,7 @@
 .itermocil recurse
 .kwm recurse
 .lein recurse
+.boot recurse
 .mackup recurse
 .mjolnir recurse
 .mrconfig skip
