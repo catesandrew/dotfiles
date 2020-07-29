@@ -9,6 +9,7 @@
 .kwm recurse
 .lein recurse
 .boot recurse
+.clojure recurse
 .mackup recurse
 .mjolnir recurse
 .mrconfig skip
