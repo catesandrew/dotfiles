@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO update this with latest
+# TODO work with jenv
 # https://github.com/steve-ross/direnv-helpers
 __prompt_install_nvm(){
   _log warn "Couldn't find nvm (node version manager)..."
@@ -69,7 +71,7 @@ __direnv_nvm_use_node(){
     # two possible locations for node versions in nvm...
     local ALT_NVM_PATH="${NVM_PATH/\/nvm.sh}"
     local TYPICAL_NVM_PATH="${NVM_PATH/nvm.sh/$NVM_NODE_VERSION_DIR}"
-    
+
     # set the nvm path to the typical place NVM stores node versions
     local NVM_PATH="$TYPICAL_NVM_PATH"
 
@@ -80,7 +82,7 @@ __direnv_nvm_use_node(){
 
     export NODE_VERSIONS=$NVM_PATH
     export NODE_VERSION_PREFIX="v"
-    
+
     use node
 }
 
@@ -98,7 +100,7 @@ _log() {
   local msg=$*
   local color_normal
   local color_success
-  
+
   color_normal=$(tput sgr0)
   color_success=$(tput setaf 2)
   color_warn=$(tput setaf 3)
@@ -126,6 +128,38 @@ _log() {
     # shellcheck disable=SC2059
     printf "${current_color}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
   fi
+}
+
+use_jenv() {
+  local java_version=$1
+  log_status "Loading jenv..."
+
+  # eval "$(jenv init -)"
+
+  # if [[ ! -z $jenv_version ]]; then
+  #   # /usr/local/opt/jenv/bin/jenv --help # local $jenv_version
+  #   jenv shell $jenv_version # 2>/dev/null
+  # fi
+}
+
+use_jenv_old() {
+  local java_version=$1
+  log_status "Loading jenv..."
+
+  # jenv_sh=/usr/local/opt/jenv/bin/jenv
+  # [ -s "$jenv_sh" ] && \. "$jenv_sh"  # This loads jenv
+
+  if [[ ! -z $jenv_version ]]; then
+    # /usr/local/opt/jenv/bin/jenv --help # local $jenv_version
+    # jenv local $jenv_version 2>/dev/null
+    # command  /usr/local/opt/jenv/bin/jenv shell "jenv_version"
+    eval `/usr/local/opt/jenv/bin/jenv sh-shell 11`
+  fi
+
+  # if [[ -e $nvm_sh ]]; then
+  #   source $nvm_sh
+  #   nvm use $node_version
+  # fi
 }
 
 requires_nvm(){
@@ -168,7 +202,7 @@ requires_stencil(){
     _log warn "Installing stencil cli"
     npm install -g @bigcommerce/stencil-cli
   fi
-  
+
 }
 
 requires_envkey(){
@@ -181,7 +215,7 @@ requires_envkey(){
     curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash
     eval $(envkey-source)
   fi
-  
+
 }
 
 requires_themekit(){
@@ -207,4 +241,3 @@ requires_meteor(){
   fi
   _log success "Good to go, Meteor installed"
 }
-
