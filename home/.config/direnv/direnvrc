@@ -134,32 +134,36 @@ use_jenv() {
   local java_version=$1
   log_status "Loading jenv..."
 
-  # eval "$(jenv init -)"
+  # Instead of `eval $(jenv init -)`, lets run it directly here.
+  eval '
+  export PATH="${HOME}/.jenv/shims:${PATH}"
+  export JENV_SHELL=bash
+  export JENV_LOADED=1
+  unset JAVA_HOME
 
-  # if [[ ! -z $jenv_version ]]; then
-  #   # /usr/local/opt/jenv/bin/jenv --help # local $jenv_version
-  #   jenv shell $jenv_version # 2>/dev/null
-  # fi
-}
+  source "${JENV_HOME}/libexec/completions/jenv.bash"
+  jenv rehash 2>/dev/null
+  source "${JENV_ROOT}/plugins/export/etc/jenv.d/init/export_jenv_hook.bash"
 
-use_jenv_old() {
-  local java_version=$1
-  log_status "Loading jenv..."
+  jenv() {
+    typeset command
+    command="$1"
+    if [ "$#" -gt 0 ]; then
+      shift
+    fi
 
-  # jenv_sh=/usr/local/opt/jenv/bin/jenv
-  # [ -s "$jenv_sh" ] && \. "$jenv_sh"  # This loads jenv
+    case "$command" in
+      enable-plugin|rehash|shell|shell-options)
+        eval `jenv "sh-$command" "$@"`;;
+      *)
+        command jenv "$command" "$@";;
+    esac
+  }
+'
 
-  if [[ ! -z $jenv_version ]]; then
-    # /usr/local/opt/jenv/bin/jenv --help # local $jenv_version
-    # jenv local $jenv_version 2>/dev/null
-    # command  /usr/local/opt/jenv/bin/jenv shell "jenv_version"
-    eval `/usr/local/opt/jenv/bin/jenv sh-shell 11`
+  if [[ -n $java_version ]]; then
+    jenv shell $java_version
   fi
-
-  # if [[ -e $nvm_sh ]]; then
-  #   source $nvm_sh
-  #   nvm use $node_version
-  # fi
 }
 
 requires_nvm(){

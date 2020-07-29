@@ -448,8 +448,21 @@ if brew_contains_element "ondir"; then
   eval "`ondir /`"
 fi
 
+# need way to load direnv plugin last and then this can go away
 if brew_contains_element "direnv"; then
   __direnv
+
+  if ! contains_element __direnv "${cd_functions[@]}"; then
+    cd_functions+=(__direnv)
+  fi
+
+  if ! contains_element __direnv "${pushd_functions[@]}"; then
+    pushd_functions+=(__direnv)
+  fi
+
+  if ! contains_element __direnv "${popd_functions[@]}"; then
+    popd_functions+=(__direnv)
+  fi
 fi
 
 if hash gdate 2>/dev/null; then
