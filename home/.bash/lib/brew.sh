@@ -1031,13 +1031,89 @@ run_brew() {
             # accept the licenses
             yes | sdkmanager --licenses
             sdkmanager --update
-            sdkmanager --no_https --install emulator
-            sdkmanager --no_https --install platform-tools
-            sdkmanager --no_https --install 'system-images;android-30;google_apis_playstore;x86_64'
-            sdkmanager --no_https --install 'extras;intel;Hardware_Accelerated_Execution_Manager'
-            sdkmanager --no_https --install 'build-tools;30.0.1'
-            sdkmanager --no_https --install 'platforms;android-30'
+            sdkmanager --install emulator
+            sdkmanager --install platform-tools
+            sdkmanager --install 'system-images;android-30;google_apis_playstore;x86_64'
+            sdkmanager --install 'extras;intel;Hardware_Accelerated_Execution_Manager'
+            sdkmanager --install 'build-tools;30.0.1'
+            sdkmanager --install 'platforms;android-30'
             sdkmanager --list
+
+            # KITKAT (4.4) API 19
+            # sdkmanager --install "system-images;android-19;google_apis;x86"
+
+            # LOLLIPOP (5.0) API 21
+            # sdkmanager --install "system-images;android-21;google_apis;x86_64"
+
+            # LOLLIPOP (5.1) API 22
+            # sdkmanager --install "system-images;android-22;google_apis;x86_64"
+
+            # MARSHMELLOW (6.0) API 23
+            # sdkmanager --install "system-images;android-23;google_apis;x86_64"
+
+            # NOUGAT (7.0) API 24
+            # sdkmanager --install "system-images;android-24;google_apis;x86_64"
+
+            # NOUGAT (7.1) API 25
+            # sdkmanager --install "system-images;android-25;google_apis;x86_64"
+
+            # OREO (8.0) API 26
+            sdkmanager --install "system-images;android-26;google_apis;x86_64"
+
+            # OREO (8.1) API 27
+            sdkmanager --install "system-images;android-27;default;x86_64"
+
+            # PIE (9.0) API 28
+            sdkmanager --install "system-images;android-28;google_apis;x86_64"
+
+            # TEN (10.0) API 29
+            sdkmanager --install "system-images;android-29;google_apis;x86_64"
+
+            # Beta (11.0) API 30
+            sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
+
+            # to create android virtual device
+            #
+            # echo "no" | avdmanager create avd --force --name "pixel_4.4" --device "pixel" --package "system-images;android-19;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "pixel_5.0" --device "pixel" --package "system-images;android-21;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            # echo "no" | avdmanager create avd --force --name "pixel_5.1" --device "pixel" --package "system-images;android-22;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            # echo "no" | avdmanager create avd --force --name "pixel_6.0" --device "pixel" --package "system-images;android-23;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            # echo "no" | avdmanager create avd --force --name "pixel_7.0" --device "pixel" --package "system-images;android-24;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            # echo "no" | avdmanager create avd --force --name "pixel_7.1" --device "pixel" --package "system-images;android-25;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_8.0" --device "pixel" --package "system-images;android-26;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_8.1" --device "pixel" --package "system-images;android-27;default;x86_64" --tag "default" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_9.0" --device "pixel" --package "system-images;android-28;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_10.0" --device "pixel" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_11.0" --device "pixel" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+
+            # to create generic virtual device
+            #
+            # echo "no" | avdmanager create avd --force --name "generic_4.4" --package "system-images;android-19;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "generic_5.0" --package "system-images;android-21;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "generic_5.1" --package "system-images;android-22;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "generic_6.0" --package "system-images;android-23;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "generic_7.0" --package "system-images;android-24;google_apis;x86" --tag "google_apis" --abi "x86"
+            # echo "no" | avdmanager create avd --force --name "generic_7.1" --package "system-images;android-25;google_apis;x86" --tag "google_apis" --abi "x86"
+            echo "no" | avdmanager create avd --force --name "generic_8.0" --package "system-images;android-26;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_8.1" --package "system-images;android-27;default;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_9.0" --package "system-images;android-28;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_10.0" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_11.0" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+
+            # add aliases
+            #
+            # alias pixel_8.0 ='emulator @pixel_8.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 1080x1920'
+            # alias pixel_8.1 ='emulator @pixel_8.1 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 1080x1920'
+            # alias pixel_9.0 ='emulator @pixel_9.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 1080x1920'
+            # alias pixel_9.0 ='emulator @pixel_9.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 1080x1920'
+            # alias pixel_10.0 ='emulator @pixel_10.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 1080x1920'
+
+            # alias generic_8.0='emulator @generic_8.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 768x1280'
+            # alias generic_8.1='emulator @generic_8.1 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 768x1280'
+            # alias generic_9.0='emulator @generic_9.0 -no-boot-anim -netdelay none -no-snapshot -wipe-data -skin 768x1280'
+
+            # You can run all of the emulators above with a -read-only parameter to run multiple emulators at the same time, but this is an experimental feature right now.
+
             ;;
           adoptopenjdk8)
             # android-sdk requires Java 8. You can install it with:
