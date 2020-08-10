@@ -1510,7 +1510,7 @@ if has('gui_running')
     if s:is_macvim
       " set gfn=Anonymous\ Pro\ for\ Powerline:h14
       " set gfn=Hack:h12
-      set gfn=PragmataPro:h12
+      set gfn=PragmataProNerdFont:h12
       " set gfn=Hasklig:h12
       set macligatures
       set transparency=5          " Make the window slightly transparent

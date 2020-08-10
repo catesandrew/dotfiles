@@ -1022,6 +1022,7 @@ run_brew() {
             # https://dl.google.com/android/repository/repository2-1.xml.
             ;;
           android-ndk)
+            # Use JAVA 1.8 with JENV for the following  commands
             brew cask install android-ndk
             yes | sdkmanager --licenses
             # Install all of the Android SDK components (you will be prompted to
@@ -1032,10 +1033,10 @@ run_brew() {
             sdkmanager --update
             sdkmanager --no_https --install emulator
             sdkmanager --no_https --install platform-tools
-            sdkmanager --no_https --install 'system-images;android-29;google_apis_playstore;x86_64'
+            sdkmanager --no_https --install 'system-images;android-30;google_apis_playstore;x86_64'
             sdkmanager --no_https --install 'extras;intel;Hardware_Accelerated_Execution_Manager'
-            sdkmanager --no_https --install 'build-tools;29.0.2'
-            sdkmanager --no_https --install 'platforms;android-29'
+            sdkmanager --no_https --install 'build-tools;30.0.1'
+            sdkmanager --no_https --install 'platforms;android-30'
             sdkmanager --list
             ;;
           adoptopenjdk8)
