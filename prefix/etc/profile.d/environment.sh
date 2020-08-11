@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! [ -d "$BREW_HOME" ]; then
+if [ ! -d "$BREW_HOME" ]; then
     if hash brew 2>/dev/null; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
@@ -36,7 +36,7 @@ if [ -d "$RBENV_ROOT" ]; then
     fi
 fi
 
-if ! [ -d "$NVM_DIR" ]; then
+if [ ! -d "$NVM_DIR" ]; then
     if [ -d /usr/local/nvm ]; then
         NVM_DIR=/usr/local/nvm
     elif [ -d "$HOME" ]; then
@@ -65,19 +65,17 @@ if [ -d "$NVM_DIR" ]; then
     fi
 fi
 
-if ! [ -d "$JENV_HOME" ]; then
+if [ ! -d "$JENV_HOME" ]; then
     if [ -d /usr/local/opt/jenv ]; then
         JENV_HOME=/usr/local/opt/jenv
     elif [ -d "$HOME" ]; then
-        JENV_HOME="$HOME/.jenv"
+        JENV_HOME="${HOME}/.jenv"
     fi
 
     export JENV_HOME
     launchctl setenv JENV_HOME "$JENV_HOME"
-fi
 
-if [ -d "$JENV_HOME" ]; then
-    JENV_ROOT="$HOME/.jenv"
+    JENV_ROOT="${HOME}/.jenv"
     export JENV_ROOT
     launchctl setenv JENV_ROOT "$JENV_ROOT"
 fi
@@ -86,7 +84,12 @@ if [ -d "$JENV_ROOT" ]; then
     if [ -f "${JENV_ROOT}/version" ]; then
         JENV_VERSION=$(cat "${JENV_ROOT}/version")
         # check to verify version is not `system`
-        JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
+        if [ "$JENV_VERSION" = "system" ]; then
+          JAVA_HOME="$(/usr/libexec/java_home)"
+        else
+          JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
+        fi
+
         export JAVA_HOME
         export JENV_VERSION
     fi

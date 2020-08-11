@@ -295,7 +295,7 @@ Here is a copy of my `/etc/profile.d/environmeht.sh` file:
 ```bash
 #!/bin/bash
 
-if ! [ -d "$BREW_HOME" ]; then
+if [ ! -d "$BREW_HOME" ]; then
     if hash brew 2>/dev/null; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
@@ -310,7 +310,7 @@ if [ -d "${HOME}/.bash" ]; then
     launchctl setenv BASH_IT "$BASH_IT"
 fi
 
-if ! [ -d "$RBENV_HOME" ]; then
+if [ ! -d "$RBENV_HOME" ]; then
     if [ -d /usr/local/opt/rbenv ]; then
         RBENV_HOME=/usr/local/opt/rbenv
     fi
@@ -331,7 +331,7 @@ if [ -d "$RBENV_ROOT" ]; then
     fi
 fi
 
-if ! [ -d "$NVM_DIR" ]; then
+if [ ! -d "$NVM_DIR" ]; then
     if [ -d /usr/local/nvm ]; then
         NVM_DIR=/usr/local/nvm
     elif [ -d "$HOME" ]; then
@@ -360,7 +360,7 @@ if [ -d "$NVM_DIR" ]; then
     fi
 fi
 
-if ! [ -d "$JENV_HOME" ]; then
+if [ ! -d "$JENV_HOME" ]; then
     if [ -d /usr/local/opt/jenv ]; then
         JENV_HOME=/usr/local/opt/jenv
     elif [ -d "$HOME" ]; then
