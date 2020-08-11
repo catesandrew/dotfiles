@@ -1114,6 +1114,9 @@ run_brew() {
 
             # You can run all of the emulators above with a -read-only parameter to run multiple emulators at the same time, but this is an experimental feature right now.
 
+            # be sure to add keyboard to all created android emulators
+            # for f in ~/.android/avd/*.avd/config.ini; do echo 'hw.keyboard=yes' >> "$f"; done
+
             ;;
           adoptopenjdk8)
             # android-sdk requires Java 8. You can install it with:
