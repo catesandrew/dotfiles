@@ -3,17 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>Disabled</key>
-	<true/>
+	<false/>
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
 	<string>osx.app.ubersicht</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
 	<key>RunAtLoad</key>
 	<false/>
 </dict>
