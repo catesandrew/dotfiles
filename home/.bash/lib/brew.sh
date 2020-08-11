@@ -821,8 +821,8 @@ run_brew() {
             ;;
           rbenv)
             brew install rbenv ruby-build
-            # rbenv install 2.6.5
-            # rbenv global 2.6.5
+            # rbenv install 2.7.1
+            # rbenv global 2.7.1
             # gem install -n /usr/local/bin fastlane -NV
             ;;
           moreutils)

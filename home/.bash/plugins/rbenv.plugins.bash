@@ -1,48 +1,69 @@
-# Load rbebv, if you are using it
+# Load rbenv, if you are using it
 
 if brew_contains_element "rbenv" || \
     hash rbenv 2>/dev/null; then
 
-  RBENV_ROOT="$HOME/.rbenv"
-  export RBENV_ROOT
-  export RBENV_SHELL=bash
+  if [ -z "$RBENV_ROOT" ]; then
+    export RBENV_ROOT="$HOME/.rbenv"
+  fi
 
-  if brew_contains_element "rbenv"; then
-    RBENV_HOME="${BREW_HOME}/opt/rbenv"
-    export RBENV_HOME
+  if [ -z "$RBENV_HOME" ]; then
+    export RBENV_HOME="${BREW_HOME}/opt/jenv"
   fi
 
   # lazy load rbenv
   rbenv() {
-    echo "Lazy loading rbenv..."
 
-    # Instead of `eval $(rbenv init -)`, lets run it directly here.
-    # eval "$(rbenv init -)"
-    path_munge "${RBENV_ROOT}/shims"
+    if [ "$RBENV_LOADED" = "1" ]; then
+      echo "rbenv is correctly loaded..."
+      rbenv() {
+        local command
+        command="$1"
+        if [ "$#" -gt 0 ]; then
+          shift
+        fi
 
-    command rbenv rehash 2>/dev/null
+        case "$command" in
+          rehash|shell)
+            eval "$(rbenv "sh-$command" "$@")";;
+          *)
+            command rbenv "$command" "$@";;
+        esac
+      }
+    else
+      echo "Lazy loading rbenv..."
+      # Instead of `eval $(rbenv init -)`, lets run it directly here.
 
-    rbenv() {
-      local command
-      command="$1"
-      if [ "$#" -gt 0 ]; then
-        shift
+      # Strip other version from PATH
+      export PATH=$(path_strip "$PATH" "${RBENV_ROOT}/shims")
+      path_munge "${RBENV_ROOT}/shims"
+
+      export RBENV_SHELL=bash
+      export RBENV_LOADED=1
+
+      rbenv() {
+        local command
+        command="$1"
+        if [ "$#" -gt 0 ]; then
+          shift
+        fi
+
+        case "$command" in
+          rehash|shell)
+            eval "$(rbenv "sh-$command" "$@")";;
+          *)
+            command rbenv "$command" "$@";;
+        esac
+      }
+
+      if [ -n "${RBENV_HOME}" ]; then
+        [[ -e ${RBENV_HOME}/completions/rbenv.bash ]] && \
+          source "${RBENV_HOME}/completions/rbenv.bash"
       fi
 
-      case "$command" in
-        rehash|shell)
-          eval "$(rbenv "sh-$command" "$@")";;
-        *)
-          command rbenv "$command" "$@";;
-      esac
-    }
-
-    if [ -n "${RBENV_HOME}" ]; then
-      [[ -e ${RBENV_HOME}/completions/rbenv.bash ]] && \
-        . "${RBENV_HOME}/completions/rbenv.bash"
+      command rbenv rehash 2>/dev/null
     fi
 
     rbenv "$@"
   }
-
 fi
