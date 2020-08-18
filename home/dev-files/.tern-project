@@ -1,0 +1,26 @@
+{
+  "ecmaVersion": 6,
+  "loadEagerly": [
+    "lib/**/*.js"
+  ],
+  "dontLoad": [
+    "node_modules/**"
+  ],
+  "libs": [
+    "browser",
+    "ecmascript",
+    "chai"
+  ],
+  "plugins": {
+    "react": {},
+    "node": {},
+    "node_resolve": {},
+    "modules": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    },
+    "es_modules": {},
+    "complete_strings": {}
+  }
+}

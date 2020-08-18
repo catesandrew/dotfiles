@@ -11,6 +11,6 @@
 	<key>Program</key>
 	<string>/Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
