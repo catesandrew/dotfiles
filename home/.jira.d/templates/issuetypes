@@ -1,0 +1,3 @@
+{{/* issuetypes template */ -}}
+{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
+{{end}}

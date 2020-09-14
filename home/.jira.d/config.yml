@@ -1,0 +1,613 @@
+#!/bin/bash
+
+# helpful go template debugging
+# echo '{{ printf "%#v" options.proj }}'
+# list of custom fields
+# customfield_10901: epic
+# customfield_10203: story points
+# customfield_10601: sprints
+# customfield_10107: implementation description
+# customfield_10110: watchers
+# customfield_10120: epic
+
+query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution)
+projects=(WEL MEM)
+# jira req https://jira.int.payoff.com/rest/api/2/issuetype | jq '.[] | .name'
+issue_types=("Bug" "Improvement" "Epic" "Task" "Sub-task" "Story" "User Story" "Research" "Data Pull" "Dashboard" "Automation" "Reporting" "Change Request" "SoftwareDeployment" "InfrastructureDeployment" "ProductionConfigChange" "PermissionsChange" "QA Sub-task" "Analysis" "Modeling" "Training" "Access" "IT Help" "UIE - Design" "Purchase" "Change" "Fault" "Off-Boarding" "LegacyIssue" "NewPlatformIssue" "MemberDataExport" "MemberDataDelete" "HMA" "Product Task" "Training Task" "QA task" "New Feature" "Service Request")
+# jira req https://jira.int.payoff.com/rest/api/2/priority | jq '.[] | .name'
+priority_types=("P1" "P2" "P3" "P4" "P5" "Blocker" "High" "Medium" "Low" "Minor")
+# jira req https://jira.int.payoff.com/rest/api/2/status | jq '.[] | .name'
+status_types=("Open(Backlog)" "Backlog" "Engineering Review" "In-Progress" "In Pull Request" "Ready for Testing" "In Testing" "Testing Failed" "User Acceptance (UAT)" "Ready for Deployment" "In Review" "Closed" "Fix_Resolve" "Resolved" "In Spec" "BI-Researching" "Selected for Engineering" "Pending" "Deployed" "To Do" "Waiting for support" "Waiting for customer" "Deploy" "Done" "Reviewed" "Prioritized" "Cancelled" "Rejected" "Open" "In Progress" "Ready for UAT" "UAT Approved" "UAT Failed" "In UAT" "Under Review" "Approved" "Canceled" "Escalated" "Waiting for approval" "Work in progress" "Reopened" "validation" "Selected for Development" "New" "Triaged" "Researching" "Ready for Assignment" "Assigned" "Fix Ready" "Customer / Member Notified" "Planning" "Completed" "SDM Review" "Impact Analysis" "Stakeholder Review" "Ideation" "Exploration" "Evaluation" "Prioritization" "Initiation" "Design" "Development" "Testing" "UAT/Regression" "Product Review")
+done_status_types=("Closed" "Fix_Resolve" "Resolved" "Deployed" "Deploy" "Done" "Cancelled" "Canceled")
+joined_done_status_types=$(printf ", '%s'" "${done_status_types[@]}")
+
+issueFile="${HOME}/.jira.d/.jira.issue"
+touch $issueFile
+echo "ISSUE_FILE: ${issueFile}"
+issue=$(head -n 1 $issueFile)
+echo "issue: ${issue}"
+
+# prefix: what you prefix your branches with (usually first name)
+
+cat<<END
+config:
+  stop: true
+
+password-source: pass
+password-name: jira.int.payoff.com/acates
+endpoint: https://jira.int.payoff.com
+user: acates
+# login: acates@happymoney.com
+
+queries:
+  todo: >-
+    resolution = unresolved {{if .project}}AND project = '{{.project}}'{{end}} AND status = 'To Do'
+  epics: resolution = unresolved AND issuetype = Epic AND project = MYWORK ORDER BY Rank Desc
+
+custom-commands:
+  - name: epics
+    help: list epics
+    script: |-
+      {{jira}} list \
+        --template {{options.tmplepics}} \
+        --query "resolution = unresolved AND issuetype = Epic ORDER BY Rank Desc" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+    options:
+      - name: tmplepics
+        short: t
+        help: template to use, ex debug
+        default: table
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+
+  - name: startwork
+    help: mark the start of work on an issue
+    args:
+      - name: ISSUE
+        help: issue to mark work being started on
+        required: true
+    script: |-
+      mkdir -p \$HOME/.jira.d/work
+      touch -p \$HOME/.jira.d/work/{{args.ISSUE}}
+
+  - name: endwork
+    help: submit worklog for issue
+    args:
+      - name: ISSUE
+        help: issue to mark work being started on
+        required: true
+    script: |-
+      starttime=\$(stat -f "%Sm" -t "%Y-%m-%dT%H:%M:%S.000%z" \$HOME.jira.d/work/{{args.ISSUE}})
+      {{jira}} worklog add {{args.ISSUE}} -S "\$starttime"
+
+  - name: env
+    help: print the JIRA environment variables available to custom commands
+    script: |-
+      env | sort | grep JIRA
+
+  - name: mine
+    help: display issues assigned to me
+    script: |-
+      eval "project=\$(echo {{options.proj}})"
+      if [ -n "\$project" ]; then
+        query="resolution = unresolved and assignee=currentuser() and project = \$project ORDER BY priority asc, created"
+      else
+        query="resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
+      fi
+      {{jira}} list \
+        --template {{options.tmplmine}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+    options:
+      - name: tmplmine
+        short: t
+        help: template to use, ex debug
+        default: list
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: proj
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+
+  - name: was
+    help: display issues assigned or reported by me
+    script: |-
+      eval "project=\$(echo {{options.proj}})"
+      if [ -n "\$project" ]; then
+        query="project = \$project AND assignee was currentUser() OR reporter was currentUser() ORDER BY updated DESC"
+      else
+        query="assignee was currentUser() OR reporter was currentUser() ORDER BY updated DESC"
+      fi
+      {{jira}} list \
+        --template {{options.tmplwas}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+    options:
+      - name: tmplwas
+        short: t
+        help: template to use, ex debug
+        default: was
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: proj
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+
+  - name: sprint-add
+    help: add issue to active sprint for project
+    options:
+      - name: next
+        short: 'n'
+        type: bool
+        help: add issue to next sprint, rather than the active one
+      - name: proj
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+    args:
+      - name: ISSUE
+        required: true
+    script: |
+      eval "project=\$(echo {{options.proj}})"
+      state={{if options.next}}future{{else}}active{{end}}
+      board_id=\$({{jira}} req "/rest/agile/1.0/board?projectKeyOrId=\$project&type=scrum" --gjq values.0.id)
+      sprint_id=\$({{jira}} req "/rest/agile/1.0/board/\$board_id/sprint?state=\$state" --gjq values.0.id)
+      if [ "\$sprint_id" = "" ]; then
+        echo "ERROR: No \$state sprint" >&2
+        exit 1
+      fi
+      {{jira}} req -M POST "/rest/agile/1.0/sprint/\$sprint_id/issue" "{\"issues\":[\"{{args.ISSUE}}\"]}"
+
+  - name: sprint
+    help: display issues for active sprint
+    script: |-
+      query="sprint in openSprints() and type != epic and type != epic and resolution = unresolved"
+      eval "project=\$(echo {{options.proj}})"
+      if [ -n "\$project" ]; then
+        query="\${query} and project=\$project"
+      fi
+      query="\${query} ORDER BY rank asc, created"
+      {{jira}} list \
+        --template {{options.tmplsprint}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+    options:
+      - name: tmplsprint
+        short: t
+        help: template to use, ex debug
+        default: table
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: proj
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+
+  # should we add this to the query? `and resolution = unresolved`
+  - name: sprint2
+    help: Shows stories in curent sprint
+    options:
+      - name: projectsprint2
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: tmplsprint2
+        short: t
+        help: template to use, ex debug
+        default: table
+      - name: querysprint2
+        help: Search the text of the ticket for this value
+        default: \$JIRA_QUERY
+        short: q
+      - name: all
+        short: a
+        type: BOOL
+        help: Include ${joined_done_status_types:2} stories
+      - name: donefield
+        type: ENUM
+        help: status fields not to list in table, unless --all
+        repeat: true
+        default: $(for i in "${done_status_types[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${status_types[@]}"; do printf "\n          - $i"; done)
+      - name: componentsprint2
+        short: c
+        help: Filter on a component, defaults to \$JIRA_COMPONENT
+        default: \$JIRA_COMPONENT
+    script: |-
+      query="sprint in openSprints() and type != epic"
+      eval "project=\$(echo {{options.projectsprint2}})"
+      if [ -n "\$project" ]; then
+        query="\${query} and project=\$project"
+      fi
+      eval "component=\$(echo {{options.componentsprint2}})"
+      if [ -n "\$component" ]; then
+        query="\${query} and component=\"\$component\""
+      fi
+      eval "qry=\$(echo {{options.querysprint2}})"
+      if [ -n "\$qry" ]; then
+        query="\${query} and text ~ \"\$qry\""
+      fi
+      {{if not options.all}}
+        query="\${query} and status NOT IN ({{range \$key, \$value := options.donefield}}{{ if \$key}},{{end}}\"{{\$value}}\"{{end}})"
+      {{end}}
+      query="\${query} ORDER BY rank asc, created"
+      {{jira}} list \
+        --template {{options.tmplsprint2}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+
+  - name: new
+    help: create a jira issue
+    script: |-
+      state="--template={{options.templatenew}}"
+      eval "project=\$(echo {{options.projectnew}})"
+      if [ -n "\$project" ]; then
+        state="\${state} --project=\$project"
+      fi
+      eval "issuetype=\$(echo {{options.issuetypenew}})"
+      if [ -n "\$issuetype" ]; then
+        state="\${state} --issuetype=\$issuetype"
+      fi
+      eval "epic=\$(echo {{options.epicnew}})"
+      if [ -n "\$epic" ]; then
+        state="\${state} -o 'epic=\$epic'"
+      fi
+      eval "reporter=\$(echo {{options.reporternew}})"
+      if [ -n "\$reporter" ]; then
+        state="\${state} -o 'reporter=\$reporter'"
+      fi
+      eval "priority=\$(echo {{options.prioritytypenew}})"
+      if [ -n "\$priority" ]; then
+        state="\${state} -o 'priority=\$priority'"
+      fi
+      {{if options.summarynew}}
+        state="\${state} -o 'summary={{options.summarynew}}'"
+      {{end}}
+      eval "labels=\$(echo {{options.labelnew}})"
+      if [ -n "\$labels" ]; then
+        state="\${state} -o 'labels=\$labels'"
+      fi
+      eval "{{jira}} create \$state"
+    options:
+      - name: templatenew
+        short: t
+        help: template to use, ex debug
+        default: create
+      - name: projectnew
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: issuetypenew
+        short: i
+        type: STRING
+        help: issuetype in to create
+        default: \$JIRA_ISSUETYPE
+        enum: $(for i in "${issue_types[@]}"; do printf "\n          - $i"; done)
+      - name: prioritytypenew
+        short: P
+        type: STRING
+        help: priority in to create
+        default: \$JIRA_PRIORITY
+        enum: $(for i in "${priority_types[@]}"; do printf "\n          - $i"; done)
+      - name: epicnew
+        short: E
+        type: ENUM
+        help: epic to link to
+        default: \$JIRA_EPIC
+      - name: reporternew
+        short: r
+        type: ENUM
+        help: reporter to use
+        default: \$JIRA_USER
+      - name: summarynew
+        short: s
+        type: STRING
+        help: summary
+      - name: labelnew
+        help: labels to use
+        short: l
+        default: \$JIRA_LABELS
+
+  - name: workon
+    aliases: ['w']
+    help: Sets the global "worked on" issue.
+    args:
+      - name: ISSUE
+    options:
+      - name: remove
+        short: r
+        type: BOOL
+        help: Remove the current issue number
+    script: |-
+      {{if options.remove}}
+        tail -n +2 "\${JIRA_ISSUE_FILE}" >| /tmp/jiratemp && mv /tmp/jiratemp "\${JIRA_ISSUE_FILE}"
+      {{else if not args.ISSUE}}
+        echo "Must provide a Issue"
+      {{else}}
+        echo "{{args.ISSUE}}" | /bin/cat - "\${JIRA_ISSUE_FILE}" >| /tmp/jiratemp && mv /tmp/jiratemp "\${JIRA_ISSUE_FILE}"
+      {{end}}
+
+  - name: i
+    help: Displays the global "worked on" issues
+    script: head "\${JIRA_ISSUE_FILE}"
+
+  - name: git
+    help: Creates a new Git branch with the Jira prefix/issue and, if provided, name
+    args:
+      - name: NAME
+    options:
+      - name: prefixgit
+        short: p
+        type: STRING
+        help: issuetype in to create
+        default: \$JIRA_PREFIX
+    script: |-
+      eval "prefix=\$(echo {{options.prefixgit}})"
+      if [ -n "\$prefix" ]; then
+        git checkout -b \${previx}/\${JIRA_ISSUE}{{if args.NAME}}-{{args.NAME}}{{end}}
+      else
+        git checkout -b \${JIRA_ISSUE}{{if args.NAME}}-{{args.NAME}}{{end}}
+      fi
+
+  # FIND WORK
+  - name: kanban
+    help: Shows stories on curent board
+    options:
+      - name: projectkanban
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: tmplkanban
+        short: t
+        help: template to use, ex debug
+        default: table
+      - name: querykanban
+        help: Search the text of the ticket for this value
+        default: \$JIRA_QUERY
+        short: q
+      - name: all
+        short: a
+        type: BOOL
+        help: Include ${joined_done_status_types:2} stories
+      - name: donefield
+        type: ENUM
+        help: status fields not to list, unless --all
+        repeat: true
+        default: $(for i in "${done_status_types[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${status_types[@]}"; do printf "\n          - $i"; done)
+      - name: componentkanban
+        short: c
+        help: Filter on a component, defaults to \$JIRA_COMPONENT
+        default: \$JIRA_COMPONENT
+    script: |-
+      query="type != epic"
+      eval "project=\$(echo {{options.projectkanban}})"
+      if [ -n "\$project" ]; then
+        query="\${query} and project=\$project"
+      fi
+      eval "component=\$(echo {{options.componentkanban}})"
+      if [ -n "\$component" ]; then
+        query="\${query} and component=\"\$component\""
+      fi
+      eval "qry=\$(echo {{options.querykanban}})"
+      if [ -n "\$qry" ]; then
+        query="\${query} and text ~ \"\$qry\""
+      fi
+      {{if not options.all}}
+        query="\${query} and status NOT IN ({{range \$key, \$value := options.donefield}}{{ if \$key}},{{end}}\"{{\$value}}\"{{end}})"
+      {{end}}
+      query="\${query} ORDER BY status,assignee"
+      {{jira}} list \
+        --template {{options.tmplkanban}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+
+  - name: link
+    help: Puts the link for JIRA_ISSUE in your clipboard if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      printf "\${JIRA_ENDPOINT}/browse/{{args.ISSUE}}" | pbcopy
+
+  - name: browser
+    help: Brings the JIRA_ISSUE up in the browser if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} view -b {{args.ISSUE}}
+
+  - name: v
+    help: Views current JIRA_ISSUE if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    options:
+      - name: tmplv
+        short: t
+        help: template to use, ex debug
+        default: customView
+    script: |
+      {{jira}} view \
+        --template {{options.tmplv}} \
+        {{args.ISSUE}} | cat
+
+  # DO WORK
+  - name: g
+    help: Actually takes the story
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} assign {{args.ISSUE}} \$JIRA_USER
+      {{jira}} trans "In Progress" {{args.ISSUE}}
+
+  - name: u
+    help: Marks story as unassigned and puts it back into ToDo
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} unassign {{args.ISSUE}}
+      {{jira}} trans "To Do" {{args.ISSUE}}
+
+  - name: qa
+    help: Assigns the story to you, moves it to QA, and brings up details
+    args:
+       - name: ISSUE
+         default: \$JIRA_ISSUE
+    options:
+      - name: review
+        short: r
+        help: Also run the 'qa' template
+        type: BOOL
+    script: |
+      {{jira}} trans "In Test" -t "qa" {{args.ISSUE}}
+      {{jira}} v {{args.ISSUE}} | vi -
+
+  - name: cr
+    help: Clears "reviewer" field
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} edit -t qa_clear {{args.ISSUE}}
+
+  - name: r
+    help: Open a comment with the template then move to signoff
+    args:
+      - name: STATUS
+        default: "SignOff"
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} comment -m "h1. Testing Session
+      h2. Acceptance Criteria
+      h2. Edge Case
+      h2. Regression Testing
+        * Existing:
+        * New:
+      h2. Look and Feel" {{args.ISSUE}}
+      {{jira}} trans "{{args.STATUS}}" {{args.ISSUE}}
+
+  - name: e
+    help: Edits current JIRA_ISSUE if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} edit {{args.ISSUE}}
+
+  - name: c
+    help: Comments on current JIRA_ISSUE if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    options:
+      - name: comment
+        short: m
+    script: |
+      {{jira}} comment{{if options.comment}} -m "{{options.comment}}"{{end}} {{args.ISSUE}}
+
+  - name: ts
+    help: Lists the TransitionS for the JIRA_ISSUE if no ISSUE is provied
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} transitions {{args.ISSUE}}
+
+  - name: t
+    help: Transitions the current JIRA_ISSUE if no ISSUE is provided
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    options:
+      - name: state
+        short: s
+        required: true
+      - name: comment
+        short: m
+    script: |
+      {{jira}} trans{{if options.comment}} -m "{{options.comment}}"{{end}} "{{options.state}}" {{args.ISSUE}}
+
+  - name: p
+    help: Moves story to "PR Review"
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    script: |
+      {{jira}} trans "PR Review" {{args.ISSUE}}
+
+  - name: d
+    help: Moves story to "Ready for Test" or provided state
+    args:
+      - name: ISSUE
+        default: \$JIRA_ISSUE
+    options:
+      - name: comment
+        short: m
+      - name: state
+        short: s
+        default: "Ready for Test"
+    script: |
+      {{jira}} trans{{if options.comment}} -m "{{options.comment}}"{{end}} -t done "{{options.state}}" {{args.ISSUE}}
+
+  # HELPERS
+  - name: cookie
+    args:
+      - name: COOKIE
+    help: Set the cookie used to talk to a hosted Jira instance
+    script: jiraCookie '{{args.COOKIE}}'
+
+  - name: test
+    help: prints out Jira-related env vars avaialable during run
+    script: |
+      env | grep 'JIRA'
+
+  - name: args_example
+    script: |
+      echo "I actually have no args... {{args}}, or options {{options}}"
+
+END

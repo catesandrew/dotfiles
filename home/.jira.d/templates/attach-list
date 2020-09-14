@@ -1,0 +1,10 @@
+{{/* attach list template */ -}}
+{{- headers "id" "filename" "bytes" "user" "created" -}}
+{{- range . -}}
+  {{- row -}}
+  {{- cell .id -}}
+  {{- cell .filename -}}
+  {{- cell .size -}}
+  {{- cell .author.displayName -}}
+  {{- cell (.created | age) -}}
+{{- end -}}

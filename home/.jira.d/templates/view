@@ -1,0 +1,58 @@
+{{/* view template */ -}}
+issue: {{ .key }}
+{{if .fields.created -}}
+created: {{ .fields.created | age }} ago
+{{end -}}
+{{if .fields.status -}}
+status: {{ .fields.status.name }}
+{{end -}}
+summary: {{ .fields.summary }}
+project: {{ .fields.project.key }}
+{{if .fields.customfield_10901 -}}
+epic: {{ .fields.customfield_10901 }}
+{{end -}}
+{{if .fields.components -}}
+components: {{ range .fields.components }}{{ .name }} {{end}}
+{{end -}}
+{{if .fields.issuetype -}}
+issuetype: {{ .fields.issuetype.name }}
+{{end -}}
+{{if .fields.customfield_10203 -}}
+story-points: {{ .fields.customfield_10203 }}
+{{end -}}
+{{if .fields.customfield_10601 -}}
+sprints: {{ range .fields.customfield_10601 }}
+- {{ . | printf "%s" | regReplace ".*name=(.+),startDate.*" "$1" }} {{end}}
+{{end -}}
+{{if .fields.customfield_10107 -}}
+implementation-summary: |
+  {{ .fields.customfield_10107 | indent 2}}
+{{end -}}
+{{if .fields.assignee -}}
+assignee: {{ .fields.assignee.displayName }}
+{{end -}}
+reporter: {{ if .fields.reporter }}{{ .fields.reporter.displayName }}{{end}}
+{{if .fields.customfield_10110 -}}
+watchers: {{ range .fields.customfield_10110 }}{{ .displayName }} {{end}}
+{{end -}}
+{{if .fields.issuelinks -}}
+blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
+depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
+{{end -}}
+{{if .fields.priority -}}
+priority: {{ .fields.priority.name }}
+{{end -}}
+{{if .fields.votes -}}
+votes: {{ .fields.votes.votes}}
+{{end -}}
+{{if .fields.labels -}}
+labels: {{ join ", " .fields.labels }}
+{{end -}}
+description: |
+  {{ or .fields.description "" | indent 2 }}
+{{if .fields.comment.comments}}
+comments:
+{{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
+    {{ or .body "" | indent 4}}
+{{end}}
+{{end -}}

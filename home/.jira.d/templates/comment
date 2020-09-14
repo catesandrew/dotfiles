@@ -1,0 +1,2 @@
+body: |~
+  {{ or .overrides.comment "" | indent 2 }}

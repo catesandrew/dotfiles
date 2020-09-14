@@ -16,6 +16,7 @@
 .pandoc recurse
 .ssh recurse
 .tmux recurse
+.jira.d recurse
 Documents recurse
 Library recurse
 Quiver-settings.json skip

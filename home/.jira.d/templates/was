@@ -1,0 +1,25 @@
+{{/* table template */ -}}
+{{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Time" "Spent" -}}
+{{- range .issues -}}
+  {{- row -}}
+  {{- cell .key -}}
+  {{- cell .fields.summary -}}
+  {{- cell .fields.issuetype.name -}}
+  {{- if .fields.priority -}}
+    {{- cell .fields.priority.name -}}
+  {{- else -}}
+    {{- cell "<none>" -}}
+  {{- end -}}
+  {{- cell .fields.status.name -}}
+  {{- cell (.fields.created | age) -}}
+  {{- if .fields.aggregatetimespent -}}
+    {{- cell .fields.aggregatetimespent -}}
+  {{- else -}}
+    {{- cell "<unk>" -}}
+  {{- end -}}
+  {{- if .fields.timespent -}}
+    {{- cell .fields.timespent -}}
+  {{- else -}}
+    {{- cell "<unassigned>" -}}
+  {{- end -}}
+{{- end -}}

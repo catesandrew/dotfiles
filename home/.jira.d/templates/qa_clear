@@ -1,0 +1,5 @@
+{{/* qa template */ -}}
+# issue: {{ .key }} - created: {{ .fields.created | age}} ago
+fields:
+  customfield_19359: # reviewer
+    name:

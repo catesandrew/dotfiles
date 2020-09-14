@@ -1,0 +1,5 @@
+{{/* compoinent add template */ -}}
+project: {{or .project ""}}
+name: {{or .name ""}}
+description: {{or .description ""}}
+leadUserName: {{or .leadUserName ""}}

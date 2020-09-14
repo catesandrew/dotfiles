@@ -1,0 +1,8 @@
+{{/* done template */ -}}
+# issue: {{ .key }} - created: {{ .fields.created | age}} ago
+transition:
+  id: {{ .transition.id }}
+  name: {{ .transition.name }}
+fields:
+  customfield_20007: Test steps
+

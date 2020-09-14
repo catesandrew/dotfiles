@@ -1,0 +1,25 @@
+{{/* table template */ -}}
+{{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
+{{- range .issues -}}
+  {{- row -}}
+  {{- cell .key -}}
+  {{- cell .fields.summary -}}
+  {{- cell .fields.issuetype.name -}}
+  {{- if .fields.priority -}}
+    {{- cell .fields.priority.name -}}
+  {{- else -}}
+    {{- cell "<none>" -}}
+  {{- end -}}
+  {{- cell .fields.status.name -}}
+  {{- cell (.fields.created | age) -}}
+  {{- if .fields.reporter -}}
+    {{- cell .fields.reporter.displayName -}}
+  {{- else -}}
+    {{- cell "<unknown>" -}}
+  {{- end -}}
+  {{- if .fields.assignee -}}
+    {{- cell .fields.assignee.displayName -}}
+  {{- else -}}
+    {{- cell "<unassigned>" -}}
+  {{- end -}}
+{{- end -}}
