@@ -1,8 +1,7 @@
 if brew_contains_element "gnupg2" || \
     hash gpg 2>/dev/null; then
 
-  export GPG_AGENT_INFO="${HOME}/.gnupg/S.gpg-agent:$(pgrep gpg-agent):1"
-
+  # https://www.gnupg.org/faq/whats-new-in-2.1.html#autostart
   if [ ! -f "${HOME}/.gpg-agent.conf" ]; then
     cat <<EOM >"${HOME}/.gpg-agent.conf"
 default-cache-ttl 604800
@@ -18,21 +17,29 @@ EOM
     fi
   fi
 
-  if [ -n "${GPG_AGENT_INFO}" ]; then
-    socat - UNIX-CONNECT:"${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
+  AGENT_PORT=$(pgrep gpg-agent)
 
-    # if [ "$__dot_system_type" == "Darwin" ]; then
-    #   /usr/bin/nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
-    # else if brew_contains_element "netcat"; then
-    #   nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
-    # else
-    #   nc -U "${GPG_AGENT_INFO%%:*}" >/dev/null </dev/null
-    # fi
+  if [ -n "${AGENT_PORT}" ]; then
+    AGENT_SOCKET=$(gpgconf --list-dirs agent-socket)
+    GPG_AGENT_INFO="${AGENT_SOCKET}:${AGENT_PORT}:1"
 
-    if [ ! -S "${GPG_AGENT_INFO%%:*}" -o $? != 0 ]; then
-      # set passphrase cache so I only have to type my passphrase once a day
-      eval $(gpg-agent --options "${HOME}/.gpg-agent.conf" --daemon --log-file "${TMPDIR}/gpg-agent.log" --verbose)
+    if [ "$(socat - UNIX-CONNECT:"${GPG_AGENT_INFO%%:*}" </dev/null)" ]; then
+      if [ ! -S "${GPG_AGENT_INFO%%:*}" -o $? != 0 ]; then
+        # set passphrase cache so I only have to type my passphrase once a day
+        eval $(gpg-agent --options ${HOME}/.gpg-agent.conf --daemon --log-file "${TMPDIR}/gpg-agent.log" --verbose)
+      fi
     fi
+
+    export GPG_AGENT_INFO
+  else
+    echo "starting gpg-agent daemon"
+
+    # set passphrase cache so I only have to type my passphrase once a day
+    eval $(gpg-agent --options ${HOME}/.gpg-agent.conf --daemon --log-file "${TMPDIR}/gpg-agent.log" --verbose)
+
+    # AGENT_PORT=$(pgrep gpg-agent)
+    # AGENT_SOCKET=$(gpgconf --list-dirs agent-socket)
+    # export GPG_AGENT_INFO
   fi
 
   # Avoid issues with `gpg` as installed via Homebrew.
