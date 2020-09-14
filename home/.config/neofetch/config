@@ -682,4 +682,3 @@ config="on"
 # as a default config and NOT as a user config. Changing this in
 # your user config won't actually do anything.
 config_file="${XDG_CONFIG_HOME:-${HOME}/.config}/neofetch/config"
-0
