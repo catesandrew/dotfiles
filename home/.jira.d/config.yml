@@ -28,6 +28,11 @@ issue=$(head -n 1 $issueFile)
 echo "issue: ${issue}"
 
 # prefix: what you prefix your branches with (usually first name)
+if [ -n "$(command -v bat)" ] ; then
+  viewer="bat"
+else
+  viewer="cat"
+fi
 
 cat<<END
 config:
@@ -471,7 +476,7 @@ custom-commands:
     script: |
       {{jira}} view \
         --template {{options.tmplv}} \
-        {{args.ISSUE}} | cat
+        {{args.ISSUE}} | $viewer
 
   # DO WORK
   - name: g
