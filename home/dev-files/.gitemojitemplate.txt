@@ -1,0 +1,69 @@
+# 🎨: art, Improving structure / format of the code.
+# ⚡: zap, Improving performance.
+# 🔥: fire, Removing code or files.
+# 🐛: bug, Fixing a bug.
+# 🚑: ambulance, Critical hotfix.
+# ✨: sparkles, Introducing new features.
+# 📝: memo, Writing docs.
+# 🚀: rocket, Deploying stuff.
+# 💄: lipstick, Updating the UI and style files.
+# 🎉: tada, Initial commit.
+# ✅: white-check-mark, Adding tests.
+# 🔒: lock, Fixing security issues.
+# 🍎: apple, Fixing something on macOS.
+# 🐧: penguin, Fixing something on Linux.
+# 🏁: checkered-flag, Fixing something on Windows.
+# 🤖: robot, Fixing something on Android.
+# 🍏: green-apple, Fixing something on iOS.
+# 🔖: bookmark, Releasing / Version tags.
+# 🚨: rotating-light, Removing linter warnings.
+# 🚧: construction, Work in progress.
+# 💚: green-heart, Fixing CI Build.
+# ⬇: arrow-down, Downgrading dependencies.
+# ⬆: arrow-up, Upgrading dependencies.
+# 📌: pushpin, Pinning dependencies to specific versions.
+# 👷: construction-worker, Adding CI build system.
+# 📈: chart-with-upwards-trend, Adding analytics or tracking code.
+# 🔨: hammer, Heavy refactoring
+# ♻: recycle, Refactoring code.
+# ➖: heavy-minus-sign, Removing a dependency.
+# 🐳: whale, Work about Docker.
+# ➕: heavy-plus-sign, Adding a dependency.
+# 🔧: wrench, Changing configuration files.
+# 🌐: globe-with-meridians, Internationalization and localization.
+# ✏: pencil, Fixing typos.
+# 💩: hankey, Writing bad code that needs to be improved.
+# ⏪: rewind, Reverting changes.
+# 🔀: twisted-rightwards-arrows, Merging branches.
+# 📦: package, Updating compiled files or packages.
+# 👽: alien, Updating code due to external API changes.
+# 🚚: truck, Moving or renaming files.
+# 📄: page-facing-up, Adding or updating license.
+# 💥: boom, Introducing breaking changes.
+# 🍱: bento, Adding or updating assets.
+# 👌: ok-hand, Updating code due to code review changes.
+# ♿: wheelchair, Improving accessibility.
+# 💡: bulb, Documenting source code.
+# 🍻: beers, Writing code drunkenly.
+# 💬: speech-balloon, Updating text and literals.
+# 🗃: card-file-box, Performing database related changes.
+# 🔊: loud-sound, Adding logs.
+# 🔇: mute, Removing logs.
+# 👥: busts-in-silhouette, Adding contributor(s).
+# 🚸: children-crossing, Improving user experience / usability.
+# 🏗: building-construction, Making architectural changes.
+# 📱: iphone, Working on responsive design.
+# 🤡: clown-face, Mocking things.
+# 🥚: egg, Adding an easter egg.
+# 🙈: see-no-evil, Adding or updating a .gitignore file
+# 📸: camera-flash, Adding or updating snapshots
+# ⚗: alembic, Experimenting new things
+# 🔍: mag, Improving SEO
+
+# JIRA_PLACEHOLDER
+
+# Motivation:
+
+# Modification:
+
+# Result:

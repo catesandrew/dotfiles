@@ -1,15 +1,18 @@
-const testFilePattern = /__tests__/;
+const testFilePattern = /lib\/__tests__/;
 
 module.exports = {
   environments: ({ pathToCurrentFile }) => {
     if (testFilePattern.test(pathToCurrentFile)) {
       return [
+        'qunit',
+        'jasmine',
         'jest',
-        'node'
+        'node',
+        'mocha',
       ];
     }
     return [
-      'es2020',
+      'es2017',
       'node',
       'browser',
       'worker',
@@ -18,7 +21,6 @@ module.exports = {
       'devtools',
     ];
   },
-  emptyLineBetweenGroups: false,
   declarationKeyword: 'import',
   logLevel: 'debug',
   excludes: [
@@ -35,47 +37,12 @@ module.exports = {
     css: 'css-template',
     MediaQuery: 'react-responsive'
   },
-  // Rely on the `eslint-plugin-import-order-alphabetical` rule to fix this for us.
-  groupImports: false,
-  // For monorepo uncomment this setting
-  // moduleNameFormatter({ moduleName, pathToCurrentFile }) {
-  //   return moduleName.replace("packages/", "");
-  // },
   ignorePackagePrefixes: [
     'eslint-',
     'wb-',
     'waybetter-',
   ],
   namedExports: {
-    'react': [
-      'Component',
-      'PureComponent',
-      'useState',
-      'useEffect',
-      'useContext',
-      'useReducer',
-      'useCallback',
-      'useMemo',
-      'useRef',
-      'useImperativeMethods',
-      'useLayoutEffect'
-    ],
-    '@storybook/addon-knobs/react': [
-      "withKnobs",
-      "text",
-      "boolean",
-      "number",
-      "color",
-      "object",
-      "array",
-      "select",
-      "files",
-      "date",
-      "button",
-    ],
-    '@storybook/react': ['storiesOf'],
-    'storybook-chrome-screenshot': ['withScreenshot', 'initScreenshot', 'setScreenshotOptions'],
-    'react-dom': ['createPortal'],
     'reselect': [
       'createSelector',
       'createStructuredSelector'

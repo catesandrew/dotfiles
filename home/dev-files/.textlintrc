@@ -1,0 +1,124 @@
+{
+  "rules": {
+    "spellcheck-tech-word": true,
+    "no-start-duplicated-conjunction": {
+      "interval": 2
+    },
+    "alex": {
+      "allow": []
+    },
+    "write-good": {
+      "passive": true,
+      "thereIs": true,
+      "illusion": true,
+      "so": true,
+      "weasel": true,
+      "adverb": true,
+      "tooWordy": true,
+      "cliches": true,
+      "eprime": false
+    },
+    "en-max-word-count": {
+      "max": 50
+    },
+    "en-capitalization": {
+      // allow lower-case words in Header
+      "allowHeading": true,
+      // allow lower-case words in Image alt
+      "allowFigures": true,
+      // allow lower-case words in ListItem
+      "allowLists": true,
+      // allow lower-case words in anywhere
+      "allowWords": []
+    },
+    "rousseau": {
+      "showLevels": [
+        "suggestion",
+        "warning",
+        "error"
+      ],
+      "ignoreTypes": [
+        "sentence:uppercase"
+      ],
+      "passive": true,
+      "lexical-illusion": true,
+      "so": true,
+      "adverbs": true,
+      "readibility": true,
+      "simplicity": true,
+      "weasel": true,
+      "sentence:start": true,
+      "sentence:end": true,
+      "sentence:uppercase": true,
+    },
+    "no-start-duplicated-conjunction": {
+      "interval": 2 // interval of sentences
+    },
+    "max-comma": {
+      "max": 4
+    },
+    "terminology": {
+      // Load default terms (see terms.json in the repository)
+      "defaultTerms": true,
+      // Syntax elements to skip. Overrides the default
+      "skip": ["Blockquote"],
+      // List of terms
+      "terms": [
+        // Exact spelling including the case
+        "JavaScript",
+        "ESLint",
+        "Sass",
+        "Less",
+        "npm",
+        // RegExp (case-insensitive) → replacement
+        [
+          "front[- ]end(\\w*)",
+          "frontend$1"
+        ],
+        [
+          "back[- ]end(\\w*)",
+          "backend$1"
+        ],
+        [
+          "web[- ]?site(s?)",
+          "site$1"
+        ],
+        [
+          "hot[- ]key",
+          "hotkey"
+        ],
+        [
+          "repo\\b",
+          "repository"
+        ],
+        [
+          "CLI tool(s?)",
+          "command line tool$1"
+        ],
+        [
+          "build system(s?)",
+          "build tool$1"
+        ],
+        [
+          "id['’]?s",
+          "IDs"
+        ],
+        [
+          "(\\w+[^.?!]\\)? )webpack",
+          "$1webpack"
+        ],
+        [
+          "(\\w+[^.?!]\\)? )internet",
+          "$internet"
+        ]
+      ],
+      // Excludes terms
+      "exclude": [
+        "CSS"
+      ]
+    },
+    "period-in-list-item": true,
+    "diacritics": {
+    }
+  }
+}
