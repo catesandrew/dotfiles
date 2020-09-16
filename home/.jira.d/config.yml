@@ -380,10 +380,12 @@ custom-commands:
         default: \$JIRA_PREFIX
     script: |-
       eval "prefix=\$(echo {{options.prefixgit}})"
+      summary=\$({{jira}} view --field=summary -t summary \${JIRA_ISSUE})
+      kebab=\$(echo "\${summary}" | casbab.sh kebab)
       if [ -n "\$prefix" ]; then
-        git checkout -b \${previx}/\${JIRA_ISSUE}{{if args.NAME}}-{{args.NAME}}{{end}}
+        git checkout -b \${prefix}/\${JIRA_ISSUE}-\$kebab{{if args.NAME}}-{{args.NAME}}{{end}}
       else
-        git checkout -b \${JIRA_ISSUE}{{if args.NAME}}-{{args.NAME}}{{end}}
+        git checkout -b \${JIRA_ISSUE}-\$kebab{{if args.NAME}}-{{args.NAME}}{{end}}
       fi
 
   # FIND WORK
