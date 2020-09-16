@@ -1,6 +1,6 @@
+Issue, Summary, Type, Priority, Status, Age, Reporter, Assignee
 {{ range .issues}}
-  {{- .key -}}
-  , {{ .fields.summary -}}
+[{{- .key }}](https://jira.int.payoff.com/browse/{{ .key }}), {{ .fields.summary -}}
   , {{ .fields.issuetype.name -}}
   , {{ if .fields.priority -}}{{ .fields.priority.name }}{{ else }}{{ "<none>" }}{{ end -}}
   , {{ .fields.status.name -}}
