@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# get current branch
+branchName=`git rev-parse --abbrev-ref HEAD`
+
+# search jira issue id in a pattern such a "feature/ABC-123-description"
+jiraId=$(echo $branchName | gsed -nr 's,[a-zA-Z]+/([a-zA-Z]+-[0-9]+)-.+,\1,p' | tr '[:lower:]' '[:upper:]')
+
+# only prepare commit message if pattern matched and jiraId was found
+if [[ ! -z $jiraId ]]; then
+ # $1 is the name of the file containing the commit message
+ # cat update_via_sed.sh | sed 's/'"$old_run"'/'"$new_run"'/'
+ cat ../.gitemojitemplate.txt $1 | sponge $1
+ # gsed -i.bak -e "1s/^/$jiraId\n/" $1
+ gsed -i.bak -e "s/# JIRA_PLACEHOLDER/$jiraId\n/" $1
+#  gsed -i.bak "1s@^@$GIT_EMOJI@" $1
+#  gsed -i.bak -e "1s/^/$GIT_EMOJI\n/" $1
+fi
