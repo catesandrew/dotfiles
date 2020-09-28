@@ -1,0 +1,7 @@
+iTerm2
+
+# merge a pane back to window or tab bar
+
+The secret key combination to drag a pane back to a window or to the tab
+bar is: command + shift + option,  while dragging the pane body (not its
+header!). View the screencast below and you’ll figure it out:
