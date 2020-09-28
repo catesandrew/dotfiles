@@ -74,20 +74,63 @@ custom-commands:
     args:
       - name: ISSUE
         help: issue to mark work being started on
-        required: true
+    options:
+      - name: projectstartwork
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
     script: |-
-      mkdir -p \$HOME/.jira.d/work
-      touch -p \$HOME/.jira.d/work/{{args.ISSUE}}
+      _issue=""
+      if [ -n "{{args.ISSUE}}" ]; then
+        _issue=\$(echo "{{args.ISSUE}}" | tr '[:lower:]' '[:upper:]')
+      else
+        _issue=\$(echo "\${JIRA_ISSUE}" | tr '[:lower:]' '[:upper:]')
+      fi
+      if ! [[ \$_issue =~ [a-zA-Z]+-[0-9]+ ]]; then
+        eval "project=\$(echo {{options.projectstartwork}})"
+        if [ -n "\$project" ]; then
+          _issue="\${project}-\${_issue}"
+        fi
+      fi
+      mkdir -p \${HOME}/.jira.d/work
+      if [ -f "\${HOME}/.jira.d/work/\$_issue" ]; then
+        echo "\${HOME}/.jira.d/work/\$_issue exists, consider ending work first"
+      else
+        touch \${HOME}/.jira.d/work/\$_issue
+      fi
 
   - name: endwork
     help: submit worklog for issue
     args:
       - name: ISSUE
         help: issue to mark work being started on
-        required: true
     script: |-
-      starttime=\$(stat -f "%Sm" -t "%Y-%m-%dT%H:%M:%S.000%z" \$HOME.jira.d/work/{{args.ISSUE}})
-      {{jira}} worklog add {{args.ISSUE}} -S "\$starttime"
+      _issue=""
+      if [ -n "{{args.ISSUE}}" ]; then
+        _issue=\$(echo "{{args.ISSUE}}" | tr '[:lower:]' '[:upper:]')
+      else
+        _issue=\$(echo "\${JIRA_ISSUE}" | tr '[:lower:]' '[:upper:]')
+      fi
+      if ! [[ \$_issue =~ [a-zA-Z]+-[0-9]+ ]]; then
+        eval "project=\$(echo {{options.projectstartwork}})"
+        if [ -n "\$project" ]; then
+          _issue="\${project}-\${_issue}"
+        fi
+      fi
+      if [ -f "\${HOME}/.jira.d/work/\$_issue" ]; then
+        startdate=\$(stat -f "%Sm" -t "%Y-%m-%dT%H:%M:%S.000%z" \${HOME}/.jira.d/work/\$_issue)
+        starttime=\$(stat -f "%Sm" -t "%s" \${HOME}/.jira.d/work/\$_issue)
+        endtime=\$(date +%s)
+        diff=\$(((\$endtime-\$starttime)/60))
+        if (( \$diff > 0 )); then
+          {{jira}} worklog add --noedit -S "\$startdate" -T "\$diff"m \$_issue
+          rm $HOME/.jira.d/work/{{args.ISSUE}}
+        fi
+      else
+        echo "\${HOME}/.jira.d/work/\$_issue does not exist, consider starting work first"
+      fi
 
   - name: env
     help: print the JIRA environment variables available to custom commands
