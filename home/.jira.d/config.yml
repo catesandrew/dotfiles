@@ -11,7 +11,7 @@
 # customfield_10120: epic
 
 query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution)
-projects=(WEL MEM)
+projects=(UIE WEL MEM)
 # jira req https://jira.int.payoff.com/rest/api/2/issuetype | jq '.[] | .name'
 issue_types=("Bug" "Improvement" "Epic" "Task" "Sub-task" "Story" "User Story" "Research" "Data Pull" "Dashboard" "Automation" "Reporting" "Change Request" "SoftwareDeployment" "InfrastructureDeployment" "ProductionConfigChange" "PermissionsChange" "QA Sub-task" "Analysis" "Modeling" "Training" "Access" "IT Help" "UIE - Design" "Purchase" "Change" "Fault" "Off-Boarding" "LegacyIssue" "NewPlatformIssue" "MemberDataExport" "MemberDataDelete" "HMA" "Product Task" "Training Task" "QA task" "New Feature" "Service Request")
 # jira req https://jira.int.payoff.com/rest/api/2/priority | jq '.[] | .name'
@@ -271,6 +271,10 @@ custom-commands:
         --query "\$query" \
         --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
 
+  # https://github.com/go-jira/jira/issues/80
+  # https://confluence.atlassian.com/jirakb/how-to-set-assignee-to-unassigned-via-rest-api-in-jira-744721880.html
+  # echo $output | sed -nr 's,OK ([a-zA-Z]+-[0-9]+).+,\1,p'
+  # jira give UIE-308 --default
   - name: new
     help: create a jira issue
     script: |-
@@ -295,14 +299,26 @@ custom-commands:
       if [ -n "\$priority" ]; then
         state="\${state} -o 'priority=\$priority'"
       fi
-      {{if options.summarynew}}
-        state="\${state} -o 'summary={{options.summarynew}}'"
-      {{end}}
+      eval "assignee=\$(echo {{options.assigneenew}})"
+      if [ -n "\$assignee" ]; then
+        state="\${state} -o 'assignee=\$assignee'"
+      else
+        state="\${state} -o 'assignee=null'"
+      fi
       eval "labels=\$(echo {{options.labelnew}})"
       if [ -n "\$labels" ]; then
         state="\${state} -o 'labels=\$labels'"
       fi
-      eval "{{jira}} create \$state"
+      {{if options.summarynew}}
+        state="\${state} -o 'summary={{options.summarynew}}'"
+      {{end}}
+      echo {{jira}} create --noedit \$state
+      output="\$(eval "{{jira}} create --noedit \$state")"
+      echo \$output
+      # echo \$output
+      new_id="\$(echo \$output | gsed -nr 's,OK ([a-zA-Z]+-[0-9]+).+,\1,p')"
+      # echo \$new_id
+      {{jira}} give \$new_id --default
     options:
       - name: templatenew
         short: t
@@ -336,6 +352,11 @@ custom-commands:
         type: ENUM
         help: reporter to use
         default: \$JIRA_USER
+      - name: assigneenew
+        short: a
+        type: string
+        help: assignee who to assign it to
+        default: \$JIRA_ASSIGNEE
       - name: summarynew
         short: s
         type: STRING
@@ -457,7 +478,7 @@ custom-commands:
     script: |
       printf "\${JIRA_ENDPOINT}/browse/{{args.ISSUE}}" | pbcopy
 
-  - name: browser
+  - name: docs
     help: Brings the JIRA_ISSUE up in the browser if no ISSUE is provided
     args:
       - name: ISSUE
@@ -491,13 +512,13 @@ custom-commands:
       {{jira}} trans "In Progress" {{args.ISSUE}}
 
   - name: u
-    help: Marks story as unassigned and puts it back into ToDo
+    help: Marks story as unassigned and puts it back into Open(Backlog)
     args:
       - name: ISSUE
         default: \$JIRA_ISSUE
     script: |
-      {{jira}} unassign {{args.ISSUE}}
-      {{jira}} trans "To Do" {{args.ISSUE}}
+      {{jira}} unassign -Q {{args.ISSUE}}
+      {{jira}} trans --noedit "Open(Backlog" {{args.ISSUE}}
 
   - name: qa
     help: Assigns the story to you, moves it to QA, and brings up details
