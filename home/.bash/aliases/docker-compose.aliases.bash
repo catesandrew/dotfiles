@@ -40,7 +40,7 @@ dcbuild() {
 __docker_compose_complete dcbuild _docker_compose_build
 
 # Generate a Docker bundle from the Compose file
-bundle() {
+dcbundle() {
   __docker_compose_c bundle "$@"
 }
 __docker_compose_complete dcbuild _docker_compose_build
