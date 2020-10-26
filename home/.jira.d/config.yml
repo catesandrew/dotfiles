@@ -425,7 +425,14 @@ custom-commands:
       {{else if not args.ISSUE}}
         echo "Must provide a Issue"
       {{else}}
-        echo "{{args.ISSUE}}" | /bin/cat - "\${JIRA_ISSUE_FILE}" >| /tmp/jiratemp && mv /tmp/jiratemp "\${JIRA_ISSUE_FILE}"
+        if test -f "/tmp/jiratemp"; then
+          rm /tmp/jiratemp
+        fi
+        UPPER_ISSUE=\$(echo "{{args.ISSUE}}" | tr '[:lower:]' '[:upper:]')
+        sed "/^\${UPPER_ISSUE}\$/d" "\${JIRA_ISSUE_FILE}" > /tmp/jiratemp
+        mv /tmp/jiratemp "\${JIRA_ISSUE_FILE}"
+        echo "\$UPPER_ISSUE" | /bin/cat - "\${JIRA_ISSUE_FILE}" > /tmp/jiratemp
+        mv /tmp/jiratemp "\${JIRA_ISSUE_FILE}"
       {{end}}
 
   - name: i
@@ -510,6 +517,70 @@ custom-commands:
       query="\${query} ORDER BY status,assignee"
       {{jira}} list \
         --template {{options.tmplkanban}} \
+        --query "\$query" \
+        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
+
+  - name: search
+    alias: s
+    help: |-
+      Search for a ticket. To perform a single character wildcard search, use the "?" symbol.
+      To perform a multiple character wildcard search, use the "*" symbol.
+      Wildcard characters need to be enclosed in quote-marks, as they are reserved characters in advanced search.
+      Use quotations, e.g. summary ~ "cha?k and che*". You cannot use a * or ? symbol as the first character of a search.
+      To do a fuzzy search, use the tilde, "~", symbol at the end of a single word term.
+      For example, to search for a term similar in spelling to "roam", use the fuzzy search: `roam~`. This search will find terms like foam and roams.
+      For more information view https://confluence.atlassian.com/jiracoreserver073/search-syntax-for-text-fields-861257223.html
+    args:
+      - name: QUERY
+        help: Search the text of the ticket for this value.
+        required: true
+    options:
+      - name: projectsearch
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: field
+        type: ENUM
+        help: fields to list in table
+        repeat: true
+        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
+      - name: tmplsearch
+        short: t
+        help: template to use, ex debug
+        default: table
+      - name: all
+        short: a
+        type: BOOL
+        help: Include ${joined_done_status_types:2} stories
+      - name: donefield
+        type: ENUM
+        help: status fields not to list, unless --all
+        repeat: true
+        default: $(for i in "${done_status_types[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${status_types[@]}"; do printf "\n          - $i"; done)
+      - name: componentsearch
+        short: c
+        help: Filter on a component, defaults to \$JIRA_COMPONENT
+        default: \$JIRA_COMPONENT
+    script: |-
+      query="text ~ \"{{args.QUERY}}\""
+      eval "project=\$(echo {{options.projectsearch}})"
+      if [ -n "\$project" ]; then
+        query="\${query} and project=\$project"
+      fi
+      eval "component=\$(echo {{options.componentsearch}})"
+      if [ -n "\$component" ]; then
+        query="\${query} and component=\"\$component\""
+      fi
+      {{if not options.all}}
+        query="\${query} and status NOT IN ({{range \$key, \$value := options.donefield}}{{ if \$key}},{{end}}\"{{\$value}}\"{{end}})"
+      {{end}}
+      query="\${query} ORDER BY status,assignee"
+      {{jira}} list \
+        --template {{options.tmplsearch}} \
         --query "\$query" \
         --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
 
