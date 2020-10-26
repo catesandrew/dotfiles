@@ -95,10 +95,10 @@
         // "d" = ( "goToMailbox:", "C7AC6F38-C415-4DB9-A7B6-66DA0CAB8C2C" ); // delegated
         "f" = ( "goToMailbox:", "FLAGGED" );
         "g" = ( "goToMailbox:", "INBOX:catesandrew@imap.gmail.com", "makeFirstResponder:", "mainOutline" ); // Gmail
+        "h" = ( "goToMailbox:", "INBOX:acates%40happymoney.com@imap.gmail.com", "makeFirstResponder:", "mainOutline" ); // HappyMoney
         "l" = "goToMailbox:";
         "i" = ( "goToMailbox:", "INBOX"); // Inbox
         "s" = ( "goToMailbox:", "SENT" );
-        // "w" = ( "goToMailbox:", "INBOX:tsidomain%5Cacates@imap.ibaset.com", "makeFirstResponder:", "mainOutline" ); // ibaset
         // "r" = ( "goToMailbox:", "6C6FE5E3-540B-4320-AB0D-00C0DBEEFB84" ); // waitingOnReply
         "z" = "centerSelectionInVisibleArea:";
     };

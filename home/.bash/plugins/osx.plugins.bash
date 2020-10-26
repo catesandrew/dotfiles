@@ -131,6 +131,30 @@ fi
 # script INTERNAL_IP4_DNS="127.0.0.1" /usr/local/etc/vpnc/vpnc-script
 # background
 # passwd-on-stdin
+function vpnc() {
+  case "$#" in
+    0)
+      echo >&2 "Usage: vpnc [on|off]"
+      ;;
+    *)
+      cmd="$1"
+      case "$cmd" in
+        on)
+          ${HOME}/.bin/vpn-connect.sh
+          ;;
+        off)
+          /opt/cisco/anyconnect/bin/vpn disconnect
+          # wifi off
+          # wifi on
+          # sleep 4s
+          # daemon-dnsmasq restart
+          ;;
+        *)
+          echo >&2 "Usage: vpnc [on|off]"
+          ;;
+      esac
+  esac
+}
 
 if brew_contains_element "openconnect"; then
   function vpn() {
