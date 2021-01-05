@@ -1,0 +1,7 @@
+{
+	name          = 'Html → Md';
+	input         = 'html';
+	environment   = 'MM_SUBJECT=${subject.prefix:+${subject.prefix} }${subject.blob:+[${subject.blob}] }${subject.body:no subject}\nMM_MESSAGE_ID=${message-id.split}\n';
+	command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/html-to-md"';
+	uuid          = '7009EFBB-EE4B-43D8-A936-2B5348976574';
+}

@@ -1,0 +1,7 @@
+{
+	name          = 'Html → Org';
+	input         = 'html';
+	environment   = 'MM_SUBJECT=${subject.prefix:+${subject.prefix} }${subject.blob:+[${subject.blob}] }${subject.body:no subject}\nMM_MESSAGE_ID=${message-id.split}\n';
+	command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/html-to-org"';
+	uuid          = '048E68A3-1308-4E75-9DE8-AE73A587FF93';
+}

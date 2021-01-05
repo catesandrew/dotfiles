@@ -1,0 +1,11 @@
+{
+	name          = 'Add...';
+	environment   = 'MM_SUBJECT=${subject.prefix:+${subject.prefix} }${subject.blob:+[${subject.blob}] }${subject.body}\nMM_MESSAGE_ID=${message-id.split}\n';
+	keyEquivalent = "^A";
+	uuid          = 'DDD7FF1A-3871-4755-B6CD-815E61541BE1';
+  script        =
+    '#!/bin/bash
+BASH_NO=no . /etc/profile
+"${MM_BUNDLE_SUPPORT}/bin/add"
+';
+}

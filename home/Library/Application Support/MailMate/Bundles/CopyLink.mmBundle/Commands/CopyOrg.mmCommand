@@ -1,0 +1,12 @@
+{
+	name          = 'Copy Email Org Link';
+	environment   = 'MM_FROM=${from}\nMM_SUBJECT=${subject.prefix:+${subject.prefix} }${subject.blob:+[${subject.blob}] }${subject.body}\nMM_MESSAGE_ID=${message-id.split}\n';
+	keyEquivalent = "^C";
+	uuid          = '9CFE6C99-46C1-4887-AF67-9BA5B9C612FB';
+  script        =
+    '#!/bin/bash
+BASH_NO=no . /etc/profile
+"${MM_BUNDLE_SUPPORT}/bin/copylink" -o
+';
+
+}

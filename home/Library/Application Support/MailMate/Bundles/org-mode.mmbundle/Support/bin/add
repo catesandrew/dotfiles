@@ -1,0 +1,30 @@
+#!/usr/bin/ruby -w
+# encoding: UTF-8
+
+require 'cgi'
+
+subject = ENV['MM_SUBJECT']
+note = "Email: message://%3c" + ENV['MM_MESSAGE_ID'] + "%3e"
+
+range_string = ENV['MM_SELECTED_RANGE']
+selection = ""
+if range_string.nil?
+  selection = $stdin.read
+else
+  canonical = $stdin.read
+  offset1,offset2 = range_string.match(/(\d+):(\d+)/).captures
+  range = Integer(offset1)..Integer(offset2)
+  selection = canonical[range]
+end
+
+if !selection.empty?
+  note = note + "\n\n" +  selection
+end
+
+File.open(ENV['HOME'] + '/org/inbox.org', 'a') { |f|
+  f.puts "\n"
+  f.puts "* TODO " + subject + "  :mail:\n"
+  f.puts note
+  f.puts "\n"
+
+}

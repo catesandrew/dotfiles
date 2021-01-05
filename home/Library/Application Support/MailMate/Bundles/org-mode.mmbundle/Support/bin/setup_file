@@ -1,0 +1,6 @@
+#!/bin/bash
+
+orgfile=`defaults read com.freron.MailMate MmOrgModeInbox`
+orgfile=`osascript -e 'POSIX path of (choose file with prompt "Choose a org-mode file to append to:" of type {"org", "txt"})'`
+defaults write com.freron.MailMate MmOrgModeInbox -string "${orgfile}"
+echo ${orgfile}

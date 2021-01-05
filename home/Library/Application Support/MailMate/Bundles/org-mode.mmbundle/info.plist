@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>contactEmailRot13</key>
+	<string>znvyzngr@knz.qx</string>
+	<key>contactName</key>
+	<string>Max Rydahl Andersen</string>
+	<key>description</key>
+	<string>Integration with org-mode files.</string>
+	<key>name</key>
+	<string>org-mode</string>
+	<key>uuid</key>
+	<string>04CE6F04-DC66-478F-92FF-885BD0BA1384</string>
+</dict>
+</plist>

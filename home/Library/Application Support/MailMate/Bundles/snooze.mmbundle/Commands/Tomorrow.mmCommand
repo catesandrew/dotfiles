@@ -1,0 +1,12 @@
+{
+  name          = '2. Tomorrow';
+  uuid          = 'FAAF2F32-463A-4459-9BCA-D68FEAEAC583';
+  input         = 'none';
+  output        = 'actions';
+  keyEquivalent = '^z';
+  script        =
+'#!/bin/bash
+BASH_NO=no . /etc/profile
+"${MM_BUNDLE_SUPPORT}/bin/snooze.py" tomorrow
+';
+}

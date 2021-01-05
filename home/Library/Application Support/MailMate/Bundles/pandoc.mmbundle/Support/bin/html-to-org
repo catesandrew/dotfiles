@@ -1,0 +1,18 @@
+#!/bin/bash
+
+BASH_NO=no . /etc/profile
+name=${MM_SUBJECT//:/_}
+name=${name//\//_}
+name=${name:0:250}
+
+mkdir -p "$TMPDIR/com.freron.MailMate.pandoc"
+tmpfile="$TMPDIR/com.freron.MailMate.pandoc/${name}.eml"
+cat > "${tmpfile}"
+
+url="message://%3c${MM_MESSAGE_ID}%3e"
+
+pandoc -f html -t org "${tmpfile}" | pbcopy
+
+# osascript "${MM_BUNDLE_SUPPORT}/bin/EagleFilerImport.scpt" "${tmpfile}" "${url}"
+
+unlink "${tmpfile}"

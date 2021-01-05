@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>contactEmailRot13</key>
+	<string>qrnavfur@qrnavfur.arg</string>
+	<key>contactName</key>
+	<string>Dean Jackson</string>
+	<key>description</key>
+	<string>Copy Message Link to Clipboard.</string>
+	<key>name</key>
+	<string>Copy Link</string>
+	<key>uuid</key>
+	<string>431C378A-CD4C-46F8-8A7A-13D2797A5136</string>
+</dict>
+</plist>

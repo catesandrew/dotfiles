@@ -1,0 +1,12 @@
+{
+  name          = '6. A Month';
+  uuid          = '5CB40147-0D29-4791-A65F-43935E20090C';
+  input         = 'none';
+  output        = 'actions';
+  keyEquivalent = '^z';
+  script        =
+'#!/bin/bash
+BASH_NO=no . /etc/profile
+"${MM_BUNDLE_SUPPORT}/bin/snooze.py" month
+';
+}
