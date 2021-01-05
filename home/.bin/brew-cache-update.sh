@@ -21,7 +21,7 @@ if hash brew 2>/dev/null; then
   echo "BASH_IT=${BASH_IT}" >> "${OUTPUT}"
   echo "export BREW_IT" >> "${OUTPUT}"
 
-  __dot_brew_list=($(brew list | sed 's/:.*//'))
+  __dot_brew_list=($(brew list --formula | sed 's/:.*//'))
   __serialise_to s "${__dot_brew_list[@]}"
 
   echo "__dot_brew_list=\"$s\"" >> "${OUTPUT}"
@@ -33,7 +33,7 @@ if hash brew 2>/dev/null; then
   echo "__dot_brew_taps=\"$s\"" >> "${OUTPUT}"
   echo "export __dot_brew_taps" >> "${OUTPUT}"
 
-  __dot_cask_list=($(brew cask list | sed 's/:.*//'))
+  __dot_cask_list=($(brew list --formula | sed 's/:.*//'))
   __serialise_to s "${__dot_cask_list[@]}"
 
   echo "__dot_cask_list=\"$s\"" >> "${OUTPUT}"
