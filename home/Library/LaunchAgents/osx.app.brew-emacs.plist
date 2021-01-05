@@ -10,13 +10,9 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --daemon</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --fg-daemon</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
-	<key>StandardErrorPath</key>
-	<string>/tmp/homebrew.mxcl.emacs.stderr</string>
-	<key>StandardOutPath</key>
-	<string>/tmp/homebrew.mxcl.emacs.stdout</string>
 </dict>
 </plist>
