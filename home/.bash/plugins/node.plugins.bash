@@ -7,6 +7,8 @@ export NODE_REPL_HISTORY_SIZE='32768'
 # Use sloppy mode by default, matching web browsers.
 export NODE_REPL_MODE='sloppy'
 
+export UV_THREADPOOL_SIZE=8
+
 # Strip other version from PATH
 export PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
 
