@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Disabled</key>
-	<true/>
+	<false/>
 	<key>KeepAlive</key>
 	<false/>
 	<key>Label</key>
@@ -15,6 +15,6 @@
 		<string>sleep 10 &amp;&amp; /Applications/Annotate.app/Contents/MacOS/Annotate</string>
 	</array>
 	<key>RunAtLoad</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
