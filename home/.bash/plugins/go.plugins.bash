@@ -9,5 +9,11 @@ if brew_contains_element "go" || \
   else
     export GOROOT="${BREW_HOME}/opt/go/libexec"
     export GOPATH="${BREW_HOME}/go"
+
+    # Strip other version from PATH
+    # export PATH=$(path_strip "$PATH" "${GOPATH}/bin")
+
+    # Append
+    path_append "${GOPATH}/bin"
   fi
 fi
