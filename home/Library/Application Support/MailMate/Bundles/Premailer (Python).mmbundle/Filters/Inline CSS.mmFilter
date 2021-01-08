@@ -1,5 +1,7 @@
 {
-        name          = 'Inline CSS';
+  name          = 'Inline CSS';
 	uuid          = '9846E526-1B45-42E8-8E75-F2B47AB5FF76';
-        command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/premailer"\n';
+	input         = 'html';
+	output        = 'html';
+  command       = '#!/bin/bash\nBASH_NO=no . /etc/profile\n"${MM_BUNDLE_SUPPORT}/bin/premailer"\n';
 }

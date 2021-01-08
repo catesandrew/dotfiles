@@ -1,5 +1,5 @@
 {
 	name          = 'Pygments';
 	uuid          = 'E4464365-9FE3-487C-8B39-D3B0F632F1D8';
-	command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/highlight"\n';
+	command       = '#!/bin/bash\nBASH_NO=no . /etc/profile\n"${MM_BUNDLE_SUPPORT}/bin/highlight"\n';
 }

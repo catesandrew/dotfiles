@@ -1,5 +1,4 @@
 #!/bin/bash
 
-BASH_NO=no . /etc/profile
 STYLE=`defaults read com.freron.MailMate MmDefaultPygmentsStyleName 2>/dev/null`
-pygmentize -f html -O noclasses=1,style=${STYLE:-colorful} -l "${CODE_LANGUAGE}"
+pygmentize -f html -O noclasses=1,nowrap=1,style=${STYLE:-github} -l "${CODE_LANGUAGE}"

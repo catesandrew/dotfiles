@@ -1,6 +1,6 @@
 {
-        isDisabled    = 1;
-        name          = 'Select Style';
-        uuid          = '7BFBE661-5E0E-43C3-945F-0E7D0DB80B86';
-        command       = '#!/bin/bash\n"${MM_BUNDLE_SUPPORT}/bin/select_style"\n';
+  isDisabled    = 1;
+  name          = 'Select Style';
+  uuid          = '7BFBE661-5E0E-43C3-945F-0E7D0DB80B86';
+  command       = '#!/bin/bash\nBASH_NO=no . /etc/profile\n"${MM_BUNDLE_SUPPORT}/bin/select_style"\n';
 }

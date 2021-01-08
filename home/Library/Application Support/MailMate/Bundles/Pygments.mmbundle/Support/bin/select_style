@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This command has not been implemented yet.
+# It should display the available styles and set the selected one using "defaults write com.freron.MailMate MmDefaultPygmentsStyleName ..."
+
+# Using Python to get styles:
+#  from pygments.styles import get_all_styles
+#  styles = list(get_all_styles())
+# See the Calendar bundle for an example of using AppleScript to display an interface.
