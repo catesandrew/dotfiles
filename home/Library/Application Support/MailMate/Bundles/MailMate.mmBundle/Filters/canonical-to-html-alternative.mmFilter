@@ -7,20 +7,15 @@ BASH_NO=no . /etc/profile
 DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
 if [ "$DEBUG_ENABLED" = 1 ] ; then
   echo "MM_MARKDOWN: ${MM_MARKDOWN}" >> "${HOME}/MailMate.log"
-  echo "MM_NO_LINKS: ${MM_NO_LINKS}" >> "${HOME}/MailMate.log"
 fi
 
 if [ -z "${MM_MARKDOWN}" ]; then
-  if [ -z "${MM_NO_LINKS}" ]; then
-    "${MM_SHARED_SUPPORT}/bin/canonical_to_html_display"
-  else
-    "${MM_SHARED_SUPPORT}/bin/canonical_to_html_display" --no-links
-  fi
+  "$MM_SHARED_SUPPORT/bin/canonical_to_html_alternative"
 else
   echo "<div class=\\"markdown\\">$(mdtohtml)</div>"
   echo "<p class=\\"signature\\">-- <br/>Andrew Cates</p>"
   echo "<div class=\\"markdown\\"><blockquote><p>$(fortune -s food computers linuxcookie literature work)</p></blockquote></div>"
 fi
 ';
-  uuid = '1822B5B3-38C7-4736-980A-CF620078F9B8';
+  uuid = 'D85EB1A8-F5D8-48EE-A2DA-05116C1F4ECB';
 }

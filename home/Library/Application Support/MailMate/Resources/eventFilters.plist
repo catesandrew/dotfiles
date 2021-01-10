@@ -3,74 +3,86 @@
   events = {
     "canonical_to_html_display" = {
       filters = (
-        // { uuid = "E32FED7D-CB06-4DE2-BCB7-1504DFFD1666"; }, // Logger
+        { uuid = "E32FED7D-CB06-4DE2-BCB7-1504DFFD1666"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
         // { uuid = "79826ECE-6C4A-452F-9531-AD96B36BD280"; }, // Delete all trailing blank lines
-        {
-          uuid = "1822B5B3-38C7-4736-980A-CF620078F9B8"; // Canonical to HTML
-          "defaultsVariableEnabled" = "MmGithubMarkdownDisabled";
-        },
-        {
-          uuid = "43FEABB7-E715-4803-B4C8-EF0540D3D959"; // Canonical to GitHub HTML
-          "defaultsVariableEnabled" = "MmGithubMarkdownEnabled";
-        },
-        // { uuid = "8FCCBEBE-9FE6-4A45-B9AD-79FECFB1C7A9"; }, // Logger
+        { uuid = "1822B5B3-38C7-4736-980A-CF620078F9B8"; defaultsVariableEnabled = "MmGithubMarkdownDisabled"; }, // Canonical to HTML
+        { uuid = "43FEABB7-E715-4803-B4C8-EF0540D3D959"; defaultsVariableEnabled = "MmGithubMarkdownEnabled"; }, // Canonical to GitHub HTML
+        { uuid = "8FCCBEBE-9FE6-4A45-B9AD-79FECFB1C7A9"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
     "canonical_to_html_alternative" = {
       filters = (
-        // { uuid = "155E1AC1-E590-4ADE-A4E9-23247FFF628B"; }, // Logger
+        { uuid = "155E1AC1-E590-4ADE-A4E9-23247FFF628B"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
         // { uuid = "DC4C51EC-9A85-4A75-BB10-D9868F442DF4"; }, // Mark Empty Lines
         { uuid = "2EB0AA72-9473-4AEE-80EB-86F1F7084965"; }, // Mark trailing empty whitespace
-        {
-          uuid = "1822B5B3-38C7-4736-980A-CF620078F9B8"; // Canonical to HTML
-          "defaultsVariableEnabled" = "MmGithubMarkdownDisabled";
-        },
-        {
-          uuid = "43FEABB7-E715-4803-B4C8-EF0540D3D959"; // Canonical to GitHub HTML
-          "defaultsVariableEnabled" = "MmGithubMarkdownEnabled";
-        },
+        { uuid = "D85EB1A8-F5D8-48EE-A2DA-05116C1F4ECB"; defaultsVariableEnabled = "MmGithubMarkdownDisabled"; }, // Canonical to HTML alternative
+        { uuid = "4F4D3CF8-EA99-4C70-8FF6-07DA58CBE4CA"; defaultsVariableEnabled = "MmGithubMarkdownEnabled"; }, // Canonical to GitHub HTML alternative
         { uuid = "56CAA623-E3EF-4A57-9824-75E9BF41E48B"; }, // Unmark emptry lines
-        {
-          uuid = "FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34"; // Smarty Pants
-          "defaultsVariableEnabled" = MmSmartyPantsEnabled;
-        },
-        // { uuid = "949D4D15-8DE5-4C01-A337-D963D7AD8E78"; }, // Logger
+        { uuid = "FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34"; defaultsVariableEnabled = "MmSmartyPantsEnabled"; }, // Smarty Pants
+        { uuid = "949D4D15-8DE5-4C01-A337-D963D7AD8E78"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
     "sanitize_html" = {
       filters = (
-        // { uuid = "8C41BE4B-0C72-40C1-84B4-016D78087B95"; }, // Logger
-        {
-          uuid = "4751C2E4-4D61-42D4-89DB-DC1B3FF677D8"; // HTML to HTML
-        },
-        // { uuid = "EBB6030E-BCBB-41F0-847D-3950398FD5AB"; }, // Logger
+        { uuid = "8C41BE4B-0C72-40C1-84B4-016D78087B95"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
+        { uuid = "4751C2E4-4D61-42D4-89DB-DC1B3FF677D8"; }, // HTML to HTML
+        { uuid = "EBB6030E-BCBB-41F0-847D-3950398FD5AB"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
+		"display_html" = {
+			filters = (
+				// { defaultsVariableUUID = "MmBundleCommandForStrippingSignatures"; },
+			);
+		};
     "embed_html" = {
       filters = (
-        // { uuid = "FAFC7DF5-74BC-4EC1-9380-B66EC17B7F8A"; }, // Logger
+        { uuid = "FAFC7DF5-74BC-4EC1-9380-B66EC17B7F8A"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
         { defaultsVariableUUID = "MmBundleCommandForEmbeddingMethod"; },
-        // { uuid = "AEDAD9FD-9002-4731-B892-7C0D59862E8E"; }, // Logger
+        { uuid = "AEDAD9FD-9002-4731-B892-7C0D59862E8E"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
     "sanitize_canonical" = {
       filters = (
-        // { uuid = "93E01756-BFC7-4E2F-BC4E-54B020E24F93"; }, // Logger
-        // {
-        //   uuid = "A51A781D-A0D3-4632-AFBB-BE65B5CEA465"; // Trim Signature
-        // },
+        { uuid = "93E01756-BFC7-4E2F-BC4E-54B020E24F93"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
+        // { uuid = "A51A781D-A0D3-4632-AFBB-BE65B5CEA465"; }, // Trim Signature
         // { uuid = "79826ECE-6C4A-452F-9531-AD96B36BD280"; }, // Delete all trailing blank lines
-        // { uuid = "784C81D0-B747-4E58-8FFE-AB907ECE76D1"; }, // Logger
+        { uuid = "784C81D0-B747-4E58-8FFE-AB907ECE76D1"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
     "html_to_text" = {
       filters = (
-        // { uuid = "D351ADD0-370B-4AC0-8949-FCCBEA304B0A"; }, // Logger
-        {
-          uuid = "0220B5F9-6A60-4D4C-8C66-CD60EF55533D"; // HTML to Canonical
-        },
-        // { uuid = "EC0F3EDF-5053-4274-9E6C-CDF8BE67B13D"; }, // Logger
+        { uuid = "D351ADD0-370B-4AC0-8949-FCCBEA304B0A"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
+        { uuid = "0220B5F9-6A60-4D4C-8C66-CD60EF55533D"; }, // HTML to Canonical
+        { uuid = "EC0F3EDF-5053-4274-9E6C-CDF8BE67B13D"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );
     };
+
+		// Temporary solution until a specific setting exists for choice of inliner
+		"inline_css" = {
+			filters = (
+        { uuid = "D0095326-450E-45B2-BEC7-3E7346E5837A"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
+				{ uuid = "9846E526-1B45-42E8-8E75-F2B47AB5FF76"; }, // Premailer
+			);
+		};
+		"code_style" = {
+			filters = (
+				{ defaultsVariableUUID = "MmBundleCommandForCodeStyling"; },
+			);
+		};
+		"math_style" = {
+			filters = (
+				{ defaultsVariableUUID = "MmBundleCommandForMathStyling"; },
+			);
+		};
+		"asciimath_style" = {
+			filters = (
+				{ uuid = "A23ECCED-ACB7-41A0-9FC3-6FC439BC817D"; }, // amath-variant
+			);
+		};
+		"texmath_style" = {
+			filters = (
+				{ uuid = "3A44100D-E3C7-4B5D-A768-F3145D7B29B3"; }, // Premailer
+			);
+		};
   };
 }

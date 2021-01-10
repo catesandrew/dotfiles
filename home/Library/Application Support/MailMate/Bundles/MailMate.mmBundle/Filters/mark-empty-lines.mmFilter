@@ -1,9 +1,14 @@
 {
   name = 'Mark Empty Lines';
-  uuid = 'DC4C51EC-9A85-4A75-BB10-D9868F442DF4';
   input = 'canonical';
   output = 'canonical';
-  script = "#!/bin/bash
-  BASH_NO=no . /etc/profile
-  gsed 's/^\\s*$/BLANK_LINE_MARKER/g'";
+  script = '#!/bin/bash
+BASH_NO=no . /etc/profile
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+fi
+
+gsed \'s/^\\s*$/BLANK_LINE_MARKER/g\'';
+  uuid = 'DC4C51EC-9A85-4A75-BB10-D9868F442DF4';
 }

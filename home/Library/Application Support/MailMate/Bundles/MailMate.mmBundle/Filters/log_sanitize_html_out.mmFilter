@@ -2,8 +2,8 @@
 	input   = 'html';
 	output  = 'html';
   script = '#!/bin/bash
-  echo log_sanitize_html_out.mmFilter
-"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+cat <&0
 ';
 	uuid    = 'EBB6030E-BCBB-41F0-847D-3950398FD5AB';
 }

@@ -5,11 +5,26 @@
 # - Reconsider '--remove-classes'
 
 TMPFILE=$(mktemp -t premailer_data) || exit 1
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugPremailerEnabled 2>/dev/null)
+STYLE=$(defaults read com.freron.MailMate MmDefaultPygmentsStyleName 2>/dev/null)
+
+CODE_STYLE="$(pygmentize -S "${STYLE:-github}" -f html)"
+
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "TMPFILE: ${TMPFILE}" >> "${HOME}/MailMate.log"
+  echo "CODE_STYLE: ${CODE_STYLE}" >> "${HOME}/MailMate.log"
+fi
+
 # The `sed` command removes `<o:p></o:p>` which appears to not work well with `premailer`.
 #  These tags are described here: http://stackoverflow.com/questions/7808968/what-do-op-elements-do-anyway
-cat | perl -pe 's,</?o:[^>]*>,,g' >${TMPFILE}
+# Then add the pygments code block to the style tag
+cat | perl -pe 's,</?o:[^>]*>,,g' | perl -pe "s,</style>,\n${CODE_STYLE}\n</style>,g" >${TMPFILE}
 
 export PYTHONIOENCODING=utf-8
-if ! (cat ${TMPFILE} | python3 -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses) ; then
-  cat ${TMPFILE} | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | python3 -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  cat ${TMPFILE} >> "${HOME}/MailMate.log"
+  TEST1=$(cat "${TMPFILE}" | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | python3 -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses)
+  echo "TEST1: ${TEST1}" >> "${HOME}/MailMate.log"
 fi
+
+cat "${TMPFILE}" | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | python3 -m premailer --remove-classes --preserve-style-tags --disable-validation --exclude-pseudoclasses

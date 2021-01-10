@@ -2,8 +2,9 @@
 	input   = 'html';
 	output  = 'html';
   script = '#!/bin/bash
-echo log_display_html_in.mmFilter
-"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+BASH_NO=no . /etc/profile
+touch ~/MailMate.log
+echo "log_display_html_in.mmFilter: ${MM_BUNDLE_ITEM_NAME}" | tee -a ~/MailMate.log
 ';
 	uuid    = '14905127-19C7-4AB4-B25D-31CC8804EBC3';
 }

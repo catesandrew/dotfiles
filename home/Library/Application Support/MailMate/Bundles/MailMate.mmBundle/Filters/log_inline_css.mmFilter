@@ -1,0 +1,15 @@
+{
+  name   = 'log_inline_css_in';
+  input  = 'html'; // Options are: none, raw, decoded, canonical, html, selection, formatted
+  output = 'html';
+  // output = 'actions'; // Options are: discard, actions
+  // environment = 'MM_CONTENT_TYPE=${content-type.type:text}\nMM_CONTENT_SUBTYPE=${content-type.subtype:plain}';
+	// executionMode = "singleMessage"; // Options are: noMessages, singleMessage, multipleMessages
+	// conditions = "list-id exists"; // Can be used to ensure that a command only applies to certain types of messages.
+	// Other options are formatString, separatorString, suffixString, filesPattern, saveForEditing, ...
+  script = '#!/bin/bash
+echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+cat <&0
+';
+	uuid    = 'D0095326-450E-45B2-BEC7-3E7346E5837A';
+}

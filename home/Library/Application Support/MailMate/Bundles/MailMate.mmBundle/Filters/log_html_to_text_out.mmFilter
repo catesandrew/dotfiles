@@ -2,8 +2,8 @@
 	input   = 'canonical';
 	output  = 'canonical';
   script = '#!/bin/bash
-  echo log_html_to_text_out.mmFilter
-"${MM_BUNDLE_SUPPORT}/bin/logger.sh"
+echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+cat <&0
 ';
 	uuid    = 'EC0F3EDF-5053-4274-9E6C-CDF8BE67B13D';
 }

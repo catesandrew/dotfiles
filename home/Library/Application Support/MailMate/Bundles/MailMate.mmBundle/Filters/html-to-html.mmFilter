@@ -4,6 +4,11 @@
   output = 'html';
   script = '#!/bin/bash
 BASH_NO=no . /etc/profile
-echo html-to-html.mmFilter | tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text | "$MM_SHARED_SUPPORT/bin/canonical_to_html" --no-links';
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+fi
+
+tidy --quiet yes --wrap 0 --input-encoding utf8 --output-encoding utf8 --force-output 1 --show-warnings no | html2text | "${MM_SHARED_SUPPORT}/bin/canonical_to_html_alternative" --no-links';
   uuid = '4751C2E4-4D61-42D4-89DB-DC1B3FF677D8';
 }

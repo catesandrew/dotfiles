@@ -4,6 +4,11 @@
   output = 'html';
   script = '#!/bin/bash
 BASH_NO=no . /etc/profile
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+fi
+
 smartypants';
   uuid = 'FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34';
 }

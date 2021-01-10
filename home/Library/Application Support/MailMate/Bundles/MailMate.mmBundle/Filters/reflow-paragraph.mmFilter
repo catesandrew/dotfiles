@@ -2,8 +2,13 @@
   name = 'Trim Signature';
   input = 'canonical';
   output = 'canonical';
-  script = "#!/bin/bash
+  script = '#!/bin/bash
 BASH_NO=no . /etc/profile
-js-par -w 70 -qi";
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+fi
+
+js-par -w 70 -qi';
   uuid = 'B51A781D-A0D3-4632-AFBB-BE65B5CEA465';
 }

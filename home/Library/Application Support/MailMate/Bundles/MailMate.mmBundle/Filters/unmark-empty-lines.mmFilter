@@ -3,7 +3,12 @@
   uuid = '56CAA623-E3EF-4A57-9824-75E9BF41E48B';
   input = 'html';
   output = 'html';
-  script = "#!/bin/bash
-  BASH_NO=no . /etc/profile
-  gsed -s 's/BLANK_LINE_MARKER/<p dir=\"auto\" class=\"blank-line\">\\&nbsp;<\\/p>/g'";
+  script = '#!/bin/bash
+BASH_NO=no . /etc/profile
+DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
+if [ "$DEBUG_ENABLED" = 1 ] ; then
+  echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
+fi
+
+gsed -s \'s/BLANK_LINE_MARKER/<p dir=\"auto\" class=\"blank-line\">\\&nbsp;<\\/p>/g\'';
 }
