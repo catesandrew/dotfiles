@@ -4,6 +4,11 @@
 <dict>
 	<key>Disabled</key>
 	<false/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>homebrew.mxcl.emacs</string>
 	<key>ProgramArguments</key>
@@ -12,7 +17,5 @@
 		<string>-c</string>
 		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --fg-daemon</string>
 	</array>
-	<key>RunAtLoad</key>
-	<true/>
 </dict>
 </plist>
