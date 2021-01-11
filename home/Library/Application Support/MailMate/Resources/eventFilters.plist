@@ -12,12 +12,12 @@
     };
     "canonical_to_html_alternative" = {
       filters = (
-        { uuid = "155E1AC1-E590-4ADE-A4E9-23247FFF628B"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
+        // { uuid = "155E1AC1-E590-4ADE-A4E9-23247FFF628B"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
         // { uuid = "DC4C51EC-9A85-4A75-BB10-D9868F442DF4"; }, // Mark Empty Lines
-        { uuid = "2EB0AA72-9473-4AEE-80EB-86F1F7084965"; }, // Mark trailing empty whitespace
+        // { uuid = "2EB0AA72-9473-4AEE-80EB-86F1F7084965"; }, // Mark trailing empty whitespace
         { uuid = "D85EB1A8-F5D8-48EE-A2DA-05116C1F4ECB"; defaultsVariableEnabled = "MmGithubMarkdownDisabled"; }, // Canonical to HTML alternative
         { uuid = "4F4D3CF8-EA99-4C70-8FF6-07DA58CBE4CA"; defaultsVariableEnabled = "MmGithubMarkdownEnabled"; }, // Canonical to GitHub HTML alternative
-        { uuid = "56CAA623-E3EF-4A57-9824-75E9BF41E48B"; }, // Unmark emptry lines
+        // { uuid = "56CAA623-E3EF-4A57-9824-75E9BF41E48B"; }, // Unmark empty lines
         { uuid = "FA6D69FE-3A82-4A1D-B8AD-39DA193C0D34"; defaultsVariableEnabled = "MmSmartyPantsEnabled"; }, // Smarty Pants
         { uuid = "949D4D15-8DE5-4C01-A337-D963D7AD8E78"; defaultsVariableEnabled = "MmDebugEnabled"; }, // Logger
       );

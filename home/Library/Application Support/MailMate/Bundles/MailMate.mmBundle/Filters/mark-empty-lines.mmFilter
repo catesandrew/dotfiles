@@ -4,11 +4,17 @@
   output = 'canonical';
   script = '#!/bin/bash
 BASH_NO=no . /etc/profile
+# does not work as the <br/>s can go in <pre> code blocks as well
 DEBUG_ENABLED=$(defaults read com.freron.MailMate MmDebugEnabled 2>/dev/null)
 if [ "$DEBUG_ENABLED" = 1 ] ; then
   echo "${MM_BUNDLE_ITEM_NAME}" >> "${HOME}/MailMate.log"
-fi
-
-gsed \'s/^\\s*$/BLANK_LINE_MARKER/g\'';
+  STDIN=$(cat -)
+  echo "STDIN: $STDIN" >> "${HOME}/MailMate.log"
+  STDOUT=$(echo "$STDIN" | gsed -r "s/^\\s*$/<br \\/>/g")
+  echo "STDOUT: $STDOUT" >> "${HOME}/MailMate.log"
+  echo "$STDIN" | gsed -r "s/^\\s*$/<br \\/>/g"
+else
+  gsed -r "s/^\\s*$/<br \\/>/g"
+fi';
   uuid = 'DC4C51EC-9A85-4A75-BB10-D9868F442DF4';
 }

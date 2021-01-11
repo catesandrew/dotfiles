@@ -12,7 +12,9 @@ fi
 if [ -z "${MM_MARKDOWN}" ]; then
   "$MM_SHARED_SUPPORT/bin/canonical_to_html_alternative"
 else
-  echo "<div class=\\"markdown\\">$(curl -X POST -H "Content-Type: text/plain" --data-binary @- "https://api.github.com/markdown/raw?access_token=c9b4bb6a93f0dbe8c952be3c5384b2404f0f0d2c")</div>"
+  MM_ACCESS_TOKEN=$(defaults read com.freron.MailMate MmAccessToken 2>/dev/null)
+
+  echo "<div class=\\"markdown\\">$(curl -X POST -H "Content-Type: text/plain" --data-binary @- "https://api.github.com/markdown/raw?access_token=${MM_ACCESS_TOKEN}")</div>"
   echo "<p class=\\"signature\\">-- <br/>Andrew Cates</p>"
   echo "<div class=\\"markdown\\"><blockquote><p>$(fortune -s food computers linuxcookie literature work)</p></blockquote></div>"
 fi

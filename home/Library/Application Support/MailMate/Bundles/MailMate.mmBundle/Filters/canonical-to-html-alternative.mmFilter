@@ -12,7 +12,7 @@ fi
 if [ -z "${MM_MARKDOWN}" ]; then
   "$MM_SHARED_SUPPORT/bin/canonical_to_html_alternative"
 else
-  echo "<div class=\\"markdown\\">$(mdtohtml)</div>"
+  echo "<div class=\\"markdown\\">$(mmd --to=html --lang=en --nosmart --notransclude)</div>"
   echo "<p class=\\"signature\\">-- <br/>Andrew Cates</p>"
   echo "<div class=\\"markdown\\"><blockquote><p>$(fortune -s food computers linuxcookie literature work)</p></blockquote></div>"
 fi

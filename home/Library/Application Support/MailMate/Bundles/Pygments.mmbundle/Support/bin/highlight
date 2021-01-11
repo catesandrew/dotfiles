@@ -19,7 +19,7 @@ else
   LEXER_ARG="-l ${CODE_LANGUAGE}"
 fi
 
-OPTION_ARG="-O noclasses=0,nowrap=0,nobackground=1,wrapcode=1,style=${STYLE:-github}"
+OPTION_ARG="-O noclasses=1,nowrap=0,nobackground=1,wrapcode=1,style=${STYLE:-github}"
 
 if [ "$DEBUG_ENABLED" = 1 ] ; then
   echo "TMPFILE: ${TMPFILE}" >> "${HOME}/MailMate.log"
