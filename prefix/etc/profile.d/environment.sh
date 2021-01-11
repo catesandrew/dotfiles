@@ -89,10 +89,23 @@ if [ -d "$JENV_ROOT" ]; then
         else
           JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
         fi
-
         export JAVA_HOME
         export JENV_VERSION
     fi
+fi
+
+
+if [ -d "${BREW_HOME}/go" ]; then
+    export GOROOT="${BREW_HOME}/opt/go/libexec"
+    export GOPATH="${BREW_HOME}/go"
+
+    launchctl setenv GOROOT "$GOROOT"
+    launchctl setenv GOPATH "$GOPATH"
+
+    # Strip other version from PATH
+    # export PATH=$(path_strip "$PATH" "${GOPATH}/bin")
+
+    PATH="${PATH}:${GOPATH}/bin"
 fi
 
 export PATH
