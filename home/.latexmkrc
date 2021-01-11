@@ -1,5 +1,9 @@
 # Use xelatex instead of pdflatex
-$pdflatex = "xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S";
+$pdflatex = 'xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S';
+# examples that were ultimately not used for working with emacs
+# $pdflatex = 'xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S && (cp "%D" "%R.pdf")';
+# $pdflatex = 'xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S && (cp "%D" "%R.pdf"); echo Output file copied from "%D" to "%R.pdf" in current directory)';
+
 # $pdflatex = "pdflatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S";
 
 # Always create PDFs
