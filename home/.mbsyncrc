@@ -17,9 +17,10 @@ IMAPStore work-remote
 Account work
 
 MaildirStore work-local
+Subfolders Verbatim
 Path ~/.mail/work/
 Inbox ~/.mail/work/Inbox
-SubFolders Legacy
+Flatten .
 
 Channel work-inbox
 Master :work-remote:
@@ -68,9 +69,10 @@ IMAPStore gmail-remote
 Account gmail
 
 MaildirStore gmail-local
+Subfolders Verbatim
 Path ~/.mail/gmail/
 Inbox ~/.mail/gmail/Inbox
-SubFolders Legacy
+Flatten .
 
 Channel gmail-inbox
 Master :gmail-remote:
