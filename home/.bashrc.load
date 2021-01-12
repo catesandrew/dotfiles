@@ -118,7 +118,6 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         fi
         unset BASH_COMP_TARGET
     elif brew_contains_element "bash-completion@2"; then
-        export BASH_COMPLETION_COMPAT_DIR="${BREW_HOME}/etc/bash_completion.d"
         [[ -r "${BREW_HOME}/etc/profile.d/bash_completion.sh" ]] && . "${BREW_HOME}/etc/profile.d/bash_completion.sh"
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
