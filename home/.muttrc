@@ -162,10 +162,55 @@ macro index,pager i2 '<sync-mailbox><enter-command>source ~/.mutt/accounts/gmail
 #  |_|  |_|_/__/\__|
 #
 
-auto_view text/html
+auto_view text/html             # automatically show html (mailcap uses lynx)
+auto_view application/pgp-encrypted
 
 # This line gets rid of iso 8859 issues with attachments
 set rfc2047_parameters
 
 # A macro to store attachments in specific folder
 macro attach , "<save-entry><bol>~/Downloads/<eol>" "Save to downloads folder"
+
+
+# settings from mutt-wizard
+# set mime_type_query_command = "file --mime-type -b %s"
+# set date_format="%y/%m/%d %I:%M%p"
+# set index_format="%2C %Z %?X?A& ? %D %-15.15F %s (%-4.4c)"
+# set sort = 'reverse-date'
+# set sleep_time = 0              # Pause 0 seconds for informational messages
+# set markers = no                # Disables the `+` displayed at line wraps
+# set mark_old = no               # Unread mail stay unread until read
+# set mime_forward = yes          # attachments are forwarded with mail
+
+# bind index,pager i noop
+# bind index,pager g noop
+# bind index \Cf noop
+
+# # General rebindings
+# bind attach l view-mailcap
+# bind editor <space> noop
+# bind pager,attach h exit
+# bind pager l view-attachments
+# bind index D delete-message
+# bind index U undelete-message
+# bind index L limit
+# bind index h noop
+# bind index l display-message
+# bind index,query <space> tag-entry
+
+# macro browser h '<change-dir><kill-line>..<enter>' "Go to parent folder"
+# bind index,pager H view-raw-message
+# bind browser l select-entry
+# bind pager,browser gg top-page
+# bind pager,browser G bottom-page
+# bind index,pager,browser d half-down
+# bind index,pager,browser u half-up
+# bind index,pager S sync-mailbox
+# bind index,pager R group-reply
+# bind index \031 previous-undeleted	# Mouse wheel
+# bind index \005 next-undeleted		# Mouse wheel
+# bind pager \031 previous-line		# Mouse wheel
+# bind pager \005 next-line		# Mouse wheel
+# bind editor <Tab> complete-query
+
+# macro index A "<limit>all\n" "show all messages (undo limit)"
