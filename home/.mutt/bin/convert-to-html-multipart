@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Original Source: https://github.com/oblitum/dotfiles/blob/ArchLinux/.local/bin/MIMEmbellish
+# https://github.com/oblitum/typographic-email
 
 import re
 import sys

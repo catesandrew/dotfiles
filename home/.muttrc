@@ -123,6 +123,9 @@ bind attach <return> view-mailcap
 set envelope_from                    # which from?
 set sig_dashes                       # dashes before sig
 set edit_headers                     # show headers when composing
+# Adds a header that is used to determine whether send-from-mutt.sh should
+# convert the markdown to html
+my_hdr Markdown: false
 set fast_reply                       # skip to compose when replying
 set askcc                            # ask for CC:
 set fcc_attach                       # save attachments with the body
