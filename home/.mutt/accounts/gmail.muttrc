@@ -11,6 +11,7 @@ alias me catesandrew <catesandrew@gmail.com>
 
 # The -a gmail will need to change to whatever you named your account in the msmtp config.
 set sendmail = "msmtp -a gmail"
+# set sendmail = "~/.mutt/bin/send-from-mutt.sh gmail"
 
 # The sendmail_wait line tells Mutt to wait for the msmtp program to finish
 # sending the mail before returning control, instead of running it in the
