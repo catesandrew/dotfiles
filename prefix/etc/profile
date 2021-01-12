@@ -1,21 +1,18 @@
 # System-wide .profile for sh(1)
 
 if [ -x /usr/libexec/path_helper ]; then
-  export PATH=""
-  eval "$(/usr/libexec/path_helper -s)"
+	eval `/usr/libexec/path_helper -s`
 fi
 
 if [ -d /etc/profile.d ]; then
-  for file in /etc/profile.d/*.sh; do
-    if [ -r "$file" ]; then
-      . "$file"
-    fi
-  done
-  unset i
+    for i in /etc/profile.d/*.sh; do
+        if [ -r $i ]; then
+            . $i
+        fi
+    done
+    unset i
 fi
 
 if [ "${BASH_NO}" != "no" ]; then
-  [ -r /etc/bashrc ] && . /etc/bashrc
-elif [ -f "${HOME}/.bashrc.load" ]; then
-  source "${HOME}/.bashrc.load"
+	[ -r /etc/bashrc ] && . /etc/bashrc
 fi
