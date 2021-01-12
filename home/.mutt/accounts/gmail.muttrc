@@ -1,0 +1,67 @@
+#    ___ __  __      _ _
+#   / __|  \/  |__ _(_) |
+#  | (_ | |\/| / _` | | |
+#   \___|_|  |_\__,_|_|_|
+#
+
+# muttrc file for account catesandrew@gmail.com
+set realname = "Andrew Cates"
+set from = "catesandrew@gmail.com"
+alias me catesandrew <catesandrew@gmail.com>
+
+# The -a gmail will need to change to whatever you named your account in the msmtp config.
+set sendmail = "msmtp -a gmail"
+
+# The sendmail_wait line tells Mutt to wait for the msmtp program to finish
+# sending the mail before returning control, instead of running it in the
+# background. This makes it obvious if there's a problem sending a message,
+# which I prefer to silent, backgrounded failures.
+set sendmail_wait = 0
+
+# The unset record line tells Mutt to not append a copy of every email you send
+# to a file on your hard drive. Gmail will save the emails you send in the sent
+# folder, so you'll get the the next time you sync with offlineimap anyway.
+unset record
+# gmail does that
+unset move
+
+set folder           = ~/.mail/gmail         # mailbox location
+set header_cache     = ~/.mail/gmail/headers # where to store headers
+set message_cachedir = ~/.mail/gmail/bodies  # where to store bodies
+set mbox_type = Maildir
+
+set spoolfile = "+Inbox"
+set mbox      = "+All"
+set postponed = "+Drafts"
+set trash     = "+Trash"
+# set record = "+Sent"
+set record    = ""
+
+bind index,pager gg noop
+bind index,pager g noop
+bind index,pager M noop
+bind index,pager C noop
+# macro index o "<shell-escape>mw -y catesandrew@gmail.com<enter>" "run mbsync to sync catesandrew@gmail.com"
+macro index o "<shell-escape>mbsync work<enter>" "run mbsync to sync catesandrew@gmail.com"
+unmailboxes *
+unalternates *
+
+mailboxes "=Canvas" "=INBOX" "=Newsletters" "=Newsletters/ABCA" "=Newsletters/AngelList" "=Newsletters/Baseball Rebellion" "=Newsletters/Blue Sombrero" "=Newsletters/Coach Insider" "=Newsletters/Coaches Insider" "=Newsletters/FDA" "=Newsletters/GameChanger" "=Newsletters/Home Connect" "=Newsletters/JavaScript Weekly" "=Newsletters/Little League" "=Newsletters/Mobile Dev" "=Newsletters/PBI" "=Newsletters/Ryan Holiday" "=Newsletters/ShutterFly" "=Newsletters/Soiling" "=Newsletters/Sports Engine" "=Newsletters/Steve Springer" "=Newsletters/Triple Crown Sports" "=Newsletters/WebTools" "=[Gmail]" "=[Gmail]/All Mail" "=[Gmail]/Drafts" "=[Gmail]/Important" "=[Gmail]/Sent Mail" "=[Gmail]/Spam" "=[Gmail]/Starred" "=[Gmail]/Trash" "=bug" "=confirmed" "=critical" "=delegated" "=discussion" "=documentation" "=enhancement" "=feature" "=postponed" "=suggestion" "=support" "=waitingOnReply"
+
+macro index,pager gi "<change-folder>=Inbox<enter>" "go to inbox"
+macro index,pager Mi ";<save-message>=Inbox<enter>" "move mail to inbox"
+macro index,pager Ci ";<copy-message>=Inbox<enter>" "copy mail to inbox"
+
+macro index,pager gd "<change-folder>=Drafts<enter>" "go to drafts"
+macro index,pager Md ";<save-message>=Drafts<enter>" "move mail to drafts"
+macro index,pager Cd ";<copy-message>=Drafts<enter>" "copy mail to drafts"
+
+macro index,pager gs "<change-folder>=Sent<enter>" "go to sent"
+
+macro index,pager gS "<change-folder>=Spam<enter>" "go to spam"
+macro index,pager MS ";<save-message>=Spam<enter>" "move mail to spam"
+macro index,pager CS ";<copy-message>=Spam<enter>" "copy mail to spam"
+
+macro index,pager gt "<change-folder>=Trash<enter>" "go to trash"
+macro index,pager Mt ";<save-message>=Trash<enter>" "move mail to trash"
+macro index,pager Ct ";<copy-message>=Trash<enter>" "copy mail to trash"

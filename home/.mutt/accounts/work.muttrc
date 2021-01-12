@@ -1,0 +1,71 @@
+#  __      __       _
+#  \ \    / /__ _ _| |__
+#   \ \/\/ / _ \ '_| / /
+#    \_/\_/\___/_| |_\_\
+#
+
+# muttrc file for account acates@happymoney.com
+set realname = "Andrew Cates"
+set from = "acates@happymoney.com"
+alias me acates <acates@happymoney.com>
+
+# The -a gmail will need to change to whatever you named your account in the msmtp config.
+set sendmail = "msmtp -a work"
+
+# The sendmail_wait line tells Mutt to wait for the msmtp program to finish
+# sending the mail before returning control, instead of running it in the
+# background. This makes it obvious if there's a problem sending a message,
+# which I prefer to silent, backgrounded failures.
+set sendmail_wait = 0
+
+# The unset record line tells Mutt to not append a copy of every email you send
+# to a file on your hard drive. Gmail will save the emails you send in the sent
+# folder, so you'll get the the next time you sync with offlineimap anyway.
+unset record
+# gmail does that
+unset move
+
+set folder           = ~/.mail/work         # mailbox location
+set header_cache     = ~/.mail/work/headers # where to store headers
+set message_cachedir = ~/.mail/work/bodies  # where to store bodies
+set mbox_type = Maildir
+
+set spoolfile = "+Inbox"
+set mbox      = "+All"
+set postponed = "+Drafts"
+set trash     = "+Trash"
+# set record = "+Sent"
+set record    = ""
+
+bind index,pager gg noop
+bind index,pager g noop
+bind index,pager M noop
+bind index,pager C noop
+# macro index o "<shell-escape>mw -y acates@happymoney.com<enter>" "run mbsync to sync acates@happymoney.com"
+macro index o "<shell-escape>mbsync work<enter>" "run mbsync to sync acates@happymoney.com"
+unmailboxes *
+unalternates *
+
+mailboxes "=GitHub" "=GitHub/HappyMoney" "=GitHub/Teampayoff" "=INBOX" "=Invitations" "=JIRA" "=JIRA/CCR" "=JIRA/ENG" "=JIRA/EPICS" "=JIRA/Helpdesk" "=JIRA/Mentions" "=JIRA/PS" "=JIRA/UIE" "=Later" "=Logging" "=Stash" "=Zoom" "=[Gmail]" "=[Gmail]/All Mail" "=[Gmail]/Archive" "=[Gmail]/Drafts" "=[Gmail]/Important" "=[Gmail]/Sent Mail" "=[Gmail]/Spam" "=[Gmail]/Starred" "=[Gmail]/Trash"
+
+macro index,pager gi "<change-folder>=Inbox<enter>" "go to inbox"
+macro index,pager Mi ";<save-message>=Inbox<enter>" "move mail to inbox"
+macro index,pager Ci ";<copy-message>=Inbox<enter>" "copy mail to inbox"
+
+macro index,pager ga "<change-folder>=Archive<enter>" "go to archive"
+macro index,pager Ma ";<save-message>=Archive<enter>" "move mail to archive"
+macro index,pager Ca ";<copy-message>=Archive<enter>" "copy mail to archive"
+
+macro index,pager gd "<change-folder>=Drafts<enter>" "go to drafts"
+macro index,pager Md ";<save-message>=Drafts<enter>" "move mail to drafts"
+macro index,pager Cd ";<copy-message>=Drafts<enter>" "copy mail to drafts"
+
+macro index,pager gs "<change-folder>=Sent<enter>" "go to sent"
+
+macro index,pager gS "<change-folder>=Spam<enter>" "go to spam"
+macro index,pager MS ";<save-message>=Spam<enter>" "move mail to spam"
+macro index,pager CS ";<copy-message>=Spam<enter>" "copy mail to spam"
+
+macro index,pager gt "<change-folder>=Trash<enter>" "go to trash"
+macro index,pager Mt ";<save-message>=Trash<enter>" "move mail to trash"
+macro index,pager Ct ";<copy-message>=Trash<enter>" "copy mail to trash"
