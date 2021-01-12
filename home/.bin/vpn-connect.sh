@@ -1,10 +1,37 @@
 #!/usr/bin/env expect
 
-spawn totp TOKEN google
+# turn off the display to stdout.
+log_user 0
+spawn pass work/google-totp
 expect {
     \n {
-        set result $expect_out(buffer)
+        # set token $expect_out(buffer,string)
+        set token [string trim $expect_out(buffer)]
+        exp_continue
+    }
+    eof {
         # puts $expect_out(buffer)
+    }
+}
+send_user "command exit with token: $token"
+
+spawn pass work/okta
+expect {
+    \n {
+        set password [string trim $expect_out(buffer)]
+        exp_continue
+    }
+    eof {
+        # puts $expect_out(buffer)
+    }
+}
+send_user "command exit with password: $password"
+
+spawn totp $token google
+expect {
+    \n {
+        # set result $expect_out(buffer)
+        set result [string trim $expect_out(buffer)]
         exp_continue
     }
     eof {
@@ -13,9 +40,10 @@ expect {
 }
 send_user "command exit with totp: $result"
 
-
+# turn display on again
+log_user 1
 set timeout -1
-spawn /opt/cisco/anyconnect/bin/vpn connect URL
+spawn /opt/cisco/anyconnect/bin/vpn connect https://vpn.happymoney.com
 match_max 100000
 
 expect {
@@ -23,7 +51,7 @@ expect {
     "Username: \[acates\]" { send "\r" }
 }
 
-expect "Password: " { send "PASSWORD\r" }
+expect "Password: " { send "${password}\r" }
 expect "Answer: " { send "3\r" }
 expect "Answer: " { send "${result}\r" }
 
