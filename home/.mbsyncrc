@@ -4,10 +4,6 @@
 # 2. If on Gmail, [enable IMAP](https://support.google.com/mail/answer/7126229?hl=en).
 # 3. If on Gmail 2FA, make an [App Password](https://support.google.com/accounts/answer/185833?hl=en).
 # 4. If on Gmail non-2FA, enable [less secure apps](https://support.google.com/accounts/answer/6010255?hl=en).
-#
-Create Both
-Expunge Both
-SyncState *
 
 # Gmail Work
 IMAPAccount work
@@ -32,31 +28,33 @@ Patterns "INBOX"
 
 Channel work-sent
 Master :work-remote:"[Gmail]/Sent Mail"
-Slave :work-local:sent
+Slave :work-local:Sent
 
 Channel work-trash
 Master :work-remote:"[Gmail]/Trash"
-Slave :work-local:trash
+Slave :work-local:Trash
 
 Channel work-all
 Master :work-remote:"[Gmail]/All Mail"
-Slave :work-local:all
-Patterns "INBOX"
+Slave :work-local:All
+
+Channel work-junk
+Master :work-remote:"[Gmail]/Spam"
+slave  :work-local:Junk
+
+# Automatically create missing mailboxes, both locally and on the server
+Create Both
+# Automatically delete messages on either side if they are found deleted on the other.
+Expunge Both
+# Save the synchronization state files in the relevant directory
+SyncState *
 
 Group work
 Channel work-inbox
 Channel work-sent
 Channel work-trash
 Channel work-all
-
-# Gmail mailboxes:
-# "All Mail"
-# "Drafts"
-# "Important"
-# "Sent Mail"
-# "Spam"
-# "Starred"
-# "Trash"
+Channel work-junk
 
 # Gmail Personal
 IMAPAccount gmail
@@ -74,42 +72,37 @@ Path ~/.mail/gmail/
 Inbox ~/.mail/gmail/Inbox
 SubFolders Legacy
 
-Channel gmail
+Channel gmail-inbox
 Master :gmail-remote:
 Slave :gmail-local:
-Patterns "[Gmail]/Sent Mail" "[Gmail]/All Mail"
+Patterns "INBOX"
+
+Channel gmail-sent
+Master :gmail-remote:"[Gmail]/Sent Mail"
+Slave :gmail-local:Sent
+
+Channel gmail-trash
+Master :gmail-remote:"[Gmail]/Trash"
+Slave :gmail-local:Trash
+
+Channel gmail-all
+Master :gmail-remote:"[Gmail]/All Mail"
+Slave :gmail-local:All
+
+Channel gmail-junk
+Master :gmail-remote:"[Gmail]/Spam"
+slave  :gmail-local:Junk
+
+# Automatically create missing mailboxes, both locally and on the server
 Create Both
+# Automatically delete messages on either side if they are found deleted on the other.
+Expunge Both
+# Save the synchronization state files in the relevant directory
 SyncState *
-Sync All
 
-
-# # First section: remote IMAP account
-# IMAPAccount fastmail
-# Host imap.fastmail.com
-# Port 993
-# User jonathanchu@fastmail.com
-# # For simplicity, this is how to read the password from another file.
-# # For better security you should use GPG https://gnupg.org/
-# PassCmd "cat ~/.mbsync-fastmail"
-# SSLType IMAPS
-# SSLVersions TLSv1.2
-#
-# IMAPStore fastmail-remote
-# Account fastmail
-#
-# # This section describes the local storage
-# MaildirStore fastmail-local
-# Path ~/Maildir/
-# Inbox ~/Maildir/INBOX
-# SubFolders Verbatim
-#
-# # This section a "channel", a connection between remote and local
-# Channel fastmail
-# Master :fastmail-remote:
-# Slave :fastmail-local:
-# Patterns *
-# Expunge None
-# CopyArrivalDate yes
-# Sync All
-# Create Slave
-# SyncState *
+Group gmail
+Channel gmail-inbox
+Channel gmail-sent
+Channel gmail-trash
+Channel gmail-all
+Channel gmail-junk

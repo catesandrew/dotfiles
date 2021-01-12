@@ -27,3 +27,4 @@ indent.pro skip
 open-connect skip
 provision skip
 dev-files skip
+.mutt recurse

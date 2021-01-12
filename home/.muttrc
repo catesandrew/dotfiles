@@ -1,0 +1,127 @@
+# https://stevelosh.com/blog/2012/10/the-homely-mutt
+
+#   ___      _   _
+#  | _ \__ _| |_| |_  ___
+#  |  _/ _` |  _| ' \(_-<
+#  |_| \__,_|\__|_||_/__/
+#
+
+set folder           = ~/.mail               # mailbox location
+set alias_file       = ~/.mutt/alias         # where to store aliases
+set header_cache     = ~/.mutt/cache/headers # where to store headers
+set message_cachedir = ~/.mutt/cache/bodies  # where to store bodies
+set certificate_file = ~/.mutt/certificates  # where to store certs
+set mailcap_path     = ~/.mutt/mailcap       # entries for filetypes
+set tmpdir           = ~/.mutt/temp          # where to keep temp files
+set signature        = ~/.mutt/sig           # my signature file
+
+#   ___          _
+#  | _ ) __ _ __(_)__ ___
+#  | _ \/ _` (_-< / _(_-<
+#  |___/\__,_/__/_\__/__/
+#
+
+set wait_key = no        # shut up, mutt
+set mbox_type = Maildir  # mailbox type
+set timeout = 3          # idle time before scanning
+set mail_check = 0       # minimum time between scans
+unset move               # gmail does that
+set delete               # don't ask, just do
+unset confirmappend      # don't ask, just do!
+set quit                 # don't ask, just do!!
+unset mark_old           # read/new is good enough for me
+set beep_new             # bell on new mails
+set pipe_decode          # strip headers and eval mimes when piping
+set thorough_search      # strip headers and eval mimes before searching
+
+#   ___ _        _             ___
+#  / __| |_ __ _| |_ _  _ ___ | _ ) __ _ _ _
+#  \__ \  _/ _` |  _| || (_-< | _ \/ _` | '_|
+#  |___/\__\__,_|\__|\_,_/__/ |___/\__,_|_|
+#
+
+set status_chars  = " *%A"
+set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
+
+#   _  _             _
+#  | || |___ __ _ __| |___ _ _
+#  | __ / -_) _` / _` / -_) '_|
+#  |_||_\___\__,_\__,_\___|_|
+#
+ignore *                                # ignore all headers
+unignore from: to: cc: date: subject:   # show only these
+unhdr_order *                           # some distros order things by default
+hdr_order from: to: cc: date: subject:  # and in this order
+
+
+# OTHERS
+set sort='reverse-threads'
+set sort_aux='last-date-received'
+auto_view text/html
+# This line gets rid of iso 8859 issues with attachments
+set rfc2047_parameters
+
+# See all mail headers in editor, cache headers and bodies
+set edit_headers=yes
+
+# Prettify
+color hdrdefault white black  # headers white on black
+color header brightgreen black ^From:  # sender's name in green
+color quoted cyan black  # quoted text in blue
+color signature red black   # signature in red
+
+# A macro to store attachments in specific folder
+macro attach , "<save-entry><bol>~/Downloads/<eol>" "Save to downloads folder"
+
+# set ssl_starttls=yes
+# set ssl_force_tls=yes
+
+#  __      __       _
+#  \ \    / /__ _ _| |__
+#   \ \/\/ / _ \ '_| / /
+#    \_/\_/\___/_| |_\_\
+#
+
+# set folder = "~/.mail/work"
+
+# Switch accounts with F keys
+macro index <f2> '<sync-mailbox><refresh><enter-command>source ~/.mail/work<enter><change-folder>!<enter>'
+
+# Use an external command to get the password
+set my_smtp_pass = `pass mbsync/acates@happymoney.com`
+# Set the smtp url
+set smtp_url="smtps://catesandrew@smtp.gmail.com:587"
+
+
+# Default inbox.
+set spoolfile = "+work/Inbox"
+set mbox      = "+work/All"
+set postponed = "+work/Drafts"
+set trash     = "+work/Trash"
+set record    = ""
+
+set from = "acates@happymoney.com"
+set realname = "Andrew Cates"
+
+#    ___ __  __      _ _
+#   / __|  \/  |__ _(_) |
+#  | (_ | |\/| / _` | | |
+#   \___|_|  |_\__,_|_|_|
+#
+
+macro index <f3> '<sync-mailbox><refresh><enter-command>source ~/.mail/gmail<enter><change-folder>!<enter>'
+
+# Use an external command to get the password
+# set my_smtp_pass = `pass mbsync/catesandrew@gmail.com`
+# Set the smtp url
+# set smtp_url="smtps://catesandrew:$my_smtp_pass@smtp.gmail.com:587"
+# set smtp_url="smtps://catesandrew@smtp.gmail.com:587"
+
+# set spoolfile = "+gmail/Inbox"
+# set mbox      = "+gmail/All"
+# set postponed = "+gmail/Drafts"
+# set trash     = "+gmail/Trash"
+# set record    = ""
+
+# set from = "acates@happymoney.com"
+# set realname = "Andrew Cates"
