@@ -49,26 +49,13 @@ unalternates *
 
 # mailboxes +Sent +Drafts +Junk +Trash +Projects `find $HOME/.mail/work/Projects -mindepth 1 -not \( -name 'tmp' -o -name 'new' -o -name 'cur' \) -type d -printf "+'Projects/%P' "`
 
-mailboxes "=GitHub" "=GitHub/HappyMoney" "=GitHub/Teampayoff" "=INBOX" "=Invitations" "=JIRA" "=JIRA/CCR" "=JIRA/ENG" "=JIRA/EPICS" "=JIRA/Helpdesk" "=JIRA/Mentions" "=JIRA/PS" "=JIRA/UIE" "=Later" "=Logging" "=Stash" "=Zoom" "=[Gmail]" "=[Gmail]/All Mail" "=[Gmail]/Archive" "=[Gmail]/Drafts" "=[Gmail]/Important" "=[Gmail]/Sent Mail" "=[Gmail]/Spam" "=[Gmail]/Starred" "=[Gmail]/Trash"
+# mailboxes "=GitHub" "=GitHub/HappyMoney" "=GitHub/Teampayoff" "=INBOX" "=Invitations" "=JIRA" "=JIRA/CCR" "=JIRA/ENG" "=JIRA/EPICS" "=JIRA/Helpdesk" "=JIRA/Mentions" "=JIRA/PS" "=JIRA/UIE" "=Later" "=Logging" "=Stash" "=Zoom" "=[Gmail]" "=[Gmail]/All Mail" "=[Gmail]/Archive" "=[Gmail]/Drafts" "=[Gmail]/Important" "=[Gmail]/Sent Mail" "=[Gmail]/Spam" "=[Gmail]/Starred" "=[Gmail]/Trash"
 
-macro index,pager gi "<change-folder>=Inbox<enter>" "go to inbox"
-macro index,pager Mi ";<save-message>=Inbox<enter>" "move mail to inbox"
-macro index,pager Ci ";<copy-message>=Inbox<enter>" "copy mail to inbox"
-
-macro index,pager ga "<change-folder>=Archive<enter>" "go to archive"
-macro index,pager Ma ";<save-message>=Archive<enter>" "move mail to archive"
-macro index,pager Ca ";<copy-message>=Archive<enter>" "copy mail to archive"
-
-macro index,pager gd "<change-folder>=Drafts<enter>" "go to drafts"
-macro index,pager Md ";<save-message>=Drafts<enter>" "move mail to drafts"
-macro index,pager Cd ";<copy-message>=Drafts<enter>" "copy mail to drafts"
-
-macro index,pager gs "<change-folder>=Sent<enter>" "go to sent"
-
-macro index,pager gS "<change-folder>=Spam<enter>" "go to spam"
-macro index,pager MS ";<save-message>=Spam<enter>" "move mail to spam"
-macro index,pager CS ";<copy-message>=Spam<enter>" "copy mail to spam"
-
-macro index,pager gt "<change-folder>=Trash<enter>" "go to trash"
-macro index,pager Mt ";<save-message>=Trash<enter>" "move mail to trash"
-macro index,pager Ct ";<copy-message>=Trash<enter>" "copy mail to trash"
+macro index ga "<change-folder>=All<enter>" "go to all mail"
+macro index gi "<change-folder>=Inbox<enter>" "go to inbox"
+macro index gd "<change-folder>=Drafts<enter>" "go to drafts"
+macro index gs "<change-folder>=Sent<enter>" "go to sent"
+macro index gS "<change-folder>=Spam<enter>" "go to spam"
+macro index gt "<change-folder>=Trash<enter>" "go to trash"
+macro index,pager d "<save-message>=Trash<enter><enter>" "Trash"
+macro index,pager y "<save-message>=All<enter><enter>" "Archive"
