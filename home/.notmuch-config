@@ -12,7 +12,8 @@
 #
 [database]
 # path=/Users/acates/mail
-path=~/.mail/gmail/
+# path=~/.mail/gmail/
+path=.mail/
 
 # User configuration
 #
