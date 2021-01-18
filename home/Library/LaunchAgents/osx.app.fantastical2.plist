@@ -5,12 +5,13 @@
 	<key>Disabled</key>
 	<false/>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.fantastical2</string>
 	<key>Program</key>
 	<string>/Applications/Fantastical.app/Contents/MacOS/Fantastical</string>
-	<key>RunAtLoad</key>
-	<true/>
 </dict>
 </plist>
