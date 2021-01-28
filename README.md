@@ -272,7 +272,7 @@ NOTE: I just added `launchctl setenv` commands to the `/etc/profile` as well bec
 # System-wide .profile for sh(1)
 
 if [ -x /usr/libexec/path_helper ]; then
-  eval `/usr/libexec/path_helper -s`
+	eval `/usr/libexec/path_helper -s`
 fi
 
 if [ -d /etc/profile.d ]; then
@@ -285,7 +285,7 @@ if [ -d /etc/profile.d ]; then
 fi
 
 if [ "${BASH_NO}" != "no" ]; then
-  [ -r /etc/bashrc ] && . /etc/bashrc
+	[ -r /etc/bashrc ] && . /etc/bashrc
 fi
 ```
 
@@ -300,7 +300,6 @@ if [ ! -d "$BREW_HOME" ]; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
-
     fi
 fi
 
@@ -310,7 +309,7 @@ if [ -d "${HOME}/.bash" ]; then
     launchctl setenv BASH_IT "$BASH_IT"
 fi
 
-if [ ! -d "$RBENV_HOME" ]; then
+if ! [ -d "$RBENV_HOME" ]; then
     if [ -d /usr/local/opt/rbenv ]; then
         RBENV_HOME=/usr/local/opt/rbenv
     fi
@@ -364,7 +363,7 @@ if [ ! -d "$JENV_HOME" ]; then
     if [ -d /usr/local/opt/jenv ]; then
         JENV_HOME=/usr/local/opt/jenv
     elif [ -d "$HOME" ]; then
-        JENV_HOME="$HOME"/.jenv
+        JENV_HOME="${HOME}/.jenv"
     fi
 
     export JENV_HOME
@@ -378,10 +377,29 @@ fi
 if [ -d "$JENV_ROOT" ]; then
     if [ -f "${JENV_ROOT}/version" ]; then
         JENV_VERSION=$(cat "${JENV_ROOT}/version")
-        JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
+        # check to verify version is not `system`
+        if [ "$JENV_VERSION" = "system" ]; then
+          JAVA_HOME="$(/usr/libexec/java_home)"
+        else
+          JAVA_HOME="$(/usr/libexec/java_home "-v${JENV_VERSION}")"
+        fi
         export JAVA_HOME
         export JENV_VERSION
     fi
+fi
+
+
+if [ -d "${BREW_HOME}/go" ]; then
+    export GOROOT="${BREW_HOME}/opt/go/libexec"
+    export GOPATH="${BREW_HOME}/go"
+
+    launchctl setenv GOROOT "$GOROOT"
+    launchctl setenv GOPATH "$GOPATH"
+
+    # Strip other version from PATH
+    # export PATH=$(path_strip "$PATH" "${GOPATH}/bin")
+
+    PATH="${PATH}:${GOPATH}/bin"
 fi
 
 export PATH

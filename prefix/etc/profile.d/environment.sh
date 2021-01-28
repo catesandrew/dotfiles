@@ -5,7 +5,6 @@ if [ ! -d "$BREW_HOME" ]; then
         BREW_HOME=$(brew --prefix)
         export BREW_HOME
         launchctl setenv BREW_HOME "$BREW_HOME"
-
     fi
 fi
 
