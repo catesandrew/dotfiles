@@ -3,14 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.karabiner-elements</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Karabiner-Elements.app/Contents/MacOS/Karabiner-Elements</string>
-    </array>
-	<key>RunAtLoad</key>
-	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Karabiner-Elements.app/Contents/MacOS/Karabiner-Elements</string>
+	</array>
 </dict>
 </plist>

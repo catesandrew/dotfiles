@@ -3,14 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.moom</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Moom.app/Contents/MacOS/Moom</string>
-    </array>
-	<key>RunAtLoad</key>
-	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Moom.app/Contents/MacOS/Moom</string>
+	</array>
 </dict>
 </plist>

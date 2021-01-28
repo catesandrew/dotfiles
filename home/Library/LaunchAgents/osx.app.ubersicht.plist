@@ -3,14 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>Disabled</key>
-	<true/>
-	<key>KeepAlive</key>
 	<false/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.ubersicht</string>
 	<key>Program</key>
 	<string>/Applications/Übersicht.app/Contents/MacOS/Übersicht</string>
-	<key>RunAtLoad</key>
-	<true/>
 </dict>
 </plist>

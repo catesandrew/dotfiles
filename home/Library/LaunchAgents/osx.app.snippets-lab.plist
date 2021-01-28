@@ -3,16 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.snippets-lab</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; sleep 8 &amp;&amp; /Applications/SnippetsLab.app/Contents/MacOS/SnippetsLab</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/SnippetsLab.app/Contents/MacOS/SnippetsLab</string>
 	</array>
-	<key>RunAtLoad</key>
-	<true/>
 </dict>
 </plist>

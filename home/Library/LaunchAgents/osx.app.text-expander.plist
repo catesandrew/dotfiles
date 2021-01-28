@@ -3,7 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.text-expander</string>
 	<key>ProgramArguments</key>
@@ -12,7 +15,5 @@
 		<string>-c</string>
 		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/TextExpander.app/Contents/MacOS/TextExpander</string>
 	</array>
-	<key>RunAtLoad</key>
-	<true/>
 </dict>
 </plist>

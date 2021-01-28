@@ -3,14 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.dash</string>
-    <key>ProgramArguments</key>
-    <array>
-      <string>/Applications/Dash.app/Contents/MacOS/Dash</string>
-    </array>
-	<key>RunAtLoad</key>
-	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Dash.app/Contents/MacOS/Dash</string>
+	</array>
 </dict>
 </plist>

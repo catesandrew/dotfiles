@@ -3,16 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.unclutter</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/sh</string>
-		<string>-c</string>
-		<string>sleep 10 &amp;&amp; /Applications/Unclutter.app/Contents/MacOS/Unclutter</string>
-	</array>
-	<key>RunAtLoad</key>
-	<true/>
+	<key>Program</key>
+	<string>/Applications/Unclutter.app/Contents/MacOS/Unclutter</string>
 </dict>
 </plist>

@@ -3,7 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>KeepAlive</key>
-	<false/>
+	<dict>
+		<key>Crashed</key>
+		<true/>
+	</dict>
 	<key>Label</key>
 	<string>osx.app.bartender</string>
 	<key>ProgramArguments</key>
