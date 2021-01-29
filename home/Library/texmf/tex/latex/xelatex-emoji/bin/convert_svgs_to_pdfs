@@ -1,0 +1,12 @@
+#!/bin/bash
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+for f in $*
+do
+  filename=$(basename "$f")
+  filename="${filename%.*}"
+  if `rsvg-convert -f pdf -o "$filename.pdf" "$filename.svg"`
+  then echo "Converted $f"
+  fi
+done
+IFS=$SAVEIFS

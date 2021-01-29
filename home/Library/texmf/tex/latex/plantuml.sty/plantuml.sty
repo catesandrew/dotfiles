@@ -1,0 +1,393 @@
+%% This is file `plantuml.sty',
+%%
+\def\plantumlVersion{3.0.0}
+
+\ProvidesPackage{plantuml}[2021/01/28 v.\plantumlVersion Plantuml style file for LaTeX]
+\def\Plantuml{{\tt Plantuml}}
+\InputIfFileExists{\jobname.pre}{}{}
+\newbox\PUMLbox
+\newdimen\PUMLdimen
+\newcounter{puml}
+\newwrite\PumlStream
+\newwrite\PumlPreStream
+\newif\ifPUMLinline
+\newif\ifPUMLattach
+\newif\ifPUMLkeepAspect
+\PUMLkeepAspecttrue
+\RequirePackage{keyval}
+\RequirePackage{ifthen}
+\RequirePackage{color,graphicx}
+\IfFileExists{ifpdf.sty}{
+  \RequirePackage{ifpdf}
+}{
+  \expandafter\newif\csname ifpdf\endcsname
+  \ifx\pdfoutput\@undefined\else
+    \ifcase\pdfoutput\else
+      \pdftrue
+    \fi
+  \fi
+}
+\IfFileExists{ifxetex.sty}{
+  \RequirePackage{ifxetex}
+}{
+  \expandafter\newif\csname ifxetex\endcsname
+  \ifx\XeTeXversion\@undefined\else
+    \xetextrue
+  \fi
+}
+\IfFileExists{catchfile.sty}{
+  \RequirePackage{catchfile}
+}{
+  \newcommand\CatchFileDef[3]{%
+    \begingroup
+    \everyeof{%
+      \ENDCATCHFILEMARKER
+      \noexpand
+    }%
+    \long\def\@tempa####1\ENDCATCHFILEMARKER{%
+      \endgroup
+      \def##1{####1}%
+    }%
+    ##3%
+    \expandafter\@tempa\@@input ##2\relax
+  }
+}
+\newif\if@puml@attachfile@loaded
+\AtBeginDocument{%
+  \@ifpackageloaded{attachfile2}{\@puml@attachfile@loadedtrue}{}%
+  \let\puml@check@attachfile\puml@check@attachfile@loaded
+}
+\newcommand\puml@check@attachfile@loaded{%
+  \if@puml@attachfile@loaded\else
+    \PackageError{plantuml}{You must load the attachfile2 package}{^^J%
+      You have requested the [attach] option for some or all of your^^J%
+      Plantuml graphics, which requires the attachfile2 package.^^J%
+      Please load it in the document preamble.^^J%
+    }%
+  \fi
+}
+\newcommand\puml@check@attachfile{%
+  \AtBeginDocument{\puml@check@attachfile@loaded}%
+  \let\puml@check@attachfile\@empty
+}
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\DeclareOption{inline}{%
+  \PUMLinlinetrue
+}
+\DeclareOption{attach}{%
+  \puml@check@attachfile
+  \PUMLattachtrue
+}
+\ProcessOptions*
+\typeout{This is Plantuml v\plantumlVersion}
+
+\def\pumllatexdir{}
+\def\pumldir{}
+\def\PUMLpumldir{}
+\def\PUMLprefix{}
+\newif\ifPUMLPDF
+\ifxetex
+  \PUMLPDFtrue
+  \usepackage{everypage}
+\else
+  \ifpdf
+    \PUMLPDFtrue
+  \fi
+\fi
+\ifPUMLPDF
+  \def\PumlExtension{pdf}
+\else
+  \def\PumlExtension{eps}
+\fi
+\def\unquoteJobname#1"#2"#3\relax{%
+  \def\rawJobname{#1}%
+  \ifx\rawJobname\empty
+    \def\rawJobname{#2}%
+  \fi
+}
+\expandafter\unquoteJobname\jobname""\relax
+\def\fixstar#1*#2\relax{%
+  \def\argtwo{#2}%
+  \ifx\argtwo\empty
+    \gdef\Jobname{#1}%
+  \else
+    \fixstar#1-#2\relax
+  \fi
+}
+\expandafter\fixstar\rawJobname*\relax
+\def\Ginclude@eps#1{%
+  \message{<#1>}%
+  \bgroup
+  \def\@tempa{!}%
+  \dimen@\Gin@req@width
+  \dimen@ii.1bp\relax
+  \divide\dimen@\dimen@ii
+  \@tempdima\Gin@req@height
+  \divide\@tempdima\dimen@ii
+    \special{PSfile=#1\space
+      llx=\Gin@llx\space
+      lly=\Gin@lly\space
+      urx=\Gin@urx\space
+      ury=\Gin@ury\space
+      \ifx\Gin@scalex\@tempa\else rwi=\number\dimen@\space\fi
+      \ifx\Gin@scaley\@tempa\else rhi=\number\@tempdima\space\fi
+      \ifGin@clip clip\fi}%
+  \egroup
+}
+\immediate\openout\PumlPreStream=\jobname.pre\relax
+\AtEndDocument{\immediate\closeout\PumlPreStream}
+\def\WritePumlLine#1{%
+  \immediate\write\PumlStream{\detokenize{#1}}%
+}
+\def\globalPUMLdefs{}
+\def\WriteGlobalPumlLine#1{%
+  \expandafter\g@addto@macro
+  \expandafter\globalPUMLdefs
+  \expandafter{\detokenize{#1^^J}}%
+}
+\def\ProcessAsymptote#1{%
+  \begingroup
+  \def\CurrentAsymptote{#1}%
+  \let\do\@makeother \dospecials
+  \@makeother\^^L% and whatever other special cases
+  \catcode`\ =10
+  \endlinechar`\^^M \catcode`\^^M=12 \xAsymptote
+}
+\begingroup
+  \catcode`\^^M=12 \endlinechar=-1\relax%
+  \gdef\xAsymptote{%
+    \expandafter\ProcessAsymptoteLine%
+  }
+  \gdef\ProcessAsymptoteLine#1^^M{%
+    \def\@tempa{#1}%
+    {%
+      \escapechar=-1\relax%
+      \xdef\@tempb{\string\\end\string\{\CurrentAsymptote\string\}}%
+    }%
+    \ifx\@tempa\@tempb%
+      \edef\next{\endgroup\noexpand\end{\CurrentAsymptote}}%
+    \else%
+      \ThisAsymptote{#1}%
+      \let\next\ProcessAsymptoteLine%
+    \fi%
+    \next%
+  }
+\endgroup
+\def\puml@init{%
+  \def\PUMLlatexdir{}%
+  \ifx\pumllatexdir\empty\else
+    \def\PUMLlatexdir{\pumllatexdir/}%
+  \fi
+  \ifx\pumldir\empty\else
+    \def\PUMLpumldir{\pumldir/}%
+  \fi
+  \def\PUMLprefix{\PUMLlatexdir\PUMLpumldir}%
+}
+\newcommand\puml[1][]{%
+  \stepcounter{puml}%
+  \setkeys{PUMLkeys}{#1}%
+  \ifPUMLattach
+    \PUMLinlinefalse
+  \fi
+  \puml@init
+  \immediate\write\PumlPreStream{%
+    \noexpand\InputIfFileExists{%
+      \PUMLprefix\noexpand\jobname-\the\c@puml.pre}{}{}%
+  }%
+  \puml@write@graphic@header
+  \let\ThisAsymptote\WritePumlLine
+  \ProcessAsymptote{puml}%
+}
+\def\endpuml{%
+  \puml@finalise@stream
+  \puml@input@graphic
+}
+\def\puml@write@graphic@header{%
+  \immediate\openout\PumlStream=\PUMLpumldir\jobname-\the\c@puml.puml\relax
+  \gdef\PumlFile{\PUMLprefix\Jobname-\the\c@puml}%
+  \immediate\write\PumlStream{%
+    % TODO use to configure settings for plantuml
+    % if(!settings.multipleView) settings.batchView=false;^^J%
+    % \ifxetex
+    %   settings.tex="xelatex";^^J%
+    % \else\ifPUMLPDF
+    %     settings.tex="pdflatex";^^J%
+    % \fi\fi
+    % \ifPUMLinline
+    %   settings.inlinetex=true;^^J%
+    %   deletepreamble();^^J%
+    % \fi
+    % defaultfilename="\Jobname-\the\c@puml";^^J%
+    % if(settings.render < 0) settings.render=4;^^J%
+    % settings.outformat="";^^J%
+    % \ifPUMLattach
+    %   settings.inlineimage=false;^^J%
+    %   settings.embed=false;^^J%
+    %   settings.toolbar=true;^^J%
+    % \else
+    %   settings.inlineimage=true;^^J%
+    %   settings.embed=true;^^J%
+    %   settings.toolbar=false;^^J%
+    %   viewportmargin=(2,2);^^J%
+    % \fi
+    \globalPUMLdefs
+  }%
+}
+\def\puml@expand@keepAspect{%
+  \ifPUMLkeepAspect keepAspect=true%
+  \else keepAspect=false%
+  \fi%
+}
+\def\puml@finalise@stream{%
+  \ifx\PUMLwidth\@empty
+    \ifx\PUMLheight\@empty
+      % write nothing!
+    \else
+      \immediate\write\PumlStream{size(0,\PUMLheight,\puml@expand@keepAspect);}%
+    \fi
+  \else
+    \ifx\PUMLheight\@empty
+      \immediate\write\PumlStream{size(\PUMLwidth,0,\puml@expand@keepAspect);}%
+    \else
+      \immediate\write\PumlStream{size(\PUMLwidth,\PUMLheight,\puml@expand@keepAspect);}%
+    \fi
+  \fi
+  \ifx\PUMLviewportwidth\@empty
+    \ifx\PUMLviewportheight\@empty
+      % write nothing!
+    \else
+      \immediate\write\PumlStream{viewportsize=(0,\PUMLviewportheight);}%
+    \fi
+  \else
+    \ifx\PUMLviewportheight\@empty
+      \immediate\write\PumlStream{viewportsize=(\PUMLviewportwidth,0);}%
+    \else
+      \immediate\write\PumlStream{%
+        viewportsize=(\PUMLviewportwidth,\PUMLviewportheight);}%
+    \fi
+  \fi
+  \immediate\closeout\PumlStream
+}
+\def\puml@input@graphic{%
+  \ifPUMLinline
+    \IfFileExists{"\PumlFile.latex"}{%
+      \catcode`:=12\relax
+      \@@input"\PumlFile.latex"\relax
+    }{%
+      \PackageWarning{plantuml}{file `\PumlFile.latex' not found}%
+    }%
+  \else
+    \IfFileExists{"\PumlFile.\PumlExtension"}{%
+      \ifPUMLattach
+        \ifPUMLPDF
+          \IfFileExists{"\PumlFile+0.pdf"}{%
+            \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile+0.pdf}}%
+          }{%
+            \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile.pdf}}%
+          }%
+        \else
+          \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile.eps}}%
+        \fi
+        \textattachfile{\PumlFile.\PumlExtension}{\phantom{\copy\PUMLbox}}%
+        \vskip-\ht\PUMLbox
+        \indent
+        \box\PUMLbox
+      \else
+        \ifPUMLPDF
+          \includegraphics[hiresbb]{\PumlFile.pdf}%
+        \else
+          \includegraphics[hiresbb]{\PumlFile.eps}%
+        \fi
+      \fi
+    }{%
+      \IfFileExists{"\PumlFile.latex"}{%
+        \catcode`:=12
+        \@@input"\PumlFile.latex"\relax
+      }{%
+        \PackageWarning{plantuml}{%
+          file `\PumlFile.\PumlExtension' not found%
+        }%
+      }%
+    }%
+  \fi
+}
+\def\pumldef{%
+  \let\ThisAsymptote\WriteGlobalPumlLine
+  \ProcessAsymptote{pumldef}%
+}
+\newcommand\pumlinclude[2][]{%
+  \begingroup
+  \stepcounter{puml}%
+  \setkeys{PUMLkeys}{#1}%
+  \ifPUMLattach
+    \PUMLinlinefalse
+  \fi
+  \puml@init
+  \immediate\write\PumlPreStream{%
+    \noexpand\InputIfFileExists{%
+      \PUMLprefix\noexpand\jobname-\the\c@puml.pre}{}{}%
+  }%
+  \puml@write@graphic@header
+  \IfFileExists{#2.puml}{%
+    \CatchFileDef\@tempa{#2.puml}{%
+      \let\do\@makeother
+      \dospecials
+      \endlinechar=10\relax
+    }%
+  }{%
+    \IfFileExists{#2}{%
+      \CatchFileDef\@tempa{#2}{%
+        \let\do\@makeother
+        \dospecials
+        \endlinechar=10\relax
+      }%
+    }{%
+      \PackageWarning{plantuml}{file #2 not found}%
+      \def\@tempa{}%
+    }%
+  }%
+  \immediate\write\PumlStream{\unexpanded\expandafter{\@tempa}}%
+  \puml@finalise@stream
+  \puml@input@graphic
+  \endgroup
+}
+\newcommand{\PUMLanimategraphics}[5][]{%
+  \IfFileExists{_#3.pdf}{%
+    \animategraphics[{#1}]{#2}{_#3}{#4}{#5}%
+  }{}%
+}
+\newcommand\pumlsetup[1]{\setkeys{PUMLkeys}{#1}}
+\define@key{PUMLkeys}{dir}{%
+  \def\pumldir{#1}%
+}
+\def\PUMLwidth{}
+\define@key{PUMLkeys}{width}{%
+  \edef\PUMLwidth{\the\dimexpr#1\relax}%
+}
+\def\PUMLheight{}
+\define@key{PUMLkeys}{height}{%
+  \edef\PUMLheight{\the\dimexpr#1\relax}%
+}
+\define@key{PUMLkeys}{keepAspect}[true]{%
+  \ifthenelse{\equal{#1}{true}}
+    {\PUMLkeepAspecttrue}
+    {\PUMLkeepAspectfalse}%
+}
+\def\PUMLviewportwidth{}
+\define@key{PUMLkeys}{viewportwidth}{%
+  \edef\PUMLviewportwidth{\the\dimexpr#1\relax}%
+}
+\def\PUMLviewportheight{}
+\define@key{PUMLkeys}{viewportheight}{%
+  \edef\PUMLviewportheight{\the\dimexpr#1\relax}%
+}
+\define@key{PUMLkeys}{inline}[true]{%
+  \ifthenelse{\equal{#1}{true}}
+    {\PUMLinlinetrue}
+    {\PUMLinlinefalse}%
+}
+\define@key{PUMLkeys}{attach}[true]{%
+  \ifthenelse{\equal{#1}{true}}
+    {\PUMLattachtrue}
+    {\PUMLattachfalse}%
+}

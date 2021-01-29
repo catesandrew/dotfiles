@@ -20,7 +20,7 @@ $out_dir = './build';
 #$out_dir = "build";
 
 # file extensions to remove when cleaning
-$clean_ext = 'acn acr alg aux bbl bcf blg brf fdb_latexmk glg glo gls idx ilg ind ist lof log lot out run.xml toc dvi';
+$clean_ext = 'acn acr alg aux bbl bcf blg brf fdb_latexmk glg glo gls idx ilg ind ist lof log lot out run.xml toc dvi xdy';
 
 # %B base of filename for current command. E.g., if a postscript file
 #    document.ps is being made from the dvi file document.dvi, then the basename
@@ -147,10 +147,117 @@ sub maketif2png {
     system( "convert \"$_[0].tif\" \"$_[0].png\"" );
 }
 
-# add_cus_dep('asy', 'eps', 0, 'asyhack');
-# add_cus_dep('asy', 'pdf', 0, 'asyhack');
-# add_cus_dep('asy', 'tex', 0, 'asyhack');
-#
-# sub asyhack {
-#     return system("asy -o asypdf/ '$_'");
+# add_cus_dep('uml', 'png', 0, 'uml2png');
+# sub uml2png {
+#     system("java -cp $PLANTUML_JAR net.sourceforge.plantuml.Run -failfast2 -nbtread auto -charset UTF-8 -o . -v -tpng \"$_[0].uml\" \"$_[0].png\"");
+#     system("java -Djava.awt.headless=true -jar $PLANTUML_JAR -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble \"$_[0].uml\" \"$_[0].png\"");
 # }
+
+# add_cus_dep('uml', 'latex', 0, 'txt2latex');
+# sub txt2latex {
+#     # system("java -cp $PLANTUML_JAR net.sourceforge.plantuml.Run -failfast2 -nbtread auto -charset UTF-8 -o . -v -tpng \"$_[0].uml\" \"$_[0].png\"");
+#     system("java -Djava.awt.headless=true -jar $PLANTUML_JAR -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble \"$_[0].tex\" \"$_[0].latex\"");
+# }
+#
+# add_cus_dep('puml', 'tex', 0, 'puml2tex');
+# sub puml2latex {
+#     # system("java -cp $PLANTUML_JAR net.sourceforge.plantuml.Run -failfast2 -nbtread auto -charset UTF-8 -o . -v -tpng \"$_[0].uml\" \"$_[0].png\"");
+#     system("java -Djava.awt.headless=true -jar $PLANTUML_JAR -failfast2 -nbtread auto -charset UTF-8 -o . -v -tlatex:nopreamble \"$_[0].puml\"");
+# }
+
+
+# A standard method of using it is with the asymptote LaTeX style file
+# (http://mirror.ctan.org/graphics/asymptote/doc/asymptote.sty)
+# The graphics drawing code is in the tex file, and applying pdflatex to
+# the tex file produces one or more files with a base name the same as
+# or related to the main tex file, but with the extension 'asy'.  The
+# .asy is processed by the program asy (part of the asymptote
+# software) to produce graphics files (which may be eps, tex, or pdf
+# files) that are used the next time pdflatex is run on the main tex
+# file.
+#
+# Latexmk can be arranged to run asymptote (i.e., the program asy)
+# when needed, by defining the following custom dependency.  (The code
+# is to be put in one of latexmk's rc files, e.g., ~/.latexmkrc.)
+#
+
+## OLD simple method (taken from the documentation for V. 2.03 of
+## asymptote).  These definitions are simple, but they may not always
+## give the desired type of output file, and they do not ensure that
+## latexmk has dependency information about files imported from the
+## asy file.
+#OLD sub asy {return system("asy \"$_[0]\"");}
+#OLD add_cus_dep("asy","eps",0,"asy");
+#OLD add_cus_dep("asy","pdf",0,"asy");
+#OLD add_cus_dep("asy","tex",0,"asy");
+
+
+# The following definitions arrange to run asy with the correct output
+# file type.  They run asy in a verbose mode so that dependency
+# information on imported files can be extracted.  To avoid adding a
+# lot of extra printout on the screen of unimportant messages, the
+# output is sent to a log file.  Since this includes error messages,
+# which the user should see, latexmk types out error messages and the
+# like. These definitions need latexmk 4.48 or later.
+
+add_cus_dep("puml","eps",0,"puml2eps");
+add_cus_dep("puml","pdf",0,"puml2pdf");
+add_cus_dep("puml","png",0,"puml2png");
+add_cus_dep("puml","latex",0,"puml2latex");
+
+# sub puml2png { return puml2x( $_[0], 'png' ); }
+# sub puml2eps { return puml2x( $_[0], 'eps' ); }
+# sub puml2pdf { return puml2pd( $_[0], 'pdf' ); }
+# sub puml2latex { return puml2x( $_[0], 'latex' ); }
+
+sub puml2pdf {
+   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpdf '$_[0].puml' >& '$_[0].log'");
+   return $ret;
+}
+
+sub puml2latex {
+   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble '$_[0].puml' >& '$_[0].log'");
+   return $ret;
+}
+
+sub puml2eps {
+   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -teps '$_[0].puml' >& '$_[0].log'");
+   return $ret;
+}
+
+sub puml2png {
+   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpng '$_[0].puml' >& '$_[0].log'");
+   return $ret;
+}
+
+sub puml2x {
+   warn "==Zero $_[0]";
+   warn "==One  $_[1]";
+   my $ret = system("plantuml -v -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble '$_[1]' '$_[0]'");
+   my $FH = new FileHandle;
+   open $FH, "$_[0].log";
+   %imp = ();
+
+   while (<$FH>) {
+     if (/^(Including|Loading) .* from (.*)\s*$/) {
+          my $import = $2;
+	  $imp{$import} = 1;
+       }
+       elsif ( /^error/ || /^.*\.asy: \d/ ) {
+           warn "==Message from asy: $_";
+	   $ret = 1;
+       }
+       elsif ( /^kpsewhich / || /^Processing / || /^Using /
+               || /^Welcome / || /^Wrote /|| /^cd /|| /^gs /
+	     ) {
+       }
+       else {
+           warn "==Message from plantuml: $_";
+       }
+   }
+   close $FH;
+# For latexmk 4.48
+   rdb_set_source( $rule, keys %imp );
+   return $ret;
+}
+
