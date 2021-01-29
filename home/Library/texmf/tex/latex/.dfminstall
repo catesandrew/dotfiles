@@ -1,1 +1,4 @@
 .DS_Store skip
+coloremoji.sty skip
+plantuml.sty skip
+xelatex-emoji skip
