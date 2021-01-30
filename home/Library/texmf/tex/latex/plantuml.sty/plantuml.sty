@@ -2,11 +2,88 @@
 %%
 %% latex and xelatex style to process plantuml code
 %%
-\def\plantumlVersion{3.0.0}
-
-\ProvidesPackage{plantuml}[2021/01/28 v.\plantumlVersion Plantuml style file for LaTeX]
-\def\Plantuml{{\tt Plantuml}}
+%% The package may take two options at load time: `inline` or `attach`. These
+%% options can also be set at any time with the `\pumlsetup{<options>}` command,
+%% or specified individually in the optional argument to each `puml` environment
+%% or `pumlinclude` command.
+%%
+%% The `inline` option uses Plantuml's tkiz output whereby included graphics
+%% have their labels typeset in the environment of the document they are
+%% contained within. Otherwise the Plantuml graphics are self-contained and
+%% their formatting is independent of the document. Please note that the
+%% plantuml latex format generated tikz pictures have some
+%% spacing/padding/marigin issues and do not support all formatting.
+%% Using eps provides lossless quality as well.
+%%
+%% The `attach` option allows generated graphics to be embedded within the PDF
+%% using the `attachfile2` package; please load that package separately if you
+%% wish to use it. The `attach` option takes precedence over the `inline`
+%% option.
+%%
+%% This package produces quite a number of output files, which by default are
+%% created in the same directory as the LaTeX document that is being compiled.
+%% To keep things more tidy, you can specify an output directory for these files
+%% by defining the `\pumldir` command. For example, if you wish to store the
+%% figure files in the subdirectory `pumltmp/`, the you would write
+%% `\renewcommand\pumldir{pumltmp}`.
+%%
+%% Alternatively (and tentatively), you may write `dir=pumltmp` in either the
+%% `puml` environment options or the options to `\pumlsetup`.
+%%
+%% Commands for inserting PlantUML graphics
+%%
+%% The main environment defined by the package is the `puml` environment, in
+%% which verbatim PlantUML code is placed that will be compiled for generating a
+%% graphic in the document. For example,
+%%
+%% \begin{verbatim}
+%% \begin{figure}
+%%   \begin{puml}[<options>]
+%%     <PLANTUML CODE>
+%%   \end{puml}
+%%   \caption{}\label{}
+%% \end{figure}
+%% \end{verbatim}
+%%
+%% If you have PlantUML code in a separate file, you can include it with
+%% the `\pumlinclude[<options>]{<filename>}` command.
+%%
+%% For PlantUML code that should be included in _every_ graphic, define it using
+%% the `pumldef` environment.
+%%
+%% Graphics options
+%%
+%% Both the `puml` environment and the `\pumlinclude` command take optional
+%% parameters for controlling aspects of the graphics creation. In addition to
+%% locally setting `inline` and `attach`, the following options may also be
+%% used:
+%%
+%% `width` Width of the figure
+%% `height` Height of the figure
+%% `keepAspect` Maintain aspect ratio [default true]
+%%
+%% These may also be set globally using the `\pumlsetup` command.
+%%
+%% Processing the document
+%%
+%% After running LaTeX on the document, it is necessary to process the
+%% PlantUML graphics so they can be included in the next compilation. The
+%% simplest procedure is a recipe such as
+%%
+%% pdflatex mydoc
+%% plantuml -failfast2 -nbtread auto -charset UTF-8 -tpdf mydoc-*.puml
+%% pdflatex mydoc
+%%
+%% This technique will recompile each graphic every time, however. To only
+%% recompile graphics that have changed, use the `latexmk` tool.
+\def\plantumlVersion{1.0.0}
+\ProvidesPackage{plantuml}[2021/01/28 \plantumlVersion{} Plantuml]
+%
+% Implementation
+% \def\Plantuml{{\tt Plantuml}}
 \InputIfFileExists{\jobname.pre}{}{}
+%
+% Allocations
 \newbox\PUMLbox
 \newdimen\PUMLdimen
 \newcounter{puml}
@@ -16,44 +93,14 @@
 \newif\ifPUMLattach
 \newif\ifPUMLkeepAspect
 \PUMLkeepAspecttrue
+%
+% Packages
 \RequirePackage{keyval}
 \RequirePackage{ifthen}
 \RequirePackage{color,graphicx}
-\IfFileExists{ifpdf.sty}{
-  \RequirePackage{ifpdf}
-}{
-  \expandafter\newif\csname ifpdf\endcsname
-  \ifx\pdfoutput\@undefined\else
-    \ifcase\pdfoutput\else
-      \pdftrue
-    \fi
-  \fi
-}
-\IfFileExists{ifxetex.sty}{
-  \RequirePackage{ifxetex}
-}{
-  \expandafter\newif\csname ifxetex\endcsname
-  \ifx\XeTeXversion\@undefined\else
-    \xetextrue
-  \fi
-}
-\IfFileExists{catchfile.sty}{
-  \RequirePackage{catchfile}
-}{
-  \newcommand\CatchFileDef[3]{%
-    \begingroup
-    \everyeof{%
-      \ENDCATCHFILEMARKER
-      \noexpand
-    }%
-    \long\def\@tempa####1\ENDCATCHFILEMARKER{%
-      \endgroup
-      \def##1{####1}%
-    }%
-    ##3%
-    \expandafter\@tempa\@@input ##2\relax
-  }
-}
+\RequirePackage{catchfile} % \CatchFileDef used in \pumlinclude.
+%
+% Ensuring attachfile2 is loaded if [attach] is requested
 \newif\if@puml@attachfile@loaded
 \AtBeginDocument{%
   \@ifpackageloaded{attachfile2}{\@puml@attachfile@loadedtrue}{}%
@@ -72,7 +119,11 @@
   \AtBeginDocument{\puml@check@attachfile@loaded}%
   \let\puml@check@attachfile\@empty
 }
+%
+% Macros
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+%
+% Package options
 \DeclareOption{inline}{%
   \PUMLinlinetrue
 }
@@ -81,12 +132,20 @@
   \PUMLattachtrue
 }
 \ProcessOptions*
-\typeout{This is Plantuml v\plantumlVersion}
-
 \def\pumllatexdir{}
 \def\pumldir{}
 \def\PUMLpumldir{}
 \def\PUMLprefix{}
+%
+\typeout{This is Plantuml v\plantumlVersion}
+%
+%% hint from https://tex.stackexchange.com/a/86355/9075
+% \makeatletter
+% \def\maxwidth#1{\ifdim\Gin@nat@width>#1 #1\else\Gin@nat@width\fi}
+% \makeatother
+%
+% Testing for PDF output: Note this is not quite the same as \ifpdf, since we
+% still want PDF output when using XeTeX.
 \newif\ifPUMLPDF
 \ifxetex
   \PUMLPDFtrue
@@ -101,6 +160,8 @@
 \else
   \def\PumlExtension{eps}
 \fi
+%
+% Bug squashing
 \def\unquoteJobname#1"#2"#3\relax{%
   \def\rawJobname{#1}%
   \ifx\rawJobname\empty
@@ -108,6 +169,9 @@
   \fi
 }
 \expandafter\unquoteJobname\jobname""\relax
+%
+% Work around jobname bug in MiKTeX 2.5 and 2.6: Turn stars in file names
+% (resulting from spaces, etc.) into minus signs
 \def\fixstar#1*#2\relax{%
   \def\argtwo{#2}%
   \ifx\argtwo\empty
@@ -117,6 +181,8 @@
   \fi
 }
 \expandafter\fixstar\rawJobname*\relax
+%
+% Work around bug in dvips.def and allow spaces in file name
 \def\Ginclude@eps#1{%
   \message{<#1>}%
   \bgroup
@@ -136,6 +202,8 @@
       \ifGin@clip clip\fi}%
   \egroup
 }
+%
+% Input/Output
 \immediate\openout\PumlPreStream=\jobname.pre\relax
 \AtEndDocument{\immediate\closeout\PumlPreStream}
 \def\WritePumlLine#1{%
@@ -147,30 +215,33 @@
   \expandafter\globalPUMLdefs
   \expandafter{\detokenize{#1^^J}}%
 }
-\def\ProcessAsymptote#1{%
+%
+% Commands for verbatim processing environments
+\def\ProcessPlantuml#1{%
   \begingroup
-  \def\CurrentAsymptote{#1}%
+  \def\CurrentPlantuml{#1}%
   \let\do\@makeother \dospecials
   \@makeother\^^L% and whatever other special cases
   \catcode`\ =10
-  \endlinechar`\^^M \catcode`\^^M=12 \xAsymptote
+  \endlinechar`\^^M \catcode`\^^M=12 \xPlantuml
 }
+% Need lots of comment chars here because hline endi is no longer a space character.
 \begingroup
   \catcode`\^^M=12 \endlinechar=-1\relax%
-  \gdef\xAsymptote{%
-    \expandafter\ProcessAsymptoteLine%
+  \gdef\xPlantuml{%
+    \expandafter\ProcessPlantumlLine%
   }
-  \gdef\ProcessAsymptoteLine#1^^M{%
+  \gdef\ProcessPlantumlLine#1^^M{%
     \def\@tempa{#1}%
     {%
       \escapechar=-1\relax%
-      \xdef\@tempb{\string\\end\string\{\CurrentAsymptote\string\}}%
+      \xdef\@tempb{\string\\end\string\{\CurrentPlantuml\string\}}%
     }%
     \ifx\@tempa\@tempb%
-      \edef\next{\endgroup\noexpand\end{\CurrentAsymptote}}%
+      \edef\next{\endgroup\noexpand\end{\CurrentPlantuml}}%
     \else%
-      \ThisAsymptote{#1}%
-      \let\next\ProcessAsymptoteLine%
+      \ThisPlantuml{#1}%
+      \let\next\ProcessPlantumlLine%
     \fi%
     \next%
   }
@@ -185,9 +256,12 @@
   \fi
   \def\PUMLprefix{\PUMLlatexdir\PUMLpumldir}%
 }
-\newcommand\puml[1][]{%
+%
+% User interface
+\newcommand{\puml}[1][]{%
   \stepcounter{puml}%
   \setkeys{PUMLkeys}{#1}%
+% Disable the "inline" option if "attach" is enabled:
   \ifPUMLattach
     \PUMLinlinefalse
   \fi
@@ -197,8 +271,8 @@
       \PUMLprefix\noexpand\jobname-\the\c@puml.pre}{}{}%
   }%
   \puml@write@graphic@header
-  \let\ThisAsymptote\WritePumlLine
-  \ProcessAsymptote{puml}%
+  \let\ThisPlantuml\WritePumlLine
+  \ProcessPlantuml{puml}%
 }
 \def\endpuml{%
   \puml@finalise@stream
@@ -208,68 +282,41 @@
   \immediate\openout\PumlStream=\PUMLpumldir\jobname-\the\c@puml.puml\relax
   \gdef\PumlFile{\PUMLprefix\Jobname-\the\c@puml}%
   \immediate\write\PumlStream{%
-    % TODO use to configure settings for plantuml
-    % if(!settings.multipleView) settings.batchView=false;^^J%
-    % \ifxetex
-    %   settings.tex="xelatex";^^J%
-    % \else\ifPUMLPDF
-    %     settings.tex="pdflatex";^^J%
-    % \fi\fi
-    % \ifPUMLinline
-    %   settings.inlinetex=true;^^J%
-    %   deletepreamble();^^J%
-    % \fi
-    % defaultfilename="\Jobname-\the\c@puml";^^J%
-    % if(settings.render < 0) settings.render=4;^^J%
-    % settings.outformat="";^^J%
-    % \ifPUMLattach
-    %   settings.inlineimage=false;^^J%
-    %   settings.embed=false;^^J%
-    %   settings.toolbar=true;^^J%
-    % \else
-    %   settings.inlineimage=true;^^J%
-    %   settings.embed=true;^^J%
-    %   settings.toolbar=false;^^J%
-    %   viewportmargin=(2,2);^^J%
-    % \fi
+    ' powered by: plantuml v\plantumlVersion^^J%
+    ' filename "\Jobname-\the\c@puml.puml"^^J%
     \globalPUMLdefs
   }%
 }
-\def\puml@expand@keepAspect{%
-  \ifPUMLkeepAspect keepAspect=true%
-  \else keepAspect=false%
-  \fi%
-}
+%
+% TODO: Add a maxwidth options to output `width=\maxwidth{\textwidth}` to the
+% options we pass to includegraphics, see this hint from
+% https://tex.stackexchange.com/a/86355/9075
+% TODO: Include more of the options from ctan/graphicx
 \def\puml@finalise@stream{%
+  \def\reptemp{}%
+% Setting size(): Only inserted if one of the dimensions is set explicitly
+% (i.e., if both height and width are not empty).
   \ifx\PUMLwidth\@empty
     \ifx\PUMLheight\@empty
       % write nothing!
     \else
-      \immediate\write\PumlStream{size(0,\PUMLheight,\puml@expand@keepAspect);}%
+      \g@addto@macro\reptemp{height=\PUMLheight}%
+      \ifPUMLkeepAspect \g@addto@macro\reptemp{,keepaspectratio} \fi%
     \fi
   \else
     \ifx\PUMLheight\@empty
-      \immediate\write\PumlStream{size(\PUMLwidth,0,\puml@expand@keepAspect);}%
+      \g@addto@macro\reptemp{width=\PUMLwidth}%
+      \ifPUMLkeepAspect \g@addto@macro\reptemp{,keepaspectratio} \fi%
     \else
-      \immediate\write\PumlStream{size(\PUMLwidth,\PUMLheight,\puml@expand@keepAspect);}%
-    \fi
-  \fi
-  \ifx\PUMLviewportwidth\@empty
-    \ifx\PUMLviewportheight\@empty
-      % write nothing!
-    \else
-      \immediate\write\PumlStream{viewportsize=(0,\PUMLviewportheight);}%
-    \fi
-  \else
-    \ifx\PUMLviewportheight\@empty
-      \immediate\write\PumlStream{viewportsize=(\PUMLviewportwidth,0);}%
-    \else
-      \immediate\write\PumlStream{%
-        viewportsize=(\PUMLviewportwidth,\PUMLviewportheight);}%
+      \g@addto@macro\reptemp{width=\PUMLwidth,height=\PUMLheight}%
+      \ifPUMLkeepAspect \g@addto@macro\reptemp{,keepaspectratio} \fi%
     \fi
   \fi
   \immediate\closeout\PumlStream
 }
+% `\includegraphics` does not expand its first argument therefore to pass the
+% variable, `reptemp` to their options, a judicious use of `\expandafter`
+% resolves that part of the problem.
 \def\puml@input@graphic{%
   \ifPUMLinline
     \IfFileExists{"\PumlFile.latex"}{%
@@ -283,12 +330,12 @@
       \ifPUMLattach
         \ifPUMLPDF
           \IfFileExists{"\PumlFile+0.pdf"}{%
-            \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile+0.pdf}}%
+            \setbox\PUMLbox=\hbox{\expandafter\includegraphics\expandafter[\reptemp]{\PumlFile+0.pdf}}%
           }{%
-            \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile.pdf}}%
+            \setbox\PUMLbox=\hbox{\expandafter\includegraphics\expandafter[\reptemp]{\PumlFile.pdf}}%
           }%
         \else
-          \setbox\PUMLbox=\hbox{\includegraphics[hiresbb]{\PumlFile.eps}}%
+          \setbox\PUMLbox=\hbox{\expandafter\includegraphics\expandafter[\reptemp]{\PumlFile.eps}}%
         \fi
         \textattachfile{\PumlFile.\PumlExtension}{\phantom{\copy\PUMLbox}}%
         \vskip-\ht\PUMLbox
@@ -296,12 +343,12 @@
         \box\PUMLbox
       \else
         \ifPUMLPDF
-          \includegraphics[hiresbb]{\PumlFile.pdf}%
+          \expandafter\includegraphics\expandafter[\reptemp]{\PumlFile.pdf}%
         \else
-          \includegraphics[hiresbb]{\PumlFile.eps}%
+          \expandafter\includegraphics\expandafter[\reptemp]{\PumlFile.eps}%
         \fi
       \fi
-    }{%
+    }{% force inline if there is no file with pdf/eps ext, but there is a txik file with latex ext
       \IfFileExists{"\PumlFile.latex"}{%
         \catcode`:=12
         \@@input"\PumlFile.latex"\relax
@@ -314,8 +361,8 @@
   \fi
 }
 \def\pumldef{%
-  \let\ThisAsymptote\WriteGlobalPumlLine
-  \ProcessAsymptote{pumldef}%
+  \let\ThisPlantuml\WriteGlobalPumlLine
+  \ProcessPlantuml{pumldef}%
 }
 \newcommand\pumlinclude[2][]{%
   \begingroup
@@ -358,6 +405,7 @@
     \animategraphics[{#1}]{#2}{_#3}{#4}{#5}%
   }{}%
 }
+% Keys for graphics processing
 \newcommand\pumlsetup[1]{\setkeys{PUMLkeys}{#1}}
 \define@key{PUMLkeys}{dir}{%
   \def\pumldir{#1}%
@@ -375,14 +423,6 @@
     {\PUMLkeepAspecttrue}
     {\PUMLkeepAspectfalse}%
 }
-\def\PUMLviewportwidth{}
-\define@key{PUMLkeys}{viewportwidth}{%
-  \edef\PUMLviewportwidth{\the\dimexpr#1\relax}%
-}
-\def\PUMLviewportheight{}
-\define@key{PUMLkeys}{viewportheight}{%
-  \edef\PUMLviewportheight{\the\dimexpr#1\relax}%
-}
 \define@key{PUMLkeys}{inline}[true]{%
   \ifthenelse{\equal{#1}{true}}
     {\PUMLinlinetrue}
@@ -393,3 +433,5 @@
     {\PUMLattachtrue}
     {\PUMLattachfalse}%
 }
+%%
+%% End of file `plantuml.sty'.
