@@ -204,13 +204,9 @@ end
 -- configure spaces for headspace
 Config.spaces = {}
 Config.funcs = {}
--- Config.projects = hs.settings.get("secrets").toggl.projects
 
 SpaceCadet = require('space-cadet')
 SpaceCadet.start(Config)
-
-Movewindows = require('movewindows')
-Movewindows.start()
 
 -- require('markdown')
 -- require('super')
