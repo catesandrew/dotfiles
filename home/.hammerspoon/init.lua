@@ -77,12 +77,11 @@ Config.applications = {
     bundleID = 'com.sonos.macController',
     hyper_key = 's',
   },
-  -- 'd', saved for dash
-  -- ['com.kapeli.dashdoc'] = {
-  --   bundleID = 'com.kapeli.dashdoc',
-  --   hyper_key = 'd',
-  --   tags = {'coding'}
-  -- },
+  ['com.kapeli.dashdoc'] = {
+    bundleID = 'com.kapeli.dashdoc',
+    local_bindings = {'d'},
+    tags = {'coding'}
+  },
   ['com.apple.finder'] = {
     bundleID = 'com.apple.finder',
     hyper_key = 'f'
@@ -111,12 +110,12 @@ Config.applications = {
   -- ';', no action
   -- ''', no action
 
-  -- 'q', no action
+  -- 'q', saved for movewindows
   -- 'w', saved for moom
-  -- ['com.manytricks.Moom'] = {
-  --   bundleID = 'com.manytricks.Moom',
-  --   hyper_key = 'w'
-  -- },
+  ['com.manytricks.Moom'] = {
+    bundleID = 'com.manytricks.Moom',
+    local_bindings = {'w'},
+  },
   ['org.gnu.Emacs'] = {
     bundleID = 'org.gnu.Emacs',
     hyper_key = 'e',
@@ -129,6 +128,7 @@ Config.applications = {
   ['com.googlecode.iterm2'] = {
     bundleID = 'com.googlecode.iterm2',
     hyper_key = 't',
+    -- hyper_key = 't',
     tags = {'coding'},
     rules = {
       {nil, 1, hs.layout.maximized}
@@ -208,6 +208,9 @@ Config.funcs = {}
 
 SpaceCadet = require('space-cadet')
 SpaceCadet.start(Config)
+
+Movewindows = require('movewindows')
+Movewindows.start()
 
 -- require('markdown')
 -- require('super')
