@@ -28,7 +28,7 @@ do case "$opt" in
 esac
 done
 
-set -- $(brew cask list)
+set -- $(brew list --cask)
 sentinel='/'
 
 oldIFS="$IFS"
@@ -43,7 +43,7 @@ do
 
 	verlocal="$(find "$appdir"/* -type d -print -quit)"
 	verlocal="${verlocal##*/}"
-	verlatest="$(brew cask info "$app" | awk -v app="$app" '$1 == app":"{print $2;}')"
+	verlatest="$(brew info --cask "$app" | awk -v app="$app" '$1 == app":"{print $2;}')"
 
 	case "$apps" in
 		*"$sentinel$app$sentinel"*)
@@ -54,7 +54,7 @@ do
 			fi
 
             if [ "$latest" -ne 0 ] && [ "$verlocal" = 'latest' ] || [ "$verlocal" != "$verlatest" ]; then
-                brew cask install --force "$app" && [ "$verlocal" != "$verlatest" ] && rm -rf "${appdir}/${verlocal}"
+                brew install --cask --force "$app" && [ "$verlocal" != "$verlatest" ] && rm -rf "${appdir}/${verlocal}"
 			fi
 			;;
 		*)
@@ -73,10 +73,10 @@ function cask_update() {
     local caskApps=$(ls $BREW_HOME/caskroom) # Lists the casks in the Caskroom
 
     for app in ${caskApps}; do # For every app there, do this
-        appToCheck=$(brew cask list | grep "${app}") # If the app is not present in `brew cask list`, this variable will be empty
+        appToCheck=$(brew list --cask | grep "${app}") # If the app is not present in `brew list --cask`, this variable will be empty
 
         if [[ -z "${appToCheck}" ]]; then # If the variable is empty, then
-            brew cask install --force "${app}" # Force an install of the app
+            brew install --cask --force "${app}" # Force an install of the app
         fi
     done
 }
@@ -84,8 +84,8 @@ function cask_update() {
 function cask_reinstall() {
     rm -rf "$(brew --cache)"
 
-    for app in $(brew cask list); do
-        brew cask install --force "${app}"
+    for app in $(brew list --cask); do
+        brew install --cask --force "${app}"
     done
 }
 

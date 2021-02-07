@@ -1,99 +1,100 @@
+-- HYPER
+--
+-- Hyper is a hyper shortcut modal.
+--
+-- Feel free to modify... I use karabiner-elements.app on my laptop and QMK on
+-- my mech keyboards to bind a single key to `F19`, which fires all this
+-- Hammerspoon-powered OSX automation.
+--
+-- I chiefly use it to launch applications quickly from a single press,
+-- although I also use it to create "universal" local bindings inspired by
+-- Shawn Blanc's OopsieThings.
+-- https://thesweetsetup.com/oopsiethings-applescript-for-things-on-mac/
+
 -- Load Extensions
-local application = require "hs.application"
-local window = require "hs.window"
-local hotkey = require "hs.hotkey"
-local keycodes = require "hs.keycodes"
-local fnutils = require "hs.fnutils"
-local alert = require "hs.alert"
-local screen = require "hs.screen"
-local grid = require "hs.grid"
-local osascript = require "hs.osascript"
-local hints = require "hs.hints"
-local appfinder = require "hs.appfinder"
+
+-- local log = hs.logger.new('space-cadet.lua', 'debug')
+
+local hyper = hs.hotkey.modal.new({}, nil)
+
+hyper.pressed  = function() hyper:enter() end
+hyper.released = function() hyper:exit() end
+
+-- Set the key you want to be HYPER to F19 in karabiner or keyboard
+-- Bind the Hyper key to the hammerspoon modal
+hs.hotkey.bind({}, 'F19', hyper.pressed, hyper.released)
+
+hyper.launch = function(app)
+  hs.application.launchOrFocusByBundleID(app.bundleID)
+end
 
 appWorkflow = [[
-  set appName to "%s"
-  set startIt to false
+  set processIsRunning to true
   tell application "System Events"
-    if not (exists process appName) then
-      set startIt to true
-    else if frontmost of process appName then
-      set visible of process appName to false
+    set runningProcesses to processes whose bundle identifier is "%s"
+    if runningProcesses is {} then
+      tell application id "%s" to activate
     else
-      set frontmost of process appName to true
+      set myProcess to first process whose bundle identifier is "%s"
+      if frontmost of myProcess is true then
+        set visible of myProcess to false
+      else
+        set frontmost of myProcess to true
+        --  bring a window to frontmost without focusing it
+        -- perform action "AXRaise" of window 1 of myProcess
+      end if
     end if
   end tell
-  if startIt then
-    tell application appName to activate
-  end if
 ]]
 
-launchAppleScript = function(appName)
-  str = string.format(appWorkflow, appName)
-  osascript.applescript(str)
+hyper.launchAppleScript = function(app)
+  str = string.format(appWorkflow, app.bundleID, app.bundleID, app.bundleID)
+  hs.osascript.applescript(str)
 end
 
-launchSingle = function(appname)
-  hs.application.launchOrFocus(appname)
-end
+-- Expects a configuration table with an applications key that has the
+-- following form:
+-- config_table.applications = {
+--   ['com.culturedcode.ThingsMac'] = {
+--     bundleID = 'com.culturedcode.ThingsMac',
+--     hyper_key = 't',
+--     tags = {'planning', 'review'},
+--     local_bindings = {',', '.'}
+--   },
+-- }
+hyper.start = function(config_table)
+  -- Use the hyper key with the application config to use the `hyper_key`
+  hs.fnutils.map(config_table.applications, function(app)
+    -- Apps that I want to jump to
+    if app.hyper_key then
+      -- hyper:bind({}, app.hyper_key, function() hyper.launchAppleScript(app); end)
+      hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app.hyper_key, function() hyper.launchAppleScript(app); end)
+    end
 
-oascripts = {
-  -- {'z', ''}, was saved for menu pop
-  {'x', 'Safari'},
-  {'c', 'Google Chrome Canary'},
-  {'v', 'MacVim'},
-  {'b', 'Google Chrome'},
-  {'n', 'NotePlan'},
-  {'m', 'MailMate'},
-  {'a', 'BusyContacts'},
-  {'s', 'Sonos'},
-  -- {'d', ''}, saved for dash
-  {'f', 'Finder'},
-  {'g', 'Tower'},
-  -- {'h', ''}, saved for launchbar
-  {'j', 'Jump Desktop'},
-  {'k', 'Fantastical'},
-  {'l', 'Slack'},
-  {';', 'Keybase'},
-  {'q', 'Quiver'},
-  -- {'w', ''}, saved for moom
-  {'e', 'Emacs'},
-  -- {'r', ''}, saved for fantastical 2
-  -- {'t', 'iTerm'},
-  -- {'y', ''}, no action
-  {'u', 'Calcbot'},
-  {'i', 'Messages'},
-  {'o', 'OmniFocus'},
-  -- {'p', ''}, saved for snippets lab
-  {'1', '1Password 7'},
-}
-
-for i, app in ipairs(oascripts) do
-  hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app[1], function()
-      launchAppleScript(app[2])
+    -- I use hyper to power some shortcuts in different apps If the app is closed
+    -- and I press the shortcut, open the app and send the shortcut, otherwise
+    -- just send the shortcut.
+    if app.local_bindings then
+      hs.fnutils.map(app.local_bindings, function(key)
+        -- hyper:bind({}, key, nil, function()
+        hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, key, nil, function()
+          if hs.application.get(app.bundleID) then
+            hs.eventtap.keyStroke({'cmd','alt','shift','ctrl'}, key)
+          else
+            hyper.launchAppleScript(app)
+            hs.timer.waitWhile(
+              function()
+                return not hs.application.get(app.bundleID):isFrontmost()
+              end,
+              function()
+                hs.eventtap.keyStroke({'cmd','alt','shift','ctrl'}, key)
+              end
+            )
+          end
+        end)
+      end)
+    end
   end)
 end
 
--- double identity apps
-
-doubleapps = {
-  -- {'t', 'iTerm2', 'iTerm'},
-  -- {'k', 'Fantastical', 'Fantastical 2'},
-}
-
-launchDouble = function(appName1, appName2)
-  local app = hs.application.find(appName1)
-  if (app and hs.application.isRunning(app)) then
-    -- alert(string.format('found running app: %s', appName1))
-    launchAppleScript(appName1)
-  else
-    -- alert(string.format('launching app: %s', appName2))
-    hs.application.launchOrFocus(appName2)
-  end
-end
-
-for i, app in ipairs(doubleapps) do
-  hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app[1], function()
-      launchDouble(app[2], app[3])
-  end)
-end
+return hyper
