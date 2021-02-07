@@ -67,8 +67,7 @@ hyper.start = function(config_table)
   hs.fnutils.map(config_table.applications, function(app)
     -- Apps that I want to jump to
     if app.hyper_key then
-      -- hyper:bind({}, app.hyper_key, function() hyper.launchAppleScript(app); end)
-      hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, app.hyper_key, function() hyper.launchAppleScript(app); end)
+      hyper:bind({}, app.hyper_key, function() hyper.launchAppleScript(app); end)
     end
 
     -- I use hyper to power some shortcuts in different apps If the app is closed
@@ -76,8 +75,7 @@ hyper.start = function(config_table)
     -- just send the shortcut.
     if app.local_bindings then
       hs.fnutils.map(app.local_bindings, function(key)
-        -- hyper:bind({}, key, nil, function()
-        hs.hotkey.bind({'shift', 'ctrl', 'alt', 'cmd'}, key, nil, function()
+        hyper:bind({}, key, nil, function()
           if hs.application.get(app.bundleID) then
             hs.eventtap.keyStroke({'cmd','alt','shift','ctrl'}, key)
           else
