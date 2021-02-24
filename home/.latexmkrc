@@ -8,6 +8,17 @@ $pdflatex = 'xelatex -interaction=nonstopmode -synctex=1 --shell-escape %O %S';
 
 # Always create PDFs
 $pdf_mode = 1;
+# This shows how to use xelatex (http://en.wikipedia.org/wiki/XeTeX)
+# with latexmk.  Xelatex uses Unicode and "supporting modern font
+# technologies such as OpenType or Apple Advanced Typography.
+#
+#   WARNING: The method shown here is suitable only for ver. 4.51 and
+#            later of latexmk, not for earlier versions.
+#
+#
+# $pdf_mode = 5;
+# $postscript_mode = $dvi_mode = 0;
+
 
 # Use Skim.app to preview generated PDFs
 $pdf_previewer = 'open -a Skim.app %S';
@@ -57,37 +68,44 @@ sub makenlo2nls {
   system( "makeindex -s nomencl.ist -o \"$_[0].nls\" \"$_[0].nlo\"" );
 }
 
-# Custom dependency for glossary/glossaries package
-# if you make custom glossaries you may have to add items to the @cus_dep_list
-# and corresponding sub-routines
-add_cus_dep( 'glo', 'gls', 0, 'makeglo2gls' );
-sub makeglo2gls {
-    system( "makeindex -s \"$_[0].ist\" -t \"$_[0].glg\" -o \"$_[0].gls\" \"$_[0].glo\"" );
+# N.B. There is also the OBSOLETE glossary package
+# (http://www.ctan.org/pkg/glossary), which has some differences.  See item 2.
+
+# 1. If you use the glossaries or the glossaries-extra package, then you use:
+
+add_cus_dep( 'acn', 'acr', 0, 'makeglossaries' );
+add_cus_dep( 'glo', 'gls', 0, 'makeglossaries' );
+sub makeglossaries {
+   my ($base_name, $path) = fileparse( $_[0] );
+   pushd $path;
+   my $return = system "makeglossaries", $base_name;
+   popd;
+   return $return;
 }
 
-# The glossaries package, with the [acronym] option, produces a .acn file when
-# processed with (xe/pdf)latex and then makeindex to process the .acn into .acr
-# and finally runs of (xe/pdf)latex to read in the .acr file. Unfortunately the
-# glossary package does just the reverse; i.e. (xe/pdf)latex processing
-# produces a .acr files and makeindex then is used to convert the .acr file to
-# a .acn file which is then ... . This dependency assumes the glossaries
-# package.
-add_cus_dep( 'acn', 'acr', 0, 'makeacn2acr' );
-sub makeacn2acr {
-    system( "makeindex -s \"$_[0].ist\" -t \"$_[0].alg\" -o \"$_[0].acr\" \"$_[0].acn\"" );
-}
+# 2. If you use the OBSOLETE glossary package, then you can do the following:
+#    (Note that the code lines are commented out to avoid trouble when this
+#    file is simply copied into a latexmkrc or this file is arranged to be
+#    read by latexmk, and one of the modern packages glossaries and
+#    glossaries-extra is used.)
 
-# for acronyms in makeglossaries
-# add_cus_dep('acn', 'acr', 0, 'makeglossaries');
-# sub acn2acr {
-#     system("makeindex $_[0].acn -s $_[0].ist -t $_[0].alg -o $_[0].acr");
-# }
+## For the main glossary:
+#add_cus_dep( 'glo', 'gls', 0, 'makeglo2gls' );
+#sub makeglo2gls {
+#    system("makeindex -s \"$_[0].ist\" -t \"$_[0].glg\" -o \"$_[0].gls\" \"$_[0].glo\"" );
+#}
 
-# for glossary package (Sigh...) --- they can co-exist!
-add_cus_dep( 'acr', 'acn', 0, 'makeacr2acn' );
-sub makeacr2acn {
-    system( "makeindex -s \"$_[0].ist\" -t \"$_[0].alg\" -o \"$_[0].acn\" \"$_[0].acr\"" );
-}
+## For acronyms:
+##
+## ===> WARNING: The code below is ONLY FOR PACKAGE glossary, NOT FOR
+##      glossaries and glossaries-extra. In the current glossaries and
+##      glossaries-extra packages the roles of the .acr and .acn files are
+##      exchanged compared with the old glossary package.  Hence the the
+##      code below will fail with the more modern packages.
+#add_cus_dep( 'acr', 'acn', 0, 'makeacr2acn' );
+#sub makeacr2acn {
+#    system( "makeindex -s \"$_[0].ist\" -t \"$_[0].alg\" -o \"$_[0].acn\" \"$_[0].acr\"" );
+#}
 
 # example of an added custom glossary type that is used in some of the
 # glossary/glossaries example files: this is for the new glossary type command
@@ -211,23 +229,19 @@ add_cus_dep("puml","latex",0,"puml2latex");
 # sub puml2latex { return puml2x( $_[0], 'latex' ); }
 
 sub puml2pdf {
-   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpdf '$_[0].puml' >& '$_[0].log'");
-   return $ret;
+   system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpdf '$_[0].puml' >& '$_[0].log'");
 }
 
 sub puml2latex {
-   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble '$_[0].puml' >& '$_[0].log'");
-   return $ret;
+   system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tlatex:nopreamble '$_[0].puml' >& '$_[0].log'");
 }
 
 sub puml2eps {
-   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -teps '$_[0].puml' >& '$_[0].log'");
-   return $ret;
+   system("plantuml -failfast2 -nbtread auto -charset UTF-8 -teps '$_[0].puml' >& '$_[0].log'");
 }
 
 sub puml2png {
-   my $ret = system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpng '$_[0].puml' >& '$_[0].log'");
-   return $ret;
+   system("plantuml -failfast2 -nbtread auto -charset UTF-8 -tpng '$_[0].puml' >& '$_[0].log'");
 }
 
 sub puml2x {
