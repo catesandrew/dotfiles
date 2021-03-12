@@ -125,6 +125,11 @@ Config.applications = {
     }
   },
   -- 'r', saved for fantastical
+  ['com.flexibits.fantastical2.mac'] = {
+    bundleID = 'com.flexibits.fantastical2.mac',
+    local_bindings = {'r'},
+    tags = {'calendar'}
+  },
   ['com.googlecode.iterm2'] = {
     bundleID = 'com.googlecode.iterm2',
     hyper_key = 't',
@@ -149,6 +154,11 @@ Config.applications = {
   },
   -- 'o', no action
   -- 'p', saved for snippets lab
+  ['com.renfei.SnippetsLab'] = {
+    bundleID = 'com.renfei.SnippetsLab',
+    local_bindings = {'p'},
+    tags = {'coding'}
+  },
   ['com.agilebits.onepassword7'] = {
     bundleID = 'com.agilebits.onepassword7',
     hyper_key = '1'
