@@ -1,9 +1,11 @@
-{{/* epic create template */ -}}
+{{/* create template */ -}}
 fields:
   project:
     key: {{ or .overrides.project "" }}
-  # Epic Name
-  customfield_10901: {{ or (index .overrides "epic-name") "" }}
+  parent:
+    key: {{ or .overrides.parent "" }}
+  issuetype:
+    name: Sub-task
   summary: >-
     {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
@@ -19,6 +21,12 @@ fields:
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
-    - name:{{end}}
-  issuetype:
-    name: Epic
+    - name:{{end}}{{if .meta.fields.customfield_10901}}
+  customfield_10901: {{ or .overrides.epic "" }}{{end}}{{if .meta.fields.labels}}
+  labels: {{range .fields.labels}}
+    - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
+    - {{.}}{{end}}{{end}}
+    - {{end}}
+#  timetracking:
+#    originalEstimate: {{ or .overrides.originalEstimate "7h 30m" }}
+#    remainingEstimate: {{ or .overrides.remainingEstimate "" }}

@@ -2,7 +2,7 @@
 fields:
   project:
     key: {{ or .overrides.project "" }}
-  issuetype: # Values: {{ range .meta.fields.issuetype.allowedValues }}{{.name}}, {{end}}
+  issuetype:
     name: {{ or .overrides.issuetype "" }}
   summary: >-
     {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
@@ -25,3 +25,6 @@ fields:
     - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
     - {{.}}{{end}}{{end}}
     - {{end}}
+#  timetracking:
+#    originalEstimate: {{ or .overrides.originalEstimate "7h 30m" }}
+#    remainingEstimate: {{ or .overrides.remainingEstimate "" }}

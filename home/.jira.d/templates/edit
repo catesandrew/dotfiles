@@ -15,20 +15,22 @@ fields:
 {{- if .meta.fields.assignee }}
   {{- if .overrides.assignee }}
   assignee:
-    name: {{ .overrides.assignee }}
+    emailAddress: {{ .overrides.assignee }}
   {{- else if .fields.assignee }}
   assignee: {{if .fields.assignee.name}}
-    name: {{ or .fields.assignee.name}}
+    emailAddress: {{ or .fields.assignee.name}}
   {{- else }}
-    displayName: {{.fields.assignee.displayName}}{{end}}{{end}}{{end}}
+    emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}{{end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}{{end}}
+    emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}{{end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
     - name: {{ .name }}{{end}}{{if .overrides.watcher}}
     - name: {{ .overrides.watcher}}{{end}}{{end}}
+#{{- if .meta.fields.customfield_10203}}
+#  customfield_10203: {{ or .overrides.storypoints "3" }}{{end}}
 {{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name "" }}{{end}}
@@ -38,6 +40,12 @@ fields:
   customfield_10601: #sprint id{{end}}
   description: |~
     {{ or .overrides.description .fields.description "" | indent 4 }}
+#{{- if .fields.timetracking}}
+#  timeestimate: 7h
+#  timeoriginalestimate: 7h
+#  timetracking:
+#    originalEstimate: {{ or .overrides.originalEstimate "7h 30m" }}
+#    remainingEstimate: {{ or .overrides.remainingEstimate "" }}{{end}}
 # votes: {{ .fields.votes.votes }}
 # comments:
 # {{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago

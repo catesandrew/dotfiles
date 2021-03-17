@@ -10,18 +10,18 @@
 # customfield_10110: watchers
 # customfield_10120: epic
 
-query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution)
+query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution timetracking)
 projects=(UIE WEL MEM CCR)
-# jira req https://jira.int.payoff.com/rest/api/2/issuetype | jq '.[] | .name'
+# jira req https://happymoneyinc.atlassian.net/rest/api/2/issuetype | jq '.[] | .name'
 issue_types=("Bug" "Improvement" "Epic" "Task" "Sub-task" "Story" "User Story" "Research" "Data Pull" "Dashboard" "Automation" "Reporting" "Change Request" "SoftwareDeployment" "InfrastructureDeployment" "ProductionConfigChange" "PermissionsChange" "QA Sub-task" "Analysis" "Modeling" "Training" "Access" "IT Help" "UIE - Design" "Purchase" "Change" "Fault" "Off-Boarding" "LegacyIssue" "NewPlatformIssue" "MemberDataExport" "MemberDataDelete" "HMA" "Product Task" "Training Task" "QA task" "New Feature" "Service Request")
-# jira req https://jira.int.payoff.com/rest/api/2/priority | jq '.[] | .name'
+# jira req https://happymoneyinc.atlassian.net/rest/api/2/priority | jq '.[] | .name'
 priority_types=("P1" "P2" "P3" "P4" "P5" "Blocker" "High" "Medium" "Low" "Minor")
-# jira req https://jira.int.payoff.com/rest/api/2/status | jq '.[] | .name'
+# jira req https://happymoneyinc.atlassian.net/rest/api/2/status | jq '.[] | .name'
 status_types=("Open(Backlog)" "Backlog" "Engineering Review" "In-Progress" "In Pull Request" "Ready for Testing" "In Testing" "Testing Failed" "User Acceptance (UAT)" "Ready for Deployment" "In Review" "Closed" "Fix_Resolve" "Resolved" "In Spec" "BI-Researching" "Selected for Engineering" "Pending" "Deployed" "To Do" "Waiting for support" "Waiting for customer" "Deploy" "Done" "Reviewed" "Prioritized" "Cancelled" "Rejected" "Open" "In Progress" "Ready for UAT" "UAT Approved" "UAT Failed" "In UAT" "Under Review" "Approved" "Canceled" "Escalated" "Waiting for approval" "Work in progress" "Reopened" "validation" "Selected for Development" "New" "Triaged" "Researching" "Ready for Assignment" "Assigned" "Fix Ready" "Customer / Member Notified" "Planning" "Completed" "SDM Review" "Impact Analysis" "Stakeholder Review" "Ideation" "Exploration" "Evaluation" "Prioritization" "Initiation" "Design" "Development" "Testing" "UAT/Regression" "Product Review")
 done_status_types=("Closed" "Fix_Resolve" "Resolved" "Deployed" "Deploy" "Done" "Cancelled" "Canceled")
 joined_done_status_types=$(printf ", '%s'" "${done_status_types[@]}")
 
-# jira req https://jira.int.payoff.com/rest/api/2/resolution | jq '.[] | .name
+# jira req https://happymoneyinc.atlassian.net/rest/api/2/resolution | jq '.[] | .name
 resolution_types=("Fixed" "Won't Fix" "Duplicate" "Incomplete" "Cannot Reproduce" "Verified" "Active" "Test Pass" "Complete" "Deleted" "Passed" "Blocked" "Failed" "Invalid Issue" "Done" "Won't Do" "Declined" "Resolved" "Known Error" "Hardware failure" "Software failure")
 
 issueFile="${HOME}/.jira.d/.jira.issue"
@@ -408,6 +408,95 @@ custom-commands:
         type: STRING
         help: summary
       - name: labelnew
+        help: labels to use
+        short: l
+        default: \$JIRA_LABELS
+
+  - name: new-sub
+    help: create a jira subtask issue
+    args:
+      - name: ISSUE
+        help: parent issue for subtask
+    script: |-
+      _issue=""
+      if [ -n "{{args.ISSUE}}" ]; then
+        _issue=\$(echo "{{args.ISSUE}}" | tr '[:lower:]' '[:upper:]')
+      else
+        _issue=\$(echo "\${JIRA_ISSUE}" | tr '[:lower:]' '[:upper:]')
+      fi
+      if ! [[ \$_issue =~ [a-zA-Z]+-[0-9]+ ]]; then
+        eval "project=\$(echo {{options.projectsub}})"
+        if [ -n "\$project" ]; then
+          _issue="\${project}-\${_issue}"
+        fi
+      fi
+      state="--template={{options.templatesub}}"
+      state="\${state} -o 'parent=\$_issue'"
+      eval "project=\$(echo {{options.projectsub}})"
+      if [ -n "\$project" ]; then
+        state="\${state} --project=\$project"
+      fi
+      eval "reporter=\$(echo {{options.reportersub}})"
+      if [ -n "\$reporter" ]; then
+        state="\${state} -o 'reporter=\$reporter'"
+      fi
+      eval "priority=\$(echo {{options.prioritytypesub}})"
+      if [ -n "\$priority" ]; then
+        state="\${state} -o 'priority=\$priority'"
+      fi
+      eval "assignee=\$(echo {{options.assigneesub}})"
+      if [ -n "\$assignee" ]; then
+        state="\${state} -o 'assignee=\$assignee'"
+      else
+        state="\${state} -o 'assignee=null'"
+      fi
+      eval "labels=\$(echo {{options.labelsub}})"
+      if [ -n "\$labels" ]; then
+        state="\${state} -o 'labels=\$labels'"
+      fi
+      {{if options.summarysub}}
+        state="\${state} -o 'summary={{options.summarysub}}'"
+      {{end}}
+      echo {{jira}} create --noedit \$state
+      output="\$(eval "{{jira}} create --noedit \$state")"
+      # echo \$output
+      new_id="\$(echo \$output | gsed -nr 's,OK ([a-zA-Z]+-[0-9]+).+,\1,p')"
+      # echo \$new_id
+      # {{jira}} give \$new_id --default
+      echo "Add orginal estimate now..."
+      open "https://happymoneyinc.atlassian.net/browse/\$new_id"
+    options:
+      - name: templatesub
+        short: t
+        help: template to use, ex debug
+        default: create-sub
+      - name: projectsub
+        short: p
+        type: ENUM
+        help: project to use
+        default: \$JIRA_PROJECT
+        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: prioritytypesub
+        short: P
+        type: STRING
+        help: priority in to create
+        default: \$JIRA_PRIORITY
+        enum: $(for i in "${priority_types[@]}"; do printf "\n          - $i"; done)
+      - name: reportersub
+        short: r
+        type: ENUM
+        help: reporter to use
+        default: \$JIRA_USER
+      - name: assigneesub
+        short: a
+        type: string
+        help: assignee who to assign it to
+        default: \$JIRA_ASSIGNEE
+      - name: summarysub
+        short: s
+        type: STRING
+        help: summary
+      - name: labelsub
         help: labels to use
         short: l
         default: \$JIRA_LABELS

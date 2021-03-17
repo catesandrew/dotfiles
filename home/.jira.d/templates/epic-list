@@ -1,6 +1,6 @@
 {{/* table template */ -}}
 {{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
-{{- range .issues -}}
+{{- range .issues -}} 
   {{- row -}}
   {{- cell .key -}}
   {{- cell .fields.summary -}}

@@ -10,12 +10,12 @@ fields:
 {{- if .meta.fields.assignee }}
   {{- if .overrides.assignee }}
   assignee:
-    name: {{ .overrides.assignee }}
+    emailAddress: {{ .overrides.assignee }}
   {{- else if .fields.assignee }}
   assignee: {{if .fields.assignee.name}}
-    name: {{ or .fields.assignee.name}}
+    emailAddress: {{ or .fields.assignee.name}}
   {{- else }}
-    displayName: {{.fields.assignee.displayName}}{{end}}{{end}}
+    emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.components}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
