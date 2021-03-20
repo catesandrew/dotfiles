@@ -23,8 +23,18 @@ fields:
   customfield_10901: {{ or .overrides.epic "" }}{{end}}{{if .meta.fields.labels}}
   labels: {{range .fields.labels}}
     - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
-    - {{.}}{{end}}{{end}}
-    - {{end}}
+    - {{.}}{{end}}{{end}}{{end}}
+{{- if .meta.fields.customfield_12001 }}
+  customfield_12001: {{if .overrides.compliances}}{{range (split "," .overrides.compliances)}}
+    - value: {{.}}{{end}}{{else}}{{range .meta.fields.customfield_12001.allowedValues}}
+    # {{.value}}
+    - value: {{.value}}{{end}}{{end}}{{end}}
+
+
+# {{if .overrides.compliances}}{{range (split "," .overrides.compliances)}}
+#    - {{.}}{{end}}{{end}}
+#    - Changes have no Compliance Impact
+# { "fields" : { "customfield_12345" : { "value" :"Y" } } }
 #  timetracking:
 #    originalEstimate: {{ or .overrides.originalEstimate "7h 30m" }}
 #    remainingEstimate: {{ or .overrides.remainingEstimate "" }}

@@ -10,18 +10,20 @@
 # customfield_10110: watchers
 # customfield_10120: epic
 
+# https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/#creating-an-issue-examples
+
 query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution timetracking)
-projects=(UIE WEL MEM CCR)
-# jira req https://happymoneyinc.atlassian.net/rest/api/2/issuetype | jq '.[] | .name'
+projects=(UIE WEL MEM CCR DEVOPS)
+# jira req /rest/api/2/issuetype | jq '.[] | .name'
 issue_types=("Bug" "Improvement" "Epic" "Task" "Sub-task" "Story" "User Story" "Research" "Data Pull" "Dashboard" "Automation" "Reporting" "Change Request" "SoftwareDeployment" "InfrastructureDeployment" "ProductionConfigChange" "PermissionsChange" "QA Sub-task" "Analysis" "Modeling" "Training" "Access" "IT Help" "UIE - Design" "Purchase" "Change" "Fault" "Off-Boarding" "LegacyIssue" "NewPlatformIssue" "MemberDataExport" "MemberDataDelete" "HMA" "Product Task" "Training Task" "QA task" "New Feature" "Service Request")
-# jira req https://happymoneyinc.atlassian.net/rest/api/2/priority | jq '.[] | .name'
+# jira req /rest/api/2/priority | jq '.[] | .name'
 priority_types=("P1" "P2" "P3" "P4" "P5" "Blocker" "High" "Medium" "Low" "Minor")
-# jira req https://happymoneyinc.atlassian.net/rest/api/2/status | jq '.[] | .name'
+# jira req /rest/api/2/status | jq '.[] | .name'
 status_types=("Open(Backlog)" "Backlog" "Engineering Review" "In-Progress" "In Pull Request" "Ready for Testing" "In Testing" "Testing Failed" "User Acceptance (UAT)" "Ready for Deployment" "In Review" "Closed" "Fix_Resolve" "Resolved" "In Spec" "BI-Researching" "Selected for Engineering" "Pending" "Deployed" "To Do" "Waiting for support" "Waiting for customer" "Deploy" "Done" "Reviewed" "Prioritized" "Cancelled" "Rejected" "Open" "In Progress" "Ready for UAT" "UAT Approved" "UAT Failed" "In UAT" "Under Review" "Approved" "Canceled" "Escalated" "Waiting for approval" "Work in progress" "Reopened" "validation" "Selected for Development" "New" "Triaged" "Researching" "Ready for Assignment" "Assigned" "Fix Ready" "Customer / Member Notified" "Planning" "Completed" "SDM Review" "Impact Analysis" "Stakeholder Review" "Ideation" "Exploration" "Evaluation" "Prioritization" "Initiation" "Design" "Development" "Testing" "UAT/Regression" "Product Review")
 done_status_types=("Closed" "Fix_Resolve" "Resolved" "Deployed" "Deploy" "Done" "Cancelled" "Canceled")
 joined_done_status_types=$(printf ", '%s'" "${done_status_types[@]}")
 
-# jira req https://happymoneyinc.atlassian.net/rest/api/2/resolution | jq '.[] | .name
+# jira req /rest/api/2/resolution | jq '.[] | .name
 resolution_types=("Fixed" "Won't Fix" "Duplicate" "Incomplete" "Cannot Reproduce" "Verified" "Active" "Test Pass" "Complete" "Deleted" "Passed" "Blocked" "Failed" "Invalid Issue" "Done" "Won't Do" "Declined" "Resolved" "Known Error" "Hardware failure" "Software failure")
 
 issueFile="${HOME}/.jira.d/.jira.issue"
@@ -355,16 +357,19 @@ custom-commands:
       if [ -n "\$labels" ]; then
         state="\${state} -o 'labels=\$labels'"
       fi
+      {{if options.compliances}}
+        state="\${state} -o 'compliances={{options.compliances}}'"
+      {{end}}
       {{if options.summarynew}}
         state="\${state} -o 'summary={{options.summarynew}}'"
       {{end}}
       echo {{jira}} create --noedit \$state
       output="\$(eval "{{jira}} create --noedit \$state")"
-      echo \$output
       # echo \$output
+      echo \$output
       new_id="\$(echo \$output | gsed -nr 's,OK ([a-zA-Z]+-[0-9]+).+,\1,p')"
-      # echo \$new_id
-      {{jira}} give \$new_id --default
+      echo \$new_id
+      # {{jira}} give \$new_id --default
     options:
       - name: templatenew
         short: t
@@ -411,6 +416,9 @@ custom-commands:
         help: labels to use
         short: l
         default: \$JIRA_LABELS
+      - name: compliances
+        help: compliances to use
+        default: \$JIRA_COMPLIANCES
 
   - name: new-sub
     help: create a jira subtask issue
