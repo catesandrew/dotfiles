@@ -13,7 +13,7 @@
 # https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/#creating-an-issue-examples
 
 query_fields=(customfield_10203 issuetype priority assignee status created reporter updated summary timespent aggregatetimespent resolution timetracking)
-projects=(UIE WEL MEM CCR DEVOPS)
+projects=(UIE WEL MEM CCR DEVOPS HELP)
 # jira req /rest/api/2/issuetype | jq '.[] | .name'
 issue_types=("Bug" "Improvement" "Epic" "Task" "Sub-task" "Story" "User Story" "Research" "Data Pull" "Dashboard" "Automation" "Reporting" "Change Request" "SoftwareDeployment" "InfrastructureDeployment" "ProductionConfigChange" "PermissionsChange" "QA Sub-task" "Analysis" "Modeling" "Training" "Access" "IT Help" "UIE - Design" "Purchase" "Change" "Fault" "Off-Boarding" "LegacyIssue" "NewPlatformIssue" "MemberDataExport" "MemberDataDelete" "HMA" "Product Task" "Training Task" "QA task" "New Feature" "Service Request")
 # jira req /rest/api/2/priority | jq '.[] | .name'
