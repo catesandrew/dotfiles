@@ -1,7 +1,12 @@
 #!/bin/bash
 
-sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
-sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+if [ -f "/Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plis" ]; then
+  sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+fi
+
+if [ -f "/Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plis" ]; then
+  sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+fi
 
 # dscacheutil -flushcache
 
