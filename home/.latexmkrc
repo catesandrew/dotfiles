@@ -275,3 +275,34 @@ sub puml2x {
    return $ret;
 }
 
+
+
+add_cus_dep('gif', 'eps', 0, 'gif2eps');
+sub gif2eps {
+	return system("convert \"$_[0].gif\" \"$_[0].eps\"");
+}
+
+add_cus_dep('jpg', 'eps', 0, 'jpg2eps');
+sub jpg2eps {
+	return system("convert \"$_[0].jpg\" \"$_[0].eps\"");
+}
+
+add_cus_dep('png', 'eps', 0, 'png2eps');
+sub png2eps {
+	return system("convert \"$_[0].png\" \"$_[0].eps\"");
+}
+
+add_cus_dep('svg', 'eps', 0, 'svg2eps');
+sub svg2eps {
+  system("/Applications/Inkscape.app/Contents/MacOS/inkscape --export-area-drawing --export-text-to-path --export-type='eps' '$_[0].svg'");
+}
+
+add_cus_dep('svg', 'pdf_tex', 0, 'svg2pdf_tex');
+sub svg2pdf_tex {
+ return system("/Applications/Inkscape.app/Contents/MacOS/inkscape --export-area-drawing --export-type='pdf' --export-latex '$_[0].svg'");
+}
+
+add_cus_dep('svg', 'eps_tex', 0, 'svg2eps_tex');
+sub svg2eps_tex {
+  system("/Applications/Inkscape.app/Contents/MacOS/inkscape --export-area-drawing --export-type='eps' --export-latex '$_[0].svg'");
+}

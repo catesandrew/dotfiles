@@ -92,7 +92,7 @@ Config.applications = {
   ['com.flexibits.fantastical2.mac'] = {
     bundleID = 'com.flexibits.fantastical2.mac',
     hyper_key = 'k',
-    local_bindings = {']'},
+    local_bindings = {']', 'r'},
     tags = {'planning', 'review', 'calendar'},
     whitelisted = true,
     rules = {
@@ -125,11 +125,6 @@ Config.applications = {
     }
   },
   -- 'r', saved for fantastical
-  ['com.flexibits.fantastical2.mac'] = {
-    bundleID = 'com.flexibits.fantastical2.mac',
-    local_bindings = {'r'},
-    tags = {'calendar'}
-  },
   ['com.googlecode.iterm2'] = {
     bundleID = 'com.googlecode.iterm2',
     hyper_key = 't',
