@@ -25,6 +25,7 @@ joined_done_status_types=$(printf ", '%s'" "${done_status_types[@]}")
 
 # jira req /rest/api/2/resolution | jq '.[] | .name
 resolution_types=("Fixed" "Won't Fix" "Duplicate" "Incomplete" "Cannot Reproduce" "Verified" "Active" "Test Pass" "Complete" "Deleted" "Passed" "Blocked" "Failed" "Invalid Issue" "Done" "Won't Do" "Declined" "Resolved" "Known Error" "Hardware failure" "Software failure")
+sprintstates=("closed" "active" "future")
 
 issueFile="${HOME}/.jira.d/.jira.issue"
 touch $issueFile
@@ -144,12 +145,16 @@ custom-commands:
   - name: mine
     help: display issues assigned to me
     script: |-
+      query="resolution = unresolved and assignee=currentuser()"
       eval "project=\$(echo {{options.proj}})"
       if [ -n "\$project" ]; then
-        query="resolution = unresolved and assignee=currentuser() and project = \$project ORDER BY priority asc, created"
-      else
-        query="resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
+        query="\${query} and project=\$project"
       fi
+      {{if not options.all}}
+        query="\${query} and status NOT IN ({{range \$key, \$value := options.donefield}}{{ if \$key}},{{end}}\"{{\$value}}\"{{end}})"
+      {{end}}
+      query="\${query} ORDER BY priority asc, created"
+
       {{jira}} list \
         --template {{options.tmplmine}} \
         --query "\$query" \
@@ -170,6 +175,16 @@ custom-commands:
         help: project to use
         default: \$JIRA_PROJECT
         enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: all
+        short: a
+        type: BOOL
+        help: Include ${joined_done_status_types:2} stories
+      - name: donefield
+        type: ENUM
+        help: status fields not to list in table, unless --all
+        repeat: true
+        default: $(for i in "${done_status_types[@]}"; do printf "\n          - $i"; done)
+        enum: $(for i in "${status_types[@]}"; do printf "\n          - $i"; done)
 
   - name: was
     help: display issues assigned or reported by me
@@ -213,11 +228,17 @@ custom-commands:
         help: project to use
         default: \$JIRA_PROJECT
         enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
+      - name: sprintstate
+        type: ENUM
+        help: sprint state to use
+        default: \$JIRA_SPRINTSTATE
+        enum: $(for i in "${sprintstates[@]}"; do printf "\n          - $i"; done)
     args:
       - name: ISSUE
         required: true
-    script: |
+    script: |-
       eval "project=\$(echo {{options.proj}})"
+      # eval "sprintstate=\$(echo {{options.sprintstate}})"
       state={{if options.next}}future{{else}}active{{end}}
       board_id=\$({{jira}} req "/rest/agile/1.0/board?projectKeyOrId=\$project&type=scrum" --gjq values.0.id)
       sprint_id=\$({{jira}} req "/rest/agile/1.0/board/\$board_id/sprint?state=\$state" --gjq values.0.id)
@@ -228,40 +249,12 @@ custom-commands:
       {{jira}} req -M POST "/rest/agile/1.0/sprint/\$sprint_id/issue" "{\"issues\":[\"{{args.ISSUE}}\"]}"
 
   - name: sprint
-    help: display issues for active sprint
-    script: |-
-      query="sprint in openSprints() and type != epic and type != epic and resolution = unresolved"
-      eval "project=\$(echo {{options.proj}})"
-      if [ -n "\$project" ]; then
-        query="\${query} and project=\$project"
-      fi
-      query="\${query} ORDER BY rank asc, created"
-      {{jira}} list \
-        --template {{options.tmplsprint}} \
-        --query "\$query" \
-        --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
-    options:
-      - name: tmplsprint
-        short: t
-        help: template to use, ex debug
-        default: table
-      - name: field
-        type: ENUM
-        help: fields to list in table
-        repeat: true
-        default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
-        enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
-      - name: proj
-        type: ENUM
-        help: project to use
-        default: \$JIRA_PROJECT
-        enum: $(for i in "${projects[@]}"; do printf "\n          - $i"; done)
-
-  # should we add this to the query? `and resolution = unresolved`
-  - name: sprint2
     help: Shows stories in curent sprint
     options:
-      - name: projectsprint2
+      - name: currentuser
+        type: bool
+        help: limit results to items assigned to current user
+      - name: projectsprint
         short: p
         type: ENUM
         help: project to use
@@ -273,11 +266,11 @@ custom-commands:
         repeat: true
         default: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
         enum: $(for i in "${query_fields[@]}"; do printf "\n          - $i"; done)
-      - name: tmplsprint2
+      - name: tmplsprint
         short: t
         help: template to use, ex debug
         default: table
-      - name: querysprint2
+      - name: querysprint
         help: Search the text of the ticket for this value
         default: \$JIRA_QUERY
         short: q
@@ -291,21 +284,23 @@ custom-commands:
         repeat: true
         default: $(for i in "${done_status_types[@]}"; do printf "\n          - $i"; done)
         enum: $(for i in "${status_types[@]}"; do printf "\n          - $i"; done)
-      - name: componentsprint2
+      - name: componentsprint
         short: c
         help: Filter on a component, defaults to \$JIRA_COMPONENT
         default: \$JIRA_COMPONENT
     script: |-
-      query="sprint in openSprints() and type != epic"
-      eval "project=\$(echo {{options.projectsprint2}})"
+      query="(Sprint is EMPTY OR Sprint in (openSprints(), futureSprints())) AND type != epic and resolution = unresolved"
+      state={{if options.currentuser}}" and assignee=currentUser()"{{end}}
+      query="\${query}\$state"
+      eval "project=\$(echo {{options.projectsprint}})"
       if [ -n "\$project" ]; then
         query="\${query} and project=\$project"
       fi
-      eval "component=\$(echo {{options.componentsprint2}})"
+      eval "component=\$(echo {{options.componentsprint}})"
       if [ -n "\$component" ]; then
         query="\${query} and component=\"\$component\""
       fi
-      eval "qry=\$(echo {{options.querysprint2}})"
+      eval "qry=\$(echo {{options.querysprint}})"
       if [ -n "\$qry" ]; then
         query="\${query} and text ~ \"\$qry\""
       fi
@@ -313,8 +308,9 @@ custom-commands:
         query="\${query} and status NOT IN ({{range \$key, \$value := options.donefield}}{{ if \$key}},{{end}}\"{{\$value}}\"{{end}})"
       {{end}}
       query="\${query} ORDER BY rank asc, created"
+      echo \$query
       {{jira}} list \
-        --template {{options.tmplsprint2}} \
+        --template {{options.tmplsprint}} \
         --query "\$query" \
         --queryfields={{range \$key, \$value := options.field}}{{ if \$key}},{{end}}{{.}}{{end}}
 
