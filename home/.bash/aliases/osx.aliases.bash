@@ -52,7 +52,8 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     alias xcproject='open -a "/Applications/Xcode.app" *.xcodeproj'
 
     export XCODE_10_PATH='/Applications/Xcode10.3.app'
-    export XCODE_11_PATH='/Applications/Xcode.app'
+    export XCODE_11_PATH='/Applications/Xcode11.0.app'
+    export XCODE_12_PATH='/Applications/Xcode.app'
 
     xcselect() {
       sudo xcode-select -s "$1"/Contents/Developer
@@ -60,7 +61,7 @@ if [ "$__dot_system_type" == "Darwin" ]; then
       echo "Selected Xcode: ${1}"
     }
 
-    alias xcstable="xcselect ${XCODE_11_PATH}"
+    alias xcstable="xcselect ${XCODE_12_PATH}"
     alias xcold="xcselect ${XCODE_10_PATH}"
     alias xcprint="xcode-select -p"
 
