@@ -1,0 +1,81 @@
+{
+  "rules": {
+    "terminology": {
+      "defaultTerms": false,
+      "skip": ["Blockquote", "Header", "Link", "Emphasis", "Strong"],
+      "terms": [
+        "Browsersync",
+        "ESLint",
+        "JavaScript",
+        "Lodash",
+        "Markdown",
+        "UglifyJS",
+        "Sass",
+        "Stylelint",
+        "CSSLint",
+        "Internet Explorer",
+        ["Node[ .]js", "Node"],
+        ["React[ .]js", "React"],
+        ["a npm", "an npm"],
+        "npm",
+        "pull request",
+
+        ["uglify", "UglifyJS"],
+        ["sourcemap", "sourcemap"],
+        ["sourcemaps", "source maps"],
+        ["environemnt", "environment"],
+        ["some", ""],
+        ["filetype", "file type"],
+        ["stylesheet", "style sheet"],
+        ["like this", ""],
+        ["probably", ""],
+        ["known as", ""],
+        ["really", ""],
+        ["just", ""],
+        ["simple", ""],
+        ["obvious", ""],
+        ["straightforward", ""],
+        ["very", ""],
+        ["a little", ""],
+        ["note that", ""],
+        ["good to note", ""],
+        ["good to remember", ""],
+        ["basically", ""],
+        ["actually", ""],
+        ["pretty", ""],
+        ["easy", ""],
+        ["interesting", ""],
+        ["way to", ""],
+        ["In order to", "To"],
+        ["in order to", "to"],
+        ["might", ""],
+        ["us", ""],
+        ["I'll", ""],
+        ["they'll", ""],
+
+        "pre-release",
+
+        "ECMAScript",
+
+        ["back[- ]end(\\w*)", "backend$1"],
+        ["front[- ]end(\\w*)", "frontend$1"],
+        ["hot[- ]key", "hotkey"],
+        ["build system(s?)", "build tool$1"],
+        ["CLI tool(s?)", "command line tool$1"],
+        ["web[- ]?site(s?)", "site$1"],
+        ["repo\\b", "repository"],
+        ["style-?guide(s?)", "style guide$1"],
+        ["change-?log(s?)", "change log$1"],
+
+        ["(\\w+[^.?!]\\)? )stylelint", "$1stylelint"]
+      ]
+    },
+    "common-misspellings": true,
+    "write-good": {
+      "adverb": false,
+      "passive": false,
+      "tooWordy": false,
+      "weasel": true
+    }
+  }
+}
