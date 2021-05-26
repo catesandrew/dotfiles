@@ -24,18 +24,18 @@ require 'wirble'
 require 'utility_belt'
 
 # load wirble
-Wirble.init
-Wirble.colorize
+# Wirble.init
+# Wirble.colorize
 
 
 # Now I can type fl 'foo' and then type rl to reload it. Much better.
 
 def fl(file_name)
    file_name += '.rb' unless file_name =~ /\.rb/
-   @@recent = file_name 
+   @@recent = file_name
    load "#{file_name}"
 end
- 
+
 def rl
   fl(@@recent)
 end
@@ -68,12 +68,12 @@ module Misc
   end
 end
 
-begin
-  # load wirble
-  require 'wirble'
+# begin
+#   # load wirble
+#   require 'wirble'
 
-  # start wirble (with color)
-  Wirble.init
-  Wirble.colorize
-rescue LoadError => err
-  warn "Couldn't load Wirble: #{err}"
+#   # start wirble (with color)
+#   Wirble.init
+#   Wirble.colorize
+# rescue LoadError => err
+#   warn "Couldn't load Wirble: #{err}"

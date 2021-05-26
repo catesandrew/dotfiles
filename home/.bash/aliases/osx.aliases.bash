@@ -63,4 +63,29 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     alias xcstable="xcselect ${XCODE_11_PATH}"
     alias xcold="xcselect ${XCODE_10_PATH}"
     alias xcprint="xcode-select -p"
+
+    xcreset() {
+      local workspace project
+
+      workspace=(*.xcworkspace)
+	    project=(*.xcodeproj)
+	    if [ -e "${workspace}" ] || [ -e "${project}" ]; then
+        echo "✓ Cleaning Xcode..."
+
+        # consider to minimize the potential for simulator flakiness
+        # pkill -int com.apple.CoreSimulator.CoreSimulatorService
+
+        killall Xcode
+        xcrun -k
+        xcodebuild -alltargets clean
+        rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang/ModuleCache"
+        rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang.$(whoami)/ModuleCache"
+        rm -rf ~/Library/Developer/Xcode/DerivedData/*
+        rm -rf ~/Library/Caches/com.apple.dt.Xcode/*
+
+        xed "$TARGET" .
+	    else
+        echo "⨯ Xcode workspace or project not found"
+	    fi
+    }
 fi
