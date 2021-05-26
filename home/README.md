@@ -548,6 +548,29 @@ echo "testing GPG" | gpg --clearsign
 
 You should see no errors and a plaintest message you've inputted along with a signature.
 
+## Textlint
+
+```bash
+npm install -g textlint \
+  textlint-plugin-latex \
+  textlint-rule-abbr-within-parentheses \
+  textlint-rule-alex \
+  textlint-rule-common-misspellings \
+  textlint-rule-diacritics \
+  textlint-rule-en-capitalization \
+  textlint-rule-en-max-word-count \
+  textlint-rule-max-comma \
+  textlint-rule-no-start-duplicated-conjunction \
+  textlint-rule-period-in-list-item \
+  textlint-rule-rousseau \
+  textlint-rule-spellcheck-tech-word \
+  textlint-rule-stop-words
+  textlint-rule-terminology \
+  textlint-rule-unexpanded-acronym \
+  textlint-rule-write-good \
+  write-good
+```
+
 [1]: http://nodejs.org/
 [2]: http://gruntjs.com/
 [3]: http://gulpjs.com/
