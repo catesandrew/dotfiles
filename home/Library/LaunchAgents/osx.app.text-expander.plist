@@ -9,11 +9,7 @@
 	</dict>
 	<key>Label</key>
 	<string>osx.app.text-expander</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/TextExpander.app/Contents/MacOS/TextExpander</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/TextExpander.app/Contents/MacOS/TextExpander</string>
 </dict>
 </plist>

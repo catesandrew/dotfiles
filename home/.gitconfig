@@ -181,6 +181,8 @@
   default = tracking
 [branch "master"]
   rebase = true
+[branch "main"]
+  rebase = true
 [mergetool]
   keepBackup = true
   prompt = false
@@ -225,3 +227,5 @@
 	includeStatusHeader = false
 	includePullRequestsSection = false
 	includeIssuesSection = false
+[rerere]
+	enabled = true

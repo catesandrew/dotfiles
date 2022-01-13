@@ -9,11 +9,7 @@
 	</dict>
 	<key>Label</key>
 	<string>osx.app.snippets-lab</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/SnippetsLab.app/Contents/MacOS/SnippetsLab</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/SnippetsLab.app/Contents/MacOS/SnippetsLab</string>
 </dict>
 </plist>

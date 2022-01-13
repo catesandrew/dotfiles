@@ -61,7 +61,7 @@ if brew_contains_element "jenv" || \
 
       ${JENV_HOME}/bin/jenv rehash 2>/dev/null
 
-      if [ -n "${JENV_HOME}" ]; then
+      if [ -n "${JENV_ROOT}" ]; then
         [[ -e ${JENV_ROOT}/plugins/export/etc/jenv.d/init/export_jenv_hook.bash ]] && \
           source "${JENV_ROOT}/plugins/export/etc/jenv.d/init/export_jenv_hook.bash"
       fi

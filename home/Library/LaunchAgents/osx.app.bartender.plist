@@ -9,12 +9,8 @@
 	</dict>
 	<key>Label</key>
 	<string>osx.app.bartender</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/sh</string>
-		<string>-c</string>
-		<string>sleep 2 &amp;&amp; /Applications/Bartender\ 3.app/Contents/Library/LoginItems/BartenderStartAtLoginHelper.app/Contents/MacOS/BartenderStartAtLoginHelper</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/Bartender 4.app/Contents/Library/LoginItems/BartenderStartAtLoginHelper.app/Contents/MacOS/BartenderStartAtLoginHelper</string>
 	<key>RunAtLoad</key>
 	<true/>
 </dict>

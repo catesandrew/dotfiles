@@ -9,11 +9,7 @@
 	</dict>
 	<key>Label</key>
 	<string>osx.app.hammerspoon</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon</string>
 </dict>
 </plist>

@@ -1,3 +1,9 @@
+# Emacs Freezes
+
+  ps aux | grep -ie emacs | grep -v grep | awk '{print $2}' | xargs kill -SIGUSR2
+  kill -SIGUSR2 <emacs_pid_goes_here>
+  killall -USR2 emacs
+
 # Running emacs
 
   GUI mode            $ emacs

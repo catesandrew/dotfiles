@@ -9,11 +9,7 @@
 	</dict>
 	<key>Label</key>
 	<string>osx.app.launch-bar</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /Applications/LaunchBar.app/Contents/MacOS/LaunchBar</string>
-	</array>
+	<key>Program</key>
+	<string>/Applications/LaunchBar.app/Contents/MacOS/LaunchBar</string>
 </dict>
 </plist>

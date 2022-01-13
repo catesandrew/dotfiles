@@ -1179,6 +1179,7 @@ run_brew() {
 
             # TEN (10.0) API 29
             sdkmanager --install "system-images;android-29;google_apis;x86_64"
+            sdkmanager --install "system-images;android-29;default;x86_64"
 
             # Beta (11.0) API 30
             sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
@@ -1196,6 +1197,7 @@ run_brew() {
             echo "no" | avdmanager create avd --force --name "pixel_9.0" --device "pixel" --package "system-images;android-28;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_10.0" --device "pixel" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_11.0" --device "pixel" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_12.0" --device "pixel" --package "system-images;android-31;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
 
             # to create generic virtual device
             #
@@ -1210,6 +1212,7 @@ run_brew() {
             echo "no" | avdmanager create avd --force --name "generic_9.0" --package "system-images;android-28;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "generic_10.0" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "generic_11.0" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_12.0" --package "system-images;android-31;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
 
             # add aliases
             #
