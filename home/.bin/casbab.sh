@@ -33,12 +33,12 @@ detect() {
   for i in '_' '-' ' '; do
     if [[ ${arg[*]} == *$i* ]]; then
       helper="yes"
-      echo "${arg[*]}" | tr '[:upper:]' '[:lower:]' | tr -s "${i}" ' '
+      echo "${arg[*]}" | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]' | tr -s "${i}" ' '
     fi
   done
   # If '_','-' and ' ' are not used as a separator try by case
   if [[ -z $helper ]] && [[ ${arg[0]} != '' ]]; then
-    dif_case "${@:-}" | tr '[:upper:]' '[:lower:]'
+    dif_case "${@:-}" | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]'
   fi
 }
 
