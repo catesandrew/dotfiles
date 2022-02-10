@@ -11,6 +11,18 @@ if brew_contains_element "nvm"; then
     export NVM_DIR="${BREW_HOME}/nvm"
   fi
 
+  if [ -n "$NVM_VERSION" ] && [ -n "$NVM_DIR" ]; then
+    ESCAPED_NVM_VERSION=$(echo "${NVM_VERSION//./$'\.'}")
+
+    PATH=$(path_strip "$PATH" "\./bin")
+    PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
+    PATH=$(path_strip "$PATH" "${NVM_DIR}/versions/node/v${ESCAPED_NVM_VERSION}/bin")
+
+    PATH="${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:$PATH"
+    PATH="./node_modules/.bin:$PATH"
+    PATH="./bin:$PATH"
+  fi
+
   # lazy load NVM into a shell session *as a function*
   nvm() {
     echo "Lazy loading nvm..."

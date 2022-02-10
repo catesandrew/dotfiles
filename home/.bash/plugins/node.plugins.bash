@@ -13,10 +13,11 @@ export UV_THREADPOOL_SIZE=8
 export DETECT_CHROMEDRIVER_VERSION=true
 
 # Strip other version from PATH
-export PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
+PATH=$(path_strip "$PATH" "\./bin")
+PATH=$(path_strip "$PATH" "\./node_modules/\.bin")
 
-# Prepend `./node_modules/.bin`
-path_prepend "./node_modules/.bin"
+PATH="./node_modules/.bin:$PATH"
+PATH="./bin:$PATH"
 
 # tells npm to compile and install all your native addons in parallel and not
 # sequentially. This greatly increases installation times.

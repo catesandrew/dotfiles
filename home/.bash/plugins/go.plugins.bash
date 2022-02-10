@@ -11,9 +11,8 @@ if brew_contains_element "go" || \
     export GOPATH="${BREW_HOME}/go"
 
     # Strip other version from PATH
-    # export PATH=$(path_strip "$PATH" "${GOPATH}/bin")
-
+    PATH=$(path_strip "$PATH" "${GOPATH}/bin")
     # Append
-    path_append "${GOPATH}/bin"
+    PATH="${PATH}:${GOPATH}/bin"
   fi
 fi

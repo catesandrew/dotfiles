@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 
 # TODO update this with latest
 # TODO work with jenv
@@ -140,7 +140,7 @@ use_rbenv() {
   export RBENV_SHELL=bash
   export RBENV_LOADED=1
 
-  source "${BREW_HOME}/Cellar/rbenv/1.1.2/completions/rbenv.bash"
+  source "${BREW_HOME}/Cellar/rbenv/1.2.0/completions/rbenv.bash"
   command rbenv rehash 2>/dev/null
 
   rbenv() {
@@ -209,14 +209,14 @@ requires_nvm(){
 
 use_nvm() {
   local node_version=$1
-  log_status "Loading ..."
+  log_status "Loading node ${node_version}..."
 
-  nvm_sh=/usr/local/opt/nvm/nvm.sh
-  [ -s "$nvm_sh" ] && \. "$nvm_sh"  # This loads nvm
+  # nvm_sh=/usr/local/opt/nvm/nvm.sh
+  # [ -s "$nvm_sh" ] && \. "$nvm_sh"  # This loads nvm
 
-  if [[ ! -z $node_version ]]; then
-     nvm use $node_version
-  fi
+  # if [[ ! -z $node_version ]]; then
+  #    nvm use $node_version
+  # fi
 
   # if [[ -e $nvm_sh ]]; then
   #   source $nvm_sh

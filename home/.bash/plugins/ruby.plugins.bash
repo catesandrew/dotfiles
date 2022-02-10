@@ -3,11 +3,11 @@
 # Make commands installed with 'gem install --user-install' available
 # ~/.gem/ruby/${RUBY_VERSION}/bin/
 
-if hash ruby 2>/dev/null; then
-    if hash gem 2>/dev/null; then
-        path_munge "$(ruby -e 'print Gem.user_dir')/bin" after
-    fi
-fi
+# if hash ruby 2>/dev/null; then
+#     if hash gem 2>/dev/null; then
+#         path_munge "$(ruby -e 'print Gem.user_dir')/bin" after
+#     fi
+# fi
 
 # removes installed gem
 # param '1: installed gem name'

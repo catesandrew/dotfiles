@@ -1,7 +1,6 @@
 # Load rbenv, if you are using it
 
-if brew_contains_element "rbenv" || \
-    hash rbenv 2>/dev/null; then
+if brew_contains_element "rbenv"; then
 
   if [ -z "$RBENV_ROOT" ]; then
     export RBENV_ROOT="$HOME/.rbenv"
@@ -9,6 +8,11 @@ if brew_contains_element "rbenv" || \
 
   if [ -z "$RBENV_HOME" ]; then
     export RBENV_HOME="${BREW_HOME}/opt/jenv"
+  fi
+
+  if [ -n "$RBENV_ROOT" ]; then
+    PATH=$(path_strip "$PATH" "${RBENV_ROOT}/shims")
+    PATH="${RBENV_ROOT}/shims:$PATH"
   fi
 
   # lazy load rbenv
