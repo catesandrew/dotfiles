@@ -99,7 +99,7 @@ case $OSTYPE in
       local git_root="$(find_git_root)"
 
       if [[ ! -z "$git_root" ]]; then
-        open -b com.fournova.Tower2 "${git_root}"
+        open -b com.fournova.Tower3 "${git_root}"
       else
         echo "No git root found."
       fi

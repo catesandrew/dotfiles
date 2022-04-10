@@ -1083,7 +1083,7 @@ run_brew() {
       'tex-live-utility'
       'textexpander'
       'touch-bar-simulator'
-      'tower2'
+      'tower3'
       'transmission'
       'ttscoff-mmd-quicklook'
       'tuntap'

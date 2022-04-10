@@ -30,7 +30,7 @@ EOM
       fi
     fi
 
-    export GPG_AGENT_INFO
+    # export GPG_AGENT_INFO
   else
     echo "starting gpg-agent daemon"
 
