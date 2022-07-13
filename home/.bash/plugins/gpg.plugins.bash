@@ -29,8 +29,6 @@ EOM
         eval $(gpg-agent --options ${HOME}/.gpg-agent.conf --daemon --log-file "${TMPDIR}/gpg-agent.log" --verbose)
       fi
     fi
-
-    # export GPG_AGENT_INFO
   else
     echo "starting gpg-agent daemon"
 
@@ -39,7 +37,6 @@ EOM
 
     # AGENT_PORT=$(pgrep gpg-agent)
     # AGENT_SOCKET=$(gpgconf --list-dirs agent-socket)
-    # export GPG_AGENT_INFO
   fi
 
   # Avoid issues with `gpg` as installed via Homebrew.
