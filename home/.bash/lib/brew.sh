@@ -153,19 +153,26 @@ run_brew() {
     local -a desired_formulae=(
       'pkg-config'
       'xorgproto'
+      'ca-certificates'
+      'readline'
+      'gdbm'
+      'mpdecimal'
+      'sqlite'
+      'xz'
+      'freetype'
+      'gettext'
+      'pcre'
       'jpeg'
+      'fontconfig'
+      'glib'
+      'lzo'
+      'pixman'
       'icu4c'
       'gflags'
+      'imath'
+      'giflib'
       'm4'
-      'gdbm'
-      'gettext'
-      'lzo'
-      'mpdecimal'
-      'pcre'
-      'pixman'
-      'readline'
-      'tcl-tk'
-      'xz'
+      'cairo'
       'boost'
       'double-conversion'
       'fmt'
@@ -173,53 +180,59 @@ run_brew() {
       'lz4'
       'snappy'
       'zstd'
-      'imath'
-      'giflib'
-      'little-cms2'
-      'bdw-gc'
-      'gmp'
-      'cairo'
-      'folly'
       'brotli'
       'openexr'
       'webp'
       'flac'
       'opus'
+      'little-cms2'
+      'bdw-gc'
+      'gmp'
+      'docbook'
+      'gobject-introspection'
+      'graphite2'
+      'folly'
+      'jpeg-xl'
       'openjpeg'
       'guile'
       'nettle'
       'p11-kit'
       'unbound'
-      'docbook'
-      'fribidi'
-      'gobject-introspection'
-      'graphite2'
-      'fizz'
-      'jpeg-xl'
-      'leptonica'
+      'docbook-xsl'
+      'gnu-getopt'
       'mpfr'
+      'fribidi'
+      'harfbuzz'
+      'fizz'
+      'aom'
+      'jasper'
+      'cjson'
+      'cmocka'
+      'mbedtls'
+      'leptonica'
       'gnutls'
       'npth'
       'pinentry'
-      'docbook-xsl'
-      'gnu-getopt'
+      'xmlto'
+      'tcl-tk'
+      'isl'
       'gdk-pixbuf'
-      'hicolor-icon-theme'
       'pango'
+      'atk'
+      'hicolor-icon-theme'
       'gsettings-desktop-schemas'
+      'nspr'
       'assimp'
       'dbus'
       'hunspell'
-      'jasper'
+      'jpeg-turbo'
       'md4c'
       'pcre2'
       'wangle'
-      'aom'
-      'cjson'
-      'cmocka'
+      'netpbm'
       'dav1d'
+      'frei0r'
       'lame'
-      'mbedtls'
       'opencore-amr'
       'rav1e'
       'rubberband'
@@ -233,38 +246,48 @@ run_brew() {
       'xvid'
       'zeromq'
       'zimg'
-      'isl'
       'gnupg'
-      'xmlto'
-      'six'
-      'c-ares'
-      'jemalloc'
+      'jbig2dec'
+      'shared-mime-info'
+      'gcc'
       'gtk+'
       'gtk+3'
       'ninja'
-      'nspr'
+      'nss'
       'qt'
       'fbthrift'
+      'gd'
       'gts'
       'autoconf'
       'krb5'
-      'jbig2dec'
-      'gcc'
-      'adns'
+      'ffmpeg'
       'gpgme'
-      'shared-mime-info'
+      'berkeley-db'
       'openldap'
       'rtmpdump'
       'abseil'
+      'c-ares'
       'protobuf'
-      'nghttp2'
+      're2'
+      'graphene'
+      'gstreamer'
+      'orc'
+      'glib-networking'
+      'hwloc'
       'sdl'
+      'ghostscript'
+      'gsasl'
+      'jemalloc'
+      'openblas'
+      'lua'
       'oniguruma'
+      'adwaita-icon-theme'
       'desktop-file-utils'
       'gtk-mac-integration'
       'intltool'
       'meson'
       'poppler'
+      'sphinx-doc'
       'zegervdv/zathura/girara'
       'zegervdv/zathura/zathura'
       'zegervdv/zathura/synctex'
@@ -273,9 +296,9 @@ run_brew() {
       'fb303'
       'ncurses'
       'graphviz'
-      'docutils'
       'jansson'
       'utf8proc'
+      'openjdk'
       'net-snmp'
       'popt'
       'xxhash'
@@ -283,27 +306,25 @@ run_brew() {
       'ruby-build'
       'py3cairo'
       'pyenv'
-      'python-tabulate'
+      'six'
       'qrencode'
       'tree'
+      'pandoc'
       'ldns'
       'stoken'
-      'hwloc'
       'gpatch'
-      'ghostscript'
       'jbig2enc'
+      'pillow'
       'pngquant'
+      'pybind11'
       'qpdf'
       'unpaper'
       'ocaml'
-      'openblas'
       'gmime'
       'talloc'
       'xapian'
-      'ilmbase'
       'screenresolution'
       'tokyo-cabinet'
-      'gsasl'
       'cscope'
       'ruby'
       'unibilium'
@@ -311,24 +332,30 @@ run_brew() {
       'cunit'
       'faac'
       'fdk-aac'
+      'perl'
       'curl'
-      'openjdk@11'
       'kubernetes-cli'
+      'juju'
       'mozjpeg'
       'grpc'
       'mysql-client'
-      'graphene'
-      'orc'
+      'heroku/brew/heroku-node'
+      'gst-plugins-base'
       'taglib'
       'faad2'
       'musepack'
       'srtp'
       'bash'
+      'open-mpi'
+      'imagemagick'
+      'mailutils'
+      'nghttp2'
       'protobuf-c'
       'rlwrap'
       'charm'
       'neon'
       'ghc'
+      'numpy'
       'p7zip'
       'ssdeep'
       'json-c'
@@ -406,8 +433,6 @@ run_brew() {
       'sslmate'
       'ssh-copy-id'
       'sqlmap'
-      'sqlite'
-      'sphinx-doc'
       'spdylay'
       'spark'
       'socat'
@@ -442,15 +467,14 @@ run_brew() {
       'recode'
       'reattach-to-user-namespace'
       're2c'
-      're2'
       'rcm'
       'rbenv'
       'ranger'
       'qscintilla2'
+      'python-tabulate'
       'pyqt'
       'pygobject3'
       'pyenv-virtualenv'
-      'pybind11'
       'py2cairo'
       'pwgen'
       'pv'
@@ -468,8 +492,8 @@ run_brew() {
       'pmd'
       'plotutils'
       'plantuml'
+      'pkcs11-helper'
       'pinentry-mac'
-      'pillow'
       'pigz'
       'pgcli'
       'pdfgrep'
@@ -479,27 +503,20 @@ run_brew() {
       'pass'
       'par'
       'pandoc-crossref'
-      'pandoc'
       'packer-completion'
       'packer'
       'optipng'
       'openssh'
-      'openjdk@8'
-      'openjdk'
       'openh264'
       'openconnect'
-      'open-mpi'
       'open-completion'
       'opam'
       'ondir'
       'ocrmypdf'
       'ocamlbuild'
       'nvm'
-      'numpy'
-      'nss'
       'notmuch'
       'nmap'
-      'netpbm'
       'netcat'
       'neofetch'
       'ncdu'
@@ -526,7 +543,6 @@ run_brew() {
       'mas'
       'makedepend'
       'make'
-      'mailutils'
       'macvim'
       'mackup'
       'm-cli'
@@ -537,7 +553,6 @@ run_brew() {
       'luarocks'
       'luajit-openresty'
       'luajit'
-      'lua'
       'lolcat'
       'logrotate'
       'lmdb'
@@ -564,12 +579,10 @@ run_brew() {
       'knock'
       'keychain'
       'juju-wait'
-      'juju'
       'jsonpp'
       'jshon'
       'jpegoptim'
       'jpeginfo'
-      'jpeg-turbo'
       'jpeg-archive'
       'john'
       'jo'
@@ -577,7 +590,8 @@ run_brew() {
       'isync'
       'irssi'
       'ipython'
-      'imagemagick'
+      'inframap'
+      'ilmbase'
       'idb-companion'
       'id3tool'
       'ical-buddy'
@@ -594,14 +608,11 @@ run_brew() {
       'helm'
       'haskell-stack'
       'hashpump'
-      'harfbuzz'
       'haproxy'
       'handbrake'
       'gzip'
-      'gstreamer'
       'gst-plugins-ugly'
       'gst-plugins-good'
-      'gst-plugins-base'
       'gst-plugins-bad'
       'gst-libav'
       'grv'
@@ -619,8 +630,6 @@ run_brew() {
       'gnu-tar'
       'gnu-sed'
       'gnu-indent'
-      'glib-networking'
-      'glib'
       'git-when-merged'
       'git-tracker'
       'git-subrepo'
@@ -637,24 +646,19 @@ run_brew() {
       'gh'
       'getdns'
       'geoip'
-      'gd'
       'gawk'
       'fzf'
       'fswatch'
-      'frei0r'
-      'freetype'
       'fpp'
       'fortune'
       'foremost'
       'fonttools'
       'fontforge'
-      'fontconfig'
       'flock'
       'findutils'
       'file-formula'
       'figlet'
       'fftw'
-      'ffmpeg'
       'fd'
       'fcrackzip'
       'fasd'
@@ -666,21 +670,22 @@ run_brew() {
       'exact-image'
       'enscript'
       'enca'
-      'emacs-plus'
+      'emacs-plus@28'
       'elinks'
       'editorconfig'
       'ed'
       'dwdiff'
       'duti'
       'doxygen'
+      'dotenv-linter'
       'dos2unix'
+      'docutils'
       'docker-swarm'
       'docker-machine'
       'docker-gen'
       'docker-credential-helper'
       'docker-compose'
       'docker-clean'
-      'docker'
       'dnsmasq'
       'dns2tcp'
       'djvulibre'
@@ -724,7 +729,6 @@ run_brew() {
       'cadaver'
       'cabextract'
       'cabal-install'
-      'ca-certificates'
       'bzip2'
       'brew-cask-completion'
       'boot-clj'
@@ -736,7 +740,6 @@ run_brew() {
       'bibutils'
       'bfs'
       'bfg'
-      'berkeley-db'
       'bcrypt'
       'bazaar'
       'bat'
@@ -747,7 +750,6 @@ run_brew() {
       'awscli'
       'automake'
       'autoconf-archive'
-      'atk'
       'aspell'
       'aspcud'
       'asciinema'
@@ -759,9 +761,9 @@ run_brew() {
       'ansiweather'
       'ansible'
       'aircrack-ng'
-      'adwaita-icon-theme'
+      'adns'
+      'act'
       'ack'
-      'dotenv-linter'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -804,15 +806,11 @@ run_brew() {
             brew install hunspell
             ;;
           emacs)
-            # --with-gnutls has issues with gh-api
-            brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
+            # brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
             ;;
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --with-spacemacs-icon --with-xwidgets
-            ;;
-          emacs-plus@28)
-            brew install emacs-plus@28 --with-spacemacs-icon --with-xwidgets --with-native-comp
+            brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp
             ;;
           wget)
             brew install wget --HEAD
@@ -822,20 +820,20 @@ run_brew() {
             # sudo xcode-select --reset
             # sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
             # sudo xcodebuild -license accept
-            brew install macvim --HEAD
+            brew install macvim
             ;;
           neovim)
-            brew install neovim --HEAD
+            brew install neovim
             ;;
           universal-ctags)
             # Given the lack of activity on the official Exuberant Ctags
-            # source, it has been forked  and renamed to Universal Ctags
+            # source, it has been forked and renamed to Universal Ctags
             # and can be found at universal-ctags/ctags.
-            brew install universal-ctags/universal-ctags/universal-ctags --HEAD --with-jansson --with-libyaml
+            brew install --HEAD universal-ctags/universal-ctags/universal-ctags
             ;;
           meson)
             # A bug in the latest stable version was fixed but has not been released yet.
-            brew install meson --HEAD
+            brew install meson
             ;;
           zathura)
             brew install zathura
@@ -848,16 +846,17 @@ run_brew() {
             ln -s $(brew --prefix zathura-pdf-poppler)/lib/pdf.dylib $(brew --prefix zathura)/lib/zathura/pdf.so
             ;;
           rbenv)
-            brew install rbenv ruby-build
-            # rbenv install 2.7.1
-            # rbenv global 2.7.1
-            # gem install -n /usr/local/bin fastlane -NV
+            brew install ruby-build
+            brew install rbenv
+            rbenv install 2.7.4
+            rbenv global 2.7.4
+            gem install bundler
             ;;
           moreutils)
-            brew unlink task-spooler && brew install moreutils &&  brew link --overwrite task-spooler
+            brew unlink task-spooler && brew install moreutils && brew link --overwrite task-spooler
             ;;
           md5sha1sum)
-            brew unlink coreutils && brew install md5sha1sum &&  brew link --overwrite coreutils
+            brew unlink coreutils && brew install md5sha1sum && brew link --overwrite coreutils
             ;;
           jenv)
             brew install jenv
@@ -868,8 +867,8 @@ run_brew() {
             # it is required by ant, bfg, boot-clj, closure-compiler,
             # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
             # and selenium-server-standalone
-            jenv add "${BREW_HOME}/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
-            jenv global 14 # To unset the version `jenv global system`
+            # jenv add "${BREW_HOME}/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+            # jenv global 11 # To unset the version `jenv global system`
             ;;
           nvm)
             # uninstall node and npm because we are going to install through nvm.
@@ -884,13 +883,13 @@ run_brew() {
             export NVM_DIR="${BREW_HOME}/nvm"
 
             brew install nvm
-            nvm install node
+            nvm install v18
             nvm use node
             node_version=$(node --version | sed 's/[^0-9.]*//g')
             nvm alias default $node_version
             ;;
           *)
-            brew install $item
+            brew install "${item}"
         esac
       done
 
@@ -933,6 +932,7 @@ run_brew() {
       'cloudapp'
       'coderunner'
       'dash'
+      'deckset'
       'docker'
       'eaglefiler'
       'electron'
@@ -940,7 +940,6 @@ run_brew() {
       'epubquicklook'
       'facebook-ios-sdk'
       'figma'
-      'figmadaemon'
       'flipper'
       'fliqlo'
       'font-fontawesome'
@@ -962,7 +961,6 @@ run_brew() {
       'imagemin'
       'imageoptim'
       'inkscape'
-      'intel-haxm'
       'ipe'
       'iterm2'
       'kaleidoscope'
@@ -980,9 +978,11 @@ run_brew() {
       'moom'
       'name-mangler'
       'ngrok'
+      'nosqlbooster-for-mongodb'
       'numi'
       'obs'
       'obsidian'
+      'openvpn-connect'
       'pacifist'
       'paw'
       'pdfpenpro'
@@ -1020,10 +1020,9 @@ run_brew() {
       'tex-live-utility'
       'textexpander'
       'touch-bar-simulator'
-      'tower3'
+      'tower2'
       'transmission'
       'ttscoff-mmd-quicklook'
-      'tuntap'
       'ubersicht'
       'vagrant'
       'vagrant-manager'
@@ -1059,7 +1058,7 @@ run_brew() {
         case "$item" in
           android-sdk)
             # https://stackoverflow.com/questions/46402772/failed-to-install-android-sdk-java-lang-noclassdeffounderror-javax-xml-bind-a
-            brew cask install android-sdk
+            brew install --cask --ignore-dependencies android-sdk
             # Update 2019-10: Google is working on a new Android SDK
             # Command-line Tools release that runs on current JVMs (9, 10, 11+)
             # and does not depend on deprecated JAXB EE modules!
@@ -1071,10 +1070,18 @@ run_brew() {
             #
             # For the latest versions check the URLs inside the
             # https://dl.google.com/android/repository/repository2-1.xml.
+            #
+            # export ANDROID_SDK_ROOT=$(brew --prefix)/share/android-sdk
+            # export ANDROID_HOME=$(brew --prefix)/share/android-sdk
+            # export PATH="$PATH:${ANDROID_HOME}/tools/bin"
+            # export PATH="$PATH:${ANDROID_HOME}/platform-tools"
+            #
+            # Note: `android-sdk` has been officially discontinued upstream. We
+            # need to migrate to `android-commandlinetools`.
             ;;
           android-ndk)
             # Use JAVA 1.8 with JENV for the following  commands
-            brew install --cask android-ndk
+            brew install --cask --ignore-dependencies android-ndk
             yes | sdkmanager --licenses
             # Install all of the Android SDK components (you will be prompted to
             # agree to license info and then this will take a while to run):
@@ -1174,42 +1181,52 @@ run_brew() {
             ;;
           adoptopenjdk8)
             # android-sdk requires Java 8. You can install it with:
-            brew install --cask adoptopenjdk/openjdk/adoptopenjdk8
+            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk8
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v1.8)"
             # jenv global 1.8 # To unset the version `jenv global system`
             ;;
+          adoptopenjdk11)
+            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk11
+            mkdir -p "${HOME}/.jenv/versions"
+            jenv add "$(/usr/libexec/java_home -v11)"
+            jenv global 11 # To unset the version `jenv global system`
+            export JAVA_HOME=$(/usr/libexec/java_home -v1.11)
+            ;;
           adoptopenjdk14)
-            brew install --cask adoptopenjdk/openjdk/adoptopenjdk14
+            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk14
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v14)"
-            jenv global 14 # To unset the version `jenv global system`
             ;;
           zulu11)
-            brew install --cask zulu11
+            brew install --cask --ignore-dependencies zulu11
             mkdir -p "${HOME}/.jenv/versions"
             unset JAVA_TOOL_OPTIONS
             jenv add "$(/usr/libexec/java_home -v11)"
             jenv global 11 # To unset the version `jenv global system`
             ;;
           java6)
-            brew install --cask java6
+            brew install --cask --ignore-dependencies java6
             jenv add "$(/usr/libexec/java_home -v1.6)"
             ;;
           java7)
-            brew install --cask java7
+            brew install --cask --ignore-dependencies java7
             jenv add "$(/usr/libexec/java_home -v1.7)"
             ;;
           java8)
-            brew install --cask java8
+            brew install --cask --ignore-dependencies java8
             jenv add "$(/usr/libexec/java_home -v1.8)"
             ;;
           java9)
-            brew install --cask java9
+            brew install --cask --ignore-dependencies java9
             jenv add "$(/usr/libexec/java_home -v9)"
             ;;
           *)
-            brew install --cask "${item}"
+            # In some cases (like when installing `cask`) regular `emacs`
+            # package will be required. In such cases you might want to install
+            # all dependencies manually (except for `emacs`) and then install
+            # desired package with `--ignore-dependencies` option.
+            brew install --cask --ignore-dependencies "${item}"
         esac
       done
 
@@ -1277,117 +1294,53 @@ run_mas() {
   if type_exists 'mas'; then
     e_header "Updating apple store apps..."
 
-    local __mas_apps=($(mas list | awk '{print $1}'))
+    # mas list | awk  '{ printf "%14s # %s\n", $1, $2 }'
+    local __mas_apps=($(mas list | awk '{print $1 $2}'))
     local __mas_app_names=( $(mas list | awk '{print $2}') )
 
     local -a mas_missing_apps
     local -a mas_desired_apps=(
-      '891059848'
-      '511114225'
-      '489880259'
-      '607529010'
-      '435989461'
-      '889428659'
-      '516801330'
-      '524141863'
-      '866773894'
-      '917665858'
-      '457622435'
-      '577085396'
-      '590518045'
-      '634833134'
-      '482898991'
-      '413965349'
-      '615916400'
-      '506622388'
-      '967805235'
-      '525319418'
-      '655527594'
-      '626221782'
-      '920404675'
-      '588726889'
-      '716854513'
-      '671951979'
-      '669462988'
-      '771501095'
-      '966457795'
-      '442160773'
-      '411643860'
-      '970502923'
-      '414209656'
-      '409203825'
-      '607596789'
-      '950112142'
-      '581789185'
-      '609341429'
-      '638230527'
-      '740472063'
-      '557536642'
-      '889922906'
-      '1161440621'
-      '980053405'
-      '896450579'
-      '931657367'
-      '768666595'
-      '969418666'
-      '439697913'
-      '520265986'
-      '724472954'
-      '555976136'
-      '935700987'
-      '403504866'
-      '905654078'
-      '420212497'
-      '987247809'
-      '979299240'
-      '593294811'
-      '668208984'
-      '1139976917'
-      '444990433'
-      '445189367'
-      '918207447'
-      '1156018315'
-      '961632517'
-      '429449079'
-      '924891282'
-      '402383384'
-      '847496013'
-      '522090209'
-      '907023335'
-      '467939042'
-      '451907568'
-      '906524969'
-      '975937182'
-      '948786052'
-      '403304796'
-      '409183694'
-      '568494494'
-      '457516296'
-      '462227149'
-      '407963104'
-      '836847379'
-      '692815145'
-      '1023902784'
-      '928871589'
-      '536511979'
-      '720669838'
-      '430798174'
-      '936399985'
-      '409201541'
-      '480623975'
-      '1233861775'
-      '640841706'
-      '459413843'
-      '1090940630'
-      '642220194'
-      '965645209'
-      '824171161'
-      '1071676469'
-      '671040216'
-      '644346785'
-      '557090104'
-      '476533227'
-      '1006087419'
+     '457516296' # Quick Sprites
+     '740472063' # Focus 2
+     '402383384' # Base
+     '931657367' # Calcbot
+     '720669838' # iThoughtsX
+     '969418666' # ColorSnapper2
+     '407963104' # Pixelmator
+     '533696630' # Webcam
+     '975937182' # Fantastical
+     '961632517' # Be
+     '467939042' # Growl
+     '429449079' # Patterns
+     '577085396' # Unclutter
+    '1579200037' # Medis
+     '403504866' # PCalc
+     '640841706' # Base64Anywhere
+     '965645209' # Date Format Creator
+    '1388020431' # DevCleaner
+     '896450579' # Textual
+     '442160773' # Cocoa JSON Editor
+     '536511979' # Characters
+    '1462643128' # TableFlip
+     '439697913' # IconJar
+     '768666595' # Iconie
+     '889428659' # xScope
+     '413965349' # Soulver
+    '1006087419' # SnippetsLab
+     '494803304' # WiFi
+     '445189367' # PopClip
+     '444990433' # JsonParser
+     '593294811' # MultiMarkdown
+     '581789185' # Napkin
+     '669462988' # Bit Fiddle
+     '520265986' # UltraCharacter Map
+     '920404675' # Monodraw
+     '489880259' # ScreenShot
+     '411643860' # DaisyDisk
+     '459413843' # ColorStrokes
+     '866773894' # Quiver
+    '1543753042' # Log-Viewer
+    '1233861775' # Acorn
     )
 
     # Use the following to generally reinstall all apple store applications
