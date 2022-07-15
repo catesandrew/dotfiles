@@ -788,6 +788,11 @@ run_brew() {
       done
     fi
 
+    # for index in ${!desired_formulae[*]}; do
+    #   e_header "Installing ${desired_formulae[$index]}..."
+    #   brew reinstall "${desired_formulae[$index]}"
+    # done
+
     if [[ "$missing_formulae" ]]; then
       e_header "Installing missing Homebrew formulae..."
 
@@ -903,7 +908,7 @@ run_brew() {
     #  | awk 'NF == 1 {print $1, $1} NF > 1 {for (i=1;i<=NF;i++) print $1, $i}' \
     #  | tsort | tac | while read li; do echo "      '$li'"; done
 
-    __cask_list=($(brew cask list | sed 's/:.*//'))
+    __cask_list=($(brew list --cask | sed 's/:.*//'))
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
       '1password-cli'
@@ -1034,6 +1039,11 @@ run_brew() {
       'zotero'
       '1password'
     )
+
+    # for index in ${!cask_desired_formulae[*]}; do
+    #   e_header "Installing ${cask_desired_formulae[$index]}..."
+    #   brew reinstall --cask "${cask_desired_formulae[$index]}"
+    # done
 
     for index in ${!cask_desired_formulae[*]}; do
       if ! contains_element "${cask_desired_formulae[$index]}" "${__cask_list[@]}"; then
