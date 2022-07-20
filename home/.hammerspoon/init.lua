@@ -154,9 +154,14 @@ Config.applications = {
     local_bindings = {'p'},
     tags = {'coding'}
   },
-  ['com.agilebits.onepassword7'] = {
-    bundleID = 'com.agilebits.onepassword7',
+  ['com.1password.1password'] = {
+    bundleID = 'com.1password.1password',
     hyper_key = '1'
+  },
+
+  ['Qisda.DDPM'] = {
+    bundleID = 'Qisda.DDPM',
+    local_bindings = {'[', ']'},
   },
   -- '[', no action
   -- ']', no action
