@@ -158,10 +158,9 @@ Config.applications = {
     bundleID = 'com.1password.1password',
     hyper_key = '1'
   },
-
   ['Qisda.DDPM'] = {
     bundleID = 'Qisda.DDPM',
-    local_bindings = {'[', ']'},
+    local_bindings = {'2', '3'},
   },
   -- '[', no action
   -- ']', no action
