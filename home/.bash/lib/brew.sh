@@ -806,7 +806,6 @@ run_brew() {
       'dashing'
       'dart'
       'czmq'
-      'csv-fix'
       'cowsay'
       'convox'
       'consul-template'
@@ -838,7 +837,6 @@ run_brew() {
       'bzip2'
       'brew-cask-completion'
       'boot-clj'
-      'boost-python'
       'bison'
       'binwalk'
       'binutils'
@@ -869,6 +867,7 @@ run_brew() {
       'aircrack-ng'
       'adns'
       'act'
+      'libimobiledevicev'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -908,7 +907,7 @@ run_brew() {
         case "$item" in
           hunspell)
             # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
-            brew install hunspell
+            brew install hunspell --ignore-dependencies
             ;;
           emacs)
             # brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
