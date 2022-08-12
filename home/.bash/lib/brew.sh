@@ -739,6 +739,7 @@ run_brew() {
       'gnu-tar'
       'gnu-sed'
       'gnu-indent'
+      'glib-utils'
       'git-when-merged'
       'git-tracker'
       'git-subrepo'
