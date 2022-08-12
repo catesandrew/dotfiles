@@ -25,11 +25,62 @@ b() {
 # complete -o bashdefault -o default -F _brew b
 __brew_complete b _brew
 
-alias bup='brew update && brew upgrade'
-alias bupc='brew update && brew upgrade && brew cleanup'
+# alias bup='brew update && brew upgrade && brew cleanup --prune=1'
+bup() {
+  local outdated_list cask_outdated_list
 
-# TODO: update to check if cask is installed (Linux)
-alias bup='brew update && brew upgrade && brew cleanup --prune=1'
+  brew update
+  outdated_list=$(brew outdated | perl -pe 's/, /|/g; tr/()//d' | perl -ane 'printf "%s %s %s\n", $F[0], $F[1], $F[3]')
+
+  if [ -n "$outdated_list" ]; then
+    echo "found: $outdated_list"
+
+    for item in $(echo "$outdated_list"); do
+      echo "Upgrading '$item'"
+      (HOMEBREW_NO_AUTO_UPDATE=1 && brew uninstall --ignore-dependencies "$item")
+      case "$item" in
+        hunspell)
+          # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
+          brew install hunspell --ignore-dependencies
+          ;;
+        emacs-plus)
+          # emacs-plus issues with daemon mode, better color emoji support
+          brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+          ;;
+        wget)
+          brew install wget --ignore-dependencies --HEAD
+          ;;
+        universal-ctags)
+          # Given the lack of activity on the official Exuberant Ctags
+          # source, it has been forked and renamed to Universal Ctags
+          # and can be found at universal-ctags/ctags.
+          brew install --HEAD --ignore-dependencies universal-ctags/universal-ctags/universal-ctags
+          ;;
+        *)
+          (HOMEBREW_NO_AUTO_UPDATE=1 && brew install --ignore-dependencies "$item")
+        esac
+    done
+
+    (HOMEBREW_NO_INSTALL_CLEANUP=1 && brew cleanup --prune=1)
+  else
+    echo "No Updates Found"
+  fi
+
+  cask_outdated_list=$(brew outdated --greedy | perl -pe 's/, /|/g; tr/()//d' | perl -ane 'printf "%s %s %s\n", $F[0], $F[1], $F[3]')
+
+  if [ -n "$cask_outdated_list" ]; then
+    echo "found: $cask_outdated_list"
+
+    for f in $(echo "$cask_outdated_list"); do
+      echo "Reinstalling '$f'"
+      (HOMEBREW_NO_AUTO_UPDATE=1 && brew reinstall --cask "$f")
+    done
+
+    (HOMEBREW_NO_INSTALL_CLEANUP=1 && brew cleanup --prune=1)
+  else
+    echo "No Cask Updates Found"
+  fi
+}
 
 bout() {
     __brew_c outdated "$@"

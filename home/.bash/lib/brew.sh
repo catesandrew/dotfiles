@@ -953,8 +953,7 @@ run_brew() {
             ln -s $(brew --prefix zathura-pdf-poppler)/lib/pdf.dylib $(brew --prefix zathura)/lib/zathura/pdf.so
             ;;
           rbenv)
-            brew install ruby-build
-            brew install rbenv
+            brew install --ignore-dependencies ruby-build rbenv
             rbenv install 2.7.4
             rbenv global 2.7.4
             gem install bundler
@@ -966,7 +965,7 @@ run_brew() {
             brew unlink coreutils && brew install md5sha1sum && brew link --overwrite coreutils
             ;;
           jenv)
-            brew install jenv
+            brew install --ignore-dependencies jenv
             mkdir -p "${HOME}/.jenv/versions"
             mkdir -p "${HOME}/.jenv/plugins"
             # jenv enable-plugin lein
@@ -989,7 +988,7 @@ run_brew() {
             sudo chmod -R go+w "${BREW_HOME}/nvm"
             export NVM_DIR="${BREW_HOME}/nvm"
 
-            brew install nvm
+            brew install --ignore-dependencies nvm
             nvm install v18
             nvm use node
             node_version=$(node --version | sed 's/[^0-9.]*//g')
