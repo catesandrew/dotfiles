@@ -1,3 +1,6 @@
+# /usr/local/work/lmp
+# /usr/local/work/playground
+
 if [[ $USER == 'vagrant' ]]; then
     CDC_DIRS=($HOME/workflow /vagrant/src)
 else
@@ -5,8 +8,17 @@ else
         /usr/local/work/uie
         /usr/local/work/api
         /usr/local/work/devops
-        /usr/local/work/lmp
-        /usr/local/work/playground
+        /usr/local/work/uie/doppio/packages
+        /usr/local/work/uie/happy-objects/packages
+        /usr/local/work/uie/happy-objects-native/packages
+        /usr/local/work/uie/koa/packages
+        /usr/local/work/uie/session/packages
+        /usr/local/work/uie/uie-common/packages
+        /usr/local/work/uie/uie-tools/packages
+        /usr/local/work/uie/landing-pages-components/packages
+        /usr/local/work/uie/apply-components/packages
+        /usr/local/work/uie/member-components/packages
+        /usr/local/work/uie/common-components/packages
     )
 fi
 
