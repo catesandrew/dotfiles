@@ -917,7 +917,8 @@ run_brew() {
             ;;
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+            # brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+            brew install emacs-plus --with-spacemacs-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
             ;;
           wget)
             brew install wget --HEAD
@@ -1237,6 +1238,9 @@ run_brew() {
             # Beta (11.0) API 30
             sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
 
+            # API 31
+            sdkmanager --install "system-images;android-31;google_apis_playstore;arm64-v8a"
+
             # to create android virtual device
             #
             # echo "no" | avdmanager create avd --force --name "pixel_4.4" --device "pixel" --package "system-images;android-19;google_apis;x86" --tag "google_apis" --abi "x86"
@@ -1251,6 +1255,7 @@ run_brew() {
             echo "no" | avdmanager create avd --force --name "pixel_10.0" --device "pixel" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_11.0" --device "pixel" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_12.0" --device "pixel" --package "system-images;android-31;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "pixel_12.0" --device "pixel" --package "system-images;android-31;google_apis_playstore;arm64-v8a" --tag "google_apis_playstore" --abi "arm64-v8a"
 
             # to create generic virtual device
             #

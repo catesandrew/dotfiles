@@ -1,5 +1,5 @@
 # Aliases
-alias gaa='git add --all'
+# alias gaa='git add --all'
 alias gff='git merge --ff-only'
 alias pullff='git pull --ff-only'
 alias noff='git merge --no-ff'
@@ -9,25 +9,25 @@ alias gdc='git diff --cached'
 alias gds='git diff --stats=160,120'
 alias gdh1='git diff HEAD~1'
 alias gcl='git clone'
-alias ga='git add'
-alias gall='git add .'
+# alias ga='git add'
+# alias gall='git add .'
 alias gus='git reset HEAD'
-alias gm="git merge"
+# alias gm="git merge"
 alias get='git'
 alias gst='git status'
-alias gss='git status -s'
-alias gl='git pull'
+# alias gss='git status -s'
+# alias gl='git pull'
 alias gpr='git pull --rebase'
 alias gpp='git pull && git push'
 alias gup='git fetch && git rebase'
 alias gp='git push'
 alias gpo='git push origin'
-alias gdv='git diff -w "$@" | vim -R -'
+# alias gdv='git diff -w "$@" | vim -R -'
 alias gc='git commit -v'
-alias gca='git commit -v -a'
-alias gcm='git commit -v -m'
-alias gci='git commit --interactive'
-alias gcv='git commit --verbose'
+# alias gca='git commit -v -a'
+# alias gcm='git commit -v -m'
+# alias gci='git commit --interactive'
+# alias gcv='git commit --verbose'
 alias gb='git branch'
 alias gba='git branch -a'
 alias gcount='git shortlog -sn'
@@ -35,7 +35,7 @@ alias gcount='git shortlog -sn'
 alias gco='git checkout'
 alias gexport='git archive --format zip --output'
 alias gdel='git branch -D'
-alias gmu='git fetch origin -v; git fetch upstream -v; git merge upstream/master'
+alias gmu='git fetch origin -v; git fetch upstream -v; git merge upstream/main'
 alias gll='git log --graph --pretty=oneline --abbrev-commit'
 alias gg="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
 alias ggs="gg --stat"
@@ -47,15 +47,15 @@ alias gt='cd $(git rev-parse --show-toplevel 2>/dev/null || (echo "."; echo "Not
 alias gta="git tag -a"
 alias gtd="git tag -d"
 alias gtl="git tag -l"
-alias gpu="git fetch origin -v; git fetch upstream -v; git merge upstream/master"
+alias gpu="git fetch origin -v; git fetch upstream -v; git merge upstream/main"
 alias gfp="git format-patch --stdout -1"
 alias gnr="git ls-files -o --exclude-standard | xargs rm"
 alias gwc="git whatchanged -p --abbrev-commit --pretty=medium"
 # number of commits on branch.
 # 1 rev-list lists revisions, and
-# 2 master.. refers to "commits since current HEAD diverged from master"
-alias gnum="git rev-list master.. | wc -l"
-#count2 = "!git log master..yourbranch --pretty=oneline | wc -l"
+# 2 main.. refers to "commits since current HEAD diverged from main"
+alias gnum="git rev-list main.. | wc -l"
+#count2 = "!git log main..yourbranch --pretty=oneline | wc -l"
 alias glga="git log --abbrev-commit --date=relative --pretty=format:'%C(bold yellow)%h%Creset %s %C(bold yellow)<%an>%Creset'"
 alias glgg="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 # Show branches, tags in git log
@@ -110,18 +110,18 @@ case $OSTYPE in
     ;;
 esac
 
-if [ -z "$EDITOR" ]; then
-    case $OSTYPE in
-      linux*)
-        alias gd='git diff | vim -R -'
-        ;;
-      darwin*)
-        alias gd='git diff | mate'
-        ;;
-      *)
-        alias gd='git diff'
-        ;;
-    esac
-else
-    alias gd="git diff | $EDITOR"
-fi
+# if [ -z "$EDITOR" ]; then
+#     case $OSTYPE in
+#       linux*)
+#         alias gd='git diff | vim -R -'
+#         ;;
+#       darwin*)
+#         alias gd='git diff | mate'
+#         ;;
+#       *)
+#         alias gd='git diff'
+#         ;;
+#     esac
+# else
+#     alias gd="git diff | $EDITOR"
+# fi
