@@ -83,7 +83,6 @@ run_brew() {
       'johanhaleby/kubetail'
       'launchdarkly/tap'
       'neovim/neovim'
-      'rhysd/actionlint'
       'saucelabs/saucectl'
       'tavianator/tap'
       'thoughtbot/formulae'
@@ -455,7 +454,6 @@ run_brew() {
       'wrk'
       'woff2'
       'whatmp3'
-      'wget'
       'webkit2png'
       'webalizer'
       'wdiff'
@@ -908,6 +906,25 @@ run_brew() {
       for item in "${missing_formulae[@]}"; do
         e_header "Installing $item..."
         case "$item" in
+          libimobiledevice)
+            brew update
+            brew uninstall --ignore-dependencies libimobiledevice
+            brew uninstall --ignore-dependencies usbmuxd
+
+            # cp libimobiledevice-glue.rb /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/libimobiledevice-glue.rb
+            # brew install --HEAD libimobiledevice-glue
+            # brew edit libimobiledevice
+            # 31 depends_on "libimobiledevice-glue"
+            # brew edit usbmuxd
+            # 26 depends_on "libimobiledevice-glue"
+
+            # Or try this instead...
+            # export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+            brew install --HEAD usbmuxd
+            # brew unlink usbmuxd
+            # brew link usbmuxd
+            brew install --HEAD libimobiledevice
+            ;;
           hunspell)
             # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
             brew install hunspell --ignore-dependencies
@@ -1188,7 +1205,7 @@ run_brew() {
             ;;
           android-ndk)
             # Use JAVA 1.8 with JENV for the following  commands
-            brew install --cask --ignore-dependencies android-ndk
+            brew install --cask android-ndk
             yes | sdkmanager --licenses
             # Install all of the Android SDK components (you will be prompted to
             # agree to license info and then this will take a while to run):
