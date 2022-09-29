@@ -34,12 +34,17 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 
 function osx_upgrade_bash4 {
   local new_version
-  new_version=$(/usr/local/bin/bash --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
+  if [[ -f "/opt/homebrew/bin/bash" ]]; then
+    bash_prefix_default=/opt/homebrew/bin/bash
+  elif [[ -f "/usr/local/bin/bash" ]]; then
+    bash_prefix_default=/usr/local/bin/bash
+  fi
+  new_version=$(${bash_prefix_default}  --version | head -n1 | sed 's/.* version \([^ ]*\).*/\1/')
   if [[ $new_version > $BASH_VERSION ]]; then
     echo "Found Bash v$new_version"
     # and try preserving all the invocation options
-    export SHELL=/usr/local/bin/bash
-    exec -l /usr/local/bin/bash -l${-//[chimBH]/} # "$@"
+    export SHELL=${bash_prefix_default}
+    exec -l ${bash_prefix_default} -l${-//[chimBH]/} # "$@"
   fi
 }
 
@@ -76,14 +81,14 @@ add_on_exit osx_upgrade_bash4
 . "${BASH_IT}/lib/vars.sh"
 . "${BASH_IT}/lib/funcs.sh"
 
-if [ "$__dot_system_type" == "Darwin" ]; then
+case "${__dot_system_type}" in
+  Darwin)
     ulimit -n 65536 65536
 
     export DICPATH=$HOME/Library/Spelling
     export DICTIONARY=en_US
 
     if hash brew 2>/dev/null; then
-
       brew_cache="${HOME}/.brew-init-bash"
       if [ -f "$brew_cache" ]; then
         . "$brew_cache"
@@ -91,26 +96,22 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         __unserialise __dot_brew_taps "$__dot_brew_taps"
         __unserialise __dot_cask_list "$__dot_cask_list"
       else
-        BREW_HOME="$(brew --prefix)"
-        export BREW_HOME
-
         __dot_brew_list=($(brew list | sed 's/:.*//'))
         __dot_brew_taps=($(brew tap | sed 's/:.*//'))
         __dot_cask_list=($(brew cask list | sed 's/:.*//'))
       fi
 
       if [ -z $BREW_HOME ]; then
-        BREW_HOME="$(brew --prefix)"
+        if [[ "$(uname -m)" == "arm64" ]]; then
+          BREW_HOME=/opt/homebrew
+        else
+          BREW_HOME=/usr/local
+        fi
         export BREW_HOME
       fi
 
       unset brew_cache
-
-      export HOMEBREW_PREFIX=/usr/local
-      export HOMEBREW_CELLAR=/usr/local/Cellar
-      export HOMEBREW_REPOSITORY=/usr/local/Homebrew
       export HOMEBREW_NO_ANALYTICS=true
-
     fi
 
     if brew_contains_element "bash-completion"; then
@@ -122,7 +123,8 @@ if [ "$__dot_system_type" == "Darwin" ]; then
     elif brew_contains_element "bash-completion@2"; then
         [[ -r "${BREW_HOME}/etc/profile.d/bash_completion.sh" ]] && . "${BREW_HOME}/etc/profile.d/bash_completion.sh"
     fi
-elif [ "$__dot_system_type" == "Linux" ]; then
+    ;;
+  Linux)
   if hash brew 2>/dev/null; then
     brew_cache="${HOME}/.brew-init-bash"
     if [ -f "$brew_cache" ]; then
@@ -133,9 +135,10 @@ elif [ "$__dot_system_type" == "Linux" ]; then
       __dot_brew_list=($(brew list | sed 's/:.*//'))
       __dot_brew_taps=($(brew tap | sed 's/:.*//'))
     fi
+    export HOMEBREW_NO_ANALYTICS=true
     export HOMEBREW_TEMP=/tmp
     if [ -z $BREW_HOME ]; then
-      BREW_HOME="$(brew --prefix)"
+      BREW_HOME=/home/linuxbrew/.linuxbrew
       export BREW_HOME
     fi
 
@@ -156,7 +159,12 @@ elif [ "$__dot_system_type" == "Linux" ]; then
       fi
     fi
   fi
-fi
+
+    ;;
+  *)
+    echo "Unsupported system type '${__dot_system_type}'"
+    ;;
+esac
 
 # echo "Found ${#__dot_brew_list[@]} installed formulas"
 # echo "Found ${#__dot_brew_taps[@]} taps"
@@ -292,8 +300,8 @@ done
 unset config_file
 unset lib
 
-path_munge "/usr/local/sbin"
-path_munge "/usr/local/bin"
+path_munge "${BREW_HOME}/sbin"
+path_munge "${BREW_HOME}/bin"
 path_munge "${HOME}/.cabal/bin"
 
 if [ "$__dot_system_type" == "Darwin" ]; then
@@ -317,7 +325,7 @@ if [ "$__dot_system_type" == "Darwin" ]; then
         export VAGRANT_VMWARE_CLONE_DIRECTORY="${HOME}/.cache/vagrant"
     fi
 elif [ "$__dot_system_type" == "Linux" ]; then
-    path_munge "/usr/local/linuxbrew/bin"
+    path_munge "${BREW_HOME}/linuxbrew/bin"
 
     # if [ ${#__dot_brew_list[@]} -gt 0 ]; then
     if [ -n "$BREW_HOME" ]; then

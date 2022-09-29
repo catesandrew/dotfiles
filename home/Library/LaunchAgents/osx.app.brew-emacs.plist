@@ -15,7 +15,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>-c</string>
-		<string>BASH_NO=no . /etc/profile &amp;&amp; /usr/local/bin/emacs --fg-daemon</string>
+		<string>BASH_NO=no . /etc/profile &amp;&amp; /opt/homebrew/bin/emacs --fg-daemon</string>
 	</array>
 </dict>
 </plist>

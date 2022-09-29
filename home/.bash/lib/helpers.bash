@@ -1,9 +1,3 @@
-# posfind: search the directory frontmost in the Finder
-function posfind { find "`/usr/local/bin/posd`" -name "*$1*"; }
-
-# posgrep: grep the directory frontmost in the Finder
-function posgrep { grep -iIrn "$1" "`/usr/local/bin/posd`"; }
-
 function tom {
     if [ "`ps xwww | grep -v grep | grep -c catalina`" == "0" ];then
         echo "Off";

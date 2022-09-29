@@ -13,13 +13,13 @@ BASH_NO=no . /etc/profile
 
 # we look for <= 2 because Emacs --daemon seems to always have an entry in
 # visibile-frame-list even if there isn't
-frameVisible=$(/usr/local/bin/emacsclient -e '(<= (length (visible-frame-list)) 2)')
+frameVisible=$(${BREW_HOME}/bin/emacsclient -e '(<= (length (visible-frame-list)) 2)')
 if [ "${frameVisible}" == "t" ]; then
   # there is a not a visible frame, launch one
-  /usr/local/bin/emacsclient --create-frame --no-wait -e "(progn (find-file \"$MM_EDIT_FILEPATH\")(gfm-mode))"
+  ${BREW_HOME}/bin/emacsclient --create-frame --no-wait -e "(progn (find-file \"$MM_EDIT_FILEPATH\")(gfm-mode))"
 else
   # there is a visible frame, just open a file in exiting one
-  /usr/local/bin/emacsclient --no-wait -e "(progn (find-file \"$MM_EDIT_FILEPATH\")(gfm-mode))"
+  ${BREW_HOME}/bin/emacsclient --no-wait -e "(progn (find-file \"$MM_EDIT_FILEPATH\")(gfm-mode))"
 fi
 
 osascript -e 'tell app "MailMate" to activate'

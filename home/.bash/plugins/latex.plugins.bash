@@ -1,7 +1,7 @@
 # use mactex
 
 # add mactex to the path if its present
-MACTEX_PATH=/usr/local/texlive/2018/bin/x86_64-darwin
+MACTEX_PATH=${BREW_HOME}/texlive/2018/bin/x86_64-darwin
 if [[ -d  $MACTEX_PATH ]]; then
     path_munge "${MACTEX_PATH}" "after"
 fi

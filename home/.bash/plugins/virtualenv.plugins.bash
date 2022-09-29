@@ -5,8 +5,8 @@ if hash virtualenvwrapper.sh 2>/dev/null; then
 
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/Devel
-export VIRTUALENVWRAPPER_SCRIPT=/usr/local/bin/virtualenvwrapper.sh
-source /usr/local/bin/virtualenvwrapper_lazy.sh
+export VIRTUALENVWRAPPER_SCRIPT=${BREW_HOME}/bin/virtualenvwrapper.sh
+source ${BREW_HOME}/bin/virtualenvwrapper_lazy.sh
 
 # create a new virtualenv for this directory
 function mkvenv {

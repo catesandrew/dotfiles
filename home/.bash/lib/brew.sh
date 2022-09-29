@@ -19,6 +19,10 @@ e_warning() {
   printf "$(tput setaf 136)! %s$(tput sgr0)\n" "$@"
 }
 
+e_install() {
+  printf "\ninstalling $(tput setaf 4)%s$(tput sgr0)\n\n" "$@"
+}
+
 contains_element () {
   local f="$1"
   local e match="$1"
@@ -244,7 +248,6 @@ run_brew() {
       'gnu-getopt'
       'isl'
       'libmpc'
-      'gdk-pixbuf'
       'pango'
       'atk'
       'hicolor-icon-theme'
@@ -295,6 +298,7 @@ run_brew() {
       'fbthrift'
       'gd'
       'gts'
+      'automake'
       'autoconf'
       'krb5'
       'jbig2dec'
@@ -319,14 +323,13 @@ run_brew() {
       'libfido2'
       'zlib'
       'graphene'
-      'gstreamer'
       'orc'
       'glib-networking'
       'libpsl'
       'libcuefile'
       'libreplaygain'
       'hwloc'
-      'sdl'
+      'sdl12-compat'
       'openblas'
       'lua'
       'oniguruma'
@@ -340,9 +343,6 @@ run_brew() {
       'poppler'
       'qt'
       'sphinx-doc'
-      'zegervdv/zathura/girara'
-      'zegervdv/zathura/zathura'
-      'zegervdv/zathura/synctex'
       'mktorrent'
       'fb303'
       'ncurses'
@@ -352,22 +352,19 @@ run_brew() {
       'utf8proc'
       'libnet'
       'libdnet'
-      'openjdk'
       'net-snmp'
       'popt'
       'xxhash'
       'coreutils'
-      'ruby-build'
+      'openssl@1.1'
       'libpython-tabulate'
       'py3cairo'
       'pyenv'
       'openssl'
       'zopfli'
       'libpq'
-      'six'
       'qrencode'
       'tree'
-      'pandoc'
       'ldns'
       'stoken'
       'gpatch'
@@ -388,7 +385,6 @@ run_brew() {
       'tokyo-cabinet'
       'gsasl'
       'cscope'
-      'ruby'
       'libuv'
       'libgsf'
       'librevenge'
@@ -397,7 +393,6 @@ run_brew() {
       'libid3tag'
       'mad'
       'cunit'
-      'libusbmuxd'
       'libexif'
       'libusb-compat'
       'faac'
@@ -414,7 +409,6 @@ run_brew() {
       'libssh'
       'mysql-client'
       'heroku/brew/heroku-node'
-      'gst-plugins-base'
       'libshout'
       'libsoup'
       'taglib'
@@ -443,8 +437,6 @@ run_brew() {
       'clingo'
       'source-highlight'
       'jq'
-      'zathura-pdf-poppler'
-      'zathura'
       'ydiff'
       'yasm'
       'xmlstarlet'
@@ -468,10 +460,8 @@ run_brew() {
       'vagrant-completion'
       'v8'
       'urlview'
-      'upx'
       'unzip'
       'unrtf'
-      'universal-ctags'
       'unison'
       'ucl'
       'uchardet'
@@ -483,7 +473,6 @@ run_brew() {
       'trash'
       'transmission-cli'
       'tractorgen'
-      'trace2html'
       'tor'
       'tnef'
       'tmuxinator-completion'
@@ -512,7 +501,6 @@ run_brew() {
       'sslmate'
       'ssh-copy-id'
       'sqlmap'
-      'spdylay'
       'spark'
       'socat'
       'smartypants'
@@ -547,6 +535,7 @@ run_brew() {
       'reattach-to-user-namespace'
       're2c'
       'rcm'
+      'ruby-build'
       'rbenv'
       'ranger'
       'qscintilla2'
@@ -554,10 +543,8 @@ run_brew() {
       'pyqt'
       'pygobject3'
       'pyenv-virtualenv'
-      'py2cairo'
       'pwgen'
       'pv'
-      'purescript'
       'pth'
       'pstree'
       'psgrep'
@@ -581,6 +568,7 @@ run_brew() {
       'passpie'
       'pass'
       'par'
+      'pandoc'
       'pandoc-crossref'
       'packer-completion'
       'packer'
@@ -616,7 +604,6 @@ run_brew() {
       'mosh'
       'moreutils'
       'minio-mc'
-      'mercurial'
       'media-info'
       'mdv'
       'maven'
@@ -624,7 +611,6 @@ run_brew() {
       'makedepend'
       'make'
       'mailutils'
-      'macvim'
       'mackup'
       'm-cli'
       'lzlib'
@@ -657,14 +643,12 @@ run_brew() {
       'libmetalink'
       'libjwt'
       'libiscsi'
-      'libimobiledevice'
       'libiconv'
       'libicns'
       'libgphoto2'
       'libgccjit'
       'libdvdcss'
       'libcroco'
-      'libav'
       'libatomic_ops'
       'lesspipe'
       'less'
@@ -710,7 +694,6 @@ run_brew() {
       'html-xml-utils'
       'highlight'
       'hidapi'
-      'heroku-node'
       'heroku'
       'helm'
       'haskell-stack'
@@ -718,11 +701,12 @@ run_brew() {
       'haproxy'
       'handbrake'
       'gzip'
+      'gstreamer'
+      'gst-plugins-base'
       'gst-plugins-ugly'
       'gst-plugins-good'
       'gst-plugins-bad'
       'gst-libav'
-      'grv'
       'groovy'
       'grep'
       'grc'
@@ -749,7 +733,6 @@ run_brew() {
       'git-crypt'
       'git'
       'gist'
-      'girara'
       'gifsicle'
       'gh'
       'getdns'
@@ -786,8 +769,6 @@ run_brew() {
       'doxygen'
       'dotenv-linter'
       'dos2unix'
-      'docutils'
-      'docker-swarm'
       'docker-machine'
       'docker-gen'
       'docker-credential-helper'
@@ -853,13 +834,12 @@ run_brew() {
       'bash-completion@2'
       'babashka'
       'awscli'
-      'automake'
-      'autoconf-archive'
+      'docutils'
+      'universal-ctags'
       'aspell'
       'aspcud'
       'asciinema'
       'asciidoc'
-      'archey'
       'apparix'
       'apktool'
       'ant'
@@ -869,6 +849,8 @@ run_brew() {
       'adns'
       'act'
       'ack'
+      'libimobiledevice'
+      'gdk-pixbuf'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -904,30 +886,37 @@ run_brew() {
       e_header "Installing missing Homebrew formulae..."
 
       for item in "${missing_formulae[@]}"; do
-        e_header "Installing $item..."
-        case "$item" in
-          libimobiledevice)
-            brew update
-            brew uninstall --ignore-dependencies libimobiledevice
-            brew uninstall --ignore-dependencies usbmuxd
+        e_install "$item"
 
-            # cp libimobiledevice-glue.rb /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/libimobiledevice-glue.rb
-            # brew install --HEAD libimobiledevice-glue
+        case "$item" in
+          perl)
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install cpan --ignore-dependencies
+            PERL_MM_OPT="INSTALL_BASE=$HOME/perl5" cpan install local::lib
+            ;;
+          libimobiledevice)
+            # cp libimobiledevice-glue.rb /opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula/libimobiledevice-glue.rb
+            # PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig brew install --HEAD libimobiledevice-glue --ignore-dependencies
             # brew edit libimobiledevice
             # 31 depends_on "libimobiledevice-glue"
-            # brew edit usbmuxd
+
+            # brew edit libusbmuxd
             # 26 depends_on "libimobiledevice-glue"
 
-            # Or try this instead...
-            # export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
-            brew install --HEAD usbmuxd
-            # brew unlink usbmuxd
-            # brew link usbmuxd
-            brew install --HEAD libimobiledevice
+            # exporrt PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
+            # brew install --HEAD --ignore-dependencies libusbmuxd
+
+            # ./autogen.sh --prefix=/opt/homebrew
+            # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
+            # make install
+
+            # brew install --HEAD --ignore-dependencies libimobiledevice
+            # ./autogen.sh --prefix=/opt/homebrew
+            # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew --without-cython --enable-debug-code --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
+            # make install
             ;;
           hunspell)
             # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
-            brew install hunspell --ignore-dependencies
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install hunspell --ignore-dependencies
             ;;
           emacs)
             # brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
@@ -935,55 +924,58 @@ run_brew() {
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
             # brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
-            brew install emacs-plus --with-spacemacs-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install emacs-plus --with-spacemacs-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
             ;;
           wget)
-            brew install wget --HEAD
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install wget --HEAD
             ;;
           macvim)
             xcode-select --install # Install Command Line Tools if you haven't already.
             # sudo xcode-select --reset
             # sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
             # sudo xcodebuild -license accept
-            brew install macvim
+            # HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies macvim
+            e_warning "Install macvim through cask as to not have to install python dependency"
             ;;
           neovim)
-            brew install neovim
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies neovim
             ;;
           universal-ctags)
             # Given the lack of activity on the official Exuberant Ctags
             # source, it has been forked and renamed to Universal Ctags
             # and can be found at universal-ctags/ctags.
-            brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --HEAD --ignore-dependencies universal-ctags/universal-ctags/universal-ctags
             ;;
           meson)
             # A bug in the latest stable version was fixed but has not been released yet.
-            brew install meson
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies meson
             ;;
           zathura)
-            brew install zathura
+            # these formula do not install on m1
+            # 'girara'
+            # 'zathura'
+            # 'zathura-pdf-poppler'
+            # 'zegervdv/zathura/girara'
+            # 'zegervdv/zathura/zathura'
+            # 'zegervdv/zathura/synctex'
+
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies zathura
             # Follow the instructions to link the plugins into place:
             mkdir -p $(brew --prefix zathura)/lib/zathura
             ;;
           zathura-pdf-poppler)
-            brew install zathura-pdf-poppler
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies zathura-pdf-poppler
             # Follow the instructions to link the plugins into place:
             ln -s $(brew --prefix zathura-pdf-poppler)/lib/pdf.dylib $(brew --prefix zathura)/lib/zathura/pdf.so
             ;;
           rbenv)
-            brew install --ignore-dependencies ruby-build rbenv
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies rbenv
             rbenv install 2.7.4
             rbenv global 2.7.4
             gem install bundler
             ;;
-          moreutils)
-            brew unlink task-spooler && brew install moreutils && brew link --overwrite task-spooler
-            ;;
-          md5sha1sum)
-            brew unlink coreutils && brew install md5sha1sum && brew link --overwrite coreutils
-            ;;
           jenv)
-            brew install --ignore-dependencies jenv
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies jenv
             mkdir -p "${HOME}/.jenv/versions"
             mkdir -p "${HOME}/.jenv/plugins"
             # jenv enable-plugin lein
@@ -1004,16 +996,16 @@ run_brew() {
             # install nvm with latest version of node
             sudo mkdir -p "${BREW_HOME}/nvm"
             sudo chmod -R go+w "${BREW_HOME}/nvm"
-            export NVM_DIR="${BREW_HOME}/nvm"
+            export NVM_DIR="$(realpath "${BREW_HOME}/../nvm")"
 
-            brew install --ignore-dependencies nvm
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies nvm
             nvm install v18
             nvm use node
             node_version=$(node --version | sed 's/[^0-9.]*//g')
             nvm alias default $node_version
             ;;
           *)
-            brew install --ignore-dependencies "${item}"
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies "${item}"
         esac
       done
 
@@ -1043,6 +1035,7 @@ run_brew() {
       'android-ndk'
       'android-platform-tools'
       'appium'
+      'appium-inspector'
       'araxis-merge'
       'audio-hijack'
       'aws-vault'
@@ -1060,9 +1053,6 @@ run_brew() {
       'docker'
       'eaglefiler'
       'electron'
-      'emacsclient'
-      'epubquicklook'
-      'facebook-ios-sdk'
       'figma'
       'flipper'
       'fliqlo'
@@ -1117,7 +1107,6 @@ run_brew() {
       'prefs-editor'
       'prince'
       'provisionql'
-      'psequel'
       'qlcolorcode'
       'qlimagesize'
       'qlmarkdown'
@@ -1144,14 +1133,14 @@ run_brew() {
       'tex-live-utility'
       'textexpander'
       'touch-bar-simulator'
-      'tower2'
+      'tower'
       'transmission'
       'ttscoff-mmd-quicklook'
       'ubersicht'
-      'vagrant'
-      'vagrant-manager'
-      'virtualbox'
-      'virtualbox-extension-pack'
+      # 'vagrant'
+      # 'vagrant-manager'
+      # 'virtualbox'
+      # 'virtualbox-extension-pack'
       'visual-studio-code'
       'vlc'
       'webpquicklook'
@@ -1161,6 +1150,7 @@ run_brew() {
       'zeplin'
       'zotero'
       '1password'
+      'macvim'
     )
 
     # for index in ${!cask_desired_formulae[*]}; do
@@ -1178,11 +1168,11 @@ run_brew() {
       e_header "Installing missing Homebrew Cask formulae..."
 
       for item in "${cask_missing_formulae[@]}"; do
-        e_header "Installing $item..."
+        e_install "$item"
         case "$item" in
           android-sdk)
             # https://stackoverflow.com/questions/46402772/failed-to-install-android-sdk-java-lang-noclassdeffounderror-javax-xml-bind-a
-            brew install --cask --ignore-dependencies android-sdk
+            brew install --cask android-sdk
             # Update 2019-10: Google is working on a new Android SDK
             # Command-line Tools release that runs on current JVMs (9, 10, 11+)
             # and does not depend on deprecated JAXB EE modules!
@@ -1309,44 +1299,44 @@ run_brew() {
             ;;
           adoptopenjdk8)
             # android-sdk requires Java 8. You can install it with:
-            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk8
+            brew install --cask adoptopenjdk/openjdk/adoptopenjdk8
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v1.8)"
             # jenv global 1.8 # To unset the version `jenv global system`
             ;;
           adoptopenjdk11)
-            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk11
+            brew install --cask adoptopenjdk/openjdk/adoptopenjdk11
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v11)"
             jenv global 11 # To unset the version `jenv global system`
             export JAVA_HOME=$(/usr/libexec/java_home -v1.11)
             ;;
           adoptopenjdk14)
-            brew install --cask --ignore-dependencies adoptopenjdk/openjdk/adoptopenjdk14
+            brew install --cask adoptopenjdk/openjdk/adoptopenjdk14
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v14)"
             ;;
           zulu11)
-            brew install --cask --ignore-dependencies zulu11
+            brew install --cask zulu11
             mkdir -p "${HOME}/.jenv/versions"
             unset JAVA_TOOL_OPTIONS
             jenv add "$(/usr/libexec/java_home -v11)"
             jenv global 11 # To unset the version `jenv global system`
             ;;
           java6)
-            brew install --cask --ignore-dependencies java6
+            brew install --cask java6
             jenv add "$(/usr/libexec/java_home -v1.6)"
             ;;
           java7)
-            brew install --cask --ignore-dependencies java7
+            brew install --cask java7
             jenv add "$(/usr/libexec/java_home -v1.7)"
             ;;
           java8)
-            brew install --cask --ignore-dependencies java8
+            brew install --cask java8
             jenv add "$(/usr/libexec/java_home -v1.8)"
             ;;
           java9)
-            brew install --cask --ignore-dependencies java9
+            brew install --cask java9
             jenv add "$(/usr/libexec/java_home -v9)"
             ;;
           *)
@@ -1354,7 +1344,7 @@ run_brew() {
             # package will be required. In such cases you might want to install
             # all dependencies manually (except for `emacs`) and then install
             # desired package with `--ignore-dependencies` option.
-            brew install --cask --ignore-dependencies "${item}"
+            brew install --cask --force "${item}"
         esac
       done
 

@@ -46,7 +46,7 @@ strfile misc
 strfile osp
 strfile rkba
 strfile tao
-mv *.dat /usr/local/share/games/fortunes/
+mv *.dat ${BREW_HOME}/share/games/fortunes/
 ```
 
 ## Usage

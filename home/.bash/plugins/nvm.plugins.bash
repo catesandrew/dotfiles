@@ -8,7 +8,7 @@ if brew_contains_element "nvm"; then
   fi
 
   if [ -z "$NVM_DIR" ]; then
-    export NVM_DIR="${BREW_HOME}/nvm"
+    export NVM_DIR="$(realpath "${BREW_HOME}/../nvm")"
   fi
 
   if [ -n "$NVM_VERSION" ] && [ -n "$NVM_DIR" ]; then

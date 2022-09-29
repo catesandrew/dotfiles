@@ -342,8 +342,8 @@ export _JUJU_2_cache_TTL=2
 if [ -x "$GOPATH/bin/juju" ]; then
     export _juju_cmd_JUJU_2="$GOPATH/bin/juju"
 # Detect Homebrew
-elif [ -x "/usr/local/bin/juju" ]; then
-    export _juju_cmd_JUJU_2="/usr/local/bin/juju"
+elif [ -x "${BREW_HOME}/bin/juju" ]; then
+  export _juju_cmd_JUJU_2="${BREW_HOME}/bin/juju"
 # Detect installed juju-2 binary (next highest priority)
 elif [ -x "/usr/bin/juju-2" ]; then
     export _juju_cmd_JUJU_2="/usr/bin/juju-2"

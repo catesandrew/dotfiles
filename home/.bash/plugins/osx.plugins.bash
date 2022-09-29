@@ -128,7 +128,7 @@ fi
 #
 # user=username
 # no-cert-check
-# script INTERNAL_IP4_DNS="127.0.0.1" /usr/local/etc/vpnc/vpnc-script
+# script INTERNAL_IP4_DNS="127.0.0.1" ${BREW_HOME}/etc/vpnc/vpnc-script
 # background
 # passwd-on-stdin
 function vpnc() {

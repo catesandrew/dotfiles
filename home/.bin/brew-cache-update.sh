@@ -17,9 +17,19 @@ if hash brew 2>/dev/null; then
   BREW_HOME="$(brew --prefix)"
   echo "BREW_HOME=${BREW_HOME}" >| "${OUTPUT}"
   echo "export BREW_HOME" >> "${OUTPUT}"
+  echo "HOMEBREW_PREFIX=${BREW_HOME}" >> "${OUTPUT}"
+  echo "export HOMEBREW_PREFIX" >> "${OUTPUT}"
+
+  HOMEBREW_CELLAR="$(brew --cellar)"
+  echo "HOMEBREW_CELLAR=${HOMEBREW_CELLAR}" >> "${OUTPUT}"
+  echo "export HOMEBREW_CELLAR" >> "${OUTPUT}"
+
+  HOMEBREW_REPOSITORY="$(brew --repository)"
+  echo "HOMEBREW_REPOSITORY=${HOMEBREW_REPOSITORY}" >> "${OUTPUT}"
+  echo "export HOMEBREW_REPOSITORY" >> "${OUTPUT}"
 
   echo "BASH_IT=${BASH_IT}" >> "${OUTPUT}"
-  echo "export BREW_IT" >> "${OUTPUT}"
+  echo "export BASH_IT" >> "${OUTPUT}"
 
   __dot_brew_list=($(brew list --formula | sed 's/:.*//'))
   __serialise_to s "${__dot_brew_list[@]}"
