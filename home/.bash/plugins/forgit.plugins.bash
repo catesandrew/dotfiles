@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # MIT (c) Wenxuan Zhang
+# https://github.com/wfxr/forgit
+if hash fzf 2>/dev/null && \
+    [ -z "$INSIDE_EMACS" ]; then
+  export FORGIT_NO_ALIASES=true
+  # BEGIN https://raw.githubusercontent.com/wfxr/forgit/master/forgit.plugin.zsh
+
 forgit::warn() { printf "%b[Warn]%b %s\n" '\e[0;33m' '\e[0m' "$@" >&2; }
 forgit::info() { printf "%b[Info]%b %s\n" '\e[0;32m' '\e[0m' "$@" >&2; }
 forgit::inside_work_tree() { git rev-parse --is-inside-work-tree >/dev/null; }
@@ -53,6 +59,10 @@ forgit::log() {
     log_format=${FORGIT_GLO_FORMAT:-$forgit_log_format}
     eval "git log $graph --color=always --format='$log_format' $* $forgit_emojify" |
         FZF_DEFAULT_OPTS="$opts" fzf
+    fzf_exit_code=$?
+    # exit successfully on 130 (ctrl-c/esc)
+    [[ $fzf_exit_code == 130 ]] && return 0
+    return $fzf_exit_code
 }
 
 # git diff viewer
@@ -89,6 +99,10 @@ forgit::diff() {
     eval "git diff --name-status $commits -- ${files[*]} | sed -E 's/^([[:alnum:]]+)[[:space:]]+(.*)$/[\1]\t\2/'" |
         sed 's/\t/  ->  /2' | expand -t 8 |
         FZF_DEFAULT_OPTS="$opts" fzf
+    fzf_exit_code=$?
+    # exit successfully on 130 (ctrl-c/esc)
+    [[ $fzf_exit_code == 130 ]] && return 0
+    return $fzf_exit_code
 }
 
 # git add selector
@@ -157,6 +171,10 @@ forgit::stash::show() {
         $FORGIT_STASH_FZF_OPTS
     "
     git stash list | FZF_DEFAULT_OPTS="$opts" fzf
+    fzf_exit_code=$?
+    # exit successfully on 130 (ctrl-c/esc)
+    [[ $fzf_exit_code == 130 ]] && return 0
+    return $fzf_exit_code
 }
 
 # git clean selector
@@ -526,4 +544,7 @@ else
 fi
 if [[ -n "$FORGIT_INSTALL_DIR" ]]; then
     export FORGIT_INSTALL_DIR
+fi
+
+# END https://raw.githubusercontent.com/wfxr/forgit/master/forgit.plugin.zsh
 fi
