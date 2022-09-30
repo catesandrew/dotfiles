@@ -1193,6 +1193,16 @@ run_brew() {
             # Note: `android-sdk` has been officially discontinued upstream. We
             # need to migrate to `android-commandlinetools`.
             ;;
+          android-commandlinetools)
+            export ANDROID_SDK_ROOT="${BREW_HOME}/share/android-commandlinetools"
+            yes | sdkmanager --licenses
+            sdkmanager --list_installed
+            sdkmanager --update
+            sdkmanager "build-tools;33.0.0" "platform-tools" "emulator" "system-images;android-33;google_apis;x86_64" "platforms;android-33"
+            sdkmanager "build-tools;33.0.0" "platform-tools" "emulator" "system-images;android-33;google_apis;arm64-v8a" "platforms;android-33"
+            avdmanager create avd -n "Pixel_5" -d "pixel_5" -k "system-images;android-33;google_apis;x86_64"
+            avdmanager create avd -n "Pixel_5" -d "pixel_5" -k "system-images;android-33;google_apis;arm64-v8a"
+            ;;
           android-ndk)
             # Use JAVA 1.8 with JENV for the following  commands
             brew install --cask android-ndk
