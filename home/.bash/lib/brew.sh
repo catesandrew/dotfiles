@@ -1151,6 +1151,7 @@ run_brew() {
       'zotero'
       '1password'
       'macvim'
+      'alacritty'
     )
 
     # for index in ${!cask_desired_formulae[*]}; do
@@ -1170,6 +1171,17 @@ run_brew() {
       for item in "${cask_missing_formulae[@]}"; do
         e_install "$item"
         case "$item" in
+          alacritty)
+            if ! (command_exists alacritty); then
+              brew install --cask alacritty
+
+              # Enable smoothing on mac
+              doo defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
+              doo defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
+            else
+              installed 'alacritty'
+            fi
+            ;;
           android-sdk)
             # https://stackoverflow.com/questions/46402772/failed-to-install-android-sdk-java-lang-noclassdeffounderror-javax-xml-bind-a
             brew install --cask android-sdk
