@@ -23,6 +23,14 @@ e_install() {
   printf "\ninstalling $(tput setaf 4)%s$(tput sgr0)\n\n" "$@"
 }
 
+command_exists () {
+  type "$1" &> /dev/null ;
+}
+
+installed () {
+  echo -e " ✓ $1 already installed."
+}
+
 contains_element () {
   local f="$1"
   local e match="$1"
@@ -69,7 +77,7 @@ run_brew() {
 
     local -a missing_taps
     local -a desired_taps=(
-      'adoptopenjdk/openjdk'
+      # 'adoptopenjdk/openjdk'
       'borkdude/brew'
       'bramstein/webfonttools'
       'clojure/tools'
@@ -1027,8 +1035,8 @@ run_brew() {
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
       '1password-cli'
-      'adoptopenjdk11'
-      'adoptopenjdk8'
+      # 'adoptopenjdk11'
+      # 'adoptopenjdk8'
       'aerial'
       'altair-graphql-client'
       'android-commandlinetools'
@@ -1152,6 +1160,9 @@ run_brew() {
       '1password'
       'macvim'
       'alacritty'
+      'temurin8'
+      'temurin11'
+      'temurin'
     )
 
     # for index in ${!cask_desired_formulae[*]}; do
@@ -1337,6 +1348,27 @@ run_brew() {
             brew install --cask adoptopenjdk/openjdk/adoptopenjdk14
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v14)"
+            ;;
+          temurin8)
+            # android-sdk requires Java 8. You can install it with:
+            brew install --cask temurin8
+            mkdir -p "${HOME}/.jenv/versions"
+            jenv add "$(/usr/libexec/java_home -v1.8)"
+            # jenv global 1.8 # To unset the version `jenv global system`
+            ;;
+          temurin11)
+            brew install --cask temurin11
+            mkdir -p "${HOME}/.jenv/versions"
+            jenv add "$(/usr/libexec/java_home -v11)"
+            jenv global 11 # To unset the version `jenv global system`
+            export JAVA_HOME=$(/usr/libexec/java_home -v1.11)
+            ;;
+          temurin)
+            # android-sdk requires Java 8. You can install it with:
+            brew install --cask temurin
+            mkdir -p "${HOME}/.jenv/versions"
+            jenv add "$(/usr/libexec/java_home -v1.8)"
+            # jenv global 1.8 # To unset the version `jenv global system`
             ;;
           zulu11)
             brew install --cask zulu11
