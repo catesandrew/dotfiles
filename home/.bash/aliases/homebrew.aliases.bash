@@ -37,7 +37,7 @@ bup() {
 
     for item in $(echo "$outdated_list"); do
       echo "Upgrading '$item'"
-      (HOMEBREW_NO_AUTO_UPDATE=1 && brew uninstall --ignore-dependencies "$item")
+      HOMEBREW_NO_AUTO_UPDATE=1 brew uninstall --ignore-dependencies "$item"
       case "$item" in
         hunspell)
           # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
@@ -57,11 +57,11 @@ bup() {
           brew install --HEAD --ignore-dependencies universal-ctags/universal-ctags/universal-ctags
           ;;
         *)
-          (HOMEBREW_NO_AUTO_UPDATE=1 && brew install --ignore-dependencies "$item")
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install --ignore-dependencies "$item"
         esac
     done
 
-    (HOMEBREW_NO_INSTALL_CLEANUP=1 && brew cleanup --prune=1)
+    HOMEBREW_NO_INSTALL_CLEANUP=1 brew cleanup --prune=1
   else
     echo "No Updates Found"
   fi
@@ -73,10 +73,10 @@ bup() {
 
     for f in $(echo "$cask_outdated_list"); do
       echo "Reinstalling '$f'"
-      (HOMEBREW_NO_AUTO_UPDATE=1 && brew reinstall --cask "$f")
+      HOMEBREW_NO_AUTO_UPDATE=1 brew reinstall --cask "$f"
     done
 
-    (HOMEBREW_NO_INSTALL_CLEANUP=1 && brew cleanup --prune=1)
+    HOMEBREW_NO_INSTALL_CLEANUP=1 brew cleanup --prune=1
   else
     echo "No Cask Updates Found"
   fi

@@ -3,8 +3,20 @@
 if brew_contains_element "pyenv" || \
     hash pyenv 2>/dev/null; then
 
-  export PYENV_ROOT="$HOME/.pyenv"
-  export PYENV_SHELL=bash
+  if [ -z "$PYENV_ROOT" ]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+  fi
+
+  if [ -z "$PYENV_HOME" ]; then
+    export PYENV_HOME="${BREW_HOME}/opt/pyenv"
+  fi
+
+  if [ -n "$PYENV_ROOT" ]; then
+    PATH=$(path_strip "$PATH" "${PYENV_ROOT}/shims")
+    PATH="${PYENV_ROOT}/shims:$PATH"
+  fi
+
+  export PYENV_SHELL=$SHELL
 
   if brew_contains_element "pyenv"; then
     export PYENV_HOME="${BREW_HOME}/opt/pyenv"

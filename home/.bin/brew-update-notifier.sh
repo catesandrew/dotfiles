@@ -21,7 +21,7 @@
 # For some help around cronjob vs launchd, I recommend reading this or a similar
 # introduction: http://alvinalexander.com/mac-os-x/mac-osx-startup-crontab-launchd-jobs
 
-BREW_EXEC='/usr/local/bin/brew'
+BREW_EXEC="$BREW_HOME/bin/brew"
 TERMINAL_NOTIFIER=`which terminal-notifier`
 NOTIF_ARGS="-sender com.apple.Terminal"
 

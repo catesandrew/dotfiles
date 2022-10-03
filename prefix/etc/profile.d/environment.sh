@@ -16,8 +16,8 @@ if [ -d "${HOME}/.bash" ]; then
 fi
 
 if ! [ -d "$RBENV_HOME" ]; then
-    if [ -d /usr/local/opt/rbenv ]; then
-        RBENV_HOME=/usr/local/opt/rbenv
+    if [ -d $BREW_HOME/opt/rbenv ]; then
+        RBENV_HOME=$BREW_HOME/opt/rbenv
     fi
 
     export RBENV_HOME
@@ -45,9 +45,42 @@ if [ -d "$RBENV_ROOT" ]; then
     fi
 fi
 
+# PYENV
+
+if ! [ -d "$PYENV_HOME" ]; then
+    if [ -d $BREW_HOME/opt/pyenv ]; then
+        PYENV_HOME=$BREW_HOME/opt/pyenv
+    fi
+
+    export PYENV_HOME
+    # launchctl setenv PYENV_HOME "$PYENV_HOME"
+fi
+
+if [ ! -d "$PYENV_ROOT" ]; then
+    if [ -d "${HOME}/.pyenv" ]; then
+        PYENV_ROOT="${HOME}/.pyenv"
+    fi
+
+    export PYENV_ROOT
+    # launchctl setenv PYENV_ROOT "$PYENV_ROOT"
+fi
+
+if [ -d "$PYENV_ROOT" ]; then
+    if [ -f "${PYENV_ROOT}/version" ]; then
+        PYENV_VERSION=$(cat "${PYENV_ROOT}/version")
+
+        # PATH=$(path_strip "$PATH" "${PYENV_ROOT}/shims")
+        # PATH="${PYENV_ROOT}/shims:$PATH"
+
+        export PYENV_VERSION
+        # launchctl setenv PYENV_VERSION "$PYENV_VERSION"
+    fi
+fi
+
+
 if [ ! -d "$NVM_DIR" ]; then
-    if [ -d /usr/local/nvm ]; then
-        NVM_DIR=/usr/local/nvm
+    if [ -d $BREW_HOME/nvm ]; then
+        NVM_DIR=$(realpath "$BREW_HOME/../nvm")
     elif [ -d "$HOME" ]; then
         NVM_DIR="$HOME"/.nvm
     fi
@@ -82,8 +115,8 @@ if [ -d "$NVM_DIR" ]; then
 fi
 
 if [ ! -d "$JENV_HOME" ]; then
-    if [ -d /usr/local/opt/jenv ]; then
-        JENV_HOME=/usr/local/opt/jenv
+    if [ -d $BREW_HOME/opt/jenv ]; then
+        JENV_HOME=$BREW_HOME/opt/jenv
     elif [ -d "$HOME" ]; then
         JENV_HOME="${HOME}/.jenv"
     fi

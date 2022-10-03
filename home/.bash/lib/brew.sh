@@ -100,6 +100,7 @@ run_brew() {
       'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
       'zegervdv/zathura'
+      'lindell/multi-gitter'
     )
 
     for index in ${!desired_taps[*]}; do
@@ -859,6 +860,7 @@ run_brew() {
       'ack'
       'libimobiledevice'
       'gdk-pixbuf'
+      'multi-gitter'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -903,7 +905,8 @@ run_brew() {
             ;;
           libimobiledevice)
             # cp libimobiledevice-glue.rb /opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula/libimobiledevice-glue.rb
-            # PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig brew install --HEAD libimobiledevice-glue --ignore-dependencies
+            # PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
+            # brew install --HEAD libimobiledevice-glue --ignore-dependencies
             # brew edit libimobiledevice
             # 31 depends_on "libimobiledevice-glue"
 
@@ -917,6 +920,10 @@ run_brew() {
             # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
             # make install
 
+            # export LD_LIBRARY_PATH="${BREW_HOME}/opt/openssl/lib:$LD_LIBRARY_PATH"
+            # export CPATH="${BREW_HOME}/opt/openssl/include:$CPATH"
+            # export LIBRARY_PATH="${BREW_HOME}/opt/openssl/lib:$LIBRARY_PATH"
+            # export PKG_CONFIG_PATH="${BREW_HOME}/opt/openssl/lib/pkgconfig"
             # brew install --HEAD --ignore-dependencies libimobiledevice
             # ./autogen.sh --prefix=/opt/homebrew
             # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew --without-cython --enable-debug-code --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
@@ -1163,6 +1170,7 @@ run_brew() {
       'temurin8'
       'temurin11'
       'temurin'
+      'kdiff3'
     )
 
     # for index in ${!cask_desired_formulae[*]}; do
@@ -1392,6 +1400,12 @@ run_brew() {
           java9)
             brew install --cask java9
             jenv add "$(/usr/libexec/java_home -v9)"
+            ;;
+          kdiff3)
+            brew install --cask kdiff3
+            git clone git@github.com:csatf/git-tower-kdiff3-shim.git
+            (cd git-tower-kdiff3-shim && ./install.sh)
+            rm -rf git-tower-kdiff3-shim
             ;;
           *)
             # In some cases (like when installing `cask`) regular `emacs`

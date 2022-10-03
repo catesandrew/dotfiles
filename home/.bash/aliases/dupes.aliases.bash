@@ -61,7 +61,7 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
     alias xmllint='${BREW_HOME}/opt/libxml2/bin/xmllint'
   fi
 
-  if brew_contains_element "openssl"; then
+  if brew_contains_element "openssl@3"; then
     alias openssl='${BREW_HOME}/opt/openssl/bin/openssl'
     alias c_rehash='${BREW_HOME}/opt/openssl/bin/c_rehash'
   fi
@@ -90,6 +90,11 @@ if [ "${__dot_system_type}" == "Darwin" ]; then
 
   if brew_contains_element "gnu-sed"; then
     alias sed='gsed'
+  fi
+
+  if brew_contains_element "libtool"; then
+    alias "libtool"="${BREW_HOME}/opt/libtool/bin/glibtool"
+    alias "libtoolize"="${BREW_HOME}/opt/libtool/bin/glibtoolize"
   fi
 
   if brew_contains_element "coreutils"; then
