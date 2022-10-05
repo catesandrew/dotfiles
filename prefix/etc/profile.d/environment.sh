@@ -35,7 +35,7 @@ fi
 
 if [ -d "$RBENV_ROOT" ]; then
     if [ -f "${RBENV_ROOT}/version" ]; then
-        RBENV_VERSION=$(cat "${RBENV_ROOT}/version")
+        RBENV_VERSION=$(head -1 "${RBENV_ROOT}/version")
 
         # PATH=$(path_strip "$PATH" "${RBENV_ROOT}/shims")
         # PATH="${RBENV_ROOT}/shims:$PATH"
@@ -67,7 +67,7 @@ fi
 
 if [ -d "$PYENV_ROOT" ]; then
     if [ -f "${PYENV_ROOT}/version" ]; then
-        PYENV_VERSION=$(cat "${PYENV_ROOT}/version")
+        PYENV_VERSION=$(head -1 "${PYENV_ROOT}/version")
 
         # PATH=$(path_strip "$PATH" "${PYENV_ROOT}/shims")
         # PATH="${PYENV_ROOT}/shims:$PATH"
@@ -91,7 +91,7 @@ fi
 
 if [ -d "$NVM_DIR" ]; then
     if [ -f "${NVM_DIR}/alias/default" ]; then
-        NVM_VERSION=$(cat "${NVM_DIR}/alias/default")
+        NVM_VERSION=$(head -1 "${NVM_DIR}/alias/default")
         # ESCAPED_NVM_VERSION=$(echo "${NVM_VERSION//./$'\.'}")
         # PATH="./bin:./node_modules/.bin:${NVM_DIR}/versions/node/v${NVM_VERSION}/bin:${PATH}"
 
@@ -131,7 +131,7 @@ export JENV_ROOT
 
 if [ -d "$JENV_ROOT" ]; then
     if [ -f "${JENV_ROOT}/version" ]; then
-        JENV_VERSION=$(cat "${JENV_ROOT}/version")
+        JENV_VERSION=$(head -1 "${JENV_ROOT}/version")
         # check to verify version is not `system`
         if [ "$JENV_VERSION" = "system" ]; then
           JAVA_HOME="$(/usr/libexec/java_home)"

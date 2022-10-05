@@ -929,6 +929,29 @@ run_brew() {
             # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew --without-cython --enable-debug-code --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
             # make install
             ;;
+          python3)
+            # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
+            pyenv uninstall 3.9.X
+            pyenv rehash
+            brew install --ignore-dependencies python@3
+            pyenv global 3.10 system
+
+            ln -sfv "$(realpath $(brew --prefix python@3.10))" $PYENV_ROOT/versions/3.10
+            ln -sfv $(realpath $(brew --prefix python@3.10))/Frameworks/Python.framework/Versions/3.10/include/python3.10 $(realpath $(brew --prefix python@3.10))/include
+
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/idle3 $(realpath $(brew --prefix python@3.10))/bin/idle
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/pip3 $(realpath $(brew --prefix python@3.10))/bin/pip
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/python3 $(realpath $(brew --prefix python@3.10))/bin/python
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/wheel3 $(realpath $(brew --prefix python@3.10))/bin/wheel
+            pyenv rehash
+
+            ls -al $PYENV_ROOT/versions
+            ;;
+          awscli)
+            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies awscli
+            pip3 install six
+            pip3 install aws-sso-cred-restore
+            ;;
           hunspell)
             # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install hunspell --ignore-dependencies
