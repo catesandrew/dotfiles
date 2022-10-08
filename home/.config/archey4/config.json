@@ -54,7 +54,7 @@
       "char_before_unit": " ",
       "sensors_chipsets": [],
       "sensors_excluded_subfeatures": [],
-      "use_fahrenheit": false
+      "use_fahrenheit": true
     },
     {
       "type": "CPU",
@@ -98,15 +98,16 @@
         "dns_timeout": 1,
         "http_url": "https://v4.ident.me/",
         "http_timeout": 1
-      },
-      "ipv6": {
-        "dns_query": "myip.opendns.com",
-        "dns_resolver": "resolver1.opendns.com",
-        "dns_timeout": 1,
-        "http_url": "https://v6.ident.me/",
-        "http_timeout": 1
       }
-    }
+    },
+		{
+			"type": "Custom",
+			"name": ">",
+      "command": "fortune",
+		  "check": true,
+		  "log_stderr": true,
+		  "one_line": false
+		}
   ],
   "default_strings": {
     "latest": "latest",
