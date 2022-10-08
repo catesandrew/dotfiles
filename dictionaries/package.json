@@ -1,0 +1,82 @@
+{
+  "name": "dictionaries",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Hunspell dictionaries in UTF-8",
+  "license": "MIT",
+  "keywords": [
+    "spelling",
+    "myspell",
+    "hunspell",
+    "dictionary"
+  ],
+  "repository": "https://github.com/wooorm/dictionaries",
+  "bugs": "https://github.com/wooorm/dictionaries/issues",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/wooorm"
+  },
+  "author": "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
+    "Thomas Beverley <tom.beverley101@gmail.com>"
+  ],
+  "type": "module",
+  "dependencies": {},
+  "devDependencies": {
+    "bcp-47": "^2.0.0",
+    "bcp-47-normalize": "^2.0.0",
+    "is-hidden": "^2.0.0",
+    "language-tags": "^1.0.0",
+    "mdast-zone": "^5.0.0",
+    "prettier": "^2.0.0",
+    "remark-cli": "^11.0.0",
+    "remark-preset-wooorm": "^9.0.0",
+    "tape": "^5.0.0",
+    "to-vfile": "^7.0.0",
+    "unist-builder": "^3.0.0",
+    "utf-8-validate": "^5.0.0",
+    "xo": "^0.51.0"
+  },
+  "scripts": {
+    "generate": "sh script/crawl.sh && node script/generate",
+    "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",
+    "test-api": "node test",
+    "test": "npm run generate && npm run format && npm run test-api"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "semi": false,
+    "trailingComma": "none"
+  },
+  "xo": {
+    "prettier": true,
+    "ignores": [
+      "dictionaries/*/index.d.ts",
+      "script/template/index.d.ts"
+    ],
+    "rules": {
+      "unicorn/prefer-module": "off",
+      "unicorn/prefer-switch": "off"
+    }
+  },
+  "remarkConfig": {
+    "plugins": [
+      "preset-wooorm",
+      [
+        "gfm",
+        {
+          "tablePipeAlign": false
+        }
+      ],
+      [
+        "lint-table-pipe-alignment",
+        false
+      ],
+      "./script/list-of-dictionaries.js"
+    ]
+  }
+}
