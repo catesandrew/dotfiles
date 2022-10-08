@@ -1083,7 +1083,6 @@ run_brew() {
       'bibdesk'
       'blackhole-2ch'
       'charles'
-      'chromedriver'
       'cloudapp'
       'coderunner'
       'dash'
