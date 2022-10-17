@@ -58,32 +58,40 @@ bup() {
           ;;
         python@3*)
             mkdir -p "${PYENV_ROOT}/versions"
+            pip3 freeze >| "${TMPDIR}/requirements.txt"
 
             # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
             if [ -f "${PYENV_ROOT}/version" ]; then
               PYENV_VERSION=$(head -1 "${PYENV_ROOT}/version")
             fi
-            # pyenv uninstall $PYENV_VERSION
-            # pyenv rehash
+            yes | pyenv uninstall $PYENV_VERSION
+            pyenv rehash
 
             version=$(echo "${item}" | cut -d@ -f2)
+            brew uninstall --ignore-dependencies "${item}"
             brew install --ignore-dependencies "python@${version}"
             ln -sfv "$(realpath $(brew --prefix "python@${version}"))" "$PYENV_ROOT/versions/${version}"
             ln -sfv "$(realpath $(brew --prefix "python@${version}"))/Frameworks/Python.framework/Versions/${version}/include/python${version}" "$(realpath $(brew --prefix "python@${version}"))/include"
             pyenv global "${version}" system
 
+            # idle pip python wheel pydoc python-config
             rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/idle"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/idle"
+            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pip"
             rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python"
             rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/wheel"
+            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pydoc"
+            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python-config"
 
             ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/idle3 "$(realpath $(brew --prefix "python@${version}"))/bin/idle"
             ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/pip3 "$(realpath $(brew --prefix "python@${version}"))/bin/pip"
             ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/python3 "$(realpath $(brew --prefix "python@${version}"))/bin/python"
             ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/wheel"
+            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/pydoc"
+            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/python-config"
             pyenv rehash
 
             ls -al "${PYENV_ROOT}/versions"
+            pip3 install -r "${TMPDIR}/requirements.txt"
           ;;
         *)
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install --ignore-dependencies "$item"
