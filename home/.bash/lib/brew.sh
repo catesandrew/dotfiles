@@ -77,7 +77,6 @@ run_brew() {
 
     local -a missing_taps
     local -a desired_taps=(
-      # 'adoptopenjdk/openjdk'
       'borkdude/brew'
       'bramstein/webfonttools'
       'clojure/tools'
@@ -1390,7 +1389,7 @@ run_brew() {
             brew install --cask temurin11
             mkdir -p "${HOME}/.jenv/versions"
             jenv add "$(/usr/libexec/java_home -v11)"
-            jenv global 11 # To unset the version `jenv global system`
+            jenv global 11.0 # To unset the version `jenv global system`
             export JAVA_HOME=$(/usr/libexec/java_home -v1.11)
             ;;
           temurin)
