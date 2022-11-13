@@ -1,8 +1,66 @@
 # https://github.com/netj/dotfiles/blob/master/.inputrc
 # http://unix.stackexchange.com/questions/21788/how-to-delete-part-of-a-path-in-an-interactive-shell/
 
+# in the `.inputrc` file you should know that the `M-` qualifier does _not_
+# work. Instead, write `\e` for Meta; and `\C` for Control.
+
+# | **Key Binding** | **Description**                                                      |
+# | ---|---                                                                                |
+# | `C-b`, `C-f` | Move backward/forward one character                                     |
+# | `M-b`, `M-f` | Move backward/forward by word                                           |
+# | `C-a`, `C-e` | Move to the beginning/end of the line                                   |
+# | `C-w`, `M-d` | Kill word backward/forward                                              |
+# | `C-d`, `Backspace` | Delete char forward/backward. `C-d` may send EOF on an empty line |
+# | `C-k`, `C-u` | Kill (to clipboard) to end of line/beginning of line                    |
+# | `C-y` | Yank from kill ring                                                            |
+# | `M-y` (after `C-y`) | Cycle through kill ring history                                  |
+# | `C-t`, `M-t` | Transpose character/word                                                |
+# | `M-u`, `M-l`, `M-c` | Upper, lower, or capitalize forward word                         |
+# | `C-_`, `C-x C-u`, `C-/` | Cycle through the undo list                                  |
+
+# Text Completion
+
+# | **Key Bindings** | **Description**                    |
+# |------------------|------------------------------------|
+# | `TAB`, `C-i`     | Complete at point                  |
+# | `M-?`            | List possible completions at point |
+# | `M-*`            | Insert all completions             |
+# | `M-~`            | Complete tilde                     |
+
+# `M-?` directs readline to display the completions at point. This is pretty
+# much the same as hitting `TAB` multiple times, but with a crucial difference:
+# `M-?` won't autocomplete parts of your query as `TAB` would.
+
+# `M-*` is more interesting. It takes all possible completion matches - sourced
+# from `M-?` \- and inserts them into your prompt. Now you can edit them before
+# you pass them to another program.
+
+# History Search
+# | **Key Bindings**           | **Description**                                    |
+# |----------------------------|----------------------------------------------------|
+# | `M-<`, `M->`               | Go to beginning/end of the history list            |
+# | `C-r`, `C-s`               | Reverse/Forward isearch history                    |
+# | `M-p`, `M-n`               | Query search backward/forward through history list |
+# | `M-.`                      | Yank (insert) last argument                        |
+# | `C-p`, `C-n`, `Up`, `Down` | Previous/Next history entry                        |
+
+# Bash-Specific Key Bindings
+# | **Key Bindings** | **Description**                     |
+# |------------------|-------------------------------------|
+# | `C-M-e`          | Expand environment variable         |
+# | `M-!`            | Complete command                    |
+# | `M-/`            | Complete filename                   |
+# | `M-@`            | Complete hostname                   |
+# | `M-$`            | Complete variable                   |
+# | `C-x C-e`        | Edit and execute command in Emacs   |
+# | `C-M-o`          | Expand using _dynamic abbrev_.      |
+
 # I hate noise
 set bell-style visible
+
+# By default the keyseq-timeout value is a rather ambitious 500 ms. I find that
+# far too quick, so I change it 1200 ms:
+set keyseq-timeout 1200
 
 # If set to on, tilde expansion is performed when readline attempts word
 # completion.
@@ -12,6 +70,8 @@ set expand-tilde on
 # appended to the filename when listing possible completions.
 set visible-stats on
 set colored-stats on
+# Colored completion of partial matches in bash
+set colored-completion-prefix on
 
 # Use case-insensitive TAB autocompletion. If set to On, readline performs
 # filename matching and completion in a case-insensitive fashion.
@@ -47,6 +107,39 @@ set mark-symlinked-directories on
 
 # don't include files that start with a period
 # set match-hidden-files off
+
+$if Bash
+
+# Wrap a command in $( ... )
+"\C-xq": "\C-a\$(\C-e)"
+
+# Wrap a command in $( .... | fzf)
+"\C-xF": "\C-e | fzf)\C-a(\C-a$\C-b\C-a"
+
+# C-M-o is `dabbrev-expand`. It looks at the word at point and attempts to
+# expand it using previously-seen history values. So, if you previously typed in
+# a complex word - say a hostname - you can ask readline to recall it anywhere
+# in a prompt:
+"\e\C-o": dabbrev-expand
+
+$endif
+
+$if Python
+
+# Wrap prompt in !help( ... )  (for PDB)
+"\C-xh": "\C-a!help(\C-e)"
+# Wrap prompt in dir( ... )
+"\C-xd": "\C-adir(\C-e)"
+
+$endif
+
+# To truly make use of the macro functionality you must first bind the command
+# print-last-kbd-macro to a key in your .inputrc file. Here I bind it to C-x P.
+# But feel free to use another key binding. Note the backslashed C.
+# `C-x (`, `C-x )` → Start/Stop macro recorder
+# `C-x e` → Play last macro
+# `C-x P` → Print out macro (Note you must bind the command to a key for this to work)
+"\C-xP": print-last-kbd-macro
 
 ## EMACS
 
@@ -88,10 +181,6 @@ set keymap emacs
 
 # replace the current line with output
 # "\er": "\C-a$(\C-e)\e\C-e"
-
-# complete words from the history list
-# dabbrev-expand was added in bash 4.0
-# "\e/": dabbrev-expand
 
 # make option-tab and shift-tab cycle through completions
 # menu-complete-backward was added in bash 4.1
@@ -150,10 +239,10 @@ set keymap vi-command
 
 ## Insert-mode bindings
 set keymap vi-insert
-"\M-[5~": ""             # up arrow or PgUp: append to previous history line
-"\M-[A": ""
-"\M-[B": ""                 # dn arrow or PGDNA: append to next history line
-"\M-[6~": ""
+"\e-[5~": ""             # up arrow or PgUp: append to previous history line
+"\e-[A": ""
+"\e-[B": ""                 # dn arrow or PGDNA: append to next history line
+"\e-[6~": ""
 
 # "\C-p": previous-history        # ^p check for partial match in history
 "\C-p": dynamic-complete-history
