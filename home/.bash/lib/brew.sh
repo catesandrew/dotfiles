@@ -928,6 +928,17 @@ run_brew() {
             # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew --without-cython --enable-debug-code --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
             # make install
             ;;
+          ruby@3)
+            rbenv uninstall 3.1
+            rbenv rehash
+            brew install --ignore-dependencies ruby@3
+            rbenv global 3.1 system
+
+            ln -sfv "$(realpath $(brew --prefix ruby@3))" $RBENV_ROOT/versions/3.1
+            pyenv rehash
+            ls -al $RBENV_ROOT/versions
+
+            ;;
           python3)
             # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
             pyenv uninstall 3.9.X

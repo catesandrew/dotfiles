@@ -56,6 +56,31 @@ bup() {
           # and can be found at universal-ctags/ctags.
           brew install --HEAD --ignore-dependencies universal-ctags/universal-ctags/universal-ctags
           ;;
+        ruby@3*)
+          # I use rbenv to manage multiple ruby installations. However, some
+          # homebrew formulae depend on ruby installed through homebrew so I
+          # decided to use ruby from homebrew and link it up through rbenv.
+          mkdir -p "${RBENV_ROOT}/versions"
+
+          # Find the old version of Ruby installed through homebrew
+          if [ -f "${RBENV_ROOT}/version" ]; then
+            RBENV_VERSION=$(head -1 "${RBENV_ROOT}/version")
+          fi
+          # Uninstall the old version from rbenv
+          yes | rbenv uninstall $RBENV_VERSION
+          rbenv rehash
+
+          # Find the new version being installed now
+          version=$(echo "${item}" | cut -d@ -f2)
+          # Now we uninstall the old version of ruby in homebrew
+          brew uninstall --ignore-dependencies "${item}"
+          # Now install the new version through the update command
+          brew install --ignore-dependencies "ruby@${version}"
+          ln -sfv "$(realpath $(brew --prefix "ruby@${version}"))" "$RBENV_ROOT/versions/${version}"
+          rbenv global "${version}" system
+          rbenv rehash
+          ls -al "${RBENV_ROOT}/versions"
+          ;;
         python@3*)
             mkdir -p "${PYENV_ROOT}/versions"
             pip3 freeze >| "${TMPDIR}/requirements.txt"
