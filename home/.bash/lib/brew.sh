@@ -1278,10 +1278,10 @@ run_brew() {
             sdkmanager --update
             sdkmanager --install emulator
             sdkmanager --install platform-tools
-            sdkmanager --install 'system-images;android-30;google_apis_playstore;x86_64'
+            sdkmanager --install 'system-images;android-31;google_apis_playstore;arm64-v8a'
             sdkmanager --install 'extras;intel;Hardware_Accelerated_Execution_Manager'
             sdkmanager --install 'build-tools;30.0.1'
-            sdkmanager --install 'platforms;android-30'
+            sdkmanager --install 'platforms;android-31'
             sdkmanager --list
 
             # KITKAT (4.4) API 19
