@@ -37,26 +37,66 @@ bup() {
 
     for item in $(echo "$outdated_list"); do
       echo "Upgrading '$item'"
-      HOMEBREW_NO_AUTO_UPDATE=1 brew uninstall --ignore-dependencies "$item"
       case "$item" in
-        hunspell)
-          # download dictionaries from http://wordlist.aspell.net/dicts/, insall in ~/Library/Spelling/
-          brew install hunspell --ignore-dependencies
-          ;;
-        emacs-plus)
+        emacs-plus@*)
+          version=$(echo "${item}" | cut -d@ -f2)
+          pkg=$(echo "${item}" | cut -d@ -f1)
+          major=$(echo "$version" | cut -d. -f1)
+          installed_version="$(brew info --json "${pkg}@${major}" | jq -r '(.[] | .versions.stable )')"
+
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            "${pkg}@${installed_version}"
+
           # emacs-plus issues with daemon mode, better color emoji support
-          brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            "${item}" \
+            --with-cacodemon-icon \
+            --with-xwidgets \
+            --with-mailutils \
+            --with-no-frame-refocus \
+            --with-imagemagick \
+            --with-native-comp
+          ;;
+        bash)
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew upgrade \
+            --ignore-dependencies bash
           ;;
         wget)
-          brew install wget --ignore-dependencies --HEAD
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies "${item}"
+
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            --HEAD \
+            "${item}"
           ;;
         universal-ctags)
           # Given the lack of activity on the official Exuberant Ctags
           # source, it has been forked and renamed to Universal Ctags
           # and can be found at universal-ctags/ctags.
-          brew install --HEAD --ignore-dependencies universal-ctags/universal-ctags/universal-ctags
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            universal-ctags/universal-ctags/universal-ctags
+
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            --HEAD \
+            universal-ctags/universal-ctags/universal-ctags
           ;;
-        ruby@3*)
+        ruby@*)
           # I use rbenv to manage multiple ruby installations. However, some
           # homebrew formulae depend on ruby installed through homebrew so I
           # decided to use ruby from homebrew and link it up through rbenv.
@@ -66,60 +106,96 @@ bup() {
           if [ -f "${RBENV_ROOT}/version" ]; then
             RBENV_VERSION=$(head -1 "${RBENV_ROOT}/version")
           fi
+
           # Uninstall the old version from rbenv
           yes | rbenv uninstall $RBENV_VERSION
           rbenv rehash
 
           # Find the new version being installed now
           version=$(echo "${item}" | cut -d@ -f2)
+          pkg=$(echo "${item}" | cut -d@ -f1)
+          major=$(echo "$version" | cut -d. -f1)
+          installed_version="$(brew info --json "${pkg}@${major}" | jq -r '(.[] | .versions.stable )')"
+
           # Now we uninstall the old version of ruby in homebrew
-          brew uninstall --ignore-dependencies "${item}"
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            "${pkg}@${installed_version}"
+
           # Now install the new version through the update command
-          brew install --ignore-dependencies "ruby@${version}"
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            "${item}"
+
           ln -sfv "$(realpath $(brew --prefix "ruby@${version}"))" "$RBENV_ROOT/versions/${version}"
           rbenv global "${version}" system
           rbenv rehash
           ls -al "${RBENV_ROOT}/versions"
           ;;
-        python@3*)
-            mkdir -p "${PYENV_ROOT}/versions"
-            pip3 freeze >| "${TMPDIR}/requirements.txt"
+        python@*)
+          mkdir -p "${PYENV_ROOT}/versions"
+          pip3 freeze >| "${TMPDIR}/requirements.txt"
 
-            # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
-            if [ -f "${PYENV_ROOT}/version" ]; then
-              PYENV_VERSION=$(head -1 "${PYENV_ROOT}/version")
-            fi
-            yes | pyenv uninstall $PYENV_VERSION
-            pyenv rehash
+          # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
+          if [ -f "${PYENV_ROOT}/version" ]; then
+            PYENV_VERSION=$(head -1 "${PYENV_ROOT}/version")
+          fi
+          yes | pyenv uninstall $PYENV_VERSION
+          pyenv rehash
 
-            version=$(echo "${item}" | cut -d@ -f2)
-            brew uninstall --ignore-dependencies "${item}"
-            brew install --ignore-dependencies "python@${version}"
-            ln -sfv "$(realpath $(brew --prefix "python@${version}"))" "$PYENV_ROOT/versions/${version}"
-            ln -sfv "$(realpath $(brew --prefix "python@${version}"))/Frameworks/Python.framework/Versions/${version}/include/python${version}" "$(realpath $(brew --prefix "python@${version}"))/include"
-            pyenv global "${version}" system
+          version=$(echo "${item}" | cut -d@ -f2)
+          pkg=$(echo "${item}" | cut -d@ -f1)
+          major=$(echo "$version" | cut -d. -f1)
+          installed_version="$(brew info --json "${pkg}@${major}" | jq -r '(.[] | .versions.stable )')"
 
-            # idle pip python wheel pydoc python-config
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/idle"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pip"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/wheel"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pydoc"
-            rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python-config"
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            "${pkg}@${installed_version}"
 
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/idle3 "$(realpath $(brew --prefix "python@${version}"))/bin/idle"
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/pip3 "$(realpath $(brew --prefix "python@${version}"))/bin/pip"
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/python3 "$(realpath $(brew --prefix "python@${version}"))/bin/python"
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/wheel"
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/pydoc"
-            ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/python-config"
-            pyenv rehash
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            "${item}"
 
-            ls -al "${PYENV_ROOT}/versions"
-            pip3 install -r "${TMPDIR}/requirements.txt"
+          ln -sfv "$(realpath $(brew --prefix "python@${version}"))" "$PYENV_ROOT/versions/${version}"
+          ln -sfv "$(realpath $(brew --prefix "python@${version}"))/Frameworks/Python.framework/Versions/${version}/include/python${version}" "$(realpath $(brew --prefix "python@${version}"))/include"
+          pyenv global "${version}" system
+
+          # idle pip python wheel pydoc python-config
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/idle"
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pip"
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python"
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/wheel"
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/pydoc"
+          rm --force "$(realpath $(brew --prefix "python@${PYENV_VERSION}"))/bin/python-config"
+
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/idle3 "$(realpath $(brew --prefix "python@${version}"))/bin/idle"
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/pip3 "$(realpath $(brew --prefix "python@${version}"))/bin/pip"
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/python3 "$(realpath $(brew --prefix "python@${version}"))/bin/python"
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/wheel"
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/pydoc"
+          ln -sfv $(realpath $(brew --prefix "python@${version}"))/bin/wheel3 "$(realpath $(brew --prefix "python@${version}"))/bin/python-config"
+          pyenv rehash
+
+          ls -al "${PYENV_ROOT}/versions"
+          pip3 install -r "${TMPDIR}/requirements.txt"
           ;;
         *)
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install --ignore-dependencies "$item"
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            "${item}"
+
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            "${item}"
         esac
     done
 
