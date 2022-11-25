@@ -1514,52 +1514,60 @@ run_mas() {
     e_header "Updating apple store apps..."
 
     # mas list | awk  '{ printf "%14s # %s\n", $1, $2 }'
-    local __mas_apps=($(mas list | awk '{print $1 $2}'))
+    local __mas_apps=($(mas list | awk '{print ""$1" # "$2}'))
     local __mas_app_names=( $(mas list | awk '{print $2}') )
 
     local -a mas_missing_apps
     local -a mas_desired_apps=(
-     '457516296' # Quick Sprites
-     '740472063' # Focus 2
+     '1006087419' # SnippetsLab
+     '1233861775' # Acorn
+     '1388020431' # DevCleaner
+     '1450874784' # Transporter
+     '1462643128' # TableFlip
+     '1474276998' # HP
+     '1543753042' # Log-Viewer
+     '1579200037' # Medis
      '402383384' # Base
-     '931657367' # Calcbot
-     '720669838' # iThoughtsX
-     '969418666' # ColorSnapper2
-     '407963104' # Pixelmator
-     '533696630' # Webcam
-     '975937182' # Fantastical
-     '961632517' # Be
-     '467939042' # Growl
-     '429449079' # Patterns
-     '577085396' # Unclutter
-    '1579200037' # Medis
      '403504866' # PCalc
-     '640841706' # Base64Anywhere
-     '965645209' # Date Format Creator
-    '1388020431' # DevCleaner
-     '896450579' # Textual
-     '442160773' # Cocoa JSON Editor
-     '536511979' # Characters
-    '1462643128' # TableFlip
-     '439697913' # IconJar
-     '768666595' # Iconie
-     '889428659' # xScope
-     '413965349' # Soulver
-    '1006087419' # SnippetsLab
-     '494803304' # WiFi
-     '445189367' # PopClip
-     '444990433' # JsonParser
-     '593294811' # MultiMarkdown
-     '581789185' # Napkin
-     '669462988' # Bit Fiddle
-     '520265986' # UltraCharacter Map
-     '920404675' # Monodraw
-     '489880259' # ScreenShot
+     '407963104' # Pixelmator
+     '409183694' # Keynote
+     '409201541' # Pages
+     '409203825' # Numbers
      '411643860' # DaisyDisk
+     '412946682' # SubnetCalc
+     '413965349' # Soulver
+     '429449079' # Patterns
+     '439697913' # Icon
+     '442160773' # Cocoa
+     '444990433' # JsonParser
+     '445189367' # PopClip
+     '457516296' # Quick
      '459413843' # ColorStrokes
+     '467939042' # Growl
+     '489880259' # ScreenShot
+     '494803304' # WiFi
+     '520265986' # Ultra
+     '533696630' # Webcam
+     '536511979' # Characters
+     '577085396' # Unclutter
+     '581789185' # Napkin
+     '593294811' # MultiMarkdown
+     '640841706' # Base64Anywhere
+     '669462988' # Bit
+     '720669838' # iThoughtsX
+     '740472063' # Focus
+     '768666595' # Iconie
+     '824171161' # Affinity
+     '824183456' # Affinity
      '866773894' # Quiver
-    '1543753042' # Log-Viewer
-    '1233861775' # Acorn
+     '889428659' # xScope
+     '896450579' # Textual
+     '920404675' # Monodraw
+     '931657367' # Calcbot
+     '961632517' # Be
+     '965645209' # Date
+     '969418666' # ColorSnapper2
+     '975937182' # Fantastical
     )
 
     # Use the following to generally reinstall all apple store applications
