@@ -91,15 +91,16 @@ run_brew() {
       'homebrew/cask-fonts'
       'homebrew/cask-versions'
       'homebrew/core'
+      'homebrew/services'
       'johanhaleby/kubetail'
       'launchdarkly/tap'
+      'lindell/multi-gitter'
       'neovim/neovim'
       'saucelabs/saucectl'
       'tavianator/tap'
       'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
       'zegervdv/zathura'
-      'lindell/multi-gitter'
     )
 
     for index in ${!desired_taps[*]}; do
