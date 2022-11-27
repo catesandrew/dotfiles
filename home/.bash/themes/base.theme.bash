@@ -1338,12 +1338,35 @@ function findup_npm_root {
 }
 
 function npm_prompt {
-  local npm_name
-  local npm_version
+  local npm_name=
+  local npm_version=
+  local npmre="(@[[:lower:][:digit:]][[:lower:][:digit:]._-]+)\/([[:lower:][:digit:]][[:lower:][:digit:]._-]*)$"
+  local result=
 
+  # The "name" field contains your package’s name, and must be lowercase and one
+  # word, and may contain hyphens and underscores.
+  # /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/
   if [[ -f "$1" ]] && has_jshon; then
-    npm_version=$(jshon -e "version" < "$1" 2> /dev/null)
-    npm_name=$(jshon -e "name" < "$1" 2> /dev/null)
+    set -o pipefail && \
+      result=($(jshon -Q -e name -u -p -e version -u < "$1"))
+    if [ $? -eq 0 ]; then
+      npm_version=${result[1]}
+      npm_name=$(echo ${result[0]} | cut -d '"' -f2 2> /dev/null)
+    else
+      npm_version=$(jshon -Q -e version -u < "$1")
+      if [ $? -ne 0 ]; then
+        npm_version="?"
+      fi
+      npm_name=$(jshon -Q -e name -u < "$1" | cut -d '"' -f2)
+      if [ $? -ne 0 ]; then
+        npm_name="?"
+      fi
+    fi
+
+    if [[ $npm_name =~ $npmre ]]; then
+      npm_name="$(echo "$npm_name" | cut -d'/' -f2)"
+    fi
+
     eval "$2=${npm_name}@${npm_version}"
   fi
 }
