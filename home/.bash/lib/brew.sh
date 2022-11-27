@@ -455,7 +455,6 @@ run_brew() {
       'whatmp3'
       'wget'
       'webkit2png'
-      'webalizer'
       'wdiff'
       'watchman'
       'watch'
@@ -636,7 +635,6 @@ run_brew() {
       'logrotate'
       'lmdb'
       'llvm'
-      'little-cms'
       'liquidprompt'
       'lighttpd'
       'libzip'
@@ -767,7 +765,7 @@ run_brew() {
       'fftw'
       'fd'
       'fcrackzip'
-      'fasd'
+      'zoxide'
       'expect'
       'expat'
       'exiftool'
@@ -777,7 +775,8 @@ run_brew() {
       'enscript'
       'enca'
       'emacs-plus'
-      'elinks'
+      'tre'
+      'felinks'
       'editorconfig'
       'ed'
       'dwdiff'
@@ -813,7 +812,6 @@ run_brew() {
       'codequery'
       'cocoapods'
       'cmake'
-      'closure-stylesheets'
       'closure-compiler'
       'cloog'
       'clojure'
@@ -841,7 +839,6 @@ run_brew() {
       'bfs'
       'bfg'
       'bcrypt'
-      'bazaar'
       'bat'
       'bashish'
       'bash-git-prompt'
@@ -1051,8 +1048,7 @@ run_brew() {
             # jenv enable-plugin lein
             jenv enable-plugin export
             # it is required by ant, bfg, boot-clj, closure-compiler,
-            # closure-stylesheets, gradle, languagetool, maven, plantuml, pmd
-            # and selenium-server-standalone
+            # gradle, languagetool, maven, plantuml, pmd and selenium-server-standalone.
             # jenv add "${BREW_HOME}/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
             # jenv global 11 # To unset the version `jenv global system`
             ;;

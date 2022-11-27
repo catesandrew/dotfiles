@@ -437,6 +437,7 @@ else
   # TODO: Migrate to brew `bash-preexec`
   . "${BASH_IT}/preexec/bash-preexec.sh"
   . "${BASH_IT}/preexec/npm-preexec.sh"
+  . "${BASH_IT}/preexec/yarn-preexec.sh"
   . "${BASH_IT}/preexec/git-preexec.sh"
 
   if [ "${TERM_PROGRAM:-""}" != "" ]; then
