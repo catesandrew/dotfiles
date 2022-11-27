@@ -38,6 +38,20 @@ bup() {
     for item in $(echo "$outdated_list"); do
       echo "Upgrading '$item'"
       case "$item" in
+        gcc|libgccjit)
+          # for emacs-plus native-comp support
+          HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew uninstall \
+            --ignore-dependencies \
+            "${item}"
+
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew install \
+            --ignore-dependencies \
+            --build-from-source \
+            "${item}"
+        ;;&
         emacs-plus@*)
           version=$(echo "${item}" | cut -d@ -f2)
           pkg=$(echo "${item}" | cut -d@ -f1)

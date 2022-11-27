@@ -776,7 +776,7 @@ run_brew() {
       'exact-image'
       'enscript'
       'enca'
-      'emacs-plus@29'
+      'emacs-plus'
       'elinks'
       'editorconfig'
       'ed'
@@ -972,10 +972,29 @@ run_brew() {
           emacs)
             # brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
             ;;
+          gcc|libgccjit)
+            # for emacs-plus native-comp support
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+              brew install \
+              --ignore-dependencies \
+              --build-from-source \
+              "${item}"
+            ;;&
           emacs-plus)
             # emacs-plus issues with daemon mode, better color emoji support
-            # brew install emacs-plus --with-cacodemon-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
-            HOMEBREW_NO_INSTALL_CLEANUP=1 brew install emacs-plus --with-spacemacs-icon --with-xwidgets --with-mailutils --with-no-frame-refocus --with-imagemagick --with-native-comp --ignore-dependencies
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              LIBRARY_PATH="$(brew --prefix)/lib" \
+              brew install \
+              --ignore-dependencies \
+              emacs-plus@29 \
+              --with-native-comp \
+              --with-xwidgets \
+              --with-imagemagick \
+              --with-mailutils \
+              --with-poll \
+              --with-no-frame-refocus \
+              --with-spacemacs-icon
             ;;
           wget)
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install wget --HEAD
