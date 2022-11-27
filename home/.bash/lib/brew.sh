@@ -859,7 +859,8 @@ run_brew() {
       'adns'
       'act'
       'ack'
-
+      'lsd'
+      'difftastic'
     )
 
     for index in ${!desired_formulae[*]}; do
