@@ -1,7 +1,9 @@
 # /usr/local/work/lmp
 
-if [[ $USER == 'vagrant' ]]; then
-    CDC_DIRS=($HOME/workflow /vagrant/src)
+if [[ $USER == 'az6806' ]]; then
+    CDC_DIRS=(
+        /usr/local/work
+    )
 else
     CDC_DIRS=(
         /usr/local/work/uie

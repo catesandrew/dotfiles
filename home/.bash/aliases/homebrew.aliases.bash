@@ -80,7 +80,7 @@ bup() {
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew upgrade \
-            --ignore-dependencies bash
+            bash
           ;;
         wget)
           HOMEBREW_NO_AUTO_UPDATE=1 \
