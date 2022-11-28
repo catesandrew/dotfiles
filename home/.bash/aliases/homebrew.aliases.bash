@@ -234,13 +234,110 @@ bup() {
   fi
 }
 
+bu() {
+  local i line item
+
+  args=("$@")
+  for (( i=0; i < ${#args[@]}; i++)); do
+    if [[ $i -eq ${#args[@]}-1 ]]; then
+      item=${args[$i]}
+    else
+      line="${line} ${args[$i]}"
+    fi
+  done
+
+  # echo $last
+  # echo $line
+
+  echo "Upgrading '$item'"
+  case "$item" in
+    python3)
+      local latest latest_semver installed_semver installed_version version
+
+      mkdir -p "${PYENV_ROOT}/versions"
+      pip3 freeze >| "${TMPDIR}/requirements.txt"
+
+      # https://thecesrom.dev/2021/06/28/how-to-add-python-installed-via-homebrew-to-pyenv-versions/
+      if [ -f "${PYENV_ROOT}/version" ]; then
+        PYENV_VERSION=$(head -1 "${PYENV_ROOT}/version")
+        # 3.10
+      fi
+      yes | pyenv uninstall $PYENV_VERSION
+      pyenv rehash
+
+      installed_semver="$(brew info --json python@3 | jq -r '(.[] | .versions.stable )')"
+      # 3.10.8
+      installed_version="$(cut -d '.' -f 1,2 <<< "${installed_semver}")"
+      # 3.10
+
+      latest="$(brew search python@3 | \grep -E '^python(@.*)?$' | sort -r --version-sort | head -n1)"
+      # python@3.11
+      latest_semver="$(brew info --json "${latest}" | jq -r '(.[] | .versions.stable )')"
+      # 3.11.0
+      version="$(cut -d '.' -f 1,2 <<< "${latest_semver}")"
+      # 3.11
+
+      HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew uninstall \
+        --ignore-dependencies \
+        "python@${installed_version}"
+
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew install \
+        --ignore-dependencies \
+        "python@${version}"
+
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))" "$PYENV_ROOT/versions/${version}"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/Frameworks/Python.framework/Versions/${version}/include/python${version}" "$(realpath $(brew --prefix "python@${version}"))/include"
+      pyenv global "${version}" system
+
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/idle"
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/pip"
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/python"
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/wheel"
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/pydoc"
+      rm --force "$(realpath $(brew --prefix "python@${installed_version}"))/bin/python-config"
+
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/idle${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/idle"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/idle${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/idle3"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/pip${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/pip"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/pip${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/pip3"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/python${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/python"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/python${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/python3"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/wheel"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/wheel3"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/pydoc"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/pydoc3"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/python-config"
+      ln -sfv "$(realpath $(brew --prefix "python@${version}"))/bin/wheel${version}" "$(realpath $(brew --prefix "python@${version}"))/bin/python3-config"
+      pyenv rehash
+
+      ls -al "${PYENV_ROOT}/versions"
+      pip3 install -r "${TMPDIR}/requirements.txt"
+      ;;
+    *)
+      HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew uninstall \
+        --ignore-dependencies \
+        "${item}"
+
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew install \
+        --ignore-dependencies \
+        "${item}"
+  esac
+}
+__brew_complete bu _brew_install
+
 bout() {
     __brew_c outdated "$@"
 }
 __brew_complete bout _brew_outdated
 
 bi() {
-    __brew_c install "$@"
+  __brew_c install "$@"
 }
 __brew_complete bi _brew_install
 
