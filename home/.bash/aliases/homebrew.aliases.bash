@@ -51,7 +51,7 @@ bup() {
             --ignore-dependencies \
             --build-from-source \
             "${item}"
-        ;;&
+        ;;
         emacs-plus@*)
           version=$(echo "${item}" | cut -d@ -f2)
           pkg=$(echo "${item}" | cut -d@ -f1)

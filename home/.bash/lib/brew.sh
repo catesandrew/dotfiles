@@ -774,7 +774,7 @@ run_brew() {
       'exact-image'
       'enscript'
       'enca'
-      'emacs-plus'
+      'emacs-plus@29'
       'tre'
       'felinks'
       'editorconfig'
@@ -978,8 +978,8 @@ run_brew() {
               --ignore-dependencies \
               --build-from-source \
               "${item}"
-            ;;&
-          emacs-plus)
+            ;;
+          emacs-plus@29)
             # emacs-plus issues with daemon mode, better color emoji support
             HOMEBREW_NO_INSTALL_CLEANUP=1 \
               LIBRARY_PATH="$(brew --prefix)/lib" \
