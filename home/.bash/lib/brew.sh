@@ -79,6 +79,7 @@ run_brew() {
     local -a desired_taps=(
       'borkdude/brew'
       'bramstein/webfonttools'
+      'catesandrew/tap'
       'clojure/tools'
       'cloudfoundry/tap'
       'd12frosted/emacs-plus'
@@ -861,6 +862,10 @@ run_brew() {
       'ack'
       'lsd'
       'difftastic'
+      'libimobiledevice-glue'
+      'libusbmuxd'
+      'libimobiledevice'
+      'ideviceinstaller'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -903,31 +908,30 @@ run_brew() {
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install cpan --ignore-dependencies
             PERL_MM_OPT="INSTALL_BASE=$HOME/perl5" cpan install local::lib
             ;;
+          libimobiledevice-glue)
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              brew install \
+              --ignore-dependencies \
+              --HEAD \
+              catesandrew/tap/libimobiledevice-glue
+            ;;
+          libusbmuxd)
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              brew install \
+              --HEAD \
+              catesandrew/tap/libusbmuxd
+            ;;
           libimobiledevice)
-            # cp libimobiledevice-glue.rb /opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula/libimobiledevice-glue.rb
-            # PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
-            # brew install --HEAD libimobiledevice-glue --ignore-dependencies
-            # brew edit libimobiledevice
-            # 31 depends_on "libimobiledevice-glue"
-
-            # brew edit libusbmuxd
-            # 26 depends_on "libimobiledevice-glue"
-
-            # exporrt PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
-            # brew install --HEAD --ignore-dependencies libusbmuxd
-
-            # ./autogen.sh --prefix=/opt/homebrew
-            # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
-            # make install
-
-            # export LD_LIBRARY_PATH="${BREW_HOME}/opt/openssl/lib:$LD_LIBRARY_PATH"
-            # export CPATH="${BREW_HOME}/opt/openssl/include:$CPATH"
-            # export LIBRARY_PATH="${BREW_HOME}/opt/openssl/lib:$LIBRARY_PATH"
-            # export PKG_CONFIG_PATH="${BREW_HOME}/opt/openssl/lib/pkgconfig"
-            # brew install --HEAD --ignore-dependencies libimobiledevice
-            # ./autogen.sh --prefix=/opt/homebrew
-            # ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew --without-cython --enable-debug-code --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
-            # make install
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              brew install \
+              --HEAD \
+              catesandrew/tap/libimobiledevice
+            ;;
+          ideviceinstaller)
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              brew install \
+              --HEAD \
+              catesandrew/tap/ideviceinstaller
             ;;
           ruby@3)
             rbenv uninstall 3.1
