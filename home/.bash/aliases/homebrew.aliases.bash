@@ -246,13 +246,10 @@ bu() {
     fi
   done
 
-  # echo $last
-  # echo $line
-
   echo "Upgrading '$item'"
   case "$item" in
     python3)
-      local latest latest_semver installed_semver installed_version version
+      local latest latest_semver python_semver installed_semver installed_version version
 
       mkdir -p "${PYENV_ROOT}/versions"
       pip3 freeze >| "${TMPDIR}/requirements.txt"
@@ -274,6 +271,26 @@ bu() {
       # python@3.11
       latest_semver="$(brew info --json "${latest}" | jq -r '(.[] | .versions.stable )')"
       # 3.11.0
+
+      # Now, which formula is latest? `python` or `python@3.y.z`?
+      python_semver="$(brew info --json python | jq -r '(.[] | .versions.stable )')"
+      # 3.1.2
+
+      __semver_comp $python_semver $latest_semver
+      case $? in
+        0)
+        # they are the same
+        ;;
+        1)
+          # `python` is greater semver, $1 > $2
+          latest_semver=$python_semver
+          latest=python
+          ;;
+        2)
+          # `python@3.y` is greater semver, $1 < $2
+          ;;
+      esac
+
       version="$(cut -d '.' -f 1,2 <<< "${latest_semver}")"
       # 3.11
 
@@ -286,7 +303,7 @@ bu() {
         HOMEBREW_NO_AUTO_UPDATE=1 \
         brew install \
         --ignore-dependencies \
-        "python@${version}"
+        "$latest"
 
       ln -sfv "$(realpath $(brew --prefix "python@${version}"))" "$PYENV_ROOT/versions/${version}"
       ln -sfv "$(realpath $(brew --prefix "python@${version}"))/Frameworks/Python.framework/Versions/${version}/include/python${version}" "$(realpath $(brew --prefix "python@${version}"))/include"
@@ -315,6 +332,69 @@ bu() {
 
       ls -al "${PYENV_ROOT}/versions"
       pip3 install -r "${TMPDIR}/requirements.txt"
+      ;;
+    ruby)
+      local latest latest_semver ruby_semver installed_semver installed_version version
+
+      mkdir -p "${RBENV_ROOT}/versions"
+
+      if [ -f "${RBENV_ROOT}/version" ]; then
+        installed_version=$(head -1 "${RBENV_ROOT}/version")
+        # 3.1
+      fi
+      if [ -n $installed_version ]; then
+        yes | rbenv uninstall $installed_version
+        rbenv rehash
+      fi
+
+      installed_semver="$(brew info --json ruby | jq -r '(.[] | .versions.stable )')"
+      # 3.1.2
+      installed_version="$(cut -d '.' -f 1,2 <<< "${installed_semver}")"
+      # 3.1
+
+      latest="$(brew search ruby | \grep -E '^ruby(@.*)?$' | sort -r --version-sort | head -n1)"
+      # ruby@3.0
+      latest_semver="$(brew info --json "${latest}" | jq -r '(.[] | .versions.stable )')"
+      # 3.0.4
+
+      # Now, which formula is latest? `ruby` or `ruby@3.y.z`?
+      ruby_semver="$(brew info --json ruby | jq -r '(.[] | .versions.stable )')"
+      # 3.1.2
+
+      __semver_comp $ruby_semver $latest_semver
+      case $? in
+        0)
+          # they are the same
+          ;;
+        1)
+          # `ruby` is greater semver, $1 > $2
+          latest_semver=$ruby_semver
+          latest=ruby
+          ;;
+        2)
+          # `ruby@3.y.z` is greater semver, $1 < $2
+          ;;
+      esac
+
+      version="$(cut -d '.' -f 1,2 <<< "${latest_semver}")"
+      # 3.1
+
+      HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew uninstall \
+        --ignore-dependencies \
+        "ruby@${installed_version}"
+
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew install \
+        --ignore-dependencies \
+        "$latest"
+
+      ln -sfv "$(realpath $(brew --prefix "ruby@${version}"))" "$RBENV_ROOT/versions/${version}"
+      rbenv global "${version}" system
+      rbenv rehash
+
+      ls -al "${RBENV_ROOT}/versions"
       ;;
     *)
       HOMEBREW_NO_AUTO_UPDATE=1 \
