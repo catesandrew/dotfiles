@@ -52,7 +52,7 @@ bup() {
             --build-from-source \
             "${item}"
         ;;
-        emacs-plus@*)
+        d12frosted/emacs-plus/emacs-plus@*)
           version=$(echo "${item}" | cut -d@ -f2)
           pkg=$(echo "${item}" | cut -d@ -f1)
           major=$(echo "$version" | cut -d. -f1)
