@@ -40,12 +40,14 @@ bup() {
       case "$item" in
         gcc|libgccjit)
           # for emacs-plus native-comp support
+          HOMEBREW_NO_INSTALL_UPGRADE=1 \
           HOMEBREW_NO_AUTO_UPDATE=1 \
             brew uninstall \
             --ignore-dependencies \
             "${item}"
 
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -58,6 +60,7 @@ bup() {
           major=$(echo "$version" | cut -d. -f1)
           installed_version="$(brew info --json "${pkg}@${major}" | jq -r '(.[] | .versions.stable )')"
 
+          HOMEBREW_NO_INSTALL_UPGRADE=1 \
           HOMEBREW_NO_AUTO_UPDATE=1 \
             brew uninstall \
             --ignore-dependencies \
@@ -65,6 +68,7 @@ bup() {
 
           # emacs-plus issues with daemon mode, better color emoji support
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -78,16 +82,19 @@ bup() {
           ;;
         bash)
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew upgrade \
             bash
           ;;
         wget)
+          HOMEBREW_NO_INSTALL_UPGRADE=1 \
           HOMEBREW_NO_AUTO_UPDATE=1 \
             brew uninstall \
             --ignore-dependencies "${item}"
 
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -99,12 +106,14 @@ bup() {
           # source, it has been forked and renamed to Universal Ctags
           # and can be found at universal-ctags/ctags.
           HOMEBREW_NO_AUTO_UPDATE=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             brew uninstall \
             --ignore-dependencies \
             universal-ctags/universal-ctags/universal-ctags
 
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             brew install \
             --ignore-dependencies \
             --HEAD \
@@ -133,12 +142,14 @@ bup() {
 
           # Now we uninstall the old version of ruby in homebrew
           HOMEBREW_NO_AUTO_UPDATE=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             brew uninstall \
             --ignore-dependencies \
             "${pkg}@${installed_version}"
 
           # Now install the new version through the update command
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -166,11 +177,13 @@ bup() {
           installed_version="$(brew info --json "${pkg}@${major}" | jq -r '(.[] | .versions.stable )')"
 
           HOMEBREW_NO_AUTO_UPDATE=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             brew uninstall \
             --ignore-dependencies \
             "${pkg}@${installed_version}"
 
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -201,11 +214,13 @@ bup() {
           ;;
         *)
           HOMEBREW_NO_AUTO_UPDATE=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             brew uninstall \
             --ignore-dependencies \
             "${item}"
 
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+            HOMEBREW_NO_INSTALL_UPGRADE=1 \
             HOMEBREW_NO_AUTO_UPDATE=1 \
             brew install \
             --ignore-dependencies \
@@ -213,7 +228,9 @@ bup() {
         esac
     done
 
-    HOMEBREW_NO_INSTALL_CLEANUP=1 brew cleanup --prune=1
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+      HOMEBREW_NO_INSTALL_CLEANUP=1 \
+      brew cleanup --prune=1
   else
     echo "No Updates Found"
   fi
@@ -225,10 +242,14 @@ bup() {
 
     for f in $(echo "$cask_outdated_list"); do
       echo "Reinstalling '$f'"
-      HOMEBREW_NO_AUTO_UPDATE=1 brew reinstall --cask "$f"
+      HOMEBREW_NO_INSTALL_UPGRADE=1 \
+        HOMEBREW_NO_AUTO_UPDATE=1 \
+        brew reinstall --cask "$f"
     done
 
-    HOMEBREW_NO_INSTALL_CLEANUP=1 brew cleanup --prune=1
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+      HOMEBREW_NO_INSTALL_CLEANUP=1 \
+      brew cleanup --prune=1
   else
     echo "No Cask Updates Found"
   fi
@@ -295,11 +316,13 @@ bu() {
       # 3.11
 
       HOMEBREW_NO_AUTO_UPDATE=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         brew uninstall \
         --ignore-dependencies \
         "python@${installed_version}"
 
       HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         HOMEBREW_NO_AUTO_UPDATE=1 \
         brew install \
         --ignore-dependencies \
@@ -380,11 +403,13 @@ bu() {
       # 3.1
 
       HOMEBREW_NO_AUTO_UPDATE=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         brew uninstall \
         --ignore-dependencies \
         "ruby@${installed_version}"
 
       HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         HOMEBREW_NO_AUTO_UPDATE=1 \
         brew install \
         --ignore-dependencies \
@@ -398,11 +423,13 @@ bu() {
       ;;
     *)
       HOMEBREW_NO_AUTO_UPDATE=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         brew uninstall \
         --ignore-dependencies \
         "${item}"
 
       HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+        HOMEBREW_NO_INSTALL_UPGRADE=1 \
         HOMEBREW_NO_AUTO_UPDATE=1 \
         brew install \
         --ignore-dependencies \
