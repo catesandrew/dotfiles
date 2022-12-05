@@ -12,7 +12,7 @@ if brew_contains_element "openssh" || \
   # starts another one.
   function start_agent {
     echo "Initialising new SSH agent..."
-    (umask 066; ${BREW_HOME}/bin/ssh-agent > "${SSH_ENV}")
+    (umask 066; ${BREW_HOME}/bin/ssh-agent >| "${SSH_ENV}")
     . "${SSH_ENV}" > /dev/null
     ${BREW_HOME}/bin/ssh-add
   }
