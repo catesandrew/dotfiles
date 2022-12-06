@@ -17,6 +17,23 @@ __brew_c() {
   brew "$@"
 }
 
+__brew_install() {
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    HOMEBREW_NO_AUTO_UPDATE=1 \
+    __brew_c install \
+    --ignore-dependencies \
+    "$@"
+}
+
+__brew_uninstall() {
+  HOMEBREW_NO_AUTO_UPDATE=1 \
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    __brew_c uninstall \
+    --ignore-dependencies \
+    "$@"
+}
+
 _completion_loader brew
 
 b() {
@@ -66,36 +83,19 @@ bup() {
             bash
           ;;
         wget)
-          HOMEBREW_NO_INSTALL_UPGRADE=1 \
-          HOMEBREW_NO_AUTO_UPDATE=1 \
-            brew uninstall \
-            --ignore-dependencies "${item}"
-
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-            HOMEBREW_NO_INSTALL_UPGRADE=1 \
-            HOMEBREW_NO_AUTO_UPDATE=1 \
-            brew install \
-            --ignore-dependencies \
-            --HEAD \
-            "${item}"
+          __brew_uninstall "${item}"
+          __brew_install --HEAD "${item}"
           ;;
         universal-ctags)
           # Given the lack of activity on the official Exuberant Ctags
           # source, it has been forked and renamed to Universal Ctags
           # and can be found at universal-ctags/ctags.
-          HOMEBREW_NO_AUTO_UPDATE=1 \
-            HOMEBREW_NO_INSTALL_UPGRADE=1 \
-            brew uninstall \
-            --ignore-dependencies \
-            universal-ctags/universal-ctags/universal-ctags
-
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-            HOMEBREW_NO_AUTO_UPDATE=1 \
-            HOMEBREW_NO_INSTALL_UPGRADE=1 \
-            brew install \
-            --ignore-dependencies \
-            --HEAD \
-            universal-ctags/universal-ctags/universal-ctags
+          __brew_uninstall universal-ctags/universal-ctags/universal-ctags
+          __brew_install --HEAD universal-ctags/universal-ctags/universal-ctags
+          ;;
+        ruby-build)
+          __brew_uninstall "${item}"
+          __brew_install --HEAD "${item}"
           ;;
         ruby*)
           source "${BASH_IT}/lib/formula-helpers.bash"
@@ -106,18 +106,8 @@ bup() {
           __formula_python
           ;;
         *)
-          HOMEBREW_NO_AUTO_UPDATE=1 \
-            HOMEBREW_NO_INSTALL_UPGRADE=1 \
-            brew uninstall \
-            --ignore-dependencies \
-            "${item}"
-
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-            HOMEBREW_NO_INSTALL_UPGRADE=1 \
-            HOMEBREW_NO_AUTO_UPDATE=1 \
-            brew install \
-            --ignore-dependencies \
-            "${item}"
+          __brew_uninstall "${item}"
+          __brew_install "${item}"
         esac
     done
 
@@ -175,18 +165,8 @@ bu() {
       __formula_ruby
       ;;
     *)
-      HOMEBREW_NO_AUTO_UPDATE=1 \
-        HOMEBREW_NO_INSTALL_UPGRADE=1 \
-        brew uninstall \
-        --ignore-dependencies \
-        "${item}"
-
-      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-        HOMEBREW_NO_INSTALL_UPGRADE=1 \
-        HOMEBREW_NO_AUTO_UPDATE=1 \
-        brew install \
-        --ignore-dependencies \
-        "${item}"
+      __brew_uninstall "${item}"
+      __brew_install "${item}"
   esac
 }
 __brew_complete bu _brew_install
@@ -223,12 +203,7 @@ bi() {
       __formula_ruby
       ;;
     *)
-      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-        HOMEBREW_NO_INSTALL_UPGRADE=1 \
-        HOMEBREW_NO_AUTO_UPDATE=1 \
-        __brew_c install \
-        --ignore-dependencies \
-        "${item}"
+      __brew_install "${item}"
   esac
 }
 __brew_complete bi _brew_install
