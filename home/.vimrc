@@ -121,36 +121,144 @@ if filereadable(s:localrc)
 endif
 " }}}
 
+call plug#begin()
+" The default plugin directory will be as follows:
+"   - Vim (Linux/macOS): '~/.vim/plugged'
+"   - Vim (Windows): '~/vimfiles/plugged'
+"   - Neovim (Linux/macOS/Windows): stdpath('data') . '/plugged'
+" You can specify a custom plugin directory by passing it as the argument
+"   - e.g. `call plug#begin('~/.vim/plugged')`
+"   - Avoid using standard Vim directory names like 'plugin'
+
+" Make sure you use single quotes
+
+" On-demand loading
+Plug 'mileszs/ack.vim'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-fugitive'
+Plug 'altercation/vim-colors-solarized'
+Plug 'othree/html5.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'tpope/vim-vividchalk'
+Plug 'tpope/vim-markdown'
+Plug 'tpope/vim-unimpaired'
+Plug 'scrooloose/syntastic'
+Plug 'leshill/vim-json'
+Plug 'tomtom/tlib_vim'
+" Plug 'tpope/vim-pathogen'
+Plug 'Lokaltog/vim-easymotion'
+Plug 'vim-scripts/YankRing.vim'
+Plug 'ap/vim-css-color'
+Plug 'nono/vim-handlebars'
+Plug 'wavded/vim-stylus'
+Plug 'juvenn/mustache'
+Plug 'airblade/vim-rooter'
+Plug 'godlygeek/tabular'
+Plug 'digitaltoad/vim-jade'
+Plug 'vim-scripts/FIGlet.vim'
+Plug 'mattn/emmet-vim'
+Plug 'xolox/vim-misc'
+Plug 'xolox/vim-session'
+Plug 'maksimr/vim-jsbeautify'
+Plug 'jngeist/vim-multimarkdown'
+Plug 'bling/vim-airline'
+Plug 'vim-scripts/LargeFile'
+Plug 'kylef/apiblueprint.vim'
+Plug 'wesQ3/vim-windowswap'
+Plug 'bitc/vim-hdevtools'
+Plug 'lukerandall/haskellmode-vim'
+Plug 'eagletmt/ghcmod-vim'
+Plug 'Shougo/vimproc'
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'rodjek/vim-puppet'
+Plug 'honza/vim-snippets'
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'vim-scripts/scratch'
+Plug 'troydm/easybuffer.vim'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'tpope/vim-haml'
+Plug 'slim-template/vim-slim'
+Plug 'kchmck/vim-coffee-script'
+Plug 'Twinside/vim-syntax-haskell-cabal'
+Plug 'elixir-lang/vim-elixir'
+Plug 'fatih/vim-go'
+Plug 'kien/ctrlp.vim'
+Plug 'tpope/vim-eunuch'
+Plug 'kana/vim-textobj-user'
+Plug 'tpope/vim-fireplace'
+Plug 'thinca/vim-visualstar'
+Plug 'nanotech/jellybeans.vim'
+Plug 'jiangmiao/auto-pairs'
+Plug 'chrisbra/SudoEdit.vim'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'tpope/vim-git'
+" Plug 'Shougo/neocomplete'
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
+Plug 'tpope/vim-dispatch'
+Plug 'groenewege/vim-less'
+Plug 'cakebaker/scss-syntax.vim'
+Plug 'gregsexton/MatchTag'
+Plug 'mmalecki/vim-node.js'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-speeddating'
+Plug 'tomtom/tcomment_vim'
+Plug 'terryma/vim-expand-region'
+Plug 'justinmk/vim-sneak'
+Plug 'mbbill/undotree'
+Plug 'dkprice/vim-easygrep'
+Plug 'tacahiroy/ctrlp-funky'
+Plug 'kana/vim-textobj-indent'
+Plug 'kana/vim-textobj-entire'
+Plug 'lucapette/vim-textobj-underscore'
+Plug 'markcornick/vim-vagrant'
+Plug 'thiderman/vim-supervisor'
+Plug 'vim-scripts/plist.vim'
+Plug 'mxw/vim-jsx'
+Plug 'ingydotnet/yaml-vim'
+Plug 'Joorem/vim-haproxy'
+Plug 'chase/vim-ansible-yaml'
+Plug 'guns/vim-sexp'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'tpope/vim-rsi'
+Plug 'tmux-plugins/tpm'
+
+" On-demand loading
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+
+call plug#end()
+
 " To disable a plugin, add it's bundle name to the following list
-let g:pathogen_disabled = []
+" let g:pathogen_disabled = []
 
 " for some reason the csscolor plugin is very slow when run on the terminal
 " but not in GVim, so disable it if no GUI is running
-if !has('gui_running')
-  call add(g:pathogen_disabled, 'csscolor')
-endif
+" if !has('gui_running')
+"   call add(g:pathogen_disabled, 'csscolor')
+" endif
 
-if !s:has_lua
-  call add(g:pathogen_disabled, 'neocomplete')
-endif
+" if !s:has_lua
+"   call add(g:pathogen_disabled, 'neocomplete')
+" endif
 
-" Gundo requires at least vim 7.3
-if v:version < '703' || !has('python')
-  call add(g:pathogen_disabled, 'gundo')
-endif
+" " Gundo requires at least vim 7.3
+" if v:version < '703' || !has('python')
+"   call add(g:pathogen_disabled, 'gundo')
+" endif
 
-if v:version < '702'
-  call add(g:pathogen_disabled, 'autocomplpop')
-  call add(g:pathogen_disabled, 'fuzzyfinder')
-  call add(g:pathogen_disabled, 'l9')
-endif
+" if v:version < '702'
+"   call add(g:pathogen_disabled, 'autocomplpop')
+"   call add(g:pathogen_disabled, 'fuzzyfinder')
+"   call add(g:pathogen_disabled, 'l9')
+" endif
 
 " Use pathogen to easily modify the runtime path to include all plugins under
 " the ~/.vim/bundle directory
-filetype off                                       " force reloading *after* pathogen loaded
-silent! call pathogen#helptags()
-silent! call pathogen#infect()
-filetype plugin indent on                          " enable detection, plugins and indenting in one step
+" filetype off                                       " force reloading *after* pathogen loaded
+" silent! call pathogen#helptags()
+" silent! call pathogen#infect()
+" filetype plugin indent on                          " enable detection, plugins and indenting in one step
 
 " }}}
 " Basic options --------------------------------------------------------------- {{{
@@ -975,7 +1083,7 @@ let g:colorizer_skip_comments = 1
 " }}}
 " Ack {{{
 
-map <leader>a :Ack! 
+map <leader>a :Ack!
 if executable('ag')
     let g:ackprg = "ag --hidden --nogroup --column --smart-case --follow"
 endif
@@ -1108,7 +1216,7 @@ let g:go_disable_autoinstall = 1
 " Rooter{{{
 
 let g:rooter_patterns = ['package.json', 'bower.json', 'Jakefile.js', 'Rakefile', 'Gruntfile.js', '.git', '.git/', '.svn/']
-let g:rooter_use_lcd = 1
+let g:rooter_cd_cmd = 'lcd'
 
 " }}}
 " Fugitive {{{
@@ -1486,7 +1594,7 @@ nnoremap <leader>2 yyPVr*jyypVr*
 nnoremap <leader>3 yypVr=
 nnoremap <leader>4 yypVr-
 nnoremap <leader>5 yypVr^
-nnoremap <leader>6 yypVr"   
+nnoremap <leader>6 yypVr"
 
 " }}}
 " MacVim ---------------------------------------------------------------------- {{{
@@ -1510,7 +1618,7 @@ if has('gui_running')
     if s:is_macvim
       " set gfn=Anonymous\ Pro\ for\ Powerline:h14
       " set gfn=Hack:h12
-      set gfn=PragmataProNerdFont:h12
+      set gfn=PragmataPro\ Liga:h14 " PragmataProNerdFont:h12
       " set gfn=Hasklig:h12
       set macligatures
       set transparency=5          " Make the window slightly transparent
