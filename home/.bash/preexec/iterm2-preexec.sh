@@ -1,37 +1,46 @@
-#!/bin/bash
-# This is based on "preexec.bash" but is customized for iTerm2.
-# https://iterm2.com/misc/bash_startup.in
+#
+# iterm2-preexec.sh
+#
 
-# Note: this module requires 2 bash features which you must not otherwise be
-# using: the "DEBUG" trap, and the "PROMPT_COMMAND" variable.  iterm2_preexec_install
-# will override these and if you override one or the other this _will_ break.
+# Avoid duplicate inclusion
+if [[ "$__iterm2_imported" == "defined" ]]; then
+    return 0
+fi
+__iterm2_imported="defined"
 
-# This is known to support bash3, as well as *mostly* support bash2.05b.  It
-# has been tested with the default shells on MacOS X 10.4 "Tiger", Ubuntu 5.10
-# "Breezy Badger", Ubuntu 6.06 "Dapper Drake", and Ubuntu 6.10 "Edgy Eft".
+if [[ "$ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX""$TERM" != screen && "$ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX""$TERM" != tmux-256color && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == *i* && "$TERM" != linux && "$TERM" != dumb ]]; then
+  if shopt extdebug | grep on > /dev/null; then
+    echo "iTerm2 Shell Integration not installed."
+    echo ""
+    echo "Your shell has 'extdebug' turned on."
+    echo "This is incompatible with shell integration."
+    echo "Find 'shopt -s extdebug' in bash's rc scripts and remove it."
+    return 0
+  fi
 
-# tmux and screen are not supported; even using the tmux hack to get escape
-# codes passed through, ncurses interferes and the cursor isn't in the right
-# place at the time it's passed through.
-if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == *i* ]]; then
   ITERM_SHELL_INTEGRATION_INSTALLED=Yes
+
   # Saved copy of your PS1. This is used to detect if the user changes PS1
   # directly. ITERM_PREV_PS1 will hold the last value that this script set PS1 to
   # (including various custom escape sequences).
   ITERM_PREV_PS1="$PS1"
 
-  # This function is installed as the PROMPT_COMMAND; it is invoked before each
-  # interactive prompt display.  It sets a variable to indicate that the prompt
-  # was just displayed, to allow the DEBUG trap, below, to know that the next
-  # command is likely interactive.
-  function __iterm2_precmd () {
-   __iterm2_last_ret_value="$?"
+  if [[ -n "$PROMPT_COMMAND" ]]; then
+    PROMPT_COMMAND+=$'\n'
+  fi;
+  PROMPT_COMMAND+='__iterm2_prompt_command'
 
-    # Work around a bug in CentOS 7.2 where preexec doesn't run if you press
-    # ^C while entering a command.
+  # Prints the current directory and hostname control sequences. Modifies PS1 to
+  # add the FinalTerm A and B codes to locate the prompt.
+  function __iterm2_prompt_command () {
+    __iterm2_last_ret_value="$?"
+
     if [[ -z "${iterm2_ran_preexec:-}" ]]
     then
-        __iterm2_preexec ""
+      # This code path is taken when you press ^C while entering a command.
+      # I observed this behavior in CentOS 7.2 and macOS "GNU bash, version 5.0.18(1)-release".
+      __iterm2_preexec ""
+      __bp_set_ret_value "$__iterm2_last_ret_value" "$__bp_last_argument_prev_command"
     fi
     iterm2_ran_preexec=""
 
@@ -68,6 +77,15 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
       export ITERM_ORIG_PS1="$PS1"
     fi
 
+    # If you want to generate PS1 dynamically from PROMPT_COMMAND, the best way
+    # to do it is to define a function named iterm2_generate_ps1 that sets PS1.
+    # Issue 5964. Other shells don't have this issue because they don't need
+    # such extremes to get precmd and preexec.
+    if [ -n "$(type -t iterm2_generate_ps1)" ] && [ "$(type -t iterm2_generate_ps1)" = function ]; then
+      iterm2_generate_ps1
+    fi
+
+
     if [[ "$PS1" != "$ITERM_PREV_PS1" ]]
     then
       export ITERM_ORIG_PS1="$PS1"
@@ -77,7 +95,7 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
     \local iterm2_prompt_prefix_value="$(iterm2_prompt_prefix)"
 
     # Add the mark unless the prompt includes '$(iterm2_prompt_mark)' as a substring.
-    if [[ $ITERM_ORIG_PS1 != *'$(iterm2_prompt_mark)'* ]]
+    if [[ $ITERM_ORIG_PS1 != *'$(iterm2_prompt_mark)'* && x$ITERM2_SQUELCH_MARK = x ]]
     then
       iterm2_prompt_prefix_value="$iterm2_prompt_prefix_value$(iterm2_prompt_mark)"
     fi
@@ -94,7 +112,6 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
     # Save the value we just set PS1 to so if the user changes PS1 we'll know and we can update ITERM_ORIG_PS1.
     export ITERM_PREV_PS1="$PS1"
     __bp_set_ret_value "$__iterm2_last_ret_value" "$__bp_last_argument_prev_command"
-
   }
 
   # This function is installed as the DEBUG trap.  It is invoked before each
@@ -107,6 +124,7 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
 
     iterm2_begin_osc
     printf "133;C;"
+    iterm2_maybe_print_cr
     iterm2_end_osc
     # If PS1 still has the value we set it to in iterm2_preexec_invoke_cmd then
     # restore it to its original value. It might have changed if you have
@@ -116,8 +134,8 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
       export PS1="$ITERM_ORIG_PS1"
     fi
     iterm2_ran_preexec="yes"
-
-    __bp_set_ret_value "$__iterm2_last_ret_value" "$__bp_last_argument_prev_command"
+    # preexec functions can return nonzero to prevent user's command from running.
+    return 0
   }
 
   # We don't care about whitespace, but users care about not changing their histcontrol variables.
@@ -136,8 +154,12 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
   }
 
   function iterm2_print_state_data() {
+    local _iterm2_hostname="${iterm2_hostname}"
+    if [ -z "${iterm2_hostname:-}" ]; then
+      _iterm2_hostname=$(hostname -f 2>/dev/null)
+    fi
     iterm2_begin_osc
-    printf "1337;RemoteHost=%s@%s" "$USER" "$iterm2_hostname"
+    printf "1337;RemoteHost=%s@%s" "$USER" "$_iterm2_hostname"
     iterm2_end_osc
 
     iterm2_begin_osc
@@ -160,16 +182,7 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
     # Users can write their own version of this function. It should call
     # iterm2_set_user_var but not produce any other output.
     function iterm2_print_user_vars() {
-      # For every function defined in our function array. Invoke it.
-      local iterm2_function
-      for iterm2_function in "${iterm2_print_user_vars_functions[@]}"; do
-
-        # Only execute this function if it actually exists.
-        # Test existence of functions with: declare -[Ff]
-        if type -t "$iterm2_function" 1>/dev/null; then
-          $iterm2_function
-        fi
-      done
+      true
     }
   fi
 
@@ -193,21 +206,33 @@ if [[ "$TERM" != screen && "$ITERM_SHELL_INTEGRATION_INSTALLED" = "" && "$-" == 
 
   function iterm2_print_version_number() {
     iterm2_begin_osc
-    printf "1337;ShellIntegrationVersion=9;shell=bash"
+    printf "1337;ShellIntegrationVersion=18;shell=bash"
     iterm2_end_osc
   }
 
   # If hostname -f is slow on your system, set iterm2_hostname before sourcing this script.
+  # On macOS we run `hostname -f` every time because it is fast.
   if [ -z "${iterm2_hostname:-}" ]; then
-    iterm2_hostname=$(hostname -f 2>/dev/null)
-    # some flavors of BSD (i.e. NetBSD and OpenBSD) don't have the -f option
-    if [ $? -ne 0 ]; then
-      iterm2_hostname=$(hostname)
+    if [ "$(uname)" != "Darwin" ]; then
+      iterm2_hostname=$(hostname -f 2>/dev/null)
+      # some flavors of BSD (i.e. NetBSD and OpenBSD) don't have the -f option
+      if [ $? -ne 0 ]; then
+        iterm2_hostname=$(hostname)
+      fi
     fi
   fi
-  # iterm2_preexec_install
 
-  # This is necessary so the first command line will have a hostname and current directory.
-  # iterm2_print_state_data
-  # iterm2_print_version_number
+  iterm2_maybe_print_cr() {
+    if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
+      printf "\r"
+    fi
+  }
+
+  # Install my function
+  if ! contains_element __iterm2_preexec "${preexec_functions[@]}"; then
+    preexec_functions+=(__iterm2_preexec)
+  fi
+
+  iterm2_print_state_data
+  iterm2_print_version_number
 fi

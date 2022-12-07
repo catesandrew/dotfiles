@@ -397,7 +397,6 @@ PREVIEW="less"
 [ -s /Applications/Preview.app ] && PREVIEW="/Applications/Preview.app"
 export PREVIEW
 
-# TODO: Add preexec to time machine node_modules folders
 function title {
   true # no op
 }
@@ -412,18 +411,6 @@ function precmd () {
     true
 }
 
-function iterm2_preexec_hook() {
-    . "${BASH_IT}/preexec/iterm2-preexec.sh"
-
-    preexec_functions+=(__iterm2_preexec)
-    precmd_functions+=(__iterm2_precmd)
-
-    # This is necessary so the first command line will have a hostname and
-    # current directory.
-    iterm2_print_state_data
-    iterm2_print_version_number
-}
-
 if __environment_variable_exists INSIDE_EMACS; then
   if [[ $INSIDE_EMACS == *"term"* ]]; then
     # support for term-mode
@@ -433,8 +420,6 @@ if __environment_variable_exists INSIDE_EMACS; then
     true
   fi
 else
-  # https://github.com/rcaloras/bash-preexec
-  # TODO: Migrate to brew `bash-preexec`
   . "${BASH_IT}/preexec/bash-preexec.sh"
   . "${BASH_IT}/preexec/npm-preexec.sh"
   . "${BASH_IT}/preexec/yarn-preexec.sh"
@@ -442,16 +427,14 @@ else
   if brew_contains_element "direnv"; then
     . "${BASH_IT}/preexec/direnv-preexec.sh"
   fi
+  . "${BASH_IT}/preexec/iterm2-preexec.sh"
 
   if [ "${TERM_PROGRAM:-""}" != "" ]; then
     if [ "$TERM_PROGRAM" == "iTerm.app" ]; then
-      iterm2_preexec_hook
       function title {
         echo -ne "\033]0;"$*"\007"
       }
     fi
-  elif [ -n "$SESSION_TYPE" ]; then
-    iterm2_preexec_hook
   fi
 fi
 

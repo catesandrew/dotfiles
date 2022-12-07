@@ -124,7 +124,7 @@ bup() {
     echo "found: $cask_outdated_list"
 
     for f in $(echo "$cask_outdated_list"); do
-      echo "Reinstalling '$f'"
+      echo "Reinstalling Cask '$f'"
       HOMEBREW_NO_INSTALL_UPGRADE=1 \
         HOMEBREW_NO_AUTO_UPDATE=1 \
         brew reinstall --cask "$f"
