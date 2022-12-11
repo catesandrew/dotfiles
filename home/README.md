@@ -26,6 +26,35 @@ So it was a quick fix:
 
 Then I updated my `$HOME/.bash_profile` to change the `ulimit` directive to match that last command, above, and I was back in business.
 
+##  Terminal
+
+To enable true color use:
+
+```
+tic -x -o ~/.terminfo xterm-24bit.terminfo
+```
+
+And then:
+
+```
+export TERM=xterm-24bit
+```
+
+Add the following to the tmux config:
+
+```
+set -g default-terminal "xterm-24bit"
+set -g terminal-overrides ',xterm-24bit:Tc'
+```
+
+And add:
+
+```
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+```
+
 ## GPG
 
 Let's setup GPG for commit signing and other shenanigans.
