@@ -33,7 +33,7 @@
 # OSX generated files #
 ######################
 .DS_Store
-Icon?
+# Icon?
 
 # Thumbnails
 ._*

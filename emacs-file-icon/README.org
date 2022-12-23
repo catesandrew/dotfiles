@@ -1,0 +1,21 @@
+#+TITLE: Emacs file icons
+
+[[./misc/icon.png]]
+[[./misc/icon-flat.png]]
+
+* To use
+- copy all the icons under either =/icns= or =/icns-flat= to =/Applications/Emacs.app/Contents/Resources=
+  
+- open =/src/Info.plist.new=, copy the data under =CFBundleDocumentTypes= (it might be displayed as "Document types") 
+  to =/Applications/Emacs.app/Contents/Info.plist=
+  
+- make mac refresh the icon for files, you can try toggling "Show icon preview" in view options in Finder.
+  
+
+* To generate
+
+Run ./src/make-icons.sh
+
+awk '/CFBundleTypeExtensions/{t=1} /<\/array>/{t=0} t&&/<string>/{gsub(/\t*<\/?string>/,"");print}' ./emacs-file-icon/src/Info.plist.new | xargs -L 1 -I "{}" duti -x {}
+
+awk '/CFBundleTypeExtensions/{t=1} /<\/array>/{t=0} t&&/<string>/{gsub(/\t*<\/?string>/,"");print}' ./emacs-file-icon/src/Info.plist.new | xargs -L 1 -I "{}" echo 'duti -s org.acates.EmacsClient {}'
