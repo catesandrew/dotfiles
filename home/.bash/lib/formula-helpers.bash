@@ -116,19 +116,21 @@ __formula_python() {
   yes | pyenv uninstall $PYENV_VERSION
   pyenv rehash
 
-  installed_semver="$(brew info --json python@3 | jq -r '(.[] | .versions.stable )')"
-  # 3.10.8
+  latest_versioned_formulae="$(brew info --json python@3 | jq -r '(.[] | .versioned_formulae | first )')"
+  # python@3.11
+  installed_semver="$(brew info --json "$latest_versioned_formulae" | jq -r '(.[] | .versions.stable )')"
+  # 3.11.1
   installed_version="$(cut -d '.' -f 1,2 <<< "${installed_semver}")"
-  # 3.10
+  # 3.11
 
   latest="$(brew search python@3 | \grep -E '^python(@.*)?$' | sort -r --version-sort | head -n1)"
   # python@3.11
   latest_semver="$(brew info --json "${latest}" | jq -r '(.[] | .versions.stable )')"
-  # 3.11.0
+  # 3.11.1
 
   # Now, which formula is latest? `python` or `python@3.y.z`?
   python_semver="$(brew info --json python | jq -r '(.[] | .versions.stable )')"
-  # 3.1.2
+  # 3.10.9
 
   __semver_comp $python_semver $latest_semver
   case $? in
