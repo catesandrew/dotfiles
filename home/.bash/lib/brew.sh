@@ -576,7 +576,6 @@ run_brew() {
       'pdfgrep'
       'pdfcrack'
       'pdf2svg'
-      'passpie'
       'pass'
       'par'
       'pandoc-crossref'
