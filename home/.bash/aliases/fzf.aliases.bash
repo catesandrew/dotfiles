@@ -48,28 +48,28 @@ fo() {
 ### Changing directory
 
 # fd - cd to selected directory
-fd() {
-  local dir
-  dir=$(find ${1:-*} -path '*/\.*' -prune \
-                  -o -type d -print 2> /dev/null | fzf +m) &&
-  cd "$dir"
-}
+# fd() {
+#   local dir
+#   dir=$(find ${1:-*} -path '*/\.*' -prune \
+#                   -o -type d -print 2> /dev/null | fzf +m) &&
+#   cd "$dir"
+# }
 
 # fda - including hidden directories
-fda() {
-  local dir
-  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
-}
+# fda() {
+#   local dir
+#   dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
+# }
 
 # Suggested by [@harelba](https://github.com/harelba) and
 # [@dimonomid](https://github.com/dimonomid):
 
 # fcd - cd into the directory of the selected file
-fcd() {
-   local file
-   local dir
-   file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
-}
+# fcd() {
+#    local file
+#    local dir
+#    file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
+# }
 
 ### Searching file contents
 
@@ -125,7 +125,7 @@ fkill() {
 ### Git
 
 # fbr - checkout git branch
-fbr() {
+fgbr() {
   local branches branch
   branches=$(git branch) &&
   branch=$(echo "$branches" | fzf +m) &&
@@ -133,7 +133,7 @@ fbr() {
 }
 
 # fbr - checkout git branch (including remote branches)
-fbr() {
+fgbra() {
   local branches branch
   branches=$(git branch --all | grep -v HEAD) &&
   branch=$(echo "$branches" |
@@ -142,7 +142,7 @@ fbr() {
 }
 
 # fco - checkout git branch/tag
-fco() {
+fgco() {
   local tags branches target
   tags=$(
     git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
@@ -157,7 +157,7 @@ fco() {
 }
 
 # fcoc - checkout git commit
-fcoc() {
+fgcoc() {
   local commits commit
   commits=$(git log --pretty=oneline --abbrev-commit --reverse) &&
   commit=$(echo "$commits" | fzf --tac +s +m -e) &&
@@ -180,7 +180,7 @@ fshow() {
 ### Tags
 
 # ftags - search ctags
-ftags() {
+fgtags() {
   local line
   [ -e tags ] &&
   line=$(
@@ -195,31 +195,31 @@ ftags() {
 # fs [FUZZY PATTERN] - Select selected tmux session
 #   - Bypass fuzzy finder if there's only one match (--select-1)
 #   - Exit if there's no match (--exit-0)
-fs() {
-  local session
-  session=$(tmux list-sessions -F "#{session_name}" | \
-    fzf --query="$1" --select-1 --exit-0) &&
-  tmux switch-client -t "$session"
-}
+# fs() {
+#   local session
+#   session=$(tmux list-sessions -F "#{session_name}" | \
+#     fzf --query="$1" --select-1 --exit-0) &&
+#   tmux switch-client -t "$session"
+# }
 
 # ftpane - switch pane
-ftpane () {
-  local panes current_window target target_window target_pane
-  panes=$(tmux list-panes -s -F '#I:#P - #{pane_current_path} #{pane_current_command}')
-  current_window=$(tmux display-message  -p '#I')
-
-  target=$(echo "$panes" | fzf) || return
-
-  target_window=$(echo $target | awk 'BEGIN{FS=":|-"} {print$1}')
-  target_pane=$(echo $target | awk 'BEGIN{FS=":|-"} {print$2}' | cut -c 1)
-
-  if [[ $current_window -eq $target_window ]]; then
-    tmux select-pane -t ${target_window}.${target_pane}
-  else
-    tmux select-pane -t ${target_window}.${target_pane} &&
-    tmux select-window -t $target_window
-  fi
-}
+# ftpane () {
+#   local panes current_window target target_window target_pane
+#   panes=$(tmux list-panes -s -F '#I:#P - #{pane_current_path} #{pane_current_command}')
+#   current_window=$(tmux display-message  -p '#I')
+#
+#   target=$(echo "$panes" | fzf) || return
+#
+#   target_window=$(echo $target | awk 'BEGIN{FS=":|-"} {print$1}')
+#   target_pane=$(echo $target | awk 'BEGIN{FS=":|-"} {print$2}' | cut -c 1)
+#
+#   if [[ $current_window -eq $target_window ]]; then
+#     tmux select-pane -t ${target_window}.${target_pane}
+#   else
+#     tmux select-pane -t ${target_window}.${target_pane} &&
+#     tmux select-window -t $target_window
+#   fi
+# }
 
 ### v
 # Inspired by [v](https://github.com/rupa/v). Opens files in ~/.viminfo
@@ -319,9 +319,9 @@ c() {
 ### RVM
 
 # RVM integration
-frb() {
-  local rb
-  rb=$((echo system; rvm list | grep ruby | cut -c 4-) |
-       awk '{print $1}' |
-       fzf-tmux -l 30 +m --reverse) && rvm use $rb
-}
+# frb() {
+#   local rb
+#   rb=$((echo system; rvm list | grep ruby | cut -c 4-) |
+#        awk '{print $1}' |
+#        fzf-tmux -l 30 +m --reverse) && rvm use $rb
+# }
