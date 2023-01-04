@@ -1,8 +1,9 @@
-# /usr/local/work/lmp
-
 if [[ $USER == 'az6806' ]]; then
     CDC_DIRS=(
         /usr/local/work
+        /usr/local/work/common-components/packages
+        /usr/local/work/redux
+        /usr/local/work/react-native
     )
 else
     CDC_DIRS=(
