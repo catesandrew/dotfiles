@@ -39,18 +39,6 @@ contains_element () {
   e_warning "Missing formula: $f" && return 1
 }
 
-# Test whether a Homebrew formula is already installed
-# $1 - formula name (may include options)
-formula_exists() {
-  if $(brew list "$1" >/dev/null); then
-    e_success "$1 already installed."
-    return 0
-  fi
-
-  e_warning "Missing formula: $1"
-  return 1
-}
-
 # Test whether a command exists
 # $1 - cmd to test
 type_exists() {
@@ -152,7 +140,7 @@ run_brew() {
     [[ $? ]] && e_success "Done"
 
     e_header "Checking status of desired Homebrew formulae..."
-    local __brew_list=($(brew list | sed 's/:.*//'))
+    local __brew_list=($(brew list --formula | sed 's/:.*//'))
 
     # Use the following to build list ordered by dependencies
     # brew list --formula \
@@ -328,7 +316,6 @@ run_brew() {
       'libcuefile'
       'libreplaygain'
       'hwloc'
-      'sdl12-compat'
       'ghostscript'
       'libheif'
       'liblqr'
@@ -1097,7 +1084,7 @@ run_brew() {
     #  | awk 'NF == 1 {print $1, $1} NF > 1 {for (i=1;i<=NF;i++) print $1, $i}' \
     #  | tsort | tac | while read li; do echo "      '$li'"; done
 
-    __cask_list=($(brew list --cask | sed 's/:.*//'))
+    __cask_list=($(brew list --casks | sed 's/:.*//'))
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
       '1password-cli'
