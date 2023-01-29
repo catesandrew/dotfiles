@@ -658,6 +658,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>diff</string>
+				<string>patch</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>emacs-diff.icns</string>
@@ -962,6 +963,23 @@
 			<string>emacs-plist.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>PList document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+				<string>utxt</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>tf</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>emacs-terraform.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Terraform file</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>TEXT</string>

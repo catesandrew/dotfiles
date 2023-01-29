@@ -59,5 +59,7 @@
   "Configuration file": "CONFIG",
   "Bower document": "BOWERRC",
   "PList document": "PLIST",
-  "Git configuration file": "GITATTRIBUTES"
+  "Git configuration file": "GITATTRIBUTES",
+  "Terraform file": "TERRAFORM",
+  "Patch file": "PATCH"
 }

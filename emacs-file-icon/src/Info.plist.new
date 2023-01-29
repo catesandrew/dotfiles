@@ -28,6 +28,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>html</string>
+				<string>html5</string>
 				<string>htm</string>
 				<string>shtm</string>
 				<string>shtml</string>
@@ -233,6 +234,8 @@
 				<string>rprofile</string>
 				<string>sh</string>
 				<string>csh</string>
+				<string>ksh</string>
+				<string>fish</string>
 				<string>zlogin</string>
 				<string>zlogout</string>
 				<string>zprofile</string>
@@ -491,6 +494,9 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>json</string>
+				<string>jsonc</string>
+				<string>json5</string>
+				<string>jsonnet</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>json-document.icns</string>
@@ -962,6 +968,41 @@
 			<string>plist-document.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>PList document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+				<string>utxt</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>tf</string>
+				<string>tfvar</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>terraform-file.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Terraform file</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+				<string>utxt</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>patch</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>patch-file.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Patch file</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>TEXT</string>

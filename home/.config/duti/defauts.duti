@@ -43,17 +43,17 @@
 ## io.mpv        public.movie               viewer
 
 # Binary
-# com.ridiculousfish.HexFiend obj editor
-# com.ridiculousfish.HexFiend bin editor
-# com.ridiculousfish.HexFiend aria2 editor
-# com.ridiculousfish.HexFiend dat editor
-# com.ridiculousfish.HexFiend obj editor
-# com.ridiculousfish.HexFiend o editor
-# com.ridiculousfish.HexFiend rsrc editor
-# com.ridiculousfish.HexFiend pyc editor
-# com.ridiculousfish.HexFiend blob editor
-# com.ridiculousfish.HexFiend exe editor
-# com.ridiculousfish.HexFiend hex editor
+com.ridiculousfish.HexFiend obj editor
+com.ridiculousfish.HexFiend bin editor
+com.ridiculousfish.HexFiend aria2 editor
+com.ridiculousfish.HexFiend dat editor
+com.ridiculousfish.HexFiend obj editor
+com.ridiculousfish.HexFiend o editor
+com.ridiculousfish.HexFiend rsrc editor
+com.ridiculousfish.HexFiend pyc editor
+com.ridiculousfish.HexFiend blob editor
+com.ridiculousfish.HexFiend exe editor
+com.ridiculousfish.HexFiend hex editor
 
 # net.sourceforge.sqlitebrowser db editor
 # net.sourceforge.sqlitebrowser sqlite editor
@@ -93,12 +93,12 @@ org.acates.EmacsClient public.data    editor
 # executables
 org.acates.EmacsClient public.unix-executable    editor
 
-# awk '/CFBundleTypeExtensions/{t=1} /<\/array>/{t=0} t&&/<string>/{gsub(/\t*<\/?string>/,"");print}' ~/emacs-file-icon/src/Info.plist.new | xargs -L 1 -I "{}" echo 'org.acates.EmacsClient {} editor'
+# awk '/CFBundleTypeExtensions/{t=1} /<\/array>/{t=0} t&&/<string>/{gsub(/\t*<\/?string>/,"");print}' Info.plist.new | xargs -L 1 -I "{}" echo 'org.acates.EmacsClient {} editor'
 
 org.acates.EmacsClient text editor
 org.acates.EmacsClient txt editor
-org.acates.EmacsClient public.plain-text    editor
 org.acates.EmacsClient html editor
+org.acates.EmacsClient html5 editor
 org.acates.EmacsClient htm editor
 org.acates.EmacsClient shtm editor
 org.acates.EmacsClient shtml editor
@@ -157,6 +157,8 @@ org.acates.EmacsClient rhistory editor
 org.acates.EmacsClient rprofile editor
 org.acates.EmacsClient sh editor
 org.acates.EmacsClient csh editor
+org.acates.EmacsClient ksh editor
+org.acates.EmacsClient fish editor
 org.acates.EmacsClient zlogin editor
 org.acates.EmacsClient zlogout editor
 org.acates.EmacsClient zprofile editor
@@ -206,6 +208,9 @@ org.acates.EmacsClient latex editor
 org.acates.EmacsClient texi editor
 org.acates.EmacsClient org editor
 org.acates.EmacsClient json editor
+org.acates.EmacsClient jsonc editor
+org.acates.EmacsClient json5 editor
+org.acates.EmacsClient jsonnet editor
 org.acates.EmacsClient swift editor
 org.acates.EmacsClient toml editor
 org.acates.EmacsClient svg editor
@@ -245,6 +250,10 @@ org.acates.EmacsClient gitattributes editor
 org.acates.EmacsClient gitconfig editor
 org.acates.EmacsClient gitignore editor
 org.acates.EmacsClient plist editor
+org.acates.EmacsClient tf editor
+org.acates.EmacsClient tfvar editor
+org.acates.EmacsClient patch editor
+org.acates.EmacsClient * editor
 
 # # Plaintex
 # com.sublimetext.4 txt    editor
@@ -299,7 +308,7 @@ org.acates.EmacsClient plist editor
 # com.sublimetext.4 editorconfig    editor
 # com.sublimetext.4 lock    editor
 # com.sublimetext.4 duti    editor
-# com.vladbadea.plisteditor plist    editor
+com.vladbadea.plisteditor plist    editor
 #
 # ## GIT
 # com.sublimetext.4 git    editor
@@ -787,78 +796,6 @@ com.apple.ScriptEditor2 scpt    editor
 # ova Open Virtual Appliance VM containers
 # com.aone.keka ova    editor
 
-# Parts
-# org.videolan.vlc .part    editor
-
-# com.aone.keka part0    editor
-# com.aone.keka part1    editor
-# com.aone.keka part2    editor
-# com.aone.keka part3    editor
-# com.aone.keka part4    editor
-# com.aone.keka part5    editor
-# com.aone.keka part6    editor
-# com.aone.keka part7    editor
-# com.aone.keka part8    editor
-# com.aone.keka part9    editor
-#
-# com.aone.keka part00    editor
-# com.aone.keka part01    editor
-# com.aone.keka part02    editor
-# com.aone.keka part03    editor
-# com.aone.keka part04    editor
-# com.aone.keka part05    editor
-# com.aone.keka part06    editor
-# com.aone.keka part07    editor
-# com.aone.keka part08    editor
-# com.aone.keka part09    editor
-# com.aone.keka part10    editor
-#
-# com.aone.keka part000    editor
-# com.aone.keka part001    editor
-# com.aone.keka part002    editor
-# com.aone.keka part003    editor
-# com.aone.keka part004    editor
-# com.aone.keka part005    editor
-# com.aone.keka part006    editor
-# com.aone.keka part007    editor
-# com.aone.keka part008    editor
-# com.aone.keka part009    editor
-# com.aone.keka part010    editor
-
-# also changes icons of folders with those endings... didn't find a way to fix yet
-# com.aone.keka 0    editor
-# com.aone.keka 1    editor
-# com.aone.keka 2    editor
-# com.aone.keka 3    editor
-# com.aone.keka 4    editor
-# com.aone.keka 5    editor
-# com.aone.keka 6    editor
-# com.aone.keka 7    editor
-# com.aone.keka 8    editor
-# com.aone.keka 9    editor
-
-# com.aone.keka 00    editor
-# com.aone.keka 01    editor
-# com.aone.keka 02    editor
-# com.aone.keka 03    editor
-# com.aone.keka 04    editor
-# com.aone.keka 05    editor
-# com.aone.keka 06    editor
-# com.aone.keka 07    editor
-# com.aone.keka 08    editor
-# com.aone.keka 09    editor
-
-# com.aone.keka 000    editor
-# com.aone.keka 001    editor
-# com.aone.keka 002    editor
-# com.aone.keka 003    editor
-# com.aone.keka 004    editor
-# com.aone.keka 005    editor
-# com.aone.keka 006    editor
-# com.aone.keka 007    editor
-# com.aone.keka 008    editor
-# com.aone.keka 009    editor
-
 # MEDIA
 ## Video
 # com.colliderli.iina public.movie    editor
@@ -916,21 +853,21 @@ com.apple.ScriptEditor2 scpt    editor
 # com.seriflabs.affinitydesigner ai    editor
 
 ## Pictures
-# com.apple.Preview bmp    editor
-# com.apple.Preview gif    editor
-# com.apple.Preview ico    editor
-# com.apple.Preview png    editor
-#
-# com.apple.Preview jpg    editor
-# com.apple.Preview jpeg    editor
-# com.apple.Preview jpg2000    editor
-# com.apple.Preview jpeg2000    editor
-#
-# com.apple.Preview icns    editor
-#
-# com.apple.Preview tif    editor
-# com.apple.Preview tiff   editor
-#
+com.apple.Preview bmp    editor
+com.apple.Preview gif    editor
+com.apple.Preview ico    editor
+com.apple.Preview png    editor
+
+com.apple.Preview jpg    editor
+com.apple.Preview jpeg    editor
+com.apple.Preview jpg2000    editor
+com.apple.Preview jpeg2000    editor
+
+com.apple.Preview icns    editor
+
+com.apple.Preview tif    editor
+com.apple.Preview tiff   editor
+
 # com.seriflabs.affinityphoto webp    editor
 #
 # com.seriflabs.affinityphoto psd    editor
