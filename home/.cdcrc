@@ -4,6 +4,9 @@ if [[ $USER == 'az6806' ]]; then
         /usr/local/work/common-components/packages
         /usr/local/work/redux
         /usr/local/work/react-native
+        /usr/local/work/att-client-app/apps
+        /usr/local/work/att-client-app/packages
+        /usr/local/work/att-client-app/rn
     )
 else
     CDC_DIRS=(
