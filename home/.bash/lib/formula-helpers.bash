@@ -117,20 +117,37 @@ __formula_python() {
   pyenv rehash
 
   latest_versioned_formulae="$(brew info --json python@3 | jq -r '(.[] | .versioned_formulae | first )')"
-  # python@3.11
-  installed_semver="$(brew info --json "$latest_versioned_formulae" | jq -r '(.[] | .versions.stable )')"
+  # python@3.10
+  latest_stable_semver="$(brew info --json python@3 | jq -r '(.[] | .versions.stable)')"
   # 3.11.1
+  installed_semver="$(brew info --json "$latest_versioned_formulae" | jq -r '(.[] | .versions.stable )')"
+  # 3.10.10
+
+  __semver_comp $latest_stable_semver $installed_semver # '3.11.2' vs '3.10.10'
+  case $? in
+    0)
+    # they are the same
+    ;;
+    1)
+      # 'latest_stable_semver' is greater semver, e.g., $1 > $2
+      installed_semver=$latest_stable_semver # now `3.11.2`
+      ;;
+    2)
+      # 'installed_semver' is greater semver, e.g., $1 < $2
+      ;;
+  esac
+
   installed_version="$(cut -d '.' -f 1,2 <<< "${installed_semver}")"
   # 3.11
 
   latest="$(brew search python@3 | \grep -E '^python(@.*)?$' | sort -r --version-sort | head -n1)"
   # python@3.11
   latest_semver="$(brew info --json "${latest}" | jq -r '(.[] | .versions.stable )')"
-  # 3.11.1
+  # 3.11.2
 
   # Now, which formula is latest? `python` or `python@3.y.z`?
   python_semver="$(brew info --json python | jq -r '(.[] | .versions.stable )')"
-  # 3.10.9
+  # 3.11.2
 
   __semver_comp $python_semver $latest_semver
   case $? in
