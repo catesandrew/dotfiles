@@ -894,6 +894,26 @@ run_brew() {
         e_install "$item"
 
         case "$item" in
+          # plantuml)
+          #   # You have to download those files from
+          #   # [Batik](http://xmlgraphics.apache.org/batik) and
+          #   # [FOP](http://xmlgraphics.apache.org/fop) web site.For testing
+          #   # purposes only, those files have been put together in a zip
+          #   # [here](http://beta.plantuml.net/batikAndFop.zip).Those files have
+          #   # to be in the very same folder as `plantuml.jar` (this is
+          #   # important).Now, you can use the `-tpdf` flag in the command line:
+          #   # java -jar plantuml.jar -tpdf diagram.txt
+          #   HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies "plantuml"
+          #   # TODO download batkiAndFop.zip and unzip to location of plantuml
+          #   # curl -LO http://dl.dropbox.com/u/13064071/batikAndFop.zip && \
+          #   #   7z x batikAndFop.zip && \
+          #   #   curl -L http://sourceforge.net/projects/plantuml/files/plantuml.jar/download -o plantuml.jar && \
+          #   #   echo -e "@startuml\nAlice -> Bob: Test\n@enduml" > diagram.txt && \
+          #   #   java -jar plantuml.jar -pdf diagram.txt
+          #   #
+          #   # sudo apt install unzip cd ~/.vscode-server/extensions/jebbs.plantuml-2.17.2 wget http://beta.plantuml.net/batikAndFop.zip unzip batikAndFop.zip
+          #   # plantuml_location="$(brew --cellar plantuml)/$(brew list --versions plantuml | tr ' ' '\n' | tail -1)/libexec/"
+          #   ;;
           perl)
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install cpan --ignore-dependencies
             PERL_MM_OPT="INSTALL_BASE=$HOME/perl5" cpan install local::lib
