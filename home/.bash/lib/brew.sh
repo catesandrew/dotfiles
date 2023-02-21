@@ -993,7 +993,37 @@ run_brew() {
               --build-from-source \
               "${item}"
             ;;
+          emacs-plus@30)
+            # clone the repo first
+            git \
+              clone \
+              --branch master \
+              -c advice.detachedHead=false \
+              https://github.com/emacs-mirror/emacs.git \
+              "${HOME}/Library/Caches/Homebrew/emacs-plus@30--git"
+
+            # emacs-plus issues with daemon mode, better color emoji support
+            HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              brew install \
+              --ignore-dependencies \
+              emacs-plus@30 \
+              --with-native-comp \
+              --with-xwidgets \
+              --with-imagemagick \
+              --with-mailutils \
+              --with-poll \
+              --with-no-frame-refocus \
+              --with-spacemacs-icon
+
           emacs-plus@29)
+            # clone the repo first
+            git \
+              clone \
+              --branch master \
+              -c advice.detachedHead=false \
+              https://github.com/emacs-mirror/emacs.git \
+              "${HOME}/Library/Caches/Homebrew/emacs-plus@29--git"
+
             # emacs-plus issues with daemon mode, better color emoji support
             HOMEBREW_NO_INSTALL_CLEANUP=1 \
               LIBRARY_PATH="$(brew --prefix)/lib" \
