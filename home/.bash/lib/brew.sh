@@ -984,16 +984,8 @@ run_brew() {
           emacs)
             # brew install emacs --HEAD --with-cocoa --with-imagemagick@6 --with-librsvg --with-modules;
             ;;
-          gcc|libgccjit)
-            # for emacs-plus native-comp support
-            HOMEBREW_NO_INSTALL_CLEANUP=1 \
-              HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
-              brew install \
-              --ignore-dependencies \
-              --build-from-source \
-              "${item}"
-            ;;
           emacs-plus@30)
+            # direnv may interfere with installation of this formulae
             # clone the repo first
             git \
               clone \
@@ -1003,7 +995,10 @@ run_brew() {
               "${HOME}/Library/Caches/Homebrew/emacs-plus@30--git"
 
             # emacs-plus issues with daemon mode, better color emoji support
+            # CPATH and LIBRARY_PATH are necessary for libgccjit library discovery
             HOMEBREW_NO_INSTALL_CLEANUP=1 \
+              CPATH="${HOMEBREW_PREFIX}/include" \
+              LIBRARY_PATH="${HOMEBREW_PREFIX}/lib/gcc/current" \
               brew install \
               --ignore-dependencies \
               emacs-plus@30 \
@@ -1016,6 +1011,7 @@ run_brew() {
               --with-spacemacs-icon
 
           emacs-plus@29)
+            # direnv may interfere with installation of this formulae
             # clone the repo first
             git \
               clone \
@@ -1025,8 +1021,10 @@ run_brew() {
               "${HOME}/Library/Caches/Homebrew/emacs-plus@29--git"
 
             # emacs-plus issues with daemon mode, better color emoji support
+            # CPATH and LIBRARY_PATH are necessary for libgccjit library discovery
             HOMEBREW_NO_INSTALL_CLEANUP=1 \
-              LIBRARY_PATH="$(brew --prefix)/lib" \
+              CPATH="${HOMEBREW_PREFIX}/include" \
+              LIBRARY_PATH="${HOMEBREW_PREFIX}/lib/gcc/current" \
               brew install \
               --ignore-dependencies \
               emacs-plus@29 \
@@ -1699,3 +1697,4 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 run_brew
 run_mas
+
