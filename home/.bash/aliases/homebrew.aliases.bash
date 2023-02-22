@@ -101,7 +101,7 @@ bup() {
           source "${BASH_IT}/lib/formula-helpers.bash"
           __formula_ruby
           ;;
-        python*)
+        python@*)
           source "${BASH_IT}/lib/formula-helpers.bash"
           __formula_python
           ;;
