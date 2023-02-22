@@ -1010,6 +1010,9 @@ run_brew() {
               --with-no-frame-refocus \
               --with-spacemacs-icon
 
+            find ~/.emacs.d/core -name "*.elc" -exec rm {} \;
+            rm -rf ~/.emacs.d/.cache/quelpa
+            ;;
           emacs-plus@29)
             # direnv may interfere with installation of this formulae
             # clone the repo first
@@ -1035,6 +1038,9 @@ run_brew() {
               --with-poll \
               --with-no-frame-refocus \
               --with-spacemacs-icon
+
+            find ~/.emacs.d/core -name "*.elc" -exec rm {} \;
+            rm -rf ~/.emacs.d/.cache/quelpa
             ;;
           wget)
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install wget --HEAD
