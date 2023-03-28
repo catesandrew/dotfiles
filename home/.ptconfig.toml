@@ -5,4 +5,56 @@ hidden = true
 smart-case = true
 
 # Ignore files/directories matching pattern
-ignore = ["bower_components", "node_modules", "build", "elpa", ".cache", ".git", "/[.-]min[.](css|js)$/" ]
+ignore = [".yarn", "bower_components", "node_modules", "build", "elpa", ".cache", ".git", "/[.-]min[.](css|js)$/" ]
+
+
+# parse pattern as regular expression
+# syntax: https://github.com/google/re2/wiki/Syntax
+e = true
+
+# match case insensitively unless pattern contains uppercase characters
+smart-case = true
+
+# search hidden files and directories
+hidden = true
+
+# print color codes in results
+color = true
+
+# don't use VCS ignore file for ignore patterns
+skip-vcs-ignores = true
+
+# ignore files/directories matching pattern
+ignore = ["*~",    # Emacs backup files
+          ".DS_Store",
+          ".cache",
+          ".cask",
+          ".ccache",
+          ".circleci",
+          ".coverage",
+          ".git",
+          ".gitattributes",
+          ".gitignore",
+          ".gitmodules",
+          ".gradle",
+          ".idea",
+          ".log",
+          ".nyc_output",
+          ".sx",
+          ".vagrant",
+          ".vscode",
+          ".yarn", # yarn cache
+          "/[.-]min[.](css|js)$/",
+          "Makefile.in", # automake
+          "Podfile.lock",
+          "Pods" , # cocoapods
+          "[#]*#", # Emacs autosave files
+          "auto",
+          "bower_components",
+          "build",
+          "coverage",
+          "elpa",
+          "lib-cov",
+          "node_modules",
+          "yarn-error.log",
+          "yarn.lock"]
