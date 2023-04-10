@@ -1,13 +1,3 @@
-# Search hidden files and directories
-hidden = true
-
-# Use as many concurrent finders as possible, this will lead the result disorder
-smart-case = true
-
-# Ignore files/directories matching pattern
-ignore = [".yarn", "bower_components", "node_modules", "build", "elpa", ".cache", ".git", "/[.-]min[.](css|js)$/" ]
-
-
 # parse pattern as regular expression
 # syntax: https://github.com/google/re2/wiki/Syntax
 e = true
@@ -52,6 +42,7 @@ ignore = ["*~",    # Emacs backup files
           "auto",
           "bower_components",
           "build",
+          "/app/build",
           "coverage",
           "elpa",
           "lib-cov",

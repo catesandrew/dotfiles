@@ -11,13 +11,14 @@ if [[ $USER == 'az6806' ]]; then
 else
     CDC_DIRS=(
         /usr/local/work/uie
-        /usr/local/work/uie/doppio/packages
         /usr/local/work/uie/happy-objects/packages
         /usr/local/work/uie/happy-objects-native/packages
         /usr/local/work/uie/koa/packages
         /usr/local/work/uie/session/packages
         /usr/local/work/uie/uie-common/packages
         /usr/local/work/uie/uie-tools/packages
+        /usr/local/work/uie/uie-mocks/packages
+        /usr/local/work/uie/uie-babel/packages
         /usr/local/work/uie/landing-pages-components/packages
         /usr/local/work/uie/apply-components/packages
         /usr/local/work/uie/member-components/packages
