@@ -116,6 +116,12 @@ case "${__dot_system_type}" in
       export HOMEBREW_NO_ANALYTICS=true
     fi
 
+    if cask_contains_element "docker"; then
+      if [[ -d "${HOME}/.docker/bin" ]]; then
+        path_munge "${HOME}/.docker/bin" "after"
+      fi
+    fi
+
     if brew_contains_element "bash-completion"; then
         BASH_COMP_TARGET="$BREW_HOME/etc/bash_completion"
         if [ "${BASH_VERSINFO[0]}" -le 3 ] && [ -f "${BASH_COMP_TARGET}" ]; then
