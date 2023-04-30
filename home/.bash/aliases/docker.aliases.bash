@@ -296,6 +296,15 @@ dent() {
 }
 __docker_complete dent __docker_complete_containers_running
 
+dentsh() {
+  if [ $# -eq 0 ]; then
+    local _name=$(basename "$PWD")
+    __docker_c exec --interactive --tty "$_name" /bin/sh
+  else
+    __docker_c exec --interactive --tty "$1" /bin/sh
+  fi
+}
+__docker_complete dentsh __docker_complete_containers_running
 
 # Export a container's filesystem as a tar archive
 dexp() {
