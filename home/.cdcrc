@@ -24,6 +24,7 @@ else
         /usr/local/work/uie/member-components/packages
         /usr/local/work/uie/common-components/packages
         /usr/local/work/api
+        /usr/local/work/lmp
         /usr/local/work/devops
         /usr/local/work/playground
         /usr/local/work/playground/react-native
