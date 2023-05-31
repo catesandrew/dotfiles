@@ -8,3 +8,4 @@ cheat recurse
 direnv recurse
 textlint recurse
 duti recurse
+yamllint recurse
