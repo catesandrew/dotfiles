@@ -46,7 +46,7 @@ __brew_complete b _brew
 bup() {
   local outdated_list cask_outdated_list
 
-  outdated_list=$(brew outdated | perl -pe 's/, /|/g; tr/()//d' | perl -ane 'printf "%s %s %s\n", $F[0], $F[1], $F[3]')
+  outdated_list=$(HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_AUTO_UPDATE=1 brew outdated | perl -pe 's/, /|/g; tr/()//d' | perl -ane 'printf "%s %s %s\n", $F[0], $F[1], $F[3]')
 
   if [ -n "$outdated_list" ]; then
     echo "found: $outdated_list"
