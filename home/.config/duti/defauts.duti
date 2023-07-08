@@ -97,11 +97,12 @@ org.acates.EmacsClient public.unix-executable    editor
 
 org.acates.EmacsClient text editor
 org.acates.EmacsClient txt editor
-org.acates.EmacsClient html editor
+# Forbidden by macOS (need to be changed with aditional user interaction)
+# org.acates.EmacsClient html editor
+# org.acates.EmacsClient htm editor
 org.acates.EmacsClient html5 editor
-org.acates.EmacsClient htm editor
-org.acates.EmacsClient shtm editor
-org.acates.EmacsClient shtml editor
+# org.acates.EmacsClient shtm editor
+# org.acates.EmacsClient shtml editor
 org.acates.EmacsClient jsp editor
 org.acates.EmacsClient asp editor
 org.acates.EmacsClient markdown editor
@@ -346,7 +347,7 @@ com.vladbadea.plisteditor plist    editor
 # com.sublimetext.4 pgp    editor
 # com.sublimetext.4 sig    editor
 #
-# # SUBTITLES
+# SUBTITLES
 # com.sublimetext.4 srt    editor
 # com.sublimetext.4 vtt    editor
 # com.sublimetext.4 sub    editor
@@ -356,8 +357,8 @@ com.vladbadea.plisteditor plist    editor
 # com.sublimetext.4 ass    editor
 # com.sublimetext.4 vss    editor
 #
-# # LICENSES / readme
-# # eg.: read.me
+# LICENSES / readme
+# eg.: read.me
 # com.sublimetext.4 me    editor
 # com.sublimetext.4 readme    editor
 #
@@ -485,11 +486,11 @@ com.vladbadea.plisteditor plist    editor
 # # Project Files
 # com.sublimetext.4 pro    editor
 #
-# # Programming Languages
-# ## https://github.com/adobe/brackets/blob/master/src/language/languages.json
-# ## https://gist.github.com/aymen-mouelhi/82c93fbcd25f091f2c13faa5e0d61760
+# Programming Languages
+## https://github.com/adobe/brackets/blob/master/src/language/languages.json
+## https://gist.github.com/aymen-mouelhi/82c93fbcd25f091f2c13faa5e0d61760
 #
-# ## JAVA / Android
+## JAVA / Android
 # com.sublimetext.4 java    editor
 # com.sublimetext.4 class    editor
 # com.sublimetext.4 vm    editor
@@ -896,6 +897,9 @@ com.apple.Preview tiff   editor
 # # VeraCrypt/TrueCrypt containers
 # org.idrix.VeraCrypt tc    editor
 # org.idrix.VeraCrypt vc    editor
-#
-# # URL Schemes
+
+# URL Schemes
 # net.langui.ContextMenuHelper   contextmenuhelper://    all
+# duti -s org.dandavison.OpenInEditor file-line
+org.dandavison.OpenInEditor file-line:// all
+org.dandavison.OpenInEditor file-line-column:// all

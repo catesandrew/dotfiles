@@ -31,6 +31,19 @@ installed () {
   echo -e " ✓ $1 already installed."
 }
 
+brew_uninstall () {
+  HOMEBREW_NO_AUTO_UPDATE=1 \
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    brew uninstall --ignore-dependencies "$@"
+}
+
+brew_install () {
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+    HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    HOMEBREW_NO_AUTO_UPDATE=1 \
+    brew install --ignore-dependencies "$@"
+}
+
 contains_element () {
   local f="$1"
   local e match="$1"
@@ -53,7 +66,7 @@ run_brew() {
   if type_exists 'brew'; then
     e_header "Updating Homebrew..."
     # Use the latest version of Homebrew
-    brew update
+    # brew update
     [[ $? ]] && e_success "Done"
 
     e_header "Updating any existing Homebrew taps..."
@@ -70,13 +83,13 @@ run_brew() {
       'catesandrew/tap'
       'clojure/tools'
       'cloudfoundry/tap'
+      'cyclonedx/cyclonedx'
       'd12frosted/emacs-plus'
       'dart-lang/dart'
       'discoteq/discoteq'
       'facebook/fb'
       'heroku/brew'
       'homebrew/cask'
-      'homebrew/cask-drivers'
       'homebrew/cask-fonts'
       'homebrew/cask-versions'
       'homebrew/core'
@@ -134,10 +147,6 @@ run_brew() {
       [[ $? ]] && e_success "Done"
     fi
 
-    e_header "Updating any existing Homebrew formulae..."
-    # Upgrade any already-installed formulae
-    brew upgrade
-    [[ $? ]] && e_success "Done"
 
     e_header "Checking status of desired Homebrew formulae..."
     local __brew_list=($(brew list --formula | sed 's/:.*//'))
@@ -394,7 +403,6 @@ run_brew() {
       'heroku/brew/heroku-node'
       'gtk+'
       'gtk+3'
-      'gst-plugins-base'
       'libshout'
       'libsoup'
       'taglib'
@@ -700,10 +708,6 @@ run_brew() {
       'handbrake'
       'gzip'
       'gtk-mac-integration'
-      'gst-plugins-ugly'
-      'gst-plugins-good'
-      'gst-plugins-bad'
-      'gst-libav'
       'grpc'
       'groovy'
       'grep'
@@ -758,7 +762,7 @@ run_brew() {
       'exact-image'
       'enscript'
       'enca'
-      'emacs-plus@29'
+      'emacs-plus@30'
       'tre'
       'felinks'
       'editorconfig'
@@ -794,7 +798,6 @@ run_brew() {
       'consul'
       'colordiff'
       'codequery'
-      'cocoapods'
       'cmake'
       'closure-compiler'
       'cloog'
@@ -856,6 +859,34 @@ run_brew() {
       'glow'
       'up'
       'yq'
+      'aribb24'
+      'binaryen'
+      'bindgen'
+      'ccls'
+      'cyclonedx-cli'
+      'docker-completion'
+      'highway'
+      'libice'
+      'liblinear'
+      'libsm'
+      'libunibreak'
+      'libxmu'
+      'libxt'
+      'prs'
+      'rapidjson'
+      'rustfmt'
+      'sdl2'
+      'sdl12-compat'
+      'util-macros'
+      'z3'
+      'bundletool'
+      'gtk4'
+      'json-glib'
+      'libzen'
+      'libmediainfo'
+      'qt@5'
+      'shadowenv'
+      'svt-av1'
     )
 
     for index in ${!desired_formulae[*]}; do
@@ -959,15 +990,15 @@ run_brew() {
             pyenv uninstall 3.9.X
             pyenv rehash
             brew install --ignore-dependencies python@3
-            pyenv global 3.10 system
+            pyenv global 3.11 system
 
-            ln -sfv "$(realpath $(brew --prefix python@3.10))" $PYENV_ROOT/versions/3.10
-            ln -sfv $(realpath $(brew --prefix python@3.10))/Frameworks/Python.framework/Versions/3.10/include/python3.10 $(realpath $(brew --prefix python@3.10))/include
+            ln -sfv "$(realpath $(brew --prefix python@3.10))" $PYENV_ROOT/versions/3.11
+            ln -sfv $(realpath $(brew --prefix python@3.10))/Frameworks/Python.framework/Versions/3.11/include/python3.11 $(realpath $(brew --prefix python@3.11))/include
 
-            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/idle3 $(realpath $(brew --prefix python@3.10))/bin/idle
-            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/pip3 $(realpath $(brew --prefix python@3.10))/bin/pip
-            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/python3 $(realpath $(brew --prefix python@3.10))/bin/python
-            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/wheel3 $(realpath $(brew --prefix python@3.10))/bin/wheel
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/idle3 $(realpath $(brew --prefix python@3.11))/bin/idle
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/pip3 $(realpath $(brew --prefix python@3.11))/bin/pip
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/python3 $(realpath $(brew --prefix python@3.11))/bin/python
+            ln -sfv $(realpath $(brew --prefix python@3.10))/bin/wheel3 $(realpath $(brew --prefix python@3.11))/bin/wheel
             pyenv rehash
 
             ls -al $PYENV_ROOT/versions
@@ -1119,6 +1150,17 @@ run_brew() {
             node_version=$(node --version | sed 's/[^0-9.]*//g')
             nvm alias default $node_version
             ;;
+          docker-completion)
+            brew_uninstall docker-completion
+            rm '/opt/homebrew/etc/bash_completion.d/docker'
+            brew_install docker-completion
+            brew link --overwrite docker-completion
+            ;;
+          docker-*)
+            brew_uninstall "${item}"
+            brew_install "${item}"
+            brew link --overwrite "${item}"
+            ;;
           *)
             HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --ignore-dependencies "${item}"
         esac
@@ -1142,8 +1184,6 @@ run_brew() {
     local -a cask_missing_formulae
     local -a cask_desired_formulae=(
       '1password-cli'
-      # 'adoptopenjdk11'
-      # 'adoptopenjdk8'
       'aerial'
       'altair-graphql-client'
       'android-commandlinetools'
@@ -1384,8 +1424,9 @@ run_brew() {
             # Beta (11.0) API 30
             sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
 
-            # API 31
+            # APIs
             sdkmanager --install "system-images;android-31;google_apis_playstore;arm64-v8a"
+            sdkmanager --install "system-images;android-33;google_apis_playstore;arm64-v8a"
 
             # to create android virtual device
             #
@@ -1402,6 +1443,7 @@ run_brew() {
             echo "no" | avdmanager create avd --force --name "pixel_11.0" --device "pixel" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_12.0" --device "pixel" --package "system-images;android-31;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "pixel_12.0" --device "pixel" --package "system-images;android-31;google_apis_playstore;arm64-v8a" --tag "google_apis_playstore" --abi "arm64-v8a"
+            echo "no" | avdmanager create avd --force --name "pixel_13.0" --device "pixel" --package "system-images;android-33;google_apis_playstore;arm64-v8a" --tag "google_apis_playstore" --abi "arm64-v8a"
 
             # to create generic virtual device
             #
@@ -1417,6 +1459,7 @@ run_brew() {
             echo "no" | avdmanager create avd --force --name "generic_10.0" --package "system-images;android-29;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "generic_11.0" --package "system-images;android-30;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
             echo "no" | avdmanager create avd --force --name "generic_12.0" --package "system-images;android-31;google_apis_playstore;x86_64" --tag "google_apis_playstore" --abi "x86_64"
+            echo "no" | avdmanager create avd --force --name "generic_13.0" --package "system-images;android-33;google_apis_playstore;arm64-v8a" --tag "google_apis_playstore" --abi "arm64-v8a"
 
             # add aliases
             #
@@ -1703,4 +1746,3 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 run_brew
 run_mas
-
