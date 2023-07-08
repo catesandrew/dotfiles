@@ -79,7 +79,6 @@ run_brew() {
     local -a missing_taps
     local -a desired_taps=(
       'borkdude/brew'
-      'bramstein/webfonttools'
       'catesandrew/tap'
       'clojure/tools'
       'cloudfoundry/tap'
@@ -94,13 +93,10 @@ run_brew() {
       'homebrew/cask-versions'
       'homebrew/core'
       'homebrew/services'
-      'johanhaleby/kubetail'
       'launchdarkly/tap'
       'lindell/multi-gitter'
-      'neovim/neovim'
       'saucelabs/saucectl'
       'tavianator/tap'
-      'thoughtbot/formulae'
       'universal-ctags/universal-ctags'
       'zegervdv/zathura'
     )
@@ -511,8 +507,6 @@ run_brew() {
       'slackcat'
       'sl'
       'shellcheck'
-      'sfnt2woff-zopfli'
-      'sfnt2woff'
       'serf'
       'selenium-server'
       'selecta'
@@ -668,7 +662,6 @@ run_brew() {
       'latex2html'
       'lastpass-cli'
       'languagetool'
-      'kubetail'
       'kops'
       'knock'
       'keychain'
