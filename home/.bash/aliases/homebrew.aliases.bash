@@ -46,7 +46,6 @@ __brew_complete b _brew
 bup() {
   local outdated_list cask_outdated_list
 
-  brew update
   outdated_list=$(brew outdated | perl -pe 's/, /|/g; tr/()//d' | perl -ane 'printf "%s %s %s\n", $F[0], $F[1], $F[3]')
 
   if [ -n "$outdated_list" ]; then
@@ -104,6 +103,17 @@ bup() {
         python@*)
           source "${BASH_IT}/lib/formula-helpers.bash"
           __formula_python
+          ;;
+        docker-completion)
+          __brew_uninstall docker-completion
+          rm '/opt/homebrew/etc/bash_completion.d/docker'
+          __brew_install docker-completion
+          brew link --overwrite docker-completion
+          ;;
+        docker-*)
+          __brew_uninstall "${item}"
+          __brew_install "${item}"
+          brew link --overwrite "${item}"
           ;;
         *)
           __brew_uninstall "${item}"
