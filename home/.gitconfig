@@ -11,9 +11,30 @@
   # Prevent showing files whose names contain non-ASCII symbols as unversioned.
   # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
   precomposeunicode = false
-[git-p4]
-  user = andrew
-  useclientspec = true
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only --features=interactive
+
+[include]
+  path = ~/.config/delta/themes.gitconfig
+
+[delta]
+  navigate = true    # use n and N to move between diff sections
+  light = false      # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
+  true-color = always
+  hyperlinks = true
+  hyperlinks-file-link-format = "file-line://{path}:{line}"
+  # hyperlinks-file-link-format = "vscode://file/{path}:{line}"
+  # or: hyperlinks-file-link-format = "idea://open?file={path}&line={line}"
+  # or: hyperlinks-file-link-format = "pycharm://open?file={path}&line={line}"
+  side-by-side = true
+  line-numbers = false
+  features = chameleon zebra-dark
+
+[delta "interactive"]
+  keep-plus-minus-markers = false
+
 [alias]
   # ignored = !git ls-files -v | grep "^[[:lower:]]"
   hide = update-index --assume-unchanged
